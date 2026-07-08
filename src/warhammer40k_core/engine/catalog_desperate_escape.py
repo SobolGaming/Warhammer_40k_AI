@@ -12,8 +12,8 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
-    geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_geometry import alive_geometry_models_for_placement
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
@@ -212,19 +212,13 @@ def _target_within_source_engagement(
     )
     source_placement = state.battlefield_state.unit_placement_by_id(source_unit.unit_instance_id)
     target_placement = state.battlefield_state.unit_placement_by_id(target_unit_instance_id)
-    source_models = tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(model_placement),
-            placement=model_placement,
-        )
-        for model_placement in source_placement.model_placements
+    source_models = alive_geometry_models_for_placement(
+        scenario=scenario,
+        unit_placement=source_placement,
     )
-    target_models = tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(model_placement),
-            placement=model_placement,
-        )
-        for model_placement in target_placement.model_placements
+    target_models = alive_geometry_models_for_placement(
+        scenario=scenario,
+        unit_placement=target_placement,
     )
     return any(
         source_model.is_within_engagement_range(

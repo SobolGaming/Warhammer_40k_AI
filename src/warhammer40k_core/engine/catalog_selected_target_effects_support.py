@@ -16,8 +16,8 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     UnitPlacement,
-    geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_geometry import alive_geometry_models_for_placement
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_unit_scoped_generic_records,
 )
@@ -219,20 +219,11 @@ def geometry_models_for_placement(
     unit_placement: UnitPlacement,
     source_model_instance_id: str | None,
 ) -> tuple[Model, ...]:
-    models: list[Model] = []
-    for placement in unit_placement.model_placements:
-        if (
-            source_model_instance_id is not None
-            and placement.model_instance_id != source_model_instance_id
-        ):
-            continue
-        models.append(
-            geometry_model_for_placement(
-                model=scenario.model_instance_for_placement(placement),
-                placement=placement,
-            )
-        )
-    return tuple(models)
+    return alive_geometry_models_for_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        model_instance_id=source_model_instance_id,
+    )
 
 
 def effect_target_unit_ids(

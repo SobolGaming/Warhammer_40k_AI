@@ -228,6 +228,72 @@ def test_catalog_desperate_escape_consumer_filters_keywords_distance_and_shape_d
         )
 
 
+def test_catalog_desperate_escape_consumer_ignores_dead_engagement_placements() -> None:
+    target_army, source_army = _mustered_core_armies()
+    target_unit = target_army.units[0]
+    source_unit = source_army.units[0]
+
+    dead_source_unit = _unit_with_dead_model(source_unit, index=0)
+    dead_source_army = _army_with_unit(source_army, dead_source_unit)
+    dead_source_record = _desperate_escape_record(source_unit=dead_source_unit)
+    dead_source_state = _state_with_battlefield(
+        armies=(target_army, dead_source_army),
+        battlefield=_battlefield_for_units_with_model_xs(
+            source_army=dead_source_army,
+            source_unit=dead_source_unit,
+            source_model_xs=(10.4, 40.0, 42.0, 44.0, 46.0),
+            target_army=target_army,
+            target_unit=target_unit,
+            target_model_xs=(10.0, 50.0, 52.0, 54.0, 56.0),
+        ),
+        active_player_id=target_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+
+    assert (
+        catalog_forced_desperate_escape_sources_for_unit(
+            state=dead_source_state,
+            unit_instance_id=target_unit.unit_instance_id,
+            ability_indexes_by_player_id={
+                target_army.player_id: AbilityCatalogIndex.from_records(()),
+                dead_source_army.player_id: AbilityCatalogIndex.from_records((dead_source_record,)),
+            },
+            armies=(target_army, dead_source_army),
+        )
+        == ()
+    )
+
+    dead_target_unit = _unit_with_dead_model(target_unit, index=0)
+    dead_target_army = _army_with_unit(target_army, dead_target_unit)
+    source_record = _desperate_escape_record(source_unit=source_unit)
+    dead_target_state = _state_with_battlefield(
+        armies=(dead_target_army, source_army),
+        battlefield=_battlefield_for_units_with_model_xs(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_model_xs=(10.4, 40.0, 42.0, 44.0, 46.0),
+            target_army=dead_target_army,
+            target_unit=dead_target_unit,
+            target_model_xs=(10.0, 50.0, 52.0, 54.0, 56.0),
+        ),
+        active_player_id=dead_target_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+
+    assert (
+        catalog_forced_desperate_escape_sources_for_unit(
+            state=dead_target_state,
+            unit_instance_id=dead_target_unit.unit_instance_id,
+            ability_indexes_by_player_id={
+                dead_target_army.player_id: AbilityCatalogIndex.from_records(()),
+                source_army.player_id: AbilityCatalogIndex.from_records((source_record,)),
+            },
+            armies=(dead_target_army, source_army),
+        )
+        == ()
+    )
+
+
 def test_catalog_selected_target_support_classifies_selection_and_effect_clauses() -> None:
     fight_selection = _fight_start_selection_clause()
     post_shoot_selection = _post_shoot_hit_selection_clause()
@@ -798,6 +864,80 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
         )
 
 
+def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    distance_selection = replace(
+        _fight_start_selection_clause(),
+        conditions=(
+            _condition(
+                RuleConditionKind.DISTANCE_PREDICATE,
+                ("object_kind", "model"),
+                ("object_reference", "this"),
+                ("predicate", "within_engagement_range"),
+                ("range_kind", "engagement_range"),
+            ),
+        ),
+    )
+
+    dead_source_unit = _unit_with_dead_model(source_unit, index=0)
+    dead_source_army = _army_with_unit(source_army, dead_source_unit)
+    dead_source_state = _state_with_battlefield(
+        armies=(dead_source_army, target_army),
+        battlefield=_battlefield_for_units_with_model_xs(
+            source_army=dead_source_army,
+            source_unit=dead_source_unit,
+            source_model_xs=(10.0, 30.0, 32.0, 34.0, 36.0),
+            target_army=target_army,
+            target_unit=target_unit,
+            target_model_xs=(10.4, 40.0, 42.0, 44.0, 46.0),
+        ),
+        active_player_id=dead_source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+
+    assert (
+        eligible_selection_target_unit_ids(
+            state=dead_source_state,
+            source_player_id=dead_source_army.player_id,
+            source_unit_instance_id=dead_source_unit.unit_instance_id,
+            source_model_instance_id=None,
+            selection_clause=distance_selection,
+            explicit_target_unit_ids=None,
+        )
+        == ()
+    )
+
+    dead_target_unit = _unit_with_dead_model(target_unit, index=0)
+    dead_target_army = _army_with_unit(target_army, dead_target_unit)
+    dead_target_state = _state_with_battlefield(
+        armies=(source_army, dead_target_army),
+        battlefield=_battlefield_for_units_with_model_xs(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_model_xs=(10.0, 30.0, 32.0, 34.0, 36.0),
+            target_army=dead_target_army,
+            target_unit=dead_target_unit,
+            target_model_xs=(10.4, 40.0, 42.0, 44.0, 46.0),
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+
+    assert (
+        eligible_selection_target_unit_ids(
+            state=dead_target_state,
+            source_player_id=source_army.player_id,
+            source_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=None,
+            selection_clause=distance_selection,
+            explicit_target_unit_ids=None,
+        )
+        == ()
+    )
+
+
 def _desperate_escape_record(*, source_unit: UnitInstance) -> AbilityCatalogRecord:
     source_text = RuleSourceText.from_raw(
         source_id="test:chaos-daemons:desperate-escape",
@@ -1024,18 +1164,48 @@ def _battlefield_for_units(
     target_unit: UnitInstance,
     target_x: float,
 ) -> BattlefieldRuntimeState:
+    return _battlefield_for_units_with_model_xs(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_model_xs=_model_xs_for_unit(unit=source_unit, start_x=source_x),
+        target_army=target_army,
+        target_unit=target_unit,
+        target_model_xs=_model_xs_for_unit(unit=target_unit, start_x=target_x),
+    )
+
+
+def _battlefield_for_units_with_model_xs(
+    *,
+    source_army: ArmyDefinition,
+    source_unit: UnitInstance,
+    source_model_xs: tuple[float, ...],
+    target_army: ArmyDefinition,
+    target_unit: UnitInstance,
+    target_model_xs: tuple[float, ...],
+) -> BattlefieldRuntimeState:
     return BattlefieldRuntimeState(
         battlefield_id="catalog-runtime-consumers-battlefield",
         battlefield_width_inches=60.0,
         battlefield_depth_inches=44.0,
         placed_armies=(
-            _placed_army(army=source_army, unit=source_unit, x=source_x),
-            _placed_army(army=target_army, unit=target_unit, x=target_x),
+            _placed_army(army=source_army, unit=source_unit, model_xs=source_model_xs),
+            _placed_army(army=target_army, unit=target_unit, model_xs=target_model_xs),
         ),
     )
 
 
-def _placed_army(*, army: ArmyDefinition, unit: UnitInstance, x: float) -> PlacedArmy:
+def _model_xs_for_unit(*, unit: UnitInstance, start_x: float) -> tuple[float, ...]:
+    return tuple(start_x + (index * 2.0) for index, _model in enumerate(unit.own_models))
+
+
+def _placed_army(
+    *,
+    army: ArmyDefinition,
+    unit: UnitInstance,
+    model_xs: tuple[float, ...],
+) -> PlacedArmy:
+    if len(model_xs) != len(unit.own_models):
+        raise AssertionError("Test battlefield model positions must match unit models.")
     return PlacedArmy(
         army_id=army.army_id,
         player_id=army.player_id,
@@ -1050,7 +1220,7 @@ def _placed_army(*, army: ArmyDefinition, unit: UnitInstance, x: float) -> Place
                         player_id=army.player_id,
                         unit_instance_id=unit.unit_instance_id,
                         model_instance_id=model.model_instance_id,
-                        pose=Pose.at(x=x + (index * 2.0), y=10.0),
+                        pose=Pose.at(x=model_xs[index], y=10.0),
                     )
                     for index, model in enumerate(unit.own_models)
                 ),
@@ -1099,3 +1269,10 @@ def _state_without_battlefield(
 
 def _army_with_unit(army: ArmyDefinition, unit: UnitInstance) -> ArmyDefinition:
     return replace(army, units=(unit,))
+
+
+def _unit_with_dead_model(unit: UnitInstance, *, index: int) -> UnitInstance:
+    models = list(unit.own_models)
+    model = models[index]
+    models[index] = replace(model, wounds_remaining=0)
+    return replace(unit, own_models=tuple(models))
