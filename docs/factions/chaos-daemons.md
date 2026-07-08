@@ -8,7 +8,51 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 4 | 28 | 43 | 1 |
+| 9 | 4 | 28 | 43 | 7 |
+
+## Semantic Support Snapshot
+
+This generated snapshot answers the support question directly. Detachment-rule support uses the semantic support table below. Exact Enhancement and Stratagem support is stricter: a source row is fully supported here only when it carries runtime consumer IDs. Datasheet support is fully supported only for source-review rows whose IR coverage is `All consumed`.
+
+### Detachments
+
+| Fully supported | Still needs semantic support |
+| --- | --- |
+| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Shadow Legion | Legion of Excess<br>Lords of the Warp<br>Plague Legion<br>Scintillating Legion<br>Warptide |
+
+### Enhancements
+
+| Detachment | Fully supported / runtime consumers registered | Still source-only / needs semantic registration |
+| --- | --- | --- |
+| Blood Legion | None | Brazenmaw<br>Fury’s Cage<br>Gateway Unto Damnation<br>Slaughterthirst (Aura) |
+| Cavalcade of Chaos | None | Apocalyptic Steeds Upgrade<br>Soul Shattering Charge Upgrade |
+| Daemonic Incursion | None | A’rgath, the King of Blades<br>Geller Breach<br>Soulstealer<br>Spite Made Manifest<br>The Endless Gift<br>The Everstave |
+| Legion of Excess | None | Avatar of Perfection<br>Dreaming Crown (Aura)<br>False Majesty (Aura)<br>Soul Glutton |
+| Plague Legion | None | Cankerblight<br>Droning Shroud (Aura)<br>Font of Spores (Aura)<br>Maggot Maws |
+| Scintillating Legion | None | Improbable Shield (Aura)<br>Inescapable Eye<br>Infernal Puppeteer<br>Neverblade |
+| Shadow Legion | Fade to Darkness<br>Leaping Shadows<br>Malice Made Manifest<br>Mantle of Gloom (Aura) | None |
+
+### Stratagems
+
+| Detachment | Fully supported / runtime consumers registered | Still source-only / needs semantic registration |
+| --- | --- | --- |
+| Blood Legion | None | BLOOD BEGETS SKULLS<br>FOOLS’ FLIGHT<br>GORE‑HUNGRY ONSLAUGHT<br>SHEATHED IN BRASS<br>SKULLS BEGET BLOOD<br>WRATH UNDENIABLE |
+| Cavalcade of Chaos | None | From Beyond the Veil<br>Inescapable Manifestations<br>Warp-Riders |
+| Daemonic Incursion | None | CORRUPT REALSPACE<br>DAEMONIC INVULNERABILITY<br>DENIZENS OF THE WARP<br>DRAUGHT OF TERROR<br>INCORPOREAL TERRORS<br>INSUBSTANTIAL ENTITIES<br>PARTING BLOWS<br>THE REALM OF CHAOS<br>UNREAL SPEED<br>WARP SURGE |
+| Legion of Excess | None | ARCHAGONISTS<br>CAVALCADE OF BLADES<br>OVERWHELMING EXCESS<br>PHANTASMAL LONGING<br>SENSORY EXCRUCIATION<br>THIEVES OF PAIN |
+| Plague Legion | None | FEVER VISIONS<br>FOETID RESURGENCE<br>MURKSHADOWS<br>PLAGUE OF WOES<br>ROT AND RENEWAL<br>SEEPING VIRULENCE |
+| Scintillating Legion | None | DELIRIUM UNMADE<br>FATEBORNE NIGHTMARES<br>FICKLEFIRE<br>FLICKERING REALITY<br>IMPOSSIBLE ECLIPSE<br>PYROGENESIS |
+| Shadow Legion | None | BINDING SHADOW<br>CHANNELLED WRATH<br>DEATH DENIED<br>ENCROACHING DARKNESS<br>SHADE PATH<br>SPITEFUL DEMISE |
+
+### Unit Datasheets
+
+| Allegiance | Fully supported (`All consumed`) | IR parsed; host needed | Unsupported IR | Bridge/catalog blocked |
+| --- | --- | --- | --- | --- |
+| Khorne | Bloodcrushers (`000001115`)<br>Flesh Hounds (`000001112`) | Bloodletters (`000001114`)<br>Bloodthirster (`000002582`)<br>Karanak (`000001104`)<br>Skarbrand (`000001105`) | Bloodmaster (`000001455`)<br>Rendmaster On Blood Throne (`000001111`)<br>Skull Cannon (`000001116`)<br>Skullmaster (`000001456`)<br>Skulltaker (`000001106`) | Skull Altar (`000001588`) |
+| Tzeentch | Burning Chariot (`000001128`)<br>Flamers (`000001125`) | Fateskimmer (`000001463`)<br>Lord of Change (`000001120`) | Blue Horrors (`000002583`)<br>Changecaster (`000001462`)<br>Exalted Flamer (`000001126`)<br>Fluxmaster (`000001464`)<br>Kairos Fateweaver (`000001117`)<br>Pink Horrors (`000002584`)<br>Screamers (`000001127`)<br>The Blue Scribes (`000001119`)<br>The Changeling (`000001118`) | None |
+| Nurgle | None | Nurglings (`000001133`)<br>Plague Drones (`000001135`)<br>Plaguebearers (`000001132`)<br>Poxbringer (`000001467`)<br>Rotigus (`000001465`)<br>Spoilpox Scrivener (`000001469`) | Beasts of Nurgle (`000001134`)<br>Epidemius (`000001129`)<br>Great Unclean One (`000001130`)<br>Horticulous Slimux (`000001466`)<br>Sloppity Bilepiper (`000001468`) | Feculent Gnarlmaw (`000001470`) |
+| Slaanesh | Seekers (`000001145`) | Fiends (`000001143`)<br>Hellflayers (`000001144`)<br>Shalaxi Helbane (`000001648`)<br>The Masque of Slaanesh (`000001136`)<br>Tranceweaver (`000001138`) | Contorted Epitome (`000001647`)<br>Daemonettes (`000001142`)<br>Infernal Enrapturess (`000001589`)<br>Syll'esske (`000001649`)<br>Tormentbringer (`000004100`) | Keeper of Secrets (`000001137`) |
+| Undivided | None | None | Be'lakor (`000001148`)<br>Daemon Prince of Chaos (`000001149`)<br>Daemon Prince of Chaos with Wings (`000002758`)<br>Soul Grinder (`000001151`) | None |
 
 ## Detachment Rule Support
 

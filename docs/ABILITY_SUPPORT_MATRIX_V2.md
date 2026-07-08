@@ -184,7 +184,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Faction | Detachments | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | Orks | 12 | 1 | 44 | 66 | 1 | [orks](factions/orks.md) |
-| Aeldari | 15 | 2 | 51 | 75 | 1 | [aeldari](factions/aeldari.md) |
+| Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |
 | Drukhari | 9 | 0 | 24 | 36 | 1 | [drukhari](factions/drukhari.md) |
 | Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |
 | Genestealer Cults | 9 | 0 | 20 | 30 | 1 | [genestealer-cults](factions/genestealer-cults.md) |
@@ -204,7 +204,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 4 | 28 | 43 | 1 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 4 | 28 | 43 | 7 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 1 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |

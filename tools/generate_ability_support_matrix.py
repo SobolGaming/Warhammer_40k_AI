@@ -122,6 +122,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_detachments_2026_27,
+    faction_subrules_2026_27,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
@@ -154,6 +155,7 @@ DEFAULT_DOCS_PATH = Path("docs") / "ABILITY_SUPPORT_MATRIX_V2.md"
 DEFAULT_FACTION_DOCS_DIR = Path("docs") / "factions"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
 RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-coverage-v1"
+CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.DEFILER_DATASHEET_IDS
 ABILITY_SUPPORT_DATASHEET_IDS = (*DAEMON_WARGEAR_DATASHEET_IDS, *CHAOS_DEFILER_DATASHEET_IDS)
@@ -187,6 +189,14 @@ MUSTERING_SUPPORT_STAGE_VALUES = frozenset(
         MUSTERING_SUPPORT_PARTIAL,
         MUSTERING_SUPPORT_SOURCE_ONLY,
         MUSTERING_SUPPORT_UNKNOWN,
+    )
+)
+_FACTION_INDEX_ENGINE_CONSUMED_KINDS = frozenset(
+    (
+        Phase17ECoverageKind.FACTION_ARMY_RULE,
+        Phase17ECoverageKind.DETACHMENT_RULE,
+        Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
+        Phase17ECoverageKind.DETACHMENT_STRATAGEM,
     )
 )
 _DATASHEET_ABILITY_FULL_STAGES = frozenset((AbilityCoverageSupportStage.ENGINE_CONSUMED,))
@@ -280,6 +290,12 @@ class DatasheetGroupReviewRow:
     supported_semantics: str
     semantics_needed: str
     catalog_blockers: str
+
+
+@dataclass(frozen=True)
+class ChaosDaemonsDatasheetReviewGroup:
+    allegiance: str
+    rows: tuple[DatasheetGroupReviewRow, ...]
 
 
 @dataclass(frozen=True)
@@ -2529,10 +2545,8 @@ def _faction_support_markdown(
         Phase17ECoverageKind.DETACHMENT_STRATAGEM,
     )
     exact_rows = (*enhancement_rows, *stratagem_rows)
-    engine_consumed_row_count = sum(
-        1
-        for row in (*army_rule_rows, *detachment_rule_rows, *exact_rows)
-        if row.status is Phase17ECoverageStatus.IMPLEMENTED
+    engine_consumed_row_count = _engine_consumed_coverage_row_count(
+        (*army_rule_rows, *detachment_rule_rows, *exact_rows)
     )
     supported_detachment_count = sum(
         1 for row in detachment_support_rows if _detachment_rule_is_supported(row)
@@ -2563,6 +2577,8 @@ def _faction_support_markdown(
             f"{len(enhancement_rows)} | {len(stratagem_rows)} | {engine_consumed_row_count} |"
         ),
     ]
+    if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
+        lines.extend(_chaos_daemons_semantic_snapshot_markdown())
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
     lines.extend(
         _faction_datasheet_support_markdown(
@@ -2576,6 +2592,14 @@ def _faction_support_markdown(
     lines.extend(_faction_exact_rule_rows_markdown("Stratagems", stratagem_rows))
     lines.append("")
     return "\n".join(lines)
+
+
+def _engine_consumed_coverage_row_count(rows: Iterable[Phase17ECoverageRow]) -> int:
+    return sum(1 for row in rows if _coverage_row_is_engine_consumed(row))
+
+
+def _coverage_row_is_engine_consumed(row: Phase17ECoverageRow) -> bool:
+    return row.status is Phase17ECoverageStatus.IMPLEMENTED or bool(row.runtime_consumer_ids)
 
 
 def _faction_detachment_rule_support_markdown(
@@ -2609,6 +2633,158 @@ def _faction_detachment_rule_support_markdown(
             + " |"
         )
     return lines
+
+
+def _chaos_daemons_semantic_snapshot_markdown() -> list[str]:
+    lines = [
+        "",
+        "## Semantic Support Snapshot",
+        "",
+        (
+            "This generated snapshot answers the support question directly. Detachment-rule "
+            "support uses the semantic support table below. Exact Enhancement and Stratagem "
+            "support is stricter: a source row is fully supported here only when it carries "
+            "runtime consumer IDs. Datasheet support is fully supported only for source-review "
+            "rows whose IR coverage is `All consumed`."
+        ),
+    ]
+    lines.extend(_chaos_daemons_detachment_snapshot_markdown())
+    lines.extend(_chaos_daemons_exact_enhancement_snapshot_markdown())
+    lines.extend(_chaos_daemons_exact_stratagem_snapshot_markdown())
+    lines.extend(_chaos_daemons_datasheet_snapshot_markdown())
+    return lines
+
+
+def _chaos_daemons_detachment_snapshot_markdown() -> list[str]:
+    rows = _detachment_rule_support_rows_for_faction(CHAOS_DAEMONS_FACTION_ID)
+    fully_supported = tuple(row.detachment for row in rows if _detachment_rule_is_supported(row))
+    needs_support = tuple(row.detachment for row in rows if not _detachment_rule_is_supported(row))
+    return [
+        "",
+        "### Detachments",
+        "",
+        "| Fully supported | Still needs semantic support |",
+        "| --- | --- |",
+        f"| {_markdown_line_list(fully_supported)} | {_markdown_line_list(needs_support)} |",
+    ]
+
+
+def _chaos_daemons_exact_enhancement_snapshot_markdown() -> list[str]:
+    rows = tuple(
+        (
+            row.detachment_name,
+            row.name,
+            bool(row.runtime_consumer_ids),
+        )
+        for row in faction_subrules_2026_27.enhancement_rows()
+        if row.faction_id == CHAOS_DAEMONS_FACTION_ID
+    )
+    return _chaos_daemons_exact_source_rows_snapshot_markdown(
+        title="Enhancements",
+        rows=rows,
+    )
+
+
+def _chaos_daemons_exact_stratagem_snapshot_markdown() -> list[str]:
+    rows = tuple(
+        (
+            row.detachment_name,
+            row.name,
+            bool(row.runtime_consumer_ids),
+        )
+        for row in faction_subrules_2026_27.stratagem_rows()
+        if row.faction_id == CHAOS_DAEMONS_FACTION_ID
+    )
+    return _chaos_daemons_exact_source_rows_snapshot_markdown(
+        title="Stratagems",
+        rows=rows,
+    )
+
+
+def _chaos_daemons_exact_source_rows_snapshot_markdown(
+    *,
+    title: str,
+    rows: tuple[tuple[str, str, bool], ...],
+) -> list[str]:
+    lines = [
+        "",
+        f"### {title}",
+        "",
+        (
+            "| Detachment | Fully supported / runtime consumers registered | "
+            "Still source-only / needs semantic registration |"
+        ),
+        "| --- | --- | --- |",
+    ]
+    for detachment_name in sorted({row[0] for row in rows}):
+        supported = tuple(
+            sorted(
+                rule_name
+                for detachment, rule_name, is_supported in rows
+                if (detachment == detachment_name and is_supported)
+            )
+        )
+        needs_support = tuple(
+            sorted(
+                rule_name
+                for detachment, rule_name, is_supported in rows
+                if (detachment == detachment_name and not is_supported)
+            )
+        )
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    _markdown_text(detachment_name),
+                    _markdown_line_list(supported),
+                    _markdown_line_list(needs_support),
+                )
+            )
+            + " |"
+        )
+    return lines
+
+
+def _chaos_daemons_datasheet_snapshot_markdown() -> list[str]:
+    lines = [
+        "",
+        "### Unit Datasheets",
+        "",
+        (
+            "| Allegiance | Fully supported (`All consumed`) | IR parsed; host needed | "
+            "Unsupported IR | Bridge/catalog blocked |"
+        ),
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for group in _chaos_daemons_datasheet_review_groups():
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    _markdown_text(group.allegiance),
+                    _chaos_daemons_datasheet_names_for_status(group.rows, "All consumed"),
+                    _chaos_daemons_datasheet_names_for_status(group.rows, "IR parsed; host needed"),
+                    _chaos_daemons_datasheet_names_for_status(group.rows, "Unsupported IR"),
+                    _chaos_daemons_datasheet_names_for_status(group.rows, "Bridge/catalog blocked"),
+                )
+            )
+            + " |"
+        )
+    return lines
+
+
+def _chaos_daemons_datasheet_names_for_status(
+    rows: tuple[DatasheetGroupReviewRow, ...],
+    ir_coverage: str,
+) -> str:
+    return _markdown_line_list(
+        f"{row.datasheet} (`{row.datasheet_id}`)"
+        for row in sorted(
+            rows,
+            key=lambda review_row: (review_row.datasheet.lower(), review_row.datasheet_id),
+        )
+        if row.ir_coverage == ir_coverage
+    )
 
 
 def _faction_datasheet_support_markdown(
@@ -2807,6 +2983,16 @@ def _chaos_daemons_datasheet_review_markdown() -> list[str]:
     )
     lines.extend(_chaos_daemons_excluded_wahapedia_rows_markdown())
     return lines
+
+
+def _chaos_daemons_datasheet_review_groups() -> tuple[ChaosDaemonsDatasheetReviewGroup, ...]:
+    return (
+        ChaosDaemonsDatasheetReviewGroup("Khorne", _chaos_daemons_khorne_review_rows()),
+        ChaosDaemonsDatasheetReviewGroup("Tzeentch", _chaos_daemons_tzeentch_review_rows()),
+        ChaosDaemonsDatasheetReviewGroup("Nurgle", _chaos_daemons_nurgle_review_rows()),
+        ChaosDaemonsDatasheetReviewGroup("Slaanesh", _chaos_daemons_slaanesh_review_rows()),
+        ChaosDaemonsDatasheetReviewGroup("Undivided", _chaos_daemons_undivided_review_rows()),
+    )
 
 
 def _chaos_daemons_allegiance_review_markdown(
@@ -5149,14 +5335,8 @@ def _faction_index_section_markdown() -> list[str]:
         engine_consumed_row_count = sum(
             1
             for row in faction_rows
-            if row.coverage_kind
-            in {
-                Phase17ECoverageKind.FACTION_ARMY_RULE,
-                Phase17ECoverageKind.DETACHMENT_RULE,
-                Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
-                Phase17ECoverageKind.DETACHMENT_STRATAGEM,
-            }
-            and row.status is Phase17ECoverageStatus.IMPLEMENTED
+            if row.coverage_kind in _FACTION_INDEX_ENGINE_CONSUMED_KINDS
+            and _coverage_row_is_engine_consumed(row)
         )
         lines.append(
             "| "
@@ -5488,6 +5668,13 @@ def _inline_code_list(values: Iterable[str]) -> str:
     if not values:
         return "None"
     return ", ".join(f"`{_markdown_text(value)}`" for value in values)
+
+
+def _markdown_line_list(values: Iterable[str]) -> str:
+    values = tuple(values)
+    if not values:
+        return "None"
+    return "<br>".join(_markdown_text(value) for value in values)
 
 
 def _source_kind_counts_text(values: dict[str, int]) -> str:
