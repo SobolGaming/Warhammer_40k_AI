@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import cast
+
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
@@ -240,6 +242,48 @@ def generic_rule_target_constraints_apply(
     return True
 
 
+def generic_rule_target_proximity_keyword_gate_applies(
+    *,
+    state: object,
+    parameters: dict[str, JsonValue],
+    attacking_unit_instance_id: str,
+    target_unit_instance_id: str | None,
+) -> bool:
+    if not any(
+        key in parameters
+        for key in (
+            "target_proximity_distance_inches",
+            "target_proximity_unit_allegiance",
+            "target_proximity_required_keyword_sequence",
+        )
+    ):
+        return True
+    if target_unit_instance_id is None:
+        return False
+    distance = _target_proximity_distance(parameters)
+    allegiance = _target_proximity_allegiance(parameters)
+    required_keywords = _target_proximity_required_keywords(parameters)
+    attacker_owner = _unit_owner(state=state, unit_instance_id=attacking_unit_instance_id)
+    for candidate_unit_id in _unit_ids_by_allegiance(
+        state=state,
+        player_id=attacker_owner,
+        allegiance=allegiance,
+    ):
+        if all(
+            _unit_has_keyword(state=state, unit_instance_id=candidate_unit_id, keyword=keyword)
+            for keyword in required_keywords
+        ) and (
+            _closest_unit_distance_inches(
+                state=state,
+                first_unit_instance_id=candidate_unit_id,
+                second_unit_instance_id=target_unit_instance_id,
+            )
+            <= distance
+        ):
+            return True
+    return False
+
+
 def _target_constraint_condition_parameters(
     conditions: tuple[dict[str, JsonValue], ...],
 ) -> tuple[dict[str, JsonValue], ...]:
@@ -342,6 +386,31 @@ def _enemy_unit_ids_for_player(*, state: object, player_id: str) -> tuple[str, .
     return tuple(sorted(ids))
 
 
+def _unit_ids_by_allegiance(
+    *,
+    state: object,
+    player_id: str,
+    allegiance: str,
+) -> tuple[str, ...]:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR target proximity gate requires GameState.")
+    requested_player_id = _validate_identifier("player_id", player_id)
+    ids: list[str] = []
+    for army in state.army_definitions:
+        if allegiance == TARGET_ALLEGIANCE_FRIENDLY:
+            if army.player_id != requested_player_id:
+                continue
+        elif allegiance == TARGET_ALLEGIANCE_ENEMY:
+            if army.player_id == requested_player_id:
+                continue
+        else:
+            raise GameLifecycleError("Unsupported generic RuleIR target proximity allegiance.")
+        ids.extend(unit.unit_instance_id for unit in army.units)
+    return tuple(sorted(ids))
+
+
 def _unit_instance(*, state: object, unit_instance_id: str) -> UnitInstance:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -422,6 +491,62 @@ def _geometry_models_for_unit(
                     "Generic RuleIR target constraint placement is invalid."
                 ) from exc
     raise GameLifecycleError("Generic RuleIR target constraint unit is unknown.")
+
+
+def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:
+    unit = _unit_instance(state=state, unit_instance_id=unit_instance_id)
+    requested_keyword = _canonical_keyword(_validate_identifier("keyword", keyword))
+    return requested_keyword in {
+        _canonical_keyword(stored) for stored in (*unit.keywords, *unit.faction_keywords)
+    }
+
+
+def _target_proximity_distance(parameters: dict[str, JsonValue]) -> float:
+    value = parameters.get("target_proximity_distance_inches")
+    if type(value) not in {int, float}:
+        raise GameLifecycleError("Generic RuleIR target_proximity_distance_inches must be numeric.")
+    distance = float(cast(int | float, value))
+    if distance < 0.0:
+        raise GameLifecycleError(
+            "Generic RuleIR target_proximity_distance_inches must not be negative."
+        )
+    return distance
+
+
+def _target_proximity_allegiance(parameters: dict[str, JsonValue]) -> str:
+    value = parameters.get("target_proximity_unit_allegiance")
+    if type(value) is not str:
+        raise GameLifecycleError(
+            "Generic RuleIR target_proximity_unit_allegiance must be a string."
+        )
+    allegiance = _validate_identifier("target_proximity_unit_allegiance", value)
+    if allegiance not in {TARGET_ALLEGIANCE_FRIENDLY, TARGET_ALLEGIANCE_ENEMY}:
+        raise GameLifecycleError("Unsupported generic RuleIR target proximity allegiance.")
+    return allegiance
+
+
+def _target_proximity_required_keywords(parameters: dict[str, JsonValue]) -> tuple[str, ...]:
+    value = parameters.get("target_proximity_required_keyword_sequence")
+    if not isinstance(value, list):
+        raise GameLifecycleError(
+            "Generic RuleIR target_proximity_required_keyword_sequence must be a list."
+        )
+    keywords: list[str] = []
+    for item in cast(list[object], value):
+        if type(item) is not str:
+            raise GameLifecycleError(
+                "Generic RuleIR target_proximity_required_keyword_sequence must contain strings."
+            )
+        keywords.append(_validate_identifier("target_proximity_required_keyword_sequence", item))
+    if not keywords:
+        raise GameLifecycleError(
+            "Generic RuleIR target_proximity_required_keyword_sequence must not be empty."
+        )
+    return tuple(keywords)
+
+
+def _canonical_keyword(value: str) -> str:
+    return value.strip().upper().replace("_", " ").replace("-", " ")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

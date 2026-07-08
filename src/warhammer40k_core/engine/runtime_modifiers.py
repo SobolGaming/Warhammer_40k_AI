@@ -108,6 +108,63 @@ class HitRollModifierContext:
 
 
 @dataclass(frozen=True, slots=True)
+class HitRollMinimumUnmodifiedSuccessContext:
+    state: GameState
+    source_phase: BattlePhase
+    attacking_unit_instance_id: str
+    attacker_model_instance_id: str
+    target_unit_instance_id: str
+    weapon_profile: WeaponProfile
+    targeting_rule_ids: tuple[str, ...]
+    current_minimum_unmodified_success: int
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Hit roll minimum success state must be GameState.")
+        object.__setattr__(self, "source_phase", _battle_phase_from_token(self.source_phase))
+        object.__setattr__(
+            self,
+            "attacking_unit_instance_id",
+            _validate_identifier(
+                "attacking_unit_instance_id",
+                self.attacking_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "attacker_model_instance_id",
+            _validate_identifier("attacker_model_instance_id", self.attacker_model_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        if type(self.weapon_profile) is not WeaponProfile:
+            raise GameLifecycleError("Hit roll minimum success profile must be WeaponProfile.")
+        object.__setattr__(
+            self,
+            "targeting_rule_ids",
+            _validate_identifier_tuple(
+                "targeting_rule_ids",
+                self.targeting_rule_ids,
+                min_length=0,
+                sort_values=True,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "current_minimum_unmodified_success",
+            _validate_d6_target(
+                "current_minimum_unmodified_success",
+                self.current_minimum_unmodified_success,
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class WoundRollModifierContext:
     state: GameState
     source_phase: BattlePhase
@@ -707,6 +764,21 @@ class RuntimeModifierRegistry:
         total += generic_rule_hit_roll_modifier(context)
         return total
 
+    def minimum_unmodified_hit_success(
+        self,
+        context: HitRollMinimumUnmodifiedSuccessContext,
+    ) -> int:
+        if type(context) is not HitRollMinimumUnmodifiedSuccessContext:
+            raise GameLifecycleError("Hit roll minimum success modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_minimum_unmodified_hit_success,
+        )
+
+        return _validate_d6_target(
+            "generic hit roll minimum success",
+            generic_rule_minimum_unmodified_hit_success(context),
+        )
+
     def wound_roll_modifier(self, context: WoundRollModifierContext) -> int:
         if type(context) is not WoundRollModifierContext:
             raise GameLifecycleError("Wound roll modifiers require a context.")
@@ -972,6 +1044,13 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     return integer
 
 
+def _validate_d6_target(field_name: str, value: object) -> int:
+    integer = _validate_int(field_name, value)
+    if not 2 <= integer <= 6:
+        raise GameLifecycleError(f"{field_name} must be between 2 and 6.")
+    return integer
+
+
 def _validate_int(field_name: str, value: object) -> int:
     if type(value) is not int:
         raise GameLifecycleError(f"{field_name} must be an int.")
@@ -979,6 +1058,27 @@ def _validate_int(field_name: str, value: object) -> int:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def _validate_identifier_tuple(
+    field_name: str,
+    value: object,
+    *,
+    min_length: int,
+    sort_values: bool,
+) -> tuple[str, ...]:
+    if type(value) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    identifiers = tuple(
+        _validate_identifier(field_name, item) for item in cast(tuple[object, ...], value)
+    )
+    if len(identifiers) < min_length:
+        raise GameLifecycleError(f"{field_name} must contain at least {min_length} values.")
+    if len(set(identifiers)) != len(identifiers):
+        raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+    if sort_values:
+        return tuple(sorted(identifiers))
+    return identifiers
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

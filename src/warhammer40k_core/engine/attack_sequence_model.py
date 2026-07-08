@@ -102,6 +102,13 @@ ATTACK_RESOLUTION_SELECTION_DECISION_TYPES = frozenset(
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     )
 )
+
+
+def _validate_bool(field_name: str, value: object) -> None:
+    if type(value) is not bool:
+        raise GameLifecycleError(f"{field_name} must be a bool.")
+
+
 SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS = {
     "attack_sequence.hit": "hit_roll_state",
     "attack_sequence.wound": "wound_roll_state",
@@ -211,6 +218,7 @@ class HitRollPayload(TypedDict):
     roll_state: DiceRollStatePayload | None
     unmodified_roll: int | None
     minimum_unmodified_success: int
+    unmodified_success_threshold_active: bool
     modifier: int
     capped_modifier: int
     final_roll: int | None
@@ -449,14 +457,13 @@ class HitRoll:
     successful: bool
     critical: bool
     minimum_unmodified_success: int = 2
+    unmodified_success_threshold_active: bool = False
     skipped: bool = False
     generated_hits: int = 1
 
     def __post_init__(self) -> None:
         object.__setattr__(
-            self,
-            "target_number",
-            _validate_d6_target("HitRoll target_number", self.target_number),
+            self, "target_number", _validate_d6_target("HitRoll target_number", self.target_number)
         )
         object.__setattr__(
             self,
@@ -472,12 +479,11 @@ class HitRoll:
             raise GameLifecycleError("HitRoll capped_modifier must be an integer.")
         if self.capped_modifier != _cap_roll_modifier(self.modifier):
             raise GameLifecycleError("HitRoll capped_modifier does not match modifier cap.")
-        if type(self.successful) is not bool:
-            raise GameLifecycleError("HitRoll successful must be a bool.")
-        if type(self.critical) is not bool:
-            raise GameLifecycleError("HitRoll critical must be a bool.")
-        if type(self.skipped) is not bool:
-            raise GameLifecycleError("HitRoll skipped must be a bool.")
+        threshold_flag = self.unmodified_success_threshold_active
+        _validate_bool("HitRoll successful", self.successful)
+        _validate_bool("HitRoll critical", self.critical)
+        _validate_bool("HitRoll unmodified_success_threshold_active", threshold_flag)
+        _validate_bool("HitRoll skipped", self.skipped)
         object.__setattr__(
             self,
             "generated_hits",
@@ -492,6 +498,10 @@ class HitRoll:
                 raise GameLifecycleError("Skipped HitRoll must generate successful hits.")
             if self.critical:
                 raise GameLifecycleError("Skipped HitRoll cannot be a Critical Hit.")
+            if self.unmodified_success_threshold_active:
+                raise GameLifecycleError(
+                    "Skipped HitRoll cannot use an unmodified success threshold."
+                )
             return
         if self.roll_state is None:
             raise GameLifecycleError("HitRoll requires a roll_state unless skipped.")
@@ -501,10 +511,10 @@ class HitRoll:
             raise GameLifecycleError("HitRoll unmodified_roll must be a D6 value.")
         if type(self.final_roll) is not int:
             raise GameLifecycleError("HitRoll final_roll must be an integer.")
-        expected_success = self.unmodified_roll == 6 or (
-            self.unmodified_roll >= self.minimum_unmodified_success
-            and self.final_roll >= self.target_number
-        )
+        unmodified_meets_minimum = self.unmodified_roll >= self.minimum_unmodified_success
+        threshold_success = threshold_flag and unmodified_meets_minimum
+        target_success = unmodified_meets_minimum and self.final_roll >= self.target_number
+        expected_success = self.unmodified_roll == 6 or threshold_success or target_success
         if self.successful != expected_success:
             raise GameLifecycleError("HitRoll success flag does not match roll semantics.")
         if self.critical != (self.unmodified_roll == 6):
@@ -531,6 +541,7 @@ class HitRoll:
             "roll_state": None if self.roll_state is None else self.roll_state.to_payload(),
             "unmodified_roll": self.unmodified_roll,
             "minimum_unmodified_success": self.minimum_unmodified_success,
+            "unmodified_success_threshold_active": self.unmodified_success_threshold_active,
             "modifier": self.modifier,
             "capped_modifier": self.capped_modifier,
             "final_roll": self.final_roll,
@@ -542,14 +553,11 @@ class HitRoll:
 
     @classmethod
     def from_payload(cls, payload: HitRollPayload) -> Self:
-        roll_state_payload = payload["roll_state"]
+        raw_roll_state = payload["roll_state"]
+        roll_state = None if raw_roll_state is None else DiceRollState.from_payload(raw_roll_state)
         return cls(
             target_number=payload["target_number"],
-            roll_state=(
-                None
-                if roll_state_payload is None
-                else DiceRollState.from_payload(roll_state_payload)
-            ),
+            roll_state=roll_state,
             unmodified_roll=payload["unmodified_roll"],
             modifier=payload["modifier"],
             capped_modifier=payload["capped_modifier"],
@@ -557,6 +565,7 @@ class HitRoll:
             successful=payload["successful"],
             critical=payload["critical"],
             minimum_unmodified_success=payload["minimum_unmodified_success"],
+            unmodified_success_threshold_active=payload["unmodified_success_threshold_active"],
             skipped=payload["skipped"],
             generated_hits=payload["generated_hits"],
         )
@@ -600,12 +609,9 @@ class WoundRoll:
             raise GameLifecycleError("WoundRoll modifier must be an integer.")
         if self.capped_modifier != _cap_roll_modifier(self.modifier):
             raise GameLifecycleError("WoundRoll capped_modifier does not match modifier cap.")
-        if type(self.successful) is not bool:
-            raise GameLifecycleError("WoundRoll successful must be a bool.")
-        if type(self.critical) is not bool:
-            raise GameLifecycleError("WoundRoll critical must be a bool.")
-        if type(self.skipped) is not bool:
-            raise GameLifecycleError("WoundRoll skipped must be a bool.")
+        _validate_bool("WoundRoll successful", self.successful)
+        _validate_bool("WoundRoll critical", self.critical)
+        _validate_bool("WoundRoll skipped", self.skipped)
         if self.skipped:
             if self.roll_state is not None or self.unmodified_roll is not None:
                 raise GameLifecycleError("Skipped WoundRoll must not include a roll.")
@@ -800,8 +806,7 @@ class PrecisionPoolSelection:
                 self.selected_model_ids,
             ),
         )
-        if type(self.selection_recorded) is not bool:
-            raise GameLifecycleError("PrecisionPoolSelection selection_recorded must be a bool.")
+        _validate_bool("PrecisionPoolSelection selection_recorded", self.selection_recorded)
         if self.selected_group_id is not None and not self.selection_recorded:
             raise GameLifecycleError("Precision selected group requires a recorded selection.")
         if self.selected_model_ids and self.selected_group_id is None:

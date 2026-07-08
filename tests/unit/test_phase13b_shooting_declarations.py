@@ -196,6 +196,11 @@ from warhammer40k_core.engine.damage_allocation import (
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import (
     GameState,
@@ -5718,8 +5723,10 @@ def test_phase14f_indirect_stationary_friendly_visibility_uses_one_to_three_fail
     )
     assert remaining_sequence is None
     assert status is None
-    assert cast(dict[str, object], hit_payload["payload"])["minimum_unmodified_success"] == 4
-    assert cast(dict[str, object], hit_payload["payload"])["successful"] is False
+    hit = cast(dict[str, object], hit_payload["payload"])
+    assert hit["minimum_unmodified_success"] == 4
+    assert hit["unmodified_success_threshold_active"] is False
+    assert hit["successful"] is False
 
 
 def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
@@ -5795,9 +5802,210 @@ def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
         )
         hit = cast(dict[str, object], hit_payload["payload"])
         assert hit["minimum_unmodified_success"] == 6
+        assert hit["unmodified_success_threshold_active"] is False
         assert hit["target_number"] == 3
         assert hit["modifier"] == 1
         assert hit["successful"] is (roll_value == 6)
+
+
+def test_phase13d_generic_rule_ir_fire_overwatch_threshold_status_applies() -> None:
+    cases = (
+        (False, 5, 5),
+        (True, 4, 4),
+    )
+    for support_near_target, roll_value, expected_minimum in cases:
+        sequence_id = (
+            "phase13d-generic-fire-overwatch-threshold-near"
+            if support_near_target
+            else "phase13d-generic-fire-overwatch-threshold-base"
+        )
+        lifecycle, units = _shooting_lifecycle(
+            alpha_unit_ids=("intercessor-1", "intercessor-2"),
+            game_id=sequence_id,
+        )
+        state = _state(lifecycle)
+        attacker = units["intercessor-1"]
+        support = replace(
+            units["intercessor-2"],
+            keywords=tuple(dict.fromkeys((*units["intercessor-2"].keywords, "PSYKER"))),
+            faction_keywords=tuple(
+                dict.fromkeys((*units["intercessor-2"].faction_keywords, "THOUSAND SONS"))
+            ),
+        )
+        _replace_unit_instance_in_state(state=state, replacement=support)
+        defender = units["enemy"]
+        if support_near_target:
+            assert state.battlefield_state is not None
+            state.replace_battlefield_state(
+                state.battlefield_state.with_unit_placement(
+                    _unit_placement_at(
+                        support,
+                        army_id="army-alpha",
+                        player_id="player-a",
+                        poses=_compact_test_unit_poses(
+                            origin=Pose.at(30.0, 35.0),
+                            model_count=len(support.own_models),
+                        ),
+                    )
+                )
+            )
+        weapon_profile = replace(
+            _first_weapon_profile(lifecycle, attacker),
+            profile_id=f"{sequence_id}-profile",
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 6),
+        )
+        state.record_persisting_effect(
+            _generic_fire_overwatch_threshold_effect(
+                effect_id=f"{sequence_id}:threshold-5",
+                owner_player_id="player-a",
+                target_unit_instance_ids=(attacker.unit_instance_id,),
+                minimum_unmodified_success=5,
+            )
+        )
+        state.record_persisting_effect(
+            _generic_fire_overwatch_threshold_effect(
+                effect_id=f"{sequence_id}:threshold-4",
+                owner_player_id="player-a",
+                target_unit_instance_ids=(attacker.unit_instance_id,),
+                minimum_unmodified_success=4,
+                proximity_required_keywords=("THOUSAND_SONS", "PSYKER"),
+            )
+        )
+        attack_context_id = f"{sequence_id}:pool-001:attack-001"
+        hit_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.hit",
+            actor_id="player-a",
+            reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,),
+        )
+        wound_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.wound",
+            actor_id="player-a",
+        )
+        pool = replace(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+            shooting_type=ShootingType.SNAP,
+            targeting_rule_ids=(FIRE_OVERWATCH_RULE_ID,),
+        )
+
+        resolve_attack_sequence_until_blocked(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=AttackSequence.start(
+                sequence_id=sequence_id,
+                attacker_player_id="player-a",
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attack_pools=(pool,),
+            ),
+            already_allocated_model_ids=(),
+            dice_manager=DiceRollManager(
+                sequence_id,
+                event_log=lifecycle.decision_controller.event_log,
+                injected_results=(
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:hit",
+                        spec=hit_spec,
+                        value=roll_value,
+                    ),
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:wound",
+                        spec=wound_spec,
+                        value=1,
+                    ),
+                ),
+            ),
+        )
+
+        hit_payload = _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.HIT,
+        )
+        hit = cast(dict[str, object], hit_payload["payload"])
+        assert hit["minimum_unmodified_success"] == expected_minimum
+        assert hit["unmodified_success_threshold_active"] is True
+        assert hit["target_number"] == 6
+        assert hit["modifier"] == 0
+        assert hit["final_roll"] == roll_value
+        assert hit["successful"] is True
+
+
+def _generic_fire_overwatch_threshold_effect(
+    *,
+    effect_id: str,
+    owner_player_id: str,
+    target_unit_instance_ids: tuple[str, ...],
+    minimum_unmodified_success: int,
+    proximity_required_keywords: tuple[str, ...] = (),
+) -> PersistingEffect:
+    parameters: dict[str, JsonValue] = {
+        "attack_role": "attacker",
+        "minimum_unmodified_success": minimum_unmodified_success,
+        "required_targeting_rule_id": FIRE_OVERWATCH_RULE_ID,
+        "roll_type": "hit",
+        "status": "minimum_unmodified_hit_success",
+    }
+    if proximity_required_keywords:
+        parameters.update(
+            {
+                "target_proximity_distance_inches": 9,
+                "target_proximity_required_keyword_sequence": list(proximity_required_keywords),
+                "target_proximity_unit_allegiance": "friendly",
+            }
+        )
+    parameter_payloads: list[dict[str, JsonValue]] = [
+        {"key": key, "value": value} for key, value in sorted(parameters.items())
+    ]
+    return PersistingEffect(
+        effect_id=effect_id,
+        source_rule_id=f"source:{effect_id}",
+        owner_player_id=owner_player_id,
+        target_unit_instance_ids=target_unit_instance_ids,
+        started_battle_round=1,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhase.SHOOTING,
+            player_id=owner_player_id,
+        ),
+        effect_payload=validate_json_value(
+            {
+                "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                "rule_id": f"rule:{effect_id}",
+                "source_id": f"source:{effect_id}",
+                "rule_ir_hash": "0" * 64,
+                "clause_id": f"clause:{effect_id}",
+                "source_span": {"start": 0, "end": 1, "text": "x"},
+                "target": {
+                    "kind": "this_unit",
+                    "source_span": {"start": 0, "end": 1, "text": "x"},
+                    "parameters": [],
+                },
+                "target_unit_instance_ids": list(target_unit_instance_ids),
+                "duration": None,
+                "conditions": [],
+                "effect": {
+                    "kind": "set_contextual_status",
+                    "source_span": {"start": 0, "end": 1, "text": "x"},
+                    "parameters": parameter_payloads,
+                },
+                "context": {
+                    "state": None,
+                    "player_id": owner_player_id,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "source_model_instance_id": None,
+                },
+            }
+        ),
+    )
 
 
 def test_phase14f_snap_shooting_rule_hits_only_on_unmodified_sixes() -> None:
@@ -5873,6 +6081,7 @@ def test_phase14f_snap_shooting_rule_hits_only_on_unmodified_sixes() -> None:
         )
         hit = cast(dict[str, object], hit_payload["payload"])
         assert hit["minimum_unmodified_success"] == 6
+        assert hit["unmodified_success_threshold_active"] is False
         assert hit["target_number"] == 2
         assert hit["modifier"] == 1
         assert hit["successful"] is (roll_value == 6)
@@ -13510,6 +13719,21 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
         actor_id="player-a",
     )
     hit_roll_state = DiceRollManager("phase13c-invalid-hit").roll_fixed(hit_spec, [2])
+    threshold_hit_roll_state = DiceRollManager("phase13c-threshold-hit").roll_fixed(hit_spec, [5])
+    threshold_hit = HitRoll(
+        target_number=6,
+        roll_state=threshold_hit_roll_state,
+        unmodified_roll=5,
+        modifier=0,
+        capped_modifier=0,
+        final_roll=5,
+        successful=True,
+        critical=False,
+        minimum_unmodified_success=5,
+        unmodified_success_threshold_active=True,
+    )
+    assert threshold_hit.to_payload()["unmodified_success_threshold_active"] is True
+    assert HitRoll.from_payload(threshold_hit.to_payload()) == threshold_hit
     with pytest.raises(GameLifecycleError, match="success flag"):
         HitRoll(
             target_number=3,
@@ -13521,6 +13745,18 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
             successful=True,
             critical=False,
         )
+    with pytest.raises(GameLifecycleError, match="unmodified_success_threshold_active"):
+        HitRoll(
+            target_number=3,
+            roll_state=hit_roll_state,
+            unmodified_roll=2,
+            modifier=0,
+            capped_modifier=0,
+            final_roll=2,
+            successful=False,
+            critical=False,
+            unmodified_success_threshold_active="bad",  # type: ignore[arg-type]
+        )
     with pytest.raises(GameLifecycleError, match="Skipped HitRoll"):
         HitRoll(
             target_number=3,
@@ -13531,6 +13767,19 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
             final_roll=None,
             successful=True,
             critical=False,
+            skipped=True,
+        )
+    with pytest.raises(GameLifecycleError, match="unmodified success threshold"):
+        HitRoll(
+            target_number=3,
+            roll_state=None,
+            unmodified_roll=None,
+            modifier=0,
+            capped_modifier=0,
+            final_roll=None,
+            successful=True,
+            critical=False,
+            unmodified_success_threshold_active=True,
             skipped=True,
         )
     with pytest.raises(GameLifecycleError, match="capped_modifier must be an integer"):
