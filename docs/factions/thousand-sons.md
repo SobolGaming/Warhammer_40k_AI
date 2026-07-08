@@ -32,7 +32,16 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Thousand Sons | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+| Defiler (`000001030`) | `Playable` | Full | Full | Full | Full | Full | Partial; supported detachments 0/9 (None) | Runtime consumers: `catalog-ir:minimum-unmodified-hit-success`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:lost-wound:feel-no-pain-resolution`, `descriptor:lost-wound:feel-no-pain-source`; coverage artifact only | No source-backed faction ability row; detachment support 0/9. |
+
+### Datasheet Ability Details
+
+| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
+| --- | --- | --- | --- | --- | --- | --- |
+| Defiler (`000001030`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
+| Defiler (`000001030`) | Feel No Pain (`000008338`) | `core` | `engine_consumed` | `core.feel_no_pain` | `descriptor:lost-wound:feel-no-pain-source`, `descriptor:lost-wound:feel-no-pain-resolution` | None |
+| Defiler (`000001030`) | Destroyer of Futures (`000001030:destroyer-of-futures`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.set_contextual_status.this_unit` | `catalog-ir:minimum-unmodified-hit-success` | None |
+| Defiler (`000001030`) | Scuttling Walker (`000001030:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
 
 ## Detachment Rule Coverage Rows
 

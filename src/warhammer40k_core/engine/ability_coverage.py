@@ -17,7 +17,11 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_consumers_for_rule,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.unit_abilities import descriptor_is_deep_strike
+from warhammer40k_core.engine.unit_abilities import (
+    descriptor_is_deadly_demise,
+    descriptor_is_deep_strike,
+    descriptor_is_feel_no_pain,
+)
 from warhammer40k_core.rules.parsed_tokens import TextSpan, TextSpanPayload
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -712,6 +716,16 @@ def _descriptor_runtime_consumer_ids(
             "descriptor:movement:deep-strike-placement",
             "descriptor:reserve-declaration:deep-strike",
         )
+    if descriptor_is_deadly_demise(ability):
+        return (
+            "descriptor:destruction-reaction:deadly-demise-source",
+            "descriptor:destruction-reaction:deadly-demise-resolution",
+        )
+    if descriptor_is_feel_no_pain(ability):
+        return (
+            "descriptor:lost-wound:feel-no-pain-source",
+            "descriptor:lost-wound:feel-no-pain-resolution",
+        )
     if _descriptor_is_shadow_of_chaos(ability):
         return (_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID,)
     return ()
@@ -884,6 +898,10 @@ def _descriptor_semantic_categories(
         raise GameLifecycleError("Ability descriptor categories require a descriptor.")
     if descriptor_is_deep_strike(ability):
         return ("core.reserve.deep_strike",)
+    if descriptor_is_deadly_demise(ability):
+        return ("core.deadly_demise",)
+    if descriptor_is_feel_no_pain(ability):
+        return ("core.feel_no_pain",)
     if _descriptor_is_shadow_of_chaos(ability):
         return ("faction.army_rule.shadow_of_chaos",)
     return ("unknown.ability_text",)

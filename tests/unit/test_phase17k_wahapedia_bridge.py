@@ -5297,7 +5297,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "Current coverage categories:" not in generated_markdown
     assert "## Runtime Hook Inventory" in generated_markdown
     assert "| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |" in generated_markdown
-    assert "| `catalog-ir:hit-roll-modifier` | No current generated rows |" in generated_markdown
+    assert "| `catalog-ir:hit-roll-modifier` | Revel in Desecration |" in generated_markdown
     assert "| `catalog-ir:wound-roll-modifier` | No current generated rows |" in generated_markdown
     assert (
         "| `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |"
@@ -5441,12 +5441,22 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
         for row in rows_by_name["Nurgle's Gift"]
     )
-    assert all(
+    assert any(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
         for row in rows_by_name["Blessings of Khorne"]
     )
-    assert all(
+    assert any(
+        row.datasheet_id == "000004207"
+        and row.support_stage is AbilityCoverageSupportStage.DESCRIPTOR_ONLY
+        for row in rows_by_name["Blessings of Khorne"]
+    )
+    assert any(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Thrill Seekers"]
+    )
+    assert any(
+        row.datasheet_id == "000004208"
+        and row.support_stage is AbilityCoverageSupportStage.DESCRIPTOR_ONLY
         for row in rows_by_name["Thrill Seekers"]
     )
     assert all(
@@ -5491,9 +5501,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Chaos Space Marines",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Blessings of Khorne"]) == (
+        "Defiler",
         "World Eaters",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Thrill Seekers"]) == (
+        "Defiler",
         "Emperor's Children",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Prioritised Efficiency"]) == (
@@ -5539,14 +5551,24 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         f"{death_guard_army_rule.HOOK_ID}:objective-control",
         f"{death_guard_army_rule.HOOK_ID}:toughness",
     }
-    assert set(rows_by_name["Blessings of Khorne"][0].runtime_consumer_ids) == {
+    blessings_of_khorne_engine_row = next(
+        row
+        for row in rows_by_name["Blessings of Khorne"]
+        if row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    )
+    thrill_seekers_engine_row = next(
+        row
+        for row in rows_by_name["Thrill Seekers"]
+        if row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    )
+    assert set(blessings_of_khorne_engine_row.runtime_consumer_ids) == {
         world_eaters_army_rule.HOOK_ID,
         world_eaters_army_rule.RAGE_FUELLED_INVIGORATION_HOOK_ID,
         world_eaters_army_rule.TOTAL_CARNAGE_HOOK_ID,
         world_eaters_army_rule.UNBRIDLED_BLOODLUST_CHARGE_MODIFIER_ID,
         f"{world_eaters_army_rule.HOOK_ID}:weapon-profile-keywords",
     }
-    assert set(rows_by_name["Thrill Seekers"][0].runtime_consumer_ids) == {
+    assert set(thrill_seekers_engine_row.runtime_consumer_ids) == {
         emperors_children_army_rule.ADVANCE_ELIGIBILITY_HOOK_ID,
         emperors_children_army_rule.FALL_BACK_ELIGIBILITY_HOOK_ID,
         emperors_children_army_rule.SHOOTING_TARGET_RESTRICTION_HOOK_ID,

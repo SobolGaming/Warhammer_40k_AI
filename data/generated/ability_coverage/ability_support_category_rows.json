@@ -176,6 +176,101 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/core/000008339/none",
+        "datasheet_id": "000001030",
+        "datasheet_name": "Defiler",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
+        "datasheet_id": "000004207",
+        "datasheet_name": "Defiler",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004208/core/000008339/none",
+        "datasheet_id": "000004208",
+        "datasheet_name": "Defiler",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004209/core/000008339/none",
+        "datasheet_id": "000004209",
+        "datasheet_name": "Defiler",
+        "source_kind": "core"
+      }
+    ],
+    "ability_names": [
+      "Deadly Demise"
+    ],
+    "category_id": "core.deadly_demise",
+    "category_name": "Core Deadly Demise",
+    "coverage_row_count": 4,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001030/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004208/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004209/core/000008339/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-resolution",
+      "descriptor:destruction-reaction:deadly-demise-source"
+    ],
+    "source_kind_counts": {
+      "core": 4
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000008338",
+        "ability_name": "Feel No Pain",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/core/000008338/none",
+        "datasheet_id": "000001030",
+        "datasheet_name": "Defiler",
+        "source_kind": "core"
+      }
+    ],
+    "ability_names": [
+      "Feel No Pain"
+    ],
+    "category_id": "core.feel_no_pain",
+    "category_name": "Core Feel No Pain",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001030/core/000008338/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "descriptor:lost-wound:feel-no-pain-resolution",
+      "descriptor:lost-wound:feel-no-pain-source"
+    ],
+    "source_kind_counts": {
+      "core": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001114:bane-of-cowards",
         "ability_name": "Bane of Cowards",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
@@ -202,6 +297,39 @@
     },
     "support_stages": [
       "generic_ir_executable"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000004208:revel-in-desecration",
+        "ability_name": "Revel in Desecration",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:revel-in-desecration/none",
+        "datasheet_id": "000004208",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Revel in Desecration"
+    ],
+    "category_id": "datasheet.roll_modifier.hit.this_model",
+    "category_name": "Datasheet Roll Modifier Hit This Model",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:revel-in-desecration/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
     ]
   },
   {
@@ -271,6 +399,99 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000001030:scuttling-walker",
+        "ability_name": "Scuttling Walker",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:scuttling-walker/none",
+        "datasheet_id": "000001030",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004207:scuttling-walker",
+        "ability_name": "Scuttling Walker",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004207/datasheet/000004207:scuttling-walker/none",
+        "datasheet_id": "000004207",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004208:scuttling-walker",
+        "ability_name": "Scuttling Walker",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:scuttling-walker/none",
+        "datasheet_id": "000004208",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004209:scuttling-walker",
+        "ability_name": "Scuttling Walker",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:scuttling-walker/none",
+        "datasheet_id": "000004209",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Scuttling Walker"
+    ],
+    "category_id": "datasheet.rule_ir.movement_transit_permission.this_unit",
+    "category_name": "Datasheet Rule Ir Movement Transit Permission This Unit",
+    "coverage_row_count": 4,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:scuttling-walker/none",
+      "chaos-daemons-bridge-catalog/000004207/datasheet/000004207:scuttling-walker/none",
+      "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:scuttling-walker/none",
+      "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:scuttling-walker/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-transit-permission"
+    ],
+    "source_kind_counts": {
+      "datasheet": 4
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000004207:unleash-wrath",
+        "ability_name": "Unleash Wrath",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004207/datasheet/000004207:unleash-wrath/none",
+        "datasheet_id": "000004207",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Unleash Wrath"
+    ],
+    "category_id": "datasheet.rule_ir.out_of_phase_action.enemy_unit",
+    "category_name": "Datasheet Rule Ir Out Of Phase Action Enemy Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004207/datasheet/000004207:unleash-wrath/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:setup-reactive-shoot-charge"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001112:hunters-from-the-warp",
         "ability_name": "Hunters from the Warp",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/datasheet/000001112:hunters-from-the-warp/none",
@@ -293,6 +514,72 @@
     ],
     "runtime_consumer_ids": [
       "catalog-ir:can-be-placed-in-reserves"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000004209:barrage-of-filth",
+        "ability_name": "Barrage of Filth",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:barrage-of-filth/none",
+        "datasheet_id": "000004209",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Barrage of Filth"
+    ],
+    "category_id": "datasheet.rule_ir.set_contextual_status.enemy_unit",
+    "category_name": "Datasheet Rule Ir Set Contextual Status Enemy Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:barrage-of-filth/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-status"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001030:destroyer-of-futures",
+        "ability_name": "Destroyer of Futures",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none",
+        "datasheet_id": "000001030",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Destroyer of Futures"
+    ],
+    "category_id": "datasheet.rule_ir.set_contextual_status.this_unit",
+    "category_name": "Datasheet Rule Ir Set Contextual Status This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:minimum-unmodified-hit-success"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -1073,6 +1360,57 @@
     },
     "support_stages": [
       "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000008428",
+        "ability_name": "Blessings of Khorne",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
+        "datasheet_id": "000004207",
+        "datasheet_name": "Defiler",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
+        "datasheet_id": "000004208",
+        "datasheet_name": "Defiler",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008396",
+        "ability_name": "Nurgle's Gift (Aura)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004209/faction/000008396/none",
+        "datasheet_id": "000004209",
+        "datasheet_name": "Defiler",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Blessings of Khorne",
+      "Nurgle's Gift (Aura)",
+      "Thrill Seekers"
+    ],
+    "category_id": "unknown.ability_text",
+    "category_name": "Unknown Abilities",
+    "coverage_row_count": 3,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
+      "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004209/faction/000008396/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [],
+    "source_kind_counts": {
+      "faction": 3
+    },
+    "support_stages": [
+      "descriptor_only"
     ]
   },
   {

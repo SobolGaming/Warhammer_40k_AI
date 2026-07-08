@@ -257,26 +257,26 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:first-death-return` | No current generated rows |
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
 | `catalog-ir:force-desperate-escape` | No current generated rows |
-| `catalog-ir:hit-roll-modifier` | No current generated rows |
+| `catalog-ir:hit-roll-modifier` | Revel in Desecration |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | No current generated rows |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon |
-| `catalog-ir:minimum-unmodified-hit-success` | No current generated rows |
+| `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures |
 | `catalog-ir:movement-characteristic-modifier` | No current generated rows |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
-| `catalog-ir:movement-transit-permission` | No current generated rows |
+| `catalog-ir:movement-transit-permission` | Scuttling Walker |
 | `catalog-ir:named-weapon-ability-choice` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
-| `catalog-ir:post-shoot-hit-target-status` | No current generated rows |
+| `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:range-characteristic-query` | No current generated rows |
 | `catalog-ir:save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:save-characteristic-query` | No current generated rows |
 | `catalog-ir:save-roll-modifier` | No current generated rows |
-| `catalog-ir:setup-reactive-shoot-charge` | No current generated rows |
+| `catalog-ir:setup-reactive-shoot-charge` | Unleash Wrath |
 | `catalog-ir:shadow-of-chaos-aura` | No current generated rows |
 | `catalog-ir:strength-characteristic-modifier` | No current generated rows |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
@@ -326,6 +326,10 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `core:new-orders` | New Orders |
 | `core:rapid-ingress` | Rapid Ingress |
 | `core:smokescreen` | Smokescreen |
+| `descriptor:destruction-reaction:deadly-demise-resolution` | Deadly Demise |
+| `descriptor:destruction-reaction:deadly-demise-source` | Deadly Demise |
+| `descriptor:lost-wound:feel-no-pain-resolution` | Feel No Pain |
+| `descriptor:lost-wound:feel-no-pain-source` | Feel No Pain |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
 | `generic:rule-ir` | CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Casting Back the Veil<br>Cloak and Shadow<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>Vengeful Sorrow<br>Warp-Riders |

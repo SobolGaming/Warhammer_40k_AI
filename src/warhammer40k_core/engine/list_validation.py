@@ -1132,17 +1132,25 @@ def _validate_wargear_option_semantics(
 ) -> None:
     options_by_id = {option.option_id: option for option in datasheet.wargear_options}
     selected_by_profile: dict[str, set[str]] = {}
+    selections_by_profile: dict[str, list[WargearSelection]] = {}
     for selection in selections:
         selected = selected_by_profile.setdefault(selection.model_profile_id, set())
         selected.update(selection.wargear_ids)
+        selections_by_profile.setdefault(selection.model_profile_id, []).append(selection)
     for selection in selections:
         if not selection.wargear_ids:
             continue
         option = options_by_id[selection.option_id]
         selected_for_profile = selected_by_profile[selection.model_profile_id]
+        other_selected_for_profile = {
+            wargear_id
+            for other_selection in selections_by_profile[selection.model_profile_id]
+            if other_selection.option_id != selection.option_id
+            for wargear_id in other_selection.wargear_ids
+        }
         for condition in option.conditions:
             if condition.kind is WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH and (
-                selected_for_profile.intersection(condition.wargear_ids)
+                other_selected_for_profile.intersection(condition.wargear_ids)
             ):
                 raise ListValidationError(
                     "WargearSelection violates a structured wargear option condition."

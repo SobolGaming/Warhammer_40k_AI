@@ -22,11 +22,7 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
-from warhammer40k_core.core.model_geometry_catalog import (
-    GeometryEvidenceKind,
-    GeometryReviewStatus,
-    GeometrySourceUnits,
-)
+from warhammer40k_core.core.model_geometry_catalog import GeometryReviewStatus
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
@@ -43,6 +39,42 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_2026_06 as event_companion_source,
+)
+from warhammer40k_core.rules.wahapedia_bridge_defaults import (
+    DEFAULT_HEIGHT_OVERRIDES,
+    DEFAULT_PDF_CORRECTIONS,
+)
+from warhammer40k_core.rules.wahapedia_bridge_defaults import (
+    ModelHeightOverride as ModelHeightOverride,
+)
+from warhammer40k_core.rules.wahapedia_bridge_defaults import (
+    PdfDatasheetCorrection as PdfDatasheetCorrection,
+)
+from warhammer40k_core.rules.wahapedia_bridge_patterns import (
+    COUNT_WORDS,
+    DAEMONIC_ALLEGIANCE_ADDITIONAL_WARGEAR_RE,
+    DAEMONIC_ALLEGIANCE_KEYWORDS,
+    DAMAGED_ABILITY_SELECTION_LIMIT_RE,
+    DAMAGED_ATTACKS_ADD_RE,
+    DAMAGED_ATTACKS_HALVE_RE,
+    DAMAGED_HEADER_RE,
+    DAMAGED_HIT_RE,
+    DAMAGED_IGNORABLE_REMAINDER_RE,
+    DAMAGED_OC_RE,
+    DAMAGED_RANGE_RE,
+    DAMAGED_SHOOTING_WEAPON_SELECTION_LIMIT_RE,
+    DUPLICATE_EQUIPMENT_RESTRICTION_RE,
+    FACTION_ARMY_RULE_ABILITY_IDS_BY_FACTION_ID,
+    LOADOUT_ITEM_COUNT_RE,
+    LOADOUT_RE,
+    OPTION_CHOICE_RE,
+    OPTION_CHOICE_RESTRICTION_RE,
+    OPTION_RE,
+    REPLACEMENT_WITH_CHOICES_RE,
+    REPLACEMENT_WITH_REQUIRED_CHOICES_RE,
+    SINGLE_REPLACEMENT_RE,
+    UNIT_COMPOSITION_PART_RE,
+    UNIT_COMPOSITION_SEPARATOR_RE,
 )
 from warhammer40k_core.rules.wahapedia_bridge_rows import (
     BridgeSourceArtifact,
@@ -64,147 +96,6 @@ class WahapediaBridgeError(ValueError):
 _SOURCE_KEYWORD_SEQUENCE_PARTS = (
     datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
 )
-
-
-@dataclass(frozen=True, slots=True)
-class PdfDatasheetCorrection:
-    datasheet_id: str
-    source_id: str
-    removed_keywords: tuple[str, ...] = ()
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self, "datasheet_id", _validate_identifier("datasheet_id", self.datasheet_id)
-        )
-        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
-        object.__setattr__(
-            self,
-            "removed_keywords",
-            _validate_identifier_tuple("removed_keywords", self.removed_keywords),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class ModelHeightOverride:
-    datasheet_id: str
-    model_name: str
-    height: float
-    height_units: GeometrySourceUnits
-    height_source_id: str
-    height_document_reference: str
-    reviewer_status: GeometryReviewStatus = GeometryReviewStatus.ACCEPTED
-    evidence_kind: GeometryEvidenceKind = GeometryEvidenceKind.MANUAL_MEASUREMENT
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self, "datasheet_id", _validate_identifier("datasheet_id", self.datasheet_id)
-        )
-        object.__setattr__(self, "model_name", _validate_identifier("model_name", self.model_name))
-        object.__setattr__(self, "height", _validate_positive_float("height", self.height))
-        object.__setattr__(self, "height_units", GeometrySourceUnits(self.height_units))
-        object.__setattr__(
-            self,
-            "height_source_id",
-            _validate_identifier("height_source_id", self.height_source_id),
-        )
-        object.__setattr__(
-            self,
-            "height_document_reference",
-            _validate_identifier("height_document_reference", self.height_document_reference),
-        )
-        object.__setattr__(self, "reviewer_status", GeometryReviewStatus(self.reviewer_status))
-        object.__setattr__(self, "evidence_kind", GeometryEvidenceKind(self.evidence_kind))
-
-
-_UNIT_COMPOSITION_PART_RE = re.compile(
-    r"(?P<count>\d+(?:-\d+)?)\s+(?P<name>.+?)"
-    r"(?=(?:,\s+|\s+and\s+)\d+(?:-\d+)?\s+|$)",
-    re.IGNORECASE,
-)
-_UNIT_COMPOSITION_SEPARATOR_RE = re.compile(r"(?:,\s+|\s+and\s+)", re.IGNORECASE)
-_MODEL_COST_RE = re.compile(r"^(?P<count>\d+)\s+models?$", re.IGNORECASE)
-_OPTION_RE = re.compile(
-    r"^1 (?P<model>.+?) that is not equipped with (?:a|an|1) "
-    r"(?P<forbidden>.+?) can be equipped with 1 (?P<granted>.+?)\.$",
-    re.IGNORECASE,
-)
-_REPLACEMENT_WITH_REQUIRED_CHOICES_RE = re.compile(
-    r"^This model's (?P<replaced>.+?) can be replaced with 1 (?P<required>.+?) "
-    r"and one of the following:\n(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
-    re.IGNORECASE,
-)
-_SINGLE_REPLACEMENT_RE = re.compile(
-    r"^This model's (?P<replaced>.+?) can be replaced with 1 (?P<replacement>.+?)\.?$",
-    re.IGNORECASE,
-)
-_OPTION_CHOICE_RE = re.compile(r"^- 1 (?P<name>.+?)\.?$", re.IGNORECASE)
-_DAEMONIC_ALLEGIANCE_ADDITIONAL_WARGEAR_RE = re.compile(
-    r"\b(?P<keyword>KHORNE|TZEENTCH|NURGLE|SLAANESH)\s*-\s*"
-    r"This model is additionally equipped with:\s*(?P<wargear>.+?)"
-    r"(?=(?:\s+\b(?:KHORNE|TZEENTCH|NURGLE|SLAANESH)\s*-\s*"
-    r"This model is additionally equipped with:)|\s*$)",
-    re.IGNORECASE | re.DOTALL,
-)
-_LOADOUT_RE = re.compile(r"[^.]+? (?:is|are) equipped with: (?P<items>[^.]+)\.?", re.IGNORECASE)
-_DAMAGED_HEADER_RE = re.compile(
-    r"^\s*DAMAGED:\s*\d+\s*-\s*\d+\s+WOUNDS\s+REMAINING\s*",
-    re.IGNORECASE,
-)
-_DAMAGED_RANGE_RE = re.compile(
-    r"While\s+(?:this\s+model|this\s+unit's\s+(?P<model_name>.+?)\s+model)\s+has\s+"
-    r"(?P<wounds_min>\d+)\s*-\s*(?P<wounds_max>\d+)\s+wounds\s+remaining",
-    re.IGNORECASE,
-)
-_DAMAGED_HIT_RE = re.compile(
-    r"each\s+time\s+(?:this\s+model|it|this\s+unit)\s+makes\s+an\s+attack,\s+"
-    r"subtract\s+(?P<value>\d+)\s+from\s+the\s+Hit\s+roll",
-    re.IGNORECASE,
-)
-_DAMAGED_MODEL_POSSESSIVE_RE = r"this\s+model'?s"
-_DAMAGED_APOSTROPHE_RE = r"'"
-_DAMAGED_OC_RE = re.compile(
-    rf"subtract\s+(?P<value>\d+)\s+from\s+"
-    rf"(?:{_DAMAGED_MODEL_POSSESSIVE_RE}|its)\s+"
-    r"Objective\s+Control\s+characteristic",
-    re.IGNORECASE,
-)
-_DAMAGED_ATTACKS_ADD_RE = re.compile(
-    r"add\s+(?P<value>\d+)\s+to\s+the\s+Attacks\s+characteristic\s+of\s+"
-    rf"{_DAMAGED_MODEL_POSSESSIVE_RE}\s+"
-    r"(?P<weapon_scope>melee\s+weapons|[^.]+)",
-    re.IGNORECASE,
-)
-_DAMAGED_ATTACKS_HALVE_RE = re.compile(
-    r"(?:the\s+Attacks\s+characteristics\s+of\s+all\s+of\s+its\s+weapons\s+are\s+halved|"
-    r"halve\s+the\s+Attacks\s+characteristic\s+of\s+that\s+model's\s+weapons)",
-    re.IGNORECASE,
-)
-_DAMAGED_SHOOTING_WEAPON_SELECTION_LIMIT_RE = re.compile(
-    rf"you\s+can\s+only\s+select\s+(?P<max>\w+)\s+of\s+the\s+"
-    rf"(?P<selection_group>C{_DAMAGED_APOSTROPHE_RE}tan\s+Powers\s+weapons)\s+"
-    r"in\s+your\s+Shooting\s+phase,\s+instead\s+of\s+(?P<baseline>\w+)",
-    re.IGNORECASE,
-)
-_DAMAGED_ABILITY_SELECTION_LIMIT_RE = re.compile(
-    r"you\s+can\s+only\s+select\s+(?P<max>\w+)\s+ability\s+when\s+using\s+its\s+"
-    r"(?P<selection_group>Relics\s+of\s+the\s+Matriarchs\s+ability),\s+"
-    r"instead\s+of\s+up\s+to\s+(?P<baseline>\w+)",
-    re.IGNORECASE,
-)
-_DAMAGED_IGNORABLE_REMAINDER_RE = re.compile(r"[\s,.;:]+|(?:\band\b)|(?:\bwhile\b)", re.IGNORECASE)
-_COUNT_WORDS = {
-    "one": 1,
-    "two": 2,
-    "three": 3,
-    "four": 4,
-    "five": 5,
-    "six": 6,
-    "seven": 7,
-    "eight": 8,
-    "nine": 9,
-    "ten": 10,
-}
-_DAEMONIC_ALLEGIANCE_KEYWORDS = ("KHORNE", "TZEENTCH", "NURGLE", "SLAANESH")
 
 
 def build_wahapedia_canonical_bridge_artifacts(
@@ -302,6 +193,12 @@ class _WeaponKeywordEntry:
     ability: AbilityDescriptor | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class _ReplacementChoice:
+    name: str
+    duplicate_limited_name: str | None = None
+
+
 EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID = (
     "pdf:warhammer40000-event-companion:2026-06-12:base-size-guide"
 )
@@ -335,9 +232,17 @@ def _bridge_datasheet(
         context=context,
         datasheet_id=datasheet_id,
     )
-    faction_ability_row = _faction_ability_row(context=context, datasheet_id=datasheet_id)
-    faction_ability_source = _ability_source_row(context=context, ability_row=faction_ability_row)
-    faction_source_ids = _source_ids(faction_row, faction_ability_row, faction_ability_source)
+    faction_ability_row, faction_ability_source = _faction_catalog_ability_rows(
+        context=context,
+        datasheet_id=datasheet_id,
+        faction_id=faction_id,
+    )
+    faction_source_rows = (
+        (faction_row, faction_ability_source)
+        if faction_ability_row is None
+        else (faction_row, faction_ability_row, faction_ability_source)
+    )
+    faction_source_ids = _source_ids(*faction_source_rows)
     _append_or_merge_faction_row(
         bridged_rows=bridged_rows,
         row={
@@ -345,7 +250,7 @@ def _bridge_datasheet(
             "name": _raw_or_field(faction_row, "name"),
             "content_scope": "matched_play",
             "faction_keywords": _joined(faction_keywords),
-            "army_rule_id": _required_field(faction_ability_row, "ability_id"),
+            "army_rule_id": _required_field(faction_ability_source, "id"),
             "army_rule_name": _raw_or_field(faction_ability_source, "name"),
             "source_ids": _joined(faction_source_ids),
         },
@@ -514,9 +419,9 @@ def _composition_parts_from_row(row: NormalizedSourceRow) -> tuple[_CompositionP
         return ()
     parts: list[_CompositionPart] = []
     position = 0
-    for match in _UNIT_COMPOSITION_PART_RE.finditer(description):
+    for match in UNIT_COMPOSITION_PART_RE.finditer(description):
         separator = description[position : match.start()]
-        if separator and _UNIT_COMPOSITION_SEPARATOR_RE.fullmatch(separator) is None:
+        if separator and UNIT_COMPOSITION_SEPARATOR_RE.fullmatch(separator) is None:
             raise WahapediaBridgeError("Unsupported unit composition row shape.")
         minimum, maximum = _composition_count_range(match.group("count"))
         parts.append(
@@ -658,7 +563,12 @@ def _keywords_for_datasheet(
     )
 
 
-def _faction_ability_row(*, context: _BridgeContext, datasheet_id: str) -> NormalizedSourceRow:
+def _faction_catalog_ability_rows(
+    *,
+    context: _BridgeContext,
+    datasheet_id: str,
+    faction_id: str,
+) -> tuple[NormalizedSourceRow | None, NormalizedSourceRow]:
     rows = tuple(
         row
         for row in _rows_matching(
@@ -666,9 +576,21 @@ def _faction_ability_row(*, context: _BridgeContext, datasheet_id: str) -> Norma
         )
         if _required_field(row, "type") == "Faction"
     )
+    if len(rows) == 1:
+        ability_source = _ability_source_row(context=context, ability_row=rows[0])
+        return rows[0], ability_source
+    if not rows:
+        ability_id = FACTION_ARMY_RULE_ABILITY_IDS_BY_FACTION_ID.get(faction_id)
+        if ability_id is None:
+            raise WahapediaBridgeError("Datasheet has no faction ability fallback.")
+        return None, _ability_source_row_by_id_and_faction(
+            context=context,
+            ability_id=ability_id,
+            faction_id=faction_id,
+        )
     if len(rows) != 1:
         raise WahapediaBridgeError("Datasheet must link exactly one faction ability.")
-    return rows[0]
+    raise WahapediaBridgeError("Datasheet faction ability lookup failed.")
 
 
 def _ability_source_row(
@@ -679,6 +601,23 @@ def _ability_source_row(
         ability_row=ability_row,
         error_type=WahapediaBridgeError,
     )
+
+
+def _ability_source_row_by_id_and_faction(
+    *,
+    context: _BridgeContext,
+    ability_id: str,
+    faction_id: str,
+) -> NormalizedSourceRow:
+    candidates = tuple(
+        row
+        for row in context.rows_by_table.get("Abilities", ())
+        if _required_field(row, "id") == ability_id
+        and _required_field(row, "faction_id") == faction_id
+    )
+    if len(candidates) != 1:
+        raise WahapediaBridgeError("Faction ability fallback did not resolve one source row.")
+    return candidates[0]
 
 
 def _bridge_unit_composition(
@@ -727,8 +666,12 @@ def _bridge_wargear(
         wargear_ids_by_name[_name_key(base_name)] = wargear_id
         wargear_ids_by_name[_name_key(name)] = wargear_id
         is_default_loadout = (
-            default_wargear_name_keys is None or _name_key(base_name) in default_wargear_name_keys
-        ) and wargear_id not in emitted_default_wargear_ids
+            _is_default_loadout_wargear(
+                base_name=base_name,
+                default_wargear_name_keys=default_wargear_name_keys,
+            )
+            and wargear_id not in emitted_default_wargear_ids
+        )
         if is_default_loadout:
             emitted_default_wargear_ids.add(wargear_id)
         description = _required_field(row, "description")
@@ -917,7 +860,7 @@ def _bridge_options(
         description = _required_field(row, "description")
         if description == "None":
             continue
-        replacement_match = _REPLACEMENT_WITH_REQUIRED_CHOICES_RE.fullmatch(description)
+        replacement_match = REPLACEMENT_WITH_REQUIRED_CHOICES_RE.fullmatch(description)
         if replacement_match is not None:
             _bridge_replacement_with_required_choices_option(
                 row=row,
@@ -928,7 +871,18 @@ def _bridge_options(
                 bridged_rows=bridged_rows,
             )
             continue
-        single_replacement_match = _SINGLE_REPLACEMENT_RE.fullmatch(description)
+        replacement_choices_match = REPLACEMENT_WITH_CHOICES_RE.fullmatch(description)
+        if replacement_choices_match is not None:
+            _bridge_replacement_with_choices_option(
+                row=row,
+                datasheet_id=datasheet_id,
+                model_profile_id=_single_model_profile_id(composition_entries),
+                wargear_ids_by_name=wargear_ids_by_name,
+                match=replacement_choices_match,
+                bridged_rows=bridged_rows,
+            )
+            continue
+        single_replacement_match = SINGLE_REPLACEMENT_RE.fullmatch(description)
         if single_replacement_match is not None:
             _bridge_single_replacement_option(
                 row=row,
@@ -939,7 +893,7 @@ def _bridge_options(
                 bridged_rows=bridged_rows,
             )
             continue
-        match = _OPTION_RE.fullmatch(description)
+        match = OPTION_RE.fullmatch(description)
         if match is None:
             raise WahapediaBridgeError("Unsupported wargear option row shape.")
         model_profile_id = _required_model_profile_id(model_profile_by_name, match.group("model"))
@@ -1007,7 +961,7 @@ def _bridge_daemonic_allegiance_options(
     model_profile_id = _single_model_profile_id(composition_entries)
     selection_group_id = f"{datasheet_id}:daemonic-allegiance"
     source_line = _required_field(row, "line")
-    for index, keyword in enumerate(_DAEMONIC_ALLEGIANCE_KEYWORDS, start=1):
+    for index, keyword in enumerate(DAEMONIC_ALLEGIANCE_KEYWORDS, start=1):
         option_id = f"{selection_group_id}:{_slug(keyword)}"
         common_fields = {
             "datasheet_id": datasheet_id,
@@ -1058,12 +1012,12 @@ def _validate_daemonic_allegiance_keywords(description: str) -> None:
             re.IGNORECASE,
         )
     }
-    if present != set(_DAEMONIC_ALLEGIANCE_KEYWORDS):
+    if present != set(DAEMONIC_ALLEGIANCE_KEYWORDS):
         raise WahapediaBridgeError("Daemonic Allegiance row must declare all four allegiances.")
 
 
 def _daemonic_allegiance_additional_wargear_by_keyword(description: str) -> dict[str, str]:
-    matches = tuple(_DAEMONIC_ALLEGIANCE_ADDITIONAL_WARGEAR_RE.finditer(description))
+    matches = tuple(DAEMONIC_ALLEGIANCE_ADDITIONAL_WARGEAR_RE.finditer(description))
     if not matches:
         if "additionally equipped with" in description.casefold():
             raise WahapediaBridgeError("Unsupported Daemonic Allegiance additional wargear shape.")
@@ -1074,7 +1028,7 @@ def _daemonic_allegiance_additional_wargear_by_keyword(description: str) -> dict
         if keyword in by_keyword:
             raise WahapediaBridgeError("Daemonic Allegiance additional wargear duplicates keyword.")
         by_keyword[keyword] = match.group("wargear").strip().removesuffix(".").strip()
-    if set(by_keyword) != set(_DAEMONIC_ALLEGIANCE_KEYWORDS):
+    if set(by_keyword) != set(DAEMONIC_ALLEGIANCE_KEYWORDS):
         raise WahapediaBridgeError(
             "Daemonic Allegiance additional wargear must define all allegiances."
         )
@@ -1098,20 +1052,20 @@ def _bridge_replacement_with_required_choices_option(
 ) -> None:
     replaced_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replaced"))
     required_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("required"))
-    choice_names = _replacement_choice_names(match.group("choices"))
+    choices = _replacement_choices(match.group("choices"))
     choice_wargear_ids = tuple(
-        _required_wargear_id(wargear_ids_by_name, choice_name) for choice_name in choice_names
+        _required_wargear_id(wargear_ids_by_name, choice.name) for choice in choices
     )
     source_line = _required_field(row, "line")
-    for choice_index, (choice_name, choice_wargear_id) in enumerate(
-        zip(choice_names, choice_wargear_ids, strict=True),
+    for choice_index, (choice, choice_wargear_id) in enumerate(
+        zip(choices, choice_wargear_ids, strict=True),
         start=1,
     ):
         other_choice_ids = tuple(
             other_id for other_id in choice_wargear_ids if other_id != choice_wargear_id
         )
         option_id = (
-            f"{datasheet_id}:{_slug(match.group('required'))}-{_slug(choice_name)}:"
+            f"{datasheet_id}:{_slug(match.group('required'))}-{_slug(choice.name)}:"
             f"option-{source_line}"
         )
         common_fields = {
@@ -1151,6 +1105,55 @@ def _bridge_replacement_with_required_choices_option(
         )
 
 
+def _bridge_replacement_with_choices_option(
+    *,
+    row: NormalizedSourceRow,
+    datasheet_id: str,
+    model_profile_id: str,
+    wargear_ids_by_name: dict[str, str],
+    match: re.Match[str],
+    bridged_rows: dict[str, list[dict[str, str]]],
+) -> None:
+    replaced_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replaced"))
+    choices = _replacement_choices(match.group("choices"))
+    source_line = _required_field(row, "line")
+    for choice_index, choice in enumerate(choices, start=1):
+        choice_wargear_id = _required_wargear_id(wargear_ids_by_name, choice.name)
+        duplicate_limited_wargear_id = (
+            ""
+            if choice.duplicate_limited_name is None
+            else _required_wargear_id(wargear_ids_by_name, choice.duplicate_limited_name)
+        )
+        bridged_rows["Datasheets_options"].append(
+            {
+                "datasheet_id": datasheet_id,
+                "line": f"{source_line}.{choice_index}",
+                "description": _raw_or_field(row, "description"),
+                "option_id": (
+                    f"{datasheet_id}:{_slug(match.group('replaced'))}-{_slug(choice.name)}:"
+                    f"option-{source_line}"
+                ),
+                "model_profile_id": model_profile_id,
+                "default_wargear_ids": "",
+                "allowed_wargear_ids": choice_wargear_id,
+                "min_selections": "0",
+                "max_selections": "1",
+                "condition_kind": (
+                    WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH.value
+                    if duplicate_limited_wargear_id
+                    else ""
+                ),
+                "condition_wargear_ids": duplicate_limited_wargear_id,
+                "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
+                "effect_wargear_id": choice_wargear_id,
+                "effect_replaced_wargear_id": replaced_wargear_id,
+                "effect_model_count": "1",
+                "effect_wargear_count": "1",
+                "source_ids": _joined(_source_ids(row)),
+            }
+        )
+
+
 def _bridge_single_replacement_option(
     *,
     row: NormalizedSourceRow,
@@ -1160,6 +1163,7 @@ def _bridge_single_replacement_option(
     match: re.Match[str],
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> None:
+    _positive_int_from_text("replacement_count", match.group("replacement_count"))
     replaced_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replaced"))
     replacement_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replacement"))
     bridged_rows["Datasheets_options"].append(
@@ -1188,16 +1192,32 @@ def _bridge_single_replacement_option(
     )
 
 
-def _replacement_choice_names(choices_text: str) -> tuple[str, ...]:
-    choice_names: list[str] = []
+def _replacement_choices(choices_text: str) -> tuple[_ReplacementChoice, ...]:
+    choices: list[_ReplacementChoice] = []
     for line in choices_text.splitlines():
-        match = _OPTION_CHOICE_RE.fullmatch(line.strip())
+        match = OPTION_CHOICE_RE.fullmatch(line.strip())
         if match is None:
             raise WahapediaBridgeError("Unsupported replacement wargear choice row shape.")
-        choice_names.append(match.group("name"))
-    if not choice_names:
+        choices.append(_replacement_choice(match.group("name")))
+    if not choices:
         raise WahapediaBridgeError("Replacement wargear option has no choices.")
-    return tuple(choice_names)
+    return tuple(choices)
+
+
+def _replacement_choice(choice_text: str) -> _ReplacementChoice:
+    restriction_match = OPTION_CHOICE_RESTRICTION_RE.fullmatch(choice_text)
+    if restriction_match is None:
+        return _ReplacementChoice(name=choice_text)
+    name = restriction_match.group("name")
+    duplicate_match = DUPLICATE_EQUIPMENT_RESTRICTION_RE.fullmatch(
+        restriction_match.group("restriction")
+    )
+    if duplicate_match is None:
+        raise WahapediaBridgeError("Unsupported replacement wargear choice restriction.")
+    duplicate_name = duplicate_match.group("name")
+    if _name_key(duplicate_name) != _name_key(name):
+        raise WahapediaBridgeError("Replacement wargear duplicate restriction target drift.")
+    return _ReplacementChoice(name=name, duplicate_limited_name=duplicate_name)
 
 
 def _bridge_leader_links(
@@ -1249,7 +1269,7 @@ def _damaged_effects_from_description(
     description = _normalize_damaged_description(damaged_description)
     if not description:
         return ()
-    range_match = _DAMAGED_RANGE_RE.search(description)
+    range_match = DAMAGED_RANGE_RE.search(description)
     if range_match is None:
         raise WahapediaBridgeError("DAMAGED section is missing a wounds-remaining range.")
     model_profile_id = _damaged_model_profile_id(
@@ -1266,7 +1286,7 @@ def _damaged_effects_from_description(
     )
     effects: list[DamagedEffectDefinition] = []
     consumed_spans = [range_match.span()]
-    for match in _DAMAGED_OC_RE.finditer(description):
+    for match in DAMAGED_OC_RE.finditer(description):
         effects.append(
             _damaged_effect(
                 datasheet_id=datasheet_id,
@@ -1283,7 +1303,7 @@ def _damaged_effects_from_description(
             )
         )
         consumed_spans.append(match.span())
-    for match in _DAMAGED_HIT_RE.finditer(description):
+    for match in DAMAGED_HIT_RE.finditer(description):
         effects.append(
             _damaged_effect(
                 datasheet_id=datasheet_id,
@@ -1300,7 +1320,7 @@ def _damaged_effects_from_description(
             )
         )
         consumed_spans.append(match.span())
-    for match in _DAMAGED_ATTACKS_ADD_RE.finditer(description):
+    for match in DAMAGED_ATTACKS_ADD_RE.finditer(description):
         weapon_scope_text = match.group("weapon_scope")
         weapon_scope = (
             DamagedWeaponScope.MELEE
@@ -1326,7 +1346,7 @@ def _damaged_effects_from_description(
             )
         )
         consumed_spans.append(match.span())
-    for match in _DAMAGED_ATTACKS_HALVE_RE.finditer(description):
+    for match in DAMAGED_ATTACKS_HALVE_RE.finditer(description):
         effects.append(
             _damaged_effect(
                 datasheet_id=datasheet_id,
@@ -1340,7 +1360,7 @@ def _damaged_effects_from_description(
             )
         )
         consumed_spans.append(match.span())
-    for match in _DAMAGED_SHOOTING_WEAPON_SELECTION_LIMIT_RE.finditer(description):
+    for match in DAMAGED_SHOOTING_WEAPON_SELECTION_LIMIT_RE.finditer(description):
         effects.append(
             _damaged_effect(
                 datasheet_id=datasheet_id,
@@ -1362,7 +1382,7 @@ def _damaged_effects_from_description(
             )
         )
         consumed_spans.append(match.span())
-    for match in _DAMAGED_ABILITY_SELECTION_LIMIT_RE.finditer(description):
+    for match in DAMAGED_ABILITY_SELECTION_LIMIT_RE.finditer(description):
         effects.append(
             _damaged_effect(
                 datasheet_id=datasheet_id,
@@ -1439,7 +1459,7 @@ def _damaged_model_profile_id(
 def _normalize_damaged_description(value: str) -> str:
     if type(value) is not str:
         raise WahapediaBridgeError("DAMAGED description must be a string.")
-    without_header = _DAMAGED_HEADER_RE.sub("", value.strip())
+    without_header = DAMAGED_HEADER_RE.sub("", value.strip())
     return re.sub(r"\s+", " ", without_header).strip()
 
 
@@ -1458,7 +1478,7 @@ def _raise_for_unparsed_damaged_text(
         cursor = end
     unconsumed_parts.append(description[cursor:])
     remainder = "".join(unconsumed_parts)
-    stripped = _DAMAGED_IGNORABLE_REMAINDER_RE.sub("", remainder)
+    stripped = DAMAGED_IGNORABLE_REMAINDER_RE.sub("", remainder)
     if stripped:
         raise WahapediaBridgeError("DAMAGED section contains unsupported effect text.")
 
@@ -2180,7 +2200,10 @@ def _required_model_profile_id(model_profile_by_name: dict[str, str], model_name
 
 
 def _required_wargear_id(wargear_ids_by_name: dict[str, str], wargear_name: str) -> str:
-    wargear_id = wargear_ids_by_name.get(_name_key(wargear_name))
+    key = _name_key(wargear_name)
+    wargear_id = wargear_ids_by_name.get(key)
+    if wargear_id is None and key.endswith("s"):
+        wargear_id = wargear_ids_by_name.get(key[:-1])
     if wargear_id is None:
         raise WahapediaBridgeError("Wargear option references an unknown wargear item.")
     return wargear_id
@@ -2253,11 +2276,11 @@ def _loadout_wargear_name_keys(loadout: str) -> frozenset[str] | None:
     stripped = " ".join(loadout.strip().split())
     if not stripped:
         return None
-    matches = tuple(_LOADOUT_RE.finditer(stripped))
+    matches = tuple(LOADOUT_RE.finditer(stripped))
     if not matches:
         raise WahapediaBridgeError("Unsupported datasheet loadout row shape.")
     item_names = tuple(
-        item.strip() for match in matches for item in match.group("items").split(";")
+        _loadout_wargear_name(item) for match in matches for item in match.group("items").split(";")
     )
     if not item_names or any(not item_name for item_name in item_names):
         raise WahapediaBridgeError("Datasheet loadout contains an empty wargear item.")
@@ -2268,6 +2291,33 @@ def _loadout_wargear_name_keys(loadout: str) -> frozenset[str] | None:
     if nothing_key in item_keys:
         raise WahapediaBridgeError("Datasheet loadout mixes nothing with wargear items.")
     return frozenset(item_keys)
+
+
+def _loadout_wargear_name(item_name: str) -> str:
+    stripped = item_name.strip()
+    match = LOADOUT_ITEM_COUNT_RE.fullmatch(stripped)
+    if match is None:
+        return stripped
+    _positive_int_from_text("loadout wargear count", match.group("count"))
+    name = match.group("name").strip()
+    if not name:
+        raise WahapediaBridgeError("Datasheet loadout contains an empty counted wargear item.")
+    return name
+
+
+def _is_default_loadout_wargear(
+    *,
+    base_name: str,
+    default_wargear_name_keys: frozenset[str] | None,
+) -> bool:
+    if default_wargear_name_keys is None:
+        return True
+    key = _name_key(base_name)
+    if key in default_wargear_name_keys:
+        return True
+    if f"{key}s" in default_wargear_name_keys:
+        return True
+    return key.endswith("s") and key[:-1] in default_wargear_name_keys
 
 
 def _weapon_description_item_name_keys(description: str) -> frozenset[str]:
@@ -2335,7 +2385,7 @@ def _positive_int_from_text(field_name: str, value: str) -> int:
 
 
 def _positive_int_from_count_text(field_name: str, value: str) -> int:
-    count = _COUNT_WORDS.get(_canonical_text(value))
+    count = COUNT_WORDS.get(_canonical_text(value))
     if count is not None:
         return count
     return _positive_int_from_text(field_name, value)
@@ -2358,15 +2408,6 @@ def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tupl
     return tuple(validated)
 
 
-def _validate_positive_float(field_name: str, value: object) -> float:
-    if not isinstance(value, int | float) or type(value) is bool:
-        raise WahapediaBridgeError(f"{field_name} must be a number.")
-    number = float(value)
-    if number <= 0.0:
-        raise WahapediaBridgeError(f"{field_name} must be greater than 0.")
-    return number
-
-
 def _deduplicated(values: list[str]) -> list[str]:
     seen: set[str] = set()
     deduplicated: list[str] = []
@@ -2376,32 +2417,3 @@ def _deduplicated(values: list[str]) -> list[str]:
         seen.add(value)
         deduplicated.append(value)
     return deduplicated
-
-
-CHAOS_DAEMONS_BLOODCRUSHERS_PDF_CORRECTION = PdfDatasheetCorrection(
-    datasheet_id="000001115",
-    source_id="pdf:chaos-daemons-faction-pack:2026-06-10:p30-p31",
-    removed_keywords=("Shadow Legion",),
-)
-
-CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES = (
-    ModelHeightOverride(
-        datasheet_id="000001115",
-        model_name="Bloodhunter",
-        height=2.75,
-        height_units=GeometrySourceUnits.INCHES,
-        height_source_id="geometry-review:chaos-daemons:bloodcrushers:bloodhunter:height",
-        height_document_reference="Chaos Daemons Faction Pack p.30-31",
-    ),
-    ModelHeightOverride(
-        datasheet_id="000001115",
-        model_name="Bloodcrushers",
-        height=2.75,
-        height_units=GeometrySourceUnits.INCHES,
-        height_source_id="geometry-review:chaos-daemons:bloodcrushers:bloodcrushers:height",
-        height_document_reference="Chaos Daemons Faction Pack p.30-31",
-    ),
-)
-
-DEFAULT_PDF_CORRECTIONS = (CHAOS_DAEMONS_BLOODCRUSHERS_PDF_CORRECTION,)
-DEFAULT_HEIGHT_OVERRIDES = CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
