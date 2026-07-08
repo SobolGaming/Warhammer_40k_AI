@@ -81,6 +81,7 @@ from warhammer40k_core.rules.wahapedia_bridge_rows import (
     bridge_rows_by_table,
     resolve_bridge_ability_source_row,
 )
+from warhammer40k_core.rules.wahapedia_equipment_choice_bridge import append_choice_rows
 from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
     WahapediaCsvTable,
@@ -854,11 +855,16 @@ def _bridge_options(
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> None:
     model_profile_by_name = _model_profiles_by_name(composition_entries)
+    profile_ids = tuple(entry.model_profile_id for entry in composition_entries)
     for row in _rows_matching(
         context.rows_by_table, "Datasheets_options", "datasheet_id", datasheet_id
     ):
         description = _required_field(row, "description")
         if description == "None":
+            continue
+        if append_choice_rows(
+            row, datasheet_id, profile_ids, wargear_ids_by_name, bridged_rows, WahapediaBridgeError
+        ):
             continue
         replacement_match = REPLACEMENT_WITH_REQUIRED_CHOICES_RE.fullmatch(description)
         if replacement_match is not None:

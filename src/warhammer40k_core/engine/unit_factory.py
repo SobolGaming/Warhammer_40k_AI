@@ -584,7 +584,10 @@ def _apply_structured_wargear_selection_to_models(
 ) -> None:
     selected_wargear = list(selection.wargear_ids)
     for effect in option.effects:
-        if effect.kind is WargearOptionEffectKind.ADD_WARGEAR:
+        if effect.kind in {
+            WargearOptionEffectKind.ADD_WARGEAR,
+            WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED,
+        }:
             _apply_add_wargear_effect_to_models(
                 option=option,
                 effect=effect,
