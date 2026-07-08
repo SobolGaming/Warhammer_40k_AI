@@ -64,6 +64,7 @@ class WargearOptionConditionKind(StrEnum):
 
 class WargearOptionEffectKind(StrEnum):
     ADD_WARGEAR = "add_wargear"
+    ADD_WARGEAR_IF_SELECTED = "add_wargear_if_selected"
     REPLACE_WARGEAR = "replace_wargear"
 
 
@@ -80,7 +81,6 @@ class AttachmentRole(StrEnum):
 CatalogParameterValue = int | float | str | bool
 type CatalogJsonValue = None | bool | int | float | str | list[CatalogJsonValue] | CatalogJsonObject
 type CatalogJsonObject = dict[str, CatalogJsonValue]
-
 REQUIRED_MODEL_CHARACTERISTICS = frozenset(
     {
         Characteristic.MOVEMENT,
@@ -228,7 +228,6 @@ class BaseSizeDefinition:
     def __post_init__(self) -> None:
         kind = base_size_kind_from_token(self.kind)
         object.__setattr__(self, "kind", kind)
-
         if kind is BaseSizeKind.CIRCULAR:
             diameter_mm = _validate_positive_number(
                 "BaseSizeDefinition diameter_mm",
@@ -240,7 +239,6 @@ class BaseSizeDefinition:
                 )
             object.__setattr__(self, "diameter_mm", diameter_mm)
             return
-
         if self.diameter_mm is not None:
             raise DatasheetCatalogError(
                 "Non-circular BaseSizeDefinition must not include diameter_mm."
@@ -491,9 +489,9 @@ class DatasheetWargearOptionEffect:
             "DatasheetWargearOptionEffect replaced_wargear_id",
             self.replaced_wargear_id,
         )
-        if kind is WargearOptionEffectKind.ADD_WARGEAR and replaced_wargear_id is not None:
+        if kind is not WargearOptionEffectKind.REPLACE_WARGEAR and replaced_wargear_id is not None:
             raise DatasheetCatalogError(
-                "ADD_WARGEAR DatasheetWargearOptionEffect must not include replaced_wargear_id."
+                "Additive DatasheetWargearOptionEffect must not include replaced_wargear_id."
             )
         if kind is WargearOptionEffectKind.REPLACE_WARGEAR:
             if replaced_wargear_id is None:
@@ -1815,6 +1813,8 @@ def _wargear_option_effect_sort_order(kind: WargearOptionEffectKind) -> int:
     if kind is WargearOptionEffectKind.REPLACE_WARGEAR:
         return 0
     if kind is WargearOptionEffectKind.ADD_WARGEAR:
+        return 1
+    if kind is WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED:
         return 1
     raise DatasheetCatalogError("Unsupported WargearOptionEffectKind sort order.")
 

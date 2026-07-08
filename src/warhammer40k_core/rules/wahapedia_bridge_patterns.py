@@ -13,6 +13,11 @@ OPTION_RE = re.compile(
     r"(?P<forbidden>.+?) can be equipped with 1 (?P<granted>.+?)\.$",
     re.IGNORECASE,
 )
+EQUIPMENT_WITH_CHOICES_RE = re.compile(
+    r"^This model can be equipped with one of the following:\n"
+    r"(?P<choices>(?:- (?:\d+ )?.+?(?:\n|$))+)$",
+    re.IGNORECASE,
+)
 REPLACEMENT_WITH_REQUIRED_CHOICES_RE = re.compile(
     r"^This model's (?P<replaced>.+?) can be replaced with 1 (?P<required>.+?) "
     r"and one of the following:\n(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
@@ -26,6 +31,10 @@ REPLACEMENT_WITH_CHOICES_RE = re.compile(
 SINGLE_REPLACEMENT_RE = re.compile(
     r"^This model's (?P<replaced>.+?) can be replaced with "
     r"(?P<replacement_count>\d+) (?P<replacement>.+?)\.?$",
+    re.IGNORECASE,
+)
+EQUIPMENT_CHOICE_RE = re.compile(
+    r"^- (?:(?P<count>\d+) )?(?P<name>.+?)\.?$",
     re.IGNORECASE,
 )
 OPTION_CHOICE_RE = re.compile(r"^- 1 (?P<name>.+?)\.?$", re.IGNORECASE)

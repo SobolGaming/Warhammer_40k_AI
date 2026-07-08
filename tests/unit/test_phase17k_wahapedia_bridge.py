@@ -775,6 +775,158 @@ def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear()
     assert doomsday_records_by_name["Reverberating Summons"].wargear_id == doomsday_bell_id
 
 
+def test_phase17k_keeper_of_secrets_bridge_supports_required_one_of_wargear() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_keeper_of_secrets_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000001137")
+    wargear_by_id = {wargear.wargear_id: wargear for wargear in package.army_catalog.wargear}
+    abilities_by_name = {ability.name: ability for ability in datasheet.abilities}
+    options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    model_profile_id = "000001137:keeper-of-secrets"
+    living_whip_id = "000001137:living-whip"
+    ritual_knife_id = "000001137:ritual-knife"
+    shining_aegis_id = "000001137:shining-aegis"
+    option_id = "000001137:equipment-choice:option-1"
+
+    option = options_by_id[option_id]
+    assert option.model_profile_id == model_profile_id
+    assert option.default_wargear_ids == ()
+    assert option.allowed_wargear_ids == (living_whip_id, ritual_knife_id, shining_aegis_id)
+    assert option.min_selections == 1
+    assert option.max_selections == 1
+    assert option.conditions == ()
+    assert tuple(effect.kind for effect in option.effects) == (
+        WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED,
+        WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED,
+        WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED,
+    )
+    assert tuple(effect.wargear_id for effect in option.effects) == option.allowed_wargear_ids
+    assert wargear_by_id[shining_aegis_id].weapon_profiles == ()
+
+    shining_aegis = abilities_by_name["Shining Aegis"]
+    assert shining_aegis.source_kind is CatalogAbilitySourceKind.WARGEAR
+    assert shining_aegis.source_wargear_id == shining_aegis_id
+    assert shining_aegis.support is CatalogAbilitySupport.GENERIC_RULE_IR
+    shining_aegis_ir = RuleIR.from_payload(cast(RuleIRPayload, shining_aegis.rule_ir_payload))
+    shining_aegis_effect = shining_aegis_ir.clauses[0].effects[0]
+    assert shining_aegis_effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+    assert parameter_payload(shining_aegis_effect.parameters) == {
+        "characteristic": "save",
+        "value": "3+",
+    }
+
+    assert _resolved_keeper_of_secrets_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(living_whip_id,),
+            ),
+        ),
+    ) == (
+        "000001137:phantasmagoria",
+        "000001137:snapping-claws",
+        "000001137:witstealer-sword",
+        living_whip_id,
+    )
+    assert _resolved_keeper_of_secrets_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(shining_aegis_id,),
+            ),
+        ),
+    ) == (
+        "000001137:phantasmagoria",
+        "000001137:snapping-claws",
+        "000001137:witstealer-sword",
+        shining_aegis_id,
+    )
+
+    with pytest.raises(ListValidationError, match="minimum selections"):
+        resolve_wargear_selections(
+            catalog=package.army_catalog,
+            datasheet=datasheet,
+            requested_selections=(
+                WargearSelection(
+                    option_id=option_id,
+                    model_profile_id=model_profile_id,
+                    wargear_ids=(),
+                ),
+            ),
+        )
+    with pytest.raises(ListValidationError, match="exceeds maximum selections"):
+        resolve_wargear_selections(
+            catalog=package.army_catalog,
+            datasheet=datasheet,
+            requested_selections=(
+                WargearSelection(
+                    option_id=option_id,
+                    model_profile_id=model_profile_id,
+                    wargear_ids=(living_whip_id, ritual_knife_id),
+                ),
+            ),
+        )
+
+    whip_unit = _keeper_of_secrets_unit(
+        package=package,
+        requested_selections=(
+            WargearSelection(
+                option_id=option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(living_whip_id,),
+            ),
+        ),
+    )
+    aegis_unit = _keeper_of_secrets_unit(
+        package=package,
+        requested_selections=(
+            WargearSelection(
+                option_id=option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(shining_aegis_id,),
+            ),
+        ),
+    )
+    all_records = catalog_ability_records_from_catalog(package.army_catalog)
+    whip_records_by_name = {
+        record.definition.name: record
+        for record in build_player_ability_index(
+            all_records,
+            army=_flesh_hounds_army(
+                package=package,
+                unit=whip_unit,
+                army_id="army-slaanesh",
+                player_id="player-whip",
+            ),
+            catalog=package.army_catalog,
+        ).all_records()
+    }
+    aegis_records_by_name = {
+        record.definition.name: record
+        for record in build_player_ability_index(
+            all_records,
+            army=_flesh_hounds_army(
+                package=package,
+                unit=aegis_unit,
+                army_id="army-slaanesh",
+                player_id="player-aegis",
+            ),
+            catalog=package.army_catalog,
+        ).all_records()
+    }
+
+    assert "Shining Aegis" not in whip_records_by_name
+    assert aegis_records_by_name["Shining Aegis"].wargear_id == shining_aegis_id
+    assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
+
+
 def test_phase17k_soul_grinder_bridge_supports_warpclaw_replacement_wargear() -> None:
     package = build_canonical_catalog_package(
         package_id=_catalog_package_id(),
@@ -6944,6 +7096,47 @@ def _great_unclean_one_unit(
     )
 
 
+def _resolved_keeper_of_secrets_model_wargear(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_selections: tuple[WargearSelection, ...],
+) -> tuple[str, ...]:
+    return (
+        _keeper_of_secrets_unit(
+            package=package,
+            requested_selections=requested_selections,
+        )
+        .own_models[0]
+        .wargear_ids
+    )
+
+
+def _keeper_of_secrets_unit(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_selections: tuple[WargearSelection, ...],
+) -> UnitInstance:
+    datasheet = package.army_catalog.datasheet_by_id("000001137")
+    return UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-slaanesh",
+        selection=UnitMusterSelection(
+            unit_selection_id="keeper-of-secrets-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000001137:keeper-of-secrets",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=requested_selections,
+        ),
+        datasheet=datasheet,
+    )
+
+
 def _resolved_soul_grinder_model_wargear(
     package: CanonicalCatalogPackage,
     *,
@@ -7903,6 +8096,24 @@ def _great_unclean_one_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                 height_units=GeometrySourceUnits.INCHES,
                 height_source_id="geometry-review:chaos-daemons:great-unclean-one:height",
                 height_document_reference="Chaos Daemons Faction Pack p.66-67",
+            ),
+        ),
+    )
+
+
+def _keeper_of_secrets_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001137",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001137",
+                model_name="Keeper of Secrets",
+                height=5.6,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:keeper-of-secrets:height",
+                height_document_reference="Chaos Daemons Faction Pack p.90-91",
             ),
         ),
     )

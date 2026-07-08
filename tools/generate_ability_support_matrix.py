@@ -3691,7 +3691,7 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="Keeper of Secrets",
             datasheet_id="000001137",
             source_basis="PDF pages 90-91; supersedes Wahapedia.",
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="IR parsed; host needed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, The Shadow of Chaos, Mesmerising Form hit "
                 "modifier, and Shining Aegis save semantics are structured paths."
@@ -3699,10 +3699,7 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             semantics_needed=(
                 "Greater Daemon of Slaanesh Shadow aura host; Daemon Lord of Slaanesh AP aura host."
             ),
-            catalog_blockers=(
-                "Optional one-of wargear choice is not represented by current additive "
-                "wargear-option semantics."
-            ),
+            catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Seekers",
