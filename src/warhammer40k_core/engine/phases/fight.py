@@ -106,11 +106,17 @@ from warhammer40k_core.engine.fight_order import (
     fight_interrupt_sources_for_player,
     legal_fight_types_for_context,
 )
+from warhammer40k_core.engine.fight_phase_end_hooks import (
+    SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE,
+    FightPhaseEndHookRegistry,
+    apply_fight_phase_end_result,
+    request_fight_phase_end_rule_if_available,
+)
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartHookRegistry,
-    FightPhaseStartRequestContext,
-    FightPhaseStartResultContext,
+    apply_fight_phase_start_result,
+    request_fight_phase_start_rule_if_available,
 )
 from warhammer40k_core.engine.fight_resolution import (
     MELEE_DECLARATION_PROPOSAL_KIND,
@@ -226,6 +232,9 @@ class FightPhaseHandler:
     fight_phase_start_hooks: FightPhaseStartHookRegistry = field(
         default_factory=FightPhaseStartHookRegistry.empty
     )
+    fight_phase_end_hooks: FightPhaseEndHookRegistry = field(
+        default_factory=FightPhaseEndHookRegistry.empty
+    )
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
@@ -262,6 +271,8 @@ class FightPhaseHandler:
             raise GameLifecycleError(
                 "FightPhaseHandler fight_phase_start_hooks must be a registry."
             )
+        if type(self.fight_phase_end_hooks) is not FightPhaseEndHookRegistry:
+            raise GameLifecycleError("FightPhaseHandler fight_phase_end_hooks must be a registry.")
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError(
                 "FightPhaseHandler runtime_modifier_registry must be a registry."
@@ -334,8 +345,8 @@ class FightPhaseHandler:
     ) -> LifecycleStatus:
         _validate_fight_phase_state(state)
         if state.fight_phase_state is None:
-            phase_start_status = _request_fight_phase_start_rule_if_available(
-                handler=self,
+            phase_start_status = request_fight_phase_start_rule_if_available(
+                registry=self.fight_phase_start_hooks,
                 state=state,
                 decisions=decisions,
             )
@@ -445,19 +456,19 @@ class FightPhaseHandler:
                 decisions=decisions,
             )
         if result.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE:
-            phase_start_result = self.fight_phase_start_hooks.apply_result(
-                FightPhaseStartResultContext(
-                    state=state,
-                    decisions=decisions,
-                    request=decisions.record_for_result(result).request,
-                    result=result,
-                )
+            return apply_fight_phase_start_result(
+                registry=self.fight_phase_start_hooks,
+                state=state,
+                decisions=decisions,
+                result=result,
             )
-            if type(phase_start_result) is LifecycleStatus:
-                return phase_start_result
-            if phase_start_result:
-                return None
-            raise GameLifecycleError("Faction rule Fight-phase start decision was not handled.")
+        if result.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE:
+            return apply_fight_phase_end_result(
+                registry=self.fight_phase_end_hooks,
+                state=state,
+                decisions=decisions,
+                result=result,
+            )
         if result.decision_type == FIGHT_INTERRUPT_DECISION_TYPE:
             return _apply_fight_interrupt_decision(
                 state=state,
@@ -553,6 +564,13 @@ def _advance_fight_phase_body(
             step=FightPhaseStepKind.CONSOLIDATE,
         )
     if fight_state.current_step is FightPhaseStepKind.END:
+        phase_end_status = request_fight_phase_end_rule_if_available(
+            registry=handler.fight_phase_end_hooks,
+            state=state,
+            decisions=decisions,
+        )
+        if phase_end_status is not None:
+            return phase_end_status
         state.replace_fight_phase_state(fight_state.with_phase_complete())
         return None
     raise GameLifecycleError("Fight phase body has unsupported current_step.")
@@ -2103,95 +2121,11 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return value
 
 
-def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
-    value = payload.get(key)
-    if type(value) is not int:
-        raise GameLifecycleError(f"{key} must be an integer.")
-    return value
-
-
 @dataclass(frozen=True, slots=True)
 class _FightRequestContext:
     fight_state: FightPhaseState
     contexts: tuple[FightEligibilityContext, ...]
     pass_available: bool
-
-
-def invalid_fight_phase_start_faction_rule_status(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-) -> LifecycleStatus | None:
-    invalid_status = _invalid_finite_decision_status(
-        state=state,
-        request=request,
-        result=result,
-        invalid_reason="invalid_fight_phase_start_faction_rule_result",
-    )
-    if invalid_status is not None:
-        return invalid_status
-    payload = _decision_payload_object(result.payload)
-    request_payload = _decision_payload_object(request.payload)
-    drift_reason = _fight_phase_start_faction_rule_drift_reason(
-        state=state,
-        request=request,
-        result=result,
-        payload=payload,
-        request_payload=request_payload,
-    )
-    if drift_reason is None:
-        return None
-    return LifecycleStatus.invalid(
-        stage=state.stage,
-        message="Fight phase start faction rule option drifted.",
-        payload=validate_json_value(
-            {
-                "game_id": state.game_id,
-                "player_id": result.actor_id,
-                "battle_round": state.battle_round,
-                "phase": (
-                    None if state.current_battle_phase is None else state.current_battle_phase.value
-                ),
-                "invalid_reason": drift_reason,
-            }
-        ),
-    )
-
-
-def _fight_phase_start_faction_rule_drift_reason(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-    payload: dict[str, JsonValue],
-    request_payload: dict[str, JsonValue],
-) -> str | None:
-    if result.actor_id is None:
-        return "actor_missing"
-    if request.actor_id != result.actor_id:
-        return "actor_player_drift"
-    if _payload_string(payload, key="game_id") != state.game_id:
-        return "game_id_drift"
-    if _payload_int(payload, key="battle_round") != state.battle_round:
-        return "battle_round_drift"
-    if _payload_string(payload, key="phase") != BattlePhase.FIGHT.value:
-        return "payload_phase_drift"
-    if _payload_string(payload, key="active_player_id") != _active_player_id(state):
-        return "active_player_drift"
-    if _payload_string(request_payload, key="game_id") != state.game_id:
-        return "request_game_id_drift"
-    if _payload_int(request_payload, key="battle_round") != state.battle_round:
-        return "request_battle_round_drift"
-    if _payload_string(request_payload, key="phase") != BattlePhase.FIGHT.value:
-        return "request_phase_drift"
-    if _payload_string(request_payload, key="active_player_id") != _active_player_id(state):
-        return "request_active_player_drift"
-    if state.current_battle_phase is not BattlePhase.FIGHT:
-        return "phase_drift"
-    if state.fight_phase_state is not None:
-        return "fight_phase_start_window_closed"
-    return None
 
 
 def invalid_fight_activation_status(
@@ -2484,49 +2418,6 @@ def _ensure_fight_phase_state(
         ),
     )
     return started
-
-
-def _request_fight_phase_start_rule_if_available(
-    *,
-    handler: FightPhaseHandler,
-    state: GameState,
-    decisions: DecisionController,
-) -> LifecycleStatus | None:
-    request = handler.fight_phase_start_hooks.next_request_for(
-        FightPhaseStartRequestContext(
-            state=state,
-            decisions=decisions,
-        )
-    )
-    if request is None:
-        return None
-    decisions.request_decision(request)
-    decisions.event_log.append(
-        "fight_phase_start_faction_rule_requested",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": _active_player_id(state),
-                "phase": BattlePhase.FIGHT.value,
-                "decision_type": request.decision_type,
-                "request_id": request.request_id,
-                "actor_id": request.actor_id,
-            }
-        ),
-    )
-    return LifecycleStatus.waiting_for_decision(
-        stage=GameLifecycleStage.BATTLE,
-        decision_request=request,
-        payload=validate_json_value(
-            {
-                "phase": BattlePhase.FIGHT.value,
-                "active_player_id": _active_player_id(state),
-                "phase_body_status": "fight_phase_start_faction_rule_pending",
-                "request_id": request.request_id,
-            }
-        ),
-    )
 
 
 def _advance_to_next_fight_request(

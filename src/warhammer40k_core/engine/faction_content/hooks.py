@@ -20,6 +20,7 @@ from warhammer40k_core.engine.fall_back_hooks import FallBackEligibilityHookBind
 from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityHookBinding,
 )
+from warhammer40k_core.engine.fight_phase_end_hooks import FightPhaseEndHookBinding
 from warhammer40k_core.engine.fight_phase_start_hooks import FightPhaseStartHookBinding
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantBinding,
@@ -107,6 +108,7 @@ _HOOK_EVENT_BY_BINDING_TYPE: Mapping[type[object], LifecycleHookEvent] = Mapping
         TurnEndHookBinding: LifecycleHookEvent.TURN_END,
         CommandPhaseStartHookBinding: LifecycleHookEvent.COMMAND_PHASE_START,
         FightPhaseStartHookBinding: LifecycleHookEvent.FIGHT_PHASE_START,
+        FightPhaseEndHookBinding: LifecycleHookEvent.FIGHT_PHASE_END,
         ShootingPhaseStartHookBinding: LifecycleHookEvent.SHOOTING_PHASE_START,
         UnitDestroyedHookBinding: LifecycleHookEvent.UNIT_DESTROYED,
         BattleShockHookBinding: LifecycleHookEvent.BATTLE_SHOCK,
@@ -143,6 +145,7 @@ HOOK_BINDING_COMBINE_NAME_BY_EVENT: Mapping[LifecycleHookEvent, str] = MappingPr
         LifecycleHookEvent.TURN_END: "turn-end hook binding",
         LifecycleHookEvent.COMMAND_PHASE_START: "Command-phase start hook binding",
         LifecycleHookEvent.FIGHT_PHASE_START: "Fight-phase start hook binding",
+        LifecycleHookEvent.FIGHT_PHASE_END: "Fight-phase end hook binding",
         LifecycleHookEvent.SHOOTING_PHASE_START: "Shooting-phase start hook binding",
         LifecycleHookEvent.UNIT_DESTROYED: "Unit-destroyed hook binding",
         LifecycleHookEvent.BATTLE_SHOCK: "Battle-shock hook binding",

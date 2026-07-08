@@ -366,6 +366,11 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:uphold_the_honour:objective-control` | Templar Vows |
 | `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos` | The Shadow of Chaos |
+| `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne` | Daemon Lord of Khorne |
+| `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage` | Relentless Carnage |
+| `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage:mortal-wound-fnp` | Relentless Carnage - Mortal Wound Feel No Pain |
+| `warhammer_40000_11th:chaos_daemons:datasheet:lord_of_change:daemon_lord_of_tzeentch` | Daemon Lord of Tzeentch |
+| `warhammer_40000_11th:chaos_daemons:datasheet:plaguebearers:infected_outbreak` | Infected Outbreak |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread` | Harbingers of Dread |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:battle-shock` | Harbingers of Dread - Battle-shock |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:hit-roll` | Harbingers of Dread - Darkness |

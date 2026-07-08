@@ -105,6 +105,10 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityHookBinding,
     FightActivationAbilityHookRegistry,
 )
+from warhammer40k_core.engine.fight_phase_end_hooks import (
+    FightPhaseEndHookBinding,
+    FightPhaseEndHookRegistry,
+)
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     FightPhaseStartHookBinding,
     FightPhaseStartHookRegistry,
@@ -245,6 +249,7 @@ class RuntimeContentContribution:
         turn_end_hook_bindings: tuple[TurnEndHookBinding, ...] = (),
         command_phase_start_hook_bindings: tuple[CommandPhaseStartHookBinding, ...] = (),
         fight_phase_start_hook_bindings: tuple[FightPhaseStartHookBinding, ...] = (),
+        fight_phase_end_hook_bindings: tuple[FightPhaseEndHookBinding, ...] = (),
         shooting_phase_start_hook_bindings: tuple[ShootingPhaseStartHookBinding, ...] = (),
         unit_destroyed_hook_bindings: tuple[UnitDestroyedHookBinding, ...] = (),
         battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = (),
@@ -393,6 +398,11 @@ class RuntimeContentContribution:
                 "fight_phase_start_hook_bindings",
                 fight_phase_start_hook_bindings,
                 FightPhaseStartHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "fight_phase_end_hook_bindings",
+                fight_phase_end_hook_bindings,
+                FightPhaseEndHookBinding,
             ),
             *_validate_contribution_tuple(
                 "shooting_phase_start_hook_bindings",
@@ -644,6 +654,14 @@ class RuntimeContentContribution:
             self.hook_bindings,
             LifecycleHookEvent.FIGHT_PHASE_START,
             FightPhaseStartHookBinding,
+        )
+
+    @property
+    def fight_phase_end_hook_bindings(self) -> tuple[FightPhaseEndHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.FIGHT_PHASE_END,
+            FightPhaseEndHookBinding,
         )
 
     @property
@@ -1014,6 +1032,7 @@ class RuntimeContentBundle:
     turn_end_hook_registry: TurnEndHookRegistry
     command_phase_start_hook_registry: CommandPhaseStartHookRegistry
     fight_phase_start_hook_registry: FightPhaseStartHookRegistry
+    fight_phase_end_hook_registry: FightPhaseEndHookRegistry
     shooting_phase_start_hook_registry: ShootingPhaseStartHookRegistry
     unit_destroyed_hook_registry: UnitDestroyedHookRegistry
     battle_shock_hook_registry: BattleShockHookRegistry
@@ -1083,6 +1102,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires CommandPhaseStartHookRegistry.")
         if type(self.fight_phase_start_hook_registry) is not FightPhaseStartHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires FightPhaseStartHookRegistry.")
+        if type(self.fight_phase_end_hook_registry) is not FightPhaseEndHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires FightPhaseEndHookRegistry.")
         if type(self.shooting_phase_start_hook_registry) is not ShootingPhaseStartHookRegistry:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires ShootingPhaseStartHookRegistry."
@@ -1372,6 +1393,12 @@ class RuntimeContentBundle:
                     validated_contributions,
                     lambda contribution: contribution.fight_phase_start_hook_bindings,
                 ),
+            )
+        )
+        fight_phase_end_hook_registry = FightPhaseEndHookRegistry.from_bindings(
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.fight_phase_end_hook_bindings,
             )
         )
         shooting_phase_start_hook_registry = ShootingPhaseStartHookRegistry.from_bindings(
@@ -1735,6 +1762,7 @@ class RuntimeContentBundle:
             turn_end_hook_registry=turn_end_hook_registry,
             command_phase_start_hook_registry=command_phase_start_hook_registry,
             fight_phase_start_hook_registry=fight_phase_start_hook_registry,
+            fight_phase_end_hook_registry=fight_phase_end_hook_registry,
             shooting_phase_start_hook_registry=shooting_phase_start_hook_registry,
             unit_destroyed_hook_registry=unit_destroyed_hook_registry,
             battle_shock_hook_registry=battle_shock_hook_registry,
