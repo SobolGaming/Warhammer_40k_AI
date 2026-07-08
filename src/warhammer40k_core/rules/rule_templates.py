@@ -23,6 +23,7 @@ class RuleTemplateFamily(StrEnum):
     GRANT_ABILITY = "grant_ability"
     KEYWORD_GATE = "keyword_gate"
     MOVEMENT_DISTANCE_MODIFICATION = "movement_distance_modification"
+    OUT_OF_PHASE_ACTION = "out_of_phase_action"
     PLACEMENT_PERMISSION_RESTRICTION = "placement_permission_restriction"
     REROLL_PERMISSION = "reroll_permission"
     RESOURCE_MODIFICATION = "resource_modification"
@@ -98,6 +99,7 @@ RETURN_ON_DEATH_TEMPLATE_ID = "phase17c:first-death-return"
 GRANT_ABILITY_TEMPLATE_ID = "phase17c:grant-ability"
 WEAPON_ABILITY_GRANT_TEMPLATE_ID = "phase17c:weapon-ability-grant"
 MOVEMENT_DISTANCE_TEMPLATE_ID = "phase17c:movement-distance-modifier"
+OUT_OF_PHASE_ACTION_TEMPLATE_ID = "phase17c:out-of-phase-action"
 PLACEMENT_TEMPLATE_ID = "phase17c:placement-permission-restriction"
 AURA_TEMPLATE_ID = "phase17c:aura"
 
@@ -258,6 +260,15 @@ INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
         family=RuleTemplateFamily.MOVEMENT_DISTANCE_MODIFICATION,
         description="Move characteristic and additional movement distance modifier clauses.",
         canonical_patterns=("add <n> to the Move characteristic", "move an additional <n>"),
+    ),
+    RuleTemplate(
+        template_id=OUT_OF_PHASE_ACTION_TEMPLATE_ID,
+        family=RuleTemplateFamily.OUT_OF_PHASE_ACTION,
+        description="Out-of-phase action choice clauses.",
+        canonical_patterns=(
+            "at the end of your opponent's Movement phase select a set-up unit within <n>",
+            "this model can either shoot or declare a charge without Charge bonus",
+        ),
     ),
     RuleTemplate(
         template_id=PLACEMENT_TEMPLATE_ID,

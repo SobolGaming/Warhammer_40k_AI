@@ -7,6 +7,7 @@ from typing import Any, cast
 
 import pytest
 
+from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
@@ -14,7 +15,11 @@ from warhammer40k_core.core.datasheet import (
     CatalogJsonObject,
     DatasheetAbilityDescriptor,
 )
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -38,6 +43,7 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
 )
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
     BattlefieldRuntimeState,
     BattlefieldScenario,
     UnitPlacement,
@@ -46,26 +52,61 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_restore_lost_wounds_after_destroying_unit,
     catalog_wound_roll_reroll_permission_for_attack,
 )
+from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
+    apply_catalog_setup_reactive_charge_move,
+    invalid_catalog_setup_reactive_charge_move_status,
+    is_catalog_setup_reactive_charge_move_request,
+)
+from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
+    CATALOG_SETUP_REACTIVE_SOURCE_KIND,
+    SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
+    apply_catalog_setup_reactive_shoot_charge_result,
+    invalid_catalog_setup_reactive_shoot_charge_status,
+    request_catalog_setup_reactive_shoot_charge_if_available,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointSourceKind,
     initial_command_point_ledgers,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import (
     EffectError,
     EffectExpiration,
     generic_rule_persisting_effect,
 )
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
-from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.lifecycle_reaction_queue import (
+    validate_reaction_queue_consistency,
+)
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    ProposalKind,
+)
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+)
+from warhammer40k_core.engine.phases.charge import (
+    CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+    FIGHTS_FIRST_CHARGE_EFFECT_KIND,
+    ChargeMoveProposal,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionRegistry,
@@ -78,10 +119,18 @@ from warhammer40k_core.engine.rule_execution import (
     rule_ir_from_execution_payload,
     scoped_rule_ir_from_execution_payload,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.selected_target_context import SELECTED_TARGET_UNIT_CONTEXT_KEY
-from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.target_restriction_hooks import ChargeTargetRestrictionHookRegistry
+from warhammer40k_core.engine.timing_windows import (
+    ReactionWindow,
+    TimingTriggerKind,
+    TimingWindow,
+    TimingWindowDescriptor,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
@@ -101,6 +150,13 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 
 SOURCE_KEYWORD_SEQUENCE_PARTS = (
     datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+)
+SETUP_REACTIVE_SHOOT_CHARGE_TEXT = (
+    "At the end of your opponent's Movement phase, you can select one enemy unit that was "
+    'set up on the battlefield within 12" of this model; this model can then either: '
+    "Shoot at that unit, but only if it is an eligible target. Declare a charge. This unit "
+    "must end that charge move engaged with the enemy unit you selected (note that even if "
+    "this charge is successful, this unit does not receive any Charge bonus this turn)."
 )
 
 
@@ -205,6 +261,1096 @@ def test_phase17d_optional_wargear_bearer_unit_effects_execute_generically() -> 
         {"key": "delta", "value": 1},
         {"key": "roll_type", "value": "charge"},
     ]
+
+
+def test_phase17d_catalog_setup_reactive_shoot_charge_requests_finite_actions_and_drift() -> None:
+    descriptor = _generic_catalog_descriptor(
+        SETUP_REACTIVE_SHOOT_CHARGE_TEXT,
+        ability_id="setup-reactive-shoot-charge",
+    )
+    catalog = _catalog_with_descriptor(descriptor)
+    armies = (
+        muster_army(
+            catalog=catalog,
+            request=_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selection_id="intercessor-unit-1",
+            ),
+        ),
+        muster_army(
+            catalog=catalog,
+            request=_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_id="intercessor-unit-2",
+            ),
+        ),
+    )
+    state = _battle_state()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    for army in armies:
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17d-setup-reactive",
+        armies=armies,
+    )
+    state.battlefield_state = scenario.battlefield_state
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    source_unit_id = "army-beta:intercessor-unit-2"
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=target_unit_id,
+        pose=Pose.at(0.0, 10.0),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=source_unit_id,
+        pose=Pose.at(16.0, 10.0),
+    )
+    source_unit = _unit_by_id(state, source_unit_id)
+    source_model = source_unit.own_models[0]
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        updated_armies.append(
+            replace(
+                army,
+                units=tuple(
+                    replace(unit, own_models=(source_model,))
+                    if unit.unit_instance_id == source_unit_id
+                    else unit
+                    for unit in army.units
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+    assert state.battlefield_state is not None
+    source_placement = state.battlefield_state.unit_placement_by_id(source_unit_id)
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        replace(
+            source_placement,
+            model_placements=(
+                next(
+                    placement
+                    for placement in source_placement.model_placements
+                    if placement.model_instance_id == source_model.model_instance_id
+                ),
+            ),
+        )
+    )
+    records = catalog_ability_records_from_catalog(catalog)
+    player_b_index = build_player_ability_index(
+        records,
+        army=state.army_definitions[1],
+        catalog=catalog,
+    )
+    decisions = DecisionController()
+    reaction_queue = ReactionQueue()
+    setup_event = decisions.event_log.append(
+        "reinforcement_unit_arrived",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": "player-a",
+            "phase": BattlePhase.MOVEMENT.value,
+            "step": "move_units",
+            "unit_instance_id": target_unit_id,
+            "placement_kind": "strategic_reserves",
+            "request_id": "phase17d-setup-request",
+            "result_id": "phase17d-setup-result",
+            "phase_body_status": "reinforcement_unit_arrived",
+        },
+    )
+
+    status = request_catalog_setup_reactive_shoot_charge_if_available(
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        ability_indexes_by_player_id={"player-b": player_b_index},
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+    )
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    request = status.decision_request
+    assert request.decision_type == SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE
+    assert request.actor_id == "player-b"
+    assert {option.option_id for option in request.options} == {"decline", "shoot", "charge"}
+    charge_payload = cast(dict[str, JsonValue], request.option_by_id("charge").payload)
+    assert charge_payload["trigger_event_id"] == setup_event.event_id
+    assert charge_payload["source_unit_instance_id"] == source_unit_id
+    assert charge_payload["target_unit_instance_id"] == target_unit_id
+    assert charge_payload["action"] == "charge"
+
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=target_unit_id,
+        pose=Pose.at(40.0, 10.0),
+    )
+    invalid_status = invalid_catalog_setup_reactive_shoot_charge_status(
+        state=state,
+        request=request,
+        result=DecisionResult.for_request(
+            result_id="phase17d-setup-reactive-charge",
+            request=request,
+            selected_option_id="charge",
+        ),
+        decisions=decisions,
+        ability_indexes_by_player_id={"player-b": player_b_index},
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+    )
+
+    assert invalid_status is not None
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_status.payload == {
+        "invalid_reason": "setup_reactive_distance_drift",
+        "field": "payload",
+    }
+
+
+def test_phase17d_catalog_setup_reactive_charge_suppresses_charge_bonus() -> None:
+    state, catalog, player_b_index = _setup_reactive_single_model_state(
+        target_pose=Pose.at(6.5, 10.0),
+        source_pose=Pose.at(16.0, 10.0),
+    )
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    source_unit_id = "army-beta:intercessor-unit-2"
+    decisions = DecisionController()
+    reaction_queue = ReactionQueue()
+    decisions.event_log.append(
+        "reinforcement_unit_arrived",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": "player-a",
+            "phase": BattlePhase.MOVEMENT.value,
+            "step": "move_units",
+            "unit_instance_id": target_unit_id,
+            "placement_kind": "strategic_reserves",
+            "request_id": "phase17d-setup-request",
+            "result_id": "phase17d-setup-result",
+            "phase_body_status": "reinforcement_unit_arrived",
+        },
+    )
+    ruleset_descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+
+    status = request_catalog_setup_reactive_shoot_charge_if_available(
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        ability_indexes_by_player_id={"player-b": player_b_index},
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=catalog,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+    )
+
+    assert status is not None
+    assert status.decision_request is not None
+    action_request = status.decision_request
+    assert {option.option_id for option in action_request.options} == {
+        "decline",
+        "shoot",
+        "charge",
+    }
+    action_result = DecisionResult.for_request(
+        result_id="phase17d-setup-reactive-charge-action",
+        request=action_request,
+        selected_option_id="charge",
+    )
+    _record_decision_result(decisions=decisions, result=action_result)
+
+    charge_status = apply_catalog_setup_reactive_shoot_charge_result(
+        state=state,
+        decisions=decisions,
+        result=action_result,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=catalog,
+        ability_index=player_b_index,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+    )
+
+    assert charge_status is not None
+    assert charge_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert charge_status.decision_request is not None
+    charge_request = charge_status.decision_request
+    assert charge_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    proposal_request = MovementProposalRequest.from_decision_request_payload(charge_request.payload)
+    assert proposal_request.proposal_kind is ProposalKind.CHARGE_MOVE
+    assert proposal_request.actor_id == "player-b"
+    proposal_context = cast(dict[str, JsonValue], proposal_request.context)
+    assert proposal_context[CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY] == [target_unit_id]
+    assert proposal_context["charge_bonus_suppressed"] is True
+    assert proposal_context["suppressed_charge_bonus"] == "fights_first"
+    assert proposal_context["suppressed_charge_bonus_effect_kind"] == (
+        FIGHTS_FIRST_CHARGE_EFFECT_KIND
+    )
+
+    move_proposal = ChargeMoveProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=proposal_request.unit_instance_id,
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=(target_unit_id,),
+        witness=_path_witness_for_unit_delta(
+            state=state,
+            unit_instance_id=source_unit_id,
+            dx=-1.25,
+        ),
+    )
+    move_result = _parameterized_result_for_request(
+        request=charge_request,
+        result_id="phase17d-setup-reactive-charge-move",
+        payload=cast(JsonValue, move_proposal.to_payload()),
+    )
+    _record_decision_result(decisions=decisions, result=move_result)
+
+    move_status = apply_catalog_setup_reactive_charge_move(
+        state=state,
+        request=charge_request,
+        result=move_result,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+
+    completed_payloads = _event_payloads(decisions, "catalog_setup_reactive_charge_move_completed")
+    assert move_status is None
+    assert len(completed_payloads) == 1
+    assert completed_payloads[0]["charge_bonus_suppressed"] is True
+    assert "persisting_effect" not in completed_payloads[0]
+    assert state.persisting_effects_for_unit(source_unit_id) == ()
+
+
+def test_phase17d_catalog_setup_reactive_charge_submits_through_lifecycle() -> None:
+    state, catalog, player_b_index = _setup_reactive_single_model_state(
+        target_pose=Pose.at(6.5, 10.0),
+        source_pose=Pose.at(16.0, 10.0),
+    )
+    lifecycle = _setup_reactive_lifecycle(state=state, catalog=catalog)
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    source_unit_id = "army-beta:intercessor-unit-2"
+    lifecycle.decision_controller.event_log.append(
+        "reinforcement_unit_arrived",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": "player-a",
+            "phase": BattlePhase.MOVEMENT.value,
+            "step": "move_units",
+            "unit_instance_id": target_unit_id,
+            "placement_kind": "strategic_reserves",
+            "request_id": "phase17d-lifecycle-setup-request",
+            "result_id": "phase17d-lifecycle-setup-result",
+            "phase_body_status": "reinforcement_unit_arrived",
+        },
+    )
+    status = request_catalog_setup_reactive_shoot_charge_if_available(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_queue=lifecycle.reaction_queue,
+        ability_indexes_by_player_id={"player-b": player_b_index},
+        ruleset_descriptor=lifecycle.config.ruleset_descriptor,
+        army_catalog=catalog,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+    )
+
+    assert status is not None
+    assert status.decision_request is not None
+    action_request = status.decision_request
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17d-lifecycle-setup-reactive-charge-action",
+            request=action_request,
+            selected_option_id="charge",
+        )
+    )
+
+    assert action_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    charge_request = lifecycle.pending_decision_request()
+    assert charge_request is not None
+    assert charge_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    proposal_request = MovementProposalRequest.from_decision_request_payload(charge_request.payload)
+    malformed_status = lifecycle.submit_decision(
+        _parameterized_result_for_request(
+            request=charge_request,
+            result_id="phase17d-lifecycle-setup-reactive-malformed-charge-move",
+            payload={},
+        )
+    )
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    assert _json_object(malformed_status.payload)["phase_body_status"] == "invalid"
+    assert lifecycle.pending_decision_request() == charge_request
+
+    invalid_move_proposal = ChargeMoveProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=proposal_request.unit_instance_id,
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=(target_unit_id,),
+        witness=_path_witness_for_unit_delta(
+            state=state,
+            unit_instance_id=source_unit_id,
+            dx=0.0,
+        ),
+    )
+    invalid_move_status = lifecycle.submit_decision(
+        _parameterized_result_for_request(
+            request=charge_request,
+            result_id="phase17d-lifecycle-setup-reactive-invalid-charge-move",
+            payload=cast(JsonValue, invalid_move_proposal.to_payload()),
+        )
+    )
+
+    assert invalid_move_status.status_kind is LifecycleStatusKind.INVALID
+    assert _json_object(invalid_move_status.payload)["phase_body_status"] == (
+        "catalog_setup_reactive_charge_move_invalid"
+    )
+    retry_request = lifecycle.pending_decision_request()
+    assert retry_request is not None
+    assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    retry_proposal_request = MovementProposalRequest.from_decision_request_payload(
+        retry_request.payload
+    )
+    move_proposal = ChargeMoveProposal(
+        proposal_request_id=retry_proposal_request.request_id,
+        proposal_kind=retry_proposal_request.proposal_kind,
+        unit_instance_id=retry_proposal_request.unit_instance_id,
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=(target_unit_id,),
+        witness=_path_witness_for_unit_delta(
+            state=state,
+            unit_instance_id=source_unit_id,
+            dx=-1.25,
+        ),
+    )
+    move_status = lifecycle.submit_decision(
+        _parameterized_result_for_request(
+            request=retry_request,
+            result_id="phase17d-lifecycle-setup-reactive-charge-move",
+            payload=cast(JsonValue, move_proposal.to_payload()),
+        )
+    )
+
+    completed_payloads = _event_payloads(
+        lifecycle.decision_controller,
+        "catalog_setup_reactive_charge_move_completed",
+    )
+    assert move_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert len(completed_payloads) == 1
+    assert completed_payloads[0]["charge_bonus_suppressed"] is True
+    assert "persisting_effect" not in completed_payloads[0]
+    assert state.persisting_effects_for_unit(source_unit_id) == ()
+
+
+def test_phase17d_catalog_setup_reactive_decline_submits_through_lifecycle() -> None:
+    state, catalog, player_b_index = _setup_reactive_single_model_state(
+        target_pose=Pose.at(6.5, 10.0),
+        source_pose=Pose.at(16.0, 10.0),
+    )
+    lifecycle = _setup_reactive_lifecycle(state=state, catalog=catalog)
+    lifecycle_state = lifecycle.state
+    assert lifecycle_state is not None
+    action_request = _request_setup_reactive_lifecycle_action(
+        lifecycle=lifecycle,
+        state=lifecycle_state,
+        catalog=catalog,
+        player_b_index=player_b_index,
+    )
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17d-lifecycle-setup-reactive-decline",
+            request=action_request,
+            selected_option_id="decline",
+        )
+    )
+
+    declined_payloads = _event_payloads(
+        lifecycle.decision_controller,
+        "catalog_setup_reactive_shoot_charge_declined",
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.reaction_queue.frames == ()
+    assert len(declined_payloads) == 1
+    assert declined_payloads[0]["source_unit_instance_id"] == "army-beta:intercessor-unit-2"
+    assert declined_payloads[0]["target_unit_instance_id"] == "army-alpha:intercessor-unit-1"
+
+
+def test_phase17d_catalog_setup_reactive_shoot_submits_through_lifecycle() -> None:
+    state, catalog, player_b_index = _setup_reactive_single_model_state(
+        target_pose=Pose.at(6.5, 10.0),
+        source_pose=Pose.at(16.0, 10.0),
+    )
+    lifecycle = _setup_reactive_lifecycle(state=state, catalog=catalog)
+    lifecycle_state = lifecycle.state
+    assert lifecycle_state is not None
+    action_request = _request_setup_reactive_lifecycle_action(
+        lifecycle=lifecycle,
+        state=lifecycle_state,
+        catalog=catalog,
+        player_b_index=player_b_index,
+    )
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17d-lifecycle-setup-reactive-shoot",
+            request=action_request,
+            selected_option_id="shoot",
+        )
+    )
+
+    shoot_payloads = _event_payloads(
+        lifecycle.decision_controller,
+        "catalog_setup_reactive_shoot_requested",
+    )
+    pending_request = lifecycle.pending_decision_request()
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert pending_request is not None
+    assert lifecycle.reaction_queue.frames[-1].request_id == pending_request.request_id
+    assert lifecycle_state.out_of_phase_shooting_state is not None
+    assert lifecycle_state.out_of_phase_shooting_state.selected_unit_instance_id == (
+        "army-beta:intercessor-unit-2"
+    )
+    assert lifecycle_state.out_of_phase_shooting_state.target_unit_ids == (
+        "army-alpha:intercessor-unit-1",
+    )
+    assert len(shoot_payloads) == 1
+    assert shoot_payloads[0]["action"] == "shoot"
+
+
+@pytest.mark.parametrize(
+    ("drift_case", "expected_message"),
+    [
+        ("wrong_stage", "Lifecycle reaction queue requires battle stage."),
+        ("missing_phase", "Lifecycle reaction queue requires a current battle phase."),
+        ("missing_pending", "Lifecycle reaction queue requires a pending decision."),
+        ("wrong_decision_type", "Lifecycle reaction queue pending decision_type drift."),
+        ("placement_drift", "Lifecycle reaction queue pending placement decision drift."),
+        ("movement_drift", "Lifecycle reaction queue pending movement decision drift."),
+        ("missing_request_id", "Lifecycle reaction queue frame requires request_id."),
+        ("duplicate_request_id", "Lifecycle reaction queue request_ids must be unique."),
+        ("game_id_drift", "Lifecycle reaction queue frame game_id drift."),
+        ("phase_drift", "Lifecycle reaction queue frame phase drift."),
+    ],
+)
+def test_phase17d_reaction_queue_consistency_rejects_drift(
+    drift_case: str,
+    expected_message: str,
+) -> None:
+    state = _battle_state()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    decisions, reaction_queue, request = _reaction_queue_consistency_fixture(state=state)
+    pending_request: DecisionRequest | None = request
+    allowlist = {request.decision_type}
+
+    if drift_case == "wrong_stage":
+        state.stage = GameLifecycleStage.SETUP
+    elif drift_case == "missing_phase":
+        state.battle_phase_index = None
+    elif drift_case == "missing_pending":
+        pending_request = None
+    elif drift_case == "wrong_decision_type":
+        allowlist = {SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE}
+    elif drift_case == "placement_drift":
+        pending_request = _non_reaction_placement_request(
+            state=state,
+            request_id=request.request_id,
+        )
+        allowlist = {PLACEMENT_PROPOSAL_DECISION_TYPE}
+    elif drift_case == "movement_drift":
+        pending_request = _non_reaction_movement_request(
+            state=state,
+            request_id=request.request_id,
+        )
+        allowlist = {MOVEMENT_PROPOSAL_DECISION_TYPE}
+    elif drift_case == "missing_request_id":
+        payload = reaction_queue.to_payload()
+        payload["frames"][0]["request_id"] = None
+        reaction_queue = ReactionQueue.from_payload(payload)
+    elif drift_case == "duplicate_request_id":
+        second = reaction_queue.emit_decision_request(
+            state=state,
+            decisions=decisions,
+            reaction_window=_reaction_queue_window(
+                state=state,
+                window_id="phase17d-reaction-consistency-duplicate",
+            ),
+            parent_phase=BattlePhase.MOVEMENT,
+            parent_step="end_movement_phase_reactions",
+            resume_token="phase17d-reaction-consistency-duplicate-resume",
+            actor_id="player-b",
+            options=(
+                DecisionOption(option_id="decline", label="Decline", payload={"action": "decline"}),
+            ),
+            payload={"source": "phase17d-reaction-consistency-duplicate"},
+        )
+        pending_request = second.decision_request
+        payload = reaction_queue.to_payload()
+        payload["frames"][1]["request_id"] = payload["frames"][0]["request_id"]
+        reaction_queue = ReactionQueue.from_payload(payload)
+    elif drift_case == "game_id_drift":
+        state.game_id = "phase17d-other-game"
+    elif drift_case == "phase_drift":
+        state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    else:
+        raise AssertionError(f"Unhandled drift case: {drift_case}")
+
+    with pytest.raises(GameLifecycleError, match=expected_message):
+        validate_reaction_queue_consistency(
+            state=state,
+            reaction_queue=reaction_queue,
+            pending_request=pending_request,
+            reaction_frame_decision_types=allowlist,
+        )
+
+
+def test_phase17d_catalog_setup_reactive_records_unsupported_multi_model_source_once() -> None:
+    state, catalog, player_b_index = _setup_reactive_single_model_state(
+        target_pose=Pose.at(6.5, 10.0),
+        source_pose=Pose.at(16.0, 10.0),
+        keep_all_source_models=True,
+    )
+    decisions = DecisionController()
+    reaction_queue = ReactionQueue()
+    _append_setup_reactive_arrival_event(
+        decisions=decisions,
+        state=state,
+        target_unit_id="army-alpha:intercessor-unit-1",
+    )
+
+    for _attempt in range(2):
+        status = request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id={"player-b": player_b_index},
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+        )
+        assert status is None
+
+    unsupported_payloads = _event_payloads(
+        decisions,
+        "catalog_setup_reactive_shoot_charge_unsupported",
+    )
+    assert len(unsupported_payloads) == 1
+    assert unsupported_payloads[0]["source_unit_instance_id"] == ("army-beta:intercessor-unit-2")
+    assert unsupported_payloads[0]["target_unit_instance_id"] == ("army-alpha:intercessor-unit-1")
+    assert unsupported_payloads[0]["unsupported_reason"] == (
+        "model_scoped_action_requires_single_placed_alive_model"
+    )
+
+
+@pytest.mark.parametrize(
+    ("payload_field", "payload_value", "diagnostic_field"),
+    [
+        ("proposal_kind", ProposalKind.NORMAL_MOVE.value, "proposal_kind"),
+        ("movement_mode", MovementMode.NORMAL.value, "movement_mode"),
+        ("movement_phase_action", "normal_move", "movement_phase_action"),
+        ("charge_target_unit_instance_ids", [1], "charge_target_unit_instance_ids"),
+        ("witness", {"model_paths": []}, "witness"),
+    ],
+)
+def test_phase17d_catalog_setup_reactive_charge_move_malformed_fields_are_typed(
+    payload_field: str,
+    payload_value: JsonValue,
+    diagnostic_field: str,
+) -> None:
+    state, catalog, player_b_index = _setup_reactive_single_model_state(
+        target_pose=Pose.at(6.5, 10.0),
+        source_pose=Pose.at(16.0, 10.0),
+    )
+    decisions, charge_request = _setup_reactive_charge_move_request(
+        state=state,
+        catalog=catalog,
+        player_b_index=player_b_index,
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(charge_request.payload)
+    valid_payload = ChargeMoveProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=proposal_request.unit_instance_id,
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=("army-alpha:intercessor-unit-1",),
+        witness=_path_witness_for_unit_delta(
+            state=state,
+            unit_instance_id="army-beta:intercessor-unit-2",
+            dx=-1.25,
+        ),
+    ).to_payload()
+    malformed_payload = dict(valid_payload)
+    malformed_payload[payload_field] = payload_value
+
+    status = invalid_catalog_setup_reactive_charge_move_status(
+        state=state,
+        request=charge_request,
+        result=_parameterized_result_for_request(
+            request=charge_request,
+            result_id=f"phase17d-malformed-setup-reactive-{payload_field}",
+            payload=cast(JsonValue, malformed_payload),
+        ),
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+    )
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    validation = _json_object(_json_object(status.payload)["proposal_validation"])
+    violations = cast(list[JsonValue], validation["violations"])
+    violation = _json_object(violations[0])
+    assert violation["field"] == diagnostic_field
+
+
+def test_phase17d_catalog_setup_reactive_charge_move_no_move_records_decline() -> None:
+    state = _battle_state()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    decisions = DecisionController()
+    request = MovementProposalRequest(
+        request_id="phase17d-setup-reactive-charge-no-move",
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id="player-b",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id="army-beta:intercessor-unit-2",
+        proposal_kind=ProposalKind.CHARGE_MOVE,
+        source_decision_request_id="phase17d-setup-reactive-action-request",
+        source_decision_result_id="phase17d-setup-reactive-action-result",
+        movement_phase_action="charge_move",
+        context={
+            "source_kind": CATALOG_SETUP_REACTIVE_SOURCE_KIND,
+            "movement_mode": MovementMode.CHARGE.value,
+            "maximum_distance_inches": 0,
+            "reachable_target_unit_instance_ids": [],
+            "reachable_target_distances_inches": {},
+        },
+    ).to_decision_request()
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    proposal = ChargeMoveProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=proposal_request.unit_instance_id,
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=(),
+        witness=None,
+    )
+    result = _parameterized_result_for_request(
+        request=request,
+        result_id="phase17d-setup-reactive-charge-no-move-result",
+        payload=cast(JsonValue, proposal.to_payload()),
+    )
+
+    status = apply_catalog_setup_reactive_charge_move(
+        state=state,
+        request=request,
+        result=result,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+    )
+
+    declined_payloads = _event_payloads(
+        decisions,
+        "catalog_setup_reactive_charge_move_declined",
+    )
+    assert status is None
+    assert len(declined_payloads) == 1
+    assert declined_payloads[0]["unit_instance_id"] == "army-beta:intercessor-unit-2"
+    assert declined_payloads[0]["proposal_request_id"] == proposal_request.request_id
+
+
+def test_phase17d_catalog_setup_reactive_charge_move_request_check_is_strict() -> None:
+    ordinary_request = DecisionRequest(
+        request_id="phase17d-ordinary-request",
+        decision_type="ordinary_decision",
+        actor_id="player-b",
+        payload={"source": "phase17d"},
+        options=(
+            DecisionOption(option_id="decline", label="Decline", payload={"action": "decline"}),
+        ),
+    )
+
+    assert is_catalog_setup_reactive_charge_move_request(ordinary_request) is False
+    with pytest.raises(GameLifecycleError, match="requires request"):
+        is_catalog_setup_reactive_charge_move_request(cast(DecisionRequest, object()))
+
+
+def test_phase17d_catalog_setup_reactive_request_validates_dependencies() -> None:
+    state, catalog, player_b_index = _setup_reactive_single_model_state(
+        target_pose=Pose.at(6.5, 10.0),
+        source_pose=Pose.at(16.0, 10.0),
+    )
+    decisions = DecisionController()
+    reaction_queue = ReactionQueue()
+    ruleset_descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+
+    assert (
+        request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=None,
+            ability_indexes_by_player_id={"player-b": player_b_index},
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="requires decisions"):
+        request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=cast(DecisionController, object()),
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id={"player-b": player_b_index},
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+        )
+    with pytest.raises(GameLifecycleError, match="ability indexes must be a mapping"):
+        request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id=cast(dict[str, AbilityCatalogIndex], []),
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+        )
+    with pytest.raises(GameLifecycleError, match="ability index mapping contained drift"):
+        request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id={
+                "player-b": cast(AbilityCatalogIndex, object()),
+            },
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+        )
+    with pytest.raises(GameLifecycleError, match="requires a RulesetDescriptor"):
+        request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id={"player-b": player_b_index},
+            ruleset_descriptor=cast(RulesetDescriptor, object()),
+            army_catalog=catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+        )
+    with pytest.raises(GameLifecycleError, match="requires an ArmyCatalog"):
+        request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id={"player-b": player_b_index},
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=cast(ArmyCatalog, object()),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+        )
+    with pytest.raises(GameLifecycleError, match="requires runtime modifiers"):
+        request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id={"player-b": player_b_index},
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=catalog,
+            runtime_modifier_registry=cast(RuntimeModifierRegistry, object()),
+            charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+        )
+    with pytest.raises(GameLifecycleError, match="requires charge target restrictions"):
+        request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id={"player-b": player_b_index},
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            charge_target_restriction_hooks=cast(ChargeTargetRestrictionHookRegistry, object()),
+        )
+    state.active_player_id = None
+    with pytest.raises(GameLifecycleError, match="requires an active player"):
+        request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id={"player-b": player_b_index},
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+        )
+
+
+def test_phase17d_catalog_setup_reactive_finite_result_malformed_is_typed() -> None:
+    state, catalog, player_b_index = _setup_reactive_single_model_state(
+        target_pose=Pose.at(6.5, 10.0),
+        source_pose=Pose.at(16.0, 10.0),
+    )
+    decisions = DecisionController()
+    reaction_queue = ReactionQueue()
+    _append_setup_reactive_arrival_event(
+        decisions=decisions,
+        state=state,
+        target_unit_id="army-alpha:intercessor-unit-1",
+    )
+    status = request_catalog_setup_reactive_shoot_charge_if_available(
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        ability_indexes_by_player_id={"player-b": player_b_index},
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+    )
+    assert status is not None
+    assert status.decision_request is not None
+
+    invalid_status = invalid_catalog_setup_reactive_shoot_charge_status(
+        state=state,
+        request=status.decision_request,
+        result=DecisionResult(
+            result_id="phase17d-setup-reactive-invalid-action",
+            request_id=status.decision_request.request_id,
+            decision_type=status.decision_request.decision_type,
+            actor_id=status.decision_request.actor_id,
+            selected_option_id="not-an-option",
+            payload=status.decision_request.option_by_id("decline").payload,
+        ),
+        decisions=decisions,
+        ability_indexes_by_player_id={"player-b": player_b_index},
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+    )
+
+    assert invalid_status is not None
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_status.payload == {
+        "invalid_reason": "invalid_catalog_setup_reactive_action_result",
+        "detail": "DecisionRequest option_id is not in the finite action space.",
+    }
+
+
+def _parameterized_result_for_request(
+    *,
+    request: DecisionRequest,
+    result_id: str,
+    payload: JsonValue,
+) -> DecisionResult:
+    return ParameterizedSubmission(
+        request_id=request.request_id,
+        result_id=result_id,
+        payload=payload,
+    ).to_result(request)
+
+
+def _record_decision_result(
+    *,
+    decisions: DecisionController,
+    result: DecisionResult,
+) -> None:
+    decisions.submit_result(result)
+
+
+def _request_setup_reactive_lifecycle_action(
+    *,
+    lifecycle: GameLifecycle,
+    state: GameState,
+    catalog: ArmyCatalog,
+    player_b_index: AbilityCatalogIndex,
+) -> DecisionRequest:
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    _append_setup_reactive_arrival_event(
+        decisions=lifecycle.decision_controller,
+        state=state,
+        target_unit_id=target_unit_id,
+    )
+    status = request_catalog_setup_reactive_shoot_charge_if_available(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_queue=lifecycle.reaction_queue,
+        ability_indexes_by_player_id={"player-b": player_b_index},
+        ruleset_descriptor=lifecycle.config.ruleset_descriptor,
+        army_catalog=catalog,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+    )
+    assert status is not None
+    assert status.decision_request is not None
+    return status.decision_request
+
+
+def _setup_reactive_charge_move_request(
+    *,
+    state: GameState,
+    catalog: ArmyCatalog,
+    player_b_index: AbilityCatalogIndex,
+) -> tuple[DecisionController, DecisionRequest]:
+    decisions = DecisionController()
+    reaction_queue = ReactionQueue()
+    _append_setup_reactive_arrival_event(
+        decisions=decisions,
+        state=state,
+        target_unit_id="army-alpha:intercessor-unit-1",
+    )
+    status = request_catalog_setup_reactive_shoot_charge_if_available(
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        ability_indexes_by_player_id={"player-b": player_b_index},
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+    )
+    assert status is not None
+    assert status.decision_request is not None
+    action_result = DecisionResult.for_request(
+        result_id="phase17d-setup-reactive-charge-action-for-request",
+        request=status.decision_request,
+        selected_option_id="charge",
+    )
+    _record_decision_result(decisions=decisions, result=action_result)
+    charge_status = apply_catalog_setup_reactive_shoot_charge_result(
+        state=state,
+        decisions=decisions,
+        result=action_result,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        ability_index=player_b_index,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        charge_target_restriction_hooks=ChargeTargetRestrictionHookRegistry.empty(),
+    )
+    assert charge_status is not None
+    assert charge_status.decision_request is not None
+    return decisions, charge_status.decision_request
+
+
+def _append_setup_reactive_arrival_event(
+    *,
+    decisions: DecisionController,
+    state: GameState,
+    target_unit_id: str,
+) -> None:
+    decisions.event_log.append(
+        "reinforcement_unit_arrived",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": "player-a",
+            "phase": BattlePhase.MOVEMENT.value,
+            "step": "move_units",
+            "unit_instance_id": target_unit_id,
+            "placement_kind": "strategic_reserves",
+            "request_id": "phase17d-lifecycle-setup-request",
+            "result_id": "phase17d-lifecycle-setup-result",
+            "phase_body_status": "reinforcement_unit_arrived",
+        },
+    )
+
+
+def _reaction_queue_consistency_fixture(
+    *,
+    state: GameState,
+) -> tuple[DecisionController, ReactionQueue, DecisionRequest]:
+    decisions = DecisionController()
+    reaction_queue = ReactionQueue()
+    triggered = reaction_queue.emit_decision_request(
+        state=state,
+        decisions=decisions,
+        reaction_window=_reaction_queue_window(
+            state=state,
+            window_id="phase17d-reaction-consistency",
+        ),
+        parent_phase=BattlePhase.MOVEMENT,
+        parent_step="end_movement_phase_reactions",
+        resume_token="phase17d-reaction-consistency-resume",
+        actor_id="player-b",
+        options=(
+            DecisionOption(option_id="decline", label="Decline", payload={"action": "decline"}),
+        ),
+        payload={"source": "phase17d-reaction-consistency"},
+    )
+    return decisions, reaction_queue, triggered.decision_request
+
+
+def _reaction_queue_window(*, state: GameState, window_id: str) -> ReactionWindow:
+    return ReactionWindow(
+        timing_window=TimingWindow(
+            window_id=window_id,
+            descriptor=TimingWindowDescriptor(
+                descriptor_id=f"{window_id}-descriptor",
+                trigger_kind=TimingTriggerKind.END_PHASE,
+                source_rule_id=f"{window_id}-source",
+                phase=BattlePhase.MOVEMENT,
+                source_step="end_movement_phase_reactions",
+            ),
+            game_id=state.game_id,
+            battle_round=state.battle_round,
+            active_player_id=state.active_player_id,
+            phase=BattlePhase.MOVEMENT,
+        ),
+        eligible_player_ids=("player-b",),
+    )
+
+
+def _non_reaction_movement_request(*, state: GameState, request_id: str) -> DecisionRequest:
+    return MovementProposalRequest(
+        request_id=request_id,
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id="player-b",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id="army-beta:intercessor-unit-2",
+        proposal_kind=ProposalKind.NORMAL_MOVE,
+        source_decision_request_id="phase17d-source-request",
+        source_decision_result_id="phase17d-source-result",
+        movement_phase_action="normal_move",
+        context={"source_kind": "ordinary_movement"},
+    ).to_decision_request()
+
+
+def _non_reaction_placement_request(*, state: GameState, request_id: str) -> DecisionRequest:
+    return MovementProposalRequest(
+        request_id=request_id,
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id="player-b",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id="army-beta:intercessor-unit-2",
+        proposal_kind=ProposalKind.REINFORCEMENT,
+        source_decision_request_id="phase17d-source-request",
+        source_decision_result_id="phase17d-source-result",
+        placement_kinds=(BattlefieldPlacementKind.STRATEGIC_RESERVES,),
+        context={"source_kind": "ordinary_reinforcement"},
+    ).to_decision_request()
 
 
 def test_phase17d_generic_reroll_permission_executes() -> None:
@@ -2253,6 +3399,112 @@ def _generic_catalog_descriptor(
     )
 
 
+def _setup_reactive_single_model_state(
+    *,
+    target_pose: Pose,
+    source_pose: Pose,
+    keep_all_source_models: bool = False,
+) -> tuple[GameState, ArmyCatalog, AbilityCatalogIndex]:
+    descriptor = _generic_catalog_descriptor(
+        SETUP_REACTIVE_SHOOT_CHARGE_TEXT,
+        ability_id="setup-reactive-shoot-charge",
+    )
+    catalog = _catalog_with_descriptor(descriptor)
+    armies = (
+        muster_army(
+            catalog=catalog,
+            request=_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selection_id="intercessor-unit-1",
+            ),
+        ),
+        muster_army(
+            catalog=catalog,
+            request=_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_id="intercessor-unit-2",
+            ),
+        ),
+    )
+    state = _battle_state()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    for army in armies:
+        state.record_army_definition(army)
+    state.battlefield_state = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17d-setup-reactive",
+        armies=armies,
+    ).battlefield_state
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        pose=target_pose,
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id="army-beta:intercessor-unit-2",
+        pose=source_pose,
+    )
+    assert state.battlefield_state is not None
+    source_unit = _unit_by_id(state, "army-beta:intercessor-unit-2")
+    if not keep_all_source_models:
+        state.battlefield_state = state.battlefield_state.with_removed_models(
+            tuple(model.model_instance_id for model in source_unit.own_models[1:])
+        )
+    records = catalog_ability_records_from_catalog(catalog)
+    player_b_index = build_player_ability_index(
+        records,
+        army=state.army_definitions[1],
+        catalog=catalog,
+    )
+    return state, catalog, player_b_index
+
+
+def _setup_reactive_lifecycle(*, state: GameState, catalog: ArmyCatalog) -> GameLifecycle:
+    config = _setup_reactive_config(catalog)
+    return GameLifecycle.from_payload(
+        cast(
+            Any,
+            {
+                "config": config.to_payload(),
+                "parameterized_movement_proposals": True,
+                "state": state.to_payload(),
+                "decisions": DecisionController().to_payload(),
+                "reaction_queue": ReactionQueue().to_payload(),
+            },
+        )
+    )
+
+
+def _setup_reactive_config(catalog: ArmyCatalog) -> GameConfig:
+    return GameConfig(
+        game_id="phase17d-game",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selection_id="intercessor-unit-1",
+            ),
+            _muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_id="intercessor-unit-2",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down"),
+    )
+
+
 def _champion_slayer_ability_index(*, datasheet_id: str) -> AbilityCatalogIndex:
     rule_ir = _champion_slayer_rule_ir()
     records = tuple(
@@ -2378,6 +3630,17 @@ def _execution_context(
 def _json_object(value: JsonValue) -> dict[str, JsonValue]:
     assert isinstance(value, dict)
     return value
+
+
+def _event_payloads(
+    decisions: DecisionController,
+    event_type: str,
+) -> tuple[dict[str, JsonValue], ...]:
+    return tuple(
+        _json_object(event.payload)
+        for event in decisions.event_log.records
+        if event.event_type == event_type
+    )
 
 
 def _battle_state() -> GameState:
@@ -2677,6 +3940,36 @@ def _with_unit_pose(
         ),
     )
     return battlefield_state.with_unit_placement(moved)
+
+
+def _path_witness_for_unit_delta(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    dx: float,
+    dy: float = 0.0,
+) -> PathWitness:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise AssertionError("test requires battlefield_state")
+    unit_placement = battlefield_state.unit_placement_by_id(unit_instance_id)
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for placement in unit_placement.model_placements:
+        start = placement.pose
+        midpoint = Pose.at(
+            start.position.x + (dx / 2.0),
+            start.position.y + (dy / 2.0),
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        end = Pose.at(
+            start.position.x + dx,
+            start.position.y + dy,
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        model_paths.append((placement.model_instance_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
 
 
 def _with_unit_keywords(

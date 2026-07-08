@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
+    request_catalog_setup_reactive_shoot_charge_if_available,
+)
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
@@ -60,7 +63,31 @@ def _request_end_opponent_movement_reaction_if_available(
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+    army_catalog: ArmyCatalog | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> LifecycleStatus | None:
+    if (
+        ability_indexes_by_player_id is not None
+        and ruleset_descriptor is not None
+        and army_catalog is not None
+        and runtime_modifier_registry is not None
+        and charge_target_restriction_hooks is not None
+    ):
+        catalog_status = request_catalog_setup_reactive_shoot_charge_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            runtime_modifier_registry=runtime_modifier_registry,
+            charge_target_restriction_hooks=charge_target_restriction_hooks,
+        )
+        if catalog_status is not None:
+            return catalog_status
     fire_overwatch_status = _request_fire_overwatch_reaction_if_available(
         state=state,
         decisions=decisions,

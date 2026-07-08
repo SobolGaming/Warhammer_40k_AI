@@ -214,6 +214,7 @@ __all__ = (
     "apply_hidden_status_loss_after_ranged_attacks",
     "invalid_shooting_phase_start_faction_rule_status",
     "request_out_of_phase_shooting_declaration",
+    "shooting_rules_unit_has_legal_declaration_against_targets",
     "shooting_rules_unit_is_eligible_to_shoot",
     "shooting_unit_can_select_to_shoot",
     "shooting_unit_has_legal_declaration_against_targets",

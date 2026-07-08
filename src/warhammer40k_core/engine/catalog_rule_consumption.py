@@ -161,6 +161,7 @@ CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID = (
     "catalog-ir:unit-move-completed-mortal-wounds"
 )
 CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID = "catalog-ir:movement-transit-permission"
+CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID = "catalog-ir:setup-reactive-shoot-charge"
 CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID = "catalog-ir:can-fallback-and-shoot"
@@ -1374,6 +1375,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
+        CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
     }
     for characteristic in Characteristic:
         hook_ids.add(_catalog_ir_characteristic_query_consumer_id(characteristic))
@@ -3819,6 +3821,8 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID)
     if _clause_is_supported_movement_transit_permission(clause):
         consumer_ids.add(CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID)
+    if _clause_is_supported_setup_reactive_shoot_charge(clause):
+        consumer_ids.add(CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID)
     if _clause_is_structured_wound_reroll_clause(clause):
         consumer_ids.add(CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID)
     if _clause_is_structured_destroyed_unit_restore_clause(clause):
@@ -3891,6 +3895,8 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         hook_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
     if _clause_is_supported_unit_move_completed_mortal_wounds(clause):
         hook_ids.add(CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID)
+    if _clause_is_supported_setup_reactive_shoot_charge(clause):
+        hook_ids.add(CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID)
     return tuple(sorted(hook_ids))
 
 
@@ -4710,6 +4716,84 @@ def _clause_is_structured_destroyed_unit_restore_clause(clause: RuleClause) -> b
         and clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED
         and any(effect.kind is RuleEffectKind.RESTORE_LOST_WOUNDS for effect in clause.effects)
     )
+
+
+def _clause_is_supported_setup_reactive_shoot_charge(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
+        return False
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return False
+    trigger_parameters = parameter_payload(trigger.parameters)
+    if trigger_parameters != {
+        "edge": "end",
+        "owner": "opponent",
+        "phase": "movement",
+        "timing_window": "end_opponent_movement_phase",
+    }:
+        return False
+    if not _clause_has_selected_unit_setup_constraint(clause):
+        return False
+    if not _clause_has_selected_unit_this_model_distance(clause):
+        return False
+    actions = {
+        _setup_reactive_action_token(effect): parameter_payload(effect.parameters)
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.OUT_OF_PHASE_ACTION
+    }
+    shoot = actions.get("shoot")
+    charge = actions.get("charge")
+    return (
+        shoot is not None
+        and shoot.get("action_group") == "setup_reactive_shoot_charge"
+        and shoot.get("action_source") == "this_model"
+        and shoot.get("target_reference") == "selected_unit"
+        and shoot.get("eligible_target_required") is True
+        and charge is not None
+        and charge.get("action_group") == "setup_reactive_shoot_charge"
+        and charge.get("action_source") == "this_model"
+        and charge.get("target_reference") == "selected_unit"
+        and charge.get("must_end_engaged_with_selected_unit") is True
+        and charge.get("suppress_charge_bonus") is True
+        and charge.get("suppressed_charge_bonus") == "fights_first"
+    )
+
+
+def _clause_has_selected_unit_setup_constraint(clause: RuleClause) -> bool:
+    return any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters)
+        == {
+            "relationship": "selected_unit_set_up_on_battlefield_this_phase",
+            "gate_subject": "selected_unit",
+        }
+        for condition in clause.conditions
+    )
+
+
+def _clause_has_selected_unit_this_model_distance(clause: RuleClause) -> bool:
+    for condition in clause.conditions:
+        if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
+            continue
+        parameters = parameter_payload(condition.parameters)
+        if (
+            parameters.get("predicate") == "within"
+            and parameters.get("range_kind") == "numeric_range"
+            and parameters.get("object_kind") == "model"
+            and parameters.get("object_reference") == "this"
+            and parameters.get("subject") == "selected_unit"
+        ):
+            distance = parameters.get("distance_inches")
+            return (type(distance) is int or type(distance) is float) and distance > 0
+    return False
+
+
+def _setup_reactive_action_token(effect: RuleEffectSpec) -> str:
+    parameters = parameter_payload(effect.parameters)
+    action = parameters.get("action")
+    return "" if type(action) is not str else _catalog_ir_lookup_token(action)
 
 
 def _clause_is_melee_wound_reroll_against_target_keywords(
@@ -5844,6 +5928,13 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         return (_catalog_ir_characteristic_modifier_consumer_id(characteristic),)
     if effect.kind is RuleEffectKind.MODIFY_MOVE_DISTANCE:
         return (_catalog_ir_characteristic_modifier_consumer_id(Characteristic.MOVEMENT),)
+    if effect.kind is RuleEffectKind.OUT_OF_PHASE_ACTION:
+        parameters = parameter_payload(effect.parameters)
+        if parameters.get("action_group") == "setup_reactive_shoot_charge" and parameters.get(
+            "action"
+        ) in {"shoot", "charge"}:
+            return (CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,)
+        return ()
     if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
         consumer_ids = _weapon_keyword_grant_consumer_ids_for_effect(effect)
         if consumer_ids:

@@ -35,6 +35,30 @@ _ABILITY_CHOICE_PREFIX_RE = re.compile(
     r"\bselect\s+one\s+of\s+the\s+following\s+abilities\s*:",
     re.IGNORECASE,
 )
+_SETUP_REACTIVE_SELECT_RE = re.compile(
+    r"\bat\s+the\s+end\s+of\s+your\s+opponent's\s+Movement\s+phase,\s+"
+    r"you\s+can\s+select\s+one\s+enemy\s+unit\s+that\s+was\s+set\s+up\s+on\s+"
+    r"the\s+battlefield\s+within\s+\d+(?:\.\d+)?\"\s+of\s+this\s+model\b",
+    re.IGNORECASE,
+)
+_SETUP_REACTIVE_EITHER_RE = re.compile(
+    r"\bthis\s+model\s+can\s+then\s+either\s*:",
+    re.IGNORECASE,
+)
+_SETUP_REACTIVE_SHOOT_RE = re.compile(
+    r"(?:^|\s)(?:\u25a0|-)?\s*Shoot\s+at\s+that\s+unit,\s+but\s+only\s+if\s+"
+    r"it\s+is\s+an\s+eligible\s+target\b",
+    re.IGNORECASE,
+)
+_SETUP_REACTIVE_CHARGE_RE = re.compile(
+    r"(?:^|\s)(?:\u25a0|-)?\s*Declare\s+a\s+charge"
+    r"(?:\s+against\s+that\s+unit)?",
+    re.IGNORECASE,
+)
+_SETUP_REACTIVE_CHARGE_BONUS_RE = re.compile(
+    r"\bdoes\s+not\s+receive\s+any\s+Charge\s+bonus\s+this\s+turn\b",
+    re.IGNORECASE,
+)
 _THAT_ABILITY_APPLICATION_RE = re.compile(r"\bthat\s+ability\b", re.IGNORECASE)
 _THIS_UNIT_NORMAL_ADVANCE_FALL_BACK_MOVE_RE = re.compile(
     r"\beach\s+time\s+this\s+unit\s+makes\s+a\s+"
@@ -86,9 +110,13 @@ def merge_rule_clause_spans(
     normalized_text: str,
     spans: tuple[TextSpan, ...],
 ) -> tuple[TextSpan, ...]:
-    merged = _merge_adjacent_clause_spans(
+    merged = _merge_setup_reactive_shoot_charge_spans(
         normalized_text=normalized_text,
         spans=spans,
+    )
+    merged = _merge_adjacent_clause_spans(
+        normalized_text=normalized_text,
+        spans=merged,
         current_patterns=(_ABILITY_CHOICE_PREFIX_RE,),
         next_pattern=_THAT_ABILITY_APPLICATION_RE,
     )
@@ -119,6 +147,57 @@ def merge_rule_clause_spans(
         ),
         next_pattern=_MOVE_THROUGH_ENGAGEMENT_AUTO_PASS_RE,
     )
+
+
+def _merge_setup_reactive_shoot_charge_spans(
+    *,
+    normalized_text: str,
+    spans: tuple[TextSpan, ...],
+) -> tuple[TextSpan, ...]:
+    merged: list[TextSpan] = []
+    index = 0
+    while index < len(spans):
+        current = spans[index]
+        if _SETUP_REACTIVE_SELECT_RE.search(current.text) is not None:
+            final_index = _setup_reactive_shoot_charge_final_index(
+                normalized_text=normalized_text,
+                spans=spans,
+                start_index=index,
+            )
+            if final_index is not None:
+                final = spans[final_index]
+                merged.append(
+                    TextSpan(
+                        text=normalized_text[current.start : final.end],
+                        start=current.start,
+                        end=final.end,
+                    )
+                )
+                index = final_index + 1
+                continue
+        merged.append(current)
+        index += 1
+    return tuple(merged)
+
+
+def _setup_reactive_shoot_charge_final_index(
+    *,
+    normalized_text: str,
+    spans: tuple[TextSpan, ...],
+    start_index: int,
+) -> int | None:
+    current = spans[start_index]
+    max_final_index = min(len(spans) - 1, start_index + 4)
+    for final_index in range(start_index + 1, max_final_index + 1):
+        combined = normalized_text[current.start : spans[final_index].end]
+        if (
+            _SETUP_REACTIVE_EITHER_RE.search(combined) is not None
+            and _SETUP_REACTIVE_SHOOT_RE.search(combined) is not None
+            and _SETUP_REACTIVE_CHARGE_RE.search(combined) is not None
+            and _SETUP_REACTIVE_CHARGE_BONUS_RE.search(combined) is not None
+        ):
+            return final_index
+    return None
 
 
 def _merge_adjacent_clause_spans(

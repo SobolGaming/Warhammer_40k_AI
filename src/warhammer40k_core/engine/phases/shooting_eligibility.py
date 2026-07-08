@@ -58,6 +58,7 @@ __all__ = (
     "_unit_has_indirect_ranged_weapon",
     "_unit_has_legal_shooting_declaration",
     "_weapon_profile_cache_fingerprint",
+    "shooting_rules_unit_has_legal_declaration_against_targets",
     "shooting_rules_unit_is_eligible_to_shoot",
     "shooting_unit_can_select_to_shoot",
     "shooting_unit_has_legal_declaration_against_targets",
@@ -564,6 +565,26 @@ def shooting_unit_has_legal_declaration_against_targets(
         state=state,
         scenario=_battlefield_scenario(state),
         unit=unit,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        player_id=player_id,
+        target_unit_ids=target_unit_ids,
+    )
+
+
+def shooting_rules_unit_has_legal_declaration_against_targets(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+    player_id: str,
+    target_unit_ids: tuple[str, ...],
+) -> bool:
+    return _rules_unit_has_legal_shooting_declaration(
+        state=state,
+        scenario=_battlefield_scenario(state),
+        rules_unit=rules_unit,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         player_id=player_id,
