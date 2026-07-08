@@ -2603,6 +2603,9 @@ def _faction_support_markdown(
             ability_rows_by_id=ability_rows_by_id,
         )
     )
+    if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
+        lines.append("")
+        return "\n".join(lines)
     lines.extend(_faction_detachment_rule_coverage_rows_markdown(detachment_rule_rows))
     lines.extend(_faction_exact_rule_rows_markdown("Enhancements", enhancement_rows))
     lines.extend(_faction_exact_rule_rows_markdown("Stratagems", stratagem_rows))
@@ -2832,6 +2835,7 @@ def _faction_datasheet_support_markdown(
     ]
     if faction_row.faction_id == "chaos-daemons":
         lines.extend(_chaos_daemons_datasheet_review_markdown())
+        return lines
     lines.extend(
         (
             (

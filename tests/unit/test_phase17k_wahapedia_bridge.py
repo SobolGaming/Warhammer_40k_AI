@@ -5114,16 +5114,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Wahapedia. | Unsupported IR |"
     ) in chaos_daemons_markdown
     assert "### Wahapedia-only rows excluded from PDF review" not in chaos_daemons_markdown
-    assert "### Datasheet Ability Details" in chaos_daemons_markdown
-    assert "Flesh Hounds (`000001112`) | `Playable` | Full | Full | Full | Full | Full" in (
-        chaos_daemons_markdown
-    )
-    assert "Hunters from the Warp (`000001112:hunters-from-the-warp`)" in (chaos_daemons_markdown)
-    assert "Collar of Khorne (`000001112:collar-of-khorne`)" in chaos_daemons_markdown
-    assert "Bloodletters (`000001114`) | `Playable`" in chaos_daemons_markdown
-    assert "Bane of Cowards (`000001114:bane-of-cowards`)" in chaos_daemons_markdown
-    assert "Bloodcrushers (`000001115`) | `Playable`" in chaos_daemons_markdown
-    assert "Brass Stampede (`000001115:brass-stampede`)" in chaos_daemons_markdown
+    assert "### Datasheet Ability Details" not in chaos_daemons_markdown
+    assert "## Detachment Rule Coverage Rows" not in chaos_daemons_markdown
+    assert "| Datasheet | Overall | Catalog | Models / geometry |" not in chaos_daemons_markdown
+    assert "Bloodletters (`000001114`) | `Playable`" not in chaos_daemons_markdown
+    assert "Bane of Cowards (`000001114:bane-of-cowards`)" not in chaos_daemons_markdown
     assert flesh_hounds_support.overall == "Playable"
     assert flesh_hounds_support.catalog_status == "Full"
     assert flesh_hounds_support.model_geometry_status == "Full"
@@ -5258,13 +5253,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Daemonic Incursion | `Full` | Warp Rifts generic IR reserve-arrival distance hook |"
     ) in chaos_daemons_markdown
     assert "| Legion of Excess | `None` | Generated scaffold only |" in chaos_daemons_markdown
-    assert "## Detachment Rule Coverage Rows" in chaos_daemons_markdown
+    assert "## Detachment Rule Coverage Rows" not in chaos_daemons_markdown
     assert "| Corsair Coterie | Pirates' Due |" in aeldari_markdown
     assert "| Corsair Coterie | Archraider |" in aeldari_markdown
     assert "`generic_supported` / `engine_consumed`" in aeldari_markdown
     assert "`named_handler_required` / `source_only`" in aeldari_markdown
-    assert "| Cavalcade of Chaos | Warp-Riders |" in chaos_daemons_markdown
-    assert "| Cavalcade of Chaos | Apocalyptic Steeds Upgrade |" in chaos_daemons_markdown
+    assert "| Cavalcade of Chaos | Warp-Riders |" not in chaos_daemons_markdown
+    assert "| Cavalcade of Chaos | Apocalyptic Steeds Upgrade |" not in chaos_daemons_markdown
     assert "Current coverage categories:" not in generated_markdown
     assert "## Runtime Hook Inventory" in generated_markdown
     assert "| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |" in generated_markdown
