@@ -17,7 +17,13 @@ from tests.phase10p_reserves_helpers import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.datasheet import BaseSizeDefinition, DatasheetKeywordSet
+from warhammer40k_core.core.datasheet import (
+    BaseSizeDefinition,
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+    DatasheetKeywordSet,
+)
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -33,6 +39,9 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.runtime import (
     build_runtime_content_bundle,
     build_runtime_content_bundle_for_armies,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    datasheets,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
     rule,
@@ -285,9 +294,13 @@ def test_warp_rifts_requires_legiones_daemonica() -> None:
     assert grants == ()
 
 
-def test_warp_rifts_requires_named_greater_daemon_anchor() -> None:
+def test_warp_rifts_requires_greater_daemon_shadow_aura_source_anchor() -> None:
     state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
-    _rename_unit(state, unit_instance_id=_ANCHOR_UNIT_ID, name="Daemon Prince")
+    _replace_unit_datasheet_abilities(
+        state,
+        unit_instance_id=_ANCHOR_UNIT_ID,
+        datasheet_abilities=(),
+    )
     target_pose = Pose.at(x=30.0, y=22.0, z=0.0, facing_degrees=0.0)
     _place_anchor_at_base_distance(
         state=state,
@@ -566,8 +579,11 @@ def _with_daemonic_incursion_units(
             )
             anchor_unit = _as_daemon_unit(
                 army.unit_by_id(_ANCHOR_UNIT_ID),
-                name="Bloodthirster",
+                name="Renamed Greater Daemon Anchor",
                 keywords=("Monster", anchor_god_keyword),
+                datasheet_abilities=(
+                    _datasheet_ability(datasheets.BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID),
+                ),
             )
             updated_armies.append(
                 replace(
@@ -596,16 +612,30 @@ def _as_daemon_unit(
     *,
     name: str,
     keywords: tuple[str, ...],
+    datasheet_abilities: tuple[DatasheetAbilityDescriptor, ...] = (),
 ) -> UnitInstance:
     return replace(
         unit,
         name=name,
         keywords=keywords,
         faction_keywords=(rule.LEGIONES_DAEMONICA,),
+        datasheet_abilities=datasheet_abilities,
         own_models=tuple(
             _with_base_size(model, base_diameter_mm=_RESERVE_BASE_DIAMETER_MM)
             for model in unit.own_models
         ),
+    )
+
+
+def _datasheet_ability(source_id: str) -> DatasheetAbilityDescriptor:
+    ability_id_suffix = source_id.split("Datasheets_abilities:", maxsplit=1)[1].replace(":", "-")
+    return DatasheetAbilityDescriptor(
+        ability_id=f"phase17g-daemonic-incursion:{ability_id_suffix}",
+        name="Source Backed Datasheet Ability",
+        source_id=source_id,
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="source-backed datasheet test ability",
     )
 
 
@@ -684,12 +714,19 @@ def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
     raise AssertionError(f"unit not found: {unit_instance_id}")
 
 
-def _rename_unit(state: GameState, *, unit_instance_id: str, name: str) -> None:
+def _replace_unit_datasheet_abilities(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    datasheet_abilities: tuple[DatasheetAbilityDescriptor, ...],
+) -> None:
     state.army_definitions = [
         replace(
             army,
             units=tuple(
-                replace(unit, name=name) if unit.unit_instance_id == unit_instance_id else unit
+                replace(unit, datasheet_abilities=datasheet_abilities)
+                if unit.unit_instance_id == unit_instance_id
+                else unit
                 for unit in army.units
             ),
         )

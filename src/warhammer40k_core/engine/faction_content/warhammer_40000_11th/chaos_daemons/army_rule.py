@@ -27,6 +27,9 @@ from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_un
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    datasheets as chaos_daemons_datasheets,
+)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
 from warhammer40k_core.engine.objective_control import (
@@ -62,17 +65,15 @@ HOOK_ID = "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:army-rule"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 LEGIONES_DAEMONICA = "LEGIONES DAEMONICA"
-GREATER_DAEMON_NAMES = frozenset(
-    {
-        "BLOODTHIRSTER",
-        "GREAT UNCLEAN ONE",
-        "KAIROS FATEWEAVER",
-        "KEEPER OF SECRETS",
-        "LORD OF CHANGE",
-        "ROTIGUS",
-        "SHALAXI HELBANE",
-        "SKARBRAND",
-    }
+GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID = (
+    (chaos_daemons_datasheets.BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID, "KHORNE"),
+    (chaos_daemons_datasheets.SKARBRAND_GREATER_DAEMON_SOURCE_ID, "KHORNE"),
+    (chaos_daemons_datasheets.LORD_OF_CHANGE_GREATER_DAEMON_SOURCE_ID, "TZEENTCH"),
+    (chaos_daemons_datasheets.KAIROS_GREATER_DAEMON_SOURCE_ID, "TZEENTCH"),
+    (chaos_daemons_datasheets.GREAT_UNCLEAN_ONE_GREATER_DAEMON_SOURCE_ID, "NURGLE"),
+    (chaos_daemons_datasheets.ROTIGUS_GREATER_DAEMON_SOURCE_ID, "NURGLE"),
+    (chaos_daemons_datasheets.KEEPER_GREATER_DAEMON_SOURCE_ID, "SLAANESH"),
+    (chaos_daemons_datasheets.SHALAXI_GREATER_DAEMON_SOURCE_ID, "SLAANESH"),
 )
 
 
@@ -452,11 +453,70 @@ def _unit_within_shadow(
         unit_instance_id=unit_instance_id,
     ):
         return True
-    return _unit_within_semantic_shadow_aura(
+    return _unit_within_greater_daemon_shadow_aura(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+    ) or _unit_within_semantic_shadow_aura(
         state=state,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
     )
+
+
+def _unit_within_greater_daemon_shadow_aura(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+) -> bool:
+    target_unit = _unit_by_id(state, unit_instance_id)
+    daemon_army = _army_for_player(state=state, player_id=player_id)
+    if not any(unit.unit_instance_id == target_unit.unit_instance_id for unit in daemon_army.units):
+        return False
+    if not _unit_has_faction_keyword(target_unit, LEGIONES_DAEMONICA):
+        return False
+    target_models = _unit_geometry_models(
+        state=state,
+        unit_instance_id=target_unit.unit_instance_id,
+    )
+    if not target_models:
+        return False
+    for source_unit in daemon_army.units:
+        if source_unit.unit_instance_id == target_unit.unit_instance_id:
+            continue
+        aura_keyword = _greater_daemon_shadow_aura_keyword(source_unit)
+        if aura_keyword is None:
+            continue
+        if not _unit_has_keyword(target_unit, aura_keyword):
+            continue
+        for source_model in _unit_geometry_models(
+            state=state, unit_instance_id=source_unit.unit_instance_id
+        ):
+            if any(
+                shapely_backend.base_footprint_distance(
+                    source_model.base,
+                    source_model.pose,
+                    target_model.base,
+                    target_model.pose,
+                )
+                <= 6.0
+                for target_model in target_models
+            ):
+                return True
+    return False
+
+
+def _greater_daemon_shadow_aura_keyword(unit: UnitInstance) -> str | None:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Greater Daemon Shadow aura lookup requires UnitInstance.")
+    for ability in unit.datasheet_abilities:
+        if ability.source_kind is not CatalogAbilitySourceKind.DATASHEET:
+            continue
+        for source_id, keyword in GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID:
+            if ability.source_id == source_id:
+                return keyword
+    return None
 
 
 def _unit_within_semantic_shadow_aura(
@@ -910,7 +970,13 @@ def _destroyed_model_ids_for_unit(
 
 
 def _is_greater_daemon_terror_unit(unit: UnitInstance) -> bool:
-    return _canonical_keyword(unit.name) in GREATER_DAEMON_NAMES
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Greater Daemon terror lookup requires UnitInstance.")
+    return any(
+        ability.source_kind is CatalogAbilitySourceKind.DATASHEET
+        and ability.source_id in chaos_daemons_datasheets.GREATER_DAEMON_SHADOW_AURA_SOURCE_IDS
+        for ability in unit.datasheet_abilities
+    )
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:

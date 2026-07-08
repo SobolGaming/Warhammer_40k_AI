@@ -369,8 +369,14 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne` | Daemon Lord of Khorne |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage` | Relentless Carnage |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage:mortal-wound-fnp` | Relentless Carnage - Mortal Wound Feel No Pain |
+| `warhammer_40000_11th:chaos_daemons:datasheet:keeper_of_secrets:daemon_lord_of_slaanesh` | Daemon Lord Of Slaanesh |
 | `warhammer_40000_11th:chaos_daemons:datasheet:lord_of_change:daemon_lord_of_tzeentch` | Daemon Lord of Tzeentch |
+| `warhammer_40000_11th:chaos_daemons:datasheet:nurglings:mischief_makers` | Mischief Makers |
 | `warhammer_40000_11th:chaos_daemons:datasheet:plaguebearers:infected_outbreak` | Infected Outbreak |
+| `warhammer_40000_11th:chaos_daemons:datasheet:poxbringer:feculent_despair` | Feculent Despair |
+| `warhammer_40000_11th:chaos_daemons:datasheet:rotigus:deluge_of_nurgle:movement` | Movement |
+| `warhammer_40000_11th:chaos_daemons:datasheet:rotigus:deluge_of_nurgle:objective_control` | Objective Control |
+| `warhammer_40000_11th:chaos_daemons:datasheet:skarbrand:rage_embodied` | Rage Embodied |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread` | Harbingers of Dread |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:battle-shock` | Harbingers of Dread - Battle-shock |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:hit-roll` | Harbingers of Dread - Darkness |

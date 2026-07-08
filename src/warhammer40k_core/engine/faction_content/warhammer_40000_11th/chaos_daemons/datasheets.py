@@ -3,13 +3,18 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import TypedDict
 
-from warhammer40k_core.core.attributes import CharacteristicValue
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
+from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockHookBinding,
+    BattleShockModifierContext,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     geometry_model_for_placement,
@@ -63,6 +68,10 @@ from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierBinding,
     HitRollModifierContext,
+    MovementBudgetModifierBinding,
+    MovementBudgetModifierContext,
+    ObjectiveControlModifierBinding,
+    ObjectiveControlModifierContext,
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
 )
@@ -105,20 +114,60 @@ BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID = (
 BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID = (
     f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000002582:6:description"
 )
+SKARBRAND_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001105:4:description"
+SKARBRAND_RAGE_EMBODIED_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001105:5:description"
 LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001120:4:description"
 LORD_OF_CHANGE_GREATER_DAEMON_SOURCE_ID = (
     f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001120:6:description"
 )
+KAIROS_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001117:4:description"
+GREAT_UNCLEAN_ONE_GREATER_DAEMON_SOURCE_ID = (
+    f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001130:5:description"
+)
 PLAGUEBEARERS_INFECTED_OUTBREAK_SOURCE_ID = (
     f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001132:5:description"
 )
+KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001137:5:description"
+KEEPER_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001137:7:description"
+ROTIGUS_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001465:5:description"
+ROTIGUS_DELUGE_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001465:7:description"
+NURGLINGS_MISCHIEF_MAKERS_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001133:4:description"
+POXBRINGER_FECULENT_DESPAIR_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001467:6:description"
 SHALAXI_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001648:4:description"
+GREATER_DAEMON_SHADOW_AURA_SOURCE_IDS = (
+    BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID,
+    SKARBRAND_GREATER_DAEMON_SOURCE_ID,
+    LORD_OF_CHANGE_GREATER_DAEMON_SOURCE_ID,
+    KAIROS_GREATER_DAEMON_SOURCE_ID,
+    GREAT_UNCLEAN_ONE_GREATER_DAEMON_SOURCE_ID,
+    ROTIGUS_GREATER_DAEMON_SOURCE_ID,
+    KEEPER_GREATER_DAEMON_SOURCE_ID,
+    SHALAXI_GREATER_DAEMON_SOURCE_ID,
+)
 
 KHORNE_HIT_MODIFIER_ID = (
     "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne"
 )
+RAGE_EMBODIED_ATTACKS_MODIFIER_ID = (
+    "warhammer_40000_11th:chaos_daemons:datasheet:skarbrand:rage_embodied"
+)
 TZEENTCH_STRENGTH_MODIFIER_ID = (
     "warhammer_40000_11th:chaos_daemons:datasheet:lord_of_change:daemon_lord_of_tzeentch"
+)
+SLAANESH_AP_MODIFIER_ID = (
+    "warhammer_40000_11th:chaos_daemons:datasheet:keeper_of_secrets:daemon_lord_of_slaanesh"
+)
+DELUGE_MOVEMENT_MODIFIER_ID = (
+    "warhammer_40000_11th:chaos_daemons:datasheet:rotigus:deluge_of_nurgle:movement"
+)
+DELUGE_OBJECTIVE_CONTROL_MODIFIER_ID = (
+    "warhammer_40000_11th:chaos_daemons:datasheet:rotigus:deluge_of_nurgle:objective_control"
+)
+MISCHIEF_MAKERS_HIT_MODIFIER_ID = (
+    "warhammer_40000_11th:chaos_daemons:datasheet:nurglings:mischief_makers"
+)
+FECULENT_DESPAIR_HOOK_ID = (
+    "warhammer_40000_11th:chaos_daemons:datasheet:poxbringer:feculent_despair"
 )
 INFECTED_OUTBREAK_HOOK_ID = (
     "warhammer_40000_11th:chaos_daemons:datasheet:plaguebearers:infected_outbreak"
@@ -147,8 +196,37 @@ def runtime_contribution() -> RuntimeContentContribution:
                 source_id=BLOODTHIRSTER_DAEMON_LORD_SOURCE_ID,
                 handler=daemon_lord_of_khorne_hit_roll_modifier,
             ),
+            HitRollModifierBinding(
+                modifier_id=MISCHIEF_MAKERS_HIT_MODIFIER_ID,
+                source_id=NURGLINGS_MISCHIEF_MAKERS_SOURCE_ID,
+                handler=mischief_makers_hit_roll_modifier,
+            ),
+        ),
+        movement_budget_modifier_bindings=(
+            MovementBudgetModifierBinding(
+                modifier_id=DELUGE_MOVEMENT_MODIFIER_ID,
+                source_id=ROTIGUS_DELUGE_SOURCE_ID,
+                handler=deluge_movement_budget_modifier,
+            ),
+        ),
+        objective_control_modifier_bindings=(
+            ObjectiveControlModifierBinding(
+                modifier_id=DELUGE_OBJECTIVE_CONTROL_MODIFIER_ID,
+                source_id=ROTIGUS_DELUGE_SOURCE_ID,
+                handler=deluge_objective_control_modifier,
+            ),
         ),
         weapon_profile_modifier_bindings=(
+            WeaponProfileModifierBinding(
+                modifier_id=RAGE_EMBODIED_ATTACKS_MODIFIER_ID,
+                source_id=SKARBRAND_RAGE_EMBODIED_SOURCE_ID,
+                handler=rage_embodied_weapon_profile_modifier,
+            ),
+            WeaponProfileModifierBinding(
+                modifier_id=SLAANESH_AP_MODIFIER_ID,
+                source_id=KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID,
+                handler=daemon_lord_of_slaanesh_weapon_profile_modifier,
+            ),
             WeaponProfileModifierBinding(
                 modifier_id=TZEENTCH_STRENGTH_MODIFIER_ID,
                 source_id=LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID,
@@ -176,6 +254,13 @@ def runtime_contribution() -> RuntimeContentContribution:
                 source_id=BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
                 source_kind=RELENTLESS_CARNAGE_SOURCE_KIND,
                 handler=apply_relentless_carnage_mortal_wound_feel_no_pain_decision,
+            ),
+        ),
+        battle_shock_hook_bindings=(
+            BattleShockHookBinding(
+                hook_id=FECULENT_DESPAIR_HOOK_ID,
+                source_id=POXBRINGER_FECULENT_DESPAIR_SOURCE_ID,
+                modifier_handler=feculent_despair_battle_shock_modifiers,
             ),
         ),
     )
@@ -215,6 +300,116 @@ def daemon_lord_of_tzeentch_weapon_profile_modifier(
     return _profile_with_strength_modifier(
         profile=context.weapon_profile,
         source_id=LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID,
+    )
+
+
+def rage_embodied_weapon_profile_modifier(
+    context: WeaponProfileModifierContext,
+) -> WeaponProfile:
+    if type(context) is not WeaponProfileModifierContext:
+        raise GameLifecycleError("Rage Embodied requires a WeaponProfileModifierContext.")
+    if context.weapon_profile.range_profile.kind is not RangeProfileKind.MELEE:
+        return context.weapon_profile
+    if not _friendly_keyworded_rules_unit_within_source_aura(
+        state=context.state,
+        target_unit_instance_id=context.attacking_unit_instance_id,
+        source_ability_id=SKARBRAND_RAGE_EMBODIED_SOURCE_ID,
+        required_god_keyword=KHORNE,
+    ):
+        return context.weapon_profile
+    return _profile_with_attack_modifier(
+        profile=context.weapon_profile,
+        source_id=SKARBRAND_RAGE_EMBODIED_SOURCE_ID,
+    )
+
+
+def daemon_lord_of_slaanesh_weapon_profile_modifier(
+    context: WeaponProfileModifierContext,
+) -> WeaponProfile:
+    if type(context) is not WeaponProfileModifierContext:
+        raise GameLifecycleError("Daemon Lord of Slaanesh requires a WeaponProfileModifierContext.")
+    if context.weapon_profile.range_profile.kind is not RangeProfileKind.MELEE:
+        return context.weapon_profile
+    if not _friendly_keyworded_rules_unit_within_source_aura(
+        state=context.state,
+        target_unit_instance_id=context.attacking_unit_instance_id,
+        source_ability_id=KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID,
+        required_god_keyword=SLAANESH,
+    ):
+        return context.weapon_profile
+    return _profile_with_ap_modifier(
+        profile=context.weapon_profile,
+        source_id=KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID,
+    )
+
+
+def deluge_movement_budget_modifier(context: MovementBudgetModifierContext) -> float:
+    if type(context) is not MovementBudgetModifierContext:
+        raise GameLifecycleError("Deluge of Nurgle requires a MovementBudgetModifierContext.")
+    if not _enemy_rules_unit_within_source_aura(
+        state=context.state,
+        target_unit_instance_id=context.unit_instance_id,
+        source_ability_id=ROTIGUS_DELUGE_SOURCE_ID,
+    ):
+        return context.current_movement_inches
+    return max(0.0, context.current_movement_inches - 2.0)
+
+
+def deluge_objective_control_modifier(context: ObjectiveControlModifierContext) -> int:
+    if type(context) is not ObjectiveControlModifierContext:
+        raise GameLifecycleError("Deluge of Nurgle requires an ObjectiveControlModifierContext.")
+    if not _enemy_rules_unit_within_source_aura(
+        state=context.state,
+        target_unit_instance_id=context.unit_instance_id,
+        source_ability_id=ROTIGUS_DELUGE_SOURCE_ID,
+    ):
+        return context.current_objective_control
+    return max(0, context.current_objective_control - 1)
+
+
+def mischief_makers_hit_roll_modifier(context: HitRollModifierContext) -> int:
+    if type(context) is not HitRollModifierContext:
+        raise GameLifecycleError("Mischief Makers requires a HitRollModifierContext.")
+    if context.source_phase is not BattlePhase.FIGHT:
+        return 0
+    if context.weapon_profile.range_profile.kind is not RangeProfileKind.MELEE:
+        return 0
+    attacking_rules_unit = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=context.attacking_unit_instance_id,
+    )
+    if _rules_unit_has_keywords(attacking_rules_unit, required_keywords=("titanic",)):
+        return 0
+    return (
+        -1
+        if _enemy_rules_unit_within_source_engagement_range(
+            state=context.state,
+            target_unit_instance_id=context.attacking_unit_instance_id,
+            source_ability_id=NURGLINGS_MISCHIEF_MAKERS_SOURCE_ID,
+        )
+        else 0
+    )
+
+
+def feculent_despair_battle_shock_modifiers(
+    context: BattleShockModifierContext,
+) -> tuple[RollModifier, ...]:
+    if type(context) is not BattleShockModifierContext:
+        raise GameLifecycleError("Feculent Despair requires a BattleShockModifierContext.")
+    source_player_ids = _enemy_source_aura_player_ids(
+        state=context.state,
+        target_unit_instance_id=context.request.unit_instance_id,
+        source_ability_id=POXBRINGER_FECULENT_DESPAIR_SOURCE_ID,
+    )
+    return tuple(
+        RollModifier(
+            modifier_id=(
+                f"{FECULENT_DESPAIR_HOOK_ID}:{context.request.request_id}:{source_player_id}"
+            ),
+            source_id=POXBRINGER_FECULENT_DESPAIR_SOURCE_ID,
+            operand=-1,
+        )
+        for source_player_id in source_player_ids
     )
 
 
@@ -540,6 +735,119 @@ def _friendly_keyworded_rules_unit_within_source_aura(
                 first_models=source_models,
                 second_models=target_models,
                 distance_inches=6.0,
+            ):
+                return True
+    return False
+
+
+def _enemy_rules_unit_within_source_aura(
+    *,
+    state: object,
+    target_unit_instance_id: str,
+    source_ability_id: str,
+) -> bool:
+    return bool(
+        _enemy_source_aura_player_ids(
+            state=state,
+            target_unit_instance_id=target_unit_instance_id,
+            source_ability_id=source_ability_id,
+        )
+    )
+
+
+def _enemy_source_aura_player_ids(
+    *,
+    state: object,
+    target_unit_instance_id: str,
+    source_ability_id: str,
+) -> tuple[str, ...]:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Chaos Daemons enemy aura lookup requires GameState.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Chaos Daemons enemy aura lookup requires battlefield_state.")
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=target_unit_instance_id,
+    )
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    target_models = _alive_geometry_models_for_rules_unit(
+        state=state,
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    )
+    if not target_models:
+        return ()
+    source_player_ids: set[str] = set()
+    for army in _chaos_daemons_armies(state):
+        if army.player_id == target_rules_unit.owner_player_id:
+            continue
+        for source_unit in army.units:
+            if not _unit_has_datasheet_ability_source(source_unit, source_ability_id):
+                continue
+            source_models = _alive_geometry_models_for_unit(
+                state=state,
+                scenario=scenario,
+                unit=source_unit,
+            )
+            if _models_within_distance(
+                first_models=source_models,
+                second_models=target_models,
+                distance_inches=6.0,
+            ):
+                source_player_ids.add(army.player_id)
+                break
+    return tuple(sorted(source_player_ids))
+
+
+def _enemy_rules_unit_within_source_engagement_range(
+    *,
+    state: object,
+    target_unit_instance_id: str,
+    source_ability_id: str,
+) -> bool:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Chaos Daemons enemy engagement lookup requires GameState.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError(
+            "Chaos Daemons enemy engagement lookup requires battlefield_state."
+        )
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=target_unit_instance_id,
+    )
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    target_models = _alive_geometry_models_for_rules_unit(
+        state=state,
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    )
+    if not target_models:
+        return False
+    for army in _chaos_daemons_armies(state):
+        if army.player_id == target_rules_unit.owner_player_id:
+            continue
+        for source_unit in army.units:
+            if not _unit_has_datasheet_ability_source(source_unit, source_ability_id):
+                continue
+            source_models = _alive_geometry_models_for_unit(
+                state=state,
+                scenario=scenario,
+                unit=source_unit,
+            )
+            if _any_models_within_engagement_range(
+                state=state,
+                first_models=source_models,
+                second_models=target_models,
             ):
                 return True
     return False
@@ -1026,6 +1334,66 @@ def _profile_with_strength_modifier(
         ),
         source_ids=tuple(sorted({*profile.source_ids, source_id})),
     )
+
+
+def _profile_with_attack_modifier(
+    *,
+    profile: WeaponProfile,
+    source_id: str,
+) -> WeaponProfile:
+    if source_id in profile.source_ids:
+        return profile
+    return replace(
+        profile,
+        attack_profile=_attack_profile_with_delta(profile.attack_profile, delta=1),
+        source_ids=tuple(sorted({*profile.source_ids, source_id})),
+    )
+
+
+def _attack_profile_with_delta(profile: AttackProfile, *, delta: int) -> AttackProfile:
+    if type(profile) is not AttackProfile:
+        raise GameLifecycleError("Rage Embodied requires an AttackProfile.")
+    if type(delta) is not int:
+        raise GameLifecycleError("AttackProfile delta must be an integer.")
+    if profile.fixed_attacks is not None:
+        return AttackProfile.fixed(max(1, profile.fixed_attacks + delta))
+    if profile.dice_expression is None:
+        raise GameLifecycleError("AttackProfile requires fixed attacks or dice expression.")
+    return AttackProfile.dice(
+        replace(
+            profile.dice_expression,
+            modifier=profile.dice_expression.modifier + delta,
+        )
+    )
+
+
+def _profile_with_ap_modifier(
+    *,
+    profile: WeaponProfile,
+    source_id: str,
+) -> WeaponProfile:
+    if source_id in profile.source_ids:
+        return profile
+    return replace(
+        profile,
+        armor_penetration=_armor_penetration_with_delta(
+            profile.armor_penetration,
+            delta=-1,
+        ),
+        source_ids=tuple(sorted({*profile.source_ids, source_id})),
+    )
+
+
+def _armor_penetration_with_delta(value: CharacteristicValue, *, delta: int) -> CharacteristicValue:
+    if type(value) is not CharacteristicValue:
+        raise GameLifecycleError("Daemon Lord of Slaanesh requires CharacteristicValue AP.")
+    if value.characteristic is not Characteristic.ARMOR_PENETRATION:
+        raise GameLifecycleError("Daemon Lord of Slaanesh requires Armor Penetration.")
+    if type(delta) is not int:
+        raise GameLifecycleError("Armor Penetration delta must be an integer.")
+    if not value.is_numeric:
+        raise GameLifecycleError("Daemon Lord of Slaanesh cannot modify dash AP.")
+    return CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, value.final + delta)
 
 
 def _rules_unit_has_keywords(

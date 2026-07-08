@@ -42,6 +42,7 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     army_rule,
+    datasheets,
 )
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -189,6 +190,76 @@ def test_daemonic_manifestation_uses_semantic_shadow_of_chaos_aura() -> None:
     assert manifestation_payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
 
 
+def test_daemonic_manifestation_uses_source_backed_greater_daemon_shadow_aura() -> None:
+    state = battle_state(
+        player_a_units=(
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
+        )
+    )
+    _mark_player_as_chaos_daemons(state, player_id="player-a", remove_battleline=True)
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-2"
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Monster", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(_datasheet_ability(datasheets.SKARBRAND_GREATER_DAEMON_SOURCE_ID),),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    _place_unit_near_center(state, unit_instance_id=source_unit_id, offset=(16.0, 0.0))
+    _place_unit_near_center(state, unit_instance_id=target_unit_id, offset=(18.0, 0.0))
+    remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    wounded_model_id = _placed_model_ids(state, target_unit_id)[0]
+    _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
+    _record_battle_shock_auto_pass(state, unit_instance_id=target_unit_id)
+    decisions = DecisionController()
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
+    )
+
+    completed = handler.begin_phase(state=state, decisions=decisions)
+
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
+    manifestation_payload = _event_payload(
+        decisions,
+        "chaos_daemons_daemonic_manifestation_healing_resolved",
+    )
+    assert manifestation_payload["unit_instance_id"] == target_unit_id
+    assert manifestation_payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
+
+
+def test_greater_daemon_shadow_aura_host_table_covers_all_datasheet_sources() -> None:
+    assert (
+        tuple(
+            source_id
+            for source_id, _keyword in army_rule.GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID
+        )
+        == datasheets.GREATER_DAEMON_SHADOW_AURA_SOURCE_IDS
+    )
+    assert tuple(
+        keyword
+        for _source_id, keyword in army_rule.GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID
+    ) == (
+        "KHORNE",
+        "KHORNE",
+        "TZEENTCH",
+        "TZEENTCH",
+        "NURGLE",
+        "NURGLE",
+        "SLAANESH",
+        "SLAANESH",
+    )
+
+
 def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> None:
     state = battle_state()
     state.game_id = "phase17g-overheal-seed-1"
@@ -331,7 +402,16 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
     _mark_player_as_chaos_daemons(
         state,
         player_id="player-a",
-        unit_name="Bloodthirster",
+        unit_name="Renamed Greater Daemon Source",
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Character", "Monster", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(
+            _datasheet_ability(datasheets.BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID),
+        ),
     )
     state.active_player_id = "player-b"
     state.command_step_state = None
@@ -652,6 +732,18 @@ def _replace_unit_keywords_and_abilities(
     if not replaced:
         raise AssertionError(f"missing unit {unit_instance_id}")
     state.army_definitions = updated_armies
+
+
+def _datasheet_ability(source_id: str) -> DatasheetAbilityDescriptor:
+    ability_id_suffix = source_id.split("Datasheets_abilities:", maxsplit=1)[1].replace(":", "-")
+    return DatasheetAbilityDescriptor(
+        ability_id=f"phase17g-chaos-daemons-army-rule:{ability_id_suffix}",
+        name="Source Backed Datasheet Ability",
+        source_id=source_id,
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="source-backed datasheet test ability",
+    )
 
 
 def _semantic_shadow_aura_ability(*, allegiance: str) -> DatasheetAbilityDescriptor:

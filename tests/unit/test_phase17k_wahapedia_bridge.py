@@ -5178,8 +5178,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "<br>Soul Shattering Charge Upgrade |"
     ) in chaos_daemons_markdown
     assert (
-        "| Nurgle | Plaguebearers (`000001132`) | Nurglings (`000001133`)"
-        "<br>Plague Drones (`000001135`)"
+        "| Nurgle | Nurglings (`000001133`)<br>Plaguebearers (`000001132`) | "
+        "Plague Drones (`000001135`)"
     ) in chaos_daemons_markdown
     for khorne_datasheet_id in (
         "000001104",
