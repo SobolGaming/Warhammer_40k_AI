@@ -4918,11 +4918,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "[aeldari](factions/aeldari.md)" in generated_markdown
     assert "Faction-pack Stratagems" not in generated_markdown
     assert "Faction-pack Enhancements" not in generated_markdown
-    assert "| Aeldari | 15 | 2 | 51 | 75 | 1 | [aeldari](factions/aeldari.md) |" in (
+    assert "| Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |" in (
         generated_markdown
     )
     assert (
-        "| Chaos Daemons | 9 | 4 | 28 | 43 | 1 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 4 | 28 | 43 | 7 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (
@@ -4986,6 +4986,24 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "### Nurgle" in chaos_daemons_markdown
     assert "### Slaanesh" in chaos_daemons_markdown
     assert "### Undivided" in chaos_daemons_markdown
+    assert "## Semantic Support Snapshot" in chaos_daemons_markdown
+    assert (
+        "| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Shadow Legion | "
+        "Legion of Excess<br>Lords of the Warp<br>Plague Legion<br>Scintillating Legion"
+        "<br>Warptide |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Shadow Legion | Fade to Darkness<br>Leaping Shadows<br>Malice Made Manifest"
+        "<br>Mantle of Gloom (Aura) | None |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Cavalcade of Chaos | None | Apocalyptic Steeds Upgrade"
+        "<br>Soul Shattering Charge Upgrade |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Nurgle | None | Nurglings (`000001133`)<br>Plague Drones (`000001135`)"
+        "<br>Plaguebearers (`000001132`)"
+    ) in chaos_daemons_markdown
     for khorne_datasheet_id in (
         "000001104",
         "000001105",
