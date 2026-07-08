@@ -577,6 +577,7 @@ def default_rule_execution_registry() -> RuleExecutionRegistry:
                     RuleEffectKind.MODIFY_CHARACTERISTIC,
                     RuleEffectKind.MODIFY_MOVE_DISTANCE,
                     RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
+                    RuleEffectKind.OUT_OF_PHASE_ACTION,
                     RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS,
                     RuleEffectKind.GRANT_ABILITY,
                     RuleEffectKind.GRANT_WEAPON_ABILITY,

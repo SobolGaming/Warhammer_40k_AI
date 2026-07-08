@@ -262,6 +262,10 @@ def _catalog_ability_source_kind(source_kind: CatalogAbilitySourceKind) -> Abili
 
 def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     for clause in rule_ir.clauses:
+        setup_reactive_timing = _catalog_setup_reactive_timing_descriptor_for_clause(clause)
+        if setup_reactive_timing is not None:
+            return setup_reactive_timing
+    for clause in rule_ir.clauses:
         charge_move_timing = _catalog_charge_move_end_timing_descriptor_for_clause(clause)
         if charge_move_timing is not None:
             return charge_move_timing
@@ -332,6 +336,9 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
 def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDescriptor:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog timing descriptor requires a RuleClause.")
+    setup_reactive_timing = _catalog_setup_reactive_timing_descriptor_for_clause(clause)
+    if setup_reactive_timing is not None:
+        return setup_reactive_timing
     charge_move_timing = _catalog_charge_move_end_timing_descriptor_for_clause(clause)
     if charge_move_timing is not None:
         return charge_move_timing
@@ -376,6 +383,28 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL)
     return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+
+
+def _catalog_setup_reactive_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return None
+    parameters = parameter_payload(trigger.parameters)
+    if (
+        parameters.get("edge") != "end"
+        or parameters.get("owner") != "opponent"
+        or parameters.get("phase") != "movement"
+        or parameters.get("timing_window") != "end_opponent_movement_phase"
+    ):
+        return None
+    if not any(_effect_is_setup_reactive_action(effect) for effect in clause.effects):
+        return None
+    return AbilityTimingDescriptor(
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        phase=battle_phase_kind_from_token("movement"),
+    )
 
 
 def _catalog_charge_move_end_timing_descriptor_for_clause(
@@ -515,6 +544,15 @@ def _effect_is_feel_no_pain_grant(effect: RuleEffectSpec) -> bool:
         return False
     parameters = parameter_payload(effect.parameters)
     return parameters.get("ability") == "Feel No Pain"
+
+
+def _effect_is_setup_reactive_action(effect: RuleEffectSpec) -> bool:
+    if effect.kind is not RuleEffectKind.OUT_OF_PHASE_ACTION:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return parameters.get("action_group") == "setup_reactive_shoot_charge" and parameters.get(
+        "action"
+    ) in {"shoot", "charge"}
 
 
 def _effect_is_passive_rule_exception_grant(effect: RuleEffectSpec) -> bool:

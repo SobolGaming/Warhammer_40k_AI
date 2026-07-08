@@ -37,6 +37,7 @@ __all__ = (
 @dataclass(frozen=True, slots=True)
 class MovementPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
+    army_catalog: ArmyCatalog | None = None
     parameterized_proposals: bool = True
     stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
     advance_move_hooks: AdvanceMoveHookRegistry = field(
@@ -57,6 +58,9 @@ class MovementPhaseHandler:
     unit_move_completed_mortal_wound_hooks: UnitMoveCompletedMortalWoundHookRegistry = field(
         default_factory=UnitMoveCompletedMortalWoundHookRegistry.empty
     )
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry = field(
+        default_factory=ChargeTargetRestrictionHookRegistry.empty
+    )
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
         default_factory=StratagemCostModifierRegistry.empty
     )
@@ -75,6 +79,8 @@ class MovementPhaseHandler:
             raise GameLifecycleError(
                 "MovementPhaseHandler ruleset_descriptor must be a RulesetDescriptor."
             )
+        if self.army_catalog is not None and type(self.army_catalog) is not ArmyCatalog:
+            raise GameLifecycleError("MovementPhaseHandler army_catalog must be an ArmyCatalog.")
         if type(self.parameterized_proposals) is not bool:
             raise GameLifecycleError("MovementPhaseHandler parameterized_proposals must be a bool.")
         if not self.parameterized_proposals:
@@ -103,6 +109,10 @@ class MovementPhaseHandler:
         ):
             raise GameLifecycleError(
                 "MovementPhaseHandler unit_move_completed_mortal_wound_hooks must be a registry."
+            )
+        if type(self.charge_target_restriction_hooks) is not ChargeTargetRestrictionHookRegistry:
+            raise GameLifecycleError(
+                "MovementPhaseHandler charge_target_restriction_hooks must be a registry."
             )
         if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
             raise GameLifecycleError(
@@ -212,6 +222,11 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
+                ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                army_catalog=self.army_catalog,
+                runtime_modifier_registry=self.runtime_modifier_registry,
+                charge_target_restriction_hooks=self.charge_target_restriction_hooks,
             )
 
         request = DecisionRequest(
@@ -462,6 +477,11 @@ def _begin_reinforcements_step(
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+    army_catalog: ArmyCatalog | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
     movement_state = state.movement_phase_state
@@ -482,6 +502,11 @@ def _begin_reinforcements_step(
             decisions=decisions,
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            runtime_modifier_registry=runtime_modifier_registry,
+            charge_target_restriction_hooks=charge_target_restriction_hooks,
             unarrived_reserve_count=len(unarrived_reserve_states),
         )
 
@@ -524,6 +549,11 @@ def _complete_reinforcements_step(
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+    army_catalog: ArmyCatalog | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
     unarrived_reserve_count: int,
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
@@ -542,6 +572,11 @@ def _complete_reinforcements_step(
         decisions=decisions,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        runtime_modifier_registry=runtime_modifier_registry,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
     if end_movement_reaction_status is not None:
         return end_movement_reaction_status

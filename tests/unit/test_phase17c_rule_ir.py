@@ -51,6 +51,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+    CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
@@ -212,6 +213,13 @@ MOVE_THROUGH_MODELS_TERRAIN_AUTO_PASS_TEXT = (
     "it can move within Engagement Range of enemy models, but cannot end that move "
     "within Engagement Range of them, and any Desperate Escape test is automatically passed."
 )
+SETUP_REACTIVE_SHOOT_CHARGE_TEXT = (
+    "At the end of your opponent's Movement phase, you can select one enemy unit that was "
+    'set up on the battlefield within 12" of this model; this model can then either: '
+    "Shoot at that unit, but only if it is an eligible target. Declare a charge. This unit "
+    "must end that charge move engaged with the enemy unit you selected (note that even if "
+    "this charge is successful, this unit does not receive any Charge bonus this turn)."
+)
 
 
 def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
@@ -262,6 +270,46 @@ def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
         condition.kind is RuleConditionKind.FREQUENCY_LIMIT
         and parameter_payload(condition.parameters) == {"scope": "phase"}
         for condition in conditions
+    )
+
+
+def test_phase17c_setup_reactive_shoot_charge_compiles_to_generic_out_of_phase_actions() -> None:
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17c:test:setup-reactive-shoot-charge",
+            raw_text=SETUP_REACTIVE_SHOOT_CHARGE_TEXT,
+        )
+    ).rule_ir
+
+    assert rule_ir.is_supported is True
+    assert len(rule_ir.clauses) == 1
+    clause = rule_ir.clauses[0]
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "end",
+        "owner": "opponent",
+        "phase": "movement",
+        "timing_window": "end_opponent_movement_phase",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert tuple(effect.kind for effect in clause.effects) == (
+        RuleEffectKind.OUT_OF_PHASE_ACTION,
+        RuleEffectKind.OUT_OF_PHASE_ACTION,
+    )
+    effect_parameters = tuple(parameter_payload(effect.parameters) for effect in clause.effects)
+    assert effect_parameters[0]["action"] == "shoot"
+    assert effect_parameters[0]["eligible_target_required"] is True
+    assert effect_parameters[1]["action"] == "charge"
+    assert effect_parameters[1]["must_end_engaged_with_selected_unit"] is True
+    assert effect_parameters[1]["suppress_charge_bonus"] is True
+    assert effect_parameters[1]["suppressed_charge_bonus"] == "fights_first"
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
     )
 
 

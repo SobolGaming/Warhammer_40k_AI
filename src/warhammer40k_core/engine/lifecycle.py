@@ -35,6 +35,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     invalid_catalog_post_shoot_hit_target_status_status,
     invalid_catalog_unit_move_completed_mortal_wounds_target_status,
 )
+from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
+    SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
+)
 from warhammer40k_core.engine.charge_declaration_hooks import (
     SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
 )
@@ -120,6 +123,14 @@ from warhammer40k_core.engine.healing import (
     apply_recorded_healing_model_decision,
     healing_effect_from_request,
     invalid_healing_model_decision_status,
+)
+from warhammer40k_core.engine.lifecycle_reaction_queue import (
+    validate_reaction_queue_consistency,
+)
+from warhammer40k_core.engine.lifecycle_setup_reactive import (
+    apply_setup_reactive_lifecycle_decision_if_applicable,
+    invalid_setup_reactive_lifecycle_status,
+    is_setup_reactive_lifecycle_request,
 )
 from warhammer40k_core.engine.mission_decisions import (
     MISSION_DECISION_TYPES,
@@ -308,6 +319,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
         SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
         SELECT_DISEMBARK_UNIT_DECISION_TYPE,
         SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
+        SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -403,6 +415,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         FIGHT_INTERRUPT_DECISION_TYPE,
         STRATAGEM_DECISION_TYPE,
         STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
         SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -557,6 +570,7 @@ class GameLifecycle:
         self._config = config
         self._movement_phase_handler = MovementPhaseHandler(
             ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
             parameterized_proposals=self.parameterized_movement_proposals,
         )
         self._shooting_phase_handler = ShootingPhaseHandler(
@@ -749,6 +763,7 @@ class GameLifecycle:
             ),
             _movement_phase_handler=MovementPhaseHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor,
+                army_catalog=None if config is None else config.army_catalog,
                 parameterized_proposals=parameterized_movement_proposals,
             ),
             _shooting_phase_handler=ShootingPhaseHandler(
@@ -767,10 +782,11 @@ class GameLifecycle:
             ),
         )
         _validate_payload_consistency(state=lifecycle._require_state(), config=lifecycle._config)
-        _validate_reaction_queue_consistency(
+        validate_reaction_queue_consistency(
             state=lifecycle._require_state(),
             reaction_queue=lifecycle.reaction_queue,
             pending_request=lifecycle._pending_decision_request(),
+            reaction_frame_decision_types=_REACTION_FRAME_DECISION_TYPES,
         )
         lifecycle._refresh_runtime_content_bundle_if_armies_mustered()
         lifecycle._battle_round_flow = BattleRoundFlow(
@@ -1093,6 +1109,17 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
+        elif is_setup_reactive_lifecycle_request(request):
+            return invalid_setup_reactive_lifecycle_status(
+                state=state,
+                config=self._require_config(),
+                runtime_content_bundle=self._require_runtime_content_bundle(),
+                decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
+                request=request,
+                result=result,
+                resolves_reaction_frame=self._result_resolves_active_reaction_frame(result),
+            )
         elif request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES:
             result.validate_for_request(request)
             if is_heroic_intervention_charge_move_request(request):
@@ -1166,6 +1193,20 @@ class GameLifecycle:
             return self._apply_stratagem_placement_decision(record=record, result=result)
         if is_command_reroll_decision_request(record.request):
             return self._apply_command_reroll_decision(record=record, result=result)
+        setup_reactive_status = apply_setup_reactive_lifecycle_decision_if_applicable(
+            state=state,
+            config=self._require_config(),
+            runtime_content_bundle=self._require_runtime_content_bundle(),
+            decisions=self.decision_controller,
+            reaction_queue=self.reaction_queue,
+            record=record,
+            result=result,
+            resolves_reaction_frame=self._result_resolves_active_reaction_frame(result),
+            pending_decision_request=self._pending_decision_request,
+            advance_until_decision_or_terminal=self.advance_until_decision_or_terminal,
+        )
+        if setup_reactive_status is not None:
+            return setup_reactive_status
         if (
             record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
             and is_heroic_intervention_charge_move_request(record.request)
@@ -2401,6 +2442,7 @@ class GameLifecycle:
         )
         self._movement_phase_handler = MovementPhaseHandler(
             ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
+            army_catalog=self._movement_phase_handler.army_catalog,
             parameterized_proposals=self._movement_phase_handler.parameterized_proposals,
             stratagem_index=runtime_stratagem_index,
             advance_eligibility_hooks=(
@@ -2416,6 +2458,9 @@ class GameLifecycle:
             ),
             unit_move_completed_mortal_wound_hooks=(
                 self._runtime_content_bundle.unit_move_completed_mortal_wound_hook_registry
+            ),
+            charge_target_restriction_hooks=(
+                self._runtime_content_bundle.charge_target_restriction_hook_registry
             ),
             stratagem_cost_modifier_registry=(
                 self._runtime_content_bundle.stratagem_cost_modifier_registry
@@ -3280,51 +3325,6 @@ def _validate_mustered_army_consistency(*, state: GameState, config: GameConfig)
         raise GameLifecycleError("Lifecycle state is missing mustered army definitions.")
     if state_payloads and state_payloads != expected_payloads:
         raise GameLifecycleError("Lifecycle state army definitions do not match config.")
-
-
-def _validate_reaction_queue_consistency(
-    *,
-    state: GameState,
-    reaction_queue: ReactionQueue,
-    pending_request: DecisionRequest | None,
-) -> None:
-    frames = reaction_queue.frames
-    if not frames:
-        if pending_request is not None and pending_request.decision_type == REACTION_DECISION_TYPE:
-            raise GameLifecycleError("Lifecycle pending reaction decision requires a frame.")
-        return
-    if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("Lifecycle reaction queue requires battle stage.")
-    if state.current_battle_phase is None:
-        raise GameLifecycleError("Lifecycle reaction queue requires a current battle phase.")
-    if pending_request is None:
-        raise GameLifecycleError("Lifecycle reaction queue requires a pending decision.")
-    if pending_request.decision_type not in _REACTION_FRAME_DECISION_TYPES:
-        raise GameLifecycleError("Lifecycle reaction queue pending decision_type drift.")
-    if (
-        pending_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
-        and not is_stratagem_placement_proposal_request(pending_request)
-        and not is_destroyed_transport_disembark_proposal_request(pending_request)
-    ):
-        raise GameLifecycleError("Lifecycle reaction queue pending placement decision drift.")
-    if (
-        pending_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-        and not is_heroic_intervention_charge_move_request(pending_request)
-    ):
-        raise GameLifecycleError("Lifecycle reaction queue pending movement decision drift.")
-    seen_request_ids: set[str] = set()
-    for frame in frames:
-        if frame.request_id is None:
-            raise GameLifecycleError("Lifecycle reaction queue frame requires request_id.")
-        if frame.request_id in seen_request_ids:
-            raise GameLifecycleError("Lifecycle reaction queue request_ids must be unique.")
-        seen_request_ids.add(frame.request_id)
-        if frame.reaction_window.timing_window.game_id != state.game_id:
-            raise GameLifecycleError("Lifecycle reaction queue frame game_id drift.")
-        if frame.parent_phase is not state.current_battle_phase:
-            raise GameLifecycleError("Lifecycle reaction queue frame phase drift.")
-    if frames[-1].request_id != pending_request.request_id:
-        raise GameLifecycleError("Lifecycle reaction queue active frame request_id drift.")
 
 
 def _validate_battlefield_state_consistency(

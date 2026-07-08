@@ -54,6 +54,7 @@ from warhammer40k_core.rules.rule_templates import (
     GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
     MOVEMENT_DISTANCE_TEMPLATE_ID,
+    OUT_OF_PHASE_ACTION_TEMPLATE_ID,
     PLACEMENT_TEMPLATE_ID,
     REROLL_PERMISSION_TEMPLATE_ID,
     RESOURCE_MODIFIER_TEMPLATE_ID,
@@ -79,6 +80,9 @@ from warhammer40k_core.rules.rule_token_normalization import (
 from warhammer40k_core.rules.selected_target_parser import (
     is_structural_target_keyword,
     selected_target_spec_from_text,
+)
+from warhammer40k_core.rules.setup_reactive_parser import (
+    compile_setup_reactive_shoot_charge_clause,
 )
 
 RULE_PARSER_VERSION = "phase17c-rule-parser-v1"
@@ -739,6 +743,13 @@ def _compile_clause(
     parsed_text: ParsedRuleText,
     parser_context: _RuleParserContext,
 ) -> RuleClause:
+    setup_reactive_clause = compile_setup_reactive_shoot_charge_clause(
+        source_id=source_id,
+        clause_index=clause_index,
+        clause_text=clause_text,
+    )
+    if setup_reactive_clause is not None:
+        return setup_reactive_clause
     trigger = _parse_trigger(clause_text)
     conditions = _dedupe_conditions(
         (
@@ -2487,6 +2498,8 @@ def _template_id_for_clause(
             candidates.append(CHARACTERISTIC_SET_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.MODIFY_MOVE_DISTANCE:
             candidates.append(MOVEMENT_DISTANCE_TEMPLATE_ID)
+        elif effect.kind is RuleEffectKind.OUT_OF_PHASE_ACTION:
+            candidates.append(OUT_OF_PHASE_ACTION_TEMPLATE_ID)
         elif effect.kind in {
             RuleEffectKind.MODIFY_COMMAND_POINTS,
             RuleEffectKind.ADD_VICTORY_POINTS,

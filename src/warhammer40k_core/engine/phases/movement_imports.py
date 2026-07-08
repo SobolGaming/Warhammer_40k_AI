@@ -10,6 +10,7 @@ from itertools import combinations
 from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.dice import (
@@ -185,6 +186,7 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_use_options_from_index,
     stratagem_window_declined_for_context,
 )
+from warhammer40k_core.engine.target_restriction_hooks import ChargeTargetRestrictionHookRegistry
 from warhammer40k_core.engine.timing_windows import (
     ReactionWindow,
     TimingTriggerKind,
@@ -266,6 +268,7 @@ __all__ = (
     "AircraftMovementPolicyPayload",
     "AircraftMovementViolation",
     "AircraftReserveTransitionReason",
+    "ArmyCatalog",
     "ArmyMusteringError",
     "BattlePhase",
     "BattlePhaseKind",
@@ -278,6 +281,7 @@ __all__ = (
     "CORE_RAPID_INGRESS_HANDLER_ID",
     "Callable",
     "Characteristic",
+    "ChargeTargetRestrictionHookRegistry",
     "CombatDisembark",
     "DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID",
     "DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES",
