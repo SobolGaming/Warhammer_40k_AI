@@ -689,6 +689,11 @@ def _generic_effect_context_applies(
         target_unit_instance_id=target_unit_instance_id,
     ):
         return False
+    if not _generic_effect_selected_target_gate_applies(
+        effect=effect,
+        target_unit_instance_id=target_unit_instance_id,
+    ):
+        return False
     if not _generic_effect_required_keyword_sequence_applies(
         state=state,
         effect=effect,
@@ -745,6 +750,26 @@ def _generic_effect_source_phase_applies(
     if phase_value is None:
         return False
     return phase_value == required_phase
+
+
+def _generic_effect_selected_target_gate_applies(
+    *,
+    effect: _GenericAttackEffect,
+    target_unit_instance_id: str | None,
+) -> bool:
+    selected_target_id = effect.parameters.get("selected_target_unit_instance_id")
+    if selected_target_id is None:
+        return True
+    if type(selected_target_id) is not str:
+        raise GameLifecycleError(
+            "Generic RuleIR selected_target_unit_instance_id must be a string."
+        )
+    if target_unit_instance_id is None:
+        return False
+    return target_unit_instance_id == _validate_identifier(
+        "selected_target_unit_instance_id",
+        selected_target_id,
+    )
 
 
 def _generic_effect_waaagh_gate_applies(

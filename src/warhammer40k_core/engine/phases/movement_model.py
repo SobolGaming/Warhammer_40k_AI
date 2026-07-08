@@ -239,6 +239,7 @@ class DesperateEscapeRequirementPayload(TypedDict):
 class DesperateEscapeRollPayload(TypedDict):
     requirement: DesperateEscapeRequirementPayload
     roll_state: DiceRollStatePayload
+    roll_modifiers: list[RollModifierPayload]
     value: int
 
 
@@ -850,6 +851,7 @@ class DesperateEscapeRoll:
     requirement: DesperateEscapeRequirement
     roll_state: DiceRollState
     value: int
+    roll_modifiers: tuple[RollModifier, ...] = ()
 
     def __post_init__(self) -> None:
         if type(self.requirement) is not DesperateEscapeRequirement:
@@ -860,10 +862,21 @@ class DesperateEscapeRoll:
             raise GameLifecycleError("DesperateEscapeRoll roll_state must be a DiceRollState.")
         if self.roll_state.original_result.spec != self.requirement.roll_spec():
             raise GameLifecycleError("DesperateEscapeRoll roll_state spec must match requirement.")
-        if self.value != self.roll_state.current_total:
-            raise GameLifecycleError("DesperateEscapeRoll value must match roll_state total.")
-        if self.value < 1 or self.value > 6:
-            raise GameLifecycleError("DesperateEscapeRoll value must be between 1 and 6.")
+        modifiers = tuple(self.roll_modifiers)
+        for modifier in modifiers:
+            if type(modifier) is not RollModifier:
+                raise GameLifecycleError(
+                    "DesperateEscapeRoll roll_modifiers must contain RollModifier values."
+                )
+        object.__setattr__(self, "roll_modifiers", modifiers)
+        modified_value, _applied_modifier_ids = apply_roll_modifiers(
+            self.roll_state.current_total,
+            modifiers,
+        )
+        if self.value != modified_value:
+            raise GameLifecycleError("DesperateEscapeRoll value must match modified total.")
+        if type(self.value) is not int:
+            raise GameLifecycleError("DesperateEscapeRoll value must be an integer.")
 
     @classmethod
     def from_roll_state(
@@ -871,11 +884,17 @@ class DesperateEscapeRoll:
         *,
         requirement: DesperateEscapeRequirement,
         roll_state: DiceRollState,
+        roll_modifiers: tuple[RollModifier, ...] = (),
     ) -> Self:
+        value, _applied_modifier_ids = apply_roll_modifiers(
+            roll_state.current_total,
+            roll_modifiers,
+        )
         return cls(
             requirement=requirement,
             roll_state=roll_state,
-            value=roll_state.current_total,
+            value=value,
+            roll_modifiers=roll_modifiers,
         )
 
     @property
@@ -886,6 +905,7 @@ class DesperateEscapeRoll:
         return {
             "requirement": self.requirement.to_payload(),
             "roll_state": self.roll_state.to_payload(),
+            "roll_modifiers": [modifier.to_payload() for modifier in self.roll_modifiers],
             "value": self.value,
         }
 
@@ -894,6 +914,9 @@ class DesperateEscapeRoll:
         return cls(
             requirement=DesperateEscapeRequirement.from_payload(payload["requirement"]),
             roll_state=DiceRollState.from_payload(payload["roll_state"]),
+            roll_modifiers=tuple(
+                RollModifier.from_payload(modifier) for modifier in payload["roll_modifiers"]
+            ),
             value=payload["value"],
         )
 

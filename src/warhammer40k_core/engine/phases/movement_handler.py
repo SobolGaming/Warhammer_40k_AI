@@ -149,6 +149,7 @@ class MovementPhaseHandler:
                     state=state,
                     decisions=decisions,
                     pending_action=movement_state.pending_action,
+                    ability_indexes_by_player_id=self.ability_indexes_by_player_id,
                 )
             stratagem_status = _request_selected_to_move_stratagem_if_available(
                 state=state,

@@ -1385,6 +1385,10 @@ class RuntimeContentBundle:
         )
         fight_phase_start_hook_registry = FightPhaseStartHookRegistry.from_bindings(
             (
+                *catalog_runtime_hooks.fight_phase_start_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
                 *generic_rule_lifecycle_hooks.fight_phase_start_hook_bindings(
                     activation=activation,
                     execution_records=records,
@@ -1589,6 +1593,10 @@ class RuntimeContentBundle:
                     execution_records=records,
                 ),
                 *catalog_post_shoot_hit_target_status_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *catalog_runtime_hooks.attack_sequence_completed_hook_bindings(
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
                 ),

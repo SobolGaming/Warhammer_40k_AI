@@ -23,6 +23,11 @@ from warhammer40k_core.core.dice import (
     RerollPermission,
     RerollPermissionPayload,
 )
+from warhammer40k_core.core.modifiers import (
+    RollModifier,
+    RollModifierPayload,
+    apply_roll_modifiers,
+)
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -79,6 +84,9 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacementPayload,
     geometry_model_for_placement,
     model_displacement_kind_from_token,
+)
+from warhammer40k_core.engine.catalog_desperate_escape import (
+    catalog_forced_desperate_escape_sources_for_unit,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_advance_roll_reroll_permission_for_unit,
@@ -374,6 +382,8 @@ __all__ = (
     "ReserveArrivalDistanceHookRegistry",
     "ReserveKind",
     "ReserveState",
+    "RollModifier",
+    "RollModifierPayload",
     "RulesetDescriptor",
     "RulesetDescriptorError",
     "RuntimeModifierRegistry",
@@ -421,9 +431,11 @@ __all__ = (
     "apply_embark_to_battlefield",
     "apply_faction_resource_spend_effect",
     "apply_reinforcement_placement_to_battlefield",
+    "apply_roll_modifiers",
     "apply_transport_hazard_mortal_wounds",
     "cast",
     "catalog_advance_roll_reroll_permission_for_unit",
+    "catalog_forced_desperate_escape_sources_for_unit",
     "combinations",
     "create_stratagem_use_decision_request",
     "dataclass",

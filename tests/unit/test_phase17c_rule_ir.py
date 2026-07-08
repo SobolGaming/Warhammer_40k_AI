@@ -47,15 +47,19 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
     CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+    CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+    CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+    CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
     _feel_no_pain_source_from_effect,  # pyright: ignore[reportPrivateUsage]
     _movement_transit_permissions_from_clause,  # pyright: ignore[reportPrivateUsage]
@@ -2565,7 +2569,7 @@ def test_phase17c_enemy_fall_back_desperate_escape_aura_compiles_to_semantic_ir(
     assert force_clause.target is not None
     assert force_clause.target.kind is RuleTargetKind.ENEMY_UNIT
     assert parameter_payload(force_keyword_gate.parameters) == {
-        "excluded_keyword_any": "MONSTER|VEHICLE",
+        "excluded_keyword_any": ("MONSTER", "VEHICLE"),
         "gate_subject": "falling_back_unit",
     }
     assert parameter_payload(force_distance.parameters) == {
@@ -2608,6 +2612,205 @@ def test_phase17c_enemy_fall_back_desperate_escape_aura_compiles_to_semantic_ir(
         CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
         CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     }
+
+
+def test_phase17c_enemy_selected_to_fall_back_desperate_escape_aura_compiles() -> None:
+    rule_ir = _compiled(
+        "Each time an enemy unit (excluding Monsters and Vehicles) that is within "
+        "Engagement Range of one or more units from your army with this ability is selected "
+        "to Fall Back, models in that enemy unit must take Desperate Escape tests. If that "
+        "enemy unit is also Battle-shocked, subtract 1 from each of those Desperate Escape "
+        "tests."
+    ).rule_ir
+
+    assert rule_ir.is_supported
+    assert len(rule_ir.clauses) == 2
+    force_trigger = rule_ir.clauses[0].trigger
+    modifier_trigger = rule_ir.clauses[1].trigger
+    assert force_trigger is not None
+    assert modifier_trigger is not None
+    assert parameter_payload(force_trigger.parameters) == {
+        "selected_unit_allegiance": "enemy",
+        "selection": "fall_back",
+        "timing_window": "just_after_enemy_unit_selected_to_fall_back",
+    }
+    assert parameter_payload(modifier_trigger.parameters) == {
+        "roll_type": "desperate_escape",
+        "source_context": "previous_effect",
+        "timing_window": "desperate_escape_test",
+    }
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) >= {
+        CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+    }
+
+
+def test_phase17c_charge_move_plural_weapon_characteristics_compile() -> None:
+    rule_ir = _compiled(
+        "Each time this unit ends a Charge move, until the end of the phase, add 1 to "
+        "the Strength and Damage characteristics of melee weapons equipped by models in "
+        "this unit."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "after",
+        "phase": "charge",
+        "subject": "this_unit",
+        "timing_window": "charge_move_end",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert tuple(
+        tuple(sorted(parameter_payload(effect.parameters).items())) for effect in clause.effects
+    ) == (
+        (("characteristic", "damage"), ("delta", 1), ("weapon_scope", "melee")),
+        (("characteristic", "strength"), ("delta", 1), ("weapon_scope", "melee")),
+    )
+
+
+def test_phase17c_leader_lethal_hits_with_critical_hit_threshold_compiles() -> None:
+    rule_ir = _compiled(
+        "While this model is leading a unit, melee weapons equipped by models in that unit "
+        "have the [LETHAL HITS] ability and each time a model in that unit makes an attack, "
+        "a successful unmodified Hit roll of 5+ scores a Critical Hit."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    minimum_hit_effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS
+    )
+
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.SELECTED_UNIT
+    assert parameter_payload(minimum_hit_effect.parameters) == {
+        "attack_role": "attacker",
+        "minimum_unmodified_success": 5,
+        "roll_type": "hit",
+        "status": "minimum_unmodified_hit_success",
+    }
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) >= {
+        CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+    }
+
+
+def test_phase17c_selected_unit_this_model_damage_bonus_compiles() -> None:
+    rule_ir = _compiled(
+        "At the start of the Fight phase, select one enemy unit within Engagement Range "
+        "of this model. Until the end of the phase, each time this model makes a melee "
+        "attack that targets that unit, add 1 to the Damage characteristic of that attack."
+    ).rule_ir
+    damage_clause = rule_ir.clauses[1]
+    damage_effect = damage_clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert damage_clause.trigger is not None
+    assert parameter_payload(damage_clause.trigger.parameters) == {
+        "actor": "this_model",
+        "attack_kind": "melee",
+        "target_reference": "selected_unit",
+        "timing_window": "attack_sequence.attack",
+    }
+    assert damage_clause.target is not None
+    assert damage_clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert _condition_payload(damage_clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "attack_kind": "melee",
+        "gate_subject": "attack_target",
+        "relationship": "this_model_makes_attack",
+        "target_reference": "selected_unit",
+    }
+    assert parameter_payload(damage_effect.parameters) == {
+        "characteristic": "damage",
+        "delta": 1,
+    }
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_consumers_for_rule(
+        rule_ir
+    )
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(
+        rule_ir
+    )
+
+
+def test_phase17c_post_shoot_hit_target_effect_compiles_to_selected_target_consumer() -> None:
+    rule_ir = _compiled(
+        "In your Shooting phase, after this unit has shot, select one enemy unit hit by "
+        "one or more of those attacks. Until the end of the phase, each time a friendly "
+        "Nurgle Legiones Daemonica unit makes an attack that targets that unit, you can "
+        "re-roll the Wound roll."
+    ).rule_ir
+    selection_clause = rule_ir.clauses[0]
+    reroll_clause = rule_ir.clauses[1]
+    reroll_effect = reroll_clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert selection_clause.trigger is not None
+    assert parameter_payload(selection_clause.trigger.parameters) == {
+        "edge": "after",
+        "owner": "active_player",
+        "phase": "shooting",
+        "subject": "this_unit",
+        "target_relationship": "hit_by_those_attacks",
+        "timing_window": "just_after_friendly_unit_has_shot",
+    }
+    assert reroll_clause.target is not None
+    assert reroll_clause.target.kind is RuleTargetKind.FRIENDLY_UNIT
+    assert parameter_payload(reroll_effect.parameters) == {"roll_type": "wound"}
+    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID in (
+        catalog_rule_ir_consumers_for_rule(rule_ir)
+    )
+    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID in (
+        catalog_rule_ir_hook_ids_for_rule(rule_ir)
+    )
+
+
+def test_phase17c_conditional_objective_hit_reroll_compiles_to_single_permission() -> None:
+    rule_ir = _compiled(
+        "Each time a model in this model's unit makes an attack, you can re-roll a Hit "
+        "roll of 1. If the target of that attack is within range of an objective marker, "
+        "you can re-roll the Hit roll instead."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    reroll_effects = tuple(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.REROLL_PERMISSION
+    )
+
+    assert rule_ir.is_supported
+    assert len(rule_ir.clauses) == 1
+    assert len(reroll_effects) == 1
+    assert parameter_payload(reroll_effects[0].parameters) == {
+        "full_reroll_if_target_within_objective_range": True,
+        "reroll_unmodified_value": 1,
+        "roll_type": "hit",
+    }
+    assert CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(rule_ir)
+
+
+def test_phase17c_selected_enemy_attack_wound_debuff_marks_attacker_role() -> None:
+    rule_ir = _compiled(
+        'At the start of the Fight phase, select one enemy unit within 6" of this model. '
+        "Until the end of the phase, each time a friendly Slaanesh Legiones Daemonica "
+        "unit makes a melee attack that targets that unit, add 1 to the Wound roll; and "
+        "each time a model in that enemy unit makes an attack, subtract 1 from the Wound "
+        "roll."
+    ).rule_ir
+    enemy_clause = rule_ir.clauses[2]
+    enemy_effect = enemy_clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert enemy_clause.target is not None
+    assert enemy_clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert parameter_payload(enemy_effect.parameters) == {
+        "attack_role": "attacker",
+        "delta": -1,
+        "roll_type": "wound",
+    }
+    assert CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(rule_ir)
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(
+        rule_ir
+    )
 
 
 @pytest.mark.parametrize(

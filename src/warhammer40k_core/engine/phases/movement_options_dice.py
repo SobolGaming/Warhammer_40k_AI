@@ -377,6 +377,7 @@ def _roll_desperate_escape_dice(
 ) -> tuple[DesperateEscapeRoll, ...]:
     rolls: list[DesperateEscapeRoll] = []
     manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
+    roll_modifiers = _desperate_escape_roll_modifiers(resolution)
     for requirement in resolution.desperate_escape_requirements:
         decisions.event_log.append(
             "desperate_escape_roll_requested",
@@ -393,6 +394,7 @@ def _roll_desperate_escape_dice(
         roll = DesperateEscapeRoll.from_roll_state(
             requirement=requirement,
             roll_state=manager.roll(requirement.roll_spec()),
+            roll_modifiers=roll_modifiers,
         )
         decisions.event_log.append(
             "desperate_escape_roll_resolved",
@@ -408,6 +410,40 @@ def _roll_desperate_escape_dice(
         )
         rolls.append(roll)
     return tuple(rolls)
+
+
+def _desperate_escape_roll_modifiers(
+    resolution: FallBackActionResult,
+) -> tuple[RollModifier, ...]:
+    if type(resolution) is not FallBackActionResult:
+        raise GameLifecycleError("Desperate Escape modifiers require FallBackActionResult.")
+    raw_sources = resolution.movement_payload.get("forced_desperate_escape_sources")
+    if raw_sources is None:
+        return ()
+    if not isinstance(raw_sources, list):
+        raise GameLifecycleError("forced_desperate_escape_sources must be a list.")
+    modifiers: list[RollModifier] = []
+    for raw_source in raw_sources:
+        if not isinstance(raw_source, dict):
+            raise GameLifecycleError("forced_desperate_escape_sources must contain objects.")
+        source = cast(dict[str, object], raw_source)
+        delta = source.get("desperate_escape_roll_modifier", 0)
+        if type(delta) is not int:
+            raise GameLifecycleError("desperate_escape_roll_modifier must be an integer.")
+        if delta == 0:
+            continue
+        effect_id = source.get("effect_id")
+        source_rule_id = source.get("source_rule_id")
+        if type(effect_id) is not str or type(source_rule_id) is not str:
+            raise GameLifecycleError("Desperate Escape modifier source metadata is malformed.")
+        modifiers.append(
+            RollModifier(
+                modifier_id=f"{_validate_identifier('effect_id', effect_id)}:roll-modifier",
+                source_id=_validate_identifier("source_rule_id", source_rule_id),
+                operand=delta,
+            )
+        )
+    return tuple(sorted(modifiers, key=lambda modifier: modifier.modifier_id))
 
 
 def _desperate_escape_model_selection_request(

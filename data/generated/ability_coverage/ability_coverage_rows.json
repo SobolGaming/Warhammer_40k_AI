@@ -183,14 +183,17 @@
     "datasheet_id": "000001114",
     "datasheet_name": "Bloodletters",
     "diagnostic_reasons": [],
-    "runtime_consumer_ids": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:desperate-escape-roll-modifier",
+      "catalog-ir:force-desperate-escape"
+    ],
     "semantic_categories": [
       "datasheet.roll_modifier.desperate_escape.enemy_unit",
       "datasheet.rule_ir.force_desperate_escape_tests.enemy_unit"
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,
-    "support_stage": "generic_ir_executable"
+    "support_stage": "engine_consumed"
   },
   {
     "ability_id": "000008433",

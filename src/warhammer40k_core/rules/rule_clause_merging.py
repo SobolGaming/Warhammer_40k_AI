@@ -104,6 +104,17 @@ _THOSE_ATTACKS_PROXIMITY_HIT_SUCCESS_THRESHOLD_RE = re.compile(
     r"of\s+[2-6]\+\s+instead\b",
     re.IGNORECASE,
 )
+_UNMODIFIED_VALUE_REROLL_RE = re.compile(
+    r"\byou\s+can\s+(?:re-roll|reroll)\s+(?:an?\s+|the\s+)?"
+    r"(?P<roll>hit|wound|damage|save)\s+roll\s+of\s+[1-6]\b",
+    re.IGNORECASE,
+)
+_OBJECTIVE_REROLL_INSTEAD_RE = re.compile(
+    r"\bif\s+the\s+target\s+of\s+that\s+attack\s+is\s+within\s+range\s+of\s+"
+    r"an?\s+objective\s+marker,\s+you\s+can\s+(?:re-roll|reroll)\s+"
+    r"(?:the\s+)?(?P<roll>hit|wound|damage|save)\s+roll\s+instead\b",
+    re.IGNORECASE,
+)
 
 
 def merge_rule_clause_spans(
@@ -137,6 +148,10 @@ def merge_rule_clause_spans(
         spans=merged,
         current_patterns=(_FIRE_OVERWATCH_HIT_SUCCESS_THRESHOLD_RE,),
         next_pattern=_THOSE_ATTACKS_PROXIMITY_HIT_SUCCESS_THRESHOLD_RE,
+    )
+    merged = _merge_adjacent_reroll_objective_instead_spans(
+        normalized_text=normalized_text,
+        spans=merged,
     )
     return _merge_adjacent_clause_spans(
         normalized_text=normalized_text,
@@ -198,6 +213,41 @@ def _setup_reactive_shoot_charge_final_index(
         ):
             return final_index
     return None
+
+
+def _merge_adjacent_reroll_objective_instead_spans(
+    *,
+    normalized_text: str,
+    spans: tuple[TextSpan, ...],
+) -> tuple[TextSpan, ...]:
+    merged: list[TextSpan] = []
+    index = 0
+    while index < len(spans):
+        current = spans[index]
+        if index + 1 >= len(spans):
+            merged.append(current)
+            index += 1
+            continue
+        current_match = _UNMODIFIED_VALUE_REROLL_RE.search(current.text)
+        next_match = _OBJECTIVE_REROLL_INSTEAD_RE.search(spans[index + 1].text)
+        if (
+            current_match is not None
+            and next_match is not None
+            and current_match.group("roll").lower() == next_match.group("roll").lower()
+        ):
+            next_span = spans[index + 1]
+            merged.append(
+                TextSpan(
+                    text=normalized_text[current.start : next_span.end],
+                    start=current.start,
+                    end=next_span.end,
+                )
+            )
+            index += 2
+            continue
+        merged.append(current)
+        index += 1
+    return tuple(merged)
 
 
 def _merge_adjacent_clause_spans(

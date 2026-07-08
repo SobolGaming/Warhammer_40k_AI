@@ -32,6 +32,8 @@ bind_shooting_modules()
 
 __all__ = (
     "COMPLETE_SHOOTING_PHASE_OPTION_ID",
+    "SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE",
+    "SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE",
     "SELECT_SHOOTING_TYPE_DECISION_TYPE",
     "SELECT_SHOOTING_UNIT_DECISION_TYPE",
     "SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE",
@@ -212,6 +214,7 @@ __all__ = (
     "_weapon_profile_cache_fingerprint",
     "_weapon_profile_for_wargear",
     "apply_hidden_status_loss_after_ranged_attacks",
+    "invalid_catalog_post_shoot_decision_status",
     "invalid_shooting_phase_start_faction_rule_status",
     "request_out_of_phase_shooting_declaration",
     "shooting_rules_unit_has_legal_declaration_against_targets",

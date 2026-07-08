@@ -21,6 +21,12 @@ _HIT_SUCCESS_THRESHOLD_RE = re.compile(
     r"(?:\s+when\s+resolving\s+that\s+Stratagem)?(?:\s+instead)?(?=\s*(?:\.|,|;|$))",
     re.IGNORECASE,
 )
+_CRITICAL_HIT_THRESHOLD_RE = re.compile(
+    r"\b(?:a\s+successful\s+)?unmodified\s+Hit\s+roll\s+of\s+"
+    r"(?P<threshold>[2-6])\+\s+scores\s+a\s+Critical\s+Hit"
+    r"(?:\s+as\s+well)?(?=\s*(?:\.|,|;|$))",
+    re.IGNORECASE,
+)
 _FIRE_OVERWATCH_STRATAGEM_RE = re.compile(
     r"\bFire\s+Overwatch\s+Stratagem\b",
     re.IGNORECASE,
@@ -28,7 +34,10 @@ _FIRE_OVERWATCH_STRATAGEM_RE = re.compile(
 
 
 def has_hit_success_threshold(text: str) -> bool:
-    return _HIT_SUCCESS_THRESHOLD_RE.search(text) is not None
+    return (
+        _HIT_SUCCESS_THRESHOLD_RE.search(text) is not None
+        or _CRITICAL_HIT_THRESHOLD_RE.search(text) is not None
+    )
 
 
 def hit_success_threshold_effects(
@@ -37,7 +46,8 @@ def hit_success_threshold_effects(
     clause_start: int,
     source_keyword_sequence_parts: tuple[str, ...],
 ) -> tuple[RuleEffectSpec, ...]:
-    return tuple(
+    effects: list[RuleEffectSpec] = []
+    effects.extend(
         RuleEffectSpec(
             kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
             source_span=_span_from_match(
@@ -55,6 +65,26 @@ def hit_success_threshold_effects(
         )
         for match in _HIT_SUCCESS_THRESHOLD_RE.finditer(clause_text)
     )
+    effects.extend(
+        RuleEffectSpec(
+            kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
+            source_span=_span_from_match(
+                clause_text=clause_text,
+                clause_start=clause_start,
+                match=match,
+            ),
+            parameters=parameters_from_pairs(
+                (
+                    ("status", "minimum_unmodified_hit_success"),
+                    ("roll_type", "hit"),
+                    ("attack_role", "attacker"),
+                    ("minimum_unmodified_success", int(match.group("threshold"))),
+                )
+            ),
+        )
+        for match in _CRITICAL_HIT_THRESHOLD_RE.finditer(clause_text)
+    )
+    return tuple(effects)
 
 
 def _hit_success_threshold_parameter_pairs(
