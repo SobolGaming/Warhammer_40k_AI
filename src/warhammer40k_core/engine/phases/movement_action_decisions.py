@@ -773,6 +773,7 @@ def _request_pending_movement_action_proposal(
     state: GameState,
     decisions: DecisionController,
     pending_action: PendingMovementActionSelection,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None,
 ) -> LifecycleStatus:
     if pending_action.movement_phase_action is not MovementPhaseActionKind.FALL_BACK:
         raise GameLifecycleError("Only pending Fall Back actions are supported.")
@@ -781,6 +782,11 @@ def _request_pending_movement_action_proposal(
     forced_sources = _forced_desperate_escape_sources_for_unit(
         state=state,
         unit_instance_id=pending_action.unit_instance_id,
+        ability_indexes_by_player_id=(
+            _empty_ability_indexes()
+            if ability_indexes_by_player_id is None
+            else ability_indexes_by_player_id
+        ),
     )
     fall_back_mode = (
         FallBackModeKind.DESPERATE_ESCAPE if forced_sources else pending_action.fall_back_mode
@@ -794,9 +800,11 @@ def _request_pending_movement_action_proposal(
         context["forced_desperate_escape_source_rule_ids"] = [
             source["source_rule_id"] for source in forced_sources
         ]
-        context["forced_desperate_escape_stratagem_use_ids"] = [
-            source["stratagem_use_id"] for source in forced_sources
+        stratagem_use_ids = [
+            source["stratagem_use_id"] for source in forced_sources if "stratagem_use_id" in source
         ]
+        if stratagem_use_ids:
+            context["forced_desperate_escape_stratagem_use_ids"] = stratagem_use_ids
         context["forced_desperate_escape_sources"] = validate_json_value(forced_sources)
     return _request_movement_proposal(
         state=state,
@@ -876,6 +884,7 @@ def _forced_desperate_escape_sources_for_unit(
     *,
     state: GameState,
     unit_instance_id: str,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None,
 ) -> tuple[dict[str, JsonValue], ...]:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     sources: list[dict[str, JsonValue]] = []
@@ -917,6 +926,15 @@ def _forced_desperate_escape_sources_for_unit(
                 "fall_back_unit_instance_id": requested_unit_id,
                 "required_fall_back_mode": FallBackModeKind.DESPERATE_ESCAPE.value,
             }
+        )
+    if ability_indexes_by_player_id is not None:
+        sources.extend(
+            catalog_forced_desperate_escape_sources_for_unit(
+                state=state,
+                unit_instance_id=requested_unit_id,
+                ability_indexes_by_player_id=ability_indexes_by_player_id,
+                armies=tuple(state.army_definitions),
+            )
         )
     return tuple(sorted(sources, key=lambda source: str(source["effect_id"])))
 

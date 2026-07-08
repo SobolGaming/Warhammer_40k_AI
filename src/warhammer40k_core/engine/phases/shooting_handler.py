@@ -25,9 +25,12 @@ if TYPE_CHECKING:
 # fmt: on
 
 __all__ = (
+    "SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE",
+    "SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE",
     "ShootingPhaseHandler",
     "_request_shooting_phase_start_rule_if_available",
     "_shooting_phase_start_faction_rule_drift_reason",
+    "invalid_catalog_post_shoot_decision_status",
     "invalid_shooting_phase_start_faction_rule_status",
 )
 
@@ -621,6 +624,12 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 result=result,
             )
+        if result.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE:
+            return apply_catalog_post_shoot_hit_target_effect_result(
+                state=state,
+                decisions=decisions,
+                result=result,
+            )
         if result.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
             return _apply_shooting_unit_selection_decision(
                 state=state,
@@ -693,6 +702,27 @@ class ShootingPhaseHandler:
                 stratagem_index=self.stratagem_index,
             )
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
+
+
+def invalid_catalog_post_shoot_decision_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    if request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE:
+        return invalid_catalog_post_shoot_hit_target_status_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+    if request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE:
+        return invalid_catalog_post_shoot_hit_target_effect_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+    return None
 
 
 def invalid_shooting_phase_start_faction_rule_status(

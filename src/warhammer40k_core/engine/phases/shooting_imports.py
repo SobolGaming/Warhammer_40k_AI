@@ -67,6 +67,12 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
     apply_catalog_post_shoot_hit_target_status_result,
+    invalid_catalog_post_shoot_hit_target_status_status,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects import (
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE,
+    apply_catalog_post_shoot_hit_target_effect_result,
+    invalid_catalog_post_shoot_hit_target_effect_status,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -273,6 +279,9 @@ __all__ = (
     "SELECT_ALLOCATION_ORDER_DECISION_TYPE",
     "SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE",
     "SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE",
+    "SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE",
+    "invalid_catalog_post_shoot_hit_target_status_status",
+    "invalid_catalog_post_shoot_hit_target_effect_status",
     "SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE",
     "SELECT_DESTRUCTION_REACTION_DECISION_TYPE",
     "SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE",
@@ -322,6 +331,7 @@ __all__ = (
     "apply_allocation_order_decision",
     "apply_attack_weapon_group_decision",
     "apply_catalog_post_shoot_hit_target_status_result",
+    "apply_catalog_post_shoot_hit_target_effect_result",
     "apply_damage_allocation_model_decision",
     "apply_destroyed_transport_disembark_proposal_decision",
     "apply_destruction_reaction_decision",

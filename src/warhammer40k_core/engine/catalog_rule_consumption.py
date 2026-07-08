@@ -25,6 +25,7 @@ from warhammer40k_core.core.weapon_profiles import (
     weapon_keyword_from_token,
 )
 from warhammer40k_core.engine import catalog_movement_transit as _catalog_transit
+from warhammer40k_core.engine import catalog_rule_selected_target_classification as _st
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -139,6 +140,7 @@ CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:desperate-es
 CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID = "catalog-ir:force-desperate-escape"
 CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:advance-roll-reroll"
 CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:charge-roll-reroll"
+CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID = "catalog-ir:hit-roll-reroll"
 CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = "catalog-ir:wound-roll-reroll"
 CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID = (
     "catalog-ir:destroyed-unit-restore-lost-wounds"
@@ -157,6 +159,8 @@ CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-woun
 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
 CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = "catalog-ir:named-weapon-ability-choice"
 CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-status"
+CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:selected-target-effect"
+CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-effect"
 CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID = (
     "catalog-ir:unit-move-completed-mortal-wounds"
 )
@@ -198,7 +202,6 @@ DEADLY_DEMISE_TRIGGER_ROLL_THRESHOLD = 6
 DEADLY_DEMISE_RANGE_INCHES = 6.0
 CORE_FIGHTS_FIRST_SOURCE_ID = "gw-11e-core-abilities:core:fights-first"
 CORE_FIGHTS_FIRST_EFFECT_KIND = "fights_first"
-
 _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
     {
         "charge": CATALOG_IR_CHARGE_ROLL_CONSUMER_ID,
@@ -227,6 +230,9 @@ _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
         "advance_roll": CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
         "charge": CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
         "charge_roll": CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+        "hit": CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+        "hit_roll": CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+        "attack_sequence_hit": CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
         "wound": CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
         "wound_roll": CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
         "attack_sequence_wound": CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
@@ -1373,6 +1379,8 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
         CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+        CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
         CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
@@ -3791,6 +3799,10 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
     consumer_ids: set[str] = set()
     for clause in rule_ir.clauses:
         consumer_ids.update(catalog_rule_ir_consumers_for_clause(clause))
+    if _st.rule_has_fight_start_selected_target_effect(rule_ir):
+        consumer_ids.add(CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID)
+    if _st.rule_has_post_shoot_hit_target_effect(rule_ir):
+        consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
     return tuple(sorted(consumer_ids))
 
 
@@ -3835,6 +3847,13 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID)
     if _clause_is_supported_first_death_return(clause):
         consumer_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID)
+    for effect in clause.effects:
+        if effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS:
+            consumer_ids.add(CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID)
+        elif effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
+            modifier_consumer_id = _roll_modifier_consumer_id_for_effect(effect)
+            if modifier_consumer_id == CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID:
+                consumer_ids.add(modifier_consumer_id)
     if not _clause_targets_this_unit(clause):
         if _clause_targets_roll_reroll_unit(clause):
             for effect in clause.effects:
@@ -3875,6 +3894,10 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
             if _effect_is_charge_roll_modifier(effect):
                 hook_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
             hook_ids.update(_catalog_ir_hook_ids_for_effect(effect))
+    if _st.rule_has_fight_start_selected_target_effect(rule_ir):
+        hook_ids.add(CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID)
+    if _st.rule_has_post_shoot_hit_target_effect(rule_ir):
+        hook_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
     return tuple(sorted(hook_ids))
 
 

@@ -20,6 +20,12 @@ _THIS_MODEL_ATTACK_TARGET_UNIT_RE = re.compile(
     r"(?:\s+that\s+is\s+(?P<not_below_half>not\s+below\s+Half-strength))?\b",
     re.IGNORECASE,
 )
+_THIS_MODEL_ATTACK_TARGET_REFERENCE_RE = re.compile(
+    r"\beach\s+time\s+this\s+model\s+makes\s+(?:a|an)\s+"
+    r"(?:(?P<attack_kind>melee|ranged)\s+)?attack\s+that\s+targets\s+"
+    r"(?:that|selected|target)\s+unit\b",
+    re.IGNORECASE,
+)
 _ADD_ROLL_RE = re.compile(
     rf"\b(?P<verb>add|subtract)\s+(?P<value>\d+)\s+(?:to|from)\s+"
     rf"(?:(?:the|each\s+of\s+those|each\s+of\s+these)\s+)?"
@@ -41,6 +47,8 @@ _REROLL_RE = re.compile(
 
 def parse_this_model_attack_target_trigger(clause_span: TextSpan) -> RuleTrigger | None:
     match = _THIS_MODEL_ATTACK_TARGET_UNIT_RE.search(clause_span.text)
+    if match is None:
+        match = _THIS_MODEL_ATTACK_TARGET_REFERENCE_RE.search(clause_span.text)
     if match is None:
         return None
     return RuleTrigger(
@@ -74,17 +82,43 @@ def parse_this_model_attack_target_conditions(
                 parameters=parameters_from_pairs(tuple(pairs)),
             )
         )
+    for match in _THIS_MODEL_ATTACK_TARGET_REFERENCE_RE.finditer(clause_span.text):
+        reference_pairs: list[tuple[str, RuleParameterValue]] = [
+            ("relationship", "this_model_makes_attack"),
+            ("gate_subject", "attack_target"),
+            ("target_reference", "selected_unit"),
+        ]
+        attack_kind = match.group("attack_kind")
+        if attack_kind is not None:
+            reference_pairs.append(("attack_kind", _lower_group(match, "attack_kind")))
+        conditions.append(
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=_span_from_match(clause_span, match),
+                parameters=parameters_from_pairs(tuple(reference_pairs)),
+            )
+        )
     return tuple(conditions)
 
 
 def this_model_attack_target_match_ranges(text: str) -> tuple[tuple[int, int], ...]:
-    return tuple(
-        (match.start(), match.end()) for match in _THIS_MODEL_ATTACK_TARGET_UNIT_RE.finditer(text)
+    return (
+        *tuple(
+            (match.start(), match.end())
+            for match in _THIS_MODEL_ATTACK_TARGET_UNIT_RE.finditer(text)
+        ),
+        *tuple(
+            (match.start(), match.end())
+            for match in _THIS_MODEL_ATTACK_TARGET_REFERENCE_RE.finditer(text)
+        ),
     )
 
 
 def has_this_model_attack_target(text: str) -> bool:
-    return _THIS_MODEL_ATTACK_TARGET_UNIT_RE.search(text) is not None
+    return (
+        _THIS_MODEL_ATTACK_TARGET_UNIT_RE.search(text) is not None
+        or _THIS_MODEL_ATTACK_TARGET_REFERENCE_RE.search(text) is not None
+    )
 
 
 def _attack_target_trigger_parameter_pairs(
@@ -95,8 +129,11 @@ def _attack_target_trigger_parameter_pairs(
     roll_types = _roll_types_for_attack_language(clause_span.text)
     pairs: list[tuple[str, RuleParameterValue]] = [
         ("actor", "this_model"),
-        ("target_allegiance", _lower_group(match, "allegiance")),
     ]
+    if "allegiance" in match.groupdict():
+        pairs.append(("target_allegiance", _lower_group(match, "allegiance")))
+    else:
+        pairs.append(("target_reference", "selected_unit"))
     attack_kind = match.group("attack_kind")
     if attack_kind is not None:
         pairs.append(("attack_kind", _lower_group(match, "attack_kind")))

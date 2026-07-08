@@ -291,12 +291,15 @@
     "datasheet_names": [
       "Bloodletters"
     ],
-    "runtime_consumer_ids": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:desperate-escape-roll-modifier",
+      "catalog-ir:force-desperate-escape"
+    ],
     "source_kind_counts": {
       "datasheet": 1
     },
     "support_stages": [
-      "generic_ir_executable"
+      "engine_consumed"
     ]
   },
   {
@@ -355,12 +358,15 @@
     "datasheet_names": [
       "Bloodletters"
     ],
-    "runtime_consumer_ids": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:desperate-escape-roll-modifier",
+      "catalog-ir:force-desperate-escape"
+    ],
     "source_kind_counts": {
       "datasheet": 1
     },
     "support_stages": [
-      "generic_ir_executable"
+      "engine_consumed"
     ]
   },
   {

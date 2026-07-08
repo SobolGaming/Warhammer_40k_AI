@@ -29,10 +29,8 @@ from warhammer40k_core.engine.battle_round_hooks import (
 )
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.catalog_rule_consumption import (
-    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
     SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
     apply_catalog_unit_move_completed_mortal_wounds_target_result,
-    invalid_catalog_post_shoot_hit_target_status_status,
     invalid_catalog_unit_move_completed_mortal_wounds_target_status,
 )
 from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
@@ -195,11 +193,16 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseHandler,
 )
 from warhammer40k_core.engine.phases.shooting import (
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE,
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
     SELECT_SHOOTING_TYPE_DECISION_TYPE,
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
     invalid_shooting_phase_start_faction_rule_status,
+)
+from warhammer40k_core.engine.phases.shooting import (
+    invalid_catalog_post_shoot_decision_status as invalid_post_shoot_status,
 )
 from warhammer40k_core.engine.prebattle import (
     SELECT_PREBATTLE_ACTION_DECISION_TYPE,
@@ -331,6 +334,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
         SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
         SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
+        SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE,
         SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
         SELECT_SHOOTING_TYPE_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
@@ -1465,14 +1469,9 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
-        if request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE:
-            invalid_status = invalid_catalog_post_shoot_hit_target_status_status(
-                state=state,
-                request=request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
+        invalid_status = invalid_post_shoot_status(state=state, request=request, result=result)
+        if invalid_status is not None:
+            return invalid_status
         return None
 
     def _apply_shooting_phase_decision(

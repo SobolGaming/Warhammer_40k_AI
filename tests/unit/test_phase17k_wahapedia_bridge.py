@@ -132,6 +132,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+    CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
     CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
@@ -207,6 +208,14 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     invalid_catalog_unit_move_completed_mortal_wounds_target_status,
     record_catalog_feel_no_pain_sources_for_unit,
 )
+from warhammer40k_core.engine.catalog_selected_target_effects import (
+    CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE,
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SUBMISSION_KIND,
+    CatalogSelectedTargetEffectRuntime,
+    apply_catalog_post_shoot_hit_target_effect_result,
+    invalid_catalog_post_shoot_hit_target_effect_status,
+)
 from warhammer40k_core.engine.catalog_turn_end_reserves import (
     CATALOG_TURN_END_RESERVES_USED_EVENT,
     CatalogTurnEndReserveRuntime,
@@ -217,7 +226,11 @@ from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
@@ -2816,6 +2829,204 @@ def test_phase17k_post_shoot_hit_target_cover_denial_records_and_applies_effect(
     )
 
 
+def test_phase17k_post_shoot_selected_target_effect_records_generic_rule_effect() -> None:
+    package = _post_shoot_selected_target_effect_package()
+    unit = _named_weapon_choice_unit(package=package)
+    target_unit = _named_weapon_choice_unit(
+        package=package,
+        army_id="army-opponent",
+        unit_selection_id="enemy-lord-of-change-1",
+    )
+    army = _flesh_hounds_army(package=package, unit=unit)
+    enemy_army = _flesh_hounds_army(
+        package=package,
+        unit=target_unit,
+        army_id="army-opponent",
+        player_id="player-opponent",
+    )
+    player_index = _player_ability_index(package=package, army=army)
+    enemy_player_index = _player_ability_index(package=package, army=enemy_army)
+    record = next(
+        record
+        for record in player_index.all_records()
+        if record.definition.name == "Warpflame Locus" and record.record_id.endswith(":clause:001")
+    )
+    replay_payload = cast(dict[str, JsonValue], record.definition.replay_payload)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _flesh_hounds_battlefield_state(
+        army=army,
+        unit=unit,
+        enemy_army=enemy_army,
+        enemy_unit=target_unit,
+        enemy_x=24.0,
+    )
+    state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    decisions = DecisionController()
+    attack_sequence = _completed_post_shoot_attack_sequence(
+        package=package,
+        attacker=unit,
+        target=target_unit,
+    )
+    _emit_successful_hit(
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        successful=True,
+    )
+    completed_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": army.player_id,
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    context = AttackSequenceCompletedContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=attack_sequence,
+        attack_sequence_completed_event_id=completed_event.event_id,
+    )
+    status = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: player_index,
+            enemy_army.player_id: enemy_player_index,
+        },
+        armies=(army, enemy_army),
+    ).post_shoot_hit_target_request(context)
+
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    )
+    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID in (
+        catalog_rule_ir_hook_ids_for_rule(rule_ir)
+    )
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = decisions.queue.peek_next()
+    assert request is not None
+    assert request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE
+    assert request.actor_id == army.player_id
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["submission_kind"] == (
+        SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SUBMISSION_KIND
+    )
+    assert request_payload["catalog_record_id"] == record.record_id
+    assert request_payload["available_target_unit_instance_ids"] == [target_unit.unit_instance_id]
+    option_payload = cast(dict[str, JsonValue], request.options[0].payload)
+    effect_records = cast(list[dict[str, JsonValue]], option_payload["generic_rule_effect_records"])
+    assert len(effect_records) == 1
+    assert effect_records[0]["target_unit_instance_ids"] == [unit.unit_instance_id]
+
+    result = DecisionResult.for_request(
+        result_id="phase17k-post-shoot-selected-target-effect",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    assert (
+        invalid_catalog_post_shoot_hit_target_effect_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+        is None
+    )
+    decisions.submit_result(result)
+    assert (
+        apply_catalog_post_shoot_hit_target_effect_result(
+            state=state,
+            decisions=decisions,
+            result=result,
+        )
+        is None
+    )
+    effects = state.persisting_effects_for_unit(unit.unit_instance_id)
+    assert len(effects) == 1
+    effect_payload = cast(dict[str, JsonValue], effects[0].effect_payload)
+    selected_payload = cast(dict[str, JsonValue], effect_payload["catalog_selected_target"])
+    effect_spec_payload = cast(dict[str, JsonValue], effect_payload["effect"])
+    effect_parameters = {
+        cast(str, item["key"]): item["value"]
+        for item in cast(list[dict[str, JsonValue]], effect_spec_payload["parameters"])
+    }
+
+    assert effect_payload["effect_kind"] == GENERIC_RULE_EFFECT_KIND
+    assert effect_payload["rule_ir_hash"] == rule_ir.ir_hash()
+    assert selected_payload["selected_target_unit_instance_id"] == target_unit.unit_instance_id
+    assert selected_payload["attack_sequence_completed_event_id"] == completed_event.event_id
+    assert effect_parameters["characteristic"] == "damage"
+    assert effect_parameters["delta"] == 1
+    assert effect_parameters["selected_target_unit_instance_id"] == target_unit.unit_instance_id
+    assert effects[0].expiration == EffectExpiration.end_phase(
+        battle_round=state.battle_round,
+        phase=BattlePhase.SHOOTING,
+        player_id=army.player_id,
+    )
+    selected_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT
+    )
+    assert len(selected_events) == 1
+
+    stale_state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    stale_status = invalid_catalog_post_shoot_hit_target_effect_status(
+        state=stale_state,
+        request=request,
+        result=result,
+    )
+    assert stale_status is not None
+    stale_payload = cast(dict[str, JsonValue], stale_status.payload)
+    assert stale_payload["field"] == "state_phase"
+
+    drifted_payload = dict(option_payload)
+    drifted_payload["hook_id"] = "changed"
+    drift_status = invalid_catalog_post_shoot_hit_target_effect_status(
+        state=state,
+        request=request,
+        result=DecisionResult(
+            result_id="phase17k-post-shoot-selected-target-effect-drift",
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=request.options[0].option_id,
+            payload=drifted_payload,
+        ),
+    )
+    assert drift_status is not None
+    drift_payload = cast(dict[str, JsonValue], drift_status.payload)
+    assert drift_payload["field"] == "payload"
+
+    malformed_status = invalid_catalog_post_shoot_hit_target_effect_status(
+        state=state,
+        request=request,
+        result=DecisionResult(
+            result_id="phase17k-post-shoot-selected-target-effect-malformed",
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id="phase17k-missing-option",
+            payload=request.options[0].payload,
+        ),
+    )
+    assert malformed_status is not None
+    malformed_payload = cast(dict[str, JsonValue], malformed_status.payload)
+    assert malformed_payload["field"] == "selected_option_id"
+    assert "object at 0x" not in json.dumps(decisions.to_payload(), sort_keys=True)
+
+
 def test_phase17k_datasheet_post_shoot_cover_denial_suppresses_save_cover() -> None:
     package = _post_shoot_cover_denial_package()
     unit = _named_weapon_choice_unit(package=package)
@@ -5178,8 +5389,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "<br>Soul Shattering Charge Upgrade |"
     ) in chaos_daemons_markdown
     assert (
-        "| Nurgle | Nurglings (`000001133`)<br>Plaguebearers (`000001132`) | "
-        "Plague Drones (`000001135`)"
+        "| Nurgle | Nurglings (`000001133`)<br>Plague Drones (`000001135`)"
+        "<br>Plaguebearers (`000001132`)<br>Poxbringer (`000001467`)"
+        "<br>Rotigus (`000001465`)<br>Spoilpox Scrivener (`000001469`) | None |"
     ) in chaos_daemons_markdown
     for khorne_datasheet_id in (
         "000001104",
@@ -5208,8 +5420,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "All consumed | Deep Strike, Brass Stampede move-completed mortal wounds"
     ) in chaos_daemons_markdown
     assert (
-        "| Bloodletters (`000001114`) | PDF pages 28-29; supersedes Wahapedia. | "
-        "IR parsed; host needed |"
+        "| Bloodletters (`000001114`) | PDF pages 28-29; supersedes Wahapedia. | All consumed |"
     ) in chaos_daemons_markdown
     assert (
         "| Bloodthirster (`000002582`) | PDF pages 16-17; supersedes Wahapedia. | All consumed |"
@@ -5304,7 +5515,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert flesh_hounds_support.datasheet_ability_status == "Full"
     assert flesh_hounds_support.faction_interaction_status == "Partial"
     assert bloodletters_support.overall == "Playable"
-    assert bloodletters_support.datasheet_ability_status == "Playable"
+    assert bloodletters_support.datasheet_ability_status == "Full"
     assert bloodcrushers_support.overall == "Playable"
     assert bloodcrushers_support.datasheet_ability_status == "Full"
     for support_row in support_rows:
@@ -5999,10 +6210,22 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ].ability_names == ("Bane of Cowards",)
     assert categories_by_name[
         "Datasheet Roll Modifier Desperate Escape Enemy Unit"
-    ].support_stages == (AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,)
+    ].runtime_consumer_ids == (
+        CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+    )
     assert categories_by_name[
         "Datasheet Rule Ir Force Desperate Escape Tests Enemy Unit"
-    ].support_stages == (AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,)
+    ].runtime_consumer_ids == (
+        CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+    )
+    assert categories_by_name[
+        "Datasheet Roll Modifier Desperate Escape Enemy Unit"
+    ].support_stages == (AbilityCoverageSupportStage.ENGINE_CONSUMED,)
+    assert categories_by_name[
+        "Datasheet Rule Ir Force Desperate Escape Tests Enemy Unit"
+    ].support_stages == (AbilityCoverageSupportStage.ENGINE_CONSUMED,)
     assert categories_by_name[
         "Datasheet Rule Ir Inflict Mortal Wounds Enemy Unit"
     ].ability_names == ("Brass Stampede",)
@@ -7013,6 +7236,14 @@ def _post_shoot_cover_denial_package() -> CanonicalCatalogPackage:
         package_id=_catalog_package_id(),
         catalog_version=_catalog_version(),
         source_artifacts=_post_shoot_cover_denial_bridge_artifacts(),
+    )
+
+
+def _post_shoot_selected_target_effect_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_post_shoot_selected_target_effect_bridge_artifacts(),
     )
 
 
@@ -8558,6 +8789,24 @@ def _post_shoot_cover_denial_bridge_artifacts() -> tuple[WahapediaJsonArtifact, 
     )
 
 
+def _post_shoot_selected_target_effect_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_post_shoot_selected_target_effect_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-lord-of-change",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-lord-of-change",
+                model_name="Lord of Change",
+                height=5.5,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:test:lord-of-change:height",
+                height_document_reference="Test Lord of Change Datasheet",
+            ),
+        ),
+    )
+
+
 def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return (
         _artifact_from_csv(
@@ -8863,6 +9112,91 @@ def _post_shoot_cover_denial_source_artifacts() -> tuple[WahapediaJsonArtifact, 
                         '"In your Shooting phase, after this model has shot, select one '
                         "enemy unit hit by one or more of those attacks. Until the end "
                         'of the phase, that unit cannot have the Benefit of Cover.",'
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-lord-of-change,Character,,false",
+                    "test-lord-of-change,Monster,,false",
+                    "test-lord-of-change,Psyker,,false",
+                    "test-lord-of-change,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-lord-of-change,1,12,10,6,5,20,6,5,100mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-lord-of-change,1,1,Bolt of Change,Ranged,18,9,2,9,-2,3,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-lord-of-change,1,1-2 Lord of Change",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _post_shoot_selected_target_effect_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-daemons-rule,test-faction,Test Daemons Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-lord-of-change,Lord of Change,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-lord-of-change,1,Faction,test-daemons-rule,"
+                        "Test Daemons Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-lord-of-change,2,Datasheet,,Warpflame Locus,"
+                        '"In your Shooting phase, after this unit has shot, select one '
+                        "enemy unit hit by one or more of those attacks. Until the end "
+                        "of the phase, each time this model makes an attack that targets "
+                        'that unit, add 1 to the Damage characteristic of that attack.",'
                     ),
                 )
             ),

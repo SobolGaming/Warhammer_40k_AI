@@ -46,7 +46,7 @@
       "chaos-daemons-bridge-catalog/000001114/wargear/000001114:instrument-of-chaos/000001114:instrument-of-chaos"
     ],
     "catalog_status": "Full",
-    "datasheet_ability_status": "Playable",
+    "datasheet_ability_status": "Full",
     "datasheet_id": "000001114",
     "datasheet_name": "Bloodletters",
     "detachment_ids": [
@@ -63,7 +63,7 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "`000001114:bane-of-cowards` Bane of Cowards: `generic_ir_executable` Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
@@ -71,7 +71,7 @@
       "daemonic-incursion",
       "shadow-legion"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:leadership-characteristic-query`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:desperate-escape-roll-modifier`, `catalog-ir:force-desperate-escape`, `catalog-ir:leadership-characteristic-query`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "None"
   },

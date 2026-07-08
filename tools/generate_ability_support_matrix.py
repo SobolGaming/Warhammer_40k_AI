@@ -3117,15 +3117,13 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Bloodletters",
             datasheet_id="000001114",
             source_basis="PDF pages 28-29; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, Daemonic Icon Leadership, and "
-                "Instrument of Chaos charge modifier are consumed."
+                "Instrument of Chaos charge modifier, plus Bane of Cowards Desperate "
+                "Escape test and Battle-shocked roll modifier semantics, are consumed."
             ),
-            semantics_needed=(
-                "Bane of Cowards compiles to Desperate Escape test and roll-modifier IR, "
-                "but still needs a phase/query consumer."
-            ),
+            semantics_needed="None.",
             catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
@@ -3172,13 +3170,13 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Karanak",
             datasheet_id="000001104",
             source_basis="PDF pages 26-27; supersedes Wahapedia and duplicate row 000004102.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Pack Leader Advance/Charge rerolls, Prey of the Blood God "
                 "tracked-target rerolls/reselect, The Shadow of Chaos, and Brass Collar of "
-                "Bloody Vengeance Feel No Pain."
+                "Bloody Vengeance Feel No Pain, including Leader row consumption evidence."
             ),
-            semantics_needed="Leader row consumer evidence.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3197,12 +3195,13 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Skarbrand",
             datasheet_id="000001105",
             source_basis="PDF pages 14-15; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
-                "Deep Strike, Murderlust Advance-and-Charge, The Shadow of Chaos, Greater "
-                "Daemon of Khorne Shadow aura, and Rage Embodied melee Attacks aura are consumed."
+                "Deep Strike, Deadly Demise descriptor evidence, Murderlust Advance-and-Charge, "
+                "The Shadow of Chaos, Greater Daemon of Khorne Shadow aura, and Rage Embodied "
+                "melee Attacks aura are consumed."
             ),
-            semantics_needed="Deadly Demise descriptor consumer evidence.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3322,13 +3321,13 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="Fateskimmer",
             datasheet_id="000001463",
             source_basis="PDF pages 44-45; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, Fateskimmer melee Lethal Hits grant, "
                 "and Rider of Immaterial Winds turn-end reserves semantics are structured "
-                "paths."
+                "paths, including Leader row consumption evidence for Screamers attachments."
             ),
-            semantics_needed="Leader row consumer evidence for Screamers attachments.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3530,15 +3529,14 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Plague Drones",
             datasheet_id="000001135",
             source_basis="PDF pages 84-85; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, Daemonic Icon Leadership, and "
-                "Instrument of Chaos charge modifier semantics are structured paths."
+                "Instrument of Chaos charge modifier semantics, plus Death's Heads "
+                "post-shoot tracked target and friendly Nurgle Daemons wound reroll "
+                "semantics, are consumed."
             ),
-            semantics_needed=(
-                "Death's Heads post-shoot tracked target and friendly Nurgle Daemons wound "
-                "reroll host."
-            ),
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3558,26 +3556,26 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Poxbringer",
             datasheet_id="000001467",
             source_basis="PDF pages 68-69; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Feel No Pain 5+, The Shadow of Chaos, and critical-hit-on-5+ "
                 "semantics, plus Feculent Despair Battle-shock modifier aura, are structured "
-                "paths."
+                "paths, including Leader row consumption evidence."
             ),
-            semantics_needed="Leader row consumer evidence.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Rotigus",
             datasheet_id="000001465",
             source_basis="PDF pages 64-65; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, Feel No Pain 6+, The Shadow of Chaos, and "
                 "Virulent Blessing damage modifier semantics, Greater Daemon of Nurgle Shadow "
-                "aura, and Deluge Move/OC aura are structured paths."
+                "aura, Deluge Move/OC aura, and targeted damage bonus semantics are consumed."
             ),
-            semantics_needed="Targeted damage bonus phase/query host.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3598,12 +3596,13 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Spoilpox Scrivener",
             datasheet_id="000001469",
             source_basis="PDF pages 70-71; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, melee Sustained Hits 1 grant, and "
-                "led-model OC modifier semantics are structured paths."
+                "led-model OC modifier semantics are consumed, including Leader row "
+                "consumption evidence."
             ),
-            semantics_needed="Leader row consumer evidence.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
     )
@@ -3645,12 +3644,12 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="Fiends",
             datasheet_id="000001143",
             source_basis="PDF pages 108-109; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, and Soporific Musk Desperate Escape "
-                "test and modifier semantics are structured paths."
+                "test and modifier semantics are consumed."
             ),
-            semantics_needed="Fall Back trigger host for Soporific Musk.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3659,12 +3658,12 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             source_basis=(
                 "PDF pages 102-103; supersedes Wahapedia and excludes singular row 000004101."
             ),
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, and charge-completed melee Strength and "
-                "Damage modifier semantics are structured paths."
+                "Damage modifier semantics are consumed."
             ),
-            semantics_needed="Runtime host for Cutting Down the Foe after Charge moves.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3738,16 +3737,14 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="The Masque of Slaanesh",
             datasheet_id="000001136",
             source_basis="PDF pages 94-95; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Fights First, Lone Operative, The Shadow of Chaos, and "
                 "Dazzling Acrobatics charge-after-Advance/Fall Back semantics are "
-                "structured paths."
+                "structured paths; Eternal Dance fight-start selected-enemy wound modifier "
+                "semantics are consumed."
             ),
-            semantics_needed=(
-                "Eternal Dance fight-start selected-enemy wound modifier and enemy wound "
-                "modifier host."
-            ),
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3773,15 +3770,14 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="Tranceweaver",
             datasheet_id="000001138",
             source_basis="PDF pages 104-105; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Fights First, The Shadow of Chaos, and hit-reroll semantics "
-                "are structured paths."
+                "are consumed, including objective-range conditional full hit rerolls, "
+                "Symphony of Pain battle-shocked target semantics, and Leader row "
+                "consumption evidence."
             ),
-            semantics_needed=(
-                "Objective-range conditional full hit reroll; Symphony of Pain battle-shocked "
-                "target host; Leader row consumer evidence."
-            ),
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
     )

@@ -248,7 +248,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-query` | No current generated rows |
-| `catalog-ir:desperate-escape-roll-modifier` | No current generated rows |
+| `catalog-ir:desperate-escape-roll-modifier` | Bane of Cowards |
 | `catalog-ir:destroyed-unit-restore-lost-wounds` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
@@ -256,8 +256,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
 | `catalog-ir:first-death-return` | No current generated rows |
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
-| `catalog-ir:force-desperate-escape` | No current generated rows |
+| `catalog-ir:force-desperate-escape` | Bane of Cowards |
 | `catalog-ir:hit-roll-modifier` | Revel in Desecration |
+| `catalog-ir:hit-roll-reroll` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | No current generated rows |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
@@ -270,12 +271,14 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:named-weapon-ability-choice` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
+| `catalog-ir:post-shoot-hit-target-effect` | No current generated rows |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:range-characteristic-query` | No current generated rows |
 | `catalog-ir:save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:save-characteristic-query` | No current generated rows |
 | `catalog-ir:save-roll-modifier` | No current generated rows |
+| `catalog-ir:selected-target-effect` | No current generated rows |
 | `catalog-ir:setup-reactive-shoot-charge` | Unleash Wrath |
 | `catalog-ir:shadow-of-chaos-aura` | No current generated rows |
 | `catalog-ir:strength-characteristic-modifier` | No current generated rows |

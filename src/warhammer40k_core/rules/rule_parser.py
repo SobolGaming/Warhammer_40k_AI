@@ -4,7 +4,6 @@ import re
 from dataclasses import dataclass
 from typing import cast
 
-from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
 from warhammer40k_core.rules.attack_target_parser import (
     has_this_model_attack_target,
@@ -17,6 +16,9 @@ from warhammer40k_core.rules.hit_success_threshold_parser import (
     hit_success_threshold_effects,
 )
 from warhammer40k_core.rules.parsed_tokens import DistancePredicateToken, ParsedRuleText, TextSpan
+from warhammer40k_core.rules.rule_characteristic_parser import (
+    parse_characteristic_effects as _parse_characteristic_effects,
+)
 from warhammer40k_core.rules.rule_clause_merging import merge_rule_clause_spans
 from warhammer40k_core.rules.rule_duration_parser import parse_rule_duration
 from warhammer40k_core.rules.rule_ir import (
@@ -187,8 +189,9 @@ _THIS_UNIT_NORMAL_ADVANCE_FALL_BACK_MOVE_RE = re.compile(
 _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE = re.compile(
     r"\beach\s+time\s+an?\s+enemy\s+unit"
     r"(?:\s+\(excluding\s+(?P<excluded_keywords>[^)]+)\))?\s+"
+    r"(?:that\s+is\s+)?"
     r"within\s+Engagement\s+Range\s+of\s+one\s+or\s+more\s+units\s+from\s+your\s+army\s+"
-    r"with\s+this\s+ability\s+Falls\s+Back\b",
+    r"with\s+this\s+ability\s+(?:Falls\s+Back|is\s+selected\s+to\s+Fall\s+Back)\b",
     re.IGNORECASE,
 )
 _POST_SHOOT_HIT_TARGET_SELECTION_RE = re.compile(
@@ -270,27 +273,21 @@ _REROLL_ROLL_LIST_RE = re.compile(
 )
 _REROLL_RE = re.compile(
     rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+"
-    rf"(?:the\s+)?(?P<roll>{_ROLL_TYPES})\s+rolls?\b"
+    rf"(?:an?\s+|the\s+)?(?P<roll>{_ROLL_TYPES})\s+rolls?\b"
+    r"(?:\s+of\s+(?P<reroll_value>[1-6]))?"
     r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+(?:unit|model))?",
     re.IGNORECASE,
 )
-_CHARACTERISTIC_NAMES = (
-    "Armor Penetration|AP|Attacks|Ballistic Skill|BS|Damage|Detection Range|Invulnerable Save|"
-    "Leadership|Move|Movement|Objective Control|OC|Range|Save|Strength|Toughness|Weapon Skill|"
-    "Wounds|WS"
-)
-_CHARACTERISTIC_RE = re.compile(
-    rf"\b(?P<verb>add|subtract)\s+(?P<value>\d+)(?:\")?\s+(?:to|from)\s+"
-    rf"(?:the\s+)?(?P<characteristic>{_CHARACTERISTIC_NAMES})\s+characteristic\b",
+_OBJECTIVE_REROLL_INSTEAD_RE = re.compile(
+    r"\bif\s+the\s+target\s+of\s+that\s+attack\s+is\s+within\s+range\s+of\s+"
+    r"an?\s+objective\s+marker,\s+you\s+can\s+(?:re-roll|reroll)\s+"
+    r"(?:the\s+)?(?P<roll>hit|wound|damage|save)\s+roll\s+instead\b",
     re.IGNORECASE,
 )
-_SET_CHARACTERISTIC_RE = re.compile(
-    rf"\b(?:have|has)\s+a\s+(?P<characteristic>{_CHARACTERISTIC_NAMES})\s+"
-    r"characteristic\s+of\s+(?P<value>[A-Za-z0-9+/-]+)(?=[\s.,;)]|$)",
-    re.IGNORECASE,
-)
-_ADDITIONAL_MOVE_RE = re.compile(
-    r"\bmove\s+an\s+additional\s+(?P<distance>\d+)(?:\")?\b",
+_SELECTED_UNIT_MAKES_ATTACK_RE = re.compile(
+    r"\b(?:a\s+model|models?)\s+in\s+"
+    r"(?:that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit)\s+"
+    r"makes?\s+an?\s+attack\b",
     re.IGNORECASE,
 )
 _CP_RE = re.compile(
@@ -516,29 +513,6 @@ _CLAUSE_TRIGGER_ANCHOR_RE = re.compile(
     r"\b(?:each\s+time|when|after|at\s+the\s+(?:start|end)\s+of)\b",
     re.IGNORECASE,
 )
-
-_CHARACTERISTIC_BY_LABEL = {
-    "armor penetration": Characteristic.ARMOR_PENETRATION,
-    "ap": Characteristic.ARMOR_PENETRATION,
-    "attacks": Characteristic.ATTACKS,
-    "ballistic skill": Characteristic.BALLISTIC_SKILL,
-    "bs": Characteristic.BALLISTIC_SKILL,
-    "damage": Characteristic.DAMAGE,
-    "detection range": Characteristic.DETECTION_RANGE,
-    "invulnerable save": Characteristic.INVULNERABLE_SAVE,
-    "leadership": Characteristic.LEADERSHIP,
-    "move": Characteristic.MOVEMENT,
-    "movement": Characteristic.MOVEMENT,
-    "objective control": Characteristic.OBJECTIVE_CONTROL,
-    "oc": Characteristic.OBJECTIVE_CONTROL,
-    "range": Characteristic.RANGE,
-    "save": Characteristic.SAVE,
-    "strength": Characteristic.STRENGTH,
-    "toughness": Characteristic.TOUGHNESS,
-    "weapon skill": Characteristic.WEAPON_SKILL,
-    "wounds": Characteristic.WOUNDS,
-    "ws": Characteristic.WEAPON_SKILL,
-}
 
 
 @dataclass(frozen=True, slots=True)
@@ -774,7 +748,7 @@ def _compile_clause(
         (
             *_parse_dice_roll_modifier_effects(clause_text),
             *_parse_reroll_effects(clause_text),
-            *_parse_characteristic_effects(clause_text),
+            *_parse_characteristic_effects(clause_text.span),
             *_parse_resource_effects(clause_text),
             *_parse_tracked_target_selection_effects(clause_text),
             *_parse_return_on_death_effects(clause_text),
@@ -1079,6 +1053,19 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                 )
             ),
         )
+    battle_shocked_match = _TARGET_BATTLE_SHOCKED_RE.search(clause_text.text)
+    if battle_shocked_match is not None and "desperate escape" in clause_text.text.lower():
+        return RuleTrigger(
+            kind=RuleTriggerKind.DICE_ROLL,
+            source_span=_span_from_match(clause_text, battle_shocked_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("roll_type", "desperate_escape"),
+                    ("source_context", "previous_effect"),
+                    ("timing_window", "desperate_escape_test"),
+                )
+            ),
+        )
     dice_trigger_match = _DICE_TRIGGER_RE.search(clause_text.text)
     if dice_trigger_match is not None:
         return RuleTrigger(
@@ -1232,7 +1219,7 @@ def _parse_keyword_conditions(
                 parameters=parameters_from_pairs(
                     (
                         ("gate_subject", "falling_back_unit"),
-                        ("excluded_keyword_any", "|".join(_keyword_list_tokens(excluded_keywords))),
+                        ("excluded_keyword_any", _keyword_list_tokens(excluded_keywords)),
                     )
                 ),
             )
@@ -1585,15 +1572,16 @@ def _dice_modifier_effect(
     match: re.Match[str],
     delta: int,
 ) -> RuleEffectSpec:
+    pairs: list[tuple[str, RuleParameterValue]] = [
+        ("roll_type", _roll_type(match.group("roll"))),
+        ("delta", delta),
+    ]
+    if _SELECTED_UNIT_MAKES_ATTACK_RE.search(clause_text.text) is not None:
+        pairs.append(("attack_role", "attacker"))
     return RuleEffectSpec(
         kind=RuleEffectKind.MODIFY_DICE_ROLL,
         source_span=_span_from_match(clause_text, match),
-        parameters=parameters_from_pairs(
-            (
-                ("roll_type", _roll_type(match.group("roll"))),
-                ("delta", delta),
-            )
-        ),
+        parameters=parameters_from_pairs(tuple(pairs)),
     )
 
 
@@ -1601,6 +1589,10 @@ def _parse_reroll_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...
     effects: list[RuleEffectSpec] = []
     list_spans: list[tuple[int, int]] = []
     tracked_target_pairs = _tracked_target_reroll_parameter_pairs(clause_text)
+    objective_instead_matches = tuple(_OBJECTIVE_REROLL_INSTEAD_RE.finditer(clause_text.text))
+    objective_instead_spans = tuple(
+        (match.start(), match.end()) for match in objective_instead_matches
+    )
     for match in _REROLL_ROLL_LIST_RE.finditer(clause_text.text):
         list_spans.append((match.start(), match.end()))
         for roll in _roll_list_values(match.group("rolls")):
@@ -1614,18 +1606,55 @@ def _parse_reroll_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...
                 )
             )
     for match in _REROLL_RE.finditer(clause_text.text):
-        if _match_is_within_any_span(match=match, spans=tuple(list_spans)):
+        if _match_is_within_any_span(
+            match=match,
+            spans=(*tuple(list_spans), *objective_instead_spans),
+        ):
             continue
+        roll_type = _roll_type(match.group("roll"))
+        pairs: list[tuple[str, RuleParameterValue]] = [("roll_type", roll_type)]
+        reroll_value = match.group("reroll_value")
+        if reroll_value is not None:
+            pairs.append(("reroll_unmodified_value", int(reroll_value)))
+        objective_instead_match = _objective_instead_match_for_roll(
+            objective_instead_matches,
+            roll_type=roll_type,
+            after=match.end(),
+        )
+        if objective_instead_match is not None:
+            pairs.append(("full_reroll_if_target_within_objective_range", True))
+        pairs.extend(tracked_target_pairs)
+        source_span = (
+            _span_from_match(clause_text, match)
+            if objective_instead_match is None
+            else _span_from_bounds(
+                clause_text,
+                start_offset=match.start(),
+                end_offset=objective_instead_match.end(),
+            )
+        )
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.REROLL_PERMISSION,
-                source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs(
-                    (("roll_type", _roll_type(match.group("roll"))), *tracked_target_pairs)
-                ),
+                source_span=source_span,
+                parameters=parameters_from_pairs(tuple(pairs)),
             )
         )
     return tuple(effects)
+
+
+def _objective_instead_match_for_roll(
+    matches: tuple[re.Match[str], ...],
+    *,
+    roll_type: str,
+    after: int,
+) -> re.Match[str] | None:
+    for match in matches:
+        if match.start() < after:
+            continue
+        if _roll_type(match.group("roll")) == roll_type:
+            return match
+    return None
 
 
 def _roll_list_values(value: str) -> tuple[str, ...]:
@@ -1782,54 +1811,6 @@ def _match_is_within_any_span(
     spans: tuple[tuple[int, int], ...],
 ) -> bool:
     return any(start <= match.start() and match.end() <= end for start, end in spans)
-
-
-def _parse_characteristic_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
-    effects: list[RuleEffectSpec] = []
-    for match in _CHARACTERISTIC_RE.finditer(clause_text.text):
-        characteristic = _characteristic_from_label(match.group("characteristic"))
-        value = int(match.group("value"))
-        delta = value if _lower_group(match, "verb") == "add" else -value
-        effect_kind = (
-            RuleEffectKind.MODIFY_MOVE_DISTANCE
-            if characteristic is Characteristic.MOVEMENT
-            else RuleEffectKind.MODIFY_CHARACTERISTIC
-        )
-        effects.append(
-            RuleEffectSpec(
-                kind=effect_kind,
-                source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs(
-                    (
-                        ("characteristic", characteristic.value),
-                        ("delta", delta),
-                    )
-                ),
-            )
-        )
-    for match in _SET_CHARACTERISTIC_RE.finditer(clause_text.text):
-        characteristic = _characteristic_from_label(match.group("characteristic"))
-        effects.append(
-            RuleEffectSpec(
-                kind=RuleEffectKind.SET_CHARACTERISTIC,
-                source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs(
-                    (
-                        ("characteristic", characteristic.value),
-                        ("value", match.group("value")),
-                    )
-                ),
-            )
-        )
-    for match in _ADDITIONAL_MOVE_RE.finditer(clause_text.text):
-        effects.append(
-            RuleEffectSpec(
-                kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
-                source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs((("delta_inches", int(match.group("distance"))),)),
-            )
-        )
-    return tuple(effects)
 
 
 def _parse_resource_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
@@ -2835,14 +2816,6 @@ def _is_weapon_keyword(value: str) -> bool:
 
 def _catalog_like_token(value: str) -> str:
     return value.strip().lower().replace("-", "_").replace(" ", "_")
-
-
-def _characteristic_from_label(value: str) -> Characteristic:
-    key = value.lower().replace("-", " ")
-    characteristic = _CHARACTERISTIC_BY_LABEL.get(key)
-    if characteristic is None:
-        raise RuleIRError(f"Unsupported characteristic label in rule language: {value}.")
-    return characteristic
 
 
 def _span_matches_existing_effect(
