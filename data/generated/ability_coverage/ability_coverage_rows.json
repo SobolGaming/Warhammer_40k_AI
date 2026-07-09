@@ -353,6 +353,196 @@
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",
     "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008337",
+    "ability_name": "Stealth",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/core/000008337/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [],
+    "semantic_categories": [
+      "unknown.ability_text"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "descriptor_only"
+  },
+  {
+    "ability_id": "000001148:pall-of-despair-aura-psychic",
+    "ability_name": "Pall of Despair (Aura, Psychic)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:pall-of-despair-aura-psychic/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:battle-shock-failed-heal",
+      "catalog-ir:battle-shock-forced-test"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.restore_lost_wounds.aura_units",
+      "datasheet.rule_ir.set_contextual_status.aura_units"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001148:supreme-commander",
+    "ability_name": "SUPREME COMMANDER",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:supreme-commander/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [],
+    "semantic_categories": [
+      "unknown.ability_text"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "descriptor_only"
+  },
+  {
+    "ability_id": "000001148:shadow-form",
+    "ability_name": "Shadow Form",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-form/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:shadow-form-choice"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001148:shadow-lord-aura-psychic",
+    "ability_name": "Shadow Lord (Aura, Psychic)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-lord-aura-psychic/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-reroll"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.reroll_permission.aura_units"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001148:the-dark-master-aura",
+    "ability_name": "The Dark Master (Aura)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:the-dark-master-aura/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:shadow-of-chaos-aura"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.aura_units"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001148:wreathed-in-shadows-aura-psychic",
+    "ability_name": "Wreathed in Shadows (Aura, Psychic)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:wreathed-in-shadows-aura-psychic/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:shooting-target-range-restriction"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.aura_units"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/faction/000008433/none",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
     "datasheet_id": "000004207",
     "datasheet_name": "Defiler",

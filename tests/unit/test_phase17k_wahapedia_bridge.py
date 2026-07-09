@@ -5283,6 +5283,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     }
     generated_markdown = support_matrix_markdown(
         ability_coverage_category_rows_payload(category_rows),
+        ability_rows=ability_coverage_rows_payload(rows),
         runtime_semantic_coverage=runtime_semantic_payload,
     )
     generated_faction_markdown = faction_support_markdown_files(
@@ -5822,6 +5823,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Flesh Hounds",
         "Bloodletters",
         "Bloodcrushers",
+        "Be'lakor",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Collar of Khorne"]) == (
         "Flesh Hounds",

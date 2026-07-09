@@ -28,6 +28,7 @@ from warhammer40k_core.engine.ability_coverage import (
     AbilityCoverageAbilityDatasheetPairPayload,
     AbilityCoverageCategoryRowPayload,
     AbilityCoverageRow,
+    AbilityCoverageRowPayload,
     AbilityCoverageSupportStage,
     ability_coverage_category_rows,
     ability_coverage_category_rows_payload,
@@ -156,9 +157,24 @@ DEFAULT_FACTION_DOCS_DIR = Path("docs") / "factions"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
 RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-coverage-v1"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
+BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.DEFILER_DATASHEET_IDS
-ABILITY_SUPPORT_DATASHEET_IDS = (*DAEMON_WARGEAR_DATASHEET_IDS, *CHAOS_DEFILER_DATASHEET_IDS)
+ABILITY_SUPPORT_DATASHEET_IDS = (
+    *BELAKOR_DATASHEET_IDS,
+    *DAEMON_WARGEAR_DATASHEET_IDS,
+    *CHAOS_DEFILER_DATASHEET_IDS,
+)
+BELAKOR_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000001148",
+        model_name="Be'lakor - EPIC HERO",
+        height=170.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="geometry-review:chaos-daemons:belakor:height",
+        height_document_reference="Chaos Daemons Be'lakor product listing",
+    ),
+)
 DATASHEET_SUPPORT_FULL = "Full"
 DATASHEET_SUPPORT_PLAYABLE = "Playable"
 DATASHEET_SUPPORT_PARTIAL = "Partial"
@@ -938,6 +954,7 @@ def main() -> None:
     docs_path.write_text(
         support_matrix_markdown(
             category_payloads,
+            ability_rows=row_payloads,
             runtime_semantic_coverage=runtime_semantic_payload,
         ),
         encoding="utf-8",
@@ -1237,7 +1254,8 @@ def _ability_support_catalog_package(
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
         height_overrides=(
-            CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
+            BELAKOR_HEIGHT_OVERRIDES
+            + CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
             + BLOODLETTERS_HEIGHT_OVERRIDES
             + FLESH_HOUNDS_HEIGHT_OVERRIDES
             + CHAOS_DEFILER_HEIGHT_OVERRIDES
@@ -2368,6 +2386,7 @@ def _leagues_of_votann_runtime_consumer_ids() -> tuple[str, ...]:
 def support_matrix_markdown(
     category_rows: list[AbilityCoverageCategoryRowPayload],
     *,
+    ability_rows: list[AbilityCoverageRowPayload] | None = None,
     runtime_semantic_coverage: RuntimeContentSemanticCoveragePayload | None = None,
 ) -> str:
     runtime_semantic_payload = (
@@ -2434,7 +2453,7 @@ def support_matrix_markdown(
             ),
         )
     )
-    lines.extend(_runtime_hook_inventory_markdown(category_rows))
+    lines.extend(_runtime_hook_inventory_markdown(category_rows, ability_rows=ability_rows))
     lines.append("")
     return "\n".join(lines)
 
@@ -4033,6 +4052,8 @@ def _required_text(value: str | None) -> str:
 
 def _runtime_hook_inventory_markdown(
     category_rows: list[AbilityCoverageCategoryRowPayload],
+    *,
+    ability_rows: list[AbilityCoverageRowPayload] | None = None,
 ) -> list[str]:
     lines = [
         "",
@@ -4040,7 +4061,7 @@ def _runtime_hook_inventory_markdown(
         "",
         (
             "This bottom inventory lists the hook, modifier, effect, handler, and runtime "
-            "consumer IDs currently surfaced by generated category rows, Core Stratagem "
+            "consumer IDs currently surfaced by generated ability rows, Core Stratagem "
             "records, or registered runtime-content contributions. Pregame mustering/list "
             "construction enforcement is reported in the Mustering / List Construction "
             "Support section instead of this phase/query inventory."
@@ -4049,7 +4070,7 @@ def _runtime_hook_inventory_markdown(
         "| Hook / consumer | Abilities / rules |",
         "| --- | --- |",
     ]
-    for row in _runtime_hook_inventory_rows(category_rows):
+    for row in _runtime_hook_inventory_rows(category_rows, ability_rows=ability_rows):
         lines.append(
             "| "
             + " | ".join(
@@ -4065,17 +4086,29 @@ def _runtime_hook_inventory_markdown(
 
 def _runtime_hook_inventory_rows(
     category_rows: list[AbilityCoverageCategoryRowPayload],
+    *,
+    ability_rows: list[AbilityCoverageRowPayload] | None = None,
 ) -> tuple[RuntimeHookInventoryRow, ...]:
     inventory: dict[str, set[str]] = {}
     for hook_id in catalog_rule_ir_registered_hook_ids():
         inventory.setdefault(hook_id, set())
-    for row in category_rows:
-        for consumer_id in row["runtime_consumer_ids"]:
-            for label in _category_runtime_consumer_labels(
-                row,
-                consumer_id=consumer_id,
-            ):
-                _add_inventory_entry(inventory, hook_id=consumer_id, label=label)
+    if ability_rows is None:
+        for category_row in category_rows:
+            for consumer_id in category_row["runtime_consumer_ids"]:
+                for label in _category_runtime_consumer_labels(
+                    category_row,
+                    consumer_id=consumer_id,
+                ):
+                    _add_inventory_entry(inventory, hook_id=consumer_id, label=label)
+    else:
+        for ability_row in ability_rows:
+            for consumer_id in ability_row["runtime_consumer_ids"]:
+                label = _RUNTIME_ID_LABEL_OVERRIDES.get(consumer_id, ability_row["ability_name"])
+                _add_inventory_entry(
+                    inventory,
+                    hook_id=consumer_id,
+                    label=label,
+                )
 
     labels_by_id = _runtime_content_labels_by_id()
     for record in eleventh_edition_core_stratagem_catalog_records():

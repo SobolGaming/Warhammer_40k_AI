@@ -43,6 +43,14 @@
       {
         "ability_id": "000008433",
         "ability_name": "The Shadow of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/faction/000008433/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008433",
+        "ability_name": "The Shadow of Chaos",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/faction/000008433/none",
         "datasheet_id": "000001115",
         "datasheet_name": "Bloodcrushers",
@@ -70,13 +78,15 @@
     ],
     "category_id": "faction.army_rule.shadow_of_chaos",
     "category_name": "Chaos Daemons Army Rule",
-    "coverage_row_count": 3,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001148/faction/000008433/none",
       "chaos-daemons-bridge-catalog/000001115/faction/000008433/none",
       "chaos-daemons-bridge-catalog/000001114/faction/000008433/none",
       "chaos-daemons-bridge-catalog/000001112/faction/000008433/none"
     ],
     "datasheet_names": [
+      "Be'lakor",
       "Bloodcrushers",
       "Bloodletters",
       "Flesh Hounds"
@@ -85,7 +95,7 @@
       "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
     ],
     "source_kind_counts": {
-      "faction": 3
+      "faction": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -178,6 +188,14 @@
       {
         "ability_id": "000008339",
         "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/core/000008339/none",
         "datasheet_id": "000001030",
         "datasheet_name": "Defiler",
@@ -213,14 +231,16 @@
     ],
     "category_id": "core.deadly_demise",
     "category_name": "Core Deadly Demise",
-    "coverage_row_count": 4,
+    "coverage_row_count": 5,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001030/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004208/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004209/core/000008339/none"
     ],
     "datasheet_names": [
+      "Be'lakor",
       "Defiler"
     ],
     "runtime_consumer_ids": [
@@ -228,7 +248,7 @@
       "descriptor:destruction-reaction:deadly-demise-source"
     ],
     "source_kind_counts": {
-      "core": 4
+      "core": 5
     },
     "support_stages": [
       "engine_consumed"
@@ -531,6 +551,129 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000001148:shadow-lord-aura-psychic",
+        "ability_name": "Shadow Lord (Aura, Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-lord-aura-psychic/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Shadow Lord (Aura, Psychic)"
+    ],
+    "category_id": "datasheet.rule_ir.reroll_permission.aura_units",
+    "category_name": "Datasheet Rule Ir Reroll Permission Aura Units",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-lord-aura-psychic/none"
+    ],
+    "datasheet_names": [
+      "Be'lakor"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-reroll"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001148:pall-of-despair-aura-psychic",
+        "ability_name": "Pall of Despair (Aura, Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:pall-of-despair-aura-psychic/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Pall of Despair (Aura, Psychic)"
+    ],
+    "category_id": "datasheet.rule_ir.restore_lost_wounds.aura_units",
+    "category_name": "Datasheet Rule Ir Restore Lost Wounds Aura Units",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:pall-of-despair-aura-psychic/none"
+    ],
+    "datasheet_names": [
+      "Be'lakor"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:battle-shock-failed-heal",
+      "catalog-ir:battle-shock-forced-test"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001148:pall-of-despair-aura-psychic",
+        "ability_name": "Pall of Despair (Aura, Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:pall-of-despair-aura-psychic/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000001148:the-dark-master-aura",
+        "ability_name": "The Dark Master (Aura)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:the-dark-master-aura/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000001148:wreathed-in-shadows-aura-psychic",
+        "ability_name": "Wreathed in Shadows (Aura, Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:wreathed-in-shadows-aura-psychic/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Pall of Despair (Aura, Psychic)",
+      "The Dark Master (Aura)",
+      "Wreathed in Shadows (Aura, Psychic)"
+    ],
+    "category_id": "datasheet.rule_ir.set_contextual_status.aura_units",
+    "category_name": "Datasheet Rule Ir Set Contextual Status Aura Units",
+    "coverage_row_count": 3,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:pall-of-despair-aura-psychic/none",
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:the-dark-master-aura/none",
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:wreathed-in-shadows-aura-psychic/none"
+    ],
+    "datasheet_names": [
+      "Be'lakor"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:battle-shock-failed-heal",
+      "catalog-ir:battle-shock-forced-test",
+      "catalog-ir:shadow-of-chaos-aura",
+      "catalog-ir:shooting-target-range-restriction"
+    ],
+    "source_kind_counts": {
+      "datasheet": 3
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000004209:barrage-of-filth",
         "ability_name": "Barrage of Filth",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:barrage-of-filth/none",
@@ -564,6 +707,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000001148:shadow-form",
+        "ability_name": "Shadow Form",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-form/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000001030:destroyer-of-futures",
         "ability_name": "Destroyer of Futures",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none",
@@ -573,22 +724,26 @@
       }
     ],
     "ability_names": [
-      "Destroyer of Futures"
+      "Destroyer of Futures",
+      "Shadow Form"
     ],
     "category_id": "datasheet.rule_ir.set_contextual_status.this_unit",
     "category_name": "Datasheet Rule Ir Set Contextual Status This Unit",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-form/none",
       "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none"
     ],
     "datasheet_names": [
+      "Be'lakor",
       "Defiler"
     ],
     "runtime_consumer_ids": [
-      "catalog-ir:minimum-unmodified-hit-success"
+      "catalog-ir:minimum-unmodified-hit-success",
+      "catalog-ir:shadow-form-choice"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -638,6 +793,14 @@
       {
         "ability_id": "000008343",
         "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
         "datasheet_id": "000001115",
         "datasheet_name": "Bloodcrushers",
@@ -665,13 +828,15 @@
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
-    "coverage_row_count": 3,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001114/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001112/core/000008343/none"
     ],
     "datasheet_names": [
+      "Be'lakor",
       "Bloodcrushers",
       "Bloodletters",
       "Flesh Hounds"
@@ -681,7 +846,7 @@
       "descriptor:reserve-declaration:deep-strike"
     ],
     "source_kind_counts": {
-      "core": 3
+      "core": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -1371,6 +1536,22 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000008337",
+        "ability_name": "Stealth",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/core/000008337/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000001148:supreme-commander",
+        "ability_name": "SUPREME COMMANDER",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:supreme-commander/none",
+        "datasheet_id": "000001148",
+        "datasheet_name": "Be'lakor",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000008428",
         "ability_name": "Blessings of Khorne",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
@@ -1398,21 +1579,28 @@
     "ability_names": [
       "Blessings of Khorne",
       "Nurgle's Gift (Aura)",
+      "SUPREME COMMANDER",
+      "Stealth",
       "Thrill Seekers"
     ],
     "category_id": "unknown.ability_text",
     "category_name": "Unknown Abilities",
-    "coverage_row_count": 3,
+    "coverage_row_count": 5,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001148/core/000008337/none",
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:supreme-commander/none",
       "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
       "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004209/faction/000008396/none"
     ],
     "datasheet_names": [
+      "Be'lakor",
       "Defiler"
     ],
     "runtime_consumer_ids": [],
     "source_kind_counts": {
+      "core": 1,
+      "datasheet": 1,
       "faction": 3
     },
     "support_stages": [

@@ -1,6 +1,49 @@
 [
   {
     "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001148/core/000008337/none",
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:pall-of-despair-aura-psychic/none",
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-form/none",
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-lord-aura-psychic/none",
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:supreme-commander/none",
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:the-dark-master-aura/none",
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:wreathed-in-shadows-aura-psychic/none",
+      "chaos-daemons-bridge-catalog/000001148/faction/000008433/none"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Partial",
+    "datasheet_id": "000001148",
+    "datasheet_name": "Be'lakor",
+    "detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "legion-of-excess",
+      "lords-of-the-warp",
+      "plague-legion",
+      "scintillating-legion",
+      "shadow-legion",
+      "warptide"
+    ],
+    "faction_id": "chaos-daemons",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "`000008337` Stealth: `descriptor_only` `000001148:supreme-commander` SUPREME COMMANDER: `descriptor_only` Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "overall": "Partial",
+    "supported_detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "shadow-legion"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:battle-shock-failed-heal`, `catalog-ir:battle-shock-forced-test`, `catalog-ir:hit-roll-reroll`, `catalog-ir:shadow-form-choice`, `catalog-ir:shadow-of-chaos-aura`, `catalog-ir:shooting-target-range-restriction`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
       "chaos-daemons-bridge-catalog/000001115/faction/000008433/none",

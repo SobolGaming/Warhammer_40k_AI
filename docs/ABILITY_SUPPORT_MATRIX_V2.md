@@ -226,7 +226,7 @@ Broad CORE V1-to-CORE V2 category forecasting is intentionally deferred until cu
 
 ## Runtime Hook Inventory
 
-This bottom inventory lists the hook, modifier, effect, handler, and runtime consumer IDs currently surfaced by generated category rows, Core Stratagem records, or registered runtime-content contributions. Pregame mustering/list construction enforcement is reported in the Mustering / List Construction Support section instead of this phase/query inventory.
+This bottom inventory lists the hook, modifier, effect, handler, and runtime consumer IDs currently surfaced by generated ability rows, Core Stratagem records, or registered runtime-content contributions. Pregame mustering/list construction enforcement is reported in the Mustering / List Construction Support section instead of this phase/query inventory.
 
 | Hook / consumer | Abilities / rules |
 | --- | --- |
@@ -237,8 +237,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:attacks-characteristic-query` | No current generated rows |
 | `catalog-ir:ballistic-skill-characteristic-modifier` | No current generated rows |
 | `catalog-ir:ballistic-skill-characteristic-query` | No current generated rows |
-| `catalog-ir:battle-shock-failed-heal` | No current generated rows |
-| `catalog-ir:battle-shock-forced-test` | No current generated rows |
+| `catalog-ir:battle-shock-failed-heal` | Pall of Despair (Aura, Psychic) |
+| `catalog-ir:battle-shock-forced-test` | Pall of Despair (Aura, Psychic) |
 | `catalog-ir:can-advance-and-charge` | No current generated rows |
 | `catalog-ir:can-advance-and-shoot-and-charge` | No current generated rows |
 | `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
@@ -260,7 +260,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
 | `catalog-ir:force-desperate-escape` | Bane of Cowards |
 | `catalog-ir:hit-roll-modifier` | Revel in Desecration |
-| `catalog-ir:hit-roll-reroll` | No current generated rows |
+| `catalog-ir:hit-roll-reroll` | Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | No current generated rows |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
@@ -282,9 +282,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:save-roll-modifier` | No current generated rows |
 | `catalog-ir:selected-target-effect` | No current generated rows |
 | `catalog-ir:setup-reactive-shoot-charge` | Unleash Wrath |
-| `catalog-ir:shadow-form-choice` | No current generated rows |
-| `catalog-ir:shadow-of-chaos-aura` | No current generated rows |
-| `catalog-ir:shooting-target-range-restriction` | No current generated rows |
+| `catalog-ir:shadow-form-choice` | Shadow Form |
+| `catalog-ir:shadow-of-chaos-aura` | The Dark Master (Aura) |
+| `catalog-ir:shooting-target-range-restriction` | Wreathed in Shadows (Aura, Psychic) |
 | `catalog-ir:strength-characteristic-modifier` | No current generated rows |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
 | `catalog-ir:toughness-characteristic-modifier` | No current generated rows |
