@@ -119,13 +119,13 @@ def geometry_models_for_unit_placement(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
 ) -> tuple[Model, ...]:
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(model_placement),
-            placement=model_placement,
-        )
-        for model_placement in unit_placement.model_placements
-    )
+    geometry_models: list[Model] = []
+    for model_placement in unit_placement.model_placements:
+        model = scenario.model_instance_for_placement(model_placement)
+        if not model.is_alive:
+            continue
+        geometry_models.append(geometry_model_for_placement(model=model, placement=model_placement))
+    return tuple(geometry_models)
 
 
 def attacker_geometry_models(

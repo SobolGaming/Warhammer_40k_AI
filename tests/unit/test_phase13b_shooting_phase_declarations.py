@@ -96,6 +96,7 @@ from warhammer40k_core.engine.transports import (
     FiringDeckSelection,
     FiringDeckWeaponSelection,
 )
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     HUNTER_RULE_ID,
     WEAPON_ABILITY_SELECTION_DECISION_TYPE,
@@ -1273,6 +1274,79 @@ def test_phase13d_lone_operative_descriptor_blocks_targets_outside_twelve() -> N
     assert close_candidates[0].is_legal
 
 
+@pytest.mark.parametrize("dead_side", ["attacker", "target"])
+def test_phase13d_lone_operative_targeting_ignores_dead_model_placements(
+    dead_side: str,
+) -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(32.0, 35.0),
+        catalog=_catalog_with_lone_operative_datasheet(),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    target = units["enemy"]
+    profile = _first_weapon_profile(lifecycle, attacker)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+
+    if dead_side == "attacker":
+        attacker = _unit_with_dead_model(attacker, index=0)
+        scenario = _scenario_with_replaced_unit(scenario=scenario, replacement=attacker)
+        scenario = _scenario_with_unit_pose(
+            scenario=scenario,
+            unit=attacker,
+            army_id="army-alpha",
+            player_id="player-a",
+            poses=(
+                Pose.at(22.0, 35.0),
+                Pose.at(10.0, 35.0),
+                Pose.at(11.4, 35.0),
+                Pose.at(12.8, 35.0),
+                Pose.at(14.2, 35.0),
+            ),
+        )
+        scenario = _scenario_with_unit_pose(
+            scenario=scenario,
+            unit=target,
+            army_id="army-beta",
+            player_id="player-b",
+            poses=_compact_test_unit_poses(origin=Pose.at(32.0, 35.0), model_count=5),
+        )
+    elif dead_side == "target":
+        target = _unit_with_dead_model(target, index=0)
+        scenario = _scenario_with_replaced_unit(scenario=scenario, replacement=target)
+        scenario = _scenario_with_unit_pose(
+            scenario=scenario,
+            unit=target,
+            army_id="army-beta",
+            player_id="player-b",
+            poses=(
+                Pose.at(22.0, 35.0),
+                Pose.at(32.0, 35.0),
+                Pose.at(33.4, 35.0),
+                Pose.at(34.8, 35.0),
+                Pose.at(36.2, 35.0),
+            ),
+        )
+    else:
+        raise AssertionError(f"Unsupported dead-side fixture {dead_side}.")
+
+    candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+    )
+
+    assert candidates[0].violation_code is ShootingTargetViolationCode.LONE_OPERATIVE
+    assert candidates[0].targeting_rule_ids == (LONE_OPERATIVE_RULE_ID,)
+
+
 def test_phase13d_stealth_descriptor_applies_ranged_hit_roll_penalty() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
@@ -2285,3 +2359,10 @@ def test_shooting_declaration_request_drift_diagnostics_are_typed() -> None:
         "source_decision_result_drift",
         "visibility_cache_key_drift",
     }
+
+
+def _unit_with_dead_model(unit: UnitInstance, *, index: int) -> UnitInstance:
+    models = list(unit.own_models)
+    model = models[index]
+    models[index] = replace(model, wounds_remaining=0)
+    return replace(unit, own_models=tuple(models))
