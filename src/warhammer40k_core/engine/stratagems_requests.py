@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.stratagems_imports import *
+from warhammer40k_core.engine.stratagems_generic_metadata import (
+    SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
+    companion_effect_selections_for_binding,
+)
 from warhammer40k_core.engine.stratagems_model import *
 
 # fmt: off
@@ -454,6 +458,13 @@ def _effect_selections_for_binding(
         if not engaged_enemy_ids:
             return ()
         return tuple(engaged_enemy_unit_effect_selection(unit_id) for unit_id in engaged_enemy_ids)
+    if selection_kind == SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND:
+        return companion_effect_selections_for_binding(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+        )
     if selection_kind is not None:
         raise GameLifecycleError("Unsupported stratagem effect selection kind.")
     return (None,)

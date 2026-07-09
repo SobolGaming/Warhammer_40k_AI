@@ -5,6 +5,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.stratagems_imports import *
+from warhammer40k_core.engine.stratagems_generic_metadata import (
+    COMPANION_OPTIONAL_KEY,
+    SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
+    companion_unit_id_or_none,
+)
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
 from warhammer40k_core.engine.stratagems_apply import *
@@ -121,6 +126,9 @@ def _effect_selection_token(effect_selection: JsonValue) -> str:
     engaged_enemy_unit_id = _engaged_enemy_unit_id_or_none(effect_selection)
     if engaged_enemy_unit_id is not None:
         return f"{ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND}:{engaged_enemy_unit_id}"
+    companion_unit_id = companion_unit_id_or_none(effect_selection)
+    if companion_unit_id is not None:
+        return f"{SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND}:{companion_unit_id}"
     raise GameLifecycleError("Unsupported Stratagem effect selection token.")
 
 
@@ -373,7 +381,10 @@ def _effect_selection_error(
             field_names=(EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY,),
         )
     payload = definition.effect_payload
-    selection_kind = payload.get("effect_selection_kind") if isinstance(payload, dict) else None
+    payload_object = payload if isinstance(payload, dict) else None
+    selection_kind = (
+        payload_object.get("effect_selection_kind") if payload_object is not None else None
+    )
     if selection_kind == HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND:
         if effect_selection is None:
             return None
@@ -419,6 +430,25 @@ def _effect_selection_error(
             return f"{ENGAGED_ENEMY_UNIT_CONTEXT_KEY}_required"
         if selected_unit_id not in _engaged_enemy_unit_ids_or_empty(context):
             return "engaged_enemy_unit_not_in_trigger_context"
+        return None
+    if selection_kind == SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND:
+        if payload_object is None:
+            raise GameLifecycleError("Stratagem effect payload must be an object.")
+        companion_optional = payload_object.get(COMPANION_OPTIONAL_KEY)
+        if companion_optional is not None and type(companion_optional) is not bool:
+            raise GameLifecycleError("companion_optional must be a bool.")
+        if effect_selection is None:
+            return None if companion_optional is True else "companion_unit_instance_id_required"
+        if (
+            _effect_selection_string_or_none(
+                effect_selection=effect_selection,
+                key="effect_selection_kind",
+            )
+            != SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND
+        ):
+            return "effect_selection_kind_mismatch"
+        if companion_unit_id_or_none(effect_selection) is None:
+            return "companion_unit_instance_id_required"
         return None
     if effect_selection is not None:
         return "effect_selection_not_supported"

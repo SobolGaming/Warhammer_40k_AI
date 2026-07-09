@@ -6,6 +6,7 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import healing_source_context as hctx
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -673,23 +674,19 @@ def _healing_candidates_for_next_step(
         state=state,
         unit_instance_id=effect.target_unit_instance_id,
     )
-    wounded_model_ids = tuple(
-        model.model_instance_id
-        for model in rules_unit.own_models
-        if model.is_alive and model.wounds_remaining < model.starting_wounds
+    wounded_model_ids = hctx.selected_wounded_healing_model_ids(
+        effect.source_context,
+        effect.resolved_steps,
+        HealingStepKind.HEAL_WOUND,
+        rules_unit.own_models,
+        _rules_unit_allows_multiple_wounded_healing(rules_unit),
     )
     if wounded_model_ids:
-        if len(wounded_model_ids) > 1 and not _rules_unit_allows_multiple_wounded_healing(
-            rules_unit
-        ):
-            raise GameLifecycleError(
-                "Multiple wounded models require an attached-unit healing decision."
-            )
         return _HealingStepCandidates(
-            step_kind=HealingStepKind.HEAL_WOUND,
-            model_ids=tuple(sorted(wounded_model_ids)),
+            step_kind=HealingStepKind.HEAL_WOUND, model_ids=wounded_model_ids
         )
-
+    if hctx.healing_source_context_bool(effect.source_context, "heal_wounded_models_only"):
+        return _HealingStepCandidates(step_kind=HealingStepKind.NO_EFFECT)
     starting_strength = state.starting_strength_record_for_unit(rules_unit.unit_instance_id)
     alive_count = len(tuple(model for model in rules_unit.own_models if model.is_alive))
     if alive_count >= starting_strength.starting_model_count:
@@ -845,19 +842,21 @@ def _apply_healing_step_to_model(
         )
     if step_kind is HealingStepKind.REVIVE_MODEL:
         placement = _revival_placement_for_model(effect=effect, model_instance_id=model_instance_id)
+        final_wounds = hctx.revival_wounds_remaining(effect.source_context, model.starting_wounds)
         transition_batch = _validate_and_apply_revival(
             state=state,
             ruleset_descriptor=ruleset_descriptor,
             effect=effect,
             model=model,
             placement=placement,
+            wounds_remaining=final_wounds,
         )
         return HealingStep(
             step_index=effect.next_step_index(),
             step_kind=HealingStepKind.REVIVE_MODEL,
             model_instance_id=model_instance_id,
             starting_wounds_remaining=model.wounds_remaining,
-            final_wounds_remaining=1,
+            final_wounds_remaining=final_wounds,
             request_id=request_id,
             result_id=result_id,
             transition_batch=transition_batch,
@@ -872,6 +871,7 @@ def _validate_and_apply_revival(
     effect: HealingEffect,
     model: ModelInstance,
     placement: ModelPlacement,
+    wounds_remaining: int,
 ) -> BattlefieldTransitionBatch:
     if model.is_alive:
         raise GameLifecycleError("Only destroyed models can be revived.")
@@ -896,7 +896,7 @@ def _validate_and_apply_revival(
     hypothetical_armies = _army_definitions_with_model_wounds(
         armies=tuple(state.army_definitions),
         model_instance_id=model.model_instance_id,
-        wounds_remaining=1,
+        wounds_remaining=wounds_remaining,
     )
     hypothetical_battlefield = _battlefield_with_returned_revival_model(
         battlefield=battlefield,
@@ -1041,10 +1041,8 @@ def _validate_revived_model_engagement(
     effect: HealingEffect,
     placement: ModelPlacement,
 ) -> None:
-    revived_model = geometry_model_for_placement(
-        model=scenario.model_instance_for_placement(placement),
-        placement=placement,
-    )
+    revived_instance = scenario.model_instance_for_placement(placement)
+    revived_model = geometry_model_for_placement(model=revived_instance, placement=placement)
     allowed_enemy_ids = set(effect.phase_start_enemy_engagement_model_ids)
     engaged_enemy_ids: set[str] = set()
     for placed_army in scenario.battlefield_state.placed_armies:
@@ -1052,9 +1050,11 @@ def _validate_revived_model_engagement(
             continue
         for unit_placement in placed_army.unit_placements:
             for enemy_placement in unit_placement.model_placements:
+                enemy_instance = scenario.model_instance_for_placement(enemy_placement)
+                if not enemy_instance.is_alive:
+                    continue
                 enemy_model = geometry_model_for_placement(
-                    model=scenario.model_instance_for_placement(enemy_placement),
-                    placement=enemy_placement,
+                    model=enemy_instance, placement=enemy_placement
                 )
                 if revived_model.is_within_engagement_range(
                     enemy_model,

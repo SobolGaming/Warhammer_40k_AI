@@ -7,6 +7,16 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
 
 from warhammer40k_core.engine.stratagems_imports import *
+from warhammer40k_core.engine.stratagems_generic_metadata import (
+    EFFECT_SELECTION_KIND_KEY,
+    REQUIRED_TRIGGER_CONTEXT_KEYS_KEY,
+    SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
+    TARGET_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY,
+    TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
+    companion_selection_error,
+    companion_unit_id_or_none,
+    unit_arrived_from_reserves_this_turn,
+)
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
 from warhammer40k_core.engine.stratagems_apply import *
@@ -332,6 +342,9 @@ def _stratagem_affected_unit_ids(
     engaged_enemy_unit_id = _engaged_enemy_unit_id_or_none(effect_selection)
     if engaged_enemy_unit_id is not None:
         raw_unit_ids.append(engaged_enemy_unit_id)
+    companion_unit_id = companion_unit_id_or_none(effect_selection)
+    if companion_unit_id is not None:
+        raw_unit_ids.append(companion_unit_id)
     if not raw_unit_ids:
         return ()
     return _validate_stratagem_affected_unit_ids(
@@ -428,6 +441,43 @@ def _generic_rule_ir_stratagem_unavailable_reason(
         )
     ):
         return "target_within_engagement_range"
+    target_trigger_list_key = _optional_generic_metadata_identifier(
+        effect_payload,
+        key=TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
+    )
+    if target_trigger_list_key is not None and target_unit_id is not None:
+        trigger_payload = context.trigger_payload
+        if not isinstance(trigger_payload, dict):
+            return "missing_trigger_payload"
+        allowed_unit_ids = _generic_trigger_identifier_list(
+            trigger_payload=trigger_payload,
+            key=target_trigger_list_key,
+            field_name=f"Generic trigger context {target_trigger_list_key}",
+        )
+        if target_unit_id not in allowed_unit_ids:
+            return "target_unit_not_in_trigger_context"
+    if (
+        _optional_generic_metadata_bool(
+            effect_payload,
+            key=TARGET_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY,
+        )
+        and target_unit_id is not None
+        and not unit_arrived_from_reserves_this_turn(state=state, unit_instance_id=target_unit_id)
+    ):
+        return "target_unit_not_arrived_from_reserves_this_turn"
+    if (
+        effect_payload.get(EFFECT_SELECTION_KIND_KEY)
+        == SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND
+    ):
+        companion_error = companion_selection_error(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+        )
+        if companion_error is not None:
+            return companion_error
     effect_selection_battle_shock_key = _optional_generic_metadata_identifier(
         effect_payload,
         key="effect_selection_unit_forbidden_if_battle_shocked",
@@ -447,12 +497,26 @@ def _generic_required_trigger_context_error(
     effect_payload: dict[str, JsonValue],
     context: StratagemEligibilityContext,
 ) -> str | None:
+    trigger_payload = context.trigger_payload
+    raw_present_keys = effect_payload.get(REQUIRED_TRIGGER_CONTEXT_KEYS_KEY)
+    if raw_present_keys is not None:
+        if not isinstance(raw_present_keys, list):
+            raise GameLifecycleError("Generic required trigger context keys must be a list.")
+        if not isinstance(trigger_payload, dict):
+            return "missing_trigger_payload"
+        for raw_key in raw_present_keys:
+            if type(raw_key) is not str:
+                raise GameLifecycleError("Generic required trigger context key must be a string.")
+            key = _generic_metadata_identifier("Generic required trigger context key", raw_key)
+            if key not in trigger_payload:
+                return f"{key}_required"
+            if _trigger_payload_value_is_empty(trigger_payload[key]):
+                return f"{key}_required"
     raw_keys = effect_payload.get("required_non_empty_trigger_context_keys")
     if raw_keys is None:
         return None
     if not isinstance(raw_keys, list):
         raise GameLifecycleError("Generic required trigger context keys must be a list.")
-    trigger_payload = context.trigger_payload
     if not isinstance(trigger_payload, dict):
         return "missing_trigger_payload"
     for raw_key in raw_keys:
@@ -472,6 +536,14 @@ def _generic_required_trigger_context_error(
             return "target_models_not_destroyed"
         return f"{key}_required"
     return None
+
+
+def _trigger_payload_value_is_empty(value: JsonValue) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, list | dict | str):
+        return not value
+    return False
 
 
 def _optional_generic_metadata_bool(

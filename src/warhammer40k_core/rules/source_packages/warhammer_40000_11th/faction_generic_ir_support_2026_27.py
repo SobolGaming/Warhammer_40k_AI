@@ -266,6 +266,11 @@ def generic_supported_stratagem_rule_ir_hash(
             source_row=source_row,
         )
         return rule_ir.ir_hash()
+    rule_ir_hash = shadow_legion_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_shadow_legion_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
+        return rule_ir_hash
     rule_ir_hash = corsair_coterie_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
@@ -360,6 +365,10 @@ def supported_cavalcade_of_chaos_stratagem_source_row_ids() -> tuple[str, ...]:
 
 def supported_hit_target_cover_denial_stratagem_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS))
+
+
+def supported_shadow_legion_stratagem_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(shadow_legion_ir.SHADOW_LEGION_STRATAGEM_SOURCE_ROW_IDS))
 
 
 def supported_generic_enhancement_source_row_ids() -> tuple[str, ...]:
@@ -729,6 +738,49 @@ def _validate_blood_legion_detachment_rule_ir(rule_ir: RuleIR) -> None:
                 raise Phase17FGenericIrSupportError(
                     "Blood Legion detachment RuleIR has unexpected keyword gate."
                 )
+
+
+def _validate_shadow_legion_stratagem_rule_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+) -> None:
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Shadow Legion Stratagem RuleIR must deserialize as supported."
+        )
+    if source_row.source_row_id not in shadow_legion_ir.SHADOW_LEGION_STRATAGEM_SOURCE_ROW_IDS:
+        raise Phase17FGenericIrSupportError("Shadow Legion Stratagem source row is unknown.")
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Shadow Legion Stratagem RuleIR produced an unexpected source ID."
+        )
+    if not any(clause.target is not None and not clause.effects for clause in rule_ir.clauses):
+        raise Phase17FGenericIrSupportError(
+            "Shadow Legion Stratagem RuleIR is missing target binding."
+        )
+    effect_kinds = tuple(effect.kind for clause in rule_ir.clauses for effect in clause.effects)
+    if effect_kinds != _shadow_legion_stratagem_effect_kinds(source_row.source_row_id):
+        raise Phase17FGenericIrSupportError(
+            "Shadow Legion Stratagem RuleIR has unexpected effect kinds."
+        )
+
+
+def _shadow_legion_stratagem_effect_kinds(source_row_id: str) -> tuple[RuleEffectKind, ...]:
+    if source_row_id == shadow_legion_ir.SPITEFUL_DEMISE_SOURCE_ROW_ID:
+        return (RuleEffectKind.INFLICT_MORTAL_WOUNDS,)
+    if source_row_id == shadow_legion_ir.CHANNELLED_WRATH_SOURCE_ROW_ID:
+        return (RuleEffectKind.GRANT_WEAPON_ABILITY, RuleEffectKind.MODIFY_CHARACTERISTIC)
+    if source_row_id == shadow_legion_ir.DEATH_DENIED_SOURCE_ROW_ID:
+        return (RuleEffectKind.RESTORE_LOST_WOUNDS, RuleEffectKind.RETURN_DESTROYED_TARGET)
+    if source_row_id == shadow_legion_ir.ENCROACHING_DARKNESS_SOURCE_ROW_ID:
+        return (RuleEffectKind.GRANT_WEAPON_ABILITY,)
+    if source_row_id == shadow_legion_ir.SHADE_PATH_SOURCE_ROW_ID:
+        return (RuleEffectKind.MODIFY_DICE_ROLL, RuleEffectKind.SET_CONTEXTUAL_STATUS)
+    if source_row_id == shadow_legion_ir.BINDING_SHADOW_SOURCE_ROW_ID:
+        return (RuleEffectKind.PLACEMENT_PERMISSION,)
+    raise Phase17FGenericIrSupportError("Shadow Legion Stratagem source row is unknown.")
 
 
 def _validate_cavalcade_of_chaos_stratagem_rule_ir(

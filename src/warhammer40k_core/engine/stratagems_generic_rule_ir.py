@@ -12,6 +12,17 @@ from warhammer40k_core.engine.stratagems_eligibility import *
 from warhammer40k_core.engine.stratagems_targeting import *
 from warhammer40k_core.engine.stratagems_geometry import *
 from warhammer40k_core.engine.stratagems_ingress import *
+from warhammer40k_core.engine.stratagems_generic_metadata import (
+    generic_rule_ir_execution_target_unit_ids,
+)
+from warhammer40k_core.engine.stratagems_generic_rule_ir_runtime import (
+    apply_generic_rule_ir_reserve_removal,
+    record_generic_rule_ir_charge_roll_modifier,
+    resolve_generic_rule_ir_context_battle_shock,
+    resolve_generic_rule_ir_mortal_wounds,
+    resolve_generic_rule_ir_restore_lost_wounds,
+    resolve_generic_rule_ir_return_destroyed_target,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -81,7 +92,7 @@ def _apply_generic_rule_ir_stratagem_handler(
             active_player_id=context.active_player_id,
             timing_window_id=context.timing_window_id,
             source_unit_instance_id=_single_target_unit_id_or_none(use_record),
-            target_unit_instance_ids=use_record.targeted_unit_instance_ids,
+            target_unit_instance_ids=generic_rule_ir_execution_target_unit_ids(use_record),
             target_player_id=target_binding.target_player_id,
             trigger_payload=_generic_stratagem_rule_trigger_payload(
                 context=context,
@@ -114,6 +125,7 @@ def _apply_generic_rule_ir_stratagem_handler(
         target_binding=target_binding,
         use_record=use_record,
         rule_result=rule_result,
+        ruleset_descriptor=ruleset_descriptor,
     )
     if _rule_execution_result_grants_triggered_normal_move(rule_result.effect_payloads):
         _request_generic_triggered_normal_move(
@@ -204,6 +216,7 @@ def _rule_execution_result_grants_strategic_reserves_placement(
     return any(
         _rule_effect_payload_kind(effect_payload) == "placement_permission"
         and _rule_effect_parameter(effect_payload, "placement_kind") == "strategic_reserves"
+        and _rule_effect_parameter(effect_payload, "operation") != "remove_to_reserves"
         for effect_payload in effect_payloads
     )
 
@@ -251,7 +264,9 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
     target_binding: StratagemTargetBinding,
     use_record: StratagemUseRecord,
     rule_result: RuleExecutionResult,
+    ruleset_descriptor: RulesetDescriptor,
 ) -> None:
+    rule_result_payload = validate_json_value(rule_result.to_payload())
     for effect_payload in rule_result.effect_payloads:
         effect_kind = _rule_effect_payload_kind(effect_payload)
         if effect_kind == "grant_ability":
@@ -305,7 +320,66 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
                     effect_payload=effect_payload,
                 )
             elif status == "force_battle_shock_test":
-                _resolve_generic_forced_battle_shock_test(
+                if (
+                    _optional_rule_effect_string_parameter(
+                        effect_payload,
+                        "target_unit_context_key",
+                    )
+                    is None
+                ):
+                    _resolve_generic_forced_battle_shock_test(
+                        state=state,
+                        decisions=decisions,
+                        context=context,
+                        use_record=use_record,
+                        effect_payload=effect_payload,
+                    )
+                else:
+                    resolve_generic_rule_ir_context_battle_shock(
+                        state=state,
+                        decisions=decisions,
+                        context=context,
+                        use_record=use_record,
+                        effect_payload=effect_payload,
+                    )
+            continue
+        if effect_kind == "inflict_mortal_wounds":
+            resolve_generic_rule_ir_mortal_wounds(
+                state=state,
+                decisions=decisions,
+                context=context,
+                use_record=use_record,
+                effect_payload=effect_payload,
+            )
+            continue
+        if effect_kind == "modify_dice_roll":
+            if (
+                _optional_rule_effect_string_parameter(effect_payload, "roll_type") == "charge"
+                and _optional_rule_effect_string_parameter(
+                    effect_payload,
+                    "target_unit_context_key",
+                )
+                is not None
+            ):
+                record_generic_rule_ir_charge_roll_modifier(
+                    state=state,
+                    decisions=decisions,
+                    context=context,
+                    use_record=use_record,
+                    rule_result_payload=rule_result_payload,
+                    effect_payload=effect_payload,
+                    expiration=_expiration_for_rule_effect_payload(
+                        effect_payload=effect_payload,
+                        context=context,
+                        use_record=use_record,
+                    ),
+                )
+            continue
+        if effect_kind == "placement_permission":
+            if _optional_rule_effect_string_parameter(effect_payload, "operation") == (
+                "remove_to_reserves"
+            ):
+                apply_generic_rule_ir_reserve_removal(
                     state=state,
                     decisions=decisions,
                     context=context,
@@ -313,12 +387,25 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
                     effect_payload=effect_payload,
                 )
             continue
-        if effect_kind == "inflict_mortal_wounds":
-            _resolve_generic_roll_pool_mortal_wounds(
+        if effect_kind == "restore_lost_wounds":
+            resolve_generic_rule_ir_restore_lost_wounds(
                 state=state,
                 decisions=decisions,
+                ruleset_descriptor=ruleset_descriptor,
                 context=context,
                 use_record=use_record,
+                rule_result_payload=rule_result_payload,
+                effect_payload=effect_payload,
+            )
+            continue
+        if effect_kind == "return_destroyed_target":
+            resolve_generic_rule_ir_return_destroyed_target(
+                state=state,
+                decisions=decisions,
+                ruleset_descriptor=ruleset_descriptor,
+                context=context,
+                use_record=use_record,
+                rule_result_payload=rule_result_payload,
                 effect_payload=effect_payload,
             )
 
@@ -689,82 +776,6 @@ def _resolve_generic_forced_battle_shock_test(
             "battle_shock_result": validate_json_value(result.to_payload()),
             "auto_passed": False,
             "source_stratagem_use": use_record.to_payload(),
-            "generic_rule_effect": validate_json_value(effect_payload),
-        },
-    )
-
-
-def _resolve_generic_roll_pool_mortal_wounds(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    context: StratagemEligibilityContext,
-    use_record: StratagemUseRecord,
-    effect_payload: dict[str, JsonValue],
-) -> None:
-    from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
-
-    required_keyword = _optional_rule_effect_string_parameter(
-        effect_payload, "required_target_keyword"
-    )
-    if required_keyword is not None:
-        unit_id = _single_target_unit_id(use_record)
-        unit = _unit_by_id(state=state, unit_instance_id=unit_id)
-        if not _unit_has_keyword(unit, required_keyword):
-            return
-    target_unit_id = _effect_selection_unit_id(
-        use_record,
-        expected_selection_kind=_required_rule_effect_string_parameter(
-            effect_payload,
-            "effect_selection_kind",
-        ),
-    )
-    quantity = _required_rule_effect_int_parameter(effect_payload, "roll_quantity")
-    sides = _required_rule_effect_int_parameter(effect_payload, "roll_sides")
-    threshold = _required_rule_effect_int_parameter(effect_payload, "success_threshold")
-    wounds_per_success = _required_rule_effect_int_parameter(
-        effect_payload, "mortal_wounds_per_success"
-    )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    rolls = tuple(
-        manager.roll(
-            DiceRollSpec(
-                expression=DiceExpression(quantity=1, sides=sides),
-                reason=f"{use_record.stratagem_id} mortal wound roll {index} for {target_unit_id}",
-                roll_type=_required_rule_effect_string_parameter(effect_payload, "roll_type"),
-                actor_id=use_record.player_id,
-            )
-        )
-        for index in range(1, quantity + 1)
-    )
-    mortal_wounds = sum(wounds_per_success for roll in rolls if roll.current_total >= threshold)
-    application_payload: JsonValue = None
-    if mortal_wounds:
-        application = apply_mortal_wounds_to_unit(
-            state=state,
-            target_unit_instance_id=target_unit_id,
-            mortal_wounds=mortal_wounds,
-            spill_over=_required_rule_effect_bool_parameter(effect_payload, "spill_over"),
-            dice_manager=manager,
-            defender_player_id=unit_owner_player_id(state=state, unit_instance_id=target_unit_id),
-        )
-        application_payload = validate_json_value(application.to_payload())
-    decisions.event_log.append(
-        "generic_stratagem_roll_pool_mortal_wounds_resolved",
-        {
-            "game_id": state.game_id,
-            "player_id": use_record.player_id,
-            "battle_round": use_record.battle_round,
-            "phase": use_record.phase.value,
-            "stratagem_use": use_record.to_payload(),
-            "effect_kind": _required_rule_effect_string_parameter(
-                effect_payload,
-                "replay_effect_kind",
-            ),
-            "target_unit_instance_id": target_unit_id,
-            "rolls": [roll.to_payload() for roll in rolls],
-            "mortal_wounds": mortal_wounds,
-            "mortal_wound_application": application_payload,
             "generic_rule_effect": validate_json_value(effect_payload),
         },
     )
@@ -1145,14 +1156,11 @@ def _generic_triggered_move_distance_roll(
         )
         return validate_json_value(d3_result.to_payload()), d3_result.value + 3
     quantity = _optional_rule_effect_int_parameter(effect_payload, "roll_quantity")
-    if quantity is None:
-        quantity = 1
+    quantity = 1 if quantity is None else quantity
     distance_bonus = _optional_rule_effect_int_parameter(effect_payload, "distance_bonus")
-    if distance_bonus is None:
-        distance_bonus = 0
+    distance_bonus = 0 if distance_bonus is None else distance_bonus
     roll_type = _optional_rule_effect_string_parameter(effect_payload, "roll_type")
-    if roll_type is None:
-        roll_type = "generic_rule_ir_triggered_normal_move"
+    roll_type = "generic_rule_ir_triggered_normal_move" if roll_type is None else roll_type
     roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=quantity, sides=roll_sides),
