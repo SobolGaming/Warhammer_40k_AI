@@ -237,6 +237,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:attacks-characteristic-query` | No current generated rows |
 | `catalog-ir:ballistic-skill-characteristic-modifier` | No current generated rows |
 | `catalog-ir:ballistic-skill-characteristic-query` | No current generated rows |
+| `catalog-ir:battle-shock-failed-heal` | No current generated rows |
+| `catalog-ir:battle-shock-forced-test` | No current generated rows |
 | `catalog-ir:can-advance-and-charge` | No current generated rows |
 | `catalog-ir:can-advance-and-shoot-and-charge` | No current generated rows |
 | `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
@@ -280,7 +282,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:save-roll-modifier` | No current generated rows |
 | `catalog-ir:selected-target-effect` | No current generated rows |
 | `catalog-ir:setup-reactive-shoot-charge` | Unleash Wrath |
+| `catalog-ir:shadow-form-choice` | No current generated rows |
 | `catalog-ir:shadow-of-chaos-aura` | No current generated rows |
+| `catalog-ir:shooting-target-range-restriction` | No current generated rows |
 | `catalog-ir:strength-characteristic-modifier` | No current generated rows |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
 | `catalog-ir:toughness-characteristic-modifier` | No current generated rows |

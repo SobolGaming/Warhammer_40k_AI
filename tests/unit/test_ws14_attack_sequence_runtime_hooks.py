@@ -265,7 +265,11 @@ def test_ws14_generic_reroll_permission_uses_source_backed_attack_path() -> None
             target_unit_instance_ids=(attacker.unit_instance_id,),
             target_kind="this_unit",
             effect_kind="reroll_permission",
-            parameters={"roll_type": "hit", "attack_role": "attacker"},
+            parameters={
+                "roll_type": "hit",
+                "attack_role": "attacker",
+                "reroll_unmodified_value": 1,
+            },
         )
     )
 
@@ -284,6 +288,9 @@ def test_ws14_generic_reroll_permission_uses_source_backed_attack_path() -> None
     assert context.permission.eligible_roll_type == "attack_sequence.hit"
     assert context.permission.timing_window == "attack_sequence.hit"
     assert context.source_payload["effect_kind"] == GENERIC_RULE_EFFECT_KIND
+    assert context.source_payload["conditional_hit_reroll"] == {
+        "reroll_unmodified_values": [1],
+    }
 
 
 def test_ws14_generic_attack_hooks_observe_persisting_effect_expiry() -> None:

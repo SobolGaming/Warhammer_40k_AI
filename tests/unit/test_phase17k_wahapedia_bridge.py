@@ -117,6 +117,8 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+    CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
+    CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
     CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
@@ -130,12 +132,15 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
     CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID,
     CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
+    CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID,
     CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
@@ -5109,6 +5114,21 @@ def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_targe
         (_effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance"),),
         target_kind=RuleTargetKind.SELECTED_UNIT,
     )
+    aura_attack_reroll_rule = _catalog_rule_ir(
+        (
+            _effect(
+                RuleEffectKind.REROLL_PERMISSION,
+                roll_type="hit",
+                attack_role="attacker",
+            ),
+            _effect(
+                RuleEffectKind.REROLL_PERMISSION,
+                roll_type="advance",
+                attack_role="attacker",
+            ),
+        ),
+        target_kind=RuleTargetKind.AURA_UNITS,
+    )
     unsupported_roll_rule = _catalog_rule_ir(
         (_effect(RuleEffectKind.REROLL_PERMISSION, roll_type="damage"),),
         target_kind=RuleTargetKind.THIS_UNIT,
@@ -5123,6 +5143,9 @@ def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_targe
         CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     }
     assert catalog_rule_ir_consumers_for_rule(selected_unit_without_leader_rule) == ()
+    assert catalog_rule_ir_consumers_for_rule(aura_attack_reroll_rule) == (
+        CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+    )
     assert catalog_rule_ir_consumers_for_rule(unsupported_roll_rule) == ()
     assert catalog_rule_ir_hook_ids_for_rule(unsupported_roll_rule) == ()
 
@@ -6910,6 +6933,52 @@ def test_phase17k_bridge_tags_warlord_mustering_datasheet_abilities() -> None:
     assert not plain_rule_ir_payload or MUSTERING_WARLORD_RULE_KEY not in json.loads(
         plain_rule_ir_payload
     )
+
+
+def test_phase17k_bridge_loads_belakor_datasheet_rule_ir_support() -> None:
+    artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001148",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001148",
+                model_name="Be'lakor - EPIC HERO",
+                height=5.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:belakor-height",
+                height_document_reference="test-doc:belakor-height",
+            ),
+        ),
+    )
+    ability_rows_by_id = {
+        row.source_row_id: row.runtime_fields_payload()
+        for row in _artifact_by_table(artifacts, "Datasheets_abilities").rows
+    }
+    expected_consumers_by_row_id = {
+        "000001148:5": {CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID},
+        "000001148:6": {CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID},
+        "000001148:8": {CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID},
+        "000001148:9": {
+            CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
+            CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
+        },
+        "000001148:10": {CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID},
+    }
+
+    for row_id, expected_consumers in expected_consumers_by_row_id.items():
+        fields = ability_rows_by_id[row_id]
+        rule_ir = RuleIR.from_payload(cast(RuleIRPayload, json.loads(fields["rule_ir_payload"])))
+
+        assert fields["support"] == CatalogAbilitySupport.GENERIC_RULE_IR.value
+        assert json.loads(fields["rule_ir_diagnostics"]) == []
+        assert expected_consumers <= set(catalog_rule_ir_consumers_for_rule(rule_ir))
+
+    supreme_commander_fields = ability_rows_by_id["000001148:7"]
+    assert supreme_commander_fields["support"] == CatalogAbilitySupport.DESCRIPTOR_ONLY.value
+    assert json.loads(supreme_commander_fields["rule_ir_payload"]) == {
+        MUSTERING_WARLORD_RULE_KEY: MUSTERING_WARLORD_REQUIRED,
+    }
 
 
 def test_phase17k_bridge_rejects_unsupported_datasheet_ability_type() -> None:

@@ -689,6 +689,8 @@ def _ability_coverage_rows_for_datasheet(
 def _rule_ir_for_ability(ability: DatasheetAbilityDescriptor) -> RuleIR | None:
     if type(ability) is not DatasheetAbilityDescriptor:
         raise GameLifecycleError("Ability coverage requires DatasheetAbilityDescriptor values.")
+    if ability.support is CatalogAbilitySupport.DESCRIPTOR_ONLY:
+        return None
     if ability.rule_ir_payload is None:
         return None
     return RuleIR.from_payload(cast(RuleIRPayload, ability.rule_ir_payload))

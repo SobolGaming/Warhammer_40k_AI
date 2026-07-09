@@ -76,6 +76,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
+from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectContext,
     apply_enhancement_effects,
@@ -1353,10 +1354,12 @@ def test_cloak_and_shadow_restriction_noops_when_close_or_unmodified_and_stays_s
     assert stratagems.apply_cloak_and_shadow(apply_context).reason is None
     assert generic_persisted_shooting_target_range_restriction(base_restriction_context) is None
 
-    with pytest.raises(GameLifecycleError, match="requires attacker model"):
+    assert (
         generic_persisted_shooting_target_range_restriction(
             replace(base_restriction_context, attacker_model_instance_id=None)
         )
+        is None
+    )
 
     state.battlefield_state = None
     with pytest.raises(GameLifecycleError, match="requires battlefield state"):
@@ -1425,6 +1428,33 @@ def test_generic_persisted_target_range_restriction_rejects_malformed_effect_pay
     _replace_first_persisting_effect_payload(
         state,
         {
+            "effect_kind": GENERIC_RULE_EFFECT_KIND,
+            "source_id": "test-source:generic-range",
+            "clause_id": "test-clause:generic-range",
+            "effect": {
+                "kind": "set_contextual_status",
+                "source_span": {"start": 0, "end": 1, "text": "x"},
+                "parameters": [
+                    {"key": "status", "value": "shooting_target_range_restriction"},
+                    {"key": "targeting_max_range_inches", "value": 18.0},
+                    {"key": "source_effect_kind", "value": "source_backed_range_limit"},
+                ],
+            },
+        },
+    )
+    generic_restriction = generic_persisted_shooting_target_range_restriction(
+        replace(restriction_context, attacker_model_instance_id=None)
+    )
+    assert generic_restriction is not None
+    generic_payload = _json_object(generic_restriction.replay_payload)
+    assert generic_payload["persisting_effect_kind"] == GENERIC_RULE_EFFECT_KIND
+    assert generic_payload["source_effect_kind"] == "source_backed_range_limit"
+    assert generic_payload["attacker_model_instance_id"] is None
+    assert generic_payload["attacking_unit_instance_id"] == _ENEMY_UNIT_ID
+
+    _replace_first_persisting_effect_payload(
+        state,
+        {
             "effect_kind": SMOKESCREEN_EFFECT_KIND,
             "targeting_max_range_inches": 18.0,
             "source_effect_kind": 1,
@@ -1440,7 +1470,7 @@ def test_generic_persisted_target_range_restriction_rejects_malformed_effect_pay
     battlefield = state.battlefield_state
     assert battlefield is not None
     state.battlefield_state = battlefield.with_removed_models((f"{_ENEMY_UNIT_ID}:model-001",))
-    with pytest.raises(GameLifecycleError, match="model is not placed"):
+    with pytest.raises(GameLifecycleError, match="attacking unit is not placed"):
         generic_persisted_shooting_target_range_restriction(restriction_context)
 
 

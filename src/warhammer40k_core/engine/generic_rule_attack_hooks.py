@@ -1301,10 +1301,30 @@ def _generic_source_payload(
     }
     if target_unit_instance_id is not None:
         payload["target_unit_instance_id"] = target_unit_instance_id
+    conditional_hit_reroll = _conditional_hit_reroll_payload(effect)
+    if conditional_hit_reroll is not None:
+        payload["conditional_hit_reroll"] = conditional_hit_reroll
     conditional_wound_reroll = _conditional_wound_reroll_payload(effect)
     if conditional_wound_reroll is not None:
         payload["conditional_wound_reroll"] = conditional_wound_reroll
     return payload
+
+
+def _conditional_hit_reroll_payload(
+    effect: _GenericAttackEffect,
+) -> dict[str, JsonValue] | None:
+    if effect.effect_kind is not RuleEffectKind.REROLL_PERMISSION:
+        return None
+    if not _roll_type_matches(effect.parameters, expected="hit"):
+        return None
+    reroll_value = effect.parameters.get("reroll_unmodified_value")
+    if reroll_value is None:
+        return None
+    if type(reroll_value) is not int:
+        raise GameLifecycleError("Generic RuleIR hit reroll_unmodified_value must be an int.")
+    if reroll_value < 1 or reroll_value > 6:
+        raise GameLifecycleError("Generic RuleIR hit reroll_unmodified_value must be 1-6.")
+    return {"reroll_unmodified_values": [reroll_value]}
 
 
 def _conditional_wound_reroll_payload(

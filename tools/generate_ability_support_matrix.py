@@ -3827,16 +3827,15 @@ def _chaos_daemons_undivided_review_rows() -> tuple[DatasheetGroupReviewRow, ...
             datasheet="Be'lakor",
             datasheet_id="000001148",
             source_basis="PDF pages 112-113; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
-                "Deep Strike, Deadly Demise D6, Stealth, and The Shadow of Chaos are known "
-                "structured paths."
+                "Deep Strike, Deadly Demise D6, Stealth, The Shadow of Chaos, The Dark "
+                "Master Shadow aura, Shadow Form source-backed battle-round choice, "
+                "Wreathed in Shadows target restriction, Pall of Despair Battle-shock "
+                "forced-test/healing hooks, Shadow Lord hit-reroll aura, and Supreme "
+                "Commander mustering are consumed."
             ),
-            semantics_needed=(
-                "The Dark Master Shadow aura; Shadow Form choice host; Wreathed in Shadows "
-                "target restriction; Pall of Despair Battle-shock and healing; Shadow Lord "
-                "hit-reroll aura; Supreme Commander mustering."
-            ),
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
