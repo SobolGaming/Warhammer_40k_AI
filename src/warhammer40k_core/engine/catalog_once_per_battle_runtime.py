@@ -131,6 +131,8 @@ class CatalogOncePerBattleRuntime:
         request_payload = _payload_object(context.request.payload)
         if request_payload.get("hook_id") != CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID:
             return False
+        if context.result.actor_id != context.request.actor_id:
+            return _invalid_status(context, reason="once_per_battle_actor_drift")
         payload = _payload_object(context.result.payload)
         activations = _available_activations(
             ability_indexes_by_player_id=self.ability_indexes_by_player_id,
@@ -147,6 +149,8 @@ class CatalogOncePerBattleRuntime:
         )
         if activation is None:
             return _invalid_status(context, reason="once_per_battle_activation_drift")
+        if context.result.actor_id != activation.player_id:
+            return _invalid_status(context, reason="once_per_battle_actor_drift")
         activate = payload.get("activate")
         if type(activate) is not bool:
             raise GameLifecycleError("Catalog once-per-battle activate must be boolean.")

@@ -705,6 +705,66 @@ def test_catalog_once_per_battle_runtime_rejects_source_model_drift_without_muta
     )
 
 
+def test_catalog_once_per_battle_runtime_rejects_actor_drift_without_mutation() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_army.units[0],
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    runtime = CatalogOncePerBattleRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records(
+                (_once_per_battle_record(source_unit=source_unit),)
+            ),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    decisions = DecisionController()
+    request = runtime.fight_phase_start_request(
+        FightPhaseStartRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    result = replace(
+        DecisionResult.for_request(
+            result_id="result:once-per-battle:actor-drift",
+            request=request,
+            selected_option_id=request.options[1].option_id,
+        ),
+        actor_id=target_army.player_id,
+    )
+
+    status = runtime.apply_fight_phase_start_result(
+        FightPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    assert type(status) is LifecycleStatus
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, JsonValue], status.payload)["invalid_reason"] == (
+        "once_per_battle_actor_drift"
+    )
+    assert not state.persisting_effects
+    assert all(
+        event.event_type != RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+        for event in decisions.event_log.records
+    )
+
+
 def test_catalog_once_per_battle_runtime_targets_attached_rules_unit_for_leader_model() -> None:
     source_army, target_army = _mustered_attached_once_per_battle_armies()
     source_unit = next(
