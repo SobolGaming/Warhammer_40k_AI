@@ -6,13 +6,13 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 ## Summary
 
-| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
+| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 4 | 28 | 43 | 7 |
+| 9 | 4 | 28 | 43 | 14 |
 
 ## Semantic Support Snapshot
 
-This generated snapshot answers the support question directly. Detachment-rule support uses the semantic support table below. Exact Enhancement and Stratagem support is stricter: a source row is fully supported here only when it carries runtime consumer IDs. Datasheet support is fully supported only for source-review rows whose IR coverage is `All consumed`.
+This generated snapshot answers the support question directly. Detachment-rule support uses the semantic support table below. Exact Enhancement and Stratagem support uses the shared Phase17F semantic execution evidence, including explicit runtime consumers and executable generic IR records. Datasheet support is fully supported only for source-review rows whose IR coverage is `All consumed`.
 
 ### Detachments
 
@@ -22,10 +22,10 @@ This generated snapshot answers the support question directly. Detachment-rule s
 
 ### Enhancements
 
-| Detachment | Fully supported / runtime consumers registered | Still source-only / needs semantic registration |
+| Detachment | Runtime supported / executable | Still source-only / blocked |
 | --- | --- | --- |
 | Blood Legion | None | Brazenmaw<br>Fury’s Cage<br>Gateway Unto Damnation<br>Slaughterthirst (Aura) |
-| Cavalcade of Chaos | None | Apocalyptic Steeds Upgrade<br>Soul Shattering Charge Upgrade |
+| Cavalcade of Chaos | Apocalyptic Steeds Upgrade<br>Soul Shattering Charge Upgrade | None |
 | Daemonic Incursion | None | A’rgath, the King of Blades<br>Geller Breach<br>Soulstealer<br>Spite Made Manifest<br>The Endless Gift<br>The Everstave |
 | Legion of Excess | None | Avatar of Perfection<br>Dreaming Crown (Aura)<br>False Majesty (Aura)<br>Soul Glutton |
 | Plague Legion | None | Cankerblight<br>Droning Shroud (Aura)<br>Font of Spores (Aura)<br>Maggot Maws |
@@ -34,10 +34,10 @@ This generated snapshot answers the support question directly. Detachment-rule s
 
 ### Stratagems
 
-| Detachment | Fully supported / runtime consumers registered | Still source-only / needs semantic registration |
+| Detachment | Runtime supported / executable | Still source-only / blocked |
 | --- | --- | --- |
 | Blood Legion | None | BLOOD BEGETS SKULLS<br>FOOLS’ FLIGHT<br>GORE‑HUNGRY ONSLAUGHT<br>SHEATHED IN BRASS<br>SKULLS BEGET BLOOD<br>WRATH UNDENIABLE |
-| Cavalcade of Chaos | None | From Beyond the Veil<br>Inescapable Manifestations<br>Warp-Riders |
+| Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations<br>Warp-Riders | None |
 | Daemonic Incursion | None | CORRUPT REALSPACE<br>DAEMONIC INVULNERABILITY<br>DENIZENS OF THE WARP<br>DRAUGHT OF TERROR<br>INCORPOREAL TERRORS<br>INSUBSTANTIAL ENTITIES<br>PARTING BLOWS<br>THE REALM OF CHAOS<br>UNREAL SPEED<br>WARP SURGE |
 | Legion of Excess | None | ARCHAGONISTS<br>CAVALCADE OF BLADES<br>OVERWHELMING EXCESS<br>PHANTASMAL LONGING<br>SENSORY EXCRUCIATION<br>THIEVES OF PAIN |
 | Plague Legion | None | FEVER VISIONS<br>FOETID RESURGENCE<br>MURKSHADOWS<br>PLAGUE OF WOES<br>ROT AND RENEWAL<br>SEEPING VIRULENCE |

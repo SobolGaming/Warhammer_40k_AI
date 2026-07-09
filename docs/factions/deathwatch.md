@@ -6,7 +6,7 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_deathwatch-z0ebavrfze-muhcibn
 
 ## Summary
 
-| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
+| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
 | 1 | 0 | 0 | 0 | 0 |
 
@@ -36,12 +36,12 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 
 ## Enhancements
 
-| Detachment | Rule | Rule ID | Timing | Category | Support status | Handler / block | Runtime consumers | Source IDs |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No exact source rows generated yet |  |  |  |  |  |  |  |  |
+| Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No exact source rows generated yet |  |  |  |  |  |  |  |  |  |
 
 ## Stratagems
 
-| Detachment | Rule | Rule ID | Timing | Category | Support status | Handler / block | Runtime consumers | Source IDs |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No exact source rows generated yet |  |  |  |  |  |  |  |  |
+| Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No exact source rows generated yet |  |  |  |  |  |  |  |  |  |
