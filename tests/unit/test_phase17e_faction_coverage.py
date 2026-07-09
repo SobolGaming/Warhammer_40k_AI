@@ -234,6 +234,7 @@ GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
         "stratagem:orks:more-dakka:000009992006",
         "stratagem:orks:more-dakka:000009992007",
     }
+    | set(generic_ir_support_source.supported_shadow_legion_stratagem_source_row_ids())
 )
 COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS = frozenset(
     {

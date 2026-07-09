@@ -5311,7 +5311,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert ("| Orks | 12 | 1 | 44 | 66 | 13 | [orks](factions/orks.md) |") in generated_markdown
     assert (
-        "| Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 4 | 28 | 43 | 20 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (
@@ -5392,6 +5392,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         "| Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations"
         "<br>Warp-Riders | None |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Shadow Legion | BINDING SHADOW<br>CHANNELLED WRATH<br>DEATH DENIED"
+        "<br>ENCROACHING DARKNESS<br>SHADE PATH<br>SPITEFUL DEMISE | None |"
     ) in chaos_daemons_markdown
     assert (
         "| Nurgle | Nurglings (`000001133`)<br>Plague Drones (`000001135`)"
@@ -5707,7 +5711,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS" in (
         generated_markdown
     )
-    assert "SPESHUL SHELLS<br>Vengeful Sorrow<br>Warp-Riders |" in generated_markdown
+    generic_rule_ir_inventory_row = next(
+        line for line in generated_markdown.splitlines() if line.startswith("| `generic:rule-ir` |")
+    )
+    assert "BINDING SHADOW<br>CALL DAT DAKKA?" in generic_rule_ir_inventory_row
+    assert "SHADE PATH<br>SINGLE-MINDED STRIKE" in generic_rule_ir_inventory_row
+    assert "SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Vengeful Sorrow<br>Warp-Riders |" in (
+        generic_rule_ir_inventory_row
+    )
     assert (
         "| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:"
         "relentless_raiders` | Relentless Raiders |"

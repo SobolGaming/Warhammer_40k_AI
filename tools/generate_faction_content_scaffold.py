@@ -46,6 +46,9 @@ SHADOW_LEGION_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.
 SHADOW_LEGION_ENHANCEMENTS_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.enhancements"
 )
+SHADOW_LEGION_STRATAGEMS_MODULE_PATH = (
+    f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.stratagems"
+)
 DAEMONIC_INCURSION_RULE_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.daemonic_incursion.rule"
 )
@@ -111,6 +114,9 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     ),
     SHADOW_LEGION_ENHANCEMENTS_MODULE_PATH: (
         "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancements"
+    ),
+    SHADOW_LEGION_STRATAGEMS_MODULE_PATH: (
+        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:stratagems"
     ),
     DAEMONIC_INCURSION_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:rule:warp_rifts"

@@ -10,6 +10,7 @@ from warhammer40k_core.core.attributes import (
     characteristic_from_token,
 )
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
@@ -37,6 +38,7 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import (
+    ChargeRollModifierContext,
     DamageRollModifierContext,
     HitRollMinimumUnmodifiedSuccessContext,
     HitRollModifierContext,
@@ -427,6 +429,22 @@ def generic_rule_modified_objective_control(
             continue
         current = max(0, current + _required_int_parameter(effect.parameters, key="delta"))
     return current
+
+
+def generic_rule_charge_roll_modifiers(
+    context: ChargeRollModifierContext,
+) -> tuple[RollModifier, ...]:
+    if type(context) is not ChargeRollModifierContext:
+        raise GameLifecycleError("Generic charge hooks require ChargeRollModifierContext.")
+    from warhammer40k_core.engine.stratagems_generic_rule_ir_runtime import (
+        charge_roll_modifiers_from_generic_rule_ir,
+    )
+
+    return charge_roll_modifiers_from_generic_rule_ir(
+        state=context.state,
+        unit_instance_id=context.unit_instance_id,
+        current_roll_modifiers=context.current_roll_modifiers,
+    )
 
 
 def _dice_roll_modifier_for_attack(

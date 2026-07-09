@@ -585,6 +585,7 @@ def default_rule_execution_registry() -> RuleExecutionRegistry:
                     RuleEffectKind.PLACEMENT_PERMISSION,
                     RuleEffectKind.PLACEMENT_RESTRICTION,
                     RuleEffectKind.RESTORE_LOST_WOUNDS,
+                    RuleEffectKind.RETURN_DESTROYED_TARGET,
                     RuleEffectKind.SET_CONTEXTUAL_STATUS,
                     RuleEffectKind.SET_CHARACTERISTIC,
                 ),

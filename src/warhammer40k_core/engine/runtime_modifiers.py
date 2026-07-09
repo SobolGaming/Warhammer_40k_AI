@@ -869,13 +869,17 @@ class RuntimeModifierRegistry:
     ) -> tuple[RollModifier, ...]:
         if type(context) is not ChargeRollModifierContext:
             raise GameLifecycleError("Charge roll modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_charge_roll_modifiers,
+        )
+
         current = context.current_roll_modifiers
         for binding in self.charge_roll_modifier_bindings:
             current = _validate_roll_modifier_tuple(
                 f"{binding.modifier_id} returned charge roll modifiers",
                 binding.handler(replace(context, current_roll_modifiers=current)),
             )
-        return current
+        return generic_rule_charge_roll_modifiers(replace(context, current_roll_modifiers=current))
 
     def modified_weapon_profile(
         self,

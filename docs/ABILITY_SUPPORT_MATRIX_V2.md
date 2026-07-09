@@ -25,7 +25,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Family | Placeholder | Partial | Implemented |
 | --- | ---: | ---: | ---: |
 | Faction | 5 | 23 | 0 |
-| Detachment | 243 | 19 | 4 |
+| Detachment | 243 | 18 | 5 |
 
 | Faction | Faction semantic status | Placeholder detachments | Partial detachments | Implemented detachments |
 | --- | --- | ---: | ---: | ---: |
@@ -50,7 +50,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Death Guard | `partial` | 9 | 0 | 0 |
 | Thousand Sons | `partial` | 9 | 0 | 0 |
 | Chaos Knights | `partial` | 8 | 0 | 0 |
-| Chaos Daemons | `partial` | 5 | 3 | 1 |
+| Chaos Daemons | `partial` | 5 | 2 | 2 |
 | Astra Militarum | `partial` | 10 | 1 | 0 |
 | Adepta Sororitas | `partial` | 8 | 0 | 0 |
 | Adeptus Mechanicus | `partial` | 10 | 0 | 0 |
@@ -204,7 +204,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 4 | 28 | 43 | 20 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 2 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
@@ -335,7 +335,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:lost-wound:feel-no-pain-source` | Feel No Pain |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
-| `generic:rule-ir` | CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Casting Back the Veil<br>Cloak and Shadow<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>Vengeful Sorrow<br>Warp-Riders |
+| `generic:rule-ir` | BINDING SHADOW<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Casting Back the Veil<br>Cloak and Shadow<br>DEATH DENIED<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Vengeful Sorrow<br>Warp-Riders |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |

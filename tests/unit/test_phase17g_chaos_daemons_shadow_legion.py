@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# pyright: reportPrivateUsage=false
 from dataclasses import replace
 from typing import cast
 
@@ -32,6 +33,13 @@ from warhammer40k_core.core.weapon_profiles import (
     RangeProfile,
     WeaponKeyword,
     WeaponProfile,
+)
+from warhammer40k_core.engine import healing_source_context
+from warhammer40k_core.engine import (
+    stratagems_generic_metadata as generic_metadata,
+)
+from warhammer40k_core.engine import (
+    stratagems_generic_rule_ir_runtime as generic_rule_ir_runtime,
 )
 from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilityContext
 from warhammer40k_core.engine.army_mustering import (
@@ -68,6 +76,7 @@ from warhammer40k_core.engine.faction_content.runtime import build_runtime_conte
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion import (  # noqa: E501
     enhancements,
     rule,
+    stratagems,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
@@ -86,6 +95,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.healing import HealingStep, HealingStepKind
 from warhammer40k_core.engine.list_validation import (
     BattleSize,
     DetachmentSelection,
@@ -105,7 +115,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.fight import (
     FightPhaseHandler,
-    _request_fight_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
+    _request_fight_unit_selected_grant_decision_if_available,
 )
 from warhammer40k_core.engine.phases.shooting import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
@@ -117,8 +127,15 @@ from warhammer40k_core.engine.phases.shooting import (
     request_out_of_phase_shooting_declaration,
 )
 from warhammer40k_core.engine.prebattle import scout_ability_instances_for_rules_unit
+from warhammer40k_core.engine.reserves import (
+    ReserveKind,
+    ReserveOrigin,
+    ReserveState,
+    ReserveStatus,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
+    ChargeRollModifierContext,
     HitRollModifierContext,
     ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
@@ -130,7 +147,26 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
     SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
 )
+from warhammer40k_core.engine.stratagems import (
+    ENGAGED_ENEMY_UNIT_CONTEXT_KEY,
+    ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+    HIT_ENEMY_UNIT_CONTEXT_KEY,
+    HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+    StratagemCatalogRecord,
+    StratagemDefinition,
+    StratagemEligibilityContext,
+    StratagemTargetBinding,
+    StratagemUseRecord,
+)
+from warhammer40k_core.engine.stratagems_generic_metadata import (
+    companion_unit_effect_selection,
+)
+from warhammer40k_core.engine.stratagems_generic_rule_ir import (
+    _apply_generic_rule_ir_stratagem_handler,
+)
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndRequestContext,
@@ -141,7 +177,7 @@ from warhammer40k_core.engine.unit_abilities import (
     scouts_distance_inches_from_descriptor,
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
@@ -254,6 +290,1162 @@ def test_shadow_legion_generic_runtime_bundle_materializes_enhancement_hooks() -
         and binding.source_kind == enhancements.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND
         for binding in malice_bundle.mortal_wound_feel_no_pain_hook_registry.all_bindings()
     )
+
+
+def test_shadow_legion_stratagem_runtime_contribution_delegates_all_six_to_generic_ir() -> None:
+    contribution = stratagems.runtime_contribution()
+
+    records_by_id = {
+        record.definition.stratagem_id: record for record in contribution.stratagem_records
+    }
+
+    assert contribution.contribution_id == stratagems.CONTRIBUTION_ID
+    assert not contribution.contribution_id.endswith(":scaffold")
+    assert set(records_by_id) == set(shadow_legion_ir.SHADOW_LEGION_STRATAGEM_IDS)
+    for record in records_by_id.values():
+        assert record.definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+        assert isinstance(record.definition.effect_payload, dict)
+        assert "rule_ir" in record.definition.effect_payload
+
+
+def test_shadow_legion_channelled_wrath_grants_lance_and_khorne_melee_ap() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Khorne"))
+    unit = _unit_for_player(state, player_id="player-a")
+    enemy = _unit_for_player(state, player_id="player-b")
+    profile = _weapon_profile(melee=True)
+
+    _use_shadow_legion_stratagem(
+        state,
+        stratagem_id=shadow_legion_ir.CHANNELLED_WRATH_STRATAGEM_ID,
+        target_unit_id=unit.unit_instance_id,
+        phase=BattlePhase.FIGHT,
+    )
+
+    modified = RuntimeModifierRegistry.empty().modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attacker_model_instance_id=unit.own_models[0].model_instance_id,
+            target_unit_instance_id=enemy.unit_instance_id,
+            weapon_profile=profile,
+        )
+    )
+
+    assert WeaponKeyword.LANCE in modified.keywords
+    assert modified.armor_penetration.final == profile.armor_penetration.final + 1
+
+
+def test_shadow_legion_encroaching_darkness_grants_ignores_cover_to_companion() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion",),
+        faction_keywords=("Heretic Astartes",),
+        player_a_unit_selection_ids=("heretic-astartes-unit", "legiones-daemonica-unit"),
+    )
+    heretic_astartes = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    legiones_daemonica = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    _replace_unit_keywords(
+        state,
+        unit_instance_id=legiones_daemonica.unit_instance_id,
+        keywords=("Shadow Legion",),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    enemy = _unit_for_player(state, player_id="player-b")
+
+    _use_shadow_legion_stratagem(
+        state,
+        stratagem_id=shadow_legion_ir.ENCROACHING_DARKNESS_STRATAGEM_ID,
+        target_unit_id=heretic_astartes.unit_instance_id,
+        phase=BattlePhase.SHOOTING,
+        effect_selection=companion_unit_effect_selection(legiones_daemonica.unit_instance_id),
+    )
+
+    registry = RuntimeModifierRegistry.empty()
+    for unit in (heretic_astartes, legiones_daemonica):
+        modified = registry.modified_weapon_profile(
+            WeaponProfileModifierContext(
+                state=state,
+                source_phase=BattlePhase.SHOOTING,
+                attacking_unit_instance_id=unit.unit_instance_id,
+                attacker_model_instance_id=unit.own_models[0].model_instance_id,
+                target_unit_instance_id=enemy.unit_instance_id,
+                weapon_profile=_weapon_profile(melee=False),
+            )
+        )
+        assert WeaponKeyword.IGNORES_COVER in modified.keywords
+
+
+def test_shadow_legion_shade_path_modifies_charge_and_forces_battle_shock() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Nurgle"))
+    defender = _unit_for_player(state, player_id="player-a")
+    charger = _unit_for_player(state, player_id="player-b")
+
+    decisions, _use_record = _use_shadow_legion_stratagem(
+        state,
+        stratagem_id=shadow_legion_ir.SHADE_PATH_STRATAGEM_ID,
+        target_unit_id=defender.unit_instance_id,
+        phase=BattlePhase.CHARGE,
+        active_player_id="player-b",
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        trigger_payload={
+            shadow_legion_ir.SHADOW_LEGION_CHARGING_UNIT_CONTEXT_KEY: charger.unit_instance_id,
+            stratagems.CHARGE_TARGET_UNIT_IDS_CONTEXT_KEY: [defender.unit_instance_id],
+        },
+    )
+
+    modifiers = RuntimeModifierRegistry.empty().charge_roll_modifiers(
+        ChargeRollModifierContext(
+            state=state,
+            unit_instance_id=charger.unit_instance_id,
+            current_roll_modifiers=(),
+        )
+    )
+
+    assert [modifier.operand for modifier in modifiers] == [-2]
+    assert _event_count(decisions, "battle_shock_test_resolved") == 1
+
+
+def test_shadow_legion_binding_shadow_removes_target_and_companion_to_reserves() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion",),
+        faction_keywords=("Heretic Astartes",),
+        player_a_unit_selection_ids=("heretic-astartes-unit", "legiones-daemonica-unit"),
+    )
+    heretic_astartes = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    legiones_daemonica = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    _replace_unit_keywords(
+        state,
+        unit_instance_id=legiones_daemonica.unit_instance_id,
+        keywords=("Shadow Legion",),
+        faction_keywords=("Legiones Daemonica",),
+    )
+
+    _use_shadow_legion_stratagem(
+        state,
+        stratagem_id=shadow_legion_ir.BINDING_SHADOW_STRATAGEM_ID,
+        target_unit_id=heretic_astartes.unit_instance_id,
+        phase=BattlePhase.MOVEMENT,
+        effect_selection=companion_unit_effect_selection(legiones_daemonica.unit_instance_id),
+    )
+
+    for unit in (heretic_astartes, legiones_daemonica):
+        reserve_state = state.reserve_state_for_unit(unit.unit_instance_id)
+        assert reserve_state is not None
+        assert reserve_state.status is ReserveStatus.IN_RESERVES
+        assert state.battlefield_state is not None
+        assert not state.battlefield_state.is_unit_placed(unit.unit_instance_id)
+
+
+def test_shadow_legion_death_denied_heals_and_revives_tzeentch_model_at_full_wounds() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Tzeentch"))
+    unit = _unit_for_player(state, player_id="player-a")
+    wounded_model = unit.own_models[0]
+    destroyed_model = unit.own_models[1]
+    if wounded_model.starting_wounds < 2 or destroyed_model.starting_wounds < 2:
+        raise AssertionError("Death Denied fixture requires multi-wound models.")
+    _set_model_wounds(
+        state,
+        model_instance_id=wounded_model.model_instance_id,
+        wounds_remaining=wounded_model.starting_wounds - 1,
+    )
+    _destroy_model(state, model_instance_id=destroyed_model.model_instance_id)
+
+    decisions, _use_record = _use_shadow_legion_stratagem(
+        state,
+        stratagem_id=shadow_legion_ir.DEATH_DENIED_STRATAGEM_ID,
+        target_unit_id=unit.unit_instance_id,
+        phase=BattlePhase.COMMAND,
+    )
+
+    refreshed = _refreshed_unit(state, unit)
+    healed_model = _model_by_id(refreshed, wounded_model.model_instance_id)
+    returned_model = _model_by_id(refreshed, destroyed_model.model_instance_id)
+
+    assert healed_model.wounds_remaining == healed_model.starting_wounds
+    assert returned_model.wounds_remaining == returned_model.starting_wounds
+    assert state.battlefield_state is not None
+    assert destroyed_model.model_instance_id not in state.battlefield_state.removed_model_ids
+    assert _event_count(decisions, "generic_stratagem_restore_lost_wounds_resolved") == 1
+    assert _event_count(decisions, "generic_stratagem_return_destroyed_target_resolved") == 1
+
+
+def test_shadow_legion_spiteful_demise_rolls_for_each_engaged_enemy_unit() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Slaanesh"))
+    source = _unit_for_player(state, player_id="player-a")
+    enemy = _unit_for_player(state, player_id="player-b")
+
+    decisions, _use_record = _use_shadow_legion_stratagem(
+        state,
+        stratagem_id=shadow_legion_ir.SPITEFUL_DEMISE_STRATAGEM_ID,
+        target_unit_id=source.unit_instance_id,
+        phase=BattlePhase.FIGHT,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+        trigger_payload={
+            shadow_legion_ir.SHADOW_LEGION_DESTROYED_LAST_MODEL_CONTEXT_KEY: (
+                source.own_models[-1].model_instance_id
+            ),
+            shadow_legion_ir.SHADOW_LEGION_ENGAGED_ENEMY_UNITS_CONTEXT_KEY: [
+                enemy.unit_instance_id
+            ],
+        },
+    )
+
+    payload = _last_event_payload(
+        decisions,
+        "generic_stratagem_roll_per_target_mortal_wounds_resolved",
+    )
+    target_results = cast(list[JsonValue], payload["target_results"])
+    assert len(target_results) == 1
+    target_result = cast(dict[str, JsonValue], target_results[0])
+    assert target_result["target_unit_instance_id"] == enemy.unit_instance_id
+
+
+def test_shadow_legion_companion_metadata_enumerates_and_validates_keyword_pairs() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion",),
+        faction_keywords=("Heretic Astartes",),
+        player_a_unit_selection_ids=("heretic-astartes-unit", "legiones-daemonica-unit"),
+    )
+    heretic_astartes = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    legiones_daemonica = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    enemy = _unit_for_player(state, player_id="player-b")
+    _replace_unit_keywords(
+        state,
+        unit_instance_id=legiones_daemonica.unit_instance_id,
+        keywords=("Shadow Legion",),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    record = _shadow_legion_stratagem_record(shadow_legion_ir.BINDING_SHADOW_STRATAGEM_ID)
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    target_binding = StratagemTargetBinding(
+        target_kind=record.definition.target_spec.target_kind,
+        target_player_id="player-a",
+        target_unit_instance_id=heretic_astartes.unit_instance_id,
+    )
+    companion_selection = companion_unit_effect_selection(legiones_daemonica.unit_instance_id)
+
+    selections = generic_metadata.companion_effect_selections_for_binding(
+        state=state,
+        definition=record.definition,
+        context=context,
+        target_binding=target_binding,
+    )
+
+    assert selections[0] is None
+    assert companion_selection in selections
+    assert (
+        generic_metadata.companion_selection_error(
+            state=state,
+            definition=record.definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=None,
+        )
+        is None
+    )
+    assert (
+        generic_metadata.companion_selection_error(
+            state=state,
+            definition=record.definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=companion_selection,
+        )
+        is None
+    )
+    assert (
+        generic_metadata.companion_selection_error(
+            state=state,
+            definition=record.definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=companion_unit_effect_selection(heretic_astartes.unit_instance_id),
+        )
+        == "companion_unit_is_target"
+    )
+    assert (
+        generic_metadata.companion_selection_error(
+            state=state,
+            definition=record.definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=companion_unit_effect_selection(enemy.unit_instance_id),
+        )
+        == "companion_unit_not_friendly"
+    )
+    assert (
+        generic_metadata.companion_selection_error(
+            state=state,
+            definition=record.definition,
+            context=context,
+            target_binding=None,
+            effect_selection=companion_selection,
+        )
+        == "target_unit_required"
+    )
+
+    required_payload = dict(cast(dict[str, JsonValue], record.definition.effect_payload))
+    required_payload[generic_metadata.COMPANION_OPTIONAL_KEY] = False
+    required_definition = replace(record.definition, effect_payload=required_payload)
+    assert (
+        generic_metadata.companion_selection_error(
+            state=state,
+            definition=required_definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=None,
+        )
+        == "companion_unit_instance_id_required"
+    )
+
+    _replace_unit_keywords(
+        state,
+        unit_instance_id=legiones_daemonica.unit_instance_id,
+        keywords=("Shadow Legion",),
+        faction_keywords=("Heretic Astartes",),
+    )
+    assert (
+        generic_metadata.companion_selection_error(
+            state=state,
+            definition=record.definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=companion_selection,
+        )
+        == "companion_unit_keyword_mismatch"
+    )
+
+
+def test_shadow_legion_companion_metadata_rejects_malformed_selection_payloads() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion",),
+        faction_keywords=("Heretic Astartes",),
+        player_a_unit_selection_ids=("heretic-astartes-unit", "legiones-daemonica-unit"),
+    )
+    heretic_astartes = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    legiones_daemonica = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    _replace_unit_keywords(
+        state,
+        unit_instance_id=legiones_daemonica.unit_instance_id,
+        keywords=("Shadow Legion",),
+        faction_keywords=("Legiones Daemonica",),
+    )
+
+    assert generic_metadata.companion_unit_id_or_none(None) is None
+    assert (
+        generic_metadata.companion_unit_id_or_none(
+            {generic_metadata.EFFECT_SELECTION_KIND_KEY: "other_selection_kind"}
+        )
+        is None
+    )
+    assert (
+        generic_metadata.companion_unit_id_or_none(
+            {
+                generic_metadata.EFFECT_SELECTION_KIND_KEY: (
+                    generic_metadata.SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND
+                )
+            }
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="unit ID"):
+        generic_metadata.companion_unit_id_or_none(
+            {
+                generic_metadata.EFFECT_SELECTION_KIND_KEY: (
+                    generic_metadata.SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND
+                ),
+                generic_metadata.COMPANION_UNIT_CONTEXT_KEY: 42,
+            }
+        )
+
+    assert generic_metadata.companion_keywords_match(
+        payload={},
+        target_unit=heretic_astartes,
+        companion_unit=legiones_daemonica,
+    )
+    assert not generic_metadata.companion_keywords_match(
+        payload={
+            generic_metadata.COMPANION_REQUIRED_KEYWORDS_BY_TARGET_KEYWORD_KEY: {
+                "Aeldari": ["Legiones Daemonica"]
+            }
+        },
+        target_unit=heretic_astartes,
+        companion_unit=legiones_daemonica,
+    )
+    malformed_payloads = (
+        {
+            generic_metadata.COMPANION_REQUIRED_KEYWORDS_BY_TARGET_KEYWORD_KEY: [
+                "Legiones Daemonica"
+            ]
+        },
+        {
+            generic_metadata.COMPANION_REQUIRED_KEYWORDS_BY_TARGET_KEYWORD_KEY: {
+                1: ["Legiones Daemonica"]
+            }
+        },
+        {
+            generic_metadata.COMPANION_REQUIRED_KEYWORDS_BY_TARGET_KEYWORD_KEY: {
+                "Heretic Astartes": "Legiones Daemonica"
+            }
+        },
+        {
+            generic_metadata.COMPANION_REQUIRED_KEYWORDS_BY_TARGET_KEYWORD_KEY: {
+                "Heretic Astartes": [1]
+            }
+        },
+    )
+    for payload in malformed_payloads:
+        with pytest.raises(GameLifecycleError):
+            generic_metadata.companion_keywords_match(
+                payload=cast(dict[str, JsonValue], payload),
+                target_unit=heretic_astartes,
+                companion_unit=legiones_daemonica,
+            )
+
+    with pytest.raises(GameLifecycleError, match="StratagemUseRecord"):
+        generic_metadata.generic_rule_ir_execution_target_unit_ids(
+            cast(StratagemUseRecord, object())
+        )
+
+
+def test_shadow_legion_companion_metadata_is_fail_fast_for_context_and_unit_drift() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion",),
+        faction_keywords=("Heretic Astartes",),
+        player_a_unit_selection_ids=(
+            "heretic-astartes-unit",
+            "legiones-daemonica-unit",
+            "unmatched-heretic-astartes-unit",
+        ),
+    )
+    heretic_astartes = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    legiones_daemonica = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    unmatched = _unit_for_player_by_index(state, player_id="player-a", index=2)
+    _replace_unit_keywords(
+        state,
+        unit_instance_id=legiones_daemonica.unit_instance_id,
+        keywords=("Shadow Legion",),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    binding_record = _shadow_legion_stratagem_record(shadow_legion_ir.BINDING_SHADOW_STRATAGEM_ID)
+    encroaching_record = _shadow_legion_stratagem_record(
+        shadow_legion_ir.ENCROACHING_DARKNESS_STRATAGEM_ID
+    )
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    target_binding = StratagemTargetBinding(
+        target_kind=binding_record.definition.target_spec.target_kind,
+        target_player_id="player-a",
+        target_unit_instance_id=heretic_astartes.unit_instance_id,
+    )
+    targetless_binding = StratagemTargetBinding.none()
+
+    selections = generic_metadata.companion_effect_selections_for_binding(
+        state=state,
+        definition=binding_record.definition,
+        context=context,
+        target_binding=target_binding,
+    )
+
+    assert companion_unit_effect_selection(legiones_daemonica.unit_instance_id) in selections
+    assert companion_unit_effect_selection(unmatched.unit_instance_id) not in selections
+    with pytest.raises(GameLifecycleError, match="StratagemDefinition"):
+        generic_metadata.companion_effect_selections_for_binding(
+            state=state,
+            definition=cast(StratagemDefinition, object()),
+            context=context,
+            target_binding=target_binding,
+        )
+    with pytest.raises(GameLifecycleError, match="StratagemEligibilityContext"):
+        generic_metadata.companion_effect_selections_for_binding(
+            state=state,
+            definition=binding_record.definition,
+            context=cast(StratagemEligibilityContext, object()),
+            target_binding=target_binding,
+        )
+    with pytest.raises(GameLifecycleError, match="target unit"):
+        generic_metadata.companion_effect_selections_for_binding(
+            state=state,
+            definition=binding_record.definition,
+            context=context,
+            target_binding=targetless_binding,
+        )
+    with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        generic_metadata.companion_effect_selections_for_binding(
+            state=state,
+            definition=replace(binding_record.definition, effect_payload=None),
+            context=context,
+            target_binding=target_binding,
+        )
+
+    bad_payload = dict(cast(dict[str, JsonValue], binding_record.definition.effect_payload))
+    bad_payload[generic_metadata.COMPANION_OPTIONAL_KEY] = "yes"
+    with pytest.raises(GameLifecycleError, match="companion_optional must be a bool"):
+        generic_metadata.companion_effect_selections_for_binding(
+            state=state,
+            definition=replace(binding_record.definition, effect_payload=bad_payload),
+            context=context,
+            target_binding=target_binding,
+        )
+
+    assert (
+        generic_metadata.companion_selection_error(
+            state=state,
+            definition=encroaching_record.definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=companion_unit_effect_selection(legiones_daemonica.unit_instance_id),
+        )
+        == "companion_unit_not_arrived_from_reserves_this_turn"
+    )
+    assert not generic_metadata.unit_arrived_from_reserves_this_turn(
+        state=state,
+        unit_instance_id=heretic_astartes.unit_instance_id,
+    )
+    with pytest.raises(GameLifecycleError, match="unit is unknown"):
+        generic_metadata.unit_by_id(state=state, unit_instance_id="missing-unit")
+    with pytest.raises(GameLifecycleError, match="player has no army"):
+        generic_metadata.friendly_units(state=state, player_id="missing-player")
+    with pytest.raises(GameLifecycleError, match="owner is unknown"):
+        generic_metadata.unit_owner_player_id(state=state, unit_instance_id="missing-unit")
+    with pytest.raises(GameLifecycleError, match="keyword lookup requires a unit"):
+        generic_metadata.unit_has_keyword(cast(UnitInstance, object()), "shadow-legion")
+    with pytest.raises(GameLifecycleError, match="keyword set requires a unit"):
+        generic_metadata.unit_keyword_set(cast(UnitInstance, object()))
+    with pytest.raises(GameLifecycleError, match="Keyword must be a string"):
+        generic_metadata._canonical_keyword(cast(str, object()))
+
+
+def test_shadow_legion_companion_metadata_tracks_current_round_reserve_arrivals() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion",),
+        faction_keywords=("Heretic Astartes",),
+        player_a_unit_selection_ids=("heretic-astartes-unit", "legiones-daemonica-unit"),
+    )
+    state.battle_round = 2
+    previous_arrival = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    current_arrival = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    _replace_unit_keywords(
+        state,
+        unit_instance_id=current_arrival.unit_instance_id,
+        keywords=("Shadow Legion",),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    state.record_reserve_state(
+        ReserveState.entered_during_battle(
+            player_id="player-a",
+            unit_instance_id=previous_arrival.unit_instance_id,
+            reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+            battle_round=1,
+            phase=BattlePhase.MOVEMENT,
+            reserve_origin=ReserveOrigin.DURING_BATTLE_STRATAGEM,
+        ).mark_arrived(
+            battle_round=1,
+            phase=BattlePhase.MOVEMENT,
+            large_model_exception_used=False,
+            post_arrival_restrictions=(),
+        )
+    )
+    state.record_reserve_state(
+        ReserveState.entered_during_battle(
+            player_id="player-a",
+            unit_instance_id=current_arrival.unit_instance_id,
+            reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            reserve_origin=ReserveOrigin.DURING_BATTLE_STRATAGEM,
+        ).mark_arrived(
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            large_model_exception_used=False,
+            post_arrival_restrictions=(),
+        )
+    )
+
+    assert not generic_metadata.unit_arrived_from_reserves_this_turn(
+        state=state,
+        unit_instance_id=previous_arrival.unit_instance_id,
+    )
+    assert generic_metadata.unit_arrived_from_reserves_this_turn(
+        state=state,
+        unit_instance_id=current_arrival.unit_instance_id,
+    )
+    refreshed_current_arrival = generic_metadata.unit_by_id(
+        state=state,
+        unit_instance_id=current_arrival.unit_instance_id,
+    )
+    assert refreshed_current_arrival.unit_instance_id == current_arrival.unit_instance_id
+    assert (
+        generic_metadata.unit_owner_player_id(
+            state=state,
+            unit_instance_id=current_arrival.unit_instance_id,
+        )
+        == "player-a"
+    )
+    assert current_arrival.unit_instance_id in {
+        unit.unit_instance_id
+        for unit in generic_metadata.friendly_units(state=state, player_id="player-a")
+    }
+    assert generic_metadata.unit_has_keyword(refreshed_current_arrival, "shadow-legion")
+    assert "LEGIONES DAEMONICA" in generic_metadata.unit_keyword_set(refreshed_current_arrival)
+
+
+def test_shadow_legion_healing_source_context_flags_lock_and_validate_model_choice() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Tzeentch"))
+    unit = _unit_for_player(state, player_id="player-a")
+    first_model = unit.own_models[0]
+    second_model = unit.own_models[1]
+    _set_model_wounds(
+        state,
+        model_instance_id=first_model.model_instance_id,
+        wounds_remaining=first_model.starting_wounds - 1,
+    )
+    _set_model_wounds(
+        state,
+        model_instance_id=second_model.model_instance_id,
+        wounds_remaining=second_model.starting_wounds - 1,
+    )
+    refreshed = _refreshed_unit(state, unit)
+    first_healing_step = HealingStep(
+        step_index=1,
+        step_kind=HealingStepKind.HEAL_WOUND,
+        model_instance_id=first_model.model_instance_id,
+        starting_wounds_remaining=first_model.starting_wounds - 1,
+        final_wounds_remaining=first_model.starting_wounds,
+    )
+
+    assert healing_source_context.selected_wounded_healing_model_ids(
+        source_context={"single_model_heal": True},
+        resolved_steps=(first_healing_step,),
+        heal_wound_step_kind=HealingStepKind.HEAL_WOUND,
+        models=refreshed.own_models,
+        allows_multiple_wounded_models=False,
+    ) == (first_model.model_instance_id,)
+    assert healing_source_context.selected_wounded_healing_model_ids(
+        source_context={},
+        resolved_steps=(),
+        heal_wound_step_kind=HealingStepKind.HEAL_WOUND,
+        models=refreshed.own_models,
+        allows_multiple_wounded_models=True,
+    ) == tuple(sorted((first_model.model_instance_id, second_model.model_instance_id)))
+    assert (
+        healing_source_context.selected_wounded_healing_model_ids(
+            source_context={"revive_destroyed_models_only": True},
+            resolved_steps=(),
+            heal_wound_step_kind=HealingStepKind.HEAL_WOUND,
+            models=refreshed.own_models,
+            allows_multiple_wounded_models=False,
+        )
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="Multiple wounded models"):
+        healing_source_context.selected_wounded_healing_model_ids(
+            source_context={},
+            resolved_steps=(),
+            heal_wound_step_kind=HealingStepKind.HEAL_WOUND,
+            models=refreshed.own_models,
+            allows_multiple_wounded_models=False,
+        )
+
+    assert not healing_source_context.healing_source_context_bool(None, "single_model_heal")
+    assert not healing_source_context.healing_source_context_bool(
+        {"single_model_heal": False},
+        "single_model_heal",
+    )
+    with pytest.raises(GameLifecycleError, match="flag must be a bool"):
+        healing_source_context.healing_source_context_bool(
+            {"single_model_heal": "yes"},
+            "single_model_heal",
+        )
+    assert healing_source_context.revival_wounds_remaining({}, starting_wounds=3) == 1
+    assert (
+        healing_source_context.revival_wounds_remaining(
+            {"revive_model_full_health": True},
+            starting_wounds=3,
+        )
+        == 3
+    )
+
+
+def test_shadow_legion_generic_runtime_effect_parameter_helpers_are_fail_fast() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Tzeentch"))
+    source_unit = _unit_for_player(state, player_id="player-a")
+    use_record = _shadow_legion_use_record_fixture(target_unit_id=source_unit.unit_instance_id)
+    payload = _generic_runtime_effect_payload(
+        (
+            ("string_parameter", "value-id"),
+            ("int_parameter", 2),
+            ("bool_parameter", True),
+            ("keyword_sequence", ["shadow-legion", "tzeentch"]),
+            ("selection_actor", "owner"),
+            ("bonus_if_source_has_keyword", "Tzeentch"),
+            ("bonus", 3),
+        )
+    )
+
+    assert generic_rule_ir_runtime._rule_effect_source_id(payload) == "generic-source"
+    assert generic_rule_ir_runtime._rule_effect_parameter(payload, "missing_parameter") is None
+    assert (
+        generic_rule_ir_runtime._required_rule_effect_string_parameter(
+            payload,
+            "string_parameter",
+        )
+        == "value-id"
+    )
+    assert (
+        generic_rule_ir_runtime._optional_rule_effect_string_parameter(
+            payload,
+            "string_parameter",
+        )
+        == "value-id"
+    )
+    assert (
+        generic_rule_ir_runtime._optional_rule_effect_string_parameter(
+            payload,
+            "missing_parameter",
+        )
+        is None
+    )
+    assert (
+        generic_rule_ir_runtime._required_rule_effect_int_parameter(
+            payload,
+            "int_parameter",
+        )
+        == 2
+    )
+    assert generic_rule_ir_runtime._required_rule_effect_bool_parameter(
+        payload,
+        "bool_parameter",
+    )
+    assert generic_rule_ir_runtime._optional_rule_effect_string_tuple_parameter(
+        payload,
+        "keyword_sequence",
+    ) == ("shadow-legion", "tzeentch")
+    assert (
+        generic_rule_ir_runtime._optional_rule_effect_string_tuple_parameter(
+            payload,
+            "missing_parameter",
+        )
+        is None
+    )
+    assert (
+        generic_rule_ir_runtime._selection_actor_player_id(
+            use_record=use_record,
+            effect_payload=payload,
+        )
+        == "player-a"
+    )
+    assert (
+        generic_rule_ir_runtime._source_keyword_bonus(
+            source_unit=source_unit,
+            effect_payload=payload,
+        )
+        == 3
+    )
+    assert (
+        generic_rule_ir_runtime._source_keyword_bonus(
+            source_unit=source_unit,
+            effect_payload=_generic_runtime_effect_payload(
+                (("bonus_if_source_has_keyword", "Khorne"), ("bonus", 3))
+            ),
+        )
+        == 0
+    )
+    assert (
+        generic_rule_ir_runtime._selection_actor_player_id(
+            use_record=use_record,
+            effect_payload=_generic_runtime_effect_payload(()),
+        )
+        is None
+    )
+
+    malformed_payloads: tuple[tuple[dict[str, JsonValue], str], ...] = (
+        ({"source_id": "generic-source"}, "requires effect object"),
+        (
+            cast(
+                dict[str, JsonValue],
+                {"source_id": "generic-source", "effect": {"parameters": {}}},
+            ),
+            "must be a list",
+        ),
+        (
+            cast(
+                dict[str, JsonValue],
+                {"source_id": "generic-source", "effect": {"parameters": [1]}},
+            ),
+            "must be an object",
+        ),
+    )
+    for malformed_payload, expected_message in malformed_payloads:
+        with pytest.raises(GameLifecycleError, match=expected_message):
+            generic_rule_ir_runtime._rule_effect_parameter(
+                malformed_payload,
+                "string_parameter",
+            )
+    with pytest.raises(GameLifecycleError, match="requires source_id"):
+        generic_rule_ir_runtime._rule_effect_source_id(
+            _generic_runtime_effect_payload((), source_id=None)
+        )
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        generic_rule_ir_runtime._required_rule_effect_string_parameter(
+            _generic_runtime_effect_payload((("string_parameter", 1),)),
+            "string_parameter",
+        )
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        generic_rule_ir_runtime._optional_rule_effect_string_parameter(
+            _generic_runtime_effect_payload((("string_parameter", 1),)),
+            "string_parameter",
+        )
+    with pytest.raises(GameLifecycleError, match="must be an int"):
+        generic_rule_ir_runtime._required_rule_effect_int_parameter(
+            _generic_runtime_effect_payload((("int_parameter", "2"),)),
+            "int_parameter",
+        )
+    with pytest.raises(GameLifecycleError, match="must be a bool"):
+        generic_rule_ir_runtime._required_rule_effect_bool_parameter(
+            _generic_runtime_effect_payload((("bool_parameter", "true"),)),
+            "bool_parameter",
+        )
+    with pytest.raises(GameLifecycleError, match="must be a list"):
+        generic_rule_ir_runtime._optional_rule_effect_string_tuple_parameter(
+            _generic_runtime_effect_payload((("keyword_sequence", "shadow-legion"),)),
+            "keyword_sequence",
+        )
+    with pytest.raises(GameLifecycleError, match="must contain strings"):
+        generic_rule_ir_runtime._optional_rule_effect_string_tuple_parameter(
+            _generic_runtime_effect_payload((("keyword_sequence", ["shadow-legion", 1]),)),
+            "keyword_sequence",
+        )
+    with pytest.raises(GameLifecycleError, match="selection actor is unsupported"):
+        generic_rule_ir_runtime._selection_actor_player_id(
+            use_record=use_record,
+            effect_payload=_generic_runtime_effect_payload((("selection_actor", "opponent"),)),
+        )
+
+
+def test_shadow_legion_generic_runtime_trigger_and_selection_helpers_are_fail_fast() -> None:
+    state = _shadow_legion_state()
+    source_unit = _unit_for_player(state, player_id="player-a")
+    enemy_unit = _unit_for_player(state, player_id="player-b")
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        trigger_payload={
+            "target_unit": enemy_unit.unit_instance_id,
+            "target_units": [enemy_unit.unit_instance_id],
+        },
+    )
+
+    assert (
+        generic_rule_ir_runtime._trigger_payload_identifier(
+            context,
+            key="target_unit",
+        )
+        == enemy_unit.unit_instance_id
+    )
+    assert generic_rule_ir_runtime._trigger_payload_identifier_list(
+        context,
+        key="target_units",
+    ) == (enemy_unit.unit_instance_id,)
+
+    hit_record = _shadow_legion_use_record_fixture(
+        target_unit_id=source_unit.unit_instance_id,
+        effect_selection={
+            "effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            HIT_ENEMY_UNIT_CONTEXT_KEY: enemy_unit.unit_instance_id,
+        },
+    )
+    engaged_record = _shadow_legion_use_record_fixture(
+        target_unit_id=source_unit.unit_instance_id,
+        effect_selection={
+            "effect_selection_kind": ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            ENGAGED_ENEMY_UNIT_CONTEXT_KEY: enemy_unit.unit_instance_id,
+        },
+    )
+    assert (
+        generic_rule_ir_runtime._effect_selection_unit_id(
+            hit_record,
+            expected_selection_kind=HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        )
+        == enemy_unit.unit_instance_id
+    )
+    assert (
+        generic_rule_ir_runtime._effect_selection_unit_id(
+            engaged_record,
+            expected_selection_kind=ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        )
+        == enemy_unit.unit_instance_id
+    )
+    assert (
+        generic_rule_ir_runtime._single_execution_target_unit_id(hit_record)
+        == source_unit.unit_instance_id
+    )
+
+    trigger_error_contexts: tuple[tuple[JsonValue, str], ...] = (
+        (None, "requires structured trigger payload"),
+        ({"target_unit": 1}, "missing identifier"),
+        ({"target_units": "enemy-unit"}, "list is missing"),
+        (
+            {"target_units": [enemy_unit.unit_instance_id, 1]},
+            "must contain IDs",
+        ),
+        ({"target_units": []}, "must not be empty"),
+    )
+    for trigger_payload, expected_message in trigger_error_contexts:
+        bad_context = StratagemEligibilityContext.from_state(
+            state=state,
+            player_id="player-a",
+            trigger_kind=TimingTriggerKind.DURING_PHASE,
+            trigger_payload=trigger_payload,
+        )
+        if isinstance(trigger_payload, dict) and "target_units" in trigger_payload:
+            with pytest.raises(GameLifecycleError, match=expected_message):
+                generic_rule_ir_runtime._trigger_payload_identifier_list(
+                    bad_context,
+                    key="target_units",
+                )
+        else:
+            with pytest.raises(GameLifecycleError, match=expected_message):
+                generic_rule_ir_runtime._trigger_payload_identifier(
+                    bad_context,
+                    key="target_unit",
+                )
+
+    with pytest.raises(GameLifecycleError, match="requires one target unit"):
+        generic_rule_ir_runtime._single_execution_target_unit_id(
+            _shadow_legion_use_record_fixture(
+                target_unit_id=source_unit.unit_instance_id,
+                effect_selection=companion_unit_effect_selection(enemy_unit.unit_instance_id),
+            )
+        )
+    effect_selection_error_records = (
+        (
+            _shadow_legion_use_record_fixture(
+                target_unit_id=source_unit.unit_instance_id,
+                effect_selection=None,
+            ),
+            HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            "requires effect selection",
+        ),
+        (
+            engaged_record,
+            HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            "selection kind drift",
+        ),
+        (
+            _shadow_legion_use_record_fixture(
+                target_unit_id=source_unit.unit_instance_id,
+                effect_selection=companion_unit_effect_selection(enemy_unit.unit_instance_id),
+            ),
+            generic_metadata.SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
+            "selection kind is unsupported",
+        ),
+        (
+            _shadow_legion_use_record_fixture(
+                target_unit_id=source_unit.unit_instance_id,
+                effect_selection={
+                    "effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+                    HIT_ENEMY_UNIT_CONTEXT_KEY: 1,
+                },
+            ),
+            HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            "selection is missing unit",
+        ),
+    )
+    for bad_record, expected_selection_kind, expected_message in effect_selection_error_records:
+        with pytest.raises(GameLifecycleError, match=expected_message):
+            generic_rule_ir_runtime._effect_selection_unit_id(
+                bad_record,
+                expected_selection_kind=expected_selection_kind,
+            )
+
+
+def test_shadow_legion_generic_runtime_charge_modifier_payloads_are_validated() -> None:
+    state = _shadow_legion_state()
+    unit = _unit_for_player(state, player_id="player-a")
+    state.record_persisting_effect(
+        _generic_charge_modifier_effect(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            effect_id="shadow-legion-charge-ignore-non-object",
+            effect_payload="not-an-object",
+        )
+    )
+    state.record_persisting_effect(
+        _generic_charge_modifier_effect(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            effect_id="shadow-legion-charge-ignore-other-kind",
+            effect_payload={"effect_kind": "other"},
+        )
+    )
+    state.record_persisting_effect(
+        _generic_charge_modifier_effect(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            effect_id="shadow-legion-charge-valid",
+            effect_payload={
+                "effect_kind": (
+                    generic_rule_ir_runtime.GENERIC_RULE_IR_CHARGE_ROLL_MODIFIER_EFFECT_KIND
+                ),
+                "roll_type": "charge",
+                "delta": -2,
+                "source_rule_id": "phase17s-shadow-legion-shade-path",
+            },
+        )
+    )
+
+    modifiers = generic_rule_ir_runtime.charge_roll_modifiers_from_generic_rule_ir(
+        state=state,
+        unit_instance_id=unit.unit_instance_id,
+        current_roll_modifiers=(),
+    )
+
+    assert [(modifier.modifier_id, modifier.operand) for modifier in modifiers] == [
+        ("shadow-legion-charge-valid", -2)
+    ]
+
+    malformed_payloads: tuple[tuple[dict[str, JsonValue], str], ...] = (
+        (
+            {
+                "effect_kind": (
+                    generic_rule_ir_runtime.GENERIC_RULE_IR_CHARGE_ROLL_MODIFIER_EFFECT_KIND
+                ),
+                "roll_type": "advance",
+                "delta": -2,
+                "source_rule_id": "phase17s-shadow-legion-shade-path",
+            },
+            "roll_type drift",
+        ),
+        (
+            {
+                "effect_kind": (
+                    generic_rule_ir_runtime.GENERIC_RULE_IR_CHARGE_ROLL_MODIFIER_EFFECT_KIND
+                ),
+                "roll_type": "charge",
+                "delta": "-2",
+                "source_rule_id": "phase17s-shadow-legion-shade-path",
+            },
+            "delta must be an int",
+        ),
+        (
+            {
+                "effect_kind": (
+                    generic_rule_ir_runtime.GENERIC_RULE_IR_CHARGE_ROLL_MODIFIER_EFFECT_KIND
+                ),
+                "roll_type": "charge",
+                "delta": -2,
+            },
+            "source_rule_id is missing",
+        ),
+    )
+    for index, (effect_payload, expected_message) in enumerate(malformed_payloads, start=1):
+        malformed_state = _shadow_legion_state()
+        malformed_unit = _unit_for_player(malformed_state, player_id="player-a")
+        malformed_state.record_persisting_effect(
+            _generic_charge_modifier_effect(
+                state=malformed_state,
+                unit_instance_id=malformed_unit.unit_instance_id,
+                effect_id=f"shadow-legion-charge-malformed-{index}",
+                effect_payload=effect_payload,
+            )
+        )
+        with pytest.raises(GameLifecycleError, match=expected_message):
+            generic_rule_ir_runtime.charge_roll_modifiers_from_generic_rule_ir(
+                state=malformed_state,
+                unit_instance_id=malformed_unit.unit_instance_id,
+                current_roll_modifiers=(),
+            )
+
+
+def test_shadow_legion_generic_runtime_mortal_threshold_and_revival_pose_edges() -> None:
+    state = _shadow_legion_state()
+    unit = _unit_for_player(state, player_id="player-a")
+    use_record = _shadow_legion_use_record_fixture(target_unit_id=unit.unit_instance_id)
+    effect_payload = _generic_runtime_effect_payload(
+        (
+            ("mortal_wounds_on_4_5", "D3"),
+            ("mortal_wounds_on_6_plus", 3),
+            ("roll_type", "shadow-legion-spiteful-demise"),
+        )
+    )
+    manager = DiceRollManager(state.game_id, event_log=DecisionController().event_log)
+
+    d3_mortal_wounds = generic_rule_ir_runtime._context_target_mortal_wounds(
+        manager=manager,
+        use_record=use_record,
+        target_unit_id=unit.unit_instance_id,
+        modified_total=4,
+        effect_payload=effect_payload,
+    )
+
+    assert 1 <= d3_mortal_wounds <= 3
+    assert (
+        generic_rule_ir_runtime._context_target_mortal_wounds(
+            manager=manager,
+            use_record=use_record,
+            target_unit_id=unit.unit_instance_id,
+            modified_total=6,
+            effect_payload=effect_payload,
+        )
+        == 3
+    )
+    assert (
+        generic_rule_ir_runtime._context_target_mortal_wounds(
+            manager=manager,
+            use_record=use_record,
+            target_unit_id=unit.unit_instance_id,
+            modified_total=3,
+            effect_payload=effect_payload,
+        )
+        == 0
+    )
+    with pytest.raises(GameLifecycleError, match="4-5 value is unsupported"):
+        generic_rule_ir_runtime._context_target_mortal_wounds(
+            manager=manager,
+            use_record=use_record,
+            target_unit_id=unit.unit_instance_id,
+            modified_total=4,
+            effect_payload=_generic_runtime_effect_payload(
+                (
+                    ("mortal_wounds_on_4_5", "D6"),
+                    ("mortal_wounds_on_6_plus", 3),
+                    ("roll_type", "shadow-legion-spiteful-demise"),
+                )
+            ),
+        )
+
+    if state.battlefield_state is None:
+        raise AssertionError("Expected battlefield state.")
+    anchor = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements[0]
+    cramped_battlefield = replace(
+        state.battlefield_state,
+        battlefield_width_inches=0.25,
+        battlefield_depth_inches=1.0,
+    )
+    candidate = generic_rule_ir_runtime._candidate_revival_pose(
+        battlefield=cramped_battlefield,
+        anchor=replace(anchor, pose=Pose.at(0.0, 0.0)),
+        secondary_anchor=None,
+        index=0,
+    )
+    assert candidate.position.x == 0.0
+    assert candidate.position.y == 0.5
+    with pytest.raises(GameLifecycleError, match="could not derive placement"):
+        generic_rule_ir_runtime._candidate_revival_pose(
+            battlefield=replace(cramped_battlefield, battlefield_depth_inches=0.25),
+            anchor=replace(anchor, pose=Pose.at(0.0, 0.0)),
+            secondary_anchor=None,
+            index=0,
+        )
 
 
 def test_leaping_shadows_grants_scouts_nine_to_bearers_attached_rules_unit() -> None:
@@ -1853,6 +3045,153 @@ def _shadow_legion_runtime_bundle(state: GameState) -> RuntimeContentBundle:
     return bundle
 
 
+def _shadow_legion_stratagem_record(stratagem_id: str) -> StratagemCatalogRecord:
+    for record in stratagems.runtime_contribution().stratagem_records:
+        if record.definition.stratagem_id == stratagem_id:
+            return record
+    raise AssertionError(f"Missing Shadow Legion Stratagem {stratagem_id}.")
+
+
+def _shadow_legion_use_record_fixture(
+    *,
+    target_unit_id: str,
+    stratagem_id: str = shadow_legion_ir.CHANNELLED_WRATH_STRATAGEM_ID,
+    target_player_id: str = "player-a",
+    effect_selection: JsonValue = None,
+) -> StratagemUseRecord:
+    record = _shadow_legion_stratagem_record(stratagem_id)
+    definition = record.definition
+    return StratagemUseRecord(
+        use_id=f"shadow-legion:{stratagem_id}:fixture-use",
+        player_id="player-a",
+        stratagem_id=stratagem_id,
+        source_id=definition.source_id,
+        battle_round=1,
+        phase=BattlePhase.FIGHT,
+        active_player_id="player-a",
+        timing_window_id=None,
+        request_id=f"shadow-legion:{stratagem_id}:fixture-request",
+        result_id=f"shadow-legion:{stratagem_id}:fixture-result",
+        selected_option_id=f"shadow-legion:{stratagem_id}:fixture-selected",
+        target_binding=StratagemTargetBinding(
+            target_kind=definition.target_spec.target_kind,
+            target_player_id=target_player_id,
+            target_unit_instance_id=target_unit_id,
+        ),
+        targeted_unit_instance_ids=(target_unit_id,),
+        affected_unit_instance_ids=(target_unit_id,),
+        command_point_cost=0,
+        command_point_transaction_id=None,
+        handler_id=definition.handler_id,
+        effect_selection=effect_selection,
+        effect_payload=definition.effect_payload,
+    )
+
+
+def _generic_runtime_effect_payload(
+    parameters: tuple[tuple[str, JsonValue], ...],
+    *,
+    source_id: str | None = "generic-source",
+) -> dict[str, JsonValue]:
+    parameter_payloads: list[JsonValue] = [
+        {"key": key, "value": value} for key, value in parameters
+    ]
+    return {
+        "source_id": source_id,
+        "effect": {"parameters": parameter_payloads},
+    }
+
+
+def _generic_charge_modifier_effect(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    effect_id: str,
+    effect_payload: JsonValue,
+) -> PersistingEffect:
+    return PersistingEffect(
+        effect_id=effect_id,
+        source_rule_id="shadow-legion-generic-charge-modifier",
+        owner_player_id="player-a",
+        target_unit_instance_ids=(unit_instance_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhaseKind.CHARGE,
+        expiration=EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhaseKind.CHARGE,
+            player_id="player-a",
+        ),
+        effect_payload=effect_payload,
+    )
+
+
+def _use_shadow_legion_stratagem(
+    state: GameState,
+    *,
+    stratagem_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    active_player_id: str = "player-a",
+    trigger_kind: TimingTriggerKind | None = None,
+    trigger_payload: JsonValue = None,
+    effect_selection: JsonValue = None,
+) -> tuple[DecisionController, StratagemUseRecord]:
+    record = _shadow_legion_stratagem_record(stratagem_id)
+    definition = record.definition
+    _set_current_battle_phase(state, phase)
+    state.active_player_id = active_player_id
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-a",
+        trigger_kind=definition.timing.trigger_kind if trigger_kind is None else trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    target_binding = StratagemTargetBinding(
+        target_kind=definition.target_spec.target_kind,
+        target_player_id=_unit_owner(state=state, unit_instance_id=target_unit_id),
+        target_unit_instance_id=target_unit_id,
+    )
+    companion_id = _companion_unit_id(effect_selection)
+    affected_ids = (
+        (target_unit_id,) if companion_id is None else tuple(sorted((target_unit_id, companion_id)))
+    )
+    use_record = StratagemUseRecord(
+        use_id=f"shadow-legion:{stratagem_id}:use",
+        player_id="player-a",
+        stratagem_id=stratagem_id,
+        source_id=definition.source_id,
+        battle_round=state.battle_round,
+        phase=phase,
+        active_player_id=active_player_id,
+        timing_window_id=None,
+        request_id=f"shadow-legion:{stratagem_id}:request",
+        result_id=f"shadow-legion:{stratagem_id}:result",
+        selected_option_id=f"shadow-legion:{stratagem_id}:selected",
+        target_binding=target_binding,
+        targeted_unit_instance_ids=(target_unit_id,),
+        affected_unit_instance_ids=affected_ids,
+        command_point_cost=0,
+        command_point_transaction_id=None,
+        handler_id=definition.handler_id,
+        effect_selection=effect_selection,
+        effect_payload=definition.effect_payload,
+    )
+    decisions = DecisionController()
+    config = phase11c_config()
+    _apply_generic_rule_ir_stratagem_handler(
+        state=state,
+        decisions=decisions,
+        context=context,
+        target_binding=target_binding,
+        definition=definition,
+        use_record=use_record,
+        ruleset_descriptor=config.ruleset_descriptor,
+        army_catalog=config.army_catalog,
+        shooting_unit_selected_grant_hooks=None,
+    )
+    return decisions, use_record
+
+
 def _apply_runtime_battle_formation_hooks(
     *,
     state: GameState,
@@ -2031,6 +3370,38 @@ def _destroy_unit_own_models(state: GameState, *, unit_instance_id: str) -> None
         raise AssertionError("Expected battlefield_state.")
     state.army_definitions = updated_armies
     state.battlefield_state = state.battlefield_state.with_removed_models(tuple(removed_model_ids))
+
+
+def _set_model_wounds(
+    state: GameState,
+    *,
+    model_instance_id: str,
+    wounds_remaining: int,
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    did_replace = False
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            updated_models: list[ModelInstance] = []
+            for model in unit.own_models:
+                if model.model_instance_id != model_instance_id:
+                    updated_models.append(model)
+                    continue
+                updated_models.append(replace(model, wounds_remaining=wounds_remaining))
+                did_replace = True
+            updated_units.append(replace(unit, own_models=tuple(updated_models)))
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not did_replace:
+        raise AssertionError(f"Missing model {model_instance_id}.")
+    state.army_definitions = updated_armies
+
+
+def _destroy_model(state: GameState, *, model_instance_id: str) -> None:
+    _set_model_wounds(state, model_instance_id=model_instance_id, wounds_remaining=0)
+    if state.battlefield_state is None:
+        raise AssertionError("Expected battlefield_state.")
+    state.battlefield_state = state.battlefield_state.with_removed_models((model_instance_id,))
 
 
 def _assign_malice_made_manifest(state: GameState, *, unit: UnitInstance) -> None:
@@ -2359,6 +3730,56 @@ def _refreshed_unit(state: GameState, unit: UnitInstance) -> UnitInstance:
             if candidate.unit_instance_id == unit.unit_instance_id:
                 return candidate
     raise AssertionError(f"Missing unit {unit.unit_instance_id}.")
+
+
+def _unit_owner(*, state: GameState, unit_instance_id: str) -> str:
+    for army in state.army_definitions:
+        if any(unit.unit_instance_id == unit_instance_id for unit in army.units):
+            return army.player_id
+    raise AssertionError(f"Missing unit {unit_instance_id}.")
+
+
+def _companion_unit_id(effect_selection: JsonValue) -> str | None:
+    if not isinstance(effect_selection, dict):
+        return None
+    value = effect_selection.get("companion_unit_instance_id")
+    if value is None:
+        return None
+    if type(value) is not str:
+        raise AssertionError("Companion unit selection fixture must contain a string id.")
+    return value
+
+
+def _replace_unit_keywords(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    keywords: tuple[str, ...],
+    faction_keywords: tuple[str, ...],
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    did_replace = False
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            if unit.unit_instance_id != unit_instance_id:
+                updated_units.append(unit)
+                continue
+            updated_units.append(
+                replace(unit, keywords=keywords, faction_keywords=faction_keywords)
+            )
+            did_replace = True
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not did_replace:
+        raise AssertionError(f"Missing unit {unit_instance_id}.")
+    state.army_definitions = updated_armies
+
+
+def _model_by_id(unit: UnitInstance, model_instance_id: str) -> ModelInstance:
+    for model in unit.own_models:
+        if model.model_instance_id == model_instance_id:
+            return model
+    raise AssertionError(f"Missing model {model_instance_id}.")
 
 
 def _unit_by_datasheet(army: ArmyDefinition, datasheet_id: str) -> UnitInstance:

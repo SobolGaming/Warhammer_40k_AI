@@ -1,7 +1,7 @@
 {
   "detachment_status_counts": {
-    "implemented": 4,
-    "partial": 19,
+    "implemented": 5,
+    "partial": 18,
     "placeholder": 243
   },
   "faction_status_counts": {
@@ -5400,8 +5400,8 @@
     },
     {
       "detachment_status_counts": {
-        "implemented": 1,
-        "partial": 3,
+        "implemented": 2,
+        "partial": 2,
         "placeholder": 5
       },
       "detachments": [
@@ -5620,7 +5620,7 @@
           "detachment_name": "Shadow Legion",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion.manifest",
-          "semantic_status": "partial",
+          "semantic_status": "implemented",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:shadow-legion",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009980002",
@@ -7092,6 +7092,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "9a14ffda23d1241e0dad0b348a5188b3296afaa281cd21b7f2d29b37dfc51568",
+  "source_package_hash": "2e8a274eab88ecc73c4452ebe234437ea0940db1eea401937cf57c8f5a8366c0",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-27"
 }

@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 4 | 28 | 43 | 14 |
+| 9 | 4 | 28 | 43 | 20 |
 
 ## Semantic Support Snapshot
 
@@ -42,7 +42,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 | Legion of Excess | None | ARCHAGONISTS<br>CAVALCADE OF BLADES<br>OVERWHELMING EXCESS<br>PHANTASMAL LONGING<br>SENSORY EXCRUCIATION<br>THIEVES OF PAIN |
 | Plague Legion | None | FEVER VISIONS<br>FOETID RESURGENCE<br>MURKSHADOWS<br>PLAGUE OF WOES<br>ROT AND RENEWAL<br>SEEPING VIRULENCE |
 | Scintillating Legion | None | DELIRIUM UNMADE<br>FATEBORNE NIGHTMARES<br>FICKLEFIRE<br>FLICKERING REALITY<br>IMPOSSIBLE ECLIPSE<br>PYROGENESIS |
-| Shadow Legion | None | BINDING SHADOW<br>CHANNELLED WRATH<br>DEATH DENIED<br>ENCROACHING DARKNESS<br>SHADE PATH<br>SPITEFUL DEMISE |
+| Shadow Legion | BINDING SHADOW<br>CHANNELLED WRATH<br>DEATH DENIED<br>ENCROACHING DARKNESS<br>SHADE PATH<br>SPITEFUL DEMISE | None |
 
 ### Unit Datasheets
 
