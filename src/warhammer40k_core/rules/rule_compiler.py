@@ -13,7 +13,7 @@ from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
 from warhammer40k_core.rules.rule_parser import RULE_PARSER_VERSION, parse_rule_ir
 from warhammer40k_core.rules.source_data import RuleSourceText, RuleSourceTextPayload
 
-RULE_COMPILER_VERSION = "phase17c-rule-compiler-v1"
+RULE_COMPILER_VERSION = "phase17c-rule-compiler-v2"
 
 
 class RuleCompilerError(ValueError):

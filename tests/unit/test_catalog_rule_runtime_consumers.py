@@ -26,6 +26,11 @@ from warhammer40k_core.engine.catalog_desperate_escape import (
     CATALOG_FORCED_DESPERATE_ESCAPE_SOURCE_KIND,
     catalog_forced_desperate_escape_sources_for_unit,
 )
+from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
+    CATALOG_ONCE_PER_BATTLE_ABILITY_ACTIVATED_EVENT,
+    CATALOG_ONCE_PER_BATTLE_ABILITY_DECLINED_EVENT,
+    CatalogOncePerBattleRuntime,
+)
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
     CatalogSelectedTargetEffectRuntime,
@@ -70,11 +75,20 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
@@ -105,6 +119,11 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 
 SOURCE_KEYWORD_SEQUENCE_PARTS = (
     datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+)
+ONCE_PER_BATTLE_FIGHT_BOOST_TEXT = (
+    "Once per battle, at the start of the Fight phase, this model can use this ability. "
+    "If it does, until the end of the phase, add 3 to the Attacks characteristic of melee "
+    "weapons equipped by this model and those weapons have the [DEVASTATING WOUNDS] ability."
 )
 
 
@@ -505,6 +524,245 @@ def test_catalog_selected_target_fight_start_runtime_records_selected_effect() -
     ] == target_unit.unit_instance_id
     assert (
         decisions.event_log.records[-1].event_type == CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT
+    )
+
+
+def test_catalog_once_per_battle_runtime_declines_then_activates_once_with_replay() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    record = _once_per_battle_record(source_unit=source_unit)
+    runtime = CatalogOncePerBattleRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    decisions = DecisionController()
+
+    request = runtime.fight_phase_start_request(
+        FightPhaseStartRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    assert DecisionRequest.from_payload(request.to_payload()) == request
+    assert request.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE
+    activation_choices = [
+        cast(dict[str, JsonValue], option.payload)["activate"] for option in request.options
+    ]
+    assert activation_choices == [False, True]
+
+    queued = decisions.request_decision(request)
+    declined = DecisionResult.for_request(
+        result_id="result:once-per-battle:declined",
+        request=queued,
+        selected_option_id=queued.options[0].option_id,
+    )
+    decisions.submit_result(declined)
+    assert (
+        runtime.apply_fight_phase_start_result(
+            FightPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=queued,
+                result=declined,
+            )
+        )
+        is True
+    )
+    assert not state.persisting_effects
+    assert decisions.event_log.records[-1].event_type == (
+        CATALOG_ONCE_PER_BATTLE_ABILITY_DECLINED_EVENT
+    )
+    assert (
+        runtime.fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+        is None
+    )
+
+    state.battle_round = 2
+    activation_request = runtime.fight_phase_start_request(
+        FightPhaseStartRequestContext(state=state, decisions=decisions)
+    )
+    assert activation_request is not None
+    queued_activation = decisions.request_decision(activation_request)
+    activated = DecisionResult.for_request(
+        result_id="result:once-per-battle:activated",
+        request=queued_activation,
+        selected_option_id=queued_activation.options[1].option_id,
+    )
+    decisions.submit_result(activated)
+    assert (
+        runtime.apply_fight_phase_start_result(
+            FightPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=queued_activation,
+                result=activated,
+            )
+        )
+        is True
+    )
+
+    assert len(state.persisting_effects) == 2
+    assert any(
+        event.event_type == RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+        for event in decisions.event_log.records
+    )
+    assert decisions.event_log.records[-1].event_type == (
+        CATALOG_ONCE_PER_BATTLE_ABILITY_ACTIVATED_EVENT
+    )
+    assert (
+        runtime.fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+        is None
+    )
+    assert DecisionController.from_payload(decisions.to_payload()).to_payload() == (
+        decisions.to_payload()
+    )
+    restored_state = GameState.from_payload(state.to_payload())
+    assert [effect.to_payload() for effect in restored_state.persisting_effects] == [
+        effect.to_payload() for effect in state.persisting_effects
+    ]
+
+
+def test_catalog_once_per_battle_runtime_rejects_source_model_drift_without_mutation() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    source_model = source_unit.own_models[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_army.units[0],
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    runtime = CatalogOncePerBattleRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records(
+                (_once_per_battle_record(source_unit=source_unit),)
+            ),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    decisions = DecisionController()
+    request = runtime.fight_phase_start_request(
+        FightPhaseStartRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    queued = decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="result:once-per-battle:drift",
+        request=queued,
+        selected_option_id=queued.options[1].option_id,
+    )
+    decisions.submit_result(result)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        (source_model.model_instance_id,)
+    )
+
+    status = runtime.apply_fight_phase_start_result(
+        FightPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=queued,
+            result=result,
+        )
+    )
+
+    assert type(status) is LifecycleStatus
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, JsonValue], status.payload)["invalid_reason"] == (
+        "once_per_battle_activation_drift"
+    )
+    assert not state.persisting_effects
+    assert all(
+        event.event_type != RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+        for event in decisions.event_log.records
+    )
+
+
+def test_catalog_once_per_battle_runtime_targets_attached_rules_unit_for_leader_model() -> None:
+    source_army, target_army = _mustered_attached_once_per_battle_armies()
+    source_unit = next(
+        unit for unit in source_army.units if unit.datasheet_id == "core-character-leader"
+    )
+    source_rules_unit_id = source_army.attached_units[0].attached_unit_instance_id
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="catalog-once-per-battle-attached",
+        armies=(source_army, target_army),
+    )
+    state = _state_without_battlefield(
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    for army in (source_army, target_army):
+        state.record_army_definition(army)
+    state.battlefield_state = scenario.battlefield_state
+    runtime = CatalogOncePerBattleRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records(
+                (_once_per_battle_record(source_unit=source_unit),)
+            ),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    decisions = DecisionController()
+
+    request = runtime.fight_phase_start_request(
+        FightPhaseStartRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    payload = cast(dict[str, JsonValue], request.payload)
+    assert payload["source_unit_instance_id"] == source_unit.unit_instance_id
+    assert payload["source_rules_unit_instance_id"] == source_rules_unit_id
+    queued = decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="result:once-per-battle:attached-leader",
+        request=queued,
+        selected_option_id=queued.options[1].option_id,
+    )
+    decisions.submit_result(result)
+
+    assert (
+        runtime.apply_fight_phase_start_result(
+            FightPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=queued,
+                result=result,
+            )
+        )
+        is True
+    )
+    assert len(state.persisting_effects) == 2
+    assert all(
+        effect.target_unit_instance_ids == (source_rules_unit_id,)
+        for effect in state.persisting_effects
     )
 
 
@@ -973,6 +1231,22 @@ def _desperate_escape_record(*, source_unit: UnitInstance) -> AbilityCatalogReco
     )
 
 
+def _once_per_battle_record(*, source_unit: UnitInstance) -> AbilityCatalogRecord:
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="wahapedia:datasheet-ability:finest-hour",
+            raw_text=ONCE_PER_BATTLE_FIGHT_BOOST_TEXT,
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
+    return _ability_record(
+        record_id="record:once-per-battle:finest-hour",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        datasheet_id=source_unit.datasheet_id,
+    )
+
+
 def _fight_start_selection_clause(
     *,
     clause_id: str = "test:selected-target:selection:fight",
@@ -1079,6 +1353,7 @@ def _ability_record(
     trigger_kind: TimingTriggerKind,
     runtime_clause_id: str | None = None,
     handler_id: str = GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    datasheet_id: str = "core-intercessor-like-infantry",
 ) -> AbilityCatalogRecord:
     replay_payload: dict[str, JsonValue] = {"rule_ir": cast(JsonValue, rule_ir.to_payload())}
     if runtime_clause_id is not None:
@@ -1097,7 +1372,7 @@ def _ability_record(
             replay_payload=validate_json_value(replay_payload),
         ),
         source_kind=AbilitySourceKind.DATASHEET,
-        datasheet_id="core-intercessor-like-infantry",
+        datasheet_id=datasheet_id,
     )
 
 
@@ -1120,6 +1395,82 @@ def _mustered_core_armies() -> tuple[ArmyDefinition, ArmyDefinition]:
         muster_army(
             catalog=catalog,
             request=_muster_request(catalog=catalog, player_id="player-b", army_id="army-beta"),
+        ),
+    )
+
+
+def _mustered_once_per_battle_armies() -> tuple[ArmyDefinition, ArmyDefinition]:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_request = replace(
+        _muster_request(catalog=catalog, player_id="player-a", army_id="army-alpha"),
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id="army-alpha-character",
+                datasheet_id="core-character-leader",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
+            ),
+        ),
+    )
+    return (
+        muster_army(catalog=catalog, request=source_request),
+        muster_army(
+            catalog=catalog,
+            request=_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+            ),
+        ),
+    )
+
+
+def _mustered_attached_once_per_battle_armies() -> tuple[ArmyDefinition, ArmyDefinition]:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_request = replace(
+        _muster_request(catalog=catalog, player_id="player-a", army_id="army-alpha"),
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id="bodyguard",
+                datasheet_id="core-intercessor-like-infantry",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="leader",
+                datasheet_id="core-character-leader",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader",
+                bodyguard_unit_selection_id="bodyguard",
+            ),
+        ),
+    )
+    return (
+        muster_army(catalog=catalog, request=source_request),
+        muster_army(
+            catalog=catalog,
+            request=_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+            ),
         ),
     )
 

@@ -281,6 +281,10 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
         battle_round_timing = _catalog_battle_round_timing_descriptor_for_clause(clause)
         if battle_round_timing is not None:
             return battle_round_timing
+    for clause in rule_ir.clauses:
+        phase_timing = _catalog_phase_timing_descriptor_for_clause(clause)
+        if phase_timing is not None:
+            return phase_timing
     turn_timing = _catalog_turn_timing_descriptor(rule_ir)
     if turn_timing is not None:
         return turn_timing
@@ -355,6 +359,9 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
     battle_round_timing = _catalog_battle_round_timing_descriptor_for_clause(clause)
     if battle_round_timing is not None:
         return battle_round_timing
+    phase_timing = _catalog_phase_timing_descriptor_for_clause(clause)
+    if phase_timing is not None:
+        return phase_timing
     if clause.trigger is not None and clause.trigger.kind in {
         RuleTriggerKind.UNIT_DESTROYED,
         RuleTriggerKind.MODEL_DESTROYED,
@@ -404,6 +411,35 @@ def _catalog_setup_reactive_timing_descriptor_for_clause(
     return AbilityTimingDescriptor(
         trigger_kind=TimingTriggerKind.END_PHASE,
         phase=battle_phase_kind_from_token("movement"),
+    )
+
+
+def _catalog_phase_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return None
+    parameters = parameter_payload(trigger.parameters)
+    phase = parameters.get("phase")
+    edge = parameters.get("edge")
+    if type(phase) is not str or phase not in {
+        "command",
+        "movement",
+        "shooting",
+        "charge",
+        "fight",
+    }:
+        return None
+    if edge == "start":
+        trigger_kind = TimingTriggerKind.START_PHASE
+    elif edge == "end":
+        trigger_kind = TimingTriggerKind.END_PHASE
+    else:
+        return None
+    return AbilityTimingDescriptor(
+        trigger_kind=trigger_kind,
+        phase=battle_phase_kind_from_token(phase),
     )
 
 

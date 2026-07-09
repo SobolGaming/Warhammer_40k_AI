@@ -274,6 +274,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:named-weapon-ability-choice` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
+| `catalog-ir:once-per-battle-ability` | No current generated rows |
 | `catalog-ir:post-shoot-hit-target-effect` | No current generated rows |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |

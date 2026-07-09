@@ -3,6 +3,10 @@ from __future__ import annotations
 import re
 
 from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_frequency_parser import (
+    OPTIONAL_ABILITY_ACTIVATION_RE,
+    OPTIONAL_ABILITY_EFFECT_CONTINUATION_RE,
+)
 
 _POST_SHOOT_HIT_TARGET_SELECTION_RE = re.compile(
     r"\b(?:(?:in|during)\s+your\s+Shooting\s+phase,\s*)?"
@@ -124,6 +128,12 @@ def merge_rule_clause_spans(
     merged = _merge_setup_reactive_shoot_charge_spans(
         normalized_text=normalized_text,
         spans=spans,
+    )
+    merged = _merge_adjacent_clause_spans(
+        normalized_text=normalized_text,
+        spans=merged,
+        current_patterns=(OPTIONAL_ABILITY_ACTIVATION_RE,),
+        next_pattern=OPTIONAL_ABILITY_EFFECT_CONTINUATION_RE,
     )
     merged = _merge_adjacent_clause_spans(
         normalized_text=normalized_text,

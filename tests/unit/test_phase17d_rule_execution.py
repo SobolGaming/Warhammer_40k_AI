@@ -8,6 +8,8 @@ from typing import Any, cast
 import pytest
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
@@ -20,6 +22,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
 )
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -77,6 +80,9 @@ from warhammer40k_core.engine.effects import (
     generic_rule_persisting_effect,
 )
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_phase_start_hooks import (
+    SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.lifecycle_reaction_queue import (
@@ -107,6 +113,7 @@ from warhammer40k_core.engine.phases.charge import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionRegistry,
@@ -119,7 +126,11 @@ from warhammer40k_core.engine.rule_execution import (
     rule_ir_from_execution_payload,
     scoped_rule_ir_from_execution_payload,
 )
-from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    WeaponProfileModifierContext,
+)
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.selected_target_context import SELECTED_TARGET_UNIT_CONTEXT_KEY
 from warhammer40k_core.engine.target_restriction_hooks import ChargeTargetRestrictionHookRegistry
@@ -158,6 +169,67 @@ SETUP_REACTIVE_SHOOT_CHARGE_TEXT = (
     "must end that charge move engaged with the enemy unit you selected (note that even if "
     "this charge is successful, this unit does not receive any Charge bonus this turn)."
 )
+ONCE_PER_BATTLE_FIGHT_BOOST_TEXT = (
+    "Once per battle, at the start of the Fight phase, this model can use this ability. "
+    "If it does, until the end of the phase, add 3 to the Attacks characteristic of melee "
+    "weapons equipped by this model and those weapons have the [DEVASTATING WOUNDS] ability."
+)
+
+
+def test_phase17d_once_per_battle_activation_consumes_and_modifies_source_model() -> None:
+    state = _battle_state_with_attached_leader_support()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    source_unit = _unit_by_id(state, "army-alpha:leader-unit")
+    source_model = source_unit.own_models[0]
+    source_rules_unit_id = "attached-unit:army-alpha:bodyguard-unit"
+    event_log = EventLog()
+    compiled = _compiled(ONCE_PER_BATTLE_FIGHT_BOOST_TEXT)
+    context = _execution_context(
+        state=state,
+        event_log=event_log,
+        source_unit_instance_id=source_rules_unit_id,
+        source_model_instance_id=source_model.model_instance_id,
+        phase=BattlePhaseKind.FIGHT,
+    )
+
+    missing_log = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=replace(context, event_log=None),
+    )
+    applied = execute_rule_ir(rule_ir=compiled.rule_ir, context=context)
+    effect_count = len(state.persisting_effects)
+    repeated = execute_rule_ir(rule_ir=compiled.rule_ir, context=context)
+
+    assert missing_log.status is RuleExecutionStatus.INVALID
+    assert missing_log.reason == "missing_input:event_log"
+    assert applied.status is RuleExecutionStatus.APPLIED
+    assert len(applied.effect_payloads) == 2
+    assert len(state.persisting_effects) == 2
+    assert [
+        event.event_type
+        for event in event_log.records
+        if event.event_type == RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+    ] == [RULE_FREQUENCY_LIMIT_CONSUMED_EVENT]
+    assert EventLog.from_payload(event_log.to_payload()).to_payload() == event_log.to_payload()
+    assert repeated.status is RuleExecutionStatus.INVALID
+    assert repeated.reason == "frequency_limit_exhausted:battle"
+    assert len(state.persisting_effects) == effect_count
+
+    profile = _weapon_profile("core-leader-blade")
+    modified = RuntimeModifierRegistry.empty().modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=source_rules_unit_id,
+            attacker_model_instance_id=source_model.model_instance_id,
+            target_unit_instance_id="army-alpha:bodyguard-unit",
+            weapon_profile=profile,
+        )
+    )
+
+    assert profile.attack_profile.fixed_attacks == 5
+    assert modified.attack_profile.fixed_attacks == 8
+    assert WeaponKeyword.DEVASTATING_WOUNDS in modified.keywords
 
 
 def test_phase17d_generic_modifier_rule_executes_as_source_linked_effect() -> None:
@@ -1573,6 +1645,7 @@ def test_phase17d_catalog_builder_emits_clause_records_for_compound_ability() ->
             "Weapons equipped by models in that unit have the [LANCE] ability.",
             TimingTriggerKind.PASSIVE_QUERY,
         ),
+        (ONCE_PER_BATTLE_FIGHT_BOOST_TEXT, TimingTriggerKind.START_PHASE),
         ("After a hit roll, re-roll hit rolls.", TimingTriggerKind.AFTER_DICE_ROLL),
         ("Gain 1CP.", TimingTriggerKind.ANY_PHASE),
     ],
@@ -1590,6 +1663,94 @@ def test_phase17d_catalog_builder_classifies_single_clause_generic_timing(
     assert (
         _json_object(records[0].definition.replay_payload)["rule_ir"] == descriptor.rule_ir_payload
     )
+    if raw_text == ONCE_PER_BATTLE_FIGHT_BOOST_TEXT:
+        assert records[0].definition.timing.phase is BattlePhaseKind.FIGHT
+
+
+def test_phase17d_once_per_battle_activation_submits_through_local_session_and_replays() -> None:
+    catalog = _catalog_with_descriptor(
+        _generic_catalog_descriptor(
+            ONCE_PER_BATTLE_FIGHT_BOOST_TEXT,
+            ability_id="once-per-battle-fight-boost",
+        )
+    )
+    config = _setup_reactive_config(catalog)
+    armies = tuple(
+        muster_army(catalog=catalog, request=request) for request in config.army_muster_requests
+    )
+    state = _battle_state()
+    for army in armies:
+        state.record_army_definition(army)
+    state.battlefield_state = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17d-once-per-battle",
+        armies=armies,
+    ).battlefield_state
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    session = LocalGameSession(lifecycle=_setup_reactive_lifecycle(state=state, catalog=catalog))
+
+    status = session.advance_until_decision_or_terminal()
+    request = status.decision_request
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert request is not None
+    assert request.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE
+    use_option = next(
+        option for option in request.options if _json_object(option.payload)["activate"] is True
+    )
+    malformed = replace(
+        DecisionResult.for_request(
+            result_id="phase17d:once-per-battle:malformed",
+            request=request,
+            selected_option_id=use_option.option_id,
+        ),
+        payload={},
+    )
+    malformed_status = session.lifecycle.submit_decision(malformed)
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.pending_decision_request() == request
+    assert session.lifecycle.state is not None
+    assert not session.lifecycle.state.persisting_effects
+
+    submitted = session.submit_option(
+        request_id=request.request_id,
+        option_id=use_option.option_id,
+        result_id="phase17d:once-per-battle:local-session",
+    )
+
+    assert submitted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    second_request = submitted.decision_request
+    assert second_request is not None
+    second_use_option = next(
+        option
+        for option in second_request.options
+        if _json_object(option.payload)["activate"] is True
+    )
+    second_submitted = session.submit_option(
+        request_id=second_request.request_id,
+        option_id=second_use_option.option_id,
+        result_id="phase17d:once-per-battle:local-session:second-model",
+    )
+    assert second_submitted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert session.lifecycle.state is not None
+    assert len(session.lifecycle.state.persisting_effects) == 4
+    assert len({effect.effect_id for effect in session.lifecycle.state.persisting_effects}) == 4
+    player_a_events = session.events_since(EventStreamCursor(), viewer_player_id="player-a")
+    player_b_events = session.events_since(EventStreamCursor(), viewer_player_id="player-b")
+    player_a_activations = [
+        event
+        for event in player_a_events["events"]
+        if event["event_type"] == "catalog_once_per_battle_ability_activated"
+    ]
+    player_b_activations = [
+        event
+        for event in player_b_events["events"]
+        if event["event_type"] == "catalog_once_per_battle_ability_activated"
+    ]
+    assert player_a_activations == player_b_activations
+    assert len(player_a_activations) == 2
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:once-per-battle:fight-boost")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
 
 
 def test_phase17d_catalog_builder_rejects_malformed_generic_ir_descriptors() -> None:
@@ -3712,6 +3873,13 @@ def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
             if unit.unit_instance_id == unit_instance_id:
                 return unit
     raise AssertionError(f"missing unit {unit_instance_id}")
+
+
+def _weapon_profile(wargear_id: str) -> WeaponProfile:
+    for wargear in ArmyCatalog.phase9a_canonical_content_pack().wargear:
+        if wargear.wargear_id == wargear_id:
+            return wargear.weapon_profiles[0]
+    raise AssertionError(f"missing wargear {wargear_id}")
 
 
 def _set_model_wounds(

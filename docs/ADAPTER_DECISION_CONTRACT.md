@@ -1,6 +1,6 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog named-weapon ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog charge-end mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, Phase 18C shared adapter session facade requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog once-per-battle ability choices, Phase 17K catalog named-weapon ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog charge-end mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, Phase 18C shared adapter session facade requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
 This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog named-weapon ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog charge-end mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, Phase 18C shared adapter session facade requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
@@ -63,6 +63,8 @@ The shared contract uses these objects and payloads:
 - `FightActivationAbilitySelection`: finite selected-to-fight ability answer selecting one engine-emitted optional ability option or the deterministic decline option before melee declaration.
 - `FightUnitSelectedGrantSelection`: finite selected-to-fight grant answer selecting one engine-emitted optional grant option or the deterministic decline option before melee declaration.
 - `FactionRuleFightPhaseStartSelection`: finite Fight-start faction-rule answer selecting one engine-emitted source-backed option before the normal `FightPhaseState` opens.
+- `CatalogOncePerBattleAbilitySelection`: finite Fight-start catalog RuleIR answer selecting
+  use or decline for one engine-emitted, source-model-scoped once-per-battle activation.
 - `FactionRuleShootingPhaseStartSelection`: finite Shooting-start faction-rule answer selecting one engine-emitted source-backed option before the normal `ShootingPhaseState` opens.
 - `CatalogNamedWeaponAbilityChoiceSelection`: finite Shooting-start catalog RuleIR answer selecting one engine-emitted weapon ability option for one source-backed unit/model named-weapon group before the normal `ShootingPhaseState` opens.
 - `CatalogPostShootHitTargetStatusSelection`: finite post-attack catalog RuleIR answer selecting one engine-emitted enemy unit hit by the just-completed Shooting attack sequence for a source-backed contextual status denial.
@@ -151,6 +153,7 @@ Relevant modules:
 - `src/warhammer40k_core/engine/phases/charge.py`
 - `src/warhammer40k_core/engine/fight_order.py`
 - `src/warhammer40k_core/engine/fight_phase_start_hooks.py`
+- `src/warhammer40k_core/engine/catalog_once_per_battle_runtime.py`
 - `src/warhammer40k_core/engine/shooting_phase_start_hooks.py`
 - `src/warhammer40k_core/engine/phases/fight.py`
 - `src/warhammer40k_core/engine/phases/shooting.py`
@@ -1124,7 +1127,7 @@ Required Phase 17G setup faction-rule tests:
 
 ## Phase 17G Fight-Start Faction-Rule Decisions
 
-Phase 17G adds opt-in Fight-start decisions for faction runtime content and generic catalog RuleIR consumers. These decisions are emitted only when the current battle phase is Fight, before the normal `FightPhaseState` opens, and only when a registered Fight-start hook has at least one legal source-backed option. Current implemented hooks include Chaos Daemons Shadow Legion Malice Made Manifest and catalog RuleIR selected-target effects such as The Masque of Slaanesh's Eternal Dance.
+Phase 17G adds opt-in Fight-start decisions for faction runtime content and generic catalog RuleIR consumers. These decisions are emitted only when the current battle phase is Fight, before the normal `FightPhaseState` opens, and only when a registered Fight-start hook has at least one legal source-backed option. Current implemented hooks include Chaos Daemons Shadow Legion Malice Made Manifest, catalog RuleIR selected-target effects such as The Masque of Slaanesh's Eternal Dance, and optional once-per-battle RuleIR activations such as Finest Hour.
 
 Phase 17G exposes the finite decision type `select_faction_rule_fight_phase_start_option`. The pending request payload contains game ID, battle round, phase `fight`, active player ID, source rule ID, hook ID, enhancement ID, bearer unit ID, bearer rules-unit ID, and eligible enemy rules-unit IDs. Current Malice Made Manifest options use the form `chaos-daemons:shadow-legion:malice-made-manifest:<bearer_rules_unit_instance_id>:<target_enemy_unit_instance_id>`.
 
@@ -1133,6 +1136,27 @@ Malice option payloads include `submission_kind: "chaos_daemons_shadow_legion_ma
 Accepted Malice selections validate the enhanced Shadow Legion bearer assignment, confirm the selected enemy rules unit was in the request snapshot and is still within Engagement Range of the bearer's attached rules unit, then roll the source-backed D6/D3 sequence through the deterministic dice manager. A D6 roll of 1 records no effect. A D6 roll of 6 applies 3 mortal wounds. Other D6 results roll D3 mortal wounds. If the target has multiple eligible mortal-wound Feel No Pain sources, the handler emits the standard `select_feel_no_pain` finite decision and resumes through the registered Malice continuation hook after the player chooses the FNP source.
 
 Catalog selected-target Fight-start options use the same `select_faction_rule_fight_phase_start_option` decision type with `submission_kind: "catalog_selected_target_fight_start_effect"` and hook ID `catalog-ir:selected-target-effect`. Request payloads include game ID, battle round, phase `fight`, active player ID, player ID, catalog record ID, ability ID/name, source rule ID, RuleIR hash, source unit/model IDs, selection clause ID, effect clause IDs, `available_target_unit_instance_ids`, and `available_catalog_selected_target_options`. Option payloads include `selected_catalog_target_effect` and replay-safe `generic_rule_effect_records`. Accepted selections persist engine-owned generic RuleIR effects until the end of the Fight phase, with a selected-target gate carried in the effect parameters. Adapters must not invent target IDs, infer Engagement Range or distance predicates locally, mutate wound modifiers, or apply generic RuleIR effects locally.
+
+Catalog once-per-battle Fight-start options use the same decision type with
+`submission_kind: "catalog_once_per_battle_fight_start_ability"` and hook ID
+`catalog-ir:once-per-battle-ability`. The request and both use/decline option payloads
+include game ID, battle round, phase `fight`, active player ID, player ID, catalog
+record and ability IDs/names, source rule ID, scoped RuleIR hash and clause ID, source
+component-unit, rules-unit, and model IDs, the deterministic battle-scoped usage key, and the current decline
+window key. The option payload adds `activate: true|false`; adapters select only an
+emitted option ID and must not synthesize usage keys, consume the frequency limit, or
+apply effects locally.
+
+Accepted use selections execute the scoped source-backed RuleIR through the generic
+executor, append `rule_frequency_limit_consumed`, and persist its effects with the IR
+duration. For Finest Hour this creates source-model-scoped melee Attacks and
+`[DEVASTATING WOUNDS]` effects until the end of the Fight phase. The usage event makes
+later battle-round requests for that same rule/model unavailable. Decline emits
+`catalog_once_per_battle_ability_declined`, suppresses only that activation in the
+current Fight-start window, and does not consume its battle use. A well-formed finite
+selection whose source model becomes unavailable after request creation may be
+recorded as a rejected attempt, but it returns typed invalid status before any
+frequency event or authoritative effect mutation.
 
 Malformed, stale, wrong-actor, wrong-game, wrong-round, wrong-phase, wrong-active-player, wrong-hook, unsupported-option, option-payload drift, source-record drift, bearer drift, target drift, closed Fight-start window, and no-longer-engaged submissions reject before the pending queue is popped and before a `DecisionRecord`, dice roll, mortal-wound application, or event is created.
 
@@ -1145,6 +1169,7 @@ Required Phase 17G Fight-start faction-rule tests:
 - multiple-source mortal-wound Feel No Pain routing through the shared FNP decision and continuation hook;
 - stale, drifted, malformed, wrong-context, and ineligible submissions reject before mutation;
 - deterministic JSON-safe decision, event, generic RuleIR effect, lifecycle, and replay payload round-trip;
+- valid once-per-battle use and decline through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`, including battle-use exhaustion and source-model drift without mutation;
 - viewer-scoped projection/event redaction for any future hidden Fight-start faction-rule selections.
 
 ## Phase 17G Fight-End Faction-Rule Decisions
