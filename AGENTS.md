@@ -52,6 +52,10 @@ Do not add AI/ranker/training logic before the deterministic rules core, decisio
 - Generated content is committed as versioned data artifacts (JSON) plus
   typed fail-fast loaders, not as Python modules. Generators emit data;
   loaders validate eagerly and preserve package hashes and provenance.
+- Forge World, Crusade, Boarding Action/Boarding Actions, Kill Team, Legends,
+  and Warhammer Legends content is out of CORE V2 support scope. Do not ingest,
+  scaffold, document, or expose it as supported engine or catalog content unless
+  this file is explicitly changed first.
 - Runtime engine code consumes structured descriptors, not ad hoc string parsing.
 - Reusable rule semantics use source-backed RuleIR, generic semantic handlers,
   or approved runtime hooks before named handlers.
@@ -282,6 +286,9 @@ Stop before coding if the change would:
 - copy legacy code wholesale;
 - make UI/headless/network paths diverge;
 - use endpoint-only movement validation;
+- add support, scaffold rows, generated docs, or catalog/runtime exposure for
+  Forge World, Crusade, Boarding Action/Boarding Actions, Kill Team, Legends,
+  or Warhammer Legends content;
 - add a named handler for reusable semantics that fit RuleIR, a generic
   semantic handler, or an approved runtime hook;
 - add a named handler without documented bespoke-subsystem justification and

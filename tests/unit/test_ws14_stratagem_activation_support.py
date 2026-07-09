@@ -72,8 +72,8 @@ def test_ws14_stratagem_activation_profiles_cover_source_only_detachment_rows() 
         faction_generic_ir_support_2026_27.supported_cavalcade_of_chaos_stratagem_source_row_ids()
     )
 
-    assert len(source_only_rows) == 1083
-    assert len(profiles) == 1080
+    assert len(source_only_rows) == 1079
+    assert len(profiles) == 1076
     assert cavalcade_generic_row_ids <= source_only_row_ids
     assert profile_source_row_ids == source_only_row_ids - cavalcade_generic_row_ids
 
@@ -106,8 +106,8 @@ def test_ws14_generated_stratagem_rule_ir_freezes_supported_effect_durations() -
         )
     ]
 
-    assert len(effect_profiles) == 172
-    assert len(duration_profiles) == 168
+    assert len(effect_profiles) == 171
+    assert len(duration_profiles) == 167
 
     payload = effect_profiles[0].rule_ir_payload()
     payload["rule_id"] = "tampered"
@@ -123,7 +123,7 @@ def test_ws14_source_backed_stratagem_activation_records_are_runtime_loadable() 
         faction_stratagem_activation_2026_27.SOURCE_PACKAGE_ID
     )
     assert len(records) == sum(len(profile.phase_tokens) for profile in profiles)
-    assert len(records) == 1264
+    assert len(records) == 1260
     assert StratagemCatalogIndex.from_records(records).all_records() == tuple(
         sorted(records, key=lambda record: record.record_id)
     )

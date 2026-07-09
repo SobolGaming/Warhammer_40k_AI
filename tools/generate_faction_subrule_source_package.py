@@ -60,10 +60,22 @@ SOURCE_ONLY_STATUS = "source_only"
 ENGINE_CONSUMED_STATUS = "engine_consumed"
 SKIP_REASON_MISSING_OWNER_FIELDS = "missing_owner_fields"
 SKIP_REASON_OWNER_NOT_IN_CURRENT_SOURCE_PACKAGE = "owner_not_in_current_source_package"
+SKIP_REASON_UNSUPPORTED_SOURCE_TYPE = "unsupported_source_type"
 APPROVED_SKIPPED_BRIDGE_REASONS = frozenset(
     (
         SKIP_REASON_MISSING_OWNER_FIELDS,
         SKIP_REASON_OWNER_NOT_IN_CURRENT_SOURCE_PACKAGE,
+        SKIP_REASON_UNSUPPORTED_SOURCE_TYPE,
+    )
+)
+UNSUPPORTED_SOURCE_MARKERS = frozenset(
+    (
+        "board action",
+        "boarding action",
+        "crusade",
+        "forge world",
+        "kill team",
+        "legend",
     )
 )
 RUNTIME_ONLY_PROVENANCE_REASON = "runtime_handler_without_bridge_source_row"
@@ -186,10 +198,15 @@ class GeneratedRuntimeOnlyRow:
 
 def main() -> None:
     faction_rows_by_bridge_id = _faction_rows_by_bridge_id()
+    detachment_rows_by_bridge_id = _detachment_rows_by_bridge_id()
     bridge_enhancements, skipped_bridge_enhancements = _bridge_enhancement_rows(
-        faction_rows_by_bridge_id
+        faction_rows_by_bridge_id,
+        detachment_rows_by_bridge_id,
     )
-    bridge_stratagems, skipped_bridge_stratagems = _bridge_stratagem_rows(faction_rows_by_bridge_id)
+    bridge_stratagems, skipped_bridge_stratagems = _bridge_stratagem_rows(
+        faction_rows_by_bridge_id,
+        detachment_rows_by_bridge_id,
+    )
     runtime_enhancements, runtime_stratagems = _runtime_subrule_seeds()
     enhancements, runtime_only_enhancements = _overlay_runtime_enhancements(
         bridge_rows=bridge_enhancements,
@@ -216,6 +233,7 @@ def main() -> None:
 
 def _bridge_enhancement_rows(
     faction_rows_by_bridge_id: dict[str, dict[str, str]],
+    detachment_rows_by_bridge_id: dict[str, dict[str, str]],
 ) -> tuple[tuple[GeneratedEnhancementRow, ...], tuple[GeneratedSkippedBridgeRow, ...]]:
     rows: list[GeneratedEnhancementRow] = []
     skipped_rows: list[GeneratedSkippedBridgeRow] = []
@@ -253,6 +271,21 @@ def _bridge_enhancement_rows(
                 )
             )
             continue
+        if _bridge_row_has_unsupported_detachment_source_type(
+            fields=fields,
+            detachment_rows_by_bridge_id=detachment_rows_by_bridge_id,
+        ):
+            skipped_rows.append(
+                _skipped_bridge_row(
+                    table="Enhancements",
+                    source_row_id=row["source_row_id"],
+                    faction_rows_by_bridge_id=faction_rows_by_bridge_id,
+                    bridge_faction_id=bridge_faction_id,
+                    detachment_name=detachment_name,
+                    skip_reason=SKIP_REASON_UNSUPPORTED_SOURCE_TYPE,
+                )
+            )
+            continue
         rows.append(
             GeneratedEnhancementRow(
                 faction_id=faction_id,
@@ -276,6 +309,7 @@ def _bridge_enhancement_rows(
 
 def _bridge_stratagem_rows(
     faction_rows_by_bridge_id: dict[str, dict[str, str]],
+    detachment_rows_by_bridge_id: dict[str, dict[str, str]],
 ) -> tuple[tuple[GeneratedStratagemRow, ...], tuple[GeneratedSkippedBridgeRow, ...]]:
     rows: list[GeneratedStratagemRow] = []
     skipped_rows: list[GeneratedSkippedBridgeRow] = []
@@ -310,6 +344,21 @@ def _bridge_stratagem_rows(
                     bridge_faction_id=bridge_faction_id,
                     detachment_name=detachment_name,
                     skip_reason=SKIP_REASON_OWNER_NOT_IN_CURRENT_SOURCE_PACKAGE,
+                )
+            )
+            continue
+        if _bridge_row_has_unsupported_detachment_source_type(
+            fields=fields,
+            detachment_rows_by_bridge_id=detachment_rows_by_bridge_id,
+        ):
+            skipped_rows.append(
+                _skipped_bridge_row(
+                    table="Stratagems",
+                    source_row_id=row["source_row_id"],
+                    faction_rows_by_bridge_id=faction_rows_by_bridge_id,
+                    bridge_faction_id=bridge_faction_id,
+                    detachment_name=detachment_name,
+                    skip_reason=SKIP_REASON_UNSUPPORTED_SOURCE_TYPE,
                 )
             )
             continue
@@ -624,6 +673,33 @@ def _faction_rows_by_bridge_id() -> dict[str, dict[str, str]]:
     return rows
 
 
+def _detachment_rows_by_bridge_id() -> dict[str, dict[str, str]]:
+    rows: dict[str, dict[str, str]] = {}
+    for row in _source_rows("Detachments"):
+        fields = row["fields"]
+        rows[fields["id"]] = fields
+    return rows
+
+
+def _bridge_row_has_unsupported_detachment_source_type(
+    *,
+    fields: dict[str, str],
+    detachment_rows_by_bridge_id: dict[str, dict[str, str]],
+) -> bool:
+    detachment_id = fields["detachment_id"].strip()
+    if not detachment_id:
+        raise TypeError("Detachment-owned bridge row lacks detachment_id.")
+    detachment_fields = detachment_rows_by_bridge_id.get(detachment_id)
+    if detachment_fields is None:
+        return False
+    return _contains_unsupported_source_marker(detachment_fields["type"])
+
+
+def _contains_unsupported_source_marker(value: str) -> bool:
+    normalized = value.casefold()
+    return any(marker in normalized for marker in UNSUPPORTED_SOURCE_MARKERS)
+
+
 def _skipped_bridge_row(
     *,
     table: str,
@@ -884,7 +960,7 @@ def _module_content(
             'IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17-exact-faction-subrules-v1"',
             (
                 'APPROVED_SKIPPED_BRIDGE_REASONS = frozenset(("missing_owner_fields", '
-                '"owner_not_in_current_source_package"))'
+                '"owner_not_in_current_source_package", "unsupported_source_type"))'
             ),
             (
                 "APPROVED_RUNTIME_ONLY_PROVENANCE_REASONS = "
