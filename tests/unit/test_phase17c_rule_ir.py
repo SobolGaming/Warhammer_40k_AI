@@ -51,6 +51,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
     CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+    CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
     CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
@@ -252,7 +253,7 @@ def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
         == compiled.to_payload()
     )
     assert compiled.rule_ir.is_supported
-    assert compiled.rule_ir.parser_version == "phase17c-rule-parser-v1"
+    assert compiled.rule_ir.parser_version == "phase17c-rule-parser-v2"
     assert compiled.rule_ir.clauses[0].trigger is not None
     assert compiled.rule_ir.clauses[0].trigger.kind is RuleTriggerKind.TIMING_WINDOW
     assert compiled.rule_ir.clauses[0].target is not None
@@ -274,6 +275,99 @@ def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
         condition.kind is RuleConditionKind.FREQUENCY_LIMIT
         and parameter_payload(condition.parameters) == {"scope": "phase"}
         for condition in conditions
+    )
+
+
+def test_phase17c_once_per_battle_optional_activation_compiles_to_generic_ir() -> None:
+    compiled = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="wahapedia:datasheet-ability:finest-hour",
+            raw_text=(
+                "Once per battle, at the start of the Fight phase, this model can use this "
+                "ability. If it does, until the end of the phase, add 3 to the Attacks "
+                "characteristic of melee weapons equipped by this model and those weapons "
+                "have the [DEVASTATING WOUNDS] ability."
+            ),
+        )
+    )
+    rule_ir = compiled.rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert len(rule_ir.clauses) == 1
+    assert clause.trigger is not None
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "start",
+        "owner": None,
+        "phase": "fight",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert [
+        parameter_payload(condition.parameters)
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.FREQUENCY_LIMIT
+    ] == [
+        {
+            "activation_kind": "optional_ability_use",
+            "max_uses": 1,
+            "scope": "battle",
+            "usage_subject": "this_model",
+        }
+    ]
+    assert [(effect.kind, parameter_payload(effect.parameters)) for effect in clause.effects] == [
+        (
+            RuleEffectKind.MODIFY_CHARACTERISTIC,
+            {"characteristic": "attacks", "delta": 3, "weapon_scope": "melee"},
+        ),
+        (
+            RuleEffectKind.GRANT_WEAPON_ABILITY,
+            {"weapon_ability": "Devastating Wounds", "weapon_scope": "melee"},
+        ),
+    ]
+    assert clause.duration is not None
+    assert parameter_payload(clause.duration.parameters) == {"endpoint": "phase"}
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
+    )
+    assert CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID in (
+        catalog_rule_ir_hook_ids_for_rule(rule_ir)
+    )
+
+
+def test_phase17c_once_per_battle_without_runtime_timing_is_not_execution_supported() -> None:
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17c:once-per-battle:shooting-start",
+            raw_text=(
+                "Once per battle, at the start of the Shooting phase, this model can use "
+                "this ability. If it does, until the end of the phase, add 3 to the Attacks "
+                "characteristic of melee weapons equipped by this model."
+            ),
+        )
+    ).rule_ir
+
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
+
+
+def test_phase17c_once_per_battle_when_it_does_continuation_merges() -> None:
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17c:once-per-battle:when-it-does",
+            raw_text=(
+                "Once per battle, at the start of the Fight phase, this model can use this "
+                "ability. When it does, until the end of the phase, add 3 to the Attacks "
+                "characteristic of melee weapons equipped by this model."
+            ),
+        )
+    ).rule_ir
+
+    assert rule_ir.is_supported
+    assert len(rule_ir.clauses) == 1
+    assert CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID in (
+        catalog_rule_ir_consumers_for_rule(rule_ir)
     )
 
 
@@ -3006,8 +3100,8 @@ def test_phase17c_compiler_payload_boundary_is_fail_fast() -> None:
         == compiled.rule_ir.to_payload()
     )
     assert identity == {
-        "compiler_version": "phase17c-rule-compiler-v1",
-        "parser_version": "phase17c-rule-parser-v1",
+        "compiler_version": "phase17c-rule-compiler-v2",
+        "parser_version": "phase17c-rule-parser-v2",
         "ir_schema_version": "phase17c-rule-ir-v1",
     }
     assert tuple(

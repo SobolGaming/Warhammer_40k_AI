@@ -29,7 +29,8 @@ _CHARACTERISTIC_RE = re.compile(
     rf"\b(?P<verb>add|subtract)\s+(?P<value>\d+)(?:\")?\s+(?:to|from)\s+"
     rf"(?:the\s+)?(?P<characteristic>{_CHARACTERISTIC_NAMES})\s+characteristic\b"
     r"(?:\s+of\s+that\s+attack|\s+of\s+(?P<weapon_scope>all|ranged|melee)?\s*"
-    r"weapons?\s+equipped\s+by\s+models\s+in\s+(?:this|that|selected|target)\s+unit)?",
+    r"weapons?\s+equipped\s+by\s+(?:this\s+model|models\s+in\s+"
+    r"(?:this|that|selected|target)\s+unit))?",
     re.IGNORECASE,
 )
 _SET_CHARACTERISTIC_RE = re.compile(

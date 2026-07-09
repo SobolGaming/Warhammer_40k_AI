@@ -26,6 +26,7 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine import catalog_contextual_status_consumption as _contextual
 from warhammer40k_core.engine import catalog_movement_transit as _catalog_transit
+from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
 from warhammer40k_core.engine import catalog_rule_selected_target_classification as _st
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -161,6 +162,7 @@ CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
 CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = "catalog-ir:named-weapon-ability-choice"
 CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-status"
 CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:selected-target-effect"
+CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID = "catalog-ir:once-per-battle-ability"
 CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-effect"
 CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID = (
     "catalog-ir:unit-move-completed-mortal-wounds"
@@ -1393,6 +1395,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
         CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+        CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
@@ -3822,7 +3825,11 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
 def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog rule consumer classification requires RuleClause.")
+    if _frequency.clause_has_unconsumed_once_per_battle_activation(clause):
+        return ()
     consumer_ids: set[str] = set()
+    if _frequency.clause_is_fight_start_once_per_battle_activation(clause):
+        consumer_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)
     if _clause_targets_this_model(clause):
         for effect in clause.effects:
             if _effect_is_feel_no_pain_grant(effect):
@@ -3901,6 +3908,8 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
         raise GameLifecycleError("Catalog rule consumer classification requires RuleIR.")
     hook_ids: set[str] = set()
     for clause in rule_ir.clauses:
+        if _frequency.clause_has_unconsumed_once_per_battle_activation(clause):
+            continue
         hook_ids.update(_catalog_ir_hook_ids_for_clause(clause))
         for effect in clause.effects:
             if _effect_is_charge_roll_modifier(effect):
@@ -3915,6 +3924,8 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
 
 def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     hook_ids: set[str] = set()
+    if _frequency.clause_is_fight_start_once_per_battle_activation(clause):
+        hook_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)
     if _clause_is_supported_tracked_target_selection(clause):
         hook_ids.add(CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID)
     if _clause_is_supported_tracked_target_reroll(clause):

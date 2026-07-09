@@ -21,6 +21,7 @@ from warhammer40k_core.rules.rule_characteristic_parser import (
 )
 from warhammer40k_core.rules.rule_clause_merging import merge_rule_clause_spans
 from warhammer40k_core.rules.rule_duration_parser import parse_rule_duration
+from warhammer40k_core.rules.rule_frequency_parser import parse_frequency_conditions
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
@@ -87,7 +88,7 @@ from warhammer40k_core.rules.setup_reactive_parser import (
     compile_setup_reactive_shoot_charge_clause,
 )
 
-RULE_PARSER_VERSION = "phase17c-rule-parser-v1"
+RULE_PARSER_VERSION = "phase17c-rule-parser-v2"
 
 _PHASES = "command|movement|shooting|charge|fight"
 _ROLL_TYPES = (
@@ -207,9 +208,6 @@ _WHEN_DOING_SO_RE = re.compile(r"\bwhen\s+doing\s+so\b", re.IGNORECASE)
 _SETUP_RE = re.compile(r"\b(?:deployment|before\s+the\s+battle|set\s+up)\b", re.IGNORECASE)
 _DICE_TRIGGER_RE = re.compile(
     rf"\b(?:after|when|each\s+time)\s+.*\b(?P<roll>{_ROLL_TYPES})\s+roll", re.IGNORECASE
-)
-_ONCE_PER_RE = re.compile(
-    r"\bonce\s+per\s+(?P<scope>phase|turn|battle|battle round)\b", re.IGNORECASE
 )
 _AURA_RE = re.compile(r"(?:\bAura\b|^\s*Aura\s*:)", re.IGNORECASE)
 _LEADING_UNIT_RE = re.compile(
@@ -732,7 +730,7 @@ def _compile_clause(
             *_parse_tracked_target_conditions(clause_text),
             *parse_this_model_attack_target_conditions(clause_text.span),
             *_parse_return_on_death_conditions(clause_text),
-            *_parse_frequency_conditions(clause_text),
+            *parse_frequency_conditions(clause_text.span),
             *_parse_keyword_conditions(clause_text, parser_context=parser_context),
             *_parse_distance_conditions(
                 clause_text,
@@ -1182,19 +1180,6 @@ def _parse_return_on_death_conditions(clause_text: _ClauseText) -> tuple[RuleCon
             ),
         ),
     )
-
-
-def _parse_frequency_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
-    conditions: list[RuleCondition] = []
-    for match in _ONCE_PER_RE.finditer(clause_text.text):
-        conditions.append(
-            RuleCondition(
-                kind=RuleConditionKind.FREQUENCY_LIMIT,
-                source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs((("scope", _lower_group(match, "scope")),)),
-            )
-        )
-    return tuple(conditions)
 
 
 def _parse_keyword_conditions(

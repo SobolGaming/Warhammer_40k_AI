@@ -42,6 +42,11 @@ from warhammer40k_core.engine.rule_duration_execution import (
     expiration_for_duration,
     rule_duration_unavailable_reason,
 )
+from warhammer40k_core.engine.rule_frequency import (
+    consume_optional_ability_frequency,
+    optional_ability_frequency_condition,
+    optional_ability_frequency_unavailable_reason,
+)
 from warhammer40k_core.engine.rule_target_resolution import (
     effect_clause_target_unavailable_reason,
     target_binding_clause_unavailable_reason,
@@ -800,8 +805,7 @@ def _execute_preflighted_rule_ir(
             if result.status is not RuleExecutionStatus.APPLIED:
                 return result
             results.append(result)
-            continue
-        if clause.effects:
+        elif clause.effects:
             for effect in clause.effects:
                 binding = _require_binding(
                     registry.binding_for_effect(clause=clause, effect=effect)
@@ -810,21 +814,41 @@ def _execute_preflighted_rule_ir(
                 if result.status is not RuleExecutionStatus.APPLIED:
                     return result
                 results.append(result)
-            continue
-        if clause.target is not None:
+        elif clause.target is not None:
             binding = _require_binding(registry.binding_for_clause(clause))
             result = binding.handler(rule_ir, clause, None, context)
             if result.status is not RuleExecutionStatus.APPLIED:
                 return result
             results.append(result)
-            continue
-        results.append(
-            RuleExecutionResult.applied(
-                rule_ir,
-                applied_clause_ids=(clause.clause_id,),
-                replay_payload={"clause_id": clause.clause_id, "execution": "no_effect"},
+        else:
+            results.append(
+                RuleExecutionResult.applied(
+                    rule_ir,
+                    applied_clause_ids=(clause.clause_id,),
+                    replay_payload={"clause_id": clause.clause_id, "execution": "no_effect"},
+                )
             )
+        frequency_events = consume_optional_ability_frequency(
+            rule_ir=rule_ir,
+            clause=clause,
+            event_log=context.event_log,
+            player_id=context.player_id,
+            source_unit_instance_id=context.source_unit_instance_id,
+            source_model_instance_id=context.source_model_instance_id,
+            battle_round=context.battle_round,
+            phase=context.phase,
+            active_player_id=context.active_player_id,
+            timing_window_id=context.timing_window_id,
         )
+        if frequency_events:
+            results.append(
+                RuleExecutionResult.applied(
+                    rule_ir,
+                    applied_clause_ids=(clause.clause_id,),
+                    event_records=frequency_events,
+                    replay_payload={"frequency_limit_consumed": True},
+                )
+            )
     return _merge_applied_results(rule_ir=rule_ir, results=tuple(results))
 
 
@@ -1106,7 +1130,13 @@ def _persisting_effect_or_none(
     if expiration is None:
         return None
     persisting_effect = generic_rule_persisting_effect(
-        effect_id=_effect_id(rule_ir=rule_ir, clause=clause, effect=effect),
+        effect_id=_effect_id(
+            rule_ir=rule_ir,
+            clause=clause,
+            effect=effect,
+            context=context,
+            target_unit_instance_ids=target_unit_instance_ids,
+        ),
         source_rule_id=rule_ir.source_id,
         owner_player_id=context.player_id,
         target_unit_instance_ids=target_unit_instance_ids,
@@ -1245,7 +1275,11 @@ def _clause_semantic_unavailable_reason(
     context: RuleExecutionContext,
     simulated_command_ledgers: dict[str, CommandPointLedger],
 ) -> str | None:
-    condition_reason = _condition_unavailable_reason(clause=clause, context=context)
+    condition_reason = _condition_unavailable_reason(
+        rule_ir=rule_ir,
+        clause=clause,
+        context=context,
+    )
     if condition_reason is not None:
         return condition_reason
     target_reason = effect_clause_target_unavailable_reason(clause=clause, context=context)
@@ -1268,9 +1302,20 @@ def _clause_semantic_unavailable_reason(
 
 def _condition_unavailable_reason(
     *,
+    rule_ir: RuleIR,
     clause: RuleClause,
     context: RuleExecutionContext,
 ) -> str | None:
+    frequency_reason = optional_ability_frequency_unavailable_reason(
+        rule_ir=rule_ir,
+        clause=clause,
+        event_log=context.event_log,
+        player_id=context.player_id,
+        source_unit_instance_id=context.source_unit_instance_id,
+        source_model_instance_id=context.source_model_instance_id,
+    )
+    if frequency_reason is not None:
+        return frequency_reason
     for condition in clause.conditions:
         if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT:
             continue
@@ -1556,9 +1601,24 @@ def _fallback_event_id(
     return f"rule-event:{rule_ir.ir_hash()[:12]}:{clause_suffix}:{effect_kind}:{suffix}"
 
 
-def _effect_id(*, rule_ir: RuleIR, clause: RuleClause, effect: RuleEffectSpec) -> str:
+def _effect_id(
+    *,
+    rule_ir: RuleIR,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+    context: RuleExecutionContext,
+    target_unit_instance_ids: tuple[str, ...],
+) -> str:
+    identity: object = effect.to_payload()
+    if optional_ability_frequency_condition(clause) is not None:
+        identity = {
+            "effect": effect.to_payload(),
+            "source_model_instance_id": context.source_model_instance_id,
+            "source_unit_instance_id": context.source_unit_instance_id,
+            "target_unit_instance_ids": list(target_unit_instance_ids),
+        }
     canonical = json.dumps(
-        effect.to_payload(),
+        identity,
         sort_keys=True,
         separators=(",", ":"),
     ).encode()
