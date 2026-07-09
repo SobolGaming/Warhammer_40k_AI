@@ -397,13 +397,15 @@
     "datasheet_id": "000001148",
     "datasheet_name": "Be'lakor",
     "diagnostic_reasons": [],
-    "runtime_consumer_ids": [],
+    "runtime_consumer_ids": [
+      "core:stealth"
+    ],
     "semantic_categories": [
-      "unknown.ability_text"
+      "core.stealth"
     ],
     "source_kind": "core",
     "source_wargear_id": null,
-    "support_stage": "descriptor_only"
+    "support_stage": "engine_consumed"
   },
   {
     "ability_id": "000001148:pall-of-despair-aura-psychic",
@@ -435,13 +437,15 @@
     "datasheet_id": "000001148",
     "datasheet_name": "Be'lakor",
     "diagnostic_reasons": [],
-    "runtime_consumer_ids": [],
+    "runtime_consumer_ids": [
+      "army-mustering:supreme-commander"
+    ],
     "semantic_categories": [
-      "unknown.ability_text"
+      "datasheet.mustering.supreme_commander"
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,
-    "support_stage": "descriptor_only"
+    "support_stage": "engine_consumed"
   },
   {
     "ability_id": "000001148:shadow-form",

@@ -81,6 +81,8 @@ from warhammer40k_core.engine.ability_catalog import (
     catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.ability_coverage import (
+    CORE_STEALTH_RUNTIME_CONSUMER_ID,
+    SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,
     AbilityCoverageAbilityDatasheetPair,
     AbilityCoverageCategoryRow,
     AbilityCoverageRow,
@@ -5383,6 +5385,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     flesh_hounds_support = support_rows_by_datasheet_id["000001112"]
     bloodletters_support = support_rows_by_datasheet_id["000001114"]
     bloodcrushers_support = support_rows_by_datasheet_id["000001115"]
+    belakor_support = support_rows_by_datasheet_id["000001148"]
+    belakor_stealth_rows = tuple(
+        row for row in rows if row.datasheet_id == "000001148" and row.ability_name == "Stealth"
+    )
+    belakor_supreme_commander_rows = tuple(
+        row
+        for row in rows
+        if row.datasheet_id == "000001148" and row.ability_name == "SUPREME COMMANDER"
+    )
     known_mustering_source_ids = {
         value
         for name, value in vars(army_mustering).items()
@@ -5551,6 +5562,25 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert bloodletters_support.datasheet_ability_status == "Full"
     assert bloodcrushers_support.overall == "Playable"
     assert bloodcrushers_support.datasheet_ability_status == "Full"
+    assert belakor_support.overall == "Playable"
+    assert belakor_support.datasheet_ability_status == "Full"
+    assert belakor_support.faction_interaction_status == "Partial"
+    assert "descriptor_only" not in belakor_support.notes
+    assert len(belakor_stealth_rows) == 1
+    assert belakor_stealth_rows[0].support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    assert belakor_stealth_rows[0].runtime_consumer_ids == (CORE_STEALTH_RUNTIME_CONSUMER_ID,)
+    assert belakor_stealth_rows[0].semantic_categories == ("core.stealth",)
+    assert len(belakor_supreme_commander_rows) == 1
+    assert (
+        belakor_supreme_commander_rows[0].support_stage
+        is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    )
+    assert belakor_supreme_commander_rows[0].runtime_consumer_ids == (
+        SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,
+    )
+    assert belakor_supreme_commander_rows[0].semantic_categories == (
+        "datasheet.mustering.supreme_commander",
+    )
     for support_row in support_rows:
         assert support_row.overall in DATASHEET_SUPPORT_OVERALL_VALUES
         assert support_row.faction_id in faction_ids
@@ -5566,6 +5596,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         assert mustering_row.support_stage in MUSTERING_SUPPORT_STAGE_VALUES
     assert known_mustering_source_ids.issubset(represented_mustering_source_ids)
     assert "army-mustering:drukhari-corsairs-and-travelling-players" in army_mustering_rule_ids
+    assert SUPREME_COMMANDER_MUSTERING_CONSUMER_ID in army_mustering_rule_ids
     assert len(army_mustering_rule_ids) > 1
     assert "## Mustering / List Construction Support" in generated_markdown
     assert (

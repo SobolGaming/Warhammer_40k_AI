@@ -25,6 +25,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
 from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.ability_coverage import (
+    SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,
     AbilityCoverageAbilityDatasheetPairPayload,
     AbilityCoverageCategoryRowPayload,
     AbilityCoverageRow,
@@ -1221,6 +1222,26 @@ def mustering_support_rows() -> tuple[MusteringSupportRow, ...]:
             notes=(
                 "Enforces one-Chapter roster restrictions plus Black Templars, Space Wolves, "
                 "and Deathwatch forbidden-unit gates for Adeptus Astartes armies."
+            ),
+        ),
+        MusteringSupportRow(
+            rule_id=SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,
+            display_name="Supreme Commander",
+            faction_id=None,
+            allowed_base_faction_ids=("any",),
+            source_id="core:supreme-commander",
+            enforcement_surface="army_mustering/list_validation",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_append_supreme_commander_warlord_violations",
+            tests_evidence=(
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_mustering_requires_supreme_commander_to_be_warlord; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander"
+            ),
+            notes=(
+                "Consumes structured Supreme Commander mustering descriptors and requires an "
+                "eligible Supreme Commander unit to be selected as Warlord when present."
             ),
         ),
     )

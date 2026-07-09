@@ -97,5 +97,19 @@
     "source_id": "phase17g:space-marines:space-marine-chapters",
     "support_stage": "full",
     "tests_evidence": "tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_black_templars_and_space_wolves; tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_deathwatch_restrictions"
+  },
+  {
+    "allowed_base_faction_ids": [
+      "any"
+    ],
+    "display_name": "Supreme Commander",
+    "enforcement_id": "army_mustering:_append_supreme_commander_warlord_violations",
+    "enforcement_surface": "army_mustering/list_validation",
+    "faction_id": null,
+    "notes": "Consumes structured Supreme Commander mustering descriptors and requires an eligible Supreme Commander unit to be selected as Warlord when present.",
+    "rule_id": "army-mustering:supreme-commander",
+    "source_id": "core:supreme-commander",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_mustering_requires_supreme_commander_to_be_warlord; tests/unit/test_phase9c_mustering.py::test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander"
   }
 ]

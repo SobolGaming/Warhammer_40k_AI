@@ -13,7 +13,7 @@
       "chaos-daemons-bridge-catalog/000001148/faction/000008433/none"
     ],
     "catalog_status": "Full",
-    "datasheet_ability_status": "Partial",
+    "datasheet_ability_status": "Full",
     "datasheet_id": "000001148",
     "datasheet_name": "Be'lakor",
     "detachment_ids": [
@@ -30,15 +30,15 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "`000008337` Stealth: `descriptor_only` `000001148:supreme-commander` SUPREME COMMANDER: `descriptor_only` Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
-    "overall": "Partial",
+    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
       "shadow-legion"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:battle-shock-failed-heal`, `catalog-ir:battle-shock-forced-test`, `catalog-ir:hit-roll-reroll`, `catalog-ir:shadow-form-choice`, `catalog-ir:shadow-of-chaos-aura`, `catalog-ir:shooting-target-range-restriction`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `army-mustering:supreme-commander`, `catalog-ir:battle-shock-failed-heal`, `catalog-ir:battle-shock-forced-test`, `catalog-ir:hit-roll-reroll`, `catalog-ir:shadow-form-choice`, `catalog-ir:shadow-of-chaos-aura`, `catalog-ir:shooting-target-range-restriction`, `core:stealth`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },
