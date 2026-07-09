@@ -7,6 +7,8 @@ RUNTIME_GENERIC_IR_BOUNDARY_FILES = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "generic_rule_lifecycle_hooks.py",
     ROOT / "src" / "warhammer40k_core" / "engine" / "generic_rule_ability_registry.py",
     ROOT / "src" / "warhammer40k_core" / "engine" / "faction_rule_execution.py",
+    ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_command_point_runtime.py",
+    ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_command_point_support.py",
     ROOT
     / "src"
     / "warhammer40k_core"
@@ -69,6 +71,15 @@ FORBIDDEN_GENERIC_RULE_LIFECYCLE_DETACHMENT_TOKENS = (
     "shadow-legion",
     "chaos-daemons",
 )
+CATALOG_COMMAND_POINT_RUNTIME_FILES = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_command_point_runtime.py",
+    ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_command_point_support.py",
+)
+FORBIDDEN_CATALOG_COMMAND_POINT_TOKENS = (
+    "definition.name",
+    "normalized_text",
+    "source_span.text",
+)
 
 
 def test_ws14_generic_ir_runtime_path_does_not_compile_or_read_raw_source_text() -> None:
@@ -87,5 +98,16 @@ def test_ws14_generic_rule_lifecycle_hooks_use_ability_registry_for_detachment_g
     offenders = [
         token for token in FORBIDDEN_GENERIC_RULE_LIFECYCLE_DETACHMENT_TOKENS if token in text
     ]
+
+    assert offenders == []
+
+
+def test_catalog_command_point_runtime_uses_structured_ids_not_names_or_rule_text() -> None:
+    offenders: list[tuple[str, str]] = []
+    for path in CATALOG_COMMAND_POINT_RUNTIME_FILES:
+        text = path.read_text(encoding="utf-8")
+        for token in FORBIDDEN_CATALOG_COMMAND_POINT_TOKENS:
+            if token in text:
+                offenders.append((path.relative_to(ROOT).as_posix(), token))
 
     assert offenders == []

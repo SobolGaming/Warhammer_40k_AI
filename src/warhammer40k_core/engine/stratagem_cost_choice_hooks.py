@@ -19,6 +19,7 @@ from warhammer40k_core.engine.stratagems import (
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.stratagems import (
+        StratagemCatalogRecord,
         StratagemDefinition,
         StratagemEligibilityContext,
         StratagemTargetBinding,
@@ -157,7 +158,6 @@ class StratagemCostChoiceHookRegistry:
     ) -> DecisionRequest | None:
         if type(context) is not StratagemCostChoiceRequestContext:
             raise GameLifecycleError("Stratagem cost choice request hooks require a context.")
-        requests: list[DecisionRequest] = []
         for binding in self.bindings:
             if binding.request_handler is None:
                 continue
@@ -168,14 +168,8 @@ class StratagemCostChoiceHookRegistry:
                 raise GameLifecycleError(
                     "Stratagem cost choice handlers must return DecisionRequest or None."
                 )
-            requests.append(request)
-        if len(requests) > 1:
-            raise GameLifecycleError(
-                "Stratagem cost choice hooks produced multiple simultaneous requests."
-            )
-        if not requests:
-            return None
-        return requests[0]
+            return request
+        return None
 
     def apply_result(self, context: StratagemCostChoiceResultContext) -> bool:
         if type(context) is not StratagemCostChoiceResultContext:
@@ -208,6 +202,31 @@ def stratagem_cost_choice_source_result(request: DecisionRequest) -> DecisionRes
         return DecisionResult.from_payload(cast(DecisionResultPayload, result_payload))
     except KeyError as exc:
         raise GameLifecycleError("Stratagem cost choice source result is malformed.") from exc
+
+
+def source_selection_for_cost_choice(
+    source_request: DecisionRequest,
+    source_result: DecisionResult,
+) -> tuple[
+    StratagemEligibilityContext,
+    StratagemCatalogRecord,
+    StratagemTargetBinding,
+    JsonValue,
+]:
+    from warhammer40k_core.engine.stratagems import (
+        stratagem_selection_from_decision_result,
+        stratagem_selection_from_target_proposal_result,
+    )
+
+    if source_request.decision_type == STRATAGEM_DECISION_TYPE:
+        selection = stratagem_selection_from_decision_result(source_result)
+    elif source_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        selection = stratagem_selection_from_target_proposal_result(source_result)
+    else:
+        raise GameLifecycleError("Stratagem cost choice source decision_type drift.")
+    if selection is None:
+        raise GameLifecycleError("Stratagem cost choice source selection is malformed.")
+    return selection
 
 
 def source_result_payload_for_cost_choice(source_result: DecisionResult) -> JsonValue:

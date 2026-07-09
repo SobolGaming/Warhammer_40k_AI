@@ -1384,28 +1384,34 @@ Required Phase 17G turn-end faction-rule tests:
 
 ## Phase 17G Stratagem-Cost Modifier Decisions
 
-Phase 17G adds opt-in Stratagem-cost modifier decisions for faction runtime content. These decisions are emitted only after a player submits a Stratagem use or Stratagem target proposal and before the original Stratagem spends CP or mutates game state. The current implemented hook is Aeldari Corsair Coterie Archraider Lord of Deceit.
+Phase 17G exposes opt-in Stratagem-cost modifier decisions for faction runtime content and source-backed generic catalog RuleIR. These decisions are emitted only after a player submits a Stratagem use or Stratagem target proposal and before the original Stratagem spends CP or mutates game state. Current implemented hooks include Aeldari Corsair Coterie Archraider Lord of Deceit and generic own-cost reductions or opponent-cost increases represented by `MODIFY_COMMAND_POINTS` with `operation: "modify_stratagem_cost"` and `application_scope: "current_stratagem_use"`.
 
-Phase 17G exposes the finite decision type `select_stratagem_cost_modifier_option`. The pending request payload contains game ID, battle round, active player ID, phase, source rule ID, hook ID, modifier ID, enhancement ID, Stratagem ID, Stratagem player ID, target unit ID, eligible model IDs, source decision request ID, source decision result ID, and a replay-safe copy of the source decision result. Adapters answer by selecting one emitted option ID. Current Lord of Deceit options use:
+The finite decision type is `select_stratagem_cost_modifier_option`. All pending request payloads contain game ID, battle round, active player ID, phase, source rule ID, hook ID, modifier ID, Stratagem ID, Stratagem player ID, target unit ID, source decision request ID, source decision result ID, and a replay-safe copy of the source decision result. Named-content requests may add enhancement and eligible-model fields. Generic catalog requests add source record ID, source clause ID, opportunity ID, source unit ID, and source model ID. Adapters answer by selecting one emitted option ID. Current Lord of Deceit options use:
 
 - `aeldari:corsair-coterie:archraider:<source_decision_result_id>:<target_unit_instance_id>:use`;
 - `aeldari:corsair-coterie:archraider:<source_decision_result_id>:<target_unit_instance_id>:decline`.
 
 Option payloads include `submission_kind: "aeldari_corsair_coterie_lord_of_deceit_cost_choice"`, player ID, source rule ID, hook ID, modifier ID, enhancement ID, target unit ID, source decision request ID, source decision result ID, and `use_ability`. Adapters must not spend CP, alter a Stratagem's cost, or resolve the original Stratagem locally while this decision is pending.
 
-Accepted use selections record a source-result-scoped Lord of Deceit event. The lifecycle then reconstructs and revalidates the original Stratagem decision against the same engine validation path with the Stratagem-cost modifier registry active. If still valid, the original Stratagem spends the modified CP cost, records modifier provenance on the `StratagemUseRecord`, mutates through the normal Stratagem handler, and resumes the original reaction frame. Accepted decline selections record a decline event and resume the original Stratagem without the +1CP modifier.
+Generic catalog option IDs use `catalog-ir:stratagem-cost:<source_decision_result_id>:<opportunity_id>:use` or `:decline`. Their option payloads use `submission_kind: "catalog_ir_stratagem_cost_choice"` and carry player, source rule/record/clause, hook, modifier, opportunity, source unit/model, target unit, source decision request/result, and `use_ability` fields. The opportunity and modifier identities are derived from the source-backed catalog record and must not be invented by an adapter.
 
-Malformed, stale, wrong-actor, wrong-hook, unsupported-option, source-request drift, source-result drift, option-payload drift, already-used-this-turn, no eligible selected Archraider model within 12", or wrong-target-owner submissions reject before the original Stratagem mutates.
+Accepted use selections record a source-result-scoped cost-choice event. The lifecycle emits additional eligible cost-choice requests sequentially for the same original Stratagem use until every optional source has been answered. It then reconstructs and revalidates the original Stratagem decision against the same engine validation path with the Stratagem-cost modifier registry active. If still valid, the original Stratagem spends the modified CP cost, records modifier provenance on the `StratagemUseRecord`, mutates through the normal Stratagem handler, and resumes the original reaction frame. Accepted decline selections record a decline event and continue that sequence without applying the declined modifier. A modifier with no source duration is scoped only to that source decision result/current Stratagem use, and the registry floors the final cost at 0CP.
+
+Malformed, stale, wrong-actor, wrong-hook, unsupported-option, source-request drift, source-result drift, source record/clause/opportunity drift, source unit/model drift, option-payload drift, exhausted frequency, unavailable source model, out-of-range source, already-used-this-turn, or wrong-target-owner submissions reject before the original Stratagem mutates.
 
 Stratagem-cost modifier choices are public table information in the current Phase 17G rules scope. If a future cost modifier is hidden, pending requests, source decision result copies, option lists, decision records, Stratagem use records, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through option counts, target IDs, source context, cost provenance, selected payload, or derived engine values.
 
 Required Phase 17G Stratagem-cost modifier tests:
 
 - valid Lord of Deceit use and decline choices through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- valid generic catalog own-cost reduction and opponent-cost increase choices;
+- sequential resolution of multiple optional sources for one original Stratagem use;
 - source decision result round-trip and original reaction-frame resume;
-- modified CP spend and `StratagemUseRecord` provenance after accepted use;
+- modified CP spend, 0CP floor, current-use-only scope, and `StratagemUseRecord` provenance after accepted use;
 - malformed, stale, wrong-context, drifted, already-used, and ineligible submissions reject before unauthorized mutation;
 - viewer-scoped projection/event redaction for any future hidden Stratagem-cost modifier selections.
+
+Catalog command-point gains do not introduce a separate adapter choice. Supported generic RuleIR currently covers a source model destroying an enemy keyword-gated unit and explicit owner-phase-start/end gains with no roll, a fixed D6-family threshold, or a Leadership test while the source model is alive and on the battlefield. The engine owns all rolls, CP cap enforcement, ledger mutation, and replay events. Attack-sequence `model_destroyed` event payloads carry `attacking_model_instance_id`, allowing the destroyed-unit hook to prove the exact source model without display-name or rule-text matching. Adapters must not award CP, roll a test, infer the attacker, or bypass the per-battle-round gain cap locally.
 
 ## Phase 17G Battle-Round Faction-Rule Decisions
 

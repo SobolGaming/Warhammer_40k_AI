@@ -369,6 +369,8 @@ def archraider_command_point_cost_choice_request(
 ) -> DecisionRequest | None:
     if type(context) is not StratagemCostChoiceRequestContext:
         raise GameLifecycleError("Archraider requires a stratagem cost choice context.")
+    if _archraider_cost_choice_answered_for_source_result(context):
+        return None
     target = context.target_binding
     if target.target_unit_instance_id is None or target.target_player_id is None:
         return None
@@ -943,6 +945,25 @@ def _archraider_cost_choice_used_for_source_result(
         if payload.get("modifier_id") != ARCHRAIDER_COST_MODIFIER_ID:
             continue
         return payload.get("use_ability") is True
+    return False
+
+
+def _archraider_cost_choice_answered_for_source_result(
+    context: StratagemCostChoiceRequestContext,
+) -> bool:
+    for record in context.decisions.event_log.records:
+        if record.event_type not in {
+            ARCHRAIDER_COST_MODIFIER_USED_EVENT,
+            ARCHRAIDER_COST_MODIFIER_DECLINED_EVENT,
+        }:
+            continue
+        payload = _payload_object(record.payload)
+        if (
+            payload.get("game_id") == context.state.game_id
+            and payload.get("source_decision_result_id") == context.source_result.result_id
+            and payload.get("modifier_id") == ARCHRAIDER_COST_MODIFIER_ID
+        ):
+            return True
     return False
 
 

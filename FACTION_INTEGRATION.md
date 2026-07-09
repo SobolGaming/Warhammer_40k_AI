@@ -439,7 +439,7 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `842633bc318eaf2e4c6945cd8a31579b48cdd504e15b546e316303b02d1caf6d`
+  `aaeffc322a15f77d468e5ed4c34597e3a65965d1b78c6340e8c42aa7afd97e2a`
 - upstream Phase 17F checksum:
   `fd81a7c2017fa1a7a1da37dedb3e24149854a7fed20d1e84e1470397156a133b`
 - bridge source version: `10th-edition-2026-06-14`
@@ -456,10 +456,10 @@ frequency. The current missing-capability summary starts with
 `generic_ir_execution_binding`, `unrepresented_rule_language`,
 `stratagem_activation_and_targeting`, `stratagem_effect_execution`, and
 `enhancement_assignment_effect`.
-Stratagem-cost aura rows remain blocked under
-`stratagem_cost_modifier_runtime`; they must not be promoted as generic Aura
-rows until RuleIR and the runtime content bundle can express the CP-cost
-modifier effect.
+Structured Stratagem-cost alterations are no longer classified under
+`stratagem_cost_modifier_runtime`: RuleIR records the current-use scope and the
+runtime content bundle applies the cost floor. Mixed rows with additional,
+unrepresented cost alterations remain blocked under that capability.
 
 The payload does not emit raw rule text. It emits source IDs, template IDs,
 template family tokens, diagnostic reason tokens, and capability family tokens

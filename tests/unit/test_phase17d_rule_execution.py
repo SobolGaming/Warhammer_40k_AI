@@ -67,7 +67,15 @@ from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
     invalid_catalog_setup_reactive_shoot_charge_status,
     request_catalog_setup_reactive_shoot_charge_if_available,
 )
+from warhammer40k_core.engine.command_point_rule_execution import (
+    CommandPointRuleMutationResult,
+    apply_command_point_rule_mutation,
+    command_point_operation_and_delta,
+    command_point_operation_shape_reason,
+    command_point_rule_unavailable_reason,
+)
 from warhammer40k_core.engine.command_points import (
+    CommandPointLedger,
     CommandPointSourceKind,
     initial_command_point_ledgers,
 )
@@ -2214,6 +2222,120 @@ def test_phase17d_generic_cp_spend_rule_uses_command_point_ledger() -> None:
     assert applied.command_point_transactions[0]["applied_amount"] == 1
 
 
+def test_phase17d_command_point_mutation_helper_is_strict_and_simulates_refunds() -> None:
+    state = _battle_state()
+    effect = _compiled("Gain 1CP.").rule_ir.clauses[0].effects[0]
+
+    assert command_point_operation_and_delta(effect) == ("gain", 1)
+    with pytest.raises(GameLifecycleError, match="exactly one payload or reason"):
+        CommandPointRuleMutationResult()
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec"):
+        command_point_operation_and_delta(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="operation must be a string"):
+        command_point_operation_and_delta(replace(effect, parameters=(RuleParameter("delta", 1),)))
+    with pytest.raises(GameLifecycleError, match="delta must be an integer"):
+        command_point_operation_and_delta(
+            replace(
+                effect,
+                parameters=(
+                    RuleParameter("delta", "one"),
+                    RuleParameter("operation", "gain"),
+                ),
+            )
+        )
+
+    invalid = apply_command_point_rule_mutation(
+        state=state,
+        player_id="player-a",
+        source_id="phase17d:test:invalid-cp",
+        operation="gain",
+        delta=-1,
+    )
+    first_refund = apply_command_point_rule_mutation(
+        state=state,
+        player_id="player-a",
+        source_id="phase17d:test:refund-one",
+        operation="refund",
+        delta=1,
+    )
+    capped_refund = apply_command_point_rule_mutation(
+        state=state,
+        player_id="player-a",
+        source_id="phase17d:test:refund-two",
+        operation="refund",
+        delta=1,
+    )
+
+    assert invalid.reason == "invalid_command_point_gain_delta"
+    assert first_refund.transaction_payload is not None
+    assert first_refund.transaction_payload["source_kind"] == "stratagem_refund"
+    assert capped_refund.reason == "command_point_refund_capped"
+
+    simulation_state = _battle_state()
+    simulated_ledgers: dict[str, CommandPointLedger] = {}
+    assert (
+        command_point_rule_unavailable_reason(
+            state=simulation_state,
+            player_id="player-a",
+            source_id="phase17d:test:simulated-refund",
+            operation="refund",
+            delta=1,
+            simulated_ledgers=simulated_ledgers,
+        )
+        is None
+    )
+    assert (
+        command_point_rule_unavailable_reason(
+            state=simulation_state,
+            player_id="player-a",
+            source_id="phase17d:test:simulated-refund-capped",
+            operation="refund",
+            delta=1,
+            simulated_ledgers=simulated_ledgers,
+        )
+        == "command_point_refund_capped"
+    )
+    assert (
+        command_point_rule_unavailable_reason(
+            state=simulation_state,
+            player_id="player-a",
+            source_id="phase17d:test:simulated-spend",
+            operation="spend",
+            delta=-1,
+            simulated_ledgers=simulated_ledgers,
+        )
+        is None
+    )
+    assert (
+        command_point_rule_unavailable_reason(
+            state=simulation_state,
+            player_id="player-b",
+            source_id="phase17d:test:simulated-insufficient",
+            operation="spend",
+            delta=-1,
+            simulated_ledgers=simulated_ledgers,
+        )
+        == "insufficient_command_points"
+    )
+
+    assert command_point_operation_shape_reason(operation="gain", delta=0) == (
+        "zero_command_point_delta"
+    )
+    assert (
+        command_point_operation_shape_reason(operation="modify_stratagem_cost", delta=1)
+        == "stratagem_cost_context_required"
+    )
+    assert command_point_operation_shape_reason(operation="refund", delta=-1) == (
+        "invalid_command_point_refund_delta"
+    )
+    assert command_point_operation_shape_reason(operation="spend", delta=1) == (
+        "invalid_command_point_spend_delta"
+    )
+    assert command_point_operation_shape_reason(operation="unknown", delta=1) == (
+        "unsupported_command_point_operation:unknown"
+    )
+
+
 def test_phase17d_duration_effect_records_generic_persisting_effect() -> None:
     state = _battle_state_with_scenario()
     target_unit_id = "army-alpha:intercessor-unit-1"
@@ -3463,7 +3585,14 @@ def _command_point_spend_rule_ir() -> RuleIR:
     compiled = _compiled("Gain 1CP and score 3VP.")
     clause = compiled.rule_ir.clauses[0]
     command_point_effect = clause.effects[0]
-    spend_effect = replace(command_point_effect, parameters=(RuleParameter("delta", -1),))
+    spend_effect = replace(
+        command_point_effect,
+        parameters=(
+            RuleParameter("affected_player", "source_player"),
+            RuleParameter("delta", -1),
+            RuleParameter("operation", "spend"),
+        ),
+    )
     spend_clause = replace(clause, effects=(spend_effect,))
     return replace(compiled.rule_ir, clauses=(spend_clause,))
 

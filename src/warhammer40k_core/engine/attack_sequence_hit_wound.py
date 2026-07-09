@@ -426,6 +426,7 @@ def _emit_damage_event(
                 "phase": attack_sequence.source_phase.value,
                 "destroying_player_id": attack_sequence.attacker_player_id,
                 "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                "attacking_model_instance_id": attack_sequence.current_pool().attacker_model_instance_id,
                 "sequence_id": attack_sequence.sequence_id,
                 "attack_context_id": attack_sequence.attack_context_id(),
                 "target_unit_instance_id": damage.target_unit_instance_id,

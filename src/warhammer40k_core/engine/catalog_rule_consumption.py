@@ -24,6 +24,7 @@ from warhammer40k_core.core.weapon_profiles import (
     canonical_weapon_keyword_tokens,
     weapon_keyword_from_token,
 )
+from warhammer40k_core.engine import catalog_command_point_support as _command_points
 from warhammer40k_core.engine import catalog_contextual_status_consumption as _contextual
 from warhammer40k_core.engine import catalog_movement_transit as _catalog_transit
 from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
@@ -3827,7 +3828,7 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         raise GameLifecycleError("Catalog rule consumer classification requires RuleClause.")
     if _frequency.clause_has_unconsumed_once_per_battle_activation(clause):
         return ()
-    consumer_ids: set[str] = set()
+    consumer_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
     if _frequency.clause_is_fight_start_once_per_battle_activation(clause):
         consumer_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)
     if _clause_targets_this_model(clause):
@@ -3923,7 +3924,7 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
 
 
 def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
-    hook_ids: set[str] = set()
+    hook_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
     if _frequency.clause_is_fight_start_once_per_battle_activation(clause):
         hook_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)
     if _clause_is_supported_tracked_target_selection(clause):

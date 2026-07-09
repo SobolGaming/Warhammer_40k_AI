@@ -113,6 +113,7 @@ class RuleTargetKind(StrEnum):
     PLAYER = "player"
     SELECTED_TARGET = "selected_target"
     SELECTED_UNIT = "selected_unit"
+    STRATAGEM_USE = "stratagem_use"
     THIS_MODEL = "this_model"
     THIS_UNIT = "this_unit"
     WEAPON = "weapon"

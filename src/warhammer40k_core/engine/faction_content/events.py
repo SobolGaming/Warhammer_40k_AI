@@ -486,6 +486,8 @@ def _event_matches_filters(
             return False
         if key == "source_unit_instance_id" and event.source_unit_instance_id != value:
             return False
+        if key == "phase" and (None if event.phase is None else event.phase.value) != value:
+            return False
     return True
 
 

@@ -2691,6 +2691,7 @@ def test_archraider_lord_of_deceit_decline_and_drift_paths_do_not_modify_cost() 
         record.event_type == enhancements.ARCHRAIDER_COST_MODIFIER_DECLINED_EVENT
         for record in decisions.event_log.records
     )
+    assert enhancements.archraider_command_point_cost_choice_request(request_context) is None
     wrong_hook_request = DecisionRequest(
         request_id="request-wrong-archraider-hook",
         decision_type=SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
@@ -3584,16 +3585,16 @@ def test_stratagem_cost_hook_registries_track_sources_and_round_trip_result() ->
         StratagemCostModifierRegistry.from_bindings(
             (cost_registry.all_bindings()[0], cost_registry.all_bindings()[0])
         )
-    with pytest.raises(GameLifecycleError, match="must not be negative"):
-        StratagemCostModifierRegistry.from_bindings(
-            (
-                StratagemCostModifierBinding(
-                    modifier_id="negative-modifier",
-                    source_id="source-negative",
-                    handler=lambda _context: -1,
-                ),
-            )
-        ).modified_command_point_cost(cost_context)
+    floored_cost = StratagemCostModifierRegistry.from_bindings(
+        (
+            StratagemCostModifierBinding(
+                modifier_id="negative-modifier",
+                source_id="source-negative",
+                handler=lambda _context: -1,
+            ),
+        )
+    ).modified_command_point_cost(cost_context)
+    assert floored_cost == 0
 
     cost_choice_request = DecisionRequest(
         request_id="request-cost-choice",
@@ -3884,7 +3885,7 @@ def test_stratagem_cost_hook_context_and_handler_validation_paths() -> None:
         request_registry.next_request_for(request_context)
     with pytest.raises(GameLifecycleError, match="request hooks require a context"):
         request_registry.next_request_for(cast(StratagemCostChoiceRequestContext, object()))
-    with pytest.raises(GameLifecycleError, match="multiple simultaneous requests"):
+    assert (
         StratagemCostChoiceHookRegistry.from_bindings(
             (
                 StratagemCostChoiceHookBinding(
@@ -3899,6 +3900,8 @@ def test_stratagem_cost_hook_context_and_handler_validation_paths() -> None:
                 ),
             )
         ).next_request_for(request_context)
+        == cost_choice_request
+    )
     result_registry = StratagemCostChoiceHookRegistry.from_bindings(
         (
             StratagemCostChoiceHookBinding(
