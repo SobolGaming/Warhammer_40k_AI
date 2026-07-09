@@ -5482,7 +5482,7 @@
         {
           "detachment_id": "daemonic-incursion",
           "detachment_name": "Daemonic Incursion",
-          "execution_record_count": 17,
+          "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion.manifest",
           "semantic_status": "partial",
           "source_ids": [
@@ -5491,34 +5491,22 @@
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008438003",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008438004",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008438005",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009547002",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009547003",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008437002",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008437003",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008437004",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008437005",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008437006",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008437007",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009548002",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009548003",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009548004",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009548005",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:daemonic-incursion:000008438002",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:daemonic-incursion:000008438003",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:daemonic-incursion:000008438004",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:daemonic-incursion:000008438005",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:daemonic-incursion:000009547002",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:daemonic-incursion:000009547003",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000008437002",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000008437003",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000008437004",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000008437005",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000008437006",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000008437007",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000009548002",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000009548003",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000009548004",
-            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000009548005",
             "gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons"
           ]
         },
@@ -7092,6 +7080,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "2e8a274eab88ecc73c4452ebe234437ea0940db1eea401937cf57c8f5a8366c0",
+  "source_package_hash": "fd81a7c2017fa1a7a1da37dedb3e24149854a7fed20d1e84e1470397156a133b",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-27"
 }

@@ -570,11 +570,12 @@ def test_phase17e_exact_subrule_source_audit_accounts_for_every_bridge_input_row
 
     assert identity["skipped_bridge_row_count"] == str(len(skipped_rows))
     assert identity["runtime_only_row_count"] == str(len(runtime_only_rows))
-    assert len(skipped_rows) == 601
+    assert len(skipped_rows) == 607
     assert Counter(row.skip_reason for row in skipped_rows) == Counter(
         {
-            "owner_not_in_current_source_package": 573,
             "missing_owner_fields": 28,
+            "owner_not_in_current_source_package": 573,
+            "unsupported_source_type": 6,
         }
     )
     assert emitted_bridge_source_ids.isdisjoint(skipped_bridge_source_ids)
@@ -605,6 +606,42 @@ def test_phase17e_exact_subrule_source_audit_accounts_for_every_bridge_input_row
         faction_subrule_source.SourceRuntimeOnlyRow.from_payload(row.to_payload()) == row
         for row in runtime_only_rows
     )
+
+
+def test_phase17e_exact_subrules_skip_unsupported_wahapedia_source_types() -> None:
+    emitted_bridge_source_ids = {
+        source_id
+        for row in faction_subrule_source.enhancement_rows()
+        for source_id in row.source_ids
+        if ":bridge-source-row:" in source_id
+    }
+    emitted_bridge_source_ids.update(
+        source_id
+        for row in faction_subrule_source.stratagem_rows()
+        for source_id in row.source_ids
+        if ":bridge-source-row:" in source_id
+    )
+    skipped_unsupported_source_ids = {
+        _bridge_source_id(row.table, row.bridge_source_row_id)
+        for row in faction_subrule_source.skipped_bridge_rows()
+        if row.skip_reason == "unsupported_source_type"
+    }
+    unsupported_source_ids = _unsupported_detachment_subrule_bridge_source_ids()
+    expected_current_owner_collisions = {
+        _bridge_source_id("Enhancements", "000009547002"),
+        _bridge_source_id("Enhancements", "000009547003"),
+        _bridge_source_id("Stratagems", "000009548002"),
+        _bridge_source_id("Stratagems", "000009548003"),
+        _bridge_source_id("Stratagems", "000009548004"),
+        _bridge_source_id("Stratagems", "000009548005"),
+    }
+
+    assert unsupported_source_ids
+    assert expected_current_owner_collisions <= unsupported_source_ids
+    assert skipped_unsupported_source_ids == expected_current_owner_collisions
+    assert emitted_bridge_source_ids.isdisjoint(unsupported_source_ids)
+    assert _bridge_source_id("Stratagems", "000009548005") in skipped_unsupported_source_ids
+    assert _bridge_source_id("Enhancements", "000009547003") in skipped_unsupported_source_ids
 
 
 def test_phase17e_manifest_records_match_official_source_manifest() -> None:
@@ -1571,6 +1608,89 @@ def _bridge_source_row_ids(table: str) -> set[str]:
             raise AssertionError("bridge source_row_id must be a string")
         source_row_ids.add(source_row_id)
     return source_row_ids
+
+
+def _unsupported_detachment_subrule_bridge_source_ids() -> set[str]:
+    unsupported_detachment_ids = _unsupported_detachment_bridge_ids()
+    return {
+        _bridge_source_id(table, source_row_id)
+        for table in ("Enhancements", "Stratagems")
+        for source_row_id in _bridge_source_row_ids_for_detachments(
+            table=table,
+            detachment_ids=unsupported_detachment_ids,
+        )
+    }
+
+
+def _unsupported_detachment_bridge_ids() -> set[str]:
+    raw_payload = json.loads((BRIDGE_JSON_DIR / "Detachments.json").read_text(encoding="utf-8"))
+    if type(raw_payload) is not dict:
+        raise AssertionError("bridge Detachments payload must be a JSON object")
+    payload = cast(dict[str, object], raw_payload)
+    raw_rows = payload["rows"]
+    if type(raw_rows) is not list:
+        raise AssertionError("bridge Detachments payload rows must be a list")
+    detachment_ids: set[str] = set()
+    for raw_row in cast(list[object], raw_rows):
+        if type(raw_row) is not dict:
+            raise AssertionError("bridge Detachments row must be a JSON object")
+        row = cast(dict[str, object], raw_row)
+        raw_fields = row["fields"]
+        if type(raw_fields) is not dict:
+            raise AssertionError("bridge Detachments row fields must be a JSON object")
+        fields = cast(dict[str, object], raw_fields)
+        detachment_id = fields["id"]
+        source_type = fields["type"]
+        if type(detachment_id) is not str or type(source_type) is not str:
+            raise AssertionError("bridge Detachments id and type must be strings")
+        if _has_unsupported_source_marker(source_type):
+            detachment_ids.add(detachment_id)
+    return detachment_ids
+
+
+def _bridge_source_row_ids_for_detachments(
+    *,
+    table: str,
+    detachment_ids: set[str],
+) -> set[str]:
+    raw_payload = json.loads((BRIDGE_JSON_DIR / f"{table}.json").read_text(encoding="utf-8"))
+    if type(raw_payload) is not dict:
+        raise AssertionError("bridge source payload must be a JSON object")
+    payload = cast(dict[str, object], raw_payload)
+    raw_rows = payload["rows"]
+    if type(raw_rows) is not list:
+        raise AssertionError("bridge source payload rows must be a list")
+    source_row_ids: set[str] = set()
+    for raw_row in cast(list[object], raw_rows):
+        if type(raw_row) is not dict:
+            raise AssertionError("bridge source payload row must be a JSON object")
+        row = cast(dict[str, object], raw_row)
+        source_row_id = row["source_row_id"]
+        raw_fields = row["fields"]
+        if type(source_row_id) is not str or type(raw_fields) is not dict:
+            raise AssertionError("bridge source row id and fields must be valid")
+        fields = cast(dict[str, object], raw_fields)
+        detachment_id = fields["detachment_id"]
+        if type(detachment_id) is not str:
+            raise AssertionError("bridge source detachment_id must be a string")
+        if detachment_id in detachment_ids:
+            source_row_ids.add(source_row_id)
+    return source_row_ids
+
+
+def _has_unsupported_source_marker(value: str) -> bool:
+    normalized = value.casefold()
+    return any(
+        marker in normalized
+        for marker in (
+            "board action",
+            "boarding action",
+            "crusade",
+            "forge world",
+            "kill team",
+            "legend",
+        )
+    )
 
 
 def _bridge_source_id(table: str, source_row_id: str) -> str:

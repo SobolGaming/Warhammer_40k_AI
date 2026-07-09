@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 4 | 28 | 43 | 20 |
+| 9 | 4 | 26 | 39 | 20 |
 
 ## Semantic Support Snapshot
 
@@ -26,7 +26,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 | --- | --- | --- |
 | Blood Legion | None | Brazenmaw<br>Fury’s Cage<br>Gateway Unto Damnation<br>Slaughterthirst (Aura) |
 | Cavalcade of Chaos | Apocalyptic Steeds Upgrade<br>Soul Shattering Charge Upgrade | None |
-| Daemonic Incursion | None | A’rgath, the King of Blades<br>Geller Breach<br>Soulstealer<br>Spite Made Manifest<br>The Endless Gift<br>The Everstave |
+| Daemonic Incursion | None | A’rgath, the King of Blades<br>Soulstealer<br>The Endless Gift<br>The Everstave |
 | Legion of Excess | None | Avatar of Perfection<br>Dreaming Crown (Aura)<br>False Majesty (Aura)<br>Soul Glutton |
 | Plague Legion | None | Cankerblight<br>Droning Shroud (Aura)<br>Font of Spores (Aura)<br>Maggot Maws |
 | Scintillating Legion | None | Improbable Shield (Aura)<br>Inescapable Eye<br>Infernal Puppeteer<br>Neverblade |
@@ -38,7 +38,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 | --- | --- | --- |
 | Blood Legion | None | BLOOD BEGETS SKULLS<br>FOOLS’ FLIGHT<br>GORE‑HUNGRY ONSLAUGHT<br>SHEATHED IN BRASS<br>SKULLS BEGET BLOOD<br>WRATH UNDENIABLE |
 | Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations<br>Warp-Riders | None |
-| Daemonic Incursion | None | CORRUPT REALSPACE<br>DAEMONIC INVULNERABILITY<br>DENIZENS OF THE WARP<br>DRAUGHT OF TERROR<br>INCORPOREAL TERRORS<br>INSUBSTANTIAL ENTITIES<br>PARTING BLOWS<br>THE REALM OF CHAOS<br>UNREAL SPEED<br>WARP SURGE |
+| Daemonic Incursion | None | CORRUPT REALSPACE<br>DAEMONIC INVULNERABILITY<br>DENIZENS OF THE WARP<br>DRAUGHT OF TERROR<br>THE REALM OF CHAOS<br>WARP SURGE |
 | Legion of Excess | None | ARCHAGONISTS<br>CAVALCADE OF BLADES<br>OVERWHELMING EXCESS<br>PHANTASMAL LONGING<br>SENSORY EXCRUCIATION<br>THIEVES OF PAIN |
 | Plague Legion | None | FEVER VISIONS<br>FOETID RESURGENCE<br>MURKSHADOWS<br>PLAGUE OF WOES<br>ROT AND RENEWAL<br>SEEPING VIRULENCE |
 | Scintillating Legion | None | DELIRIUM UNMADE<br>FATEBORNE NIGHTMARES<br>FICKLEFIRE<br>FLICKERING REALITY<br>IMPOSSIBLE ECLIPSE<br>PYROGENESIS |

@@ -5311,7 +5311,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert ("| Orks | 12 | 1 | 44 | 66 | 13 | [orks](factions/orks.md) |") in generated_markdown
     assert (
-        "| Chaos Daemons | 9 | 4 | 28 | 43 | 20 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 4 | 26 | 39 | 20 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (
