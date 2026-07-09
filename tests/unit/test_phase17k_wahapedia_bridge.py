@@ -5309,26 +5309,27 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "| Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |" in (
         generated_markdown
     )
+    assert ("| Orks | 12 | 1 | 44 | 66 | 13 | [orks](factions/orks.md) |") in generated_markdown
     assert (
-        "| Chaos Daemons | 9 | 4 | 28 | 43 | 7 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (
-        "| Leagues of Votann | 10 | 0 | 28 | 42 | 1 | "
+        "| Leagues of Votann | 10 | 0 | 28 | 42 | 2 | "
         "[leagues-of-votann](factions/leagues-of-votann.md) |"
     ) in generated_markdown
     assert (
-        "| Imperial Knights | 8 | 0 | 24 | 36 | 1 | "
+        "| Imperial Knights | 8 | 0 | 24 | 36 | 2 | "
         "[imperial-knights](factions/imperial-knights.md) |"
     ) in generated_markdown
     assert (
         "| Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |"
     ) in generated_markdown
     assert (
-        "| Genestealer Cults | 9 | 0 | 20 | 30 | 1 | "
+        "| Genestealer Cults | 9 | 0 | 20 | 30 | 3 | "
         "[genestealer-cults](factions/genestealer-cults.md) |"
     ) in generated_markdown
-    assert "| Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |" in (
+    assert "| Tyranids | 10 | 0 | 32 | 48 | 2 | [tyranids](factions/tyranids.md) |" in (
         generated_markdown
     )
     assert (
@@ -5336,7 +5337,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "[adepta-sororitas](factions/adepta-sororitas.md) |"
     ) in generated_markdown
     assert (
-        "| Adeptus Custodes | 9 | 0 | 24 | 36 | 1 | "
+        "| Adeptus Custodes | 9 | 0 | 24 | 36 | 3 | "
         "[adeptus-custodes](factions/adeptus-custodes.md) |"
     ) in generated_markdown
     assert (
@@ -5385,8 +5386,12 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "<br>Mantle of Gloom (Aura) | None |"
     ) in chaos_daemons_markdown
     assert (
-        "| Cavalcade of Chaos | None | Apocalyptic Steeds Upgrade"
-        "<br>Soul Shattering Charge Upgrade |"
+        "| Cavalcade of Chaos | Apocalyptic Steeds Upgrade"
+        "<br>Soul Shattering Charge Upgrade | None |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations"
+        "<br>Warp-Riders | None |"
     ) in chaos_daemons_markdown
     assert (
         "| Nurgle | Nurglings (`000001133`)<br>Plague Drones (`000001135`)"
@@ -5625,18 +5630,22 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     adeptus_custodes_markdown = generated_faction_markdown["adeptus-custodes.md"]
     adeptus_mechanicus_markdown = generated_faction_markdown["adeptus-mechanicus.md"]
     chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
+    emperors_children_markdown = generated_faction_markdown["emperors-children.md"]
     genestealer_cults_markdown = generated_faction_markdown["genestealer-cults.md"]
     imperial_knights_markdown = generated_faction_markdown["imperial-knights.md"]
+    orks_markdown = generated_faction_markdown["orks.md"]
     tyranids_markdown = generated_faction_markdown["tyranids.md"]
     assert "## Detachment Rule Support" in aeldari_markdown
     assert "## Detachment Rule Support" in chaos_daemons_markdown
     assert "| Supported detachment rules |" in chaos_daemons_markdown
     assert "| 8 | 0 | 20 | 30 | 1 |" in adepta_sororitas_markdown
-    assert "| 9 | 0 | 24 | 36 | 1 |" in adeptus_custodes_markdown
+    assert "| 9 | 0 | 24 | 36 | 3 |" in adeptus_custodes_markdown
     assert "| 10 | 0 | 28 | 42 | 1 |" in adeptus_mechanicus_markdown
-    assert "| 9 | 0 | 20 | 30 | 1 |" in genestealer_cults_markdown
-    assert "| 8 | 0 | 24 | 36 | 1 |" in imperial_knights_markdown
-    assert "| 10 | 0 | 32 | 48 | 1 |" in tyranids_markdown
+    assert "| 10 | 1 | 30 | 45 | 18 |" in emperors_children_markdown
+    assert "| 9 | 0 | 20 | 30 | 3 |" in genestealer_cults_markdown
+    assert "| 8 | 0 | 24 | 36 | 2 |" in imperial_knights_markdown
+    assert "| 12 | 1 | 44 | 66 | 13 |" in orks_markdown
+    assert "| 10 | 0 | 32 | 48 | 2 |" in tyranids_markdown
     assert (
         "| Daemonic Incursion | `Full` | Warp Rifts generic IR reserve-arrival distance hook |"
     ) in chaos_daemons_markdown
@@ -5646,8 +5655,31 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "| Corsair Coterie | Archraider |" in aeldari_markdown
     assert "`generic_supported` / `engine_consumed`" in aeldari_markdown
     assert "`named_handler_required` / `source_only`" in aeldari_markdown
-    assert "| Cavalcade of Chaos | Warp-Riders |" not in chaos_daemons_markdown
-    assert "| Cavalcade of Chaos | Apocalyptic Steeds Upgrade |" not in chaos_daemons_markdown
+    assert (
+        "| Detachment | Rule | Rule ID | Timing | Category | Source support | "
+        "Execution status | Handler / block | Runtime consumers | Source IDs |"
+    ) in orks_markdown
+    assert (
+        "| More Dakka! | Da Gobshot Thunderbuss | `000009991002` | "
+        "army_construction | enhancement | `generic_supported` / `source_only` | "
+        "`executable_generic_ir` |  | None |"
+    ) in orks_markdown
+    orks_get_stuck_in_row = next(
+        line
+        for line in orks_markdown.splitlines()
+        if line.startswith("| More Dakka! | GET STUCK IN, LADZ! | `000009992003` |")
+    )
+    assert "| `generic_supported` / `source_only` | `executable_generic_ir` |" in (
+        orks_get_stuck_in_row
+    )
+    assert (
+        "| Cavalcade of Chaos | Apocalyptic Steeds Upgrade"
+        "<br>Soul Shattering Charge Upgrade | None |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations"
+        "<br>Warp-Riders | None |"
+    ) in chaos_daemons_markdown
     assert "Current coverage categories:" not in generated_markdown
     assert "## Runtime Hook Inventory" in generated_markdown
     assert "| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |" in generated_markdown

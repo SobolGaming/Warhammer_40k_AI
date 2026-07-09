@@ -6,6 +6,7 @@ import json
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date
+from functools import cache
 from pathlib import Path
 from typing import TypedDict, cast
 
@@ -122,12 +123,11 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_detachments_2026_27,
-    faction_subrules_2026_27,
+    faction_execution_2026_27,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
     Phase17ECoverageRow,
-    Phase17ECoverageStatus,
 )
 from warhammer40k_core.rules.wahapedia_bridge import (
     ModelHeightOverride,
@@ -2585,7 +2585,7 @@ def _faction_support_markdown(
         "",
         (
             "| Detachment rules | Supported detachment rules | Exact Enhancements | "
-            "Exact Stratagems | Engine-consumed rows |"
+            "Exact Stratagems | Engine-supported rows |"
         ),
         "| ---: | ---: | ---: | ---: | ---: |",
         (
@@ -2618,7 +2618,49 @@ def _engine_consumed_coverage_row_count(rows: Iterable[Phase17ECoverageRow]) -> 
 
 
 def _coverage_row_is_engine_consumed(row: Phase17ECoverageRow) -> bool:
-    return row.status is Phase17ECoverageStatus.IMPLEMENTED or bool(row.runtime_consumer_ids)
+    return (
+        _coverage_row_execution_record(row).execution_status
+        in _EXECUTABLE_PHASE17F_EXECUTION_STATUSES
+    )
+
+
+_EXECUTABLE_PHASE17F_EXECUTION_STATUSES = frozenset(
+    (
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+    )
+)
+
+
+@cache
+def _phase17f_execution_records_by_descriptor_id() -> Mapping[
+    str,
+    faction_execution_2026_27.Phase17FExecutionRecord,
+]:
+    records_by_descriptor_id: dict[
+        str,
+        faction_execution_2026_27.Phase17FExecutionRecord,
+    ] = {}
+    for record in faction_execution_2026_27.execution_records():
+        if record.coverage_descriptor_id in records_by_descriptor_id:
+            raise ValueError(
+                "Duplicate Phase17F execution evidence for coverage descriptor "
+                f"{record.coverage_descriptor_id!r}."
+            )
+        records_by_descriptor_id[record.coverage_descriptor_id] = record
+    return records_by_descriptor_id
+
+
+def _coverage_row_execution_record(
+    row: Phase17ECoverageRow,
+) -> faction_execution_2026_27.Phase17FExecutionRecord:
+    record = _phase17f_execution_records_by_descriptor_id().get(row.descriptor_id)
+    if record is None:
+        raise ValueError(
+            "Coverage row is missing Phase17F execution evidence for descriptor "
+            f"{row.descriptor_id!r}."
+        )
+    return record
 
 
 def _faction_detachment_rule_support_markdown(
@@ -2662,9 +2704,9 @@ def _chaos_daemons_semantic_snapshot_markdown() -> list[str]:
         (
             "This generated snapshot answers the support question directly. Detachment-rule "
             "support uses the semantic support table below. Exact Enhancement and Stratagem "
-            "support is stricter: a source row is fully supported here only when it carries "
-            "runtime consumer IDs. Datasheet support is fully supported only for source-review "
-            "rows whose IR coverage is `All consumed`."
+            "support uses the shared Phase17F semantic execution evidence, including explicit "
+            "runtime consumers and executable generic IR records. Datasheet support is fully "
+            "supported only for source-review rows whose IR coverage is `All consumed`."
         ),
     ]
     lines.extend(_chaos_daemons_detachment_snapshot_markdown())
@@ -2690,13 +2732,10 @@ def _chaos_daemons_detachment_snapshot_markdown() -> list[str]:
 
 def _chaos_daemons_exact_enhancement_snapshot_markdown() -> list[str]:
     rows = tuple(
-        (
-            row.detachment_name,
-            row.name,
-            bool(row.runtime_consumer_ids),
-        )
-        for row in faction_subrules_2026_27.enhancement_rows()
+        row
+        for row in faction_coverage_2026_27.coverage_rows()
         if row.faction_id == CHAOS_DAEMONS_FACTION_ID
+        and row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
     )
     return _chaos_daemons_exact_source_rows_snapshot_markdown(
         title="Enhancements",
@@ -2706,13 +2745,10 @@ def _chaos_daemons_exact_enhancement_snapshot_markdown() -> list[str]:
 
 def _chaos_daemons_exact_stratagem_snapshot_markdown() -> list[str]:
     rows = tuple(
-        (
-            row.detachment_name,
-            row.name,
-            bool(row.runtime_consumer_ids),
-        )
-        for row in faction_subrules_2026_27.stratagem_rows()
+        row
+        for row in faction_coverage_2026_27.coverage_rows()
         if row.faction_id == CHAOS_DAEMONS_FACTION_ID
+        and row.coverage_kind is Phase17ECoverageKind.DETACHMENT_STRATAGEM
     )
     return _chaos_daemons_exact_source_rows_snapshot_markdown(
         title="Stratagems",
@@ -2723,31 +2759,33 @@ def _chaos_daemons_exact_stratagem_snapshot_markdown() -> list[str]:
 def _chaos_daemons_exact_source_rows_snapshot_markdown(
     *,
     title: str,
-    rows: tuple[tuple[str, str, bool], ...],
+    rows: tuple[Phase17ECoverageRow, ...],
 ) -> list[str]:
     lines = [
         "",
         f"### {title}",
         "",
-        (
-            "| Detachment | Fully supported / runtime consumers registered | "
-            "Still source-only / needs semantic registration |"
-        ),
+        ("| Detachment | Runtime supported / executable | Still source-only / blocked |"),
         "| --- | --- | --- |",
     ]
-    for detachment_name in sorted({row[0] for row in rows}):
+    for detachment_name in sorted({_required_text(row.detachment_name) for row in rows}):
         supported = tuple(
             sorted(
-                rule_name
-                for detachment, rule_name, is_supported in rows
-                if (detachment == detachment_name and is_supported)
+                row.rule_name
+                for row in rows
+                if (
+                    row.detachment_name == detachment_name and _coverage_row_is_engine_consumed(row)
+                )
             )
         )
         needs_support = tuple(
             sorted(
-                rule_name
-                for detachment, rule_name, is_supported in rows
-                if (detachment == detachment_name and not is_supported)
+                row.rule_name
+                for row in rows
+                if (
+                    row.detachment_name == detachment_name
+                    and not _coverage_row_is_engine_consumed(row)
+                )
             )
         )
         lines.append(
@@ -3922,13 +3960,13 @@ def _faction_exact_rule_rows_markdown(
         f"## {title}",
         "",
         (
-            "| Detachment | Rule | Rule ID | Timing | Category | Support status | "
-            "Handler / block | Runtime consumers | Source IDs |"
+            "| Detachment | Rule | Rule ID | Timing | Category | Source support | "
+            "Execution status | Handler / block | Runtime consumers | Source IDs |"
         ),
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     if not rows:
-        lines.append("| No exact source rows generated yet |  |  |  |  |  |  |  |  |")
+        lines.append("| No exact source rows generated yet |  |  |  |  |  |  |  |  |  |")
         return lines
     for row in rows:
         lines.append(
@@ -3941,6 +3979,7 @@ def _faction_exact_rule_rows_markdown(
                     _markdown_text(_required_text(row.timing_descriptor)),
                     _markdown_text(_required_text(row.rule_category)),
                     _coverage_status_text(row),
+                    _coverage_execution_status_text(row),
                     _handler_or_block_text(row),
                     _inline_code_list(row.runtime_consumer_ids),
                     _inline_code_list(row.source_ids),
@@ -3972,11 +4011,18 @@ def _coverage_status_text(row: Phase17ECoverageRow) -> str:
     return f"`{row.status.value}` / `{row.runtime_support_status.value}`"
 
 
+def _coverage_execution_status_text(row: Phase17ECoverageRow) -> str:
+    return f"`{_coverage_row_execution_record(row).execution_status.value}`"
+
+
 def _handler_or_block_text(row: Phase17ECoverageRow) -> str:
     if row.handler_id is not None:
         return f"`{_markdown_text(row.handler_id)}`"
     if row.unsupported_reason is not None:
         return f"`{row.unsupported_reason.value}`"
+    execution_record = _coverage_row_execution_record(row)
+    if execution_record.block_reason is not None:
+        return f"`{execution_record.block_reason.value}`"
     return ""
 
 
@@ -5212,7 +5258,7 @@ def _faction_index_section_markdown() -> list[str]:
         "",
         (
             "| Faction | Detachments | Supported detachment rules | Exact Enhancements | "
-            "Exact Stratagems | Engine-consumed rows | File |"
+            "Exact Stratagems | Engine-supported rows | File |"
         ),
         "| --- | ---: | ---: | ---: | ---: | ---: | --- |",
     ]
