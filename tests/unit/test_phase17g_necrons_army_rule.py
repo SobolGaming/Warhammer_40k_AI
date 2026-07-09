@@ -745,6 +745,34 @@ def _complete_setup_through_gate(*, state: GameState, config: GameConfig) -> Non
     )
 
 
+def test_reanimation_phase_start_engagement_ignores_destroyed_enemy_placements() -> None:
+    lifecycle = _battle_ready_lifecycle()
+    state = _require_state(lifecycle)
+    necron_unit = _unit_by_id(state, NECRON_UNIT_1_ID)
+    enemy_unit_id = "army-beta:enemy-unit"
+    enemy_unit = _unit_by_id(state, enemy_unit_id)
+    necron_poses = (
+        Pose.at(x=10.0, y=20.0),
+        *tuple(Pose.at(x=30.0 + index, y=30.0) for index in range(1, 5)),
+    )
+    enemy_poses = (
+        Pose.at(x=10.5, y=20.0),
+        *tuple(Pose.at(x=50.0 + index, y=50.0) for index in range(1, 5)),
+    )
+    _place_unit_model_poses(state, unit_id=necron_unit.unit_instance_id, poses=necron_poses)
+    _place_unit_model_poses(state, unit_id=enemy_unit_id, poses=enemy_poses)
+    _set_model_wounds(
+        state,
+        model_instance_id=enemy_unit.own_models[0].model_instance_id,
+        wounds_remaining=0,
+    )
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=NECRON_UNIT_1_ID)
+
+    assert (
+        army_rule._phase_start_enemy_engagement_model_ids(state=state, rules_unit=rules_unit) == ()
+    )
+
+
 def _mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
         mission_pack=chapter_approved_2026_27_mission_pack(),
@@ -881,6 +909,27 @@ def _set_model_wounds(
     if not did_update:
         raise AssertionError(f"missing model {model_instance_id}")
     state.army_definitions = updated_armies
+
+
+def _place_unit_model_poses(
+    state: GameState,
+    *,
+    unit_id: str,
+    poses: tuple[Pose, ...],
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("battlefield_state is required")
+    unit_placement = state.battlefield_state.unit_placement_by_id(unit_id)
+    if len(poses) != len(unit_placement.model_placements):
+        raise AssertionError("pose fixture must match placed model count")
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        unit_placement.with_model_placements(
+            tuple(
+                placement.with_pose(pose)
+                for placement, pose in zip(unit_placement.model_placements, poses, strict=True)
+            )
+        )
+    )
 
 
 def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:

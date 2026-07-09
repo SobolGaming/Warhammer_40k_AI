@@ -1041,10 +1041,8 @@ def _validate_revived_model_engagement(
     effect: HealingEffect,
     placement: ModelPlacement,
 ) -> None:
-    revived_model = geometry_model_for_placement(
-        model=scenario.model_instance_for_placement(placement),
-        placement=placement,
-    )
+    revived_instance = scenario.model_instance_for_placement(placement)
+    revived_model = geometry_model_for_placement(model=revived_instance, placement=placement)
     allowed_enemy_ids = set(effect.phase_start_enemy_engagement_model_ids)
     engaged_enemy_ids: set[str] = set()
     for placed_army in scenario.battlefield_state.placed_armies:
@@ -1052,9 +1050,11 @@ def _validate_revived_model_engagement(
             continue
         for unit_placement in placed_army.unit_placements:
             for enemy_placement in unit_placement.model_placements:
+                enemy_instance = scenario.model_instance_for_placement(enemy_placement)
+                if not enemy_instance.is_alive:
+                    continue
                 enemy_model = geometry_model_for_placement(
-                    model=scenario.model_instance_for_placement(enemy_placement),
-                    placement=enemy_placement,
+                    model=enemy_instance, placement=enemy_placement
                 )
                 if revived_model.is_within_engagement_range(
                     enemy_model,

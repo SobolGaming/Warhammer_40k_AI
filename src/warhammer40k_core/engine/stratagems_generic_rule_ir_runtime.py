@@ -642,17 +642,20 @@ def _phase_start_enemy_engagement_model_ids(
     own_placements = _rules_unit_placements(state=state, rules_unit=rules_unit)
     engaged_enemy_ids: set[str] = set()
     for own_placement in own_placements:
-        own_model = geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(own_placement),
-            placement=own_placement,
-        )
+        own_model_instance = scenario.model_instance_for_placement(own_placement)
+        if not own_model_instance.is_alive:
+            continue
+        own_model = geometry_model_for_placement(model=own_model_instance, placement=own_placement)
         for placed_army in battlefield.placed_armies:
             if placed_army.player_id == rules_unit.owner_player_id:
                 continue
             for unit_placement in placed_army.unit_placements:
                 for enemy_placement in unit_placement.model_placements:
+                    enemy_model_instance = scenario.model_instance_for_placement(enemy_placement)
+                    if not enemy_model_instance.is_alive:
+                        continue
                     enemy_model = geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(enemy_placement),
+                        model=enemy_model_instance,
                         placement=enemy_placement,
                     )
                     if own_model.is_within_engagement_range(

@@ -1448,6 +1448,36 @@ def test_shadow_legion_generic_runtime_mortal_threshold_and_revival_pose_edges()
         )
 
 
+def test_shadow_legion_generic_runtime_phase_start_engagement_ignores_dead_enemy() -> None:
+    state = _shadow_legion_state()
+    source_unit = _unit_for_player(state, player_id="player-a")
+    enemy_unit = _unit_for_player(state, player_id="player-b")
+    source_poses = (
+        Pose.at(x=10.0, y=20.0),
+        *tuple(Pose.at(x=30.0 + index, y=30.0) for index in range(1, 5)),
+    )
+    enemy_poses = (
+        Pose.at(x=10.5, y=20.0),
+        *tuple(Pose.at(x=50.0 + index, y=50.0) for index in range(1, 5)),
+    )
+    _place_unit_poses(state, unit_instance_id=source_unit.unit_instance_id, poses=source_poses)
+    _place_unit_poses(state, unit_instance_id=enemy_unit.unit_instance_id, poses=enemy_poses)
+    _set_model_wounds(
+        state,
+        model_instance_id=enemy_unit.own_models[0].model_instance_id,
+        wounds_remaining=0,
+    )
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit.unit_instance_id)
+
+    assert (
+        generic_rule_ir_runtime._phase_start_enemy_engagement_model_ids(
+            state=state,
+            rules_unit=rules_unit,
+        )
+        == ()
+    )
+
+
 def test_leaping_shadows_grants_scouts_nine_to_bearers_attached_rules_unit() -> None:
     state = _shadow_legion_state(
         unit_keywords=("Shadow Legion", "Undivided", "Character"),

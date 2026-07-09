@@ -1039,6 +1039,52 @@ def test_revival_requires_phase_start_coherent_placement_without_mutation() -> N
     assert removed_placement.model_instance_id not in state.battlefield_state.placed_model_ids()
 
 
+def test_revival_engagement_validator_ignores_destroyed_enemy_placements() -> None:
+    state = _battle_state()
+    decisions = DecisionController()
+    unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:intercessor-unit-3"
+    unit = _unit_by_id(state, unit_id)
+    enemy = _unit_by_id(state, enemy_unit_id)
+    target_poses = tuple(
+        Pose.at(x=10.0 + index * 1.8, y=10.0) for index in range(len(unit.own_models))
+    )
+    enemy_poses = (
+        Pose.at(x=10.5, y=10.0),
+        *tuple(Pose.at(x=40.0 + index, y=40.0) for index in range(1, len(enemy.own_models))),
+    )
+    _place_unit_model_poses(state, unit_id=unit_id, poses=target_poses)
+    _place_unit_model_poses(state, unit_id=enemy_unit_id, poses=enemy_poses)
+    _set_model_wounds(
+        state,
+        model_instance_id=enemy.own_models[0].model_instance_id,
+        wounds_remaining=0,
+    )
+    removed_placement = _remove_model(state, model_instance_id=unit.own_models[0].model_instance_id)
+    effect = HealingEffect(
+        effect_id="phase14h-revive-dead-enemy-engagement",
+        target_unit_instance_id=unit_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+        phase_start_enemy_engagement_model_ids=(),
+        revival_placements=(removed_placement.with_pose(Pose.at(x=10.3, y=10.0)),),
+    )
+
+    resolved, follow_up = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+
+    assert follow_up is None
+    assert resolved.is_complete()
+    assert model_by_id(state=state, model_instance_id=removed_placement.model_instance_id).is_alive
+    assert state.battlefield_state is not None
+    assert enemy.own_models[0].model_instance_id in state.battlefield_state.placed_model_ids()
+
+
 def test_healing_domain_records_fail_fast_on_invalid_payload_shapes() -> None:
     state = _battle_state()
     unit_id = "army-alpha:intercessor-unit-1"
@@ -1481,6 +1527,26 @@ def _placed_model_ids(state: GameState, unit_id: str) -> tuple[str, ...]:
     return tuple(
         placement.model_instance_id
         for placement in state.battlefield_state.unit_placement_by_id(unit_id).model_placements
+    )
+
+
+def _place_unit_model_poses(
+    state: GameState,
+    *,
+    unit_id: str,
+    poses: tuple[Pose, ...],
+) -> None:
+    assert state.battlefield_state is not None
+    unit_placement = state.battlefield_state.unit_placement_by_id(unit_id)
+    if len(poses) != len(unit_placement.model_placements):
+        raise AssertionError("pose fixture must match placed model count")
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        unit_placement.with_model_placements(
+            tuple(
+                placement.with_pose(pose)
+                for placement, pose in zip(unit_placement.model_placements, poses, strict=True)
+            )
+        )
     )
 
 
