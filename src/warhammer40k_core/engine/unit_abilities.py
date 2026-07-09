@@ -111,6 +111,10 @@ def descriptor_is_feel_no_pain(descriptor: DatasheetAbilityDescriptor) -> bool:
     return _descriptor_matches_spec(descriptor, _FEEL_NO_PAIN_SPEC)
 
 
+def descriptor_is_stealth(descriptor: DatasheetAbilityDescriptor) -> bool:
+    return _descriptor_matches_spec(descriptor, _STEALTH_SPEC)
+
+
 def unit_has_infiltrators(unit: UnitInstance) -> bool:
     return _unit_has_core_keyword_ability(unit=unit, spec=_INFILTRATORS_SPEC)
 

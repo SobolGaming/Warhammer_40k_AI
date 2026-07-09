@@ -24,6 +24,7 @@ from warhammer40k_core.core.weapon_profiles import (
     canonical_weapon_keyword_tokens,
     weapon_keyword_from_token,
 )
+from warhammer40k_core.engine import catalog_contextual_status_consumption as _contextual
 from warhammer40k_core.engine import catalog_movement_transit as _catalog_transit
 from warhammer40k_core.engine import catalog_rule_selected_target_classification as _st
 from warhammer40k_core.engine.abilities import (
@@ -140,8 +141,8 @@ CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:desperate-es
 CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID = "catalog-ir:force-desperate-escape"
 CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:advance-roll-reroll"
 CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:charge-roll-reroll"
-CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID = "catalog-ir:hit-roll-reroll"
-CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = "catalog-ir:wound-roll-reroll"
+CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID = _contextual.CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID
+CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = _contextual.CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID
 CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID = (
     "catalog-ir:destroyed-unit-restore-lost-wounds"
 )
@@ -173,7 +174,19 @@ CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
     "catalog-ir:can-advance-and-shoot-and-charge"
 )
 CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
-CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID = "catalog-ir:shadow-of-chaos-aura"
+CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID = (
+    _contextual.CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID
+)
+CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID = _contextual.CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID
+CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID = (
+    _contextual.CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID
+)
+CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID = (
+    _contextual.CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID
+)
+CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID = (
+    _contextual.CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID
+)
 CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND = "catalog_named_weapon_ability_choice"
 CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SELECTED_EVENT = "catalog_named_weapon_ability_choice_selected"
 CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND = "catalog_post_shoot_hit_target_status"
@@ -1374,7 +1387,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
         CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
-        CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
+        *_contextual.registered_hook_ids(),
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
         CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
         CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
@@ -3818,8 +3831,7 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
                 modifier_consumer_id = _roll_modifier_consumer_id_for_effect(effect)
                 if modifier_consumer_id is not None:
                     consumer_ids.add(modifier_consumer_id)
-    if _clause_targets_shadow_of_chaos_aura(clause):
-        consumer_ids.add(CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID)
+    consumer_ids.update(_contextual.consumer_ids_for_clause(clause))
     if _clause_targets_attacker_status_unit(clause):
         for effect in clause.effects:
             if _effect_is_minimum_unmodified_hit_success(effect):
@@ -3920,6 +3932,7 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         hook_ids.add(CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID)
     if _clause_is_supported_setup_reactive_shoot_charge(clause):
         hook_ids.add(CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID)
+    hook_ids.update(_contextual.consumer_ids_for_clause(clause))
     return tuple(sorted(hook_ids))
 
 
@@ -5245,30 +5258,6 @@ def _effect_is_turn_end_reserve_permission(effect: RuleEffectSpec) -> bool:
     )
 
 
-def _clause_targets_shadow_of_chaos_aura(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
-    return (
-        clause.target is not None
-        and clause.target.kind is RuleTargetKind.AURA_UNITS
-        and any(condition.kind is RuleConditionKind.AURA for condition in clause.conditions)
-        and any(_effect_is_shadow_of_chaos_status(effect) for effect in clause.effects)
-    )
-
-
-def _effect_is_shadow_of_chaos_status(effect: RuleEffectSpec) -> bool:
-    if type(effect) is not RuleEffectSpec:
-        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
-    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
-        return False
-    parameters = parameter_payload(effect.parameters)
-    return (
-        parameters.get("status") == "within_shadow_of_chaos"
-        and parameters.get("rules_context") == "shadow_of_chaos"
-        and parameters.get("owner") == "your_army"
-    )
-
-
 def _effect_is_minimum_unmodified_hit_success(effect: RuleEffectSpec) -> bool:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
@@ -5969,8 +5958,9 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         )
     if effect.kind is RuleEffectKind.GRANT_ABILITY and _effect_is_feel_no_pain_grant(effect):
         return (CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,)
-    if _effect_is_shadow_of_chaos_status(effect):
-        return (CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,)
+    contextual_hook_ids = _contextual.hook_ids_for_effect(effect)
+    if contextual_hook_ids:
+        return contextual_hook_ids
     if _effect_is_minimum_unmodified_hit_success(effect):
         return (CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,)
     if effect.kind is RuleEffectKind.RESTORE_LOST_WOUNDS:

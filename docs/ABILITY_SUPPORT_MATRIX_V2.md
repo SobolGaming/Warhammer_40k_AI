@@ -176,6 +176,7 @@ This generated section reports pregame army-list rules enforced by `army_musteri
 | Freeblades | `army-mustering:freeblades` | `phase17g:imperial-knights:freeblades` | faction `imperial-knights`; allowed base `imperium` | `army_mustering/list_validation` | `full` | `army_mustering:_append_freeblades_violations` | tests/unit/test_phase9c_mustering.py::test_phase17g_freeblades_allows_one_titanic_or_three_armigers_for_imperium_armies; tests/unit/test_phase9c_mustering.py::test_phase17g_freeblades_reports_roster_violations; tests/unit/test_phase9c_mustering.py::test_phase17g_freeblades_rejects_non_imperium_faction_access | Allows Imperium armies to include either one TITANIC Imperial Knights model or up to three ARMIGER models, and forbids allied Enhancements and Warlords. |
 | Shadow Legion Thralls of the First Prince | `army-mustering:shadow-legion-thralls-of-the-first-prince` | `phase17g:chaos-daemons:shadow-legion:thralls-of-the-first-prince` | faction `chaos-daemons`; allowed base `chaos-daemons` | `army_mustering/list_validation/army_factory` | `full` | `army_mustering:_append_shadow_legion_violations` | tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_shadow_legion_mustering_grants_keywords_and_deep_strike; tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_shadow_legion_roster_reports_thralls_and_forbidden_units | Enforces Shadow Legion detachment restrictions, Heretic Astartes Thralls allow-list and points caps, forbidden Daemon Prince/Epic Hero selections, and grants Shadow Legion, Undivided, and Deep Strike keywords. |
 | Space Marine Chapters | `army-mustering:space-marine-chapters` | `phase17g:space-marines:space-marine-chapters` | faction `space-marines`; allowed base `space-marines` | `army_mustering/list_validation` | `full` | `army_mustering:_append_space_marine_chapter_violations` | tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_black_templars_and_space_wolves; tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_deathwatch_restrictions | Enforces one-Chapter roster restrictions plus Black Templars, Space Wolves, and Deathwatch forbidden-unit gates for Adeptus Astartes armies. |
+| Supreme Commander | `army-mustering:supreme-commander` | `core:supreme-commander` | allowed base `any` | `army_mustering/list_validation` | `full` | `army_mustering:_append_supreme_commander_warlord_violations` | tests/unit/test_phase9c_mustering.py::test_mustering_requires_supreme_commander_to_be_warlord; tests/unit/test_phase9c_mustering.py::test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander | Consumes structured Supreme Commander mustering descriptors and requires an eligible Supreme Commander unit to be selected as Warlord when present. |
 
 ## Factions
 
@@ -226,7 +227,7 @@ Broad CORE V1-to-CORE V2 category forecasting is intentionally deferred until cu
 
 ## Runtime Hook Inventory
 
-This bottom inventory lists the hook, modifier, effect, handler, and runtime consumer IDs currently surfaced by generated category rows, Core Stratagem records, or registered runtime-content contributions. Pregame mustering/list construction enforcement is reported in the Mustering / List Construction Support section instead of this phase/query inventory.
+This bottom inventory lists the hook, modifier, effect, handler, and runtime consumer IDs currently surfaced by generated ability rows, Core Stratagem records, or registered runtime-content contributions. Pregame mustering/list construction enforcement is reported in the Mustering / List Construction Support section instead of this phase/query inventory.
 
 | Hook / consumer | Abilities / rules |
 | --- | --- |
@@ -237,6 +238,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:attacks-characteristic-query` | No current generated rows |
 | `catalog-ir:ballistic-skill-characteristic-modifier` | No current generated rows |
 | `catalog-ir:ballistic-skill-characteristic-query` | No current generated rows |
+| `catalog-ir:battle-shock-failed-heal` | Pall of Despair (Aura, Psychic) |
+| `catalog-ir:battle-shock-forced-test` | Pall of Despair (Aura, Psychic) |
 | `catalog-ir:can-advance-and-charge` | No current generated rows |
 | `catalog-ir:can-advance-and-shoot-and-charge` | No current generated rows |
 | `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
@@ -258,7 +261,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
 | `catalog-ir:force-desperate-escape` | Bane of Cowards |
 | `catalog-ir:hit-roll-modifier` | Revel in Desecration |
-| `catalog-ir:hit-roll-reroll` | No current generated rows |
+| `catalog-ir:hit-roll-reroll` | Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | No current generated rows |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
@@ -280,7 +283,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:save-roll-modifier` | No current generated rows |
 | `catalog-ir:selected-target-effect` | No current generated rows |
 | `catalog-ir:setup-reactive-shoot-charge` | Unleash Wrath |
-| `catalog-ir:shadow-of-chaos-aura` | No current generated rows |
+| `catalog-ir:shadow-form-choice` | Shadow Form |
+| `catalog-ir:shadow-of-chaos-aura` | The Dark Master (Aura) |
+| `catalog-ir:shooting-target-range-restriction` | Wreathed in Shadows (Aura, Psychic) |
 | `catalog-ir:strength-characteristic-modifier` | No current generated rows |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
 | `catalog-ir:toughness-characteristic-modifier` | No current generated rows |
@@ -329,6 +334,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `core:new-orders` | New Orders |
 | `core:rapid-ingress` | Rapid Ingress |
 | `core:smokescreen` | Smokescreen |
+| `core:stealth` | Stealth |
 | `descriptor:destruction-reaction:deadly-demise-resolution` | Deadly Demise |
 | `descriptor:destruction-reaction:deadly-demise-source` | Deadly Demise |
 | `descriptor:lost-wound:feel-no-pain-resolution` | Feel No Pain |

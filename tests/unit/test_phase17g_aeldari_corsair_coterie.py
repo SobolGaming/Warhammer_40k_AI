@@ -76,6 +76,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
+from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectContext,
     apply_enhancement_effects,
@@ -1353,14 +1354,116 @@ def test_cloak_and_shadow_restriction_noops_when_close_or_unmodified_and_stays_s
     assert stratagems.apply_cloak_and_shadow(apply_context).reason is None
     assert generic_persisted_shooting_target_range_restriction(base_restriction_context) is None
 
-    with pytest.raises(GameLifecycleError, match="requires attacker model"):
+    assert (
         generic_persisted_shooting_target_range_restriction(
             replace(base_restriction_context, attacker_model_instance_id=None)
         )
+        is None
+    )
 
     state.battlefield_state = None
     with pytest.raises(GameLifecycleError, match="requires battlefield state"):
         generic_persisted_shooting_target_range_restriction(base_restriction_context)
+
+
+@pytest.mark.parametrize("dead_side", ["attacker", "target"])
+def test_generic_persisted_shooting_target_range_restriction_ignores_dead_model_placements(
+    dead_side: str,
+) -> None:
+    state, corsair_army, enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=40.0,
+    )
+    target_unit = corsair_army.units[0]
+    attacker_unit = enemy_army.units[0]
+
+    apply_context = _corsair_stratagem_handler_context(
+        state=state,
+        player_id="player-a",
+        stratagem_id=stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
+        handler_id=stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
+        target_unit_id=target_unit.unit_instance_id,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+        trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [target_unit.unit_instance_id]},
+    )
+    assert stratagems.apply_cloak_and_shadow(apply_context).reason is None
+    _replace_first_persisting_effect_payload(
+        state,
+        {
+            "effect_kind": GENERIC_RULE_EFFECT_KIND,
+            "source_id": "test-source:wreathed-in-shadows-range",
+            "clause_id": "test-clause:wreathed-in-shadows-range",
+            "effect": {
+                "kind": "set_contextual_status",
+                "source_span": {"start": 0, "end": 1, "text": "x"},
+                "parameters": [
+                    {"key": "status", "value": "shooting_target_range_restriction"},
+                    {"key": "targeting_max_range_inches", "value": 18.0},
+                    {"key": "source_effect_kind", "value": "source_backed_range_limit"},
+                ],
+            },
+        },
+    )
+
+    if dead_side == "attacker":
+        attacker_unit = _unit_with_second_model_and_dead_model(
+            attacker_unit,
+            dead_model_index=0,
+        )
+        _replace_unit_instance_in_state(state=state, replacement=attacker_unit)
+        _set_unit_model_x_positions(
+            state=state,
+            army_id="army-b",
+            player_id="player-b",
+            unit=attacker_unit,
+            model_xs=(10.0, 40.0),
+        )
+        _set_unit_model_x_positions(
+            state=state,
+            army_id="army-a",
+            player_id="player-a",
+            unit=target_unit,
+            model_xs=(10.4,),
+        )
+    elif dead_side == "target":
+        target_unit = _unit_with_second_model_and_dead_model(target_unit, dead_model_index=0)
+        _replace_unit_instance_in_state(state=state, replacement=target_unit)
+        _set_unit_model_x_positions(
+            state=state,
+            army_id="army-b",
+            player_id="player-b",
+            unit=attacker_unit,
+            model_xs=(10.0,),
+        )
+        _set_unit_model_x_positions(
+            state=state,
+            army_id="army-a",
+            player_id="player-a",
+            unit=target_unit,
+            model_xs=(10.4, 40.0),
+        )
+    else:
+        raise AssertionError(f"Unsupported dead-side fixture {dead_side}.")
+
+    restriction_context = ShootingTargetRestrictionContext(
+        state=state,
+        player_id="player-b",
+        battle_round=state.battle_round,
+        attacking_unit_instance_id=attacker_unit.unit_instance_id,
+        attacker_model_instance_id=None,
+        target_unit_instance_id=target_unit.unit_instance_id,
+    )
+
+    restriction = generic_persisted_shooting_target_range_restriction(restriction_context)
+
+    assert restriction is not None
+    assert (
+        restriction.violation_code
+        == GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_VIOLATION_CODE
+    )
 
 
 def test_generic_persisted_target_range_restriction_rejects_malformed_effect_payloads() -> None:
@@ -1425,6 +1528,33 @@ def test_generic_persisted_target_range_restriction_rejects_malformed_effect_pay
     _replace_first_persisting_effect_payload(
         state,
         {
+            "effect_kind": GENERIC_RULE_EFFECT_KIND,
+            "source_id": "test-source:generic-range",
+            "clause_id": "test-clause:generic-range",
+            "effect": {
+                "kind": "set_contextual_status",
+                "source_span": {"start": 0, "end": 1, "text": "x"},
+                "parameters": [
+                    {"key": "status", "value": "shooting_target_range_restriction"},
+                    {"key": "targeting_max_range_inches", "value": 18.0},
+                    {"key": "source_effect_kind", "value": "source_backed_range_limit"},
+                ],
+            },
+        },
+    )
+    generic_restriction = generic_persisted_shooting_target_range_restriction(
+        replace(restriction_context, attacker_model_instance_id=None)
+    )
+    assert generic_restriction is not None
+    generic_payload = _json_object(generic_restriction.replay_payload)
+    assert generic_payload["persisting_effect_kind"] == GENERIC_RULE_EFFECT_KIND
+    assert generic_payload["source_effect_kind"] == "source_backed_range_limit"
+    assert generic_payload["attacker_model_instance_id"] is None
+    assert generic_payload["attacking_unit_instance_id"] == _ENEMY_UNIT_ID
+
+    _replace_first_persisting_effect_payload(
+        state,
+        {
             "effect_kind": SMOKESCREEN_EFFECT_KIND,
             "targeting_max_range_inches": 18.0,
             "source_effect_kind": 1,
@@ -1440,7 +1570,7 @@ def test_generic_persisted_target_range_restriction_rejects_malformed_effect_pay
     battlefield = state.battlefield_state
     assert battlefield is not None
     state.battlefield_state = battlefield.with_removed_models((f"{_ENEMY_UNIT_ID}:model-001",))
-    with pytest.raises(GameLifecycleError, match="model is not placed"):
+    with pytest.raises(GameLifecycleError, match="attacking unit is not placed"):
         generic_persisted_shooting_target_range_restriction(restriction_context)
 
 
@@ -5354,6 +5484,74 @@ def _unit_placement(
                 pose=Pose.at(x=x, y=22.0, facing_degrees=0.0),
             ),
         ),
+    )
+
+
+def _unit_with_second_model_and_dead_model(
+    unit: UnitInstance,
+    *,
+    dead_model_index: int,
+) -> UnitInstance:
+    if len(unit.own_models) != 1:
+        raise AssertionError("Test unit must start with one model.")
+    if dead_model_index not in (0, 1):
+        raise AssertionError("Dead model index must select one of the test models.")
+    first_model = unit.own_models[0]
+    second_model = replace(
+        first_model,
+        model_instance_id=f"{unit.unit_instance_id}:model-002",
+        name=f"{first_model.name} 2",
+    )
+    models = [first_model, second_model]
+    models[dead_model_index] = replace(models[dead_model_index], wounds_remaining=0)
+    return replace(unit, own_models=tuple(models))
+
+
+def _replace_unit_instance_in_state(
+    *,
+    state: GameState,
+    replacement: UnitInstance,
+) -> None:
+    for army_index, army in enumerate(state.army_definitions):
+        units = tuple(
+            replacement if unit.unit_instance_id == replacement.unit_instance_id else unit
+            for unit in army.units
+        )
+        if units != army.units:
+            state.army_definitions[army_index] = replace(army, units=units)
+            return
+    raise AssertionError(f"Missing unit {replacement.unit_instance_id}.")
+
+
+def _set_unit_model_x_positions(
+    *,
+    state: GameState,
+    army_id: str,
+    player_id: str,
+    unit: UnitInstance,
+    model_xs: tuple[float, ...],
+) -> None:
+    if len(model_xs) != len(unit.own_models):
+        raise AssertionError("Test placement positions must match unit models.")
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Test state requires a battlefield.")
+    state.battlefield_state = battlefield.with_unit_placement(
+        UnitPlacement(
+            army_id=army_id,
+            player_id=player_id,
+            unit_instance_id=unit.unit_instance_id,
+            model_placements=tuple(
+                ModelPlacement(
+                    army_id=army_id,
+                    player_id=player_id,
+                    unit_instance_id=unit.unit_instance_id,
+                    model_instance_id=model.model_instance_id,
+                    pose=Pose.at(x=x, y=22.0, facing_degrees=0.0),
+                )
+                for model, x in zip(unit.own_models, model_xs, strict=True)
+            ),
+        )
     )
 
 

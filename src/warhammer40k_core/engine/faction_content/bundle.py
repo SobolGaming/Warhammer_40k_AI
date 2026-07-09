@@ -1434,9 +1434,15 @@ class RuntimeContentBundle:
             )
         )
         battle_shock_hook_registry = BattleShockHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.battle_shock_hook_bindings,
+            (
+                *catalog_runtime_hooks.battle_shock_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.battle_shock_hook_bindings,
+                ),
             )
         )
         advance_eligibility_hook_registry = AdvanceEligibilityHookRegistry.from_bindings(

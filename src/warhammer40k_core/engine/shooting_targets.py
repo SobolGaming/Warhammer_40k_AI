@@ -22,13 +22,32 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     SpatialIndexState,
-    UnitPlacement,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_from_armies,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    attacker_geometry_models as _attacker_geometry_models,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    geometry_models_for_unit_placement as _geometry_models_for_unit_placement,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    geometry_models_for_unit_placements as _geometry_models_for_unit_placements,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    target_in_range_model_ids as _target_in_range_model_ids,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    target_within_shooting_selection_range,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    unit_placement_or_none as _unit_placement_or_none,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    unit_placements_for_rules_unit_or_none as _unit_placements_for_rules_unit_or_none,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType, validate_shooting_type_tuple
 from warhammer40k_core.engine.unit_abilities import unit_has_lone_operative, unit_has_stealth
@@ -42,7 +61,6 @@ from warhammer40k_core.engine.weapon_abilities import (
     hunter_target_allowed,
 )
 from warhammer40k_core.geometry import shapely_backend
-from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.visibility import (
     BenefitOfCoverResult,
@@ -788,6 +806,7 @@ def _target_candidate(
         _lone_operative_target_allowed(
             scenario=scenario,
             attacker_unit=attacker_unit,
+            attacker_model_instance_id=attacker_model_instance_id,
             target_rules_unit=target_rules_unit,
         )
     ):
@@ -900,31 +919,6 @@ def _invalid_candidate(
     )
 
 
-def _unit_placement_or_none(
-    scenario: BattlefieldScenario,
-    unit_instance_id: str,
-) -> UnitPlacement | None:
-    return scenario.battlefield_state.unit_placement_or_none(unit_instance_id)
-
-
-def _unit_placements_for_rules_unit_or_none(
-    *,
-    scenario: BattlefieldScenario,
-    rules_unit: RulesUnitView,
-) -> tuple[UnitPlacement, ...] | None:
-    placements: list[UnitPlacement] = []
-    for component in rules_unit.components:
-        placement = _unit_placement_or_none(scenario, component.unit.unit_instance_id)
-        if placement is None:
-            if any(model.is_alive for model in component.unit.own_models):
-                return None
-            continue
-        placements.append(placement)
-    if not placements:
-        return None
-    return tuple(placements)
-
-
 def _canonical_target_unit_ids(
     *,
     scenario: BattlefieldScenario,
@@ -949,53 +943,6 @@ def _player_id_for_unit(scenario: BattlefieldScenario, unit_instance_id: str) ->
         armies=scenario.armies,
         unit_instance_id=unit_instance_id,
     ).owner_player_id
-
-
-def _geometry_models_for_unit_placements(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placements: tuple[UnitPlacement, ...],
-) -> tuple[Model, ...]:
-    return tuple(
-        geometry_model
-        for unit_placement in unit_placements
-        for geometry_model in _geometry_models_for_unit_placement(
-            scenario=scenario,
-            unit_placement=unit_placement,
-        )
-    )
-
-
-def _geometry_models_for_unit_placement(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-) -> tuple[Model, ...]:
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(model_placement),
-            placement=model_placement,
-        )
-        for model_placement in unit_placement.model_placements
-    )
-
-
-def _attacker_geometry_models(
-    *,
-    scenario: BattlefieldScenario,
-    attacker_placement: UnitPlacement,
-    attacker_model_instance_id: str | None,
-) -> tuple[Model, ...]:
-    models = _geometry_models_for_unit_placement(
-        scenario=scenario,
-        unit_placement=attacker_placement,
-    )
-    if attacker_model_instance_id is None:
-        return models
-    selected = tuple(model for model in models if model.model_id == attacker_model_instance_id)
-    if not selected:
-        raise GameLifecycleError("Selected attacker model is not placed in the attacker unit.")
-    return selected
 
 
 def shooting_dynamic_model_blockers(
@@ -1043,20 +990,6 @@ def _shooting_dynamic_model_blockers(
         observing_unit_id=observing_unit_id,
         target_unit_id=target_unit_id,
     )
-
-
-def _target_in_range_model_ids(
-    *,
-    attacker_models: tuple[Model, ...],
-    target_models: tuple[Model, ...],
-    range_inches: int | float,
-) -> tuple[str, ...]:
-    ids: set[str] = set()
-    for attacker_model in attacker_models:
-        for target_model in target_models:
-            if attacker_model.range_to(target_model) <= float(range_inches):
-                ids.add(target_model.model_id)
-    return tuple(sorted(ids))
 
 
 def _hidden_target_detection_validation(
@@ -1540,14 +1473,16 @@ def _lone_operative_target_allowed(
     *,
     scenario: BattlefieldScenario,
     attacker_unit: UnitInstance,
+    attacker_model_instance_id: str | None,
     target_rules_unit: RulesUnitView,
 ) -> bool:
-    target_distance = _closest_distance_between_unit_and_rules_unit(
+    return target_within_shooting_selection_range(
         scenario=scenario,
-        first_unit_id=attacker_unit.unit_instance_id,
-        second_rules_unit=target_rules_unit,
+        attacking_unit_instance_id=attacker_unit.unit_instance_id,
+        attacker_model_instance_id=attacker_model_instance_id,
+        target_unit_instance_id=target_rules_unit.unit_instance_id,
+        max_range_inches=12.0,
     )
-    return target_distance <= 12.0
 
 
 def _rules_unit_has_lone_operative(rules_unit: RulesUnitView) -> bool:
@@ -1560,37 +1495,6 @@ def _rules_unit_has_stealth(rules_unit: RulesUnitView) -> bool:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Stealth target lookup requires a rules unit.")
     return any(unit_has_stealth(component.unit) for component in rules_unit.components)
-
-
-def _closest_distance_between_unit_and_rules_unit(
-    *,
-    scenario: BattlefieldScenario,
-    first_unit_id: str,
-    second_rules_unit: RulesUnitView,
-) -> float:
-    first_placement = scenario.battlefield_state.unit_placement_by_id(first_unit_id)
-    second_placements = _unit_placements_for_rules_unit_or_none(
-        scenario=scenario,
-        rules_unit=second_rules_unit,
-    )
-    if second_placements is None:
-        raise GameLifecycleError("Distance to rules unit requires placed target models.")
-    first_models = _geometry_models_for_unit_placement(
-        scenario=scenario,
-        unit_placement=first_placement,
-    )
-    second_models = _geometry_models_for_unit_placements(
-        scenario=scenario,
-        unit_placements=second_placements,
-    )
-    distances = tuple(
-        DistanceMeasurementContext.from_models(first_model, second_model).closest_distance_inches()
-        for first_model in first_models
-        for second_model in second_models
-    )
-    if not distances:
-        raise GameLifecycleError("Distance between units requires placed models.")
-    return min(distances)
 
 
 def _unit_has_vehicle_or_monster_keyword(unit: UnitInstance) -> bool:

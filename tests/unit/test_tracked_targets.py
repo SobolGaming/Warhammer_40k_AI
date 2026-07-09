@@ -6,7 +6,10 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.engine import (
+    catalog_contextual_status_consumption as catalog_contextual_module,
+)
 from warhammer40k_core.engine import (
     catalog_tracked_target_runtime as catalog_tracked_target_runtime_module,
 )
@@ -20,12 +23,53 @@ from warhammer40k_core.engine.abilities import (
     AbilityTimingDescriptor,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
-from warhammer40k_core.engine.battle_round_hooks import BattleRoundStartRequestContext
+from warhammer40k_core.engine.battle_round_hooks import (
+    BattleRoundStartRequestContext,
+    BattleRoundStartResultContext,
+)
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockResult,
+    BattleShockTestReason,
+    BattleShockTestRequest,
+)
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockForcedTestContext,
+    BattleShockOutcomeContext,
+)
+from warhammer40k_core.engine.catalog_battle_shock_runtime import (
+    CATALOG_BATTLE_SHOCK_FAILED_HEAL_EVENT,
+    CATALOG_BATTLE_SHOCK_FAILED_HEAL_ROLL_TYPE,
+    catalog_battle_shock_hook_bindings,
+    catalog_forced_battle_shock_unit_ids,
+    resolve_catalog_battle_shock_failed_heal,
+)
+from warhammer40k_core.engine.catalog_contextual_status_consumption import (
+    CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
+    CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
+    CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+    CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID,
+    CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
+    CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID,
+    consumer_ids_for_clause,
+    hook_ids_for_effect,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_clauses_from_record
+from warhammer40k_core.engine.catalog_shadow_form_runtime import (
+    CATALOG_SHADOW_FORM_SELECTED_EVENT,
+    CATALOG_SHADOW_FORM_SELECTION_EFFECT_KIND,
+    CATALOG_SHADOW_FORM_SUBMISSION_KIND,
+    CatalogShadowFormRuntime,
+)
 from warhammer40k_core.engine.catalog_tracked_target_runtime import CatalogTrackedTargetRuntime
 from warhammer40k_core.engine.command_points import initial_command_point_ledgers
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, canonical_json
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
@@ -33,7 +77,7 @@ from warhammer40k_core.engine.list_validation import (
     ModelProfileSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.source_backed_rerolls import (
@@ -52,8 +96,13 @@ from warhammer40k_core.engine.tracked_targets import (
     tracked_target_reroll_permission_context_for_unit,
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.rule_ir import RuleClause, RuleEffectKind, RuleEffectSpec, RuleIR
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_daemons_datasheet_ir_support_2026_27 as belakor_ir_source,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
@@ -153,6 +202,496 @@ def test_tracked_target_runtime_empty_indexes_have_no_hooks() -> None:
 
     assert runtime.battle_round_start_bindings() == ()
     assert runtime.unit_destroyed_bindings() == ()
+
+
+def test_catalog_shadow_form_runtime_records_selection_and_event() -> None:
+    state = _battle_state_with_scenario()
+    runtime = CatalogShadowFormRuntime(
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records(_belakor_shadow_form_records()),
+            "player-b": AbilityCatalogIndex.from_records(()),
+        },
+        armies=tuple(state.army_definitions),
+    )
+    decisions = DecisionController()
+
+    bindings = runtime.battle_round_start_bindings()
+    request = runtime.battle_round_start_request(
+        BattleRoundStartRequestContext(state=state, decisions=decisions)
+    )
+
+    assert len(bindings) == 1
+    assert request is not None
+    assert request.actor_id == "player-a"
+    assert isinstance(request.payload, dict)
+    assert request.payload["submission_kind"] == CATALOG_SHADOW_FORM_SUBMISSION_KIND
+    assert request.payload["source_rule_id"] == belakor_ir_source.BELAKOR_SHADOW_FORM_SOURCE_ID
+    selected_option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict)
+        and option.payload["selected_shadow_form_source_id"]
+        == belakor_ir_source.BELAKOR_WREATHED_IN_SHADOWS_SOURCE_ID
+    )
+    result = DecisionResult.for_request(
+        result_id="result:shadow-form",
+        request=request,
+        selected_option_id=selected_option.option_id,
+    )
+
+    applied = runtime.apply_battle_round_start_result(
+        BattleRoundStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    assert applied
+    selection_effects = [
+        effect
+        for effect in state.persisting_effects_for_unit(
+            state.army_definitions[0].units[0].unit_instance_id
+        )
+        if isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("effect_kind") == CATALOG_SHADOW_FORM_SELECTION_EFFECT_KIND
+    ]
+    assert len(selection_effects) == 1
+    assert any(
+        event.event_type == CATALOG_SHADOW_FORM_SELECTED_EVENT
+        for event in decisions.event_log.records
+    )
+    assert (
+        runtime.battle_round_start_request(
+            BattleRoundStartRequestContext(state=state, decisions=decisions)
+        )
+        is None
+    )
+
+
+def test_catalog_shadow_form_selection_rejects_adapter_drift() -> None:
+    state = _battle_state_with_scenario()
+    runtime = CatalogShadowFormRuntime(
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records(_belakor_shadow_form_records()),
+            "player-b": AbilityCatalogIndex.from_records(()),
+        },
+        armies=tuple(state.army_definitions),
+    )
+    decisions = DecisionController()
+    request = runtime.battle_round_start_request(
+        BattleRoundStartRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    selected_option = request.options[0]
+    result = DecisionResult.for_request(
+        result_id="result:shadow-form-drift",
+        request=request,
+        selected_option_id=selected_option.option_id,
+    )
+
+    assert not runtime.apply_battle_round_start_result(
+        BattleRoundStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=replace(request, decision_type="other_decision_type"),
+            result=result,
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires an actor"):
+        runtime.apply_battle_round_start_result(
+            BattleRoundStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=replace(result, actor_id=None),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="payload drift"):
+        runtime.apply_battle_round_start_result(
+            BattleRoundStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=replace(result, payload={"drift": True}),
+            )
+        )
+
+
+def test_catalog_contextual_status_consumption_classifies_belakor_rule_ir() -> None:
+    consumer_ids: set[str] = set()
+    hook_ids: set[str] = set()
+    for row_id in (
+        belakor_ir_source.BELAKOR_DARK_MASTER_ROW_ID,
+        belakor_ir_source.BELAKOR_SHADOW_FORM_ROW_ID,
+        belakor_ir_source.BELAKOR_WREATHED_IN_SHADOWS_ROW_ID,
+        belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID,
+        belakor_ir_source.BELAKOR_SHADOW_LORD_ROW_ID,
+    ):
+        rule_ir = _belakor_rule_ir(row_id)
+        for clause in rule_ir.clauses:
+            consumer_ids.update(consumer_ids_for_clause(clause))
+            for effect in clause.effects:
+                hook_ids.update(hook_ids_for_effect(effect))
+
+    assert {
+        CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
+        CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
+        CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID,
+        CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
+        CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID,
+    } <= consumer_ids
+    assert {
+        CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
+        CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
+        CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID,
+        CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
+        CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID,
+    } <= hook_ids
+    with pytest.raises(GameLifecycleError, match="RuleClause"):
+        consumer_ids_for_clause(cast(RuleClause, object()))
+    with pytest.raises(GameLifecycleError, match="RuleEffectSpec"):
+        hook_ids_for_effect(cast(RuleEffectSpec, object()))
+
+
+def test_catalog_contextual_status_effect_classifiers_are_fail_fast() -> None:
+    bad_effect = cast(RuleEffectSpec, object())
+    with pytest.raises(GameLifecycleError, match="RuleEffectSpec"):
+        catalog_contextual_module._effect_is_shadow_of_chaos_status(bad_effect)  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="RuleEffectSpec"):
+        catalog_contextual_module._effect_is_shadow_form_choice(bad_effect)  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="RuleEffectSpec"):
+        catalog_contextual_module._effect_is_shooting_target_range_restriction(bad_effect)  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="RuleEffectSpec"):
+        catalog_contextual_module._effect_is_battle_shock_forced_test(bad_effect)  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="RuleEffectSpec"):
+        catalog_contextual_module._effect_is_battle_shock_failed_heal(bad_effect)  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="RuleEffectSpec"):
+        catalog_contextual_module._attack_roll_reroll_consumer_id_for_effect(bad_effect)  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="RuleClause"):
+        catalog_contextual_module.aura_attack_roll_reroll_consumer_ids_for_clause(
+            cast(RuleClause, object())
+        )
+
+
+def test_catalog_battle_shock_runtime_detects_forced_test_effects() -> None:
+    state = _battle_state_with_scenario()
+    source_unit = state.army_definitions[0].units[0]
+    target_unit = state.army_definitions[1].units[0]
+    pall_rule_ir = _belakor_rule_ir(belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID)
+    forced_effect = next(
+        effect
+        for clause in pall_rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS
+    )
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="effect:forced-battle-shock",
+            source_rule_id=pall_rule_ir.source_id,
+            owner_player_id="player-a",
+            target_unit_instance_ids=(target_unit.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.COMMAND,
+            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+            effect_payload=cast(
+                JsonValue,
+                {
+                    "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                    "effect": forced_effect.to_payload(),
+                    "context": {"source_unit_instance_id": source_unit.unit_instance_id},
+                },
+            ),
+        )
+    )
+    records = (
+        _belakor_catalog_record(
+            row_id=belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID,
+            ability_id="ability:pall-of-despair",
+            name="Pall of Despair",
+        ),
+    )
+    indexes = {
+        "player-a": AbilityCatalogIndex.from_records(records),
+        "player-b": AbilityCatalogIndex.from_records(()),
+    }
+
+    bindings = catalog_battle_shock_hook_bindings(
+        ability_indexes_by_player_id=indexes,
+        armies=tuple(state.army_definitions),
+    )
+    forced_ids = catalog_forced_battle_shock_unit_ids(
+        BattleShockForcedTestContext(
+            state=state,
+            active_player_id="player-b",
+            phase=BattlePhase.COMMAND,
+            phase_start_battle_shocked_unit_ids=(),
+        )
+    )
+
+    assert [binding.hook_id for binding in bindings] == [
+        CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
+        CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
+    ]
+    assert forced_ids == (target_unit.unit_instance_id,)
+    assert (
+        catalog_forced_battle_shock_unit_ids(
+            BattleShockForcedTestContext(
+                state=state,
+                active_player_id="player-b",
+                phase=BattlePhase.SHOOTING,
+                phase_start_battle_shocked_unit_ids=(),
+            )
+        )
+        == ()
+    )
+
+
+def test_catalog_battle_shock_failed_heal_resolves_generic_rule_ir_effect() -> None:
+    state = _battle_state_with_scenario()
+    decisions = DecisionController()
+    source_unit = state.army_definitions[0].units[0]
+    target_unit = state.army_definitions[1].units[0]
+    pall_rule_ir = _belakor_rule_ir(belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID)
+    heal_effect = next(
+        effect
+        for clause in pall_rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.RESTORE_LOST_WOUNDS
+    )
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="effect:failed-battle-shock-heal",
+            source_rule_id=pall_rule_ir.source_id,
+            owner_player_id="player-a",
+            target_unit_instance_ids=(target_unit.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.COMMAND,
+            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+            effect_payload=cast(
+                JsonValue,
+                {
+                    "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                    "effect": heal_effect.to_payload(),
+                    "context": {"source_unit_instance_id": source_unit.unit_instance_id},
+                },
+            ),
+        )
+    )
+    below_half_context = BelowHalfStrengthContext.from_unit(
+        player_id="player-b",
+        unit=target_unit,
+        starting_strength=StartingStrengthRecord.from_unit(
+            player_id="player-b",
+            unit=target_unit,
+        ),
+        current_model_ids=target_unit.own_model_ids(),
+    )
+    request = BattleShockTestRequest.for_unit(
+        request_id="request:failed-battle-shock",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-b",
+        unit_instance_id=target_unit.unit_instance_id,
+        reason=BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
+        leadership_target=6,
+        below_half_strength_context=below_half_context,
+    )
+    result = BattleShockResult.from_roll_state(
+        result_id="result:failed-battle-shock",
+        request=request,
+        roll_state=DiceRollManager("catalog-battle-shock-result").roll_fixed(
+            request.spec,
+            [1, 1],
+        ),
+    )
+    dice_manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+
+    resolve_catalog_battle_shock_failed_heal(
+        BattleShockOutcomeContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=dice_manager,
+            result=result,
+            active_player_id="player-b",
+            phase=BattlePhase.COMMAND,
+            auto_passed=False,
+            phase_start_battle_shocked_unit_ids=(),
+        )
+    )
+
+    event_types = [event.event_type for event in decisions.event_log.records]
+    assert CATALOG_BATTLE_SHOCK_FAILED_HEAL_EVENT in event_types
+    saw_heal_roll = False
+    for event in decisions.event_log.records:
+        if event.event_type != "dice_rolled":
+            continue
+        payload = event.payload
+        if not isinstance(payload, dict):
+            continue
+        spec = payload.get("spec")
+        if not isinstance(spec, dict):
+            continue
+        if spec.get("roll_type") == CATALOG_BATTLE_SHOCK_FAILED_HEAL_ROLL_TYPE:
+            saw_heal_roll = True
+    assert saw_heal_roll
+    catalog_event = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_BATTLE_SHOCK_FAILED_HEAL_EVENT
+    )
+    assert isinstance(catalog_event.payload, dict)
+    assert catalog_event.payload["source_unit_instance_id"] == source_unit.unit_instance_id
+    assert catalog_event.payload["target_unit_instance_id"] == target_unit.unit_instance_id
+
+
+def test_catalog_battle_shock_runtime_noops_and_fail_fast_paths() -> None:
+    state = _battle_state_with_scenario()
+    source_unit = state.army_definitions[0].units[0]
+    target_unit = state.army_definitions[1].units[0]
+    pall_rule_ir = _belakor_rule_ir(belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID)
+    forced_effect = next(
+        effect
+        for clause in pall_rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS
+    )
+    heal_effect = next(
+        effect
+        for clause in pall_rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.RESTORE_LOST_WOUNDS
+    )
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="effect:own-forced-battle-shock",
+            source_rule_id=pall_rule_ir.source_id,
+            owner_player_id="player-b",
+            target_unit_instance_ids=(target_unit.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.COMMAND,
+            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+            effect_payload=cast(
+                JsonValue,
+                {
+                    "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                    "effect": forced_effect.to_payload(),
+                    "context": {"source_unit_instance_id": source_unit.unit_instance_id},
+                },
+            ),
+        )
+    )
+    assert (
+        catalog_forced_battle_shock_unit_ids(
+            BattleShockForcedTestContext(
+                state=state,
+                active_player_id="player-b",
+                phase=BattlePhase.COMMAND,
+                phase_start_battle_shocked_unit_ids=(),
+            )
+        )
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="player_id is not in this game"):
+        catalog_forced_battle_shock_unit_ids(
+            BattleShockForcedTestContext(
+                state=state,
+                active_player_id="player-missing",
+                phase=BattlePhase.COMMAND,
+                phase_start_battle_shocked_unit_ids=(),
+            )
+        )
+
+    records = (
+        _belakor_catalog_record(
+            row_id=belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID,
+            ability_id="ability:pall-of-despair",
+            name="Pall of Despair",
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="armies are invalid"):
+        catalog_battle_shock_hook_bindings(
+            ability_indexes_by_player_id={
+                "player-a": AbilityCatalogIndex.from_records(records),
+            },
+            armies=(cast(ArmyDefinition, object()),),
+        )
+
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="effect:failed-battle-shock-own-heal",
+            source_rule_id=pall_rule_ir.source_id,
+            owner_player_id="player-b",
+            target_unit_instance_ids=(target_unit.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.COMMAND,
+            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+            effect_payload=cast(
+                JsonValue,
+                {
+                    "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                    "effect": heal_effect.to_payload(),
+                    "context": {"source_unit_instance_id": source_unit.unit_instance_id},
+                },
+            ),
+        )
+    )
+    request = BattleShockTestRequest.for_unit(
+        request_id="request:battle-shock-noop",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-b",
+        unit_instance_id=target_unit.unit_instance_id,
+        reason=BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
+        leadership_target=6,
+        below_half_strength_context=BelowHalfStrengthContext.from_unit(
+            player_id="player-b",
+            unit=target_unit,
+            starting_strength=StartingStrengthRecord.from_unit(
+                player_id="player-b",
+                unit=target_unit,
+            ),
+            current_model_ids=target_unit.own_model_ids(),
+        ),
+    )
+    failed_result = BattleShockResult.from_roll_state(
+        result_id="result:battle-shock-noop-failed",
+        request=request,
+        roll_state=DiceRollManager("catalog-battle-shock-noop-failed").roll_fixed(
+            request.spec,
+            [1, 1],
+        ),
+    )
+    passed_result = BattleShockResult.from_roll_state(
+        result_id="result:battle-shock-noop-passed",
+        request=request,
+        roll_state=DiceRollManager("catalog-battle-shock-noop-passed").roll_fixed(
+            request.spec,
+            [6, 6],
+        ),
+    )
+    decisions = DecisionController()
+    base_context = BattleShockOutcomeContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        result=failed_result,
+        active_player_id="player-b",
+        phase=BattlePhase.SHOOTING,
+        auto_passed=False,
+        phase_start_battle_shocked_unit_ids=(),
+    )
+
+    resolve_catalog_battle_shock_failed_heal(base_context)
+    resolve_catalog_battle_shock_failed_heal(replace(base_context, phase=BattlePhase.COMMAND))
+    resolve_catalog_battle_shock_failed_heal(replace(base_context, result=passed_result))
+
+    assert all(
+        event.event_type != CATALOG_BATTLE_SHOCK_FAILED_HEAL_EVENT
+        for event in decisions.event_log.records
+    )
 
 
 def test_tracked_target_runtime_fail_fast_and_empty_selection_paths() -> None:
@@ -1293,3 +1832,60 @@ def _tracked_target_catalog_record(
         source_kind=AbilitySourceKind.DATASHEET,
         datasheet_id="core-intercessor-like-infantry",
     )
+
+
+def _belakor_catalog_record(
+    *,
+    row_id: str,
+    ability_id: str,
+    name: str,
+) -> AbilityCatalogRecord:
+    rule_ir = _belakor_rule_ir(row_id)
+    return AbilityCatalogRecord(
+        record_id=f"record:{ability_id}",
+        definition=AbilityDefinition(
+            ability_id=ability_id,
+            name=name,
+            source_id=rule_ir.source_id,
+            when_descriptor="Source-backed Be'lakor runtime test ability.",
+            effect_descriptor="Generic RuleIR effect.",
+            restrictions_descriptor="Source-backed test restrictions.",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.START_BATTLE_ROUND),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=cast(JsonValue, {"rule_ir": rule_ir.to_payload()}),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id="core-intercessor-like-infantry",
+    )
+
+
+def _belakor_shadow_form_records() -> tuple[AbilityCatalogRecord, ...]:
+    return (
+        _belakor_catalog_record(
+            row_id=belakor_ir_source.BELAKOR_SHADOW_FORM_ROW_ID,
+            ability_id="ability:shadow-form",
+            name="Shadow Form",
+        ),
+        _belakor_catalog_record(
+            row_id=belakor_ir_source.BELAKOR_WREATHED_IN_SHADOWS_ROW_ID,
+            ability_id="ability:wreathed-in-shadows",
+            name="Wreathed in Shadows",
+        ),
+        _belakor_catalog_record(
+            row_id=belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID,
+            ability_id="ability:pall-of-despair",
+            name="Pall of Despair",
+        ),
+        _belakor_catalog_record(
+            row_id=belakor_ir_source.BELAKOR_SHADOW_LORD_ROW_ID,
+            ability_id="ability:shadow-lord",
+            name="Shadow Lord",
+        ),
+    )
+
+
+def _belakor_rule_ir(row_id: str) -> RuleIR:
+    payload = belakor_ir_source.datasheet_rule_ir_payload_by_source_row_id(row_id)
+    if payload is None:
+        raise AssertionError(f"Missing Be'lakor RuleIR payload for row: {row_id}.")
+    return RuleIR.from_payload(payload)

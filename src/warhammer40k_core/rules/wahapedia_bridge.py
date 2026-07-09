@@ -87,6 +87,7 @@ from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaCsvTable,
     WahapediaJsonArtifact,
 )
+from warhammer40k_core.rules.wahapedia_static_rule_ir import compact_json, payload_by_source_row_id
 from warhammer40k_core.rules.weapon_profile_names import WEAPON_PROFILE_SUFFIX_RE
 
 
@@ -767,36 +768,32 @@ def _bridge_abilities(
                 else None
             )
             if mustering_warlord_value is not None:
-                rule_ir_payload = json.dumps(
-                    {MUSTERING_WARLORD_RULE_KEY: mustering_warlord_value},
-                    sort_keys=True,
-                    separators=(",", ":"),
+                rule_ir_payload = compact_json(
+                    {MUSTERING_WARLORD_RULE_KEY: mustering_warlord_value}
                 )
             else:
-                compiled = compile_rule_source_text(
-                    source_text,
-                    source_keyword_sequence_parts=_SOURCE_KEYWORD_SEQUENCE_PARTS,
-                )
-                rule_ir_diagnostics = json.dumps(
-                    _rule_ir_diagnostics(compiled.rule_ir),
-                    sort_keys=True,
-                    separators=(",", ":"),
-                )
-                if compiled.rule_ir.is_supported:
-                    rule_ir_payload = json.dumps(
-                        compiled.rule_ir.to_payload(),
-                        sort_keys=True,
-                        separators=(",", ":"),
+                static_rule_ir_payload = None
+                if source_kind is CatalogAbilitySourceKind.DATASHEET:
+                    static_rule_ir_payload = payload_by_source_row_id(
+                        description_source_row.source_row_id
                     )
+                if static_rule_ir_payload is not None:
+                    rule_ir_payload = compact_json(static_rule_ir_payload)
+                    rule_ir_diagnostics = compact_json([])
                     support = CatalogAbilitySupport.GENERIC_RULE_IR
                 else:
-                    if source_kind is CatalogAbilitySourceKind.WARGEAR:
-                        rule_ir_payload = json.dumps(
-                            compiled.rule_ir.to_payload(),
-                            sort_keys=True,
-                            separators=(",", ":"),
-                        )
-                    support = CatalogAbilitySupport.UNSUPPORTED
+                    compiled = compile_rule_source_text(
+                        source_text,
+                        source_keyword_sequence_parts=_SOURCE_KEYWORD_SEQUENCE_PARTS,
+                    )
+                    rule_ir_diagnostics = compact_json(_rule_ir_diagnostics(compiled.rule_ir))
+                    if compiled.rule_ir.is_supported:
+                        rule_ir_payload = compact_json(compiled.rule_ir.to_payload())
+                        support = CatalogAbilitySupport.GENERIC_RULE_IR
+                    else:
+                        if source_kind is CatalogAbilitySourceKind.WARGEAR:
+                            rule_ir_payload = compact_json(compiled.rule_ir.to_payload())
+                        support = CatalogAbilitySupport.UNSUPPORTED
         bridged_rows["Datasheets_abilities"].append(
             {
                 "datasheet_id": datasheet_id,

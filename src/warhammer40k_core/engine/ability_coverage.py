@@ -7,6 +7,8 @@ from typing import TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
+    MUSTERING_WARLORD_REQUIRED,
+    MUSTERING_WARLORD_RULE_KEY,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     DatasheetAbilityDescriptor,
@@ -21,6 +23,7 @@ from warhammer40k_core.engine.unit_abilities import (
     descriptor_is_deadly_demise,
     descriptor_is_deep_strike,
     descriptor_is_feel_no_pain,
+    descriptor_is_stealth,
 )
 from warhammer40k_core.rules.parsed_tokens import TextSpan, TextSpanPayload
 from warhammer40k_core.rules.rule_ir import (
@@ -689,6 +692,8 @@ def _ability_coverage_rows_for_datasheet(
 def _rule_ir_for_ability(ability: DatasheetAbilityDescriptor) -> RuleIR | None:
     if type(ability) is not DatasheetAbilityDescriptor:
         raise GameLifecycleError("Ability coverage requires DatasheetAbilityDescriptor values.")
+    if ability.support is CatalogAbilitySupport.DESCRIPTOR_ONLY:
+        return None
     if ability.rule_ir_payload is None:
         return None
     return RuleIR.from_payload(cast(RuleIRPayload, ability.rule_ir_payload))
@@ -726,6 +731,10 @@ def _descriptor_runtime_consumer_ids(
             "descriptor:lost-wound:feel-no-pain-source",
             "descriptor:lost-wound:feel-no-pain-resolution",
         )
+    if descriptor_is_stealth(ability):
+        return (CORE_STEALTH_RUNTIME_CONSUMER_ID,)
+    if _descriptor_is_supreme_commander(ability):
+        return (SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,)
     if _descriptor_is_shadow_of_chaos(ability):
         return (_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID,)
     return ()
@@ -902,6 +911,10 @@ def _descriptor_semantic_categories(
         return ("core.deadly_demise",)
     if descriptor_is_feel_no_pain(ability):
         return ("core.feel_no_pain",)
+    if descriptor_is_stealth(ability):
+        return ("core.stealth",)
+    if _descriptor_is_supreme_commander(ability):
+        return ("datasheet.mustering.supreme_commander",)
     if _descriptor_is_shadow_of_chaos(ability):
         return ("faction.army_rule.shadow_of_chaos",)
     return ("unknown.ability_text",)
@@ -932,6 +945,17 @@ def _descriptor_is_shadow_of_chaos(ability: DatasheetAbilityDescriptor) -> bool:
     return (
         ability.source_kind is CatalogAbilitySourceKind.FACTION
         and ability.ability_id == _SHADOW_OF_CHAOS_CATALOG_ABILITY_ID
+    )
+
+
+def _descriptor_is_supreme_commander(ability: DatasheetAbilityDescriptor) -> bool:
+    if type(ability) is not DatasheetAbilityDescriptor:
+        raise GameLifecycleError("Supreme Commander descriptor matching requires a descriptor.")
+    payload = ability.rule_ir_payload
+    return (
+        ability.source_kind is CatalogAbilitySourceKind.DATASHEET
+        and type(payload) is dict
+        and payload.get(MUSTERING_WARLORD_RULE_KEY) == MUSTERING_WARLORD_REQUIRED
     )
 
 
@@ -1047,7 +1071,9 @@ _SUPPORT_STAGE_ORDER: Mapping[AbilityCoverageSupportStage, int] = {
 
 _CATEGORY_NAMES: Mapping[str, str] = {
     "core.descriptor": "Core Ability Descriptor",
+    "core.stealth": "Stealth",
     "core.reserve.deep_strike": "Deep Strike Reserve Arrival",
+    "datasheet.mustering.supreme_commander": "Supreme Commander",
     "faction.army_rule.blessings_of_khorne": "World Eaters Army Rule",
     "faction.army_rule.templar_vows": "Black Templars Army Rule",
     "faction.army_rule.dark_pacts": "Chaos Space Marines Army Rule",
@@ -1063,6 +1089,8 @@ _CATEGORY_NAMES: Mapping[str, str] = {
     "wargear.roll_modifier.charge.this_unit": "Charge Roll Modifier",
 }
 
+CORE_STEALTH_RUNTIME_CONSUMER_ID = "core:stealth"
+SUPREME_COMMANDER_MUSTERING_CONSUMER_ID = "army-mustering:supreme-commander"
 _SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID = (
     "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
 )

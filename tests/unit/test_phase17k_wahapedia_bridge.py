@@ -81,6 +81,8 @@ from warhammer40k_core.engine.ability_catalog import (
     catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.ability_coverage import (
+    CORE_STEALTH_RUNTIME_CONSUMER_ID,
+    SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,
     AbilityCoverageAbilityDatasheetPair,
     AbilityCoverageCategoryRow,
     AbilityCoverageRow,
@@ -117,6 +119,8 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+    CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
+    CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
     CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
@@ -130,12 +134,15 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
     CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID,
     CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
+    CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID,
     CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
@@ -5109,6 +5116,21 @@ def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_targe
         (_effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance"),),
         target_kind=RuleTargetKind.SELECTED_UNIT,
     )
+    aura_attack_reroll_rule = _catalog_rule_ir(
+        (
+            _effect(
+                RuleEffectKind.REROLL_PERMISSION,
+                roll_type="hit",
+                attack_role="attacker",
+            ),
+            _effect(
+                RuleEffectKind.REROLL_PERMISSION,
+                roll_type="advance",
+                attack_role="attacker",
+            ),
+        ),
+        target_kind=RuleTargetKind.AURA_UNITS,
+    )
     unsupported_roll_rule = _catalog_rule_ir(
         (_effect(RuleEffectKind.REROLL_PERMISSION, roll_type="damage"),),
         target_kind=RuleTargetKind.THIS_UNIT,
@@ -5123,6 +5145,9 @@ def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_targe
         CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     }
     assert catalog_rule_ir_consumers_for_rule(selected_unit_without_leader_rule) == ()
+    assert catalog_rule_ir_consumers_for_rule(aura_attack_reroll_rule) == (
+        CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+    )
     assert catalog_rule_ir_consumers_for_rule(unsupported_roll_rule) == ()
     assert catalog_rule_ir_hook_ids_for_rule(unsupported_roll_rule) == ()
 
@@ -5260,6 +5285,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     }
     generated_markdown = support_matrix_markdown(
         ability_coverage_category_rows_payload(category_rows),
+        ability_rows=ability_coverage_rows_payload(rows),
         runtime_semantic_coverage=runtime_semantic_payload,
     )
     generated_faction_markdown = faction_support_markdown_files(
@@ -5359,6 +5385,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     flesh_hounds_support = support_rows_by_datasheet_id["000001112"]
     bloodletters_support = support_rows_by_datasheet_id["000001114"]
     bloodcrushers_support = support_rows_by_datasheet_id["000001115"]
+    belakor_support = support_rows_by_datasheet_id["000001148"]
+    belakor_stealth_rows = tuple(
+        row for row in rows if row.datasheet_id == "000001148" and row.ability_name == "Stealth"
+    )
+    belakor_supreme_commander_rows = tuple(
+        row
+        for row in rows
+        if row.datasheet_id == "000001148" and row.ability_name == "SUPREME COMMANDER"
+    )
     known_mustering_source_ids = {
         value
         for name, value in vars(army_mustering).items()
@@ -5527,6 +5562,25 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert bloodletters_support.datasheet_ability_status == "Full"
     assert bloodcrushers_support.overall == "Playable"
     assert bloodcrushers_support.datasheet_ability_status == "Full"
+    assert belakor_support.overall == "Playable"
+    assert belakor_support.datasheet_ability_status == "Full"
+    assert belakor_support.faction_interaction_status == "Partial"
+    assert "descriptor_only" not in belakor_support.notes
+    assert len(belakor_stealth_rows) == 1
+    assert belakor_stealth_rows[0].support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    assert belakor_stealth_rows[0].runtime_consumer_ids == (CORE_STEALTH_RUNTIME_CONSUMER_ID,)
+    assert belakor_stealth_rows[0].semantic_categories == ("core.stealth",)
+    assert len(belakor_supreme_commander_rows) == 1
+    assert (
+        belakor_supreme_commander_rows[0].support_stage
+        is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    )
+    assert belakor_supreme_commander_rows[0].runtime_consumer_ids == (
+        SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,
+    )
+    assert belakor_supreme_commander_rows[0].semantic_categories == (
+        "datasheet.mustering.supreme_commander",
+    )
     for support_row in support_rows:
         assert support_row.overall in DATASHEET_SUPPORT_OVERALL_VALUES
         assert support_row.faction_id in faction_ids
@@ -5542,6 +5596,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         assert mustering_row.support_stage in MUSTERING_SUPPORT_STAGE_VALUES
     assert known_mustering_source_ids.issubset(represented_mustering_source_ids)
     assert "army-mustering:drukhari-corsairs-and-travelling-players" in army_mustering_rule_ids
+    assert SUPREME_COMMANDER_MUSTERING_CONSUMER_ID in army_mustering_rule_ids
     assert len(army_mustering_rule_ids) > 1
     assert "## Mustering / List Construction Support" in generated_markdown
     assert (
@@ -5799,6 +5854,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Flesh Hounds",
         "Bloodletters",
         "Bloodcrushers",
+        "Be'lakor",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Collar of Khorne"]) == (
         "Flesh Hounds",
@@ -6910,6 +6966,52 @@ def test_phase17k_bridge_tags_warlord_mustering_datasheet_abilities() -> None:
     assert not plain_rule_ir_payload or MUSTERING_WARLORD_RULE_KEY not in json.loads(
         plain_rule_ir_payload
     )
+
+
+def test_phase17k_bridge_loads_belakor_datasheet_rule_ir_support() -> None:
+    artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001148",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001148",
+                model_name="Be'lakor - EPIC HERO",
+                height=5.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:belakor-height",
+                height_document_reference="test-doc:belakor-height",
+            ),
+        ),
+    )
+    ability_rows_by_id = {
+        row.source_row_id: row.runtime_fields_payload()
+        for row in _artifact_by_table(artifacts, "Datasheets_abilities").rows
+    }
+    expected_consumers_by_row_id = {
+        "000001148:5": {CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID},
+        "000001148:6": {CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID},
+        "000001148:8": {CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID},
+        "000001148:9": {
+            CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
+            CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
+        },
+        "000001148:10": {CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID},
+    }
+
+    for row_id, expected_consumers in expected_consumers_by_row_id.items():
+        fields = ability_rows_by_id[row_id]
+        rule_ir = RuleIR.from_payload(cast(RuleIRPayload, json.loads(fields["rule_ir_payload"])))
+
+        assert fields["support"] == CatalogAbilitySupport.GENERIC_RULE_IR.value
+        assert json.loads(fields["rule_ir_diagnostics"]) == []
+        assert expected_consumers <= set(catalog_rule_ir_consumers_for_rule(rule_ir))
+
+    supreme_commander_fields = ability_rows_by_id["000001148:7"]
+    assert supreme_commander_fields["support"] == CatalogAbilitySupport.DESCRIPTOR_ONLY.value
+    assert json.loads(supreme_commander_fields["rule_ir_payload"]) == {
+        MUSTERING_WARLORD_RULE_KEY: MUSTERING_WARLORD_REQUIRED,
+    }
 
 
 def test_phase17k_bridge_rejects_unsupported_datasheet_ability_type() -> None:
