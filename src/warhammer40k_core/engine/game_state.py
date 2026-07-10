@@ -21,8 +21,8 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusteringError,
     ArmyMusterRequest,
     ArmyMusterRequestPayload,
-    AttachedUnitFormation,
 )
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battle_shock import (
     BattleShockedUnitState,
     BattleShockResult,

@@ -17,6 +17,7 @@ from tools.generate_ability_support_matrix import (
     datasheet_support_rows,
     datasheet_support_rows_payload,
     faction_support_markdown_files,
+    leader_attachment_consumer_evidence_datasheet_ids,
     mustering_support_rows,
     mustering_support_rows_payload,
     runtime_content_semantic_coverage_payload,
@@ -25,12 +26,12 @@ from tools.generate_ability_support_matrix import (
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attachment_eligibility import AttachmentRole
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
     MUSTERING_WARLORD_REQUIRED,
     MUSTERING_WARLORD_RULE_KEY,
-    AttachmentRole,
     BaseSizeKind,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
@@ -6266,6 +6267,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "[adeptus-mechanicus](factions/adeptus-mechanicus.md) |"
     ) in generated_markdown
     chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
+    leader_attachment_evidence_ids = leader_attachment_consumer_evidence_datasheet_ids()
     coverage_row_ids = {row.coverage_row_id for row in rows}
     faction_ids = {row.faction_id for row in faction_detachment_source.faction_rows()}
     detachment_ids_by_faction = {
@@ -6306,6 +6308,38 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "### Slaanesh" in chaos_daemons_markdown
     assert "### Undivided" in chaos_daemons_markdown
     assert "## Semantic Support Snapshot" in chaos_daemons_markdown
+    assert "Leader row consumer evidence" not in chaos_daemons_markdown
+    chaos_daemons_leader_datasheet_ids = {
+        "000001104",
+        "000001106",
+        "000001126",
+        "000001129",
+        "000001138",
+        "000001455",
+        "000001456",
+        "000001462",
+        "000001463",
+        "000001464",
+        "000001466",
+        "000001467",
+        "000001468",
+        "000001469",
+        "000001589",
+        "000001647",
+        "000001649",
+        "000004100",
+    }
+    assert chaos_daemons_leader_datasheet_ids <= leader_attachment_evidence_ids
+    assert chaos_daemons_markdown.count(
+        "Source-backed Leader attachment targets are consumed by generic army mustering."
+    ) == len(chaos_daemons_leader_datasheet_ids)
+    attachment_support_row = next(
+        row
+        for row in mustering_rows
+        if row.rule_id == army_mustering.ATTACHMENT_DECLARATION_MUSTERING_CONSUMER_ID
+    )
+    assert attachment_support_row.support_stage == "full"
+    assert attachment_support_row.source_id == army_mustering.ATTACHMENT_ELIGIBILITY_SOURCE_ID
     assert (
         "| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Shadow Legion | "
         "Legion of Excess<br>Lords of the Warp<br>Plague Legion<br>Scintillating Legion"
@@ -7964,9 +7998,37 @@ def test_phase17k_support_ability_marks_attachment_eligibility_role_as_support()
     support = package.army_catalog.datasheet_by_id("test-support-unit")
 
     assert support.attachment_eligibilities[0].role is AttachmentRole.SUPPORT
-    assert support.attachment_eligibilities[0].allowed_bodyguard_datasheet_ids == (
-        "test-bodyguard-unit",
+    assert tuple(
+        target.bodyguard_datasheet_id for target in support.attachment_eligibilities[0].targets
+    ) == ("test-bodyguard-unit",)
+    assert len(support.attachment_eligibilities[0].targets[0].source_ids) == 1
+    assert "Datasheets_leader" in support.attachment_eligibilities[0].targets[0].source_ids[0]
+
+
+def test_phase17k_bridge_omits_attachment_edges_with_an_excluded_bodyguard_endpoint() -> None:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_support_attachment_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-support-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-support-unit",
+                model_name="Support",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:support-height",
+                height_document_reference="test-doc:support-height",
+            ),
+        ),
     )
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=bridge_artifacts,
+    )
+
+    assert "Datasheets_leader" not in {artifact.source_table for artifact in bridge_artifacts}
+    assert package.army_catalog.datasheet_by_id("test-support-unit").attachment_eligibilities == ()
 
 
 def test_phase17k_bridge_preserves_raw_source_text_for_reference_catalog() -> None:

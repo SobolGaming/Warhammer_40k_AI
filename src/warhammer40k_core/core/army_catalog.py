@@ -3,14 +3,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.attachment_eligibility import (
+    AttachmentEligibility,
+    AttachmentRole,
+    AttachmentTargetEligibility,
+)
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.content_scope import (
     SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES,
     CatalogContentScope,
 )
 from warhammer40k_core.core.datasheet import (
-    AttachmentEligibility,
-    AttachmentRole,
     BaseSizeDefinition,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
@@ -108,6 +111,7 @@ class ArmyCatalog:
 
         _validate_datasheet_faction_keywords(datasheets, factions)
         _validate_datasheet_wargear_links(datasheets, wargear)
+        _validate_datasheet_attachment_links(datasheets)
         _validate_faction_rule_links(factions, army_rules)
         _validate_supported_content_scopes(
             datasheets=datasheets,
@@ -334,8 +338,14 @@ class ArmyCatalog:
                     attachment_eligibilities=(
                         AttachmentEligibility(
                             role=AttachmentRole.LEADER,
-                            allowed_bodyguard_datasheet_ids=("core-intercessor-like-infantry",),
-                            source_id="datasheet:core-character-leader:attachment:leader",
+                            targets=(
+                                AttachmentTargetEligibility(
+                                    bodyguard_datasheet_id="core-intercessor-like-infantry",
+                                    source_ids=(
+                                        "datasheet:core-character-leader:attachment:leader",
+                                    ),
+                                ),
+                            ),
                         ),
                     ),
                 ),
@@ -360,8 +370,14 @@ class ArmyCatalog:
                     attachment_eligibilities=(
                         AttachmentEligibility(
                             role=AttachmentRole.SUPPORT,
-                            allowed_bodyguard_datasheet_ids=("core-intercessor-like-infantry",),
-                            source_id="datasheet:core-character-support:attachment:support",
+                            targets=(
+                                AttachmentTargetEligibility(
+                                    bodyguard_datasheet_id="core-intercessor-like-infantry",
+                                    source_ids=(
+                                        "datasheet:core-character-support:attachment:support",
+                                    ),
+                                ),
+                            ),
                         ),
                     ),
                 ),
@@ -896,6 +912,20 @@ def _validate_datasheet_wargear_links(
                 ):
                     raise ArmyCatalogError(
                         "ArmyCatalog datasheet mustering option references unknown wargear."
+                    )
+
+
+def _validate_datasheet_attachment_links(
+    datasheets: tuple[DatasheetDefinition, ...],
+) -> None:
+    datasheet_ids = {datasheet.datasheet_id for datasheet in datasheets}
+    for datasheet in datasheets:
+        for eligibility in datasheet.attachment_eligibilities:
+            for target in eligibility.targets:
+                if target.bodyguard_datasheet_id not in datasheet_ids:
+                    raise ArmyCatalogError(
+                        "ArmyCatalog attachment eligibility references an unknown bodyguard "
+                        "datasheet."
                     )
 
 

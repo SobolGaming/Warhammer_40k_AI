@@ -45,13 +45,13 @@ from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilit
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
-    AttachedUnitFormation,
     EnhancementAssignment,
     RosterUnitPointValue,
     WarlordSelection,
     muster_army,
     validate_roster_legality,
 )
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
@@ -3481,6 +3481,9 @@ def _attach_shadow_legion_units(
                             sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
                         ),
                         source_id="phase17g:shadow-legion:test-attached-unit",
+                        attachment_source_ids=(
+                            "phase17g:shadow-legion:test-attachment-eligibility",
+                        ),
                     ),
                 ),
             )

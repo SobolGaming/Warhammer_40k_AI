@@ -15,9 +15,9 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
-    AttachedUnitFormation,
     RosterLegalityReport,
 )
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     ModelPlacement,
@@ -300,6 +300,7 @@ def test_gate_of_infinity_attached_rules_unit_requires_all_components_and_moves_
                     sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
                 ),
                 source_id="phase17g:grey-knights:test-attached-unit",
+                attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
             ),
         ),
     )
@@ -354,6 +355,7 @@ def test_gate_of_infinity_attached_rules_unit_missing_ability_is_not_eligible() 
                     sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
                 ),
                 source_id="phase17g:grey-knights:test-attached-unit",
+                attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
             ),
         ),
     )
@@ -394,6 +396,7 @@ def test_gate_of_infinity_rejects_stale_component_drift_before_mutation() -> Non
                     sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
                 ),
                 source_id="phase17g:grey-knights:test-attached-unit",
+                attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
             ),
         ),
     )
@@ -416,6 +419,7 @@ def test_gate_of_infinity_rejects_stale_component_drift_before_mutation() -> Non
                         )
                     ),
                     source_id="phase17g:grey-knights:test-attached-unit",
+                    attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
                 ),
             ),
         )

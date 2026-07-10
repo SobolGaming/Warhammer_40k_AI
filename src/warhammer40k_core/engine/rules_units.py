@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, AttachedUnitFormation
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 

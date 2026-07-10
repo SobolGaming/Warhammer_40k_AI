@@ -5,6 +5,11 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.attachment_eligibility import (
+    AttachmentEligibility,
+    AttachmentEligibilityPayload,
+    AttachmentRole,
+)
 from warhammer40k_core.core.attributes import (
     Characteristic,
     CharacteristicError,
@@ -71,11 +76,6 @@ class WargearOptionEffectKind(StrEnum):
 class DatasheetMusteringOptionEffectKind(StrEnum):
     ADD_KEYWORD = "add_keyword"
     ADD_WARGEAR = "add_wargear"
-
-
-class AttachmentRole(StrEnum):
-    LEADER = "leader"
-    SUPPORT = "support"
 
 
 CatalogParameterValue = int | float | str | bool
@@ -194,12 +194,6 @@ class DamagedEffectDefinitionPayload(TypedDict):
     max_selections: int | None
     baseline_max_selections: int | None
     selection_group: str | None
-    source_id: str
-
-
-class AttachmentEligibilityPayload(TypedDict):
-    role: str
-    allowed_bodyguard_datasheet_ids: list[str]
     source_id: str
 
 
@@ -1106,45 +1100,6 @@ class DamagedEffectDefinition:
 
 
 @dataclass(frozen=True, slots=True)
-class AttachmentEligibility:
-    role: AttachmentRole
-    allowed_bodyguard_datasheet_ids: tuple[str, ...]
-    source_id: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "role", attachment_role_from_token(self.role))
-        object.__setattr__(
-            self,
-            "allowed_bodyguard_datasheet_ids",
-            _validate_identifier_tuple(
-                "AttachmentEligibility allowed_bodyguard_datasheet_ids",
-                self.allowed_bodyguard_datasheet_ids,
-                min_length=1,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "source_id",
-            _validate_identifier("AttachmentEligibility source_id", self.source_id),
-        )
-
-    def to_payload(self) -> AttachmentEligibilityPayload:
-        return {
-            "role": self.role.value,
-            "allowed_bodyguard_datasheet_ids": list(self.allowed_bodyguard_datasheet_ids),
-            "source_id": self.source_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: AttachmentEligibilityPayload) -> Self:
-        return cls(
-            role=attachment_role_from_token(payload["role"]),
-            allowed_bodyguard_datasheet_ids=tuple(payload["allowed_bodyguard_datasheet_ids"]),
-            source_id=payload["source_id"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
 class DatasheetDefinition:
     datasheet_id: str
     name: str
@@ -1300,7 +1255,7 @@ class DatasheetDefinition:
             tuple(
                 sorted(
                     attachment_eligibilities,
-                    key=lambda eligibility: eligibility.source_id,
+                    key=lambda eligibility: eligibility.role.value,
                 )
             ),
         )
@@ -1470,17 +1425,6 @@ def datasheet_mustering_option_effect_kind_from_token(
         raise DatasheetCatalogError(
             f"Unsupported DatasheetMusteringOptionEffectKind token: {token}."
         ) from exc
-
-
-def attachment_role_from_token(token: object) -> AttachmentRole:
-    if type(token) is AttachmentRole:
-        return token
-    if type(token) is not str:
-        raise DatasheetCatalogError("AttachmentRole token must be a string.")
-    try:
-        return AttachmentRole(token)
-    except ValueError as exc:
-        raise DatasheetCatalogError(f"Unsupported AttachmentRole token: {token}.") from exc
 
 
 def _catalog_content_scope_from_token(
@@ -1912,16 +1856,12 @@ def _validate_attachment_eligibility_tuple(
     if type(values) is not tuple:
         raise DatasheetCatalogError(f"{field_name} must be a tuple.")
     seen_roles: set[AttachmentRole] = set()
-    seen_sources: set[str] = set()
     validated: list[AttachmentEligibility] = []
     for value in values:
         if type(value) is not AttachmentEligibility:
             raise DatasheetCatalogError(f"{field_name} must contain attachment eligibility values.")
         if value.role in seen_roles:
             raise DatasheetCatalogError(f"{field_name} must not contain duplicate roles.")
-        if value.source_id in seen_sources:
-            raise DatasheetCatalogError(f"{field_name} must not contain duplicate source IDs.")
         seen_roles.add(value.role)
-        seen_sources.add(value.source_id)
         validated.append(value)
     return tuple(validated)
