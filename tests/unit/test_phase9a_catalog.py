@@ -12,10 +12,14 @@ from warhammer40k_core.core.army_catalog import (
     ArmyCatalogError,
     ArmyCatalogPayload,
 )
+from warhammer40k_core.core.attachment_eligibility import (
+    AttachmentEligibility,
+    AttachmentRole,
+    AttachmentTargetEligibility,
+)
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.content_scope import CatalogContentScope
 from warhammer40k_core.core.datasheet import (
-    AttachmentRole,
     BaseSizeDefinition,
     BaseSizeKind,
     CatalogAbilitySupport,
@@ -179,16 +183,44 @@ def test_army_catalog_round_trips_canonical_phase9a_content_pack() -> None:
         "datasheet:core-deep-strike-unit:ability:deep-strike"
     )
     assert leader.attachment_eligibilities[0].role is AttachmentRole.LEADER
-    assert leader.attachment_eligibilities[0].allowed_bodyguard_datasheet_ids == (
-        infantry.datasheet_id,
-    )
+    assert tuple(
+        target.bodyguard_datasheet_id for target in leader.attachment_eligibilities[0].targets
+    ) == (infantry.datasheet_id,)
     assert support.attachment_eligibilities[0].role is AttachmentRole.SUPPORT
-    assert support.attachment_eligibilities[0].allowed_bodyguard_datasheet_ids == (
-        infantry.datasheet_id,
-    )
+    assert tuple(
+        target.bodyguard_datasheet_id for target in support.attachment_eligibilities[0].targets
+    ) == (infantry.datasheet_id,)
     assert "<" not in blob
     assert "object at 0x" not in blob
     assert ArmyCatalog.from_payload(payload).to_payload() == catalog.to_payload()
+
+
+def test_army_catalog_rejects_attachment_targets_outside_the_catalog() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    leader = catalog.datasheet_by_id("core-character-leader")
+    invalid_leader = replace(
+        leader,
+        attachment_eligibilities=(
+            AttachmentEligibility(
+                role=AttachmentRole.LEADER,
+                targets=(
+                    AttachmentTargetEligibility(
+                        bodyguard_datasheet_id="missing-bodyguard",
+                        source_ids=("test:missing-bodyguard-attachment",),
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    with pytest.raises(ArmyCatalogError, match="unknown bodyguard datasheet"):
+        replace(
+            catalog,
+            datasheets=tuple(
+                invalid_leader if datasheet.datasheet_id == leader.datasheet_id else datasheet
+                for datasheet in catalog.datasheets
+            ),
+        )
 
 
 def test_catalog_keyword_tokens_are_canonicalized_at_data_boundary() -> None:

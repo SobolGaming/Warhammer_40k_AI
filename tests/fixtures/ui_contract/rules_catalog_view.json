@@ -1068,7 +1068,7 @@
     "game": "warhammer_40000",
     "version": "core-v2-phase9a"
   },
-  "source_hash": "ac418e15c6ffd7cc300656d6c4a26a1fe83b97a216fd3df4fb56aae2a313751f",
+  "source_hash": "61d45fc487ff61b6df12ceaf0bc3fb4e922b312c5fb50e382ebabb4ab663666b",
   "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
   "stratagem_display_by_id": {},
   "wargear_display_by_id": {

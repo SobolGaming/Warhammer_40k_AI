@@ -5,11 +5,14 @@ from dataclasses import replace
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attachment_eligibility import (
+    AttachmentEligibility,
+    AttachmentRole,
+    AttachmentTargetEligibility,
+)
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.content_scope import CatalogContentScope
 from warhammer40k_core.core.datasheet import (
-    AttachmentEligibility,
-    AttachmentRole,
     BaseSizeDefinition,
     DatasheetDefinition,
     DatasheetKeywordSet,
@@ -224,8 +227,12 @@ def test_catalog_with_mfm_leader_allowances_replaces_stale_catalog_leader_target
         if eligibility.role is AttachmentRole.LEADER
     )
     assert len(leader_eligibilities) == 1
-    assert leader_eligibilities[0].allowed_bodyguard_datasheet_ids == ("bodyguard-b",)
-    assert leader_eligibilities[0].source_id == "test-mfm:faction:test-faction:unit:leader:leader"
+    assert tuple(target.bodyguard_datasheet_id for target in leader_eligibilities[0].targets) == (
+        "bodyguard-b",
+    )
+    assert leader_eligibilities[0].targets[0].source_ids == (
+        "test-mfm:faction:test-faction:unit:leader:leader",
+    )
     assert overlay.datasheet_by_id("foreign-unit") == catalog.datasheet_by_id("foreign-unit")
 
 
@@ -537,8 +544,12 @@ def _catalog() -> ArmyCatalog:
             attachment_eligibilities=(
                 AttachmentEligibility(
                     role=AttachmentRole.LEADER,
-                    allowed_bodyguard_datasheet_ids=("bodyguard-a",),
-                    source_id="stale:leader",
+                    targets=(
+                        AttachmentTargetEligibility(
+                            bodyguard_datasheet_id="bodyguard-a",
+                            source_ids=("stale:leader",),
+                        ),
+                    ),
                 ),
             ),
         ),

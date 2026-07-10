@@ -130,6 +130,7 @@ def build_wahapedia_canonical_bridge_artifacts(
     )
     context = _BridgeContext(
         rows_by_table=rows_by_table,
+        selected_datasheet_ids=frozenset(selected_datasheet_ids),
         corrections_by_datasheet=corrections_by_datasheet,
         height_by_datasheet_and_model=height_by_datasheet_and_model,
         event_companion_base_sizes_by_key=_event_companion_base_sizes_by_key(),
@@ -146,6 +147,7 @@ def build_wahapedia_canonical_bridge_artifacts(
 @dataclass(frozen=True, slots=True)
 class _BridgeContext:
     rows_by_table: dict[str, tuple[NormalizedSourceRow, ...]]
+    selected_datasheet_ids: frozenset[str]
     corrections_by_datasheet: dict[str, PdfDatasheetCorrection]
     height_by_datasheet_and_model: dict[tuple[str, str], ModelHeightOverride]
     event_companion_base_sizes_by_key: dict[
@@ -1230,15 +1232,14 @@ def _bridge_leader_links(
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> None:
     for row in context.rows_by_table.get("Datasheets_leader", ()):
-        if (
-            _required_field(row, "leader_id") != datasheet_id
-            and _required_field(row, "attached_id") != datasheet_id
-        ):
+        leader_id = _required_field(row, "leader_id")
+        attached_id = _required_field(row, "attached_id")
+        if leader_id != datasheet_id or attached_id not in context.selected_datasheet_ids:
             continue
         bridged_rows["Datasheets_leader"].append(
             {
-                "leader_id": _required_field(row, "leader_id"),
-                "attached_id": _required_field(row, "attached_id"),
+                "leader_id": leader_id,
+                "attached_id": attached_id,
                 "source_ids": _joined(_source_ids(row)),
             }
         )

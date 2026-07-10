@@ -84,6 +84,11 @@ The shared contract uses these objects and payloads:
 - `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
 - `DeploymentPlacementProposal`: Deploy Armies placement answer containing the complete selected rules-unit model placement set, placement kind `deployment`, proposal request ID, ruleset hash, and replay-safe source context.
 - `BattleFormationDeclarationState`: Declare Battle Formations reserve declaration state containing the next player, completed players, and per-player available reserve declaration counts.
+- `AttachedUnitFormation`: deterministic muster-time Leader/Support formation payload containing
+  bodyguard, Leader, Support, and complete component unit instance IDs. Its
+  `attachment_source_ids` field carries the sorted source IDs of the exact catalog
+  attachment targets accepted by the engine. Adapters and replay consumers may display or
+  audit this evidence but must not infer, add, or mutate attachment legality from it.
 - `FactionRuleState`: deterministic replay-safe setup state for faction-rule selections, keyed by player, faction, source rule, state kind, setup request, and setup result.
 - `FactionRuleSetupSelection`: finite setup answer selecting one engine-emitted option from a faction runtime hook during `declare_battle_formations`.
 - `ReserveDeclarationRequest`: finite setup request context for declaring Strategic Reserves or Deep Strike units during `declare_battle_formations`.
@@ -148,6 +153,8 @@ Relevant modules:
 - `src/warhammer40k_core/engine/deployment.py`
 - `src/warhammer40k_core/engine/prebattle.py`
 - `src/warhammer40k_core/engine/prebattle_records.py`
+- `src/warhammer40k_core/engine/attached_unit_formation.py`
+- `src/warhammer40k_core/core/attachment_eligibility.py`
 - `src/warhammer40k_core/engine/setup_completion.py`
 - `src/warhammer40k_core/engine/battle_formation_hooks.py`
 - `src/warhammer40k_core/engine/faction_rule_states.py`

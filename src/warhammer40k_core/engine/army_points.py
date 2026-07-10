@@ -3,9 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
-from warhammer40k_core.core.datasheet import (
+from warhammer40k_core.core.attachment_eligibility import (
     AttachmentEligibility,
     AttachmentRole,
+    AttachmentTargetEligibility,
+)
+from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     ModelProfileDefinition,
 )
@@ -697,8 +700,13 @@ def _attachment_eligibility_from_mfm(
         bodyguard_datasheet_ids.append(datasheets[0].datasheet_id)
     return AttachmentEligibility(
         role=AttachmentRole.LEADER,
-        allowed_bodyguard_datasheet_ids=tuple(bodyguard_datasheet_ids),
-        source_id=leader_allowance.source_id,
+        targets=tuple(
+            AttachmentTargetEligibility(
+                bodyguard_datasheet_id=bodyguard_datasheet_id,
+                source_ids=(leader_allowance.source_id,),
+            )
+            for bodyguard_datasheet_id in bodyguard_datasheet_ids
+        ),
     )
 
 

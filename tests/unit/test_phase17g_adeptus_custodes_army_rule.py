@@ -32,7 +32,8 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, AttachedUnitFormation
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -497,6 +498,7 @@ def _attach_custodes_rules_unit(state: GameState) -> tuple[str, UnitInstance, Un
             sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
         ),
         source_id="martial-katah-test:attached-unit",
+        attachment_source_ids=("martial-katah-test:attachment-eligibility",),
     )
     updated_armies: list[ArmyDefinition] = []
     for army in state.army_definitions:

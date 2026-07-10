@@ -37,7 +37,6 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusteringError,
     ArmyMusterRequest,
     ArmyMusterRequestPayload,
-    AttachedUnitFormation,
     DedicatedTransportCapacityProfile,
     DedicatedTransportManifest,
     EnhancementAssignment,
@@ -46,6 +45,10 @@ from warhammer40k_core.engine.army_mustering import (
     WarlordSelection,
     muster_army,
     validate_roster_legality,
+)
+from warhammer40k_core.engine.attached_unit_formation import (
+    AttachedUnitFormation,
+    AttachedUnitFormationError,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.deployment import deployment_unit_selection_request
@@ -1474,6 +1477,10 @@ def test_attachment_declarations_form_runtime_attached_unit_from_structured_cata
         bodyguard.unit_instance_id,
         leader.unit_instance_id,
         support.unit_instance_id,
+    )
+    assert formation.attachment_source_ids == (
+        "datasheet:core-character-leader:attachment:leader",
+        "datasheet:core-character-support:attachment:support",
     )
     assert "ATTACHED_UNIT" in bodyguard.keywords
     assert "runtime-attached-unit:bodyguard" in bodyguard.own_models[0].source_ids
@@ -3636,7 +3643,7 @@ def test_phase16d_roster_payload_value_objects_fail_fast() -> None:
                 "violations": [],
             }
         )
-    with pytest.raises(ArmyMusteringError, match="requires a leader or support"):
+    with pytest.raises(AttachedUnitFormationError, match="requires a leader or support"):
         AttachedUnitFormation(
             attached_unit_instance_id="attached-unit:army-alpha:bodyguard-unit",
             bodyguard_unit_instance_id="army-alpha:bodyguard-unit",
@@ -3646,7 +3653,7 @@ def test_phase16d_roster_payload_value_objects_fail_fast() -> None:
             ),
             source_id="attached-unit:missing-role",
         )
-    with pytest.raises(ArmyMusteringError, match="component_unit_instance_ids"):
+    with pytest.raises(AttachedUnitFormationError, match="component_unit_instance_ids"):
         AttachedUnitFormation(
             attached_unit_instance_id="attached-unit:army-alpha:bodyguard-unit",
             bodyguard_unit_instance_id="army-alpha:bodyguard-unit",

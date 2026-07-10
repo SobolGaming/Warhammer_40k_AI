@@ -28,7 +28,8 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, AttachedUnitFormation
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
     BattleRoundStartHookRegistry,
@@ -995,6 +996,7 @@ def _attach_admech_rules_unit(state: GameState) -> tuple[str, UnitInstance, Unit
             sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
         ),
         source_id="doctrina-test:attached-unit",
+        attachment_source_ids=("doctrina-test:attachment-eligibility",),
     )
     updated_armies: list[ArmyDefinition] = []
     for army in state.army_definitions:

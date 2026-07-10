@@ -39,9 +39,9 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
-    AttachedUnitFormation,
     muster_army,
 )
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,

@@ -37,6 +37,8 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_payload,
 )
 from warhammer40k_core.engine.army_mustering import (
+    ATTACHMENT_DECLARATION_MUSTERING_CONSUMER_ID,
+    ATTACHMENT_ELIGIBILITY_SOURCE_ID,
     CULT_OF_DARK_GODS_SOURCE_ID,
     DAEMONIC_PACT_SOURCE_ID,
     DREADBLADES_SOURCE_ID,
@@ -992,6 +994,11 @@ def main() -> None:
     for filename, markdown in faction_support_markdown_files(
         datasheet_support_rows=datasheet_rows,
         ability_rows=rows,
+        leader_attachment_evidence_datasheet_ids=(
+            leader_attachment_consumer_evidence_datasheet_ids(
+                source_json_dir=source_json_dir,
+            )
+        ),
     ).items():
         (faction_docs_dir / filename).write_text(markdown, encoding="utf-8")
 
@@ -1103,6 +1110,27 @@ def datasheet_support_rows_payload(
 
 def mustering_support_rows() -> tuple[MusteringSupportRow, ...]:
     rows = (
+        MusteringSupportRow(
+            rule_id=ATTACHMENT_DECLARATION_MUSTERING_CONSUMER_ID,
+            display_name="Leader and Support attachment declarations",
+            faction_id=None,
+            allowed_base_faction_ids=("any",),
+            source_id=ATTACHMENT_ELIGIBILITY_SOURCE_ID,
+            enforcement_surface="catalog_generation/army_mustering",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_resolve_attached_unit_formations",
+            tests_evidence=(
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog; "
+                "tests/unit/test_phase17k_wahapedia_bridge.py::"
+                "test_phase17k_support_ability_marks_attachment_eligibility_role_as_support"
+            ),
+            notes=(
+                "Consumes every structured attachment target through the shared army-mustering "
+                "path, preserves target-specific source IDs on the attached-unit formation, "
+                "and rejects catalog targets that are not present in the same catalog."
+            ),
+        ),
         MusteringSupportRow(
             rule_id="army-mustering:daemonic-pact",
             display_name="Daemonic Pact",
@@ -1900,6 +1928,36 @@ def _load_source_artifacts(source_json_dir: Path) -> tuple[WahapediaJsonArtifact
     return tuple(artifacts)
 
 
+def leader_attachment_consumer_evidence_datasheet_ids(
+    *,
+    source_json_dir: Path = DEFAULT_SOURCE_JSON_DIR,
+) -> frozenset[str]:
+    artifacts = _load_source_artifacts(_resolve_repo_path(source_json_dir))
+    artifacts_by_table = {artifact.source_table: artifact for artifact in artifacts}
+    datasheet_artifact = artifacts_by_table.get("Datasheets")
+    leader_artifact = artifacts_by_table.get("Datasheets_leader")
+    if datasheet_artifact is None or leader_artifact is None:
+        raise ValueError("Leader attachment evidence requires datasheet and leader artifacts.")
+    datasheet_ids = {row.source_row_id for row in datasheet_artifact.rows}
+    leader_datasheet_ids: set[str] = set()
+    seen_source_row_ids: set[str] = set()
+    for row in leader_artifact.rows:
+        if row.source_row_id in seen_source_row_ids:
+            raise ValueError("Leader attachment evidence source row IDs must be unique.")
+        seen_source_row_ids.add(row.source_row_id)
+        fields = row.runtime_fields_payload()
+        leader_id = fields.get("leader_id")
+        bodyguard_id = fields.get("attached_id")
+        if leader_id is None or bodyguard_id is None:
+            raise ValueError("Leader attachment evidence rows require both endpoint IDs.")
+        if leader_id not in datasheet_ids or bodyguard_id not in datasheet_ids:
+            raise ValueError("Leader attachment evidence row references an unknown datasheet.")
+        leader_datasheet_ids.add(leader_id)
+    if not leader_datasheet_ids:
+        raise ValueError("Leader attachment evidence requires at least one source row.")
+    return frozenset(leader_datasheet_ids)
+
+
 def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
@@ -2575,6 +2633,7 @@ def faction_support_markdown_files(
     *,
     datasheet_support_rows: tuple[DatasheetSupportRow, ...] | None = None,
     ability_rows: tuple[AbilityCoverageRow, ...] | None = None,
+    leader_attachment_evidence_datasheet_ids: frozenset[str] | None = None,
 ) -> dict[str, str]:
     if datasheet_support_rows is None or ability_rows is None:
         package = _ability_support_catalog_package()
@@ -2585,6 +2644,10 @@ def faction_support_markdown_files(
                 package=package,
                 ability_rows=ability_rows,
             )
+    if leader_attachment_evidence_datasheet_ids is None:
+        leader_attachment_evidence_datasheet_ids = (
+            leader_attachment_consumer_evidence_datasheet_ids()
+        )
     ability_rows_by_id = {row.coverage_row_id: row for row in ability_rows}
     return {
         f"{faction_row.faction_id}.md": _faction_support_markdown(
@@ -2593,6 +2656,7 @@ def faction_support_markdown_files(
                 row for row in datasheet_support_rows if row.faction_id == faction_row.faction_id
             ),
             ability_rows_by_id=ability_rows_by_id,
+            leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
         for faction_row in faction_detachments_2026_27.faction_rows()
     }
@@ -2603,6 +2667,7 @@ def _faction_support_markdown(
     *,
     datasheet_support_rows: tuple[DatasheetSupportRow, ...],
     ability_rows_by_id: Mapping[str, AbilityCoverageRow],
+    leader_attachment_evidence_datasheet_ids: frozenset[str],
 ) -> str:
     pdf_record = _faction_pdf_record(faction_row.faction_id)
     coverage_rows = tuple(
@@ -2670,6 +2735,7 @@ def _faction_support_markdown(
             faction_row=faction_row,
             rows=datasheet_support_rows,
             ability_rows_by_id=ability_rows_by_id,
+            leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
     )
     if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
@@ -2918,6 +2984,7 @@ def _faction_datasheet_support_markdown(
     faction_row: faction_detachments_2026_27.SourceFactionRow,
     rows: tuple[DatasheetSupportRow, ...],
     ability_rows_by_id: Mapping[str, AbilityCoverageRow],
+    leader_attachment_evidence_datasheet_ids: frozenset[str],
 ) -> list[str]:
     sorted_rows = tuple(
         sorted(rows, key=lambda row: (row.datasheet_name.lower(), row.datasheet_id))
@@ -2941,7 +3008,11 @@ def _faction_datasheet_support_markdown(
         "",
     ]
     if faction_row.faction_id == "chaos-daemons":
-        lines.extend(_chaos_daemons_datasheet_review_markdown())
+        lines.extend(
+            _chaos_daemons_datasheet_review_markdown(
+                leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids)
+            )
+        )
         return lines
     lines.extend(
         (
@@ -3052,9 +3123,16 @@ def _faction_datasheet_support_markdown(
     return lines
 
 
-def _chaos_daemons_datasheet_review_markdown() -> list[str]:
+def _chaos_daemons_datasheet_review_markdown(
+    *,
+    leader_attachment_evidence_datasheet_ids: frozenset[str],
+) -> list[str]:
     lines: list[str] = []
-    lines.extend(_chaos_daemons_khorne_review_markdown())
+    lines.extend(
+        _chaos_daemons_khorne_review_markdown(
+            leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids)
+        )
+    )
     lines.extend(
         _chaos_daemons_allegiance_review_markdown(
             heading="Tzeentch",
@@ -3066,6 +3144,7 @@ def _chaos_daemons_datasheet_review_markdown() -> list[str]:
                 "rows absent from the PDF are excluded from this review."
             ),
             rows=_chaos_daemons_tzeentch_review_rows(),
+            leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
     )
     lines.extend(
@@ -3079,6 +3158,7 @@ def _chaos_daemons_datasheet_review_markdown() -> list[str]:
                 "rows absent from the PDF are excluded from this review."
             ),
             rows=_chaos_daemons_nurgle_review_rows(),
+            leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
     )
     lines.extend(
@@ -3092,6 +3172,7 @@ def _chaos_daemons_datasheet_review_markdown() -> list[str]:
                 "rows absent from the PDF are excluded from this review."
             ),
             rows=_chaos_daemons_slaanesh_review_rows(),
+            leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
     )
     lines.extend(
@@ -3106,6 +3187,7 @@ def _chaos_daemons_datasheet_review_markdown() -> list[str]:
                 "from the PDF are excluded from this review."
             ),
             rows=_chaos_daemons_undivided_review_rows(),
+            leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
     )
     return lines
@@ -3126,6 +3208,7 @@ def _chaos_daemons_allegiance_review_markdown(
     heading: str,
     intro: str,
     rows: tuple[DatasheetGroupReviewRow, ...],
+    leader_attachment_evidence_datasheet_ids: frozenset[str],
 ) -> list[str]:
     lines = [
         f"### {heading}",
@@ -3149,12 +3232,20 @@ def _chaos_daemons_allegiance_review_markdown(
     for row in sorted(
         rows, key=lambda review_row: (review_row.datasheet.lower(), review_row.datasheet_id)
     ):
-        lines.append(_chaos_daemons_review_row_markdown(row))
+        lines.append(
+            _chaos_daemons_review_row_markdown(
+                row,
+                leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
+            )
+        )
     lines.append("")
     return lines
 
 
-def _chaos_daemons_khorne_review_markdown() -> list[str]:
+def _chaos_daemons_khorne_review_markdown(
+    *,
+    leader_attachment_evidence_datasheet_ids: frozenset[str],
+) -> list[str]:
     lines = [
         "### Khorne",
         "",
@@ -3184,12 +3275,28 @@ def _chaos_daemons_khorne_review_markdown() -> list[str]:
         _chaos_daemons_khorne_review_rows(),
         key=lambda review_row: (review_row.datasheet.lower(), review_row.datasheet_id),
     ):
-        lines.append(_chaos_daemons_review_row_markdown(row))
+        lines.append(
+            _chaos_daemons_review_row_markdown(
+                row,
+                leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
+            )
+        )
     lines.append("")
     return lines
 
 
-def _chaos_daemons_review_row_markdown(row: DatasheetGroupReviewRow) -> str:
+def _chaos_daemons_review_row_markdown(
+    row: DatasheetGroupReviewRow,
+    *,
+    leader_attachment_evidence_datasheet_ids: frozenset[str],
+) -> str:
+    supported_semantics = row.supported_semantics
+    if row.datasheet_id in leader_attachment_evidence_datasheet_ids:
+        supported_semantics = (
+            supported_semantics.rstrip(".")
+            + ". Source-backed Leader attachment targets are consumed by generic army "
+            "mustering."
+        )
     return (
         "| "
         + " | ".join(
@@ -3197,7 +3304,7 @@ def _chaos_daemons_review_row_markdown(row: DatasheetGroupReviewRow) -> str:
                 f"{_markdown_text(row.datasheet)} (`{_markdown_text(row.datasheet_id)}`)",
                 _markdown_text(row.source_basis),
                 _markdown_text(row.ir_coverage),
-                _markdown_text(row.supported_semantics),
+                _markdown_text(supported_semantics),
                 _markdown_text(row.semantics_needed),
                 _markdown_text(row.catalog_blockers),
             )
@@ -3244,7 +3351,7 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             ),
             semantics_needed=(
                 "A Gory Path unsupported diagnostics; Bloodmaster selected-unit wound "
-                "modifier host; Leader row consumer evidence."
+                "modifier host."
             ),
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
@@ -3281,7 +3388,7 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             supported_semantics=(
                 "Deep Strike, Pack Leader Advance/Charge rerolls, Prey of the Blood God "
                 "tracked-target rerolls/reselect, The Shadow of Chaos, and Brass Collar of "
-                "Bloody Vengeance Feel No Pain, including Leader row consumption evidence."
+                "Bloody Vengeance Feel No Pain."
             ),
             semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
@@ -3345,8 +3452,7 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "compiles to generic weapon-ability grant IR."
             ),
             semantics_needed=(
-                "Devastating Charge unsupported diagnostics; Skullmaster's Fury runtime host; "
-                "Leader row consumer evidence."
+                "Devastating Charge unsupported diagnostics; Skullmaster's Fury runtime host."
             ),
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
@@ -3359,9 +3465,7 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "Deep Strike, Lord of Decapitations Devastating Wounds grant, and The Shadow "
                 "of Chaos."
             ),
-            semantics_needed=(
-                "Skulls for Khorne unsupported diagnostics; Leader row consumer evidence."
-            ),
+            semantics_needed="Skulls for Khorne unsupported diagnostics.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
     )
@@ -3405,7 +3509,7 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
                 "Deep Strike, The Shadow of Chaos, and ranged Sustained Hits 1 grant "
                 "semantics are structured paths."
             ),
-            semantics_needed="Post-shoot Battle-shock trigger and Leader row consumer evidence.",
+            semantics_needed="Post-shoot Battle-shock trigger.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3419,8 +3523,7 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             ),
             semantics_needed=(
                 "Flames of Change aflame target state with Move, Advance, and Charge "
-                "modifiers; Manifestation of Destruction restrictions; Leader row consumer "
-                "evidence."
+                "modifiers; Manifestation of Destruction restrictions."
             ),
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
@@ -3432,7 +3535,7 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, Fateskimmer melee Lethal Hits grant, "
                 "and Rider of Immaterial Winds turn-end reserves semantics are structured "
-                "paths, including Leader row consumption evidence for Screamers attachments."
+                "paths."
             ),
             semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
@@ -3458,9 +3561,7 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
                 "Deep Strike, The Shadow of Chaos, and led-unit hit modifier semantics are "
                 "structured paths."
             ),
-            semantics_needed=(
-                "Altered Reality dice-result substitution and Leader row consumer evidence."
-            ),
+            semantics_needed="Altered Reality dice-result substitution.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3566,8 +3667,7 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "semantics are structured paths."
             ),
             semantics_needed=(
-                "Tally of Pestilence destroyed-model counter and Command phase CP reward; "
-                "Leader row consumer evidence."
+                "Tally of Pestilence destroyed-model counter and Command phase CP reward."
             ),
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
@@ -3615,7 +3715,7 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             ),
             semantics_needed=(
                 "Heroic Intervention Stratagem cost and extra-use semantics; Seed the Garden "
-                "terrain Shadow extension; Leader row consumer evidence."
+                "terrain Shadow extension."
             ),
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
@@ -3666,7 +3766,7 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             supported_semantics=(
                 "Deep Strike, Feel No Pain 5+, The Shadow of Chaos, and critical-hit-on-5+ "
                 "semantics, plus Feculent Despair Battle-shock modifier aura, are structured "
-                "paths, including Leader row consumption evidence."
+                "paths."
             ),
             semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
@@ -3693,9 +3793,7 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "Deep Strike, The Shadow of Chaos, led-unit Move modifier, and Advance "
                 "reroll semantics are structured paths."
             ),
-            semantics_needed=(
-                "Disease of Mirth fight-start Battle-shock tests; Leader row consumer evidence."
-            ),
+            semantics_needed="Disease of Mirth fight-start Battle-shock tests.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3705,8 +3803,7 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, melee Sustained Hits 1 grant, and "
-                "led-model OC modifier semantics are consumed, including Leader row "
-                "consumption evidence."
+                "led-model OC modifier semantics are consumed."
             ),
             semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
@@ -3727,7 +3824,7 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             ),
             semantics_needed=(
                 "Horrible Fascination random shooting debuff/no-shoot outcome and possible "
-                "self mortal wounds; Leader row consumer evidence."
+                "self mortal wounds."
             ),
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
@@ -3834,9 +3931,7 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
                 "Deep Strike, The Shadow of Chaos, and Prince of Slaanesh critical wound "
                 "modifier semantics are structured paths."
             ),
-            semantics_needed=(
-                "Delightful Agonies destroyed-model resurrection; Leader row consumer evidence."
-            ),
+            semantics_needed="Delightful Agonies destroyed-model resurrection.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3864,13 +3959,8 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
                 "Deep Strike, The Shadow of Chaos, and Tormentbringer melee Sustained Hits "
                 "1 aura grant semantics are structured paths."
             ),
-            semantics_needed=(
-                "Hysterical Frenzy fight-on-death trigger; Leader row consumer evidence."
-            ),
-            catalog_blockers=(
-                "Leader target normalization must ignore excluded singular Hellflayer row "
-                "000004101."
-            ),
+            semantics_needed="Hysterical Frenzy fight-on-death trigger.",
+            catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Tranceweaver",
@@ -3880,8 +3970,7 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             supported_semantics=(
                 "Deep Strike, Fights First, The Shadow of Chaos, and hit-reroll semantics "
                 "are consumed, including objective-range conditional full hit rerolls, "
-                "Symphony of Pain battle-shocked target semantics, and Leader row "
-                "consumption evidence."
+                "and Symphony of Pain battle-shocked target semantics."
             ),
             semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",

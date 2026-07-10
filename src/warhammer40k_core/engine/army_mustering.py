@@ -4,12 +4,15 @@ from dataclasses import dataclass, field, replace
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attachment_eligibility import (
+    AttachmentEligibility,
+    AttachmentRole,
+    AttachmentTargetEligibility,
+)
 from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
     MUSTERING_WARLORD_REQUIRED,
     MUSTERING_WARLORD_RULE_KEY,
-    AttachmentEligibility,
-    AttachmentRole,
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetMusteringOptionEffectKind,
@@ -19,6 +22,10 @@ from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.attached_unit_formation import (
+    AttachedUnitFormation,
+    AttachedUnitFormationPayload,
+)
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     AttachmentDeclarationPayload,
@@ -52,6 +59,8 @@ class ArmyMusteringError(ValueError):
     """Raised when army mustering violates CORE V2 invariants."""
 
 
+ATTACHMENT_DECLARATION_MUSTERING_CONSUMER_ID = "army-mustering:attachment-declaration"
+ATTACHMENT_ELIGIBILITY_SOURCE_ID = "core:attachment-eligibility"
 DAEMONIC_PACT_SOURCE_ID = "phase17g:chaos-daemons:daemonic-pact"
 DAEMONIC_PACT_FACTION_KEYWORD = "LEGIONES DAEMONICA"
 DAEMONIC_PACT_BASE_KEYWORDS = frozenset({"CHAOS KNIGHTS", "HERETIC ASTARTES"})
@@ -184,15 +193,6 @@ class ArmyMusterRequestPayload(TypedDict):
     dedicated_transport_manifests: list[DedicatedTransportManifestPayload]
     roster_legality_required: bool
     battle_size: str
-
-
-class AttachedUnitFormationPayload(TypedDict):
-    attached_unit_instance_id: str
-    bodyguard_unit_instance_id: str
-    leader_unit_instance_ids: list[str]
-    support_unit_instance_ids: list[str]
-    component_unit_instance_ids: list[str]
-    source_id: str
 
 
 class ArmyDefinitionPayload(TypedDict):
@@ -775,87 +775,6 @@ class ArmyMusterRequest:
             ),
             roster_legality_required=payload["roster_legality_required"],
             battle_size=_battle_size_from_token(payload["battle_size"]),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class AttachedUnitFormation:
-    attached_unit_instance_id: str
-    bodyguard_unit_instance_id: str
-    leader_unit_instance_ids: tuple[str, ...] = ()
-    support_unit_instance_ids: tuple[str, ...] = ()
-    component_unit_instance_ids: tuple[str, ...] = ()
-    source_id: str = ""
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "attached_unit_instance_id",
-            _validate_attached_unit_instance_id(
-                "AttachedUnitFormation attached_unit_instance_id",
-                self.attached_unit_instance_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "bodyguard_unit_instance_id",
-            _validate_identifier(
-                "AttachedUnitFormation bodyguard_unit_instance_id",
-                self.bodyguard_unit_instance_id,
-            ),
-        )
-        leader_ids = _validate_identifier_tuple(
-            "AttachedUnitFormation leader_unit_instance_ids",
-            self.leader_unit_instance_ids,
-            min_length=0,
-        )
-        support_ids = _validate_identifier_tuple(
-            "AttachedUnitFormation support_unit_instance_ids",
-            self.support_unit_instance_ids,
-            min_length=0,
-        )
-        if not leader_ids and not support_ids:
-            raise ArmyMusteringError("AttachedUnitFormation requires a leader or support unit.")
-        component_ids = _validate_identifier_tuple(
-            "AttachedUnitFormation component_unit_instance_ids",
-            self.component_unit_instance_ids,
-            min_length=2,
-        )
-        expected_component_ids = tuple(
-            sorted((self.bodyguard_unit_instance_id, *leader_ids, *support_ids))
-        )
-        if component_ids != expected_component_ids:
-            raise ArmyMusteringError(
-                "AttachedUnitFormation component_unit_instance_ids must match components."
-            )
-        object.__setattr__(self, "leader_unit_instance_ids", leader_ids)
-        object.__setattr__(self, "support_unit_instance_ids", support_ids)
-        object.__setattr__(self, "component_unit_instance_ids", component_ids)
-        object.__setattr__(
-            self,
-            "source_id",
-            _validate_identifier("AttachedUnitFormation source_id", self.source_id),
-        )
-
-    def to_payload(self) -> AttachedUnitFormationPayload:
-        return {
-            "attached_unit_instance_id": self.attached_unit_instance_id,
-            "bodyguard_unit_instance_id": self.bodyguard_unit_instance_id,
-            "leader_unit_instance_ids": list(self.leader_unit_instance_ids),
-            "support_unit_instance_ids": list(self.support_unit_instance_ids),
-            "component_unit_instance_ids": list(self.component_unit_instance_ids),
-            "source_id": self.source_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: AttachedUnitFormationPayload) -> Self:
-        return cls(
-            attached_unit_instance_id=payload["attached_unit_instance_id"],
-            bodyguard_unit_instance_id=payload["bodyguard_unit_instance_id"],
-            leader_unit_instance_ids=tuple(payload["leader_unit_instance_ids"]),
-            support_unit_instance_ids=tuple(payload["support_unit_instance_ids"]),
-            component_unit_instance_ids=tuple(payload["component_unit_instance_ids"]),
-            source_id=payload["source_id"],
         )
 
 
@@ -3121,7 +3040,10 @@ def _resolve_attached_unit_formations(
     units_by_selection_id = {
         unit.unit_instance_id.removeprefix(f"{request.army_id}:"): unit for unit in units
     }
-    grouped: dict[str, dict[AttachmentRole, UnitInstance]] = {}
+    grouped: dict[
+        str,
+        dict[AttachmentRole, tuple[UnitInstance, AttachmentTargetEligibility]],
+    ] = {}
     for declaration in request.attachment_declarations:
         source_unit = units_by_selection_id.get(declaration.source_unit_selection_id)
         bodyguard_unit = units_by_selection_id.get(declaration.bodyguard_unit_selection_id)
@@ -3132,7 +3054,8 @@ def _resolve_attached_unit_formations(
         source_datasheet = datasheets_by_selection_id[declaration.source_unit_selection_id]
         bodyguard_datasheet = datasheets_by_selection_id[declaration.bodyguard_unit_selection_id]
         eligibility = _attachment_eligibility_for_datasheet(source_datasheet)
-        if bodyguard_datasheet.datasheet_id not in eligibility.allowed_bodyguard_datasheet_ids:
+        target = eligibility.target_for_bodyguard_datasheet_id(bodyguard_datasheet.datasheet_id)
+        if target is None:
             raise ArmyMusteringError(
                 "AttachmentDeclaration bodyguard datasheet is not allowed by source datasheet."
             )
@@ -3141,7 +3064,7 @@ def _resolve_attached_unit_formations(
             raise ArmyMusteringError(
                 "AttachmentDeclaration exceeds one Leader or one Support per bodyguard."
             )
-        role_group[eligibility.role] = source_unit
+        role_group[eligibility.role] = (source_unit, target)
 
     _validate_required_support_attachments(
         request=request,
@@ -3160,14 +3083,14 @@ def _resolve_attached_unit_formations(
         leader_ids = tuple(
             sorted(
                 unit.unit_instance_id
-                for role, unit in role_group.items()
+                for role, (unit, _target) in role_group.items()
                 if role is AttachmentRole.LEADER
             )
         )
         support_ids = tuple(
             sorted(
                 unit.unit_instance_id
-                for role, unit in role_group.items()
+                for role, (unit, _target) in role_group.items()
                 if role is AttachmentRole.SUPPORT
             )
         )
@@ -3180,6 +3103,15 @@ def _resolve_attached_unit_formations(
         claimed_component_ids.update(component_ids)
         attached_unit_id = f"attached-unit:{request.army_id}:{bodyguard_selection_id}"
         source_id = f"attached-unit-join:{request.army_id}:{bodyguard_selection_id}"
+        attachment_source_ids = tuple(
+            sorted(
+                {
+                    attachment_source_id
+                    for _unit, target in role_group.values()
+                    for attachment_source_id in target.source_ids
+                }
+            )
+        )
         formations.append(
             AttachedUnitFormation(
                 attached_unit_instance_id=attached_unit_id,
@@ -3188,6 +3120,7 @@ def _resolve_attached_unit_formations(
                 support_unit_instance_ids=support_ids,
                 component_unit_instance_ids=component_ids,
                 source_id=source_id,
+                attachment_source_ids=attachment_source_ids,
             )
         )
         roles_by_unit_id[bodyguard_unit.unit_instance_id] = "bodyguard"
@@ -3608,13 +3541,6 @@ def _validate_unprefixed_identifier_tuple(
     if len(validated) < min_length:
         raise ArmyMusteringError(f"{field_name} must contain at least {min_length} values.")
     return tuple(sorted(validated))
-
-
-def _validate_attached_unit_instance_id(field_name: str, value: object) -> str:
-    identifier = _validate_identifier(field_name, value)
-    if not identifier.startswith("attached-unit:"):
-        raise ArmyMusteringError(f"{field_name} must use attached-unit identity.")
-    return identifier
 
 
 def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str) -> str:

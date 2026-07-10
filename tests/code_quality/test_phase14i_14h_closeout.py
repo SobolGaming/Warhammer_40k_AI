@@ -22,8 +22,14 @@ GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py
 UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
 HEALING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing.py"
 DATASHEET_PATH = ROOT / "src" / "warhammer40k_core" / "core" / "datasheet.py"
+ATTACHMENT_ELIGIBILITY_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "core" / "attachment_eligibility.py"
+)
 LIST_VALIDATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "list_validation.py"
 ARMY_MUSTERING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "army_mustering.py"
+ATTACHED_UNIT_FORMATION_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "attached_unit_formation.py"
+)
 STRATAGEMS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
 STRATAGEMS_SPLIT_PATHS = tuple(sorted(STRATAGEMS_PATH.parent.glob("stratagems*.py")))
 SHOOTING_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "shooting.py"
@@ -109,8 +115,10 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     unit_state_source = UNIT_STATE_PATH.read_text(encoding="utf-8")
     healing_source = HEALING_PATH.read_text(encoding="utf-8")
     datasheet_source = DATASHEET_PATH.read_text(encoding="utf-8")
+    attachment_eligibility_source = ATTACHMENT_ELIGIBILITY_PATH.read_text(encoding="utf-8")
     list_validation_source = LIST_VALIDATION_PATH.read_text(encoding="utf-8")
     army_mustering_source = ARMY_MUSTERING_PATH.read_text(encoding="utf-8")
+    attached_unit_formation_source = ATTACHED_UNIT_FORMATION_PATH.read_text(encoding="utf-8")
     stratagems_source = _stratagems_source()
 
     assert "def resolve_combat_disembark(" in transport_source
@@ -138,9 +146,10 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "apply_healing_model_decision" in healing_source
     assert "with_returned_model_placement" in healing_source
     assert "phase_start_enemy_engagement_model_ids" in healing_source
-    assert "class AttachmentEligibility" in datasheet_source
+    assert "attachment_eligibilities" in datasheet_source
+    assert "class AttachmentEligibility" in attachment_eligibility_source
     assert "class AttachmentDeclaration" in list_validation_source
-    assert "class AttachedUnitFormation" in army_mustering_source
+    assert "class AttachedUnitFormation" in attached_unit_formation_source
     assert "def _resolve_attached_unit_formations(" in army_mustering_source
     assert "def _validate_required_support_attachments(" in army_mustering_source
     assert (

@@ -6,14 +6,17 @@ from dataclasses import dataclass
 from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attachment_eligibility import (
+    AttachmentEligibility,
+    AttachmentRole,
+    AttachmentTargetEligibility,
+)
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.content_scope import (
     CatalogContentScope,
     catalog_content_scope_from_token,
 )
 from warhammer40k_core.core.datasheet import (
-    AttachmentEligibility,
-    AttachmentRole,
     BaseSizeDefinition,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
@@ -772,24 +775,28 @@ def _attachment_eligibilities_from_rows(
     ability_rows: tuple[NormalizedSourceRow, ...],
     leader_rows: tuple[NormalizedSourceRow, ...],
 ) -> tuple[AttachmentEligibility, ...]:
-    bodyguard_ids = tuple(
-        _required_field(row=leader_row, column_name="attached_id")
-        for leader_row in leader_rows
-        if _required_field(row=leader_row, column_name="leader_id") == row.source_row_id
-    )
-    if not bodyguard_ids:
-        return ()
-    role = _attachment_role_from_ability_rows(ability_rows)
     matching_rows = tuple(
         leader_row
         for leader_row in leader_rows
         if _required_field(row=leader_row, column_name="leader_id") == row.source_row_id
     )
+    if not matching_rows:
+        return ()
+    role = _attachment_role_from_ability_rows(ability_rows)
+    rows_by_bodyguard_id: dict[str, list[NormalizedSourceRow]] = {}
+    for leader_row in matching_rows:
+        bodyguard_id = _required_field(row=leader_row, column_name="attached_id")
+        rows_by_bodyguard_id.setdefault(bodyguard_id, []).append(leader_row)
     return (
         AttachmentEligibility(
             role=role,
-            allowed_bodyguard_datasheet_ids=_deduplicated_ids(bodyguard_ids),
-            source_id=_source_ids_from_rows(matching_rows)[0],
+            targets=tuple(
+                AttachmentTargetEligibility(
+                    bodyguard_datasheet_id=bodyguard_id,
+                    source_ids=_source_ids_from_rows(tuple(rows_by_bodyguard_id[bodyguard_id])),
+                )
+                for bodyguard_id in sorted(rows_by_bodyguard_id)
+            ),
         ),
     )
 
