@@ -43,6 +43,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookRegistry,
 )
 from warhammer40k_core.engine.catalog_command_point_runtime import CatalogCommandPointRuntime
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_advance_eligibility_hook_bindings,
     catalog_fall_back_eligibility_hook_bindings,
@@ -199,6 +200,7 @@ DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID = "runtime-content:module-default"
 EMPTY_NAMED_HANDLERS: Mapping[str, FactionRuleNamedHandler] = MappingProxyType({})
 _BundleSummaryPayload = _bundle_payloads.RuntimeContentBundleSummaryPayload
 _Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
+_xrecords = faction_execution_2026_27.execution_records
 _summary_hash = _bundle_validation.summary_hash
 _combine_unique_values = _bundle_validation.combine_unique_values
 _validate_contribution_tuple = _bundle_validation.validate_contribution_tuple
@@ -1295,16 +1297,13 @@ class RuntimeContentBundle:
         )
         named_handlers = _merged_named_handlers(validated_contributions)
         available_records = (
-            faction_execution_2026_27.execution_records()
-            if faction_execution_records is None
-            else faction_execution_records
+            _xrecords() if faction_execution_records is None else faction_execution_records
         )
         records = (
             available_records
             if include_unselected_faction_execution_records
             else _selected_faction_execution_records(
-                available_records=available_records,
-                selected_execution_record_ids=activation.selected_execution_record_ids,
+                available_records, activation.selected_execution_record_ids
             )
         )
         faction_registry = FactionRuleExecutionRegistry.from_records(
@@ -1321,13 +1320,12 @@ class RuntimeContentBundle:
             catalog=catalog,
             records=ability_records,
         )
-        catalog_command_point_runtime = CatalogCommandPointRuntime(
-            ability_indexes_by_player_id=ability_indexes_by_player_id,
-            armies=validated_armies,
-        )
+        catalog_cp = CatalogCommandPointRuntime(ability_indexes_by_player_id, validated_armies)
+        catalog_rules = CatalogDatasheetRuleRuntime(ability_indexes_by_player_id, validated_armies)
         event_handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
             (
-                *catalog_command_point_runtime.event_handler_bindings(),
+                *catalog_cp.event_handler_bindings(),
+                *catalog_rules.event_handler_bindings(),
                 *_contribution_values(
                     validated_contributions,
                     lambda contribution: contribution.event_handler_bindings,
@@ -1336,7 +1334,8 @@ class RuntimeContentBundle:
         )
         event_index = RuntimeContentEventIndex.from_subscriptions(
             (
-                *catalog_command_point_runtime.event_subscriptions(),
+                *catalog_cp.event_subscriptions(),
+                *catalog_rules.event_subscriptions(),
                 *_contribution_values(
                     validated_contributions,
                     lambda contribution: contribution.event_subscriptions,
@@ -1430,7 +1429,7 @@ class RuntimeContentBundle:
         )
         unit_destroyed_hook_registry = UnitDestroyedHookRegistry.from_bindings(
             (
-                *catalog_command_point_runtime.unit_destroyed_hook_bindings(),
+                *catalog_cp.unit_destroyed_hook_bindings(),
                 *catalog_runtime_hooks.unit_destroyed_hook_bindings(
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
@@ -1559,6 +1558,7 @@ class RuntimeContentBundle:
             ShootingTargetRestrictionHookRegistry.from_bindings(
                 (
                     *generic_target_restriction_effects.shooting_target_restriction_hook_bindings(),
+                    *catalog_rules.shooting_target_restriction_bindings(),
                     *generic_rule_lifecycle_hooks.shooting_target_restriction_hook_bindings(
                         activation=activation,
                         execution_records=records,
@@ -1664,6 +1664,7 @@ class RuntimeContentBundle:
                     activation=activation,
                     execution_records=records,
                 ),
+                *catalog_rules.fight_unit_selected_grant_bindings(),
                 *_contribution_values(
                     validated_contributions,
                     lambda contribution: contribution.fight_unit_selected_grant_hook_bindings,
@@ -1690,7 +1691,7 @@ class RuntimeContentBundle:
         )
         stratagem_cost_choice_hook_registry = StratagemCostChoiceHookRegistry.from_bindings(
             (
-                *catalog_command_point_runtime.stratagem_cost_choice_hook_bindings(),
+                *catalog_cp.stratagem_cost_choice_hook_bindings(),
                 *generic_rule_lifecycle_hooks.stratagem_cost_choice_hook_bindings(
                     activation=activation,
                     execution_records=records,
@@ -1703,7 +1704,7 @@ class RuntimeContentBundle:
         )
         stratagem_cost_modifier_registry = StratagemCostModifierRegistry.from_bindings(
             (
-                *catalog_command_point_runtime.stratagem_cost_modifier_bindings(),
+                *catalog_cp.stratagem_cost_modifier_bindings(),
                 *generic_rule_lifecycle_hooks.stratagem_cost_modifier_bindings(
                     activation=activation,
                     execution_records=records,
@@ -1716,11 +1717,13 @@ class RuntimeContentBundle:
         )
         damaged_runtime = CatalogDamagedEffectRuntime(armies=validated_armies)
         runtime_modifier_registry = RuntimeModifierRegistry.from_bindings(
-            unit_characteristic_modifier_bindings=_contribution_values(
+            unit_characteristic_modifier_bindings=catalog_rules.unit_characteristic_modifier_bindings()
+            + _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.unit_characteristic_modifier_bindings,
             ),
-            hit_roll_modifier_bindings=_contribution_values(
+            hit_roll_modifier_bindings=catalog_rules.hit_roll_modifier_bindings()
+            + _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.hit_roll_modifier_bindings,
             )
@@ -1739,7 +1742,8 @@ class RuntimeContentBundle:
                     lambda contribution: contribution.save_option_modifier_bindings,
                 )
             ),
-            movement_budget_modifier_bindings=_contribution_values(
+            movement_budget_modifier_bindings=catalog_rules.movement_budget_modifier_bindings()
+            + _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.movement_budget_modifier_bindings,
             ),
@@ -1758,7 +1762,8 @@ class RuntimeContentBundle:
                 validated_contributions,
                 lambda contribution: contribution.charge_roll_modifier_bindings,
             ),
-            weapon_profile_modifier_bindings=_contribution_values(
+            weapon_profile_modifier_bindings=catalog_rules.weapon_profile_modifier_bindings()
+            + _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.weapon_profile_modifier_bindings,
             )
@@ -1958,7 +1963,6 @@ def _merged_named_handlers(
 
 
 def _selected_faction_execution_records(
-    *,
     available_records: tuple[_Phase17FExecutionRecord, ...],
     selected_execution_record_ids: tuple[str, ...],
 ) -> tuple[_Phase17FExecutionRecord, ...]:

@@ -282,6 +282,10 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
         if battle_round_timing is not None:
             return battle_round_timing
     for clause in rule_ir.clauses:
+        fight_selected_timing = _catalog_fight_selected_timing_descriptor_for_clause(clause)
+        if fight_selected_timing is not None:
+            return fight_selected_timing
+    for clause in rule_ir.clauses:
         phase_timing = _catalog_phase_timing_descriptor_for_clause(clause)
         if phase_timing is not None:
             return phase_timing
@@ -295,13 +299,19 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
     if any(
+        clause.trigger is None
+        and any(effect.kind is RuleEffectKind.GRANT_ABILITY for effect in clause.effects)
+        for clause in rule_ir.clauses
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if any(
         _effect_is_shadow_of_chaos_status(effect)
         for clause in rule_ir.clauses
         for effect in clause.effects
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
     if any(
-        effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+        effect.kind in {RuleEffectKind.MODIFY_CHARACTERISTIC, RuleEffectKind.SET_CHARACTERISTIC}
         for clause in rule_ir.clauses
         for effect in clause.effects
     ):
@@ -359,6 +369,9 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
     battle_round_timing = _catalog_battle_round_timing_descriptor_for_clause(clause)
     if battle_round_timing is not None:
         return battle_round_timing
+    fight_selected_timing = _catalog_fight_selected_timing_descriptor_for_clause(clause)
+    if fight_selected_timing is not None:
+        return fight_selected_timing
     phase_timing = _catalog_phase_timing_descriptor_for_clause(clause)
     if phase_timing is not None:
         return phase_timing
@@ -371,13 +384,14 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
         _effect_is_passive_rule_exception_grant(effect)
         or _effect_is_shadow_of_chaos_status(effect)
         or _effect_is_feel_no_pain_grant(effect)
-        or effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+        or effect.kind in {RuleEffectKind.MODIFY_CHARACTERISTIC, RuleEffectKind.SET_CHARACTERISTIC}
         or effect.kind is RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION
         for effect in clause.effects
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
     if clause.trigger is None and any(
-        effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY for effect in clause.effects
+        effect.kind in {RuleEffectKind.GRANT_ABILITY, RuleEffectKind.GRANT_WEAPON_ABILITY}
+        for effect in clause.effects
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
     if any(
@@ -424,6 +438,7 @@ def _catalog_phase_timing_descriptor_for_clause(
     phase = parameters.get("phase")
     edge = parameters.get("edge")
     if type(phase) is not str or phase not in {
+        "any",
         "command",
         "movement",
         "shooting",
@@ -439,7 +454,22 @@ def _catalog_phase_timing_descriptor_for_clause(
         return None
     return AbilityTimingDescriptor(
         trigger_kind=trigger_kind,
-        phase=battle_phase_kind_from_token(phase),
+        phase=None if phase == "any" else battle_phase_kind_from_token(phase),
+    )
+
+
+def _catalog_fight_selected_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.UNIT_SELECTED:
+        return None
+    parameters = parameter_payload(trigger.parameters)
+    if parameters.get("phase") != "fight" or parameters.get("timing_window") != "selected_to_fight":
+        return None
+    return AbilityTimingDescriptor(
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+        phase=battle_phase_kind_from_token("fight"),
     )
 
 

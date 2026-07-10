@@ -5,6 +5,12 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from typing import NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.engine import battle_formation_hooks as _bf
+from warhammer40k_core.engine import battle_round_hooks as _br
+from warhammer40k_core.engine import charge_declaration_hooks as _cd
+from warhammer40k_core.engine import command_phase_start_hooks as _cs
+from warhammer40k_core.engine import fight_activation_abilities as _fa
+from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -20,14 +26,12 @@ from warhammer40k_core.engine.attack_sequence import (
     invalid_destroyed_transport_disembark_proposal_status,
     is_destroyed_transport_disembark_proposal_request,
 )
-from warhammer40k_core.engine.battle_formation_hooks import (
-    SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
-)
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
-from warhammer40k_core.engine.battle_round_hooks import (
-    SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
-)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
+    SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
+    invalid_any_phase_once_per_battle_status,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
     apply_catalog_unit_move_completed_mortal_wounds_target_result,
@@ -35,12 +39,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
     SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
-)
-from warhammer40k_core.engine.charge_declaration_hooks import (
-    SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
-)
-from warhammer40k_core.engine.command_phase_start_hooks import (
-    SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.cult_ambush import (
     SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE,
@@ -94,9 +92,6 @@ from warhammer40k_core.engine.faction_content.runtime import (
     build_runtime_content_bundle_for_armies,
     runtime_content_activation_for_armies,
 )
-from warhammer40k_core.engine.fight_activation_abilities import (
-    FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
-)
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FIGHT_INTERRUPT_DECISION_TYPE,
@@ -107,9 +102,6 @@ from warhammer40k_core.engine.fight_phase_decisions import (
 )
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
-)
-from warhammer40k_core.engine.fight_unit_selected_hooks import (
-    SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
 )
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -368,7 +360,7 @@ _SHOOTING_PHASE_DISPATCH_DECISION_TYPES = _SHOOTING_DECISION_TYPES - (
 _CHARGE_DECISION_TYPES = frozenset(
     (
         SELECT_CHARGING_UNIT_DECISION_TYPE,
-        SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+        _cd.SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
         SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
     )
@@ -381,7 +373,7 @@ _CHARGE_PHASE_DISPATCH_DECISION_TYPES = _CHARGE_DECISION_TYPES - frozenset(
 )
 _COMMAND_DECISION_TYPES = frozenset(
     (
-        SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+        _cs.SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
         TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
         TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE,
     )
@@ -390,8 +382,8 @@ _FIGHT_DECISION_TYPES = frozenset(
     (
         *FIGHT_PHASE_FACTION_RULE_DECISION_TYPES,
         FIGHT_ACTIVATION_DECISION_TYPE,
-        SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
-        FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+        _fu.SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+        _fa.FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
         SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
@@ -447,12 +439,13 @@ _SETUP_DECISION_TYPES = frozenset(
         SELECT_PREBATTLE_ACTION_DECISION_TYPE,
         SUBMIT_SCOUT_MOVE_DECISION_TYPE,
         SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
-        SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
+        _bf.SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
     )
 )
 _BATTLE_ROUND_DECISION_TYPES = frozenset(
     (
-        SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
+        SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
+        _br.SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
         SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     )
 )
@@ -1022,7 +1015,7 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
-        if request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
+        if request.decision_type == _bf.SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
             return _invalid_finite_decision_status(
                 state=state,
                 request=request,
@@ -1050,7 +1043,14 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
-        if request.decision_type == SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE:
+        if request.decision_type == SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE:
+            return invalid_any_phase_once_per_battle_status(
+                state=self._require_state(),
+                decisions=self.decision_controller,
+                request=request,
+                result=result,
+            )
+        if request.decision_type == _br.SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE:
             return _invalid_finite_decision_status(
                 state=self._require_state(),
                 request=request,
@@ -1719,7 +1719,7 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
-        if request.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE:
+        if request.decision_type == _cd.SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE:
             invalid_status = invalid_charge_declaration_grant_status(
                 state=state,
                 request=request,
@@ -1792,7 +1792,7 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
-        if request.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE:
+        if request.decision_type == _fu.SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE:
             invalid_status = self._fight_phase_handler.invalid_fight_unit_selected_grant_status(
                 state=state,
                 request=request,
@@ -1816,7 +1816,7 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
-        if request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE:
+        if request.decision_type == _fa.FIGHT_ACTIVATION_ABILITY_DECISION_TYPE:
             invalid_status = invalid_fight_activation_ability_status(
                 state=state,
                 request=request,
@@ -3048,7 +3048,7 @@ def _fight_decision_owns_request(
 ) -> bool:
     if request.decision_type in {
         FIGHT_ACTIVATION_DECISION_TYPE,
-        FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+        _fa.FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
         SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     }:
         return True

@@ -1096,6 +1096,23 @@ def _effect_payload(
     return payload
 
 
+def generic_rule_effect_payload(
+    *,
+    rule_ir: RuleIR,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+    context: RuleExecutionContext,
+    target_unit_instance_ids: tuple[str, ...] | None = None,
+) -> dict[str, JsonValue]:
+    return _effect_payload(
+        rule_ir=_validate_rule_ir(rule_ir),
+        clause=clause,
+        effect=effect,
+        context=context,
+        target_unit_instance_ids=target_unit_instance_ids,
+    )
+
+
 def _persisting_effect_or_none(
     *,
     rule_ir: RuleIR,

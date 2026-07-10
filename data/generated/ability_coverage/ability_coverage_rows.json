@@ -547,6 +547,510 @@
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",
     "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/core/000008339/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/core/000008343/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001149:daemonic-allegiance",
+    "ability_name": "DAEMONIC ALLEGIANCE",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-allegiance/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "army-mustering:required-datasheet-option"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.mustering_selection.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001149:daemon-prince-of-khorne",
+    "ability_name": "Daemon Prince of Khorne",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemon-prince-of-khorne/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:strength-characteristic-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001149:daemon-prince-of-nurgle",
+    "ability_name": "Daemon Prince of Nurgle",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemon-prince-of-nurgle/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:toughness-characteristic-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001149:daemon-prince-of-slaanesh",
+    "ability_name": "Daemon Prince of Slaanesh",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemon-prince-of-slaanesh/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-characteristic-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001149:daemon-prince-of-tzeentch",
+    "ability_name": "Daemon Prince of Tzeentch",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemon-prince-of-tzeentch/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:attacks-characteristic-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001149:daemonic-lord",
+    "ability_name": "Daemonic Lord",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-ability:lone-operative"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001149:prince-of-darkness-aura",
+    "ability_name": "Prince of Darkness (Aura)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:prince-of-darkness-aura/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:aura-ability:stealth"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.aura_units"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001149:unholy-vigour",
+    "ability_name": "Unholy Vigour",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:unholy-vigour/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:once-per-battle-ability"
+    ],
+    "semantic_categories": [
+      "datasheet.characteristic_set.invulnerable_save.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/faction/000008433/none",
+    "datasheet_id": "000001149",
+    "datasheet_name": "Daemon Prince of Chaos",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/core/000008339/none",
+    "datasheet_id": "000001151",
+    "datasheet_name": "Soul Grinder",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/core/000008343/none",
+    "datasheet_id": "000001151",
+    "datasheet_name": "Soul Grinder",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001151:daemonic-allegiance",
+    "ability_name": "DAEMONIC ALLEGIANCE",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/datasheet/000001151:daemonic-allegiance/none",
+    "datasheet_id": "000001151",
+    "datasheet_name": "Soul Grinder",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "army-mustering:required-datasheet-option"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.mustering_selection.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001151:scuttling-walker",
+    "ability_name": "Scuttling Walker",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/datasheet/000001151:scuttling-walker/none",
+    "datasheet_id": "000001151",
+    "datasheet_name": "Soul Grinder",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-transit-permission"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.movement_transit_permission.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/faction/000008433/none",
+    "datasheet_id": "000001151",
+    "datasheet_name": "Soul Grinder",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/core/000008339/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/core/000008343/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002758:daemonic-allegiance",
+    "ability_name": "DAEMONIC ALLEGIANCE",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemonic-allegiance/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "army-mustering:required-datasheet-option"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.mustering_selection.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002758:daemon-prince-of-khorne",
+    "ability_name": "Daemon Prince of Khorne",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemon-prince-of-khorne/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:strength-characteristic-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002758:daemon-prince-of-nurgle",
+    "ability_name": "Daemon Prince of Nurgle",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemon-prince-of-nurgle/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:toughness-characteristic-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002758:daemon-prince-of-slaanesh",
+    "ability_name": "Daemon Prince of Slaanesh",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemon-prince-of-slaanesh/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-characteristic-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002758:daemon-prince-of-tzeentch",
+    "ability_name": "Daemon Prince of Tzeentch",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemon-prince-of-tzeentch/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:attacks-characteristic-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002758:harbinger-of-death",
+    "ability_name": "Harbinger of Death",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:harbinger-of-death/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:fight-selected-weapon-ability-choice",
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:lethal-hits",
+      "catalog-ir:weapon-keyword-grant:precision",
+      "catalog-ir:weapon-keyword-grant:sustained-hits"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_weapon_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002758:malefic-destruction",
+    "ability_name": "Malefic Destruction",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:malefic-destruction/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:once-per-battle-ability"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/faction/000008433/none",
+    "datasheet_id": "000002758",
+    "datasheet_name": "Daemon Prince Of Chaos With Wings",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
     "datasheet_id": "000004207",
     "datasheet_name": "Defiler",

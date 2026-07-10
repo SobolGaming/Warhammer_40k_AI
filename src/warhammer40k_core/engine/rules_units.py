@@ -175,6 +175,36 @@ def rules_unit_owner_player_id(*, state: GameState, unit_instance_id: str) -> st
     return rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id).owner_player_id
 
 
+def placed_alive_models_for_component_unit(
+    *, state: GameState, unit_instance_id: str
+) -> tuple[ModelInstance, ...]:
+    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    if state.battlefield_state is None:
+        return ()
+    placed_model_ids = frozenset(state.battlefield_state.placed_model_ids())
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=requested_id)
+    component = next(
+        (
+            candidate
+            for candidate in rules_unit.components
+            if candidate.unit.unit_instance_id == requested_id
+        ),
+        None,
+    )
+    if component is None:
+        raise GameLifecycleError("Rules unit does not contain the requested component unit.")
+    return tuple(
+        sorted(
+            (
+                model
+                for model in component.unit.own_models
+                if model.is_alive and model.model_instance_id in placed_model_ids
+            ),
+            key=lambda model: model.model_instance_id,
+        )
+    )
+
+
 def _attached_unit_for_id(
     *,
     army: ArmyDefinition,
