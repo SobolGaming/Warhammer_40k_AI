@@ -1794,6 +1794,40 @@ def test_catalog_command_point_cost_choices_modify_only_the_current_stratagem_us
     )
     result_payload = cast(dict[str, JsonValue], result.payload)
     request_payload = cast(dict[str, JsonValue], request.payload)
+    with pytest.raises(GameLifecycleError, match="cost choice actor drift"):
+        runtime.apply_stratagem_cost_choice_result(
+            StratagemCostChoiceResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=replace(result, actor_id=target_army.player_id),
+                source_request=source_request,
+                source_result=source_result,
+                definition=definition,
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="cost choice actor drift"):
+        runtime.apply_stratagem_cost_choice_result(
+            StratagemCostChoiceResultContext(
+                state=state,
+                decisions=decisions,
+                request=replace(request, actor_id=target_army.player_id),
+                result=replace(result, actor_id=target_army.player_id),
+                source_request=source_request,
+                source_result=source_result,
+                definition=definition,
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+            )
+        )
+    assert not any(
+        event.event_type == CATALOG_IR_STRATAGEM_COST_CHOICE_EVENT
+        for event in decisions.event_log.records
+    )
     assert not runtime.apply_stratagem_cost_choice_result(
         StratagemCostChoiceResultContext(
             state=state,
@@ -2005,22 +2039,34 @@ def test_catalog_command_point_own_cost_reduction_is_consumed_by_generic_registr
         )
     )
 
-    assert (
-        StratagemCostModifierRegistry.from_bindings(
-            runtime.stratagem_cost_modifier_bindings()
-        ).modified_command_point_cost(
-            _cost_modifier_context(
-                state=state,
-                decisions=decisions,
-                definition=definition,
-                eligibility=eligibility,
-                target_binding=target_binding,
-                source_request_id=source_request.request_id,
-                source_result_id=source_result.result_id,
-            )
-        )
-        == 0
+    registry = StratagemCostModifierRegistry.from_bindings(
+        runtime.stratagem_cost_modifier_bindings()
     )
+    no_choice_cost = registry.modified_command_point_cost(
+        StratagemCostModifierContext(
+            state=state,
+            definition=definition,
+            eligibility_context=eligibility,
+            target_binding=target_binding,
+            effect_selection=None,
+            base_command_point_cost=definition.command_point_cost,
+            current_command_point_cost=definition.command_point_cost,
+        )
+    )
+    accepted_cost = registry.modified_command_point_cost(
+        _cost_modifier_context(
+            state=state,
+            decisions=decisions,
+            definition=definition,
+            eligibility=eligibility,
+            target_binding=target_binding,
+            source_request_id=source_request.request_id,
+            source_result_id=source_result.result_id,
+        )
+    )
+
+    assert no_choice_cost == 1
+    assert accepted_cost == 0
 
 
 def test_catalog_command_point_cost_frequency_is_consumed_from_stratagem_use_record() -> None:

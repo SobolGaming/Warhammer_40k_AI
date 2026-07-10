@@ -307,6 +307,11 @@ class CatalogCommandPointRuntime:
         result_payload = _payload_object(context.result.payload, label="cost choice result")
         opportunity_id = _payload_identifier(result_payload, key="opportunity_id")
         source = self._cost_source_by_opportunity_id(opportunity_id)
+        if (
+            context.result.actor_id != context.request.actor_id
+            or context.result.actor_id != source.owner_player_id
+        ):
+            raise GameLifecycleError("Catalog Stratagem cost choice actor drift.")
         if not self._cost_source_is_eligible(source=source, context=context):
             raise GameLifecycleError("Catalog Stratagem cost opportunity is no longer eligible.")
         _validate_cost_choice_result_context(
@@ -396,12 +401,11 @@ class CatalogCommandPointRuntime:
                 return context.current_command_point_cost
             parameters = command_point_effect_parameters(source.clause)
             delta = _mapping_int(parameters, key="delta")
-            if _cost_source_is_optional(source):
-                if context.source_decision_result_id is None:
-                    if delta > 0:
-                        return context.current_command_point_cost
-                elif not _cost_choice_was_accepted(context=context, source=source):
-                    return context.current_command_point_cost
+            if _cost_source_is_optional(source) and (
+                context.source_decision_result_id is None
+                or not _cost_choice_was_accepted(context=context, source=source)
+            ):
+                return context.current_command_point_cost
             if (
                 parameters.get("stacking") == "non_cumulative_cost_increase"
                 and delta > 0
