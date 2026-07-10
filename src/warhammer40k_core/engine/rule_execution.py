@@ -18,12 +18,12 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
-from warhammer40k_core.engine.command_points import (
-    CommandPointGainStatus,
-    CommandPointLedger,
-    CommandPointSourceKind,
-    CommandPointSpendStatus,
+from warhammer40k_core.engine.command_point_rule_execution import (
+    apply_command_point_rule_mutation,
+    command_point_operation_and_delta,
+    command_point_rule_unavailable_reason,
 )
+from warhammer40k_core.engine.command_points import CommandPointLedger
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     PersistingEffect,
@@ -946,29 +946,19 @@ def _command_point_handler(
 ) -> RuleExecutionResult:
     resolved_effect = _require_effect(effect)
     state = _require_state(context)
-    delta = _int_parameter(resolved_effect, "delta")
-    if delta == 0:
-        return RuleExecutionResult.invalid(rule_ir, reason="zero_command_point_delta")
-    if delta > 0:
-        gain_result = state.gain_command_points(
-            player_id=context.player_id,
-            amount=delta,
-            source_id=rule_ir.source_id,
-            source_kind=CommandPointSourceKind.OTHER,
-            cap_exempt=False,
-        )
-        if gain_result.status is not CommandPointGainStatus.APPLIED:
-            return RuleExecutionResult.invalid(rule_ir, reason="command_point_gain_capped")
-        payload = _json_object(gain_result.to_payload())
-    else:
-        spend_result = state.spend_command_points(
-            player_id=context.player_id,
-            amount=abs(delta),
-            source_id=rule_ir.source_id,
-        )
-        if spend_result.status is not CommandPointSpendStatus.APPLIED:
-            return RuleExecutionResult.invalid(rule_ir, reason="insufficient_command_points")
-        payload = _json_object(spend_result.to_payload())
+    operation, delta = command_point_operation_and_delta(resolved_effect)
+    mutation = apply_command_point_rule_mutation(
+        state=state,
+        player_id=context.player_id,
+        source_id=rule_ir.source_id,
+        operation=operation,
+        delta=delta,
+    )
+    if mutation.reason is not None:
+        return RuleExecutionResult.invalid(rule_ir, reason=mutation.reason)
+    payload = mutation.transaction_payload
+    if payload is None:
+        raise GameLifecycleError("Applied command-point rule mutation is missing payload.")
     event = _emit_event(
         context=context,
         event_type="rule_execution_command_points_modified",
@@ -1466,33 +1456,15 @@ def _command_point_unavailable_reason(
     state = context.state
     if state is None:
         return "missing_input:game_state"
-    delta = _int_parameter(effect, "delta")
-    if delta == 0:
-        return "zero_command_point_delta"
-    ledger = simulated_command_ledgers.get(context.player_id)
-    if ledger is None:
-        ledger = state.command_point_ledger_for_player(context.player_id)
-    if delta > 0:
-        updated, gain_result = ledger.gain(
-            battle_round=state.battle_round,
-            amount=delta,
-            source_id=rule_ir.source_id,
-            source_kind=CommandPointSourceKind.OTHER,
-            cap_exempt=False,
-        )
-        if gain_result.status is not CommandPointGainStatus.APPLIED:
-            return "command_point_gain_capped"
-        simulated_command_ledgers[context.player_id] = updated
-        return None
-    updated, spend_result = ledger.spend(
-        battle_round=state.battle_round,
-        amount=abs(delta),
+    operation, delta = command_point_operation_and_delta(effect)
+    return command_point_rule_unavailable_reason(
+        state=state,
+        player_id=context.player_id,
         source_id=rule_ir.source_id,
+        operation=operation,
+        delta=delta,
+        simulated_ledgers=simulated_command_ledgers,
     )
-    if spend_result.status is not CommandPointSpendStatus.APPLIED:
-        return "insufficient_command_points"
-    simulated_command_ledgers[context.player_id] = updated
-    return None
 
 
 def _binding_unavailable_reason(
@@ -1663,13 +1635,6 @@ def _positive_int_parameter(effect: RuleEffectSpec, key: str) -> int:
         raise GameLifecycleError(f"Rule effect parameter {key} must be an integer.")
     if value < 1:
         raise GameLifecycleError(f"Rule effect parameter {key} must be positive.")
-    return value
-
-
-def _int_parameter(effect: RuleEffectSpec, key: str) -> int:
-    value = _parameter(effect, key)
-    if type(value) is not int:
-        raise GameLifecycleError(f"Rule effect parameter {key} must be an integer.")
     return value
 
 

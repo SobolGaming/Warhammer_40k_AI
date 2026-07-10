@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 
+from warhammer40k_core.rules.command_point_parser import command_point_frequency_span_end
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
     RuleCondition,
@@ -20,7 +21,7 @@ OPTIONAL_ABILITY_EFFECT_CONTINUATION_RE = re.compile(
     re.IGNORECASE,
 )
 _ONCE_PER_RE = re.compile(
-    r"\bonce\s+per\s+(?P<scope>phase|turn|battle|battle round)\b",
+    r"\bonce\s+per\s+(?P<scope>battle round|phase|turn|battle)\b",
     re.IGNORECASE,
 )
 
@@ -55,10 +56,14 @@ def parse_frequency_conditions(clause_span: TextSpan) -> tuple[RuleCondition, ..
     for match in _ONCE_PER_RE.finditer(clause_span.text):
         if activation_range is not None and _range_contains(activation_range, match.span()):
             continue
+        span_end = command_point_frequency_span_end(
+            clause_span.text,
+            fallback_end=match.end(),
+        )
         conditions.append(
             RuleCondition(
                 kind=RuleConditionKind.FREQUENCY_LIMIT,
-                source_span=_span_from_range(clause_span, match.start(), match.end()),
+                source_span=_span_from_range(clause_span, match.start(), span_end),
                 parameters=parameters_from_pairs((("scope", match.group("scope").lower()),)),
             )
         )

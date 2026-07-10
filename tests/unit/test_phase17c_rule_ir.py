@@ -34,6 +34,16 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_support_rollup_for_ability,
     ability_support_rollup_for_rule_ir,
 )
+from warhammer40k_core.engine.catalog_command_point_support import (
+    CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+    CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    clause_is_supported_command_point_gain,
+    clause_is_supported_destroyed_unit_command_point_gain,
+    clause_is_supported_phase_command_point_gain,
+    clause_is_supported_stratagem_cost_modifier,
+    command_point_consumer_ids_for_clause,
+    command_point_effect,
+)
 from warhammer40k_core.engine.catalog_movement_transit import (
     movement_mode_tokens_or_none as _movement_mode_tokens_or_none,
 )
@@ -178,6 +188,41 @@ CHAMPION_SLAYER_TEXT = (
     "Each time this model makes a melee attack that targets a Character or Monster unit, "
     "you can re-roll the Wound roll. Each time this model destroys an enemy Character or "
     "Monster unit, this model regains up to D6 lost wounds."
+)
+SKULLS_FOR_KHORNE_TEXT = (
+    "Each time this model makes an attack that targets a Character unit, you can re-roll "
+    "the Hit roll and you can re-roll the Wound roll. Each time this model destroys an "
+    "enemy Character unit, you gain 1CP."
+)
+OPPONENT_STRATAGEM_COST_TEXT = (
+    'Once per turn, when your opponent targets a unit from their army within 12" of this '
+    "model with a stratagem, you can use this ability. If you do, increase the CP cost of "
+    "the use of that stratagem by 1CP."
+)
+OWN_STRATAGEM_COST_TEXT = (
+    "Once per battle round, one unit from your army with this ability can use it when its "
+    "unit is targeted with a Stratagem. If it does, reduce the CP cost of that use of that "
+    "Stratagem by 1CP."
+)
+DIRECT_OWN_STRATAGEM_COST_TEXT = (
+    "Once per turn, when you target this model with a Stratagem, you may reduce the CP cost "
+    "of that use of that Stratagem by 1CP."
+)
+POST_TRIGGER_RANGE_STRATAGEM_COST_TEXT = (
+    "Each time your opponent targets a unit from their army with a Stratagem, if that unit "
+    'is within 12" of the bearer, increase the cost of that use of that Stratagem by 1CP '
+    "(this is not cumulative with any other rules that would increase the CP cost of that "
+    "Stratagem)."
+)
+LEADERSHIP_COMMAND_POINT_TEXT = (
+    "At the end of your Command phase, if this model is on the battlefield, take a "
+    "Leadership test for this model; if that test is passed, you gain 1CP."
+)
+DIRECT_PHASE_COMMAND_POINT_TEXT = (
+    "At the start of your Command phase, if this model is on the battlefield, you gain 1CP."
+)
+FIXED_ROLL_COMMAND_POINT_TEXT = (
+    "At the end of your Command phase, roll one D6: on a 4+, you gain 1CP."
 )
 THIS_MODEL_NOT_BELOW_HALF_HIT_MODIFIER_TEXT = (
     "Each time this model makes an attack that targets an enemy unit that is not below "
@@ -465,6 +510,442 @@ def test_phase17c_champion_slayer_compiles_to_two_independent_clauses() -> None:
     assert len(rule_ir.clauses) == 2
     assert rule_ir.clauses[0].source_span.text.startswith("Each time this model makes")
     assert rule_ir.clauses[1].source_span.text.startswith("Each time this model destroys")
+
+
+def test_phase17c_command_point_gain_after_destroying_character_is_structured() -> None:
+    rule_ir = _compiled(SKULLS_FOR_KHORNE_TEXT).rule_ir
+    attack_clause, gain_clause = rule_ir.clauses
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert attack_clause.trigger is not None
+    assert parameter_payload(attack_clause.trigger.parameters) == {
+        "actor": "this_model",
+        "roll_types": ("hit", "wound"),
+        "timing_window": "attack_sequence.roll",
+    }
+    assert tuple(parameter_payload(effect.parameters) for effect in attack_clause.effects) == (
+        {"roll_type": "hit"},
+        {"roll_type": "wound"},
+    )
+    assert _condition_payload(attack_clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "gate_subject": "attack_target",
+        "relationship": "this_model_makes_attack",
+    }
+    assert gain_clause.trigger is not None
+    assert gain_clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED
+    assert parameter_payload(gain_clause.trigger.parameters) == {
+        "actor": "this_model",
+        "destroyed_allegiance": "enemy",
+        "destroyed_unit_kind": "unit",
+    }
+    assert gain_clause.target is not None
+    assert gain_clause.target.kind is RuleTargetKind.PLAYER
+    assert _condition_payload(gain_clause, RuleConditionKind.KEYWORD_GATE) == {
+        "gate_subject": "destroyed_unit",
+        "required_keyword_any": ("CHARACTER",),
+    }
+    assert parameter_payload(gain_clause.effects[0].parameters) == {
+        "affected_player": "source_player",
+        "delta": 1,
+        "operation": "gain",
+    }
+    assert CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID in catalog_rule_ir_consumers_for_rule(rule_ir)
+
+
+@pytest.mark.parametrize(
+    (
+        "text",
+        "delta",
+        "affected_player",
+        "frequency_scope",
+        "relationship",
+        "usage_scope",
+    ),
+    [
+        (
+            OPPONENT_STRATAGEM_COST_TEXT,
+            1,
+            "opponent",
+            "turn",
+            "stratagem_targets_unit_within_source_model_range",
+            "source_model",
+        ),
+        (
+            OWN_STRATAGEM_COST_TEXT,
+            -1,
+            "source_player",
+            "battle round",
+            "stratagem_targets_source_unit",
+            "army_ability",
+        ),
+        (
+            DIRECT_OWN_STRATAGEM_COST_TEXT,
+            -1,
+            "source_player",
+            "turn",
+            "stratagem_targets_source_unit",
+            "source_model",
+        ),
+    ],
+)
+def test_phase17c_stratagem_cost_modifiers_are_current_use_semantics(
+    text: str,
+    delta: int,
+    affected_player: str,
+    frequency_scope: str,
+    relationship: str,
+    usage_scope: str,
+) -> None:
+    rule_ir = _compiled(text).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert len(rule_ir.clauses) == 1
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.UNIT_SELECTED
+    assert parameter_payload(clause.trigger.parameters) == {
+        "selected_unit_allegiance": "enemy" if delta > 0 else "friendly",
+        "selection": "stratagem_target",
+        "source_relationship": relationship,
+        "stratagem_user": "opponent" if delta > 0 else "source_player",
+        "timing_window": "after_unit_selected_as_stratagem_target",
+        "usage_scope": usage_scope,
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.STRATAGEM_USE
+    assert _condition_payload(clause, RuleConditionKind.FREQUENCY_LIMIT) == {
+        "scope": frequency_scope,
+    }
+    assert _condition_payload(clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "gate_subject": "stratagem_target",
+        "relationship": relationship,
+        "selected_unit_allegiance": "enemy" if delta > 0 else "friendly",
+    }
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "affected_player": affected_player,
+        "application_scope": "current_stratagem_use",
+        "delta": delta,
+        "minimum_cost": 0,
+        "operation": "modify_stratagem_cost",
+        "optional": True,
+        "stacking": "cumulative",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    )
+
+
+def test_phase17c_stratagem_cost_range_after_trigger_and_stacking_are_structured() -> None:
+    rule_ir = _compiled(POST_TRIGGER_RANGE_STRATAGEM_COST_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert parameter_payload(clause.trigger.parameters) == {
+        "selected_unit_allegiance": "enemy",
+        "selection": "stratagem_target",
+        "source_relationship": "stratagem_targets_unit_within_source_model_range",
+        "stratagem_user": "opponent",
+        "timing_window": "after_unit_selected_as_stratagem_target",
+        "usage_scope": "source_model",
+    }
+    assert _condition_payload(clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "gate_subject": "stratagem_target",
+        "relationship": "stratagem_targets_unit_within_source_model_range",
+        "selected_unit_allegiance": "enemy",
+    }
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "affected_player": "opponent",
+        "application_scope": "current_stratagem_use",
+        "delta": 1,
+        "minimum_cost": 0,
+        "operation": "modify_stratagem_cost",
+        "optional": False,
+        "stacking": "non_cumulative_cost_increase",
+    }
+
+
+def test_phase17c_leadership_gated_command_point_gain_is_structured() -> None:
+    rule_ir = _compiled(LEADERSHIP_COMMAND_POINT_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "end",
+        "owner": "active_player",
+        "phase": "command",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.PLAYER
+    assert _condition_payload(clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "gate_subject": "source_model",
+        "relationship": "source_model_on_battlefield",
+    }
+    assert _condition_payload(clause, RuleConditionKind.DICE_ROLL_GATE) == {
+        "comparison": "greater_or_equal",
+        "roll_count": 2,
+        "roll_expression": "2D6",
+        "roll_type": "leadership",
+        "success_threshold_source": "target_leadership",
+        "test_target": "this_model",
+    }
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "affected_player": "source_player",
+        "delta": 1,
+        "operation": "gain",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+    )
+
+
+@pytest.mark.parametrize(
+    ("text", "edge", "dice_gate"),
+    [
+        (DIRECT_PHASE_COMMAND_POINT_TEXT, "start", None),
+        (
+            FIXED_ROLL_COMMAND_POINT_TEXT,
+            "end",
+            {
+                "comparison": "greater_or_equal",
+                "roll_count": 1,
+                "roll_expression": "D6",
+                "roll_type": "command_point_gain",
+                "success_threshold": 4,
+            },
+        ),
+    ],
+)
+def test_phase17c_phase_command_point_gains_are_structured(
+    text: str,
+    edge: str,
+    dice_gate: dict[str, object] | None,
+) -> None:
+    rule_ir = _compiled(text).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": edge,
+        "owner": "active_player",
+        "phase": "command",
+    }
+    gates = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.DICE_ROLL_GATE
+    )
+    assert tuple(parameter_payload(gate.parameters) for gate in gates) == (
+        () if dice_gate is None else (dice_gate,)
+    )
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "affected_player": "source_player",
+        "delta": 1,
+        "operation": "gain",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+    )
+
+
+def test_phase17c_command_point_consumer_classifiers_fail_closed_on_ir_drift() -> None:
+    destroyed_clause = _compiled(SKULLS_FOR_KHORNE_TEXT).rule_ir.clauses[1]
+    phase_clause = _compiled(DIRECT_PHASE_COMMAND_POINT_TEXT).rule_ir.clauses[0]
+    fixed_roll_clause = _compiled(FIXED_ROLL_COMMAND_POINT_TEXT).rule_ir.clauses[0]
+    cost_clause = _compiled(OPPONENT_STRATAGEM_COST_TEXT).rule_ir.clauses[0]
+
+    with pytest.raises(GameLifecycleError, match="requires RuleClause"):
+        command_point_consumer_ids_for_clause(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="exactly one CP effect"):
+        command_point_effect(replace(phase_clause, effects=()))
+
+    assert not clause_is_supported_destroyed_unit_command_point_gain(
+        replace(
+            destroyed_clause,
+            trigger=replace(
+                cast(RuleTrigger, destroyed_clause.trigger),
+                parameters=(RuleParameter("actor", "this_unit"),),
+            ),
+        )
+    )
+    assert not clause_is_supported_destroyed_unit_command_point_gain(
+        replace(
+            destroyed_clause,
+            conditions=tuple(
+                condition
+                for condition in destroyed_clause.conditions
+                if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT
+            ),
+        )
+    )
+    assert not clause_is_supported_command_point_gain(
+        replace(
+            phase_clause,
+            target=replace(
+                cast(RuleTargetSpec, phase_clause.target),
+                parameters=(RuleParameter("relationship", "opponent"),),
+            ),
+        )
+    )
+    assert not clause_is_supported_phase_command_point_gain(
+        replace(
+            phase_clause,
+            trigger=replace(
+                cast(RuleTrigger, phase_clause.trigger),
+                parameters=(
+                    RuleParameter("edge", "start"),
+                    RuleParameter("owner", "opponent"),
+                    RuleParameter("phase", "command"),
+                ),
+            ),
+        )
+    )
+    frequency = next(
+        condition
+        for condition in cost_clause.conditions
+        if condition.kind is RuleConditionKind.FREQUENCY_LIMIT
+    )
+    assert not clause_is_supported_phase_command_point_gain(
+        replace(phase_clause, conditions=(*phase_clause.conditions, frequency))
+    )
+    battlefield_constraint = next(
+        condition
+        for condition in phase_clause.conditions
+        if condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+    )
+    assert not clause_is_supported_phase_command_point_gain(
+        replace(
+            phase_clause,
+            conditions=(battlefield_constraint, replace(battlefield_constraint)),
+        )
+    )
+    assert not clause_is_supported_phase_command_point_gain(
+        replace(
+            phase_clause,
+            conditions=(
+                replace(
+                    battlefield_constraint,
+                    parameters=(
+                        RuleParameter("gate_subject", "source_model"),
+                        RuleParameter("relationship", "wrong_relationship"),
+                    ),
+                ),
+            ),
+        )
+    )
+    dice_gate = next(
+        condition
+        for condition in fixed_roll_clause.conditions
+        if condition.kind is RuleConditionKind.DICE_ROLL_GATE
+    )
+    assert not clause_is_supported_phase_command_point_gain(
+        replace(
+            fixed_roll_clause,
+            conditions=(*fixed_roll_clause.conditions, replace(dice_gate)),
+        )
+    )
+
+    unsupported_cost_clause = replace(
+        cost_clause,
+        unsupported_reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+        diagnostics=(
+            RuleParseDiagnostic(
+                reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+                message="Unrepresented test residue.",
+                source_span=cost_clause.source_span,
+            ),
+        ),
+    )
+    assert not clause_is_supported_stratagem_cost_modifier(unsupported_cost_clause)
+    assert not clause_is_supported_stratagem_cost_modifier(replace(cost_clause, trigger=None))
+    assert not clause_is_supported_stratagem_cost_modifier(
+        replace(
+            cost_clause,
+            target=replace(cast(RuleTargetSpec, cost_clause.target), kind=RuleTargetKind.PLAYER),
+        )
+    )
+    trigger = cast(RuleTrigger, cost_clause.trigger)
+    trigger_parameters = parameter_payload(trigger.parameters)
+    assert not clause_is_supported_stratagem_cost_modifier(
+        replace(
+            cost_clause,
+            trigger=replace(
+                trigger,
+                parameters=tuple(
+                    RuleParameter(key, "unknown")
+                    if key == "usage_scope"
+                    else RuleParameter(key, value)
+                    for key, value in trigger_parameters.items()
+                ),
+            ),
+        )
+    )
+    assert not clause_is_supported_stratagem_cost_modifier(
+        replace(
+            cost_clause,
+            conditions=tuple(
+                condition
+                for condition in cost_clause.conditions
+                if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT
+            ),
+        )
+    )
+    assert not clause_is_supported_stratagem_cost_modifier(
+        replace(
+            cost_clause,
+            conditions=tuple(
+                condition
+                for condition in cost_clause.conditions
+                if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE
+            ),
+        )
+    )
+    assert not clause_is_supported_stratagem_cost_modifier(replace(cost_clause, effects=()))
+    effect = cost_clause.effects[0]
+    effect_parameters = parameter_payload(effect.parameters)
+
+    def cost_effect(**overrides: RuleParameterValue) -> RuleEffectSpec:
+        return replace(
+            effect,
+            parameters=tuple(
+                RuleParameter(key, overrides.get(key, value))
+                for key, value in effect_parameters.items()
+            ),
+        )
+
+    assert not clause_is_supported_stratagem_cost_modifier(
+        replace(cost_clause, effects=(cost_effect(delta=0),))
+    )
+    assert not clause_is_supported_stratagem_cost_modifier(
+        replace(cost_clause, effects=(cost_effect(affected_player="source_player"),))
+    )
+    source_trigger = replace(
+        trigger,
+        parameters=tuple(
+            RuleParameter(key, "source_player")
+            if key == "stratagem_user"
+            else RuleParameter(key, "friendly")
+            if key == "selected_unit_allegiance"
+            else RuleParameter(key, value)
+            for key, value in trigger_parameters.items()
+        ),
+    )
+    assert not clause_is_supported_stratagem_cost_modifier(
+        replace(
+            cost_clause,
+            trigger=source_trigger,
+            effects=(cost_effect(delta=1, affected_player="source_player"),),
+        )
+    )
+    assert not clause_is_supported_stratagem_cost_modifier(
+        replace(cost_clause, effects=(cost_effect(delta=-1),))
+    )
 
 
 def test_phase17c_champion_slayer_clause_one_has_melee_target_gate_and_wound_reroll() -> None:

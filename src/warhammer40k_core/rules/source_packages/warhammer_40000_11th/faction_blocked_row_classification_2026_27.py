@@ -13,7 +13,12 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
-from warhammer40k_core.rules.rule_ir import RuleIR
+from warhammer40k_core.rules.rule_ir import (
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    parameter_payload,
+)
 from warhammer40k_core.rules.rule_templates import (
     RESOURCE_MODIFIER_TEMPLATE_ID,
     TIMING_WINDOW_TEMPLATE_ID,
@@ -54,6 +59,12 @@ _BRIDGE_SOURCE_ROW_RE = re.compile(
     r"bridge-source-row:(?P<table>Enhancements|Stratagems):(?P<id>[^:]+)$"
 )
 _SOURCE_DESCRIPTION_COLUMN = "description"
+_COMMAND_POINT_OPERATION_RE = re.compile(
+    r"(?:\b(?:gain|add|refund|spend|lose|remove)\s+\d+\s*(?:CP|Command Points?)\b|"
+    r"\b(?:increase|reduce)\s+(?:the\s+)?(?:CP\s+)?cost\b[^.]*?"
+    r"\bby\s+\d+\s*CP\b|\bfor\s+\d+\s*CP\b)",
+    re.IGNORECASE,
+)
 _FACTION_LINK_SLUG_OVERRIDES = {
     "emperor-s-children": "emperors-children",
     "t-au-empire": "tau-empire",
@@ -789,12 +800,6 @@ def _missing_capabilities_for_record(
     if _contains_any(
         text,
         (
-            "command point",
-            "command points",
-            " cp",
-            "1cp",
-            "2cp",
-            "3cp",
             "miracle dice",
             "pain token",
             "cabal point",
@@ -802,6 +807,9 @@ def _missing_capabilities_for_record(
             "blood tithe",
             "waaagh",
         ),
+    ) or (
+        _contains_any(text, ("command point", "command points", " cp", "1cp", "2cp", "3cp"))
+        and not _all_command_point_operations_are_structured(text=text, rule_ir=rule_ir)
     ):
         families.add(Phase17IMissingCapabilityFamily.FACTION_RESOURCE_LEDGER)
     if (
@@ -811,7 +819,7 @@ def _missing_capabilities_for_record(
             text,
             ("command point", "command points", " cp", "1cp", "2cp", "3cp"),
         )
-    ):
+    ) and not _all_stratagem_cost_operations_are_structured(text=text, rule_ir=rule_ir):
         families.add(Phase17IMissingCapabilityFamily.STRATAGEM_COST_MODIFIER_RUNTIME)
     if _contains_any(text, ("when mustering", "army roster", "when you select", "must include")):
         families.add(Phase17IMissingCapabilityFamily.MUSTERING_CONSTRAINT)
@@ -822,6 +830,38 @@ def _missing_capabilities_for_record(
 
 def _contains_any(text: str, needles: tuple[str, ...]) -> bool:
     return any(needle in text for needle in needles)
+
+
+def _all_command_point_operations_are_structured(*, text: str, rule_ir: RuleIR) -> bool:
+    operation_count = len(tuple(_COMMAND_POINT_OPERATION_RE.finditer(text)))
+    if operation_count == 0:
+        return False
+    return operation_count == len(_structured_command_point_effects(rule_ir))
+
+
+def _all_stratagem_cost_operations_are_structured(*, text: str, rule_ir: RuleIR) -> bool:
+    operation_count = sum(
+        1
+        for match in _COMMAND_POINT_OPERATION_RE.finditer(text)
+        if "cost" in match.group(0).lower() or match.group(0).lower().startswith("for ")
+    )
+    if operation_count == 0:
+        return False
+    structured_count = sum(
+        1
+        for effect in _structured_command_point_effects(rule_ir)
+        if parameter_payload(effect.parameters).get("operation") == "modify_stratagem_cost"
+    )
+    return operation_count == structured_count
+
+
+def _structured_command_point_effects(rule_ir: RuleIR) -> tuple[RuleEffectSpec, ...]:
+    return tuple(
+        effect
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.MODIFY_COMMAND_POINTS
+    )
 
 
 def _sorted_missing_capabilities(

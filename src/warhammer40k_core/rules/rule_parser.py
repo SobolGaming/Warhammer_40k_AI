@@ -11,6 +11,12 @@ from warhammer40k_core.rules.attack_target_parser import (
     parse_this_model_attack_target_trigger,
     this_model_attack_target_match_ranges,
 )
+from warhammer40k_core.rules.command_point_parser import (
+    command_point_target,
+    parse_command_point_conditions,
+    parse_command_point_effects,
+    parse_command_point_trigger,
+)
 from warhammer40k_core.rules.hit_success_threshold_parser import (
     has_hit_success_threshold,
     hit_success_threshold_effects,
@@ -141,14 +147,15 @@ _RETURN_ON_DEATH_SET_UP_RE = re.compile(
     r"(?P<full_health>at\s+full\s+health))\b",
     re.IGNORECASE,
 )
-_THIS_MODEL_MELEE_ATTACK_TARGET_RE = re.compile(
-    r"\beach\s+time\s+this\s+model\s+makes\s+a\s+melee\s+attack\s+that\s+targets\s+"
-    r"(?:a|an)\s+(?P<keyword>Character\s+or\s+Monster)\s+unit\b",
+_THIS_MODEL_ATTACK_KEYWORD_TARGET_RE = re.compile(
+    r"\beach\s+time\s+this\s+model\s+makes\s+(?:a|an)\s+"
+    r"(?:(?P<attack_kind>melee|ranged)\s+)?attack\s+that\s+targets\s+"
+    r"(?:a|an)\s+(?P<keyword>Character(?:\s+or\s+Monster)?)\s+unit\b",
     re.IGNORECASE,
 )
 _THIS_MODEL_DESTROYS_ENEMY_KEYWORD_UNIT_RE = re.compile(
     r"\beach\s+time\s+this\s+model\s+destroys\s+an\s+enemy\s+"
-    r"(?P<keyword>Character\s+or\s+Monster)\s+unit\b",
+    r"(?P<keyword>Character(?:\s+or\s+Monster)?)\s+unit\b",
     re.IGNORECASE,
 )
 _TRACKED_TARGET_ROLE_PATTERN = "prey|quarry"
@@ -286,11 +293,6 @@ _SELECTED_UNIT_MAKES_ATTACK_RE = re.compile(
     r"\b(?:a\s+model|models?)\s+in\s+"
     r"(?:that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit)\s+"
     r"makes?\s+an?\s+attack\b",
-    re.IGNORECASE,
-)
-_CP_RE = re.compile(
-    r"\b(?P<verb>gain|add|refund|spend|lose|remove)\s+(?P<value>\d+)\s*"
-    r"(?:CP|Command Points?|Command point)\b",
     re.IGNORECASE,
 )
 _VP_RE = re.compile(
@@ -731,6 +733,7 @@ def _compile_clause(
             *parse_this_model_attack_target_conditions(clause_text.span),
             *_parse_return_on_death_conditions(clause_text),
             *parse_frequency_conditions(clause_text.span),
+            *parse_command_point_conditions(clause_text.span),
             *_parse_keyword_conditions(clause_text, parser_context=parser_context),
             *_parse_distance_conditions(
                 clause_text,
@@ -747,7 +750,8 @@ def _compile_clause(
             *_parse_dice_roll_modifier_effects(clause_text),
             *_parse_reroll_effects(clause_text),
             *_parse_characteristic_effects(clause_text.span),
-            *_parse_resource_effects(clause_text),
+            *parse_command_point_effects(clause_text.span),
+            *_parse_victory_point_effects(clause_text),
             *_parse_tracked_target_selection_effects(clause_text),
             *_parse_return_on_death_effects(clause_text),
             *_parse_grant_ability_effects(clause_text),
@@ -806,23 +810,12 @@ def _compile_clause(
 
 
 def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
+    command_point_trigger = parse_command_point_trigger(clause_text.span)
+    if command_point_trigger is not None:
+        return command_point_trigger
     attack_target_trigger = parse_this_model_attack_target_trigger(clause_text.span)
     if attack_target_trigger is not None:
         return attack_target_trigger
-    melee_target_match = _THIS_MODEL_MELEE_ATTACK_TARGET_RE.search(clause_text.text)
-    if melee_target_match is not None:
-        return RuleTrigger(
-            kind=RuleTriggerKind.DICE_ROLL,
-            source_span=_span_from_match(clause_text, melee_target_match),
-            parameters=parameters_from_pairs(
-                (
-                    ("roll_type", "wound"),
-                    ("timing_window", "attack_sequence.wound"),
-                    ("attack_kind", "melee"),
-                    ("actor", "this_model"),
-                )
-            ),
-        )
     destroys_enemy_match = _THIS_MODEL_DESTROYS_ENEMY_KEYWORD_UNIT_RE.search(clause_text.text)
     if destroys_enemy_match is not None:
         return RuleTrigger(
@@ -1209,21 +1202,8 @@ def _parse_keyword_conditions(
                 ),
             )
         )
-    for match in _THIS_MODEL_MELEE_ATTACK_TARGET_RE.finditer(clause_text.text):
+    for match in _THIS_MODEL_ATTACK_KEYWORD_TARGET_RE.finditer(clause_text.text):
         target_match_ranges.append((match.start(), match.end()))
-        conditions.append(
-            RuleCondition(
-                kind=RuleConditionKind.TARGET_CONSTRAINT,
-                source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs(
-                    (
-                        ("relationship", "this_model_makes_attack"),
-                        ("attack_kind", "melee"),
-                        ("gate_subject", "attack_target"),
-                    )
-                ),
-            )
-        )
         conditions.extend(
             _keyword_any_gate_conditions_from_match(
                 clause_text=clause_text,
@@ -1379,6 +1359,9 @@ def _parse_target(
     *,
     parser_context: _RuleParserContext,
 ) -> RuleTargetSpec | None:
+    command_target = command_point_target(clause_text.span)
+    if command_target is not None:
+        return command_target
     if _AURA_RE.search(clause_text.text) is not None:
         return RuleTargetSpec(
             kind=RuleTargetKind.AURA_UNITS,
@@ -1391,7 +1374,7 @@ def _parse_target(
             ),
         )
     if (
-        _THIS_MODEL_MELEE_ATTACK_TARGET_RE.search(clause_text.text) is not None
+        _THIS_MODEL_ATTACK_KEYWORD_TARGET_RE.search(clause_text.text) is not None
         or has_this_model_attack_target(clause_text.text)
         or _RESTORE_LOST_WOUNDS_RE.search(clause_text.text) is not None
     ):
@@ -1798,19 +1781,8 @@ def _match_is_within_any_span(
     return any(start <= match.start() and match.end() <= end for start, end in spans)
 
 
-def _parse_resource_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+def _parse_victory_point_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
-    for match in _CP_RE.finditer(clause_text.text):
-        verb = _lower_group(match, "verb")
-        value = int(match.group("value"))
-        delta = -value if verb in {"spend", "lose", "remove"} else value
-        effects.append(
-            RuleEffectSpec(
-                kind=RuleEffectKind.MODIFY_COMMAND_POINTS,
-                source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs((("delta", delta),)),
-            )
-        )
     for match in _VP_RE.finditer(clause_text.text):
         effects.append(
             RuleEffectSpec(

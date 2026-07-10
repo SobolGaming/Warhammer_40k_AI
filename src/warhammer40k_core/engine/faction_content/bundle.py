@@ -42,6 +42,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
 )
+from warhammer40k_core.engine.catalog_command_point_runtime import CatalogCommandPointRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_advance_eligibility_hook_bindings,
     catalog_fall_back_eligibility_hook_bindings,
@@ -1320,16 +1321,26 @@ class RuntimeContentBundle:
             catalog=catalog,
             records=ability_records,
         )
+        catalog_command_point_runtime = CatalogCommandPointRuntime(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=validated_armies,
+        )
         event_handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.event_handler_bindings,
+            (
+                *catalog_command_point_runtime.event_handler_bindings(),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.event_handler_bindings,
+                ),
             )
         )
         event_index = RuntimeContentEventIndex.from_subscriptions(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.event_subscriptions,
+            (
+                *catalog_command_point_runtime.event_subscriptions(),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.event_subscriptions,
+                ),
             ),
             handler_registry=event_handler_registry,
         )
@@ -1419,6 +1430,7 @@ class RuntimeContentBundle:
         )
         unit_destroyed_hook_registry = UnitDestroyedHookRegistry.from_bindings(
             (
+                *catalog_command_point_runtime.unit_destroyed_hook_bindings(),
                 *catalog_runtime_hooks.unit_destroyed_hook_bindings(
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
@@ -1678,6 +1690,7 @@ class RuntimeContentBundle:
         )
         stratagem_cost_choice_hook_registry = StratagemCostChoiceHookRegistry.from_bindings(
             (
+                *catalog_command_point_runtime.stratagem_cost_choice_hook_bindings(),
                 *generic_rule_lifecycle_hooks.stratagem_cost_choice_hook_bindings(
                     activation=activation,
                     execution_records=records,
@@ -1690,6 +1703,7 @@ class RuntimeContentBundle:
         )
         stratagem_cost_modifier_registry = StratagemCostModifierRegistry.from_bindings(
             (
+                *catalog_command_point_runtime.stratagem_cost_modifier_bindings(),
                 *generic_rule_lifecycle_hooks.stratagem_cost_modifier_bindings(
                     activation=activation,
                     execution_records=records,

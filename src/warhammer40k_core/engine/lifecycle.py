@@ -243,6 +243,7 @@ from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
     StratagemCostChoiceRequestContext,
     StratagemCostChoiceResultContext,
+    source_selection_for_cost_choice,
     stratagem_cost_choice_source_result,
 )
 from warhammer40k_core.engine.stratagems import (
@@ -2612,14 +2613,7 @@ class GameLifecycle:
         state = self._require_state()
         source_result = stratagem_cost_choice_source_result(request)
         source_record = self.decision_controller.record_for_result(source_result)
-        if source_record.request.decision_type == STRATAGEM_DECISION_TYPE:
-            selection = stratagem_selection_from_decision_result(source_result)
-        elif source_record.request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
-            selection = stratagem_selection_from_target_proposal_result(source_result)
-        else:
-            raise GameLifecycleError("Stratagem cost choice source decision_type drift.")
-        if selection is None:
-            raise GameLifecycleError("Stratagem cost choice source selection is malformed.")
+        selection = source_selection_for_cost_choice(source_record.request, source_result)
         context, catalog_record, target_binding, effect_selection = selection
         cost_choice_hooks = (
             self._require_runtime_content_bundle().stratagem_cost_choice_hook_registry
@@ -2640,6 +2634,13 @@ class GameLifecycle:
         )
         if not handled:
             raise GameLifecycleError("Stratagem cost choice result was not handled.")
+        next_choice_status = self._request_stratagem_cost_choice_if_available(
+            source_request=source_record.request,
+            source_result=source_result,
+            selection=selection,
+        )
+        if next_choice_status is not None:
+            return next_choice_status
         if source_record.request.decision_type == STRATAGEM_DECISION_TYPE:
             invalid_status = invalid_stratagem_use_status(
                 state=state,

@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.engine import (
+    catalog_command_point_runtime as command_point_runtime,
+)
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -15,12 +20,28 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     AbilityTimingDescriptor,
 )
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusterRequest,
+    EnhancementAssignment,
+    muster_army,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     ModelPlacement,
     PlacedArmy,
     UnitPlacement,
+)
+from warhammer40k_core.engine.catalog_command_point_runtime import (
+    CATALOG_IR_COMMAND_POINT_GAIN_EVENT,
+    CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT,
+    CATALOG_IR_COMMAND_POINT_PHASE_GAIN_EVENT,
+    CATALOG_IR_STRATAGEM_COST_CHOICE_EVENT,
+    CatalogCommandPointRuntime,
+)
+from warhammer40k_core.engine.catalog_command_point_support import (
+    CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+    CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
 )
 from warhammer40k_core.engine.catalog_desperate_escape import (
     CATALOG_FORCED_DESPERATE_ESCAPE_SOURCE_KIND,
@@ -30,6 +51,9 @@ from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CATALOG_ONCE_PER_BATTLE_ABILITY_ACTIVATED_EVENT,
     CATALOG_ONCE_PER_BATTLE_ABILITY_DECLINED_EVENT,
     CatalogOncePerBattleRuntime,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_rule_clauses_from_record,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
@@ -68,6 +92,14 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+from warhammer40k_core.engine.faction_content.events import (
+    RuntimeContentEvent,
+    RuntimeContentEventHandlerRegistry,
+    RuntimeContentEventIndex,
+    RuntimeContentEventResult,
+)
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartRequestContext,
@@ -89,7 +121,27 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
+    StratagemCostChoiceRequestContext,
+    StratagemCostChoiceResultContext,
+)
+from warhammer40k_core.engine.stratagem_cost_modifiers import (
+    StratagemCostModifierContext,
+    StratagemCostModifierRegistry,
+)
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_DECISION_TYPE,
+    StratagemCategory,
+    StratagemDefinition,
+    StratagemEligibilityContext,
+    StratagemTargetBinding,
+    StratagemTargetKind,
+    StratagemTimingDescriptor,
+    StratagemUseRecord,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.parsed_tokens import TextSpan
@@ -124,6 +176,31 @@ ONCE_PER_BATTLE_FIGHT_BOOST_TEXT = (
     "Once per battle, at the start of the Fight phase, this model can use this ability. "
     "If it does, until the end of the phase, add 3 to the Attacks characteristic of melee "
     "weapons equipped by this model and those weapons have the [DEVASTATING WOUNDS] ability."
+)
+DESTROYED_CHARACTER_COMMAND_POINT_TEXT = (
+    "Each time this model makes an attack that targets a Character unit, you can re-roll "
+    "the Hit roll and you can re-roll the Wound roll. Each time this model destroys an "
+    "enemy Character unit, you gain 1CP."
+)
+OPPONENT_STRATAGEM_COST_TEXT = (
+    'Once per turn, when your opponent targets a unit from their army within 12" of this '
+    "model with a stratagem, you can use this ability. If you do, increase the CP cost of "
+    "the use of that stratagem by 1CP."
+)
+OWN_STRATAGEM_COST_TEXT = (
+    "Once per battle round, one unit from your army with this ability can use it when its "
+    "unit is targeted with a Stratagem. If it does, reduce the CP cost of that use of that "
+    "Stratagem by 1CP."
+)
+LEADERSHIP_COMMAND_POINT_TEXT = (
+    "At the end of your Command phase, if this model is on the battlefield, take a "
+    "Leadership test for this model; if that test is passed, you gain 1CP."
+)
+DIRECT_PHASE_COMMAND_POINT_TEXT = (
+    "At the start of your Command phase, if this model is on the battlefield, you gain 1CP."
+)
+FIXED_ROLL_COMMAND_POINT_TEXT = (
+    "At the end of your Command phase, roll one D6: on a 1+, you gain 1CP."
 )
 
 
@@ -1253,6 +1330,1174 @@ def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None
             explicit_target_unit_ids=None,
         )
         == ()
+    )
+
+
+def test_catalog_command_point_bundle_registers_source_backed_generic_consumers() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    destroyed_record = _command_point_record(
+        record_id="record:catalog-cp:destroyed-character",
+        raw_text=DESTROYED_CHARACTER_COMMAND_POINT_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+    )
+    leadership_record = _command_point_record(
+        record_id="record:catalog-cp:leadership",
+        raw_text=LEADERSHIP_COMMAND_POINT_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+    )
+    opponent_cost_record = _command_point_record(
+        record_id="record:catalog-cp:opponent-cost",
+        raw_text=OPPONENT_STRATAGEM_COST_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    own_cost_record = _command_point_record(
+        record_id="record:catalog-cp:own-cost",
+        raw_text=OWN_STRATAGEM_COST_TEXT,
+        source_unit=target_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=RuntimeContentActivation.from_armies(
+            armies=(source_army, target_army),
+            catalog=catalog,
+        ),
+        armies=(source_army, target_army),
+        catalog=catalog,
+        contributions=(),
+        base_ability_records=(
+            destroyed_record,
+            leadership_record,
+            opponent_cost_record,
+            own_cost_record,
+        ),
+    )
+
+    assert CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID in {
+        binding.hook_id for binding in bundle.unit_destroyed_hook_registry.all_bindings()
+    }
+    assert {
+        binding.source_id for binding in bundle.stratagem_cost_modifier_registry.all_bindings()
+    } == {opponent_cost_record.definition.source_id, own_cost_record.definition.source_id}
+    assert {
+        binding.source_id for binding in bundle.stratagem_cost_choice_hook_registry.all_bindings()
+    } >= {CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID}
+    subscriptions = bundle.event_index.subscriptions_for(TimingTriggerKind.END_PHASE)
+    assert any(
+        subscription.source_rule_id == leadership_record.definition.source_id
+        and subscription.filters
+        == {
+            "phase": BattlePhaseKind.COMMAND.value,
+            "player_id": source_army.player_id,
+        }
+        for subscription in subscriptions
+    )
+
+
+def test_catalog_command_point_destroyed_character_gain_is_scoped_and_idempotent() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    character_target = replace(
+        target_army.units[0],
+        keywords=tuple(sorted((*target_army.units[0].keywords, "CHARACTER"))),
+    )
+    target_army = _army_with_unit(target_army, character_target)
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=character_target,
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    record = _command_point_record(
+        record_id="record:catalog-cp:destroyed-character-runtime",
+        raw_text=DESTROYED_CHARACTER_COMMAND_POINT_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (record,)},
+    )
+    decisions = DecisionController()
+    attacker_model_id = source_unit.own_models[0].model_instance_id
+    destroyed_event = decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "destroying_player_id": source_army.player_id,
+            "attacking_model_instance_id": attacker_model_id,
+            "target_unit_instance_id": character_target.unit_instance_id,
+            "model_instance_id": character_target.own_models[0].model_instance_id,
+        },
+    )
+    destroyed_payload = cast(dict[str, JsonValue], destroyed_event.payload)
+    context = UnitDestroyedContext(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.SHOOTING,
+        model_destroyed_event_id=destroyed_event.event_id,
+        model_destroyed_payload=destroyed_payload,
+        destroying_player_id=source_army.player_id,
+        destroyed_unit_instance_id=character_target.unit_instance_id,
+        destroyed_player_id=target_army.player_id,
+    )
+
+    runtime.resolve_unit_destroyed(context)
+    runtime.resolve_unit_destroyed(context)
+
+    assert state.command_point_total(source_army.player_id) == 1
+    gain_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_IR_COMMAND_POINT_GAIN_EVENT
+    )
+    assert len(gain_events) == 1
+    payload = cast(dict[str, JsonValue], gain_events[0].payload)
+    assert payload["source_record_id"] == record.record_id
+    assert payload["source_model_instance_id"] == attacker_model_id
+    assert payload["destroyed_unit_instance_id"] == character_target.unit_instance_id
+
+
+def test_catalog_command_point_leadership_gain_dispatches_at_owner_command_phase_end() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = _unit_with_leadership(source_army.units[0], leadership=2)
+    source_army = _army_with_unit(source_army, source_unit)
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_army.units[0],
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.COMMAND,
+    )
+    record = _command_point_record(
+        record_id="record:catalog-cp:leadership-runtime",
+        raw_text=LEADERSHIP_COMMAND_POINT_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (record,)},
+    )
+    handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
+        runtime.event_handler_bindings()
+    )
+    event_index = RuntimeContentEventIndex.from_subscriptions(
+        runtime.event_subscriptions(),
+        handler_registry=handler_registry,
+    )
+    decisions = DecisionController()
+
+    results = event_index.dispatch(
+        RuntimeContentEvent(
+            event_id="runtime-event:catalog-cp:leadership",
+            game_id=state.game_id,
+            player_id=source_army.player_id,
+            battle_round=state.battle_round,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            phase=BattlePhaseKind.COMMAND,
+            active_player_id=source_army.player_id,
+        ),
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    assert len(results) == 1
+    assert state.command_point_total(source_army.player_id) == 1
+    resolution_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
+    )
+    assert len(resolution_events) == 1
+    resolution = cast(dict[str, JsonValue], resolution_events[0].payload)
+    assert resolution["passed"] is True
+    assert resolution["leadership_target"] == 2
+    assert resolution["source_record_id"] == record.record_id
+
+
+@pytest.mark.parametrize(
+    ("raw_text", "trigger_kind", "expects_dice_roll"),
+    [
+        (DIRECT_PHASE_COMMAND_POINT_TEXT, TimingTriggerKind.START_PHASE, False),
+        (FIXED_ROLL_COMMAND_POINT_TEXT, TimingTriggerKind.END_PHASE, True),
+    ],
+)
+def test_catalog_command_point_phase_gain_supports_automatic_and_fixed_roll_gates(
+    raw_text: str,
+    trigger_kind: TimingTriggerKind,
+    expects_dice_roll: bool,
+) -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_army.units[0],
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.COMMAND,
+    )
+    record = _command_point_record(
+        record_id=f"record:catalog-cp:phase-gain:{trigger_kind.value}",
+        raw_text=raw_text,
+        source_unit=source_unit,
+        trigger_kind=trigger_kind,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (record,)},
+    )
+    handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
+        runtime.event_handler_bindings()
+    )
+    event_index = RuntimeContentEventIndex.from_subscriptions(
+        runtime.event_subscriptions(),
+        handler_registry=handler_registry,
+    )
+    decisions = DecisionController()
+
+    results = event_index.dispatch(
+        RuntimeContentEvent(
+            event_id=f"runtime-event:catalog-cp:{trigger_kind.value}",
+            game_id=state.game_id,
+            player_id=source_army.player_id,
+            battle_round=state.battle_round,
+            trigger_kind=trigger_kind,
+            phase=BattlePhaseKind.COMMAND,
+            active_player_id=source_army.player_id,
+        ),
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    assert len(results) == 1
+    assert state.command_point_total(source_army.player_id) == 1
+    assert sum(event.event_type == "dice_rolled" for event in decisions.event_log.records) == int(
+        expects_dice_roll
+    )
+    resolution = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_IR_COMMAND_POINT_PHASE_GAIN_EVENT
+    )
+    payload = cast(dict[str, JsonValue], resolution.payload)
+    assert payload["test_kind"] == ("fixed_roll" if expects_dice_roll else "automatic")
+    assert payload["passed"] is True
+
+
+def test_catalog_command_point_phase_gain_records_failure_cap_and_inactive_owner() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_army.units[0],
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.COMMAND,
+    )
+    automatic_record = _command_point_record(
+        record_id="record:catalog-cp:phase-gain:cap",
+        raw_text=DIRECT_PHASE_COMMAND_POINT_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    failed_roll_record = _command_point_record(
+        record_id="record:catalog-cp:phase-gain:failed-roll",
+        raw_text=("At the end of your Command phase, roll one D6: on a 7+, you gain 1CP."),
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={
+            source_army.player_id: (automatic_record, failed_roll_record),
+        },
+    )
+    handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
+        runtime.event_handler_bindings()
+    )
+    event_index = RuntimeContentEventIndex.from_subscriptions(
+        runtime.event_subscriptions(),
+        handler_registry=handler_registry,
+    )
+    decisions = DecisionController()
+
+    def dispatch(
+        *, event_id: str, trigger_kind: TimingTriggerKind, active_player_id: str
+    ) -> tuple[RuntimeContentEventResult, ...]:
+        return event_index.dispatch(
+            RuntimeContentEvent(
+                event_id=event_id,
+                game_id=state.game_id,
+                player_id=source_army.player_id,
+                battle_round=state.battle_round,
+                trigger_kind=trigger_kind,
+                phase=BattlePhaseKind.COMMAND,
+                active_player_id=active_player_id,
+            ),
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+
+    inactive_results = dispatch(
+        event_id="runtime-event:catalog-cp:inactive-owner",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        active_player_id=target_army.player_id,
+    )
+    dispatch(
+        event_id="runtime-event:catalog-cp:gain-applied",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        active_player_id=source_army.player_id,
+    )
+    dispatch(
+        event_id="runtime-event:catalog-cp:gain-capped",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        active_player_id=source_army.player_id,
+    )
+    dispatch(
+        event_id="runtime-event:catalog-cp:roll-failed",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        active_player_id=source_army.player_id,
+    )
+
+    assert inactive_results[0].replay_payload == {"resolutions": []}
+    assert state.command_point_total(source_army.player_id) == 1
+    assert any(
+        event.event_type == "command_points_gain_capped" for event in decisions.event_log.records
+    )
+    failed_resolution = next(
+        event.payload
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_IR_COMMAND_POINT_PHASE_GAIN_EVENT
+        and isinstance(event.payload, dict)
+        and event.payload.get("runtime_event_id") == "runtime-event:catalog-cp:roll-failed"
+    )
+    assert failed_resolution["passed"] is False
+    assert failed_resolution["command_point_result"] is None
+
+
+def test_catalog_command_point_cost_choices_modify_only_the_current_stratagem_use() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=18.0,
+        ),
+        active_player_id=target_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    record = _command_point_record(
+        record_id="record:catalog-cp:opponent-cost-runtime",
+        raw_text=OPPONENT_STRATAGEM_COST_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    second_record = _command_point_record(
+        record_id="record:catalog-cp:opponent-cost-runtime-second",
+        raw_text=OPPONENT_STRATAGEM_COST_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (record, second_record)},
+    )
+    decisions = DecisionController()
+    definition = _test_stratagem_definition(command_point_cost=1)
+    eligibility = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=target_army.player_id,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    target_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id=target_army.player_id,
+        target_unit_instance_id=target_unit.unit_instance_id,
+    )
+    source_request, source_result = _test_stratagem_source_decision(
+        actor_id=target_army.player_id,
+        suffix="opponent-cost",
+    )
+    request_context = StratagemCostChoiceRequestContext(
+        state=state,
+        decisions=decisions,
+        source_request=source_request,
+        source_result=source_result,
+        definition=definition,
+        eligibility_context=eligibility,
+        target_binding=target_binding,
+        effect_selection=None,
+    )
+
+    request = runtime.stratagem_cost_choice_request(request_context)
+    assert request is not None
+    assert request.actor_id == source_army.player_id
+    use_option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict) and option.payload.get("use_ability") is True
+    )
+    result = DecisionResult.for_request(
+        result_id="result:catalog-cp:opponent-cost",
+        request=request,
+        selected_option_id=use_option.option_id,
+    )
+    result_payload = cast(dict[str, JsonValue], result.payload)
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    with pytest.raises(GameLifecycleError, match="cost choice actor drift"):
+        runtime.apply_stratagem_cost_choice_result(
+            StratagemCostChoiceResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=replace(result, actor_id=target_army.player_id),
+                source_request=source_request,
+                source_result=source_result,
+                definition=definition,
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="cost choice actor drift"):
+        runtime.apply_stratagem_cost_choice_result(
+            StratagemCostChoiceResultContext(
+                state=state,
+                decisions=decisions,
+                request=replace(request, actor_id=target_army.player_id),
+                result=replace(result, actor_id=target_army.player_id),
+                source_request=source_request,
+                source_result=source_result,
+                definition=definition,
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+            )
+        )
+    assert not any(
+        event.event_type == CATALOG_IR_STRATAGEM_COST_CHOICE_EVENT
+        for event in decisions.event_log.records
+    )
+    assert not runtime.apply_stratagem_cost_choice_result(
+        StratagemCostChoiceResultContext(
+            state=state,
+            decisions=decisions,
+            request=replace(
+                request,
+                payload={**request_payload, "hook_id": "catalog-ir:unrelated-hook"},
+            ),
+            result=result,
+            source_request=source_request,
+            source_result=source_result,
+            definition=definition,
+            eligibility_context=eligibility,
+            target_binding=target_binding,
+            effect_selection=None,
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="source_clause_id drift"):
+        runtime.apply_stratagem_cost_choice_result(
+            StratagemCostChoiceResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=replace(
+                    result,
+                    payload={**result_payload, "source_clause_id": "drifted-clause"},
+                ),
+                source_request=source_request,
+                source_result=source_result,
+                definition=definition,
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+            )
+        )
+    assert not any(
+        event.event_type == CATALOG_IR_STRATAGEM_COST_CHOICE_EVENT
+        for event in decisions.event_log.records
+    )
+    assert runtime.apply_stratagem_cost_choice_result(
+        StratagemCostChoiceResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            source_request=source_request,
+            source_result=source_result,
+            definition=definition,
+            eligibility_context=eligibility,
+            target_binding=target_binding,
+            effect_selection=None,
+        )
+    )
+    second_request = runtime.stratagem_cost_choice_request(request_context)
+    assert second_request is not None
+    assert second_request.payload != request.payload
+    decline_option = next(
+        option
+        for option in second_request.options
+        if isinstance(option.payload, dict) and option.payload.get("use_ability") is False
+    )
+    second_result = DecisionResult.for_request(
+        result_id="result:catalog-cp:opponent-cost-second",
+        request=second_request,
+        selected_option_id=decline_option.option_id,
+    )
+    assert runtime.apply_stratagem_cost_choice_result(
+        StratagemCostChoiceResultContext(
+            state=state,
+            decisions=decisions,
+            request=second_request,
+            result=second_result,
+            source_request=source_request,
+            source_result=source_result,
+            definition=definition,
+            eligibility_context=eligibility,
+            target_binding=target_binding,
+            effect_selection=None,
+        )
+    )
+    registry = StratagemCostModifierRegistry.from_bindings(
+        runtime.stratagem_cost_modifier_bindings()
+    )
+
+    applied_cost = registry.modified_command_point_cost(
+        _cost_modifier_context(
+            state=state,
+            decisions=decisions,
+            definition=definition,
+            eligibility=eligibility,
+            target_binding=target_binding,
+            source_request_id=source_request.request_id,
+            source_result_id=source_result.result_id,
+        )
+    )
+    unrelated_cost = registry.modified_command_point_cost(
+        _cost_modifier_context(
+            state=state,
+            decisions=decisions,
+            definition=definition,
+            eligibility=eligibility,
+            target_binding=target_binding,
+            source_request_id="request:unrelated-stratagem",
+            source_result_id="result:unrelated-stratagem",
+        )
+    )
+    no_choice_cost = registry.modified_command_point_cost(
+        StratagemCostModifierContext(
+            state=state,
+            definition=definition,
+            eligibility_context=eligibility,
+            target_binding=target_binding,
+            effect_selection=None,
+            base_command_point_cost=definition.command_point_cost,
+            current_command_point_cost=definition.command_point_cost,
+        )
+    )
+
+    assert applied_cost == 2
+    assert unrelated_cost == 1
+    assert no_choice_cost == 1
+    assert runtime.stratagem_cost_choice_request(request_context) is None
+    assert (
+        sum(
+            event.event_type == CATALOG_IR_STRATAGEM_COST_CHOICE_EVENT
+            for event in decisions.event_log.records
+        )
+        == 2
+    )
+
+
+def test_catalog_command_point_own_cost_reduction_is_consumed_by_generic_registry() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    record = _command_point_record(
+        record_id="record:catalog-cp:own-cost-runtime",
+        raw_text=OWN_STRATAGEM_COST_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (record,)},
+    )
+    decisions = DecisionController()
+    definition = _test_stratagem_definition(command_point_cost=1)
+    eligibility = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=source_army.player_id,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    target_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id=source_army.player_id,
+        target_unit_instance_id=source_unit.unit_instance_id,
+    )
+    source_request, source_result = _test_stratagem_source_decision(
+        actor_id=source_army.player_id,
+        suffix="own-cost",
+    )
+    request_context = StratagemCostChoiceRequestContext(
+        state=state,
+        decisions=decisions,
+        source_request=source_request,
+        source_result=source_result,
+        definition=definition,
+        eligibility_context=eligibility,
+        target_binding=target_binding,
+        effect_selection=None,
+    )
+    request = runtime.stratagem_cost_choice_request(request_context)
+    assert request is not None
+    use_option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict) and option.payload.get("use_ability") is True
+    )
+    result = DecisionResult.for_request(
+        result_id="result:catalog-cp:own-cost",
+        request=request,
+        selected_option_id=use_option.option_id,
+    )
+    assert runtime.apply_stratagem_cost_choice_result(
+        StratagemCostChoiceResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            source_request=source_request,
+            source_result=source_result,
+            definition=definition,
+            eligibility_context=eligibility,
+            target_binding=target_binding,
+            effect_selection=None,
+        )
+    )
+
+    registry = StratagemCostModifierRegistry.from_bindings(
+        runtime.stratagem_cost_modifier_bindings()
+    )
+    no_choice_cost = registry.modified_command_point_cost(
+        StratagemCostModifierContext(
+            state=state,
+            definition=definition,
+            eligibility_context=eligibility,
+            target_binding=target_binding,
+            effect_selection=None,
+            base_command_point_cost=definition.command_point_cost,
+            current_command_point_cost=definition.command_point_cost,
+        )
+    )
+    accepted_cost = registry.modified_command_point_cost(
+        _cost_modifier_context(
+            state=state,
+            decisions=decisions,
+            definition=definition,
+            eligibility=eligibility,
+            target_binding=target_binding,
+            source_request_id=source_request.request_id,
+            source_result_id=source_result.result_id,
+        )
+    )
+
+    assert no_choice_cost == 1
+    assert accepted_cost == 0
+
+
+def test_catalog_command_point_cost_frequency_is_consumed_from_stratagem_use_record() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=18.0,
+        ),
+        active_player_id=target_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    record = _command_point_record(
+        record_id="record:catalog-cp:frequency-consumed",
+        raw_text=OPPONENT_STRATAGEM_COST_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (record,)},
+    )
+    modifier_binding = runtime.stratagem_cost_modifier_bindings()[0]
+    definition = _test_stratagem_definition(command_point_cost=1)
+    eligibility = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=target_army.player_id,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    target_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id=target_army.player_id,
+        target_unit_instance_id=target_unit.unit_instance_id,
+    )
+    state.record_stratagem_use(
+        StratagemUseRecord(
+            use_id="stratagem-use:catalog-cp:frequency-consumed",
+            player_id=target_army.player_id,
+            stratagem_id=definition.stratagem_id,
+            source_id=definition.source_id,
+            battle_round=state.battle_round,
+            phase=BattlePhaseKind.SHOOTING,
+            active_player_id=state.active_player_id,
+            timing_window_id=None,
+            request_id="request:catalog-cp:frequency-consumed:prior",
+            result_id="result:catalog-cp:frequency-consumed:prior",
+            selected_option_id="option:catalog-cp:frequency-consumed:prior",
+            target_binding=target_binding,
+            targeted_unit_instance_ids=(target_unit.unit_instance_id,),
+            affected_unit_instance_ids=(target_unit.unit_instance_id,),
+            command_point_cost=2,
+            command_point_transaction_id=None,
+            handler_id="record-only:catalog-cp:frequency-consumed",
+            command_point_modifier_ids=(modifier_binding.modifier_id,),
+            command_point_modifier_source_ids=(modifier_binding.source_id,),
+        )
+    )
+    source_request, source_result = _test_stratagem_source_decision(
+        actor_id=target_army.player_id,
+        suffix="frequency-consumed",
+    )
+
+    assert (
+        runtime.stratagem_cost_choice_request(
+            StratagemCostChoiceRequestContext(
+                state=state,
+                decisions=DecisionController(),
+                source_request=source_request,
+                source_result=source_result,
+                definition=definition,
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+            )
+        )
+        is None
+    )
+
+
+def test_catalog_command_point_enhancement_cost_source_binds_only_assigned_bearer() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    enhancement_id = "catalog-cp-test-enhancement"
+    assigned_source_army = replace(
+        source_army,
+        detachment_selection=replace(
+            source_army.detachment_selection,
+            enhancement_ids=(enhancement_id,),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id=enhancement_id,
+                target_unit_selection_id=source_unit.unit_instance_id.removeprefix(
+                    f"{source_army.army_id}:"
+                ),
+                source_id="source:catalog-cp-test-enhancement-assignment",
+            ),
+        ),
+    )
+    datasheet_record = _command_point_record(
+        record_id="record:catalog-cp:enhancement-cost-runtime",
+        raw_text=OPPONENT_STRATAGEM_COST_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    enhancement_record = AbilityCatalogRecord(
+        record_id=datasheet_record.record_id,
+        definition=replace(datasheet_record.definition, ability_id=enhancement_id),
+        source_kind=AbilitySourceKind.ENHANCEMENT,
+        detachment_id=source_army.detachment_selection.detachment_ids[0],
+    )
+
+    assigned_runtime = _command_point_runtime(
+        armies=(assigned_source_army, target_army),
+        records_by_player={assigned_source_army.player_id: (enhancement_record,)},
+    )
+    unassigned_runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (enhancement_record,)},
+    )
+
+    assert len(assigned_runtime.stratagem_cost_modifier_bindings()) == 1
+    assert len(assigned_runtime.stratagem_cost_choice_hook_bindings()) == 1
+    assert unassigned_runtime.stratagem_cost_modifier_bindings() == ()
+    assert unassigned_runtime.stratagem_cost_choice_hook_bindings() == ()
+
+
+def test_catalog_command_point_runtime_helpers_fail_fast_on_contract_drift() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    destroyed_record = _command_point_record(
+        record_id="record:catalog-cp:strict-destroyed",
+        raw_text=DESTROYED_CHARACTER_COMMAND_POINT_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+    )
+    phase_record = _command_point_record(
+        record_id="record:catalog-cp:strict-phase",
+        raw_text=DIRECT_PHASE_COMMAND_POINT_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    cost_record = _command_point_record(
+        record_id="record:catalog-cp:strict-cost",
+        raw_text=OPPONENT_STRATAGEM_COST_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    destroyed_clause = catalog_rule_clauses_from_record(destroyed_record)[1]
+    phase_clause = catalog_rule_clauses_from_record(phase_record)[0]
+    cost_clause = catalog_rule_clauses_from_record(cost_record)[0]
+
+    with pytest.raises(GameLifecycleError, match="ability indexes must be a mapping"):
+        command_point_runtime._validate_ability_indexes(())  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="must contain ability indexes"):
+        command_point_runtime._validate_ability_indexes(  # pyright: ignore[reportPrivateUsage]
+            {source_army.player_id: object()}
+        )
+    with pytest.raises(GameLifecycleError, match="armies must be a tuple"):
+        command_point_runtime._validate_armies([])  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="must contain ArmyDefinition"):
+        command_point_runtime._validate_armies((object(),))  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        command_point_runtime._payload_object(None, label="test")  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="missing source_id"):
+        command_point_runtime._payload_identifier({}, key="source_id")  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="must be a boolean"):
+        command_point_runtime._payload_bool({}, key="accepted")  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="must be an integer"):
+        command_point_runtime._mapping_int({}, key="delta")  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="must be positive"):
+        command_point_runtime._mapping_positive_int(  # pyright: ignore[reportPrivateUsage]
+            {"delta": 0}, key="delta"
+        )
+
+    with pytest.raises(GameLifecycleError, match="player army is unknown"):
+        command_point_runtime._army_for_player(  # pyright: ignore[reportPrivateUsage]
+            (source_army, target_army), player_id="unknown-player"
+        )
+    with pytest.raises(GameLifecycleError, match="runtime unit is unknown"):
+        command_point_runtime._unit_in_army(  # pyright: ignore[reportPrivateUsage]
+            source_army, unit_instance_id="unknown-unit"
+        )
+    with pytest.raises(GameLifecycleError, match="runtime unit is unknown"):
+        command_point_runtime._unit_by_id(  # pyright: ignore[reportPrivateUsage]
+            (source_army, target_army), "unknown-unit"
+        )
+    with pytest.raises(GameLifecycleError, match="runtime model is unknown"):
+        command_point_runtime._model_in_unit(  # pyright: ignore[reportPrivateUsage]
+            source_unit, model_instance_id="unknown-model"
+        )
+    with pytest.raises(GameLifecycleError, match="missing Leadership"):
+        command_point_runtime._model_leadership(  # pyright: ignore[reportPrivateUsage]
+            replace(
+                source_unit.own_models[0],
+                characteristics=tuple(
+                    value
+                    for value in source_unit.own_models[0].characteristics
+                    if value.characteristic is not Characteristic.LEADERSHIP
+                ),
+            )
+        )
+
+    assert not command_point_runtime._destroyed_keywords_match(  # pyright: ignore[reportPrivateUsage]
+        destroyed_clause, destroyed_keywords={"MONSTER"}
+    )
+    without_keyword_clause = replace(
+        destroyed_clause,
+        conditions=tuple(
+            condition
+            for condition in destroyed_clause.conditions
+            if condition.kind is not RuleConditionKind.KEYWORD_GATE
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="missing keyword gate"):
+        command_point_runtime._destroyed_keywords_match(  # pyright: ignore[reportPrivateUsage]
+            without_keyword_clause, destroyed_keywords={"CHARACTER"}
+        )
+
+    assert (
+        command_point_runtime._phase_gain_trigger_kind(  # pyright: ignore[reportPrivateUsage]
+            phase_clause
+        )
+        is TimingTriggerKind.START_PHASE
+    )
+    assert (
+        command_point_runtime._phase_gain_dice_gate(  # pyright: ignore[reportPrivateUsage]
+            phase_clause
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="trigger edge is malformed"):
+        command_point_runtime._phase_gain_trigger_kind(  # pyright: ignore[reportPrivateUsage]
+            replace(
+                phase_clause,
+                trigger=replace(
+                    cast(RuleTrigger, phase_clause.trigger),
+                    parameters=(
+                        RuleParameter("edge", "middle"),
+                        RuleParameter("owner", "active_player"),
+                        RuleParameter("phase", "command"),
+                    ),
+                ),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="missing its trigger"):
+        command_point_runtime._required_trigger(  # pyright: ignore[reportPrivateUsage]
+            replace(phase_clause, trigger=None)
+        )
+
+    frequency = next(
+        condition
+        for condition in cost_clause.conditions
+        if condition.kind is RuleConditionKind.FREQUENCY_LIMIT
+    )
+    malformed_frequency_clause = replace(
+        cost_clause,
+        conditions=tuple(
+            replace(condition, parameters=(RuleParameter("scope", 1),))
+            if condition is frequency
+            else condition
+            for condition in cost_clause.conditions
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="frequency scope is malformed"):
+        command_point_runtime._cost_frequency_scope(  # pyright: ignore[reportPrivateUsage]
+            malformed_frequency_clause
+        )
+    without_distance_clause = replace(
+        cost_clause,
+        conditions=tuple(
+            condition
+            for condition in cost_clause.conditions
+            if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="range is missing"):
+        command_point_runtime._cost_source_range_inches(  # pyright: ignore[reportPrivateUsage]
+            without_distance_clause
+        )
+
+    with pytest.raises(GameLifecycleError, match="indexes must match army player IDs"):
+        CatalogCommandPointRuntime(
+            ability_indexes_by_player_id={
+                source_army.player_id: AbilityCatalogIndex.from_records(())
+            },
+            armies=(source_army, target_army),
+        )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={},
+    )
+    with pytest.raises(GameLifecycleError, match="unit-destroyed runtime requires context"):
+        runtime.resolve_unit_destroyed(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="cost choice requires context"):
+        runtime.stratagem_cost_choice_request(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="cost choice result requires context"):
+        runtime.apply_stratagem_cost_choice_result(cast(Any, object()))
+
+
+def _command_point_record(
+    *,
+    record_id: str,
+    raw_text: str,
+    source_unit: UnitInstance,
+    trigger_kind: TimingTriggerKind,
+) -> AbilityCatalogRecord:
+    source_text = RuleSourceText.from_raw(
+        source_id=f"source:{record_id}",
+        raw_text=raw_text,
+    )
+    rule_ir = compile_rule_source_text(
+        source_text,
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
+    return _ability_record(
+        record_id=record_id,
+        rule_ir=rule_ir,
+        trigger_kind=trigger_kind,
+        datasheet_id=source_unit.datasheet_id,
+    )
+
+
+def _command_point_runtime(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+    records_by_player: Mapping[str, tuple[AbilityCatalogRecord, ...]],
+) -> CatalogCommandPointRuntime:
+    return CatalogCommandPointRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: AbilityCatalogIndex.from_records(
+                records_by_player.get(army.player_id, ())
+            )
+            for army in armies
+        },
+        armies=armies,
+    )
+
+
+def _unit_with_leadership(unit: UnitInstance, *, leadership: int) -> UnitInstance:
+    return replace(
+        unit,
+        own_models=tuple(
+            replace(
+                model,
+                characteristics=tuple(
+                    CharacteristicValue.from_raw(Characteristic.LEADERSHIP, leadership)
+                    if value.characteristic is Characteristic.LEADERSHIP
+                    else value
+                    for value in model.characteristics
+                ),
+            )
+            for model in unit.own_models
+        ),
+    )
+
+
+def _test_stratagem_definition(*, command_point_cost: int) -> StratagemDefinition:
+    return StratagemDefinition(
+        stratagem_id="catalog-cp-test-stratagem",
+        name="Catalog CP Test Stratagem",
+        source_id="source:catalog-cp-test-stratagem",
+        command_point_cost=command_point_cost,
+        category=StratagemCategory.BATTLE_TACTIC,
+        when_descriptor="Start of the Shooting phase.",
+        target_descriptor="One friendly unit.",
+        effect_descriptor="Record-only test effect.",
+        restrictions_descriptor="Test Stratagem.",
+        timing=StratagemTimingDescriptor(
+            trigger_kind=TimingTriggerKind.START_PHASE,
+            phase=BattlePhaseKind.SHOOTING,
+        ),
+    )
+
+
+def _test_stratagem_source_decision(
+    *,
+    actor_id: str,
+    suffix: str,
+) -> tuple[DecisionRequest, DecisionResult]:
+    request = DecisionRequest(
+        request_id=f"request:catalog-cp:{suffix}",
+        decision_type=STRATAGEM_DECISION_TYPE,
+        actor_id=actor_id,
+        payload={"finite": True},
+        options=(
+            DecisionOption(
+                option_id=f"option:catalog-cp:{suffix}",
+                label="Use test Stratagem",
+                payload={"submission_kind": STRATAGEM_DECISION_TYPE},
+            ),
+        ),
+    )
+    return (
+        request,
+        DecisionResult.for_request(
+            result_id=f"result:catalog-cp:{suffix}",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        ),
+    )
+
+
+def _cost_modifier_context(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    definition: StratagemDefinition,
+    eligibility: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    source_request_id: str,
+    source_result_id: str,
+) -> StratagemCostModifierContext:
+    return StratagemCostModifierContext(
+        state=state,
+        definition=definition,
+        eligibility_context=eligibility,
+        target_binding=target_binding,
+        effect_selection=None,
+        base_command_point_cost=definition.command_point_cost,
+        current_command_point_cost=definition.command_point_cost,
+        decisions=decisions,
+        source_decision_request_id=source_request_id,
+        source_decision_result_id=source_result_id,
     )
 
 

@@ -170,10 +170,11 @@ class StratagemCostModifierRegistry:
         modifier_ids: list[str] = []
         source_ids: list[str] = []
         for binding in self.bindings:
-            modified = _validate_non_negative_int(
+            raw_modified = _validate_int(
                 f"{binding.modifier_id} returned command point cost",
                 binding.handler(replace(context, current_command_point_cost=current)),
             )
+            modified = max(0, raw_modified)
             if modified != current:
                 modifier_ids.append(binding.modifier_id)
                 source_ids.append(binding.source_id)
@@ -205,6 +206,12 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
         raise GameLifecycleError(f"{field_name} must be an int.")
     if value < 0:
         raise GameLifecycleError(f"{field_name} must not be negative.")
+    return value
+
+
+def _validate_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an int.")
     return value
 
 

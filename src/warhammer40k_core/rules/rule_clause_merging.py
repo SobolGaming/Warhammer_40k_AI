@@ -2,6 +2,12 @@ from __future__ import annotations
 
 import re
 
+from warhammer40k_core.rules.command_point_parser import (
+    LEADERSHIP_TEST_PASSED_CONTINUATION_RE,
+    LEADERSHIP_TEST_RE,
+    STRATAGEM_COST_EFFECT_CONTINUATION_RE,
+    STRATAGEM_COST_TRIGGER_RE,
+)
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_frequency_parser import (
     OPTIONAL_ABILITY_ACTIVATION_RE,
@@ -134,6 +140,18 @@ def merge_rule_clause_spans(
         spans=merged,
         current_patterns=(OPTIONAL_ABILITY_ACTIVATION_RE,),
         next_pattern=OPTIONAL_ABILITY_EFFECT_CONTINUATION_RE,
+    )
+    merged = _merge_adjacent_clause_spans(
+        normalized_text=normalized_text,
+        spans=merged,
+        current_patterns=(STRATAGEM_COST_TRIGGER_RE,),
+        next_pattern=STRATAGEM_COST_EFFECT_CONTINUATION_RE,
+    )
+    merged = _merge_adjacent_clause_spans(
+        normalized_text=normalized_text,
+        spans=merged,
+        current_patterns=(LEADERSHIP_TEST_RE,),
+        next_pattern=LEADERSHIP_TEST_PASSED_CONTINUATION_RE,
     )
     merged = _merge_adjacent_clause_spans(
         normalized_text=normalized_text,
