@@ -118,6 +118,18 @@ CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES = (
     ),
 )
 
+CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000001117",
+        model_name="Kairos Fateweaver - EPIC HERO",
+        height=7.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:kairos-fateweaver:height",
+        height_document_reference="https://www.adeptusars.com/miniatures/kairos-fateweaver",
+        evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+    ),
+)
+
 DEATH_GUARD_DEFILER_PDF_CORRECTION = PdfDatasheetCorrection(
     datasheet_id="000004209",
     source_id="pdf:death-guard-faction-pack:2026-06-10:p5-p6",
@@ -181,5 +193,6 @@ DEFAULT_PDF_CORRECTIONS = (
 )
 DEFAULT_HEIGHT_OVERRIDES = (
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
+    *CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES,
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,
 )

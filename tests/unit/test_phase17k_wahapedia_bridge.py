@@ -44,6 +44,7 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.dice import DiceRollResult, RerollComponentSelectionPolicy
 from warhammer40k_core.core.model_geometry_catalog import (
+    GeometryEvidenceKind,
     GeometryMeasurementKind,
     GeometrySourceUnits,
 )
@@ -116,6 +117,10 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     PlacedArmy,
     UnitPlacement,
+)
+from warhammer40k_core.engine.catalog_command_point_support import (
+    CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+    CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
@@ -970,6 +975,47 @@ def test_phase17k_keeper_bridge_rejects_non_single_item_equipment_choice() -> No
                 ),
             ),
         )
+
+
+def test_phase17k_kairos_bridge_consumes_both_command_point_abilities_and_height() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_kairos_fateweaver_bridge_artifacts(),
+    )
+    records_by_name = {
+        record.definition.name: record
+        for record in catalog_ability_records_from_catalog(package.army_catalog)
+    }
+
+    looks_forward = records_by_name["One Head Looks Forward"]
+    looks_back = records_by_name["One Head Looks Back (Aura)"]
+    looks_forward_payload = cast(dict[str, JsonValue], looks_forward.definition.replay_payload)
+    looks_back_payload = cast(dict[str, JsonValue], looks_back.definition.replay_payload)
+    looks_forward_ir = RuleIR.from_payload(cast(RuleIRPayload, looks_forward_payload["rule_ir"]))
+    looks_back_ir = RuleIR.from_payload(cast(RuleIRPayload, looks_back_payload["rule_ir"]))
+    assert looks_forward_ir.is_supported
+    assert looks_back_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(looks_forward_ir) == (
+        CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_consumers_for_rule(looks_back_ir) == (
+        CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    )
+
+    geometry = package.model_geometries[0]
+    assert geometry.model_profile_id == "000001117:kairos-fateweaver-epic-hero"
+    assert geometry.height.height_inches == 7.0
+    height_evidence = next(
+        evidence
+        for evidence in geometry.evidence
+        if evidence.evidence_id == geometry.height.evidence_id
+    )
+    assert height_evidence.evidence_kind is GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT
+    assert height_evidence.document_reference == (
+        "https://www.adeptusars.com/miniatures/kairos-fateweaver"
+    )
+    assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
 
 
 def test_phase17k_soul_grinder_bridge_supports_warpclaw_replacement_wargear() -> None:
@@ -8479,6 +8525,27 @@ def _bloodthirster_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                 height_units=GeometrySourceUnits.INCHES,
                 height_source_id="geometry-review:chaos-daemons:bloodthirster:height",
                 height_document_reference="Chaos Daemons Faction Pack p.16-17",
+            ),
+        ),
+    )
+
+
+def _kairos_fateweaver_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001117",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001117",
+                model_name="Kairos Fateweaver - EPIC HERO",
+                height=7.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:kairos-fateweaver:height",
+                height_document_reference=(
+                    "https://www.adeptusars.com/miniatures/kairos-fateweaver"
+                ),
+                evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
             ),
         ),
     )

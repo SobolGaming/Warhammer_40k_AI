@@ -3438,15 +3438,14 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="Kairos Fateweaver",
             datasheet_id="000001117",
             source_basis="PDF pages 38-39; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, The Shadow of Chaos, and Greater Daemon of "
-                "Tzeentch Shadow aura are known structured paths."
+                "Tzeentch Shadow aura, One Head Looks Forward Leadership-test CP gain, and "
+                "One Head Looks Back non-cumulative Stratagem-cost increase are consumed."
             ),
-            semantics_needed=(
-                "Leadership-test CP gain; One Head Looks Back Stratagem-cost increase."
-            ),
-            catalog_blockers="Representative height remains unreviewed outside this report.",
+            semantics_needed="None.",
+            catalog_blockers="No known datasheet-level blockers.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Lord of Change",
