@@ -30,6 +30,7 @@ from warhammer40k_core.engine import catalog_datasheet_rule_support as _datashee
 from warhammer40k_core.engine import catalog_movement_transit as _t
 from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
 from warhammer40k_core.engine import catalog_rule_selected_target_classification as _st
+from warhammer40k_core.engine import rules_units as _rules_units
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -2354,14 +2355,11 @@ def _current_placed_alive_model_instance_ids_for_unit(
 ) -> tuple[str, ...]:
     _validate_game_state(state)
     _validate_unit(unit)
-    if state.battlefield_state is None:
-        return ()
-    placed_model_ids = frozenset(state.battlefield_state.placed_model_ids())
     return tuple(
-        sorted(
-            model.model_instance_id
-            for model in unit.own_models
-            if model.is_alive and model.model_instance_id in placed_model_ids
+        model.model_instance_id
+        for model in _rules_units.placed_alive_models_for_component_unit(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
         )
     )
 

@@ -29,6 +29,7 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
+    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_source_matches_unit,
 )
 from warhammer40k_core.engine.faction_content.events import (
@@ -251,10 +252,9 @@ class CatalogDatasheetRuleRuntime:
                 source=source, context_unit_id=context.unit_instance_id, state=context.state
             ):
                 return context.current_movement_inches
-            if (
-                context.model_instance_id not in source.unit.own_model_ids()
-                or not _source_keyword_gate_applies(source)
-            ):
+            if context.model_instance_id not in _current_source_model_ids(
+                state=context.state, source=source
+            ) or not _source_keyword_gate_applies(source):
                 return context.current_movement_inches
             return context.current_movement_inches + float(_source_characteristic_delta(source)[1])
 
@@ -270,10 +270,9 @@ class CatalogDatasheetRuleRuntime:
                 state=context.state,
             ):
                 return context.weapon_profile
-            if (
-                context.attacker_model_instance_id not in source.unit.own_model_ids()
-                or not _source_keyword_gate_applies(source)
-            ):
+            if context.attacker_model_instance_id not in _current_source_model_ids(
+                state=context.state, source=source
+            ) or not _source_keyword_gate_applies(source):
                 return context.weapon_profile
             return rule_ir_modified_weapon_profile(
                 parameters=parameter_payload(source.clause.effects[0].parameters),
@@ -297,7 +296,7 @@ class CatalogDatasheetRuleRuntime:
             )
             for source in sources:
                 if (
-                    not _source_is_alive(source)
+                    not _source_is_alive(context.state, source)
                     or target.owner_player_id != source.player_id
                     or not _rules_unit_has_required_aura_keyword(target, source.clause)
                 ):
@@ -359,7 +358,7 @@ class CatalogDatasheetRuleRuntime:
                 source=source, context_unit_id=context.unit_instance_id, state=context.state
             ):
                 return None
-            source_model_id = _alive_source_model_id(source)
+            source_model_id = _alive_source_model_id(context.state, source)
             execution_context = RuleExecutionContext(
                 game_id=context.state.game_id,
                 player_id=source.player_id,
@@ -443,19 +442,30 @@ def _source_applies_to_rules_unit(
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=context_unit_id)
     return (
         source.unit.unit_instance_id in rules_unit.component_unit_instance_ids
-        and _source_is_alive(source)
+        and _source_is_alive(state, source)
     )
 
 
-def _source_is_alive(source: _CatalogClauseSource) -> bool:
-    return any(model.is_alive for model in source.unit.own_models)
+def _source_is_alive(state: object, source: _CatalogClauseSource) -> bool:
+    return bool(_current_source_model_ids(state=state, source=source))
 
 
-def _alive_source_model_id(source: _CatalogClauseSource) -> str:
-    model = next((model for model in source.unit.own_models if model.is_alive), None)
-    if model is None:
-        raise GameLifecycleError("Catalog datasheet source model is destroyed.")
-    return model.model_instance_id
+def _alive_source_model_id(state: object, source: _CatalogClauseSource) -> str:
+    model_ids = _current_source_model_ids(state=state, source=source)
+    if not model_ids:
+        raise GameLifecycleError("Catalog datasheet source model is not placed and alive.")
+    return model_ids[0]
+
+
+def _current_source_model_ids(*, state: object, source: _CatalogClauseSource) -> tuple[str, ...]:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Catalog datasheet source query requires GameState.")
+    return catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+        state=state,
+        unit=source.unit,
+    )
 
 
 def _friendly_keyworded_unit_within(*, source: _CatalogClauseSource, state: object) -> bool:

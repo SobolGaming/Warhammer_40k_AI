@@ -1414,6 +1414,16 @@ def test_phase17k_daemon_prince_allegiance_modifiers_use_generic_runtime_queries
         ).strength.final
         == infernal_cannon.strength.final
     )
+    assert khorne_unit.own_models[0].is_alive
+    _set_current_model_wounds(
+        khorne_state,
+        model_instance_id=khorne_unit.own_models[0].model_instance_id,
+        wounds_remaining=0,
+    )
+    assert (
+        khorne_registry.modified_weapon_profile(khorne_context).strength.final
+        == hellforged.strength.final
+    )
 
     tzeentch_unit, tzeentch_state, tzeentch_registry = runtime_for("TZEENTCH")
     tzeentch_context = replace(
@@ -1447,15 +1457,20 @@ def test_phase17k_daemon_prince_allegiance_modifiers_use_generic_runtime_queries
 
     slaanesh_unit, slaanesh_state, slaanesh_registry = runtime_for("SLAANESH")
     base_movement = float(_model_characteristic(slaanesh_unit, Characteristic.MOVEMENT))
-    assert slaanesh_registry.modified_movement_inches(
-        MovementBudgetModifierContext(
-            state=slaanesh_state,
-            unit_instance_id=slaanesh_unit.unit_instance_id,
-            model_instance_id=slaanesh_unit.own_models[0].model_instance_id,
-            base_movement_inches=base_movement,
-            current_movement_inches=base_movement,
-        )
-    ) == (base_movement + 2.0)
+    slaanesh_context = MovementBudgetModifierContext(
+        state=slaanesh_state,
+        unit_instance_id=slaanesh_unit.unit_instance_id,
+        model_instance_id=slaanesh_unit.own_models[0].model_instance_id,
+        base_movement_inches=base_movement,
+        current_movement_inches=base_movement,
+    )
+    assert slaanesh_registry.modified_movement_inches(slaanesh_context) == (base_movement + 2.0)
+    assert slaanesh_state.battlefield_state is not None
+    slaanesh_state.battlefield_state = slaanesh_state.battlefield_state.with_removed_models(
+        (slaanesh_unit.own_models[0].model_instance_id,)
+    )
+    assert slaanesh_unit.own_models[0].is_alive
+    assert slaanesh_registry.modified_movement_inches(slaanesh_context) == base_movement
 
 
 def test_phase17k_malefic_destruction_persists_generic_scoped_attacks_modifier() -> None:
@@ -1480,6 +1495,26 @@ def test_phase17k_malefic_destruction_persists_generic_scoped_attacks_modifier()
         armies=(army,),
     )
     registry = FightPhaseStartHookRegistry.from_bindings(runtime.fight_phase_start_bindings())
+    destroyed_state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+    _set_state_battle_phase(destroyed_state, BattlePhase.FIGHT)
+    _set_current_model_wounds(
+        destroyed_state,
+        model_instance_id=unit.own_models[0].model_instance_id,
+        wounds_remaining=0,
+    )
+    assert unit.own_models[0].is_alive
+    assert (
+        registry.next_request_for(
+            FightPhaseStartRequestContext(
+                state=destroyed_state,
+                decisions=DecisionController(),
+            )
+        )
+        is None
+    )
     request = registry.next_request_for(
         FightPhaseStartRequestContext(state=state, decisions=decisions)
     )
@@ -1558,18 +1593,17 @@ def test_phase17k_harbinger_of_death_requires_generic_finite_weapon_choice() -> 
     grant_registry = FightUnitSelectedGrantRegistry.from_bindings(
         runtime.fight_unit_selected_grant_bindings()
     )
-    grants = grant_registry.grants_for(
-        FightUnitSelectedContext(
-            state=state,
-            player_id=army.player_id,
-            battle_round=1,
-            unit_instance_id=unit.unit_instance_id,
-            fight_type="normal",
-            ordering_band="remaining_combats",
-            request_id="fight-activation-request",
-            result_id="fight-activation-result",
-        )
+    grant_context = FightUnitSelectedContext(
+        state=state,
+        player_id=army.player_id,
+        battle_round=1,
+        unit_instance_id=unit.unit_instance_id,
+        fight_type="normal",
+        ordering_band="remaining_combats",
+        request_id="fight-activation-request",
+        result_id="fight-activation-result",
     )
+    grants = grant_registry.grants_for(grant_context)
     options = fight_unit_selected_grant_options(
         unit_instance_id=unit.unit_instance_id,
         activation_request_id="fight-activation-request",
@@ -1653,6 +1687,13 @@ def test_phase17k_harbinger_of_death_requires_generic_finite_weapon_choice() -> 
             replace(context, weapon_profile=infernal)
         ).keywords
     )
+    _set_current_model_wounds(
+        state,
+        model_instance_id=unit.own_models[0].model_instance_id,
+        wounds_remaining=0,
+    )
+    assert unit.own_models[0].is_alive
+    assert grant_registry.grants_for(grant_context) == ()
 
 
 def test_phase17k_unholy_vigour_any_phase_decision_is_replay_safe_and_runtime_consumed() -> None:
@@ -1941,11 +1982,12 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
         allegiance="NURGLE",
         unit_selection_id="daemon-prince-aura-source",
     )
-    support = _daemon_prince_unit(
-        package=package,
-        datasheet_id="000001149",
-        allegiance="KHORNE",
-        unit_selection_id="daemon-prince-infantry-support",
+    support = _soul_grinder_unit(
+        package,
+        requested_wargear_selections=(),
+        mustering_option_selections=(
+            MusteringOptionSelection(option_id="000001151:daemonic-allegiance:khorne"),
+        ),
     )
     support = replace(support, keywords=tuple(sorted((*support.keywords, "INFANTRY"))))
     attacker = _daemon_prince_unit(
@@ -1983,7 +2025,7 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
                 PlacedArmy(
                     army_id=enemy_army.army_id,
                     player_id=enemy_army.player_id,
-                    unit_placements=(_single_model_unit_placement(enemy_army, attacker, x=30.0),),
+                    unit_placements=(_single_model_unit_placement(enemy_army, attacker, x=40.0),),
                 ),
             ),
         )
@@ -2030,6 +2072,11 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
         shooting_type=ShootingType.NORMAL,
     )
     assert hit_registry.hit_roll_modifier(hit_context) == -1
+    support_hit_context = replace(
+        hit_context,
+        target_unit_instance_id=support.unit_instance_id,
+    )
+    assert hit_registry.hit_roll_modifier(support_hit_context) == -1
     assert (
         hit_registry.hit_roll_modifier(
             replace(
@@ -2048,7 +2095,18 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
     assert len(restrictions) == 1
     assert restrictions[0].violation_code == "conditional_lone_operative_range"
 
-    state.battlefield_state = battlefield(20.0)
+    state.battlefield_state = battlefield(30.0)
+    assert restriction_registry.restrictions_for(restriction_context) == ()
+    assert hit_registry.hit_roll_modifier(support_hit_context) == 0
+
+    state.battlefield_state = battlefield(14.0)
+    _set_current_model_wounds(
+        state,
+        model_instance_id=source.own_models[0].model_instance_id,
+        wounds_remaining=0,
+    )
+    assert source.own_models[0].is_alive
+    assert hit_registry.hit_roll_modifier(support_hit_context) == 0
     assert restriction_registry.restrictions_for(restriction_context) == ()
 
 
@@ -8820,6 +8878,29 @@ def _runtime_clause_id(record: AbilityCatalogRecord) -> str:
 
 def _set_state_battle_phase(state: GameState, phase: BattlePhase) -> None:
     state.battle_phase_index = tuple(state.battle_phase_sequence).index(phase)
+
+
+def _set_current_model_wounds(
+    state: GameState, *, model_instance_id: str, wounds_remaining: int
+) -> None:
+    armies: list[ArmyDefinition] = []
+    updated = False
+    for army in state.army_definitions:
+        units: list[UnitInstance] = []
+        for unit in army.units:
+            models = tuple(
+                replace(model, wounds_remaining=wounds_remaining)
+                if model.model_instance_id == model_instance_id
+                else model
+                for model in unit.own_models
+            )
+            if models != unit.own_models:
+                updated = True
+            units.append(replace(unit, own_models=models))
+        armies.append(replace(army, units=tuple(units)))
+    if not updated:
+        raise AssertionError(f"Missing current model: {model_instance_id}.")
+    state.army_definitions = armies
 
 
 def _pending_completed_attack_sequence_for_test(state: GameState) -> AttackSequence | None:
