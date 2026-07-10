@@ -22,7 +22,23 @@ def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() ->
 
     assert bundle.ruleset_id.to_payload()["edition"] == "11e"
     assert core_rules.LOCAL_CORE_RULES_PDF in document.title
-    assert core_rules.LOCAL_CORE_RULES_PDF in document.source_texts[0].raw_text
+    assert any(
+        core_rules.LOCAL_CORE_RULES_PDF in source.raw_text for source in document.source_texts
+    )
+    assert {source.source_id for source in document.source_texts} >= {
+        core_rules.NON_CORE_CP_GAIN_CAP_SOURCE_ID,
+        core_rules.UNNAMED_ZERO_CP_STRATAGEM_COST_SOURCE_ID,
+    }
+    assert any(
+        "maximum of 1 CP per battle round" in source.raw_text
+        for source in document.source_texts
+        if source.source_id == core_rules.NON_CORE_CP_GAIN_CAP_SOURCE_ID
+    )
+    assert any(
+        "reduce the CP cost of that use of that Stratagem by 1CP" in source.raw_text
+        for source in document.source_texts
+        if source.source_id == core_rules.UNNAMED_ZERO_CP_STRATAGEM_COST_SOURCE_ID
+    )
     assert "<" not in encoded
     assert "object at 0x" not in encoded
     assert SourceCatalog.from_payload(payload).to_payload() == payload

@@ -25,6 +25,17 @@ STRATAGEM_COST_EFFECT_CONTINUATION_RE = re.compile(
     rf"^\s*(?:if\s+(?:it\s+does|you\s+do),\s*)?(?:{STRATAGEM_COST_EFFECT_RE.pattern})",
     re.IGNORECASE,
 )
+UNNAMED_ZERO_CP_STRATAGEM_COST_RE = re.compile(
+    r"\b(?P<trigger>you\s+(?:can|may)\s+target\s+"
+    r"(?:(?P<source_target>this\s+unit|this\s+model(?:'s\s+unit)?|"
+    r"(?:the\s+)?bearer's\s+unit)|"
+    r"(?P<direct_source_target>(?:an?|one)\s+friendly"
+    r"(?:\s+[A-Za-z][A-Za-z0-9_'-]*){0,4}\s+unit))"
+    r"(?:\s+within\s+\d+(?:\.\d+)?\"\s+of\s+"
+    r"(?:this\s+model|(?:the\s+)?bearer))?\s+"
+    r"with\s+a\s+Stratagem\s+for\s+0\s*CP)\b",
+    re.IGNORECASE,
+)
 STRATAGEM_COST_TRIGGER_RE = re.compile(
     r"\b(?:when|each\s+time)\s+(?P<trigger>"
     r"your\s+opponent\s+targets\s+a\s+unit\s+from\s+their\s+army"
@@ -86,7 +97,7 @@ _NON_CUMULATIVE_COST_INCREASE_RE = re.compile(
 
 
 def parse_command_point_trigger(clause_span: TextSpan) -> RuleTrigger | None:
-    match = STRATAGEM_COST_TRIGGER_RE.search(clause_span.text)
+    match = _stratagem_cost_trigger_match(clause_span.text)
     if match is None:
         return None
     opponent_use = _trigger_is_opponent_use(match)
@@ -111,7 +122,7 @@ def parse_command_point_conditions(clause_span: TextSpan) -> tuple[RuleCondition
     if not has_command_point_effect(clause_span.text):
         return ()
     conditions: list[RuleCondition] = []
-    trigger_match = STRATAGEM_COST_TRIGGER_RE.search(clause_span.text)
+    trigger_match = _stratagem_cost_trigger_match(clause_span.text)
     if trigger_match is not None:
         opponent_use = _trigger_is_opponent_use(trigger_match)
         conditions.append(
@@ -223,6 +234,25 @@ def parse_command_point_effects(clause_span: TextSpan) -> tuple[RuleEffectSpec, 
                 ),
             )
         )
+    zero_cp_match = UNNAMED_ZERO_CP_STRATAGEM_COST_RE.search(clause_span.text)
+    if zero_cp_match is not None:
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.MODIFY_COMMAND_POINTS,
+                source_span=_span_from_match(clause_span, zero_cp_match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("affected_player", "source_player"),
+                        ("application_scope", "current_stratagem_use"),
+                        ("delta", -1),
+                        ("minimum_cost", 0),
+                        ("operation", "modify_stratagem_cost"),
+                        ("optional", True),
+                        ("stacking", "cumulative"),
+                    )
+                ),
+            )
+        )
     for match in _COMMAND_POINT_LEDGER_RE.finditer(clause_span.text):
         verb = match.group("verb").lower()
         value = int(match.group("value"))
@@ -245,7 +275,7 @@ def parse_command_point_effects(clause_span: TextSpan) -> tuple[RuleEffectSpec, 
 
 
 def command_point_target(clause_span: TextSpan) -> RuleTargetSpec | None:
-    cost_match = STRATAGEM_COST_EFFECT_RE.search(clause_span.text)
+    cost_match = _stratagem_cost_effect_match(clause_span.text)
     if cost_match is not None:
         return RuleTargetSpec(
             kind=RuleTargetKind.STRATAGEM_USE,
@@ -264,15 +294,19 @@ def command_point_target(clause_span: TextSpan) -> RuleTargetSpec | None:
 def has_command_point_effect(text: str) -> bool:
     return (
         STRATAGEM_COST_EFFECT_RE.search(text) is not None
+        or UNNAMED_ZERO_CP_STRATAGEM_COST_RE.search(text) is not None
         or _COMMAND_POINT_LEDGER_RE.search(text) is not None
     )
 
 
 def command_point_frequency_span_end(text: str, *, fallback_end: int) -> int:
-    if _OPTIONAL_COST_USE_RE.search(text) is None:
-        return fallback_end
-    effect_match = STRATAGEM_COST_EFFECT_RE.search(text)
+    effect_match = _stratagem_cost_effect_match(text)
     if effect_match is None:
+        return fallback_end
+    if (
+        UNNAMED_ZERO_CP_STRATAGEM_COST_RE.fullmatch(effect_match.group(0)) is None
+        and _OPTIONAL_COST_USE_RE.search(text) is None
+    ):
         return fallback_end
     return effect_match.start()
 
@@ -288,7 +322,24 @@ def _stratagem_target_relationship(match: re.Match[str], clause_text: str) -> st
         or STRATAGEM_COST_POST_TRIGGER_RANGE_RE.search(clause_text) is not None
     ):
         return "stratagem_targets_unit_within_source_model_range"
+    direct_source_target = match.group("direct_source_target")
+    if direct_source_target is not None and "friendly" in direct_source_target.lower():
+        return "stratagem_targets_friendly_unit"
     return "stratagem_targets_source_unit"
+
+
+def _stratagem_cost_trigger_match(text: str) -> re.Match[str] | None:
+    explicit_match = STRATAGEM_COST_TRIGGER_RE.search(text)
+    if explicit_match is not None:
+        return explicit_match
+    return UNNAMED_ZERO_CP_STRATAGEM_COST_RE.search(text)
+
+
+def _stratagem_cost_effect_match(text: str) -> re.Match[str] | None:
+    explicit_match = STRATAGEM_COST_EFFECT_RE.search(text)
+    if explicit_match is not None:
+        return explicit_match
+    return UNNAMED_ZERO_CP_STRATAGEM_COST_RE.search(text)
 
 
 def _stratagem_cost_relationship_span(

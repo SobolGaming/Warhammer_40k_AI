@@ -192,6 +192,9 @@ OWN_STRATAGEM_COST_TEXT = (
     "unit is targeted with a Stratagem. If it does, reduce the CP cost of that use of that "
     "Stratagem by 1CP."
 )
+UNNAMED_ZERO_CP_STRATAGEM_COST_TEXT = (
+    "Once per battle round, you can target a friendly unit with a Stratagem for 0CP."
+)
 LEADERSHIP_COMMAND_POINT_TEXT = (
     "At the end of your Command phase, if this model is on the battlefield, take a "
     "Leadership test for this model; if that test is passed, you gain 1CP."
@@ -1959,7 +1962,7 @@ def test_catalog_command_point_cost_choices_modify_only_the_current_stratagem_us
     )
 
 
-def test_catalog_command_point_own_cost_reduction_is_consumed_by_generic_registry() -> None:
+def test_catalog_unnamed_zero_cp_rule_reduces_current_use_by_one_in_generic_registry() -> None:
     source_army, target_army = _mustered_core_armies()
     source_unit = source_army.units[0]
     target_unit = target_army.units[0]
@@ -1977,8 +1980,8 @@ def test_catalog_command_point_own_cost_reduction_is_consumed_by_generic_registr
         phase=BattlePhase.SHOOTING,
     )
     record = _command_point_record(
-        record_id="record:catalog-cp:own-cost-runtime",
-        raw_text=OWN_STRATAGEM_COST_TEXT,
+        record_id="record:catalog-cp:unnamed-zero-cp-runtime",
+        raw_text=UNNAMED_ZERO_CP_STRATAGEM_COST_TEXT,
         source_unit=source_unit,
         trigger_kind=TimingTriggerKind.ANY_PHASE,
     )

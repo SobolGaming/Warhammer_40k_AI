@@ -722,6 +722,24 @@ def test_cp_ledger_spend_refund_and_gain_cap_are_typed_and_replay_safe() -> None
     )
 
 
+def test_oversized_command_point_refund_applies_only_remaining_round_capacity() -> None:
+    ledger, refund = CommandPointLedger.initial(player_id="player-a").refund(
+        battle_round=1,
+        amount=3,
+        source_id="phase12b-oversized-refund",
+    )
+
+    assert refund.status is CommandPointRefundStatus.CAPPED
+    assert refund.requested_amount == 3
+    assert refund.applied_amount == 1
+    assert refund.capped_reason == "non_command_cp_gain_cap_reached"
+    assert refund.transaction is not None
+    assert refund.transaction.amount == 1
+    assert refund.transaction.cap_exempt is False
+    assert ledger.command_points == 1
+    assert CommandPointRefundResult.from_payload(refund.to_payload()) == refund
+
+
 def test_same_phase_duplicate_and_battle_shocked_targeting_suppress_options() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
@@ -1404,7 +1422,7 @@ def test_public_projection_exposes_command_points_and_stratagem_records() -> Non
     assert use_payload["stratagem_id"] == "projection-stratagem"
 
 
-def test_stratagem_command_point_effects_create_ledger_transactions() -> None:
+def test_stratagem_command_point_effects_share_the_non_core_round_cap() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
@@ -1419,7 +1437,7 @@ def test_stratagem_command_point_effects_create_ledger_transactions() -> None:
                     command_point_cost=0,
                     effect_payload={
                         "command_point_gain": {"amount": 1},
-                        "command_point_refund": {"amount": 1, "cap_exempt": True},
+                        "command_point_refund": {"amount": 1},
                     },
                 ),
             ),
@@ -1435,17 +1453,20 @@ def test_stratagem_command_point_effects_create_ledger_transactions() -> None:
         )
     )
 
-    assert state.command_point_total("player-a") == 2
+    assert state.command_point_total("player-a") == 1
     gain_source = _last_event_payload(lifecycle.decision_controller, "command_points_gained")[
         "source_id"
     ]
-    refund_source = _last_event_payload(lifecycle.decision_controller, "command_points_refunded")[
-        "source_id"
-    ]
+    refund_payload = _last_event_payload(
+        lifecycle.decision_controller,
+        "command_points_refund_capped",
+    )
+    refund_source = refund_payload["source_id"]
     assert type(gain_source) is str
     assert type(refund_source) is str
     assert gain_source.endswith(":cp-gain")
     assert refund_source.endswith(":cp-refund")
+    assert refund_payload["applied_amount"] == 0
 
 
 def test_phase12b_fail_fast_validation_branches() -> None:
@@ -1745,7 +1766,7 @@ def test_command_point_spend_and_refund_results_validate_fail_fast() -> None:
             transaction=refund.transaction,
             capped_reason="not-valid",
         )
-    with pytest.raises(GameLifecycleError, match="cannot have a transaction"):
+    with pytest.raises(GameLifecycleError, match=r"Zero-applied capped.*cannot"):
         CommandPointRefundResult(
             player_id="player-a",
             battle_round=1,
@@ -1757,7 +1778,7 @@ def test_command_point_spend_and_refund_results_validate_fail_fast() -> None:
             transaction=refund.transaction,
             capped_reason="capped",
         )
-    with pytest.raises(GameLifecycleError, match="applies no CP"):
+    with pytest.raises(GameLifecycleError, match="must apply less than requested"):
         CommandPointRefundResult(
             player_id="player-a",
             battle_round=1,

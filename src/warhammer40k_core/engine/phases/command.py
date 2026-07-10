@@ -838,7 +838,6 @@ def _resolve_command_step_start(
                 f"command-phase-start:round-{state.battle_round:02d}:active-{active_player_id}"
             ),
             source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
-            cap_exempt=True,
         )
         if gain.status is not CommandPointGainStatus.APPLIED:
             raise GameLifecycleError("Command phase CP gain must not be capped.")

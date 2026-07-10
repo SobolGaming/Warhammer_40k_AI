@@ -38,6 +38,10 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     UnitPlacement,
 )
+from warhammer40k_core.engine.command_points import (
+    CommandPointGainStatus,
+    CommandPointSourceKind,
+)
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -2424,6 +2428,57 @@ def test_event_companion_tactical_secondary_discard_cp_reward_uses_event_source_
         "gw-11e-warhammer-event-companion-v1-0-2026-06:secondary:"
         f"tactical-procedure:discard:{result_id}:cp-reward"
     )
+
+
+def test_tactical_secondary_discard_cp_reward_shares_the_non_core_round_cap() -> None:
+    lifecycle = _event_companion_battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    prior_gain = state.gain_command_points(
+        player_id="player-a",
+        amount=1,
+        source_id="phase17j-prior-ability-cp-gain",
+        source_kind=CommandPointSourceKind.OTHER,
+    )
+    assert prior_gain.status is CommandPointGainStatus.APPLIED
+    active_card = _active_tactical_card(state)
+    discard_waiting = request_tactical_secondary_discard(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+    )
+    discard_request = discard_waiting.decision_request
+    assert discard_request is not None
+    discard_result = FiniteOptionSubmission(
+        request_id=discard_request.request_id,
+        selected_option_id=f"discard:{active_card.secondary_mission_id}",
+        result_id="phase17j-capped-own-turn-discard",
+    ).to_result(discard_request)
+
+    lifecycle.submit_decision(discard_result)
+
+    assert state.command_point_total("player-a") == 1
+    capped_payload = cast(
+        dict[str, JsonValue],
+        next(
+            record.payload
+            for record in reversed(lifecycle.decision_controller.event_log.records)
+            if record.event_type == "command_points_gain_capped"
+        ),
+    )
+    assert capped_payload["requested_amount"] == 1
+    assert capped_payload["applied_amount"] == 0
+    assert capped_payload["status"] == "capped"
+    discard_payload = cast(
+        dict[str, JsonValue],
+        next(
+            record.payload
+            for record in lifecycle.decision_controller.event_log.records
+            if record.event_type == "tactical_secondary_missions_discarded"
+        ),
+    )
+    assert discard_payload["command_point_gain"] == capped_payload
 
 
 def test_tactical_secondary_discard_awards_source_backed_cp_in_own_turn() -> None:

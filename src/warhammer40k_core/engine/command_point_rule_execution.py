@@ -3,9 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from warhammer40k_core.engine.command_points import (
-    CommandPointGainStatus,
     CommandPointLedger,
-    CommandPointRefundStatus,
     CommandPointSourceKind,
     CommandPointSpendStatus,
 )
@@ -57,9 +55,8 @@ def apply_command_point_rule_mutation(
             amount=delta,
             source_id=source_id,
             source_kind=CommandPointSourceKind.OTHER,
-            cap_exempt=False,
         )
-        if gain_result.status is not CommandPointGainStatus.APPLIED:
+        if gain_result.applied_amount == 0:
             return CommandPointRuleMutationResult(reason="command_point_gain_capped")
         transaction_payload = _json_object(gain_result.to_payload())
     elif operation == "refund":
@@ -67,9 +64,8 @@ def apply_command_point_rule_mutation(
             player_id=player_id,
             amount=delta,
             source_id=source_id,
-            cap_exempt=False,
         )
-        if refund_result.status is not CommandPointRefundStatus.APPLIED:
+        if refund_result.applied_amount == 0:
             return CommandPointRuleMutationResult(reason="command_point_refund_capped")
         transaction_payload = _json_object(refund_result.to_payload())
     elif operation == "spend":
@@ -105,9 +101,8 @@ def command_point_rule_unavailable_reason(
             amount=delta,
             source_id=source_id,
             source_kind=CommandPointSourceKind.OTHER,
-            cap_exempt=False,
         )
-        if gain_result.status is not CommandPointGainStatus.APPLIED:
+        if gain_result.applied_amount == 0:
             return "command_point_gain_capped"
         simulated_ledgers[player_id] = updated_ledger
         return None
@@ -116,9 +111,8 @@ def command_point_rule_unavailable_reason(
             battle_round=state.battle_round,
             amount=delta,
             source_id=source_id,
-            cap_exempt=False,
         )
-        if refund_result.status is not CommandPointRefundStatus.APPLIED:
+        if refund_result.applied_amount == 0:
             return "command_point_refund_capped"
         simulated_ledgers[player_id] = updated_ledger
         return None

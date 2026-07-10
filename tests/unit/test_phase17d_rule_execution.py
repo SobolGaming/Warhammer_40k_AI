@@ -2172,6 +2172,26 @@ def test_phase17d_generic_cp_rule_mutates_command_point_ledger_and_reports_cap()
     assert len(event_log.records) == event_count_after_first
 
 
+def test_phase17d_oversized_generic_cp_gain_applies_only_remaining_round_capacity() -> None:
+    state = _battle_state()
+    event_log = EventLog()
+    compiled = _compiled("Gain 3CP.")
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(state=state, event_log=event_log),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert state.command_point_total("player-a") == 1
+    transaction = result.command_point_transactions[0]
+    assert transaction["status"] == "capped"
+    assert transaction["requested_amount"] == 3
+    assert transaction["applied_amount"] == 1
+    assert transaction["capped_reason"] == "non_command_cp_gain_cap_reached"
+
+
 def test_phase17d_later_invalid_effect_does_not_leave_prior_mutation() -> None:
     state = _battle_state()
     event_log = EventLog()

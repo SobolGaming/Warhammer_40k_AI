@@ -167,9 +167,15 @@ def test_command_step_grants_both_players_cp_once_before_tactical_draw() -> None
 def test_non_command_cp_gain_cap_is_enforced_per_battle_round() -> None:
     state = _battle_state()
 
-    first = state.gain_command_points(
+    core_gain = state.gain_command_points(
         player_id="player-a",
         amount=1,
+        source_id="core-command-phase-gain",
+        source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
+    )
+    oversized = state.gain_command_points(
+        player_id="player-a",
+        amount=3,
         source_id="ability-gain-cp",
         source_kind=CommandPointSourceKind.OTHER,
     )
@@ -179,18 +185,21 @@ def test_non_command_cp_gain_cap_is_enforced_per_battle_round() -> None:
         source_id="second-ability-gain-cp",
         source_kind=CommandPointSourceKind.OTHER,
     )
-    exempt = state.gain_command_points(
-        player_id="player-a",
-        amount=1,
-        source_id="explicit-cap-override",
-        source_kind=CommandPointSourceKind.OTHER,
-        cap_exempt=True,
-    )
 
-    assert first.status is CommandPointGainStatus.APPLIED
+    assert core_gain.status is CommandPointGainStatus.APPLIED
+    assert core_gain.transaction is not None
+    assert core_gain.transaction.cap_exempt is True
+    assert oversized.status is CommandPointGainStatus.CAPPED
+    assert oversized.requested_amount == 3
+    assert oversized.applied_amount == 1
+    assert oversized.transaction is not None
+    assert oversized.transaction.amount == 1
+    assert oversized.transaction.cap_exempt is False
+    assert oversized.capped_reason == "non_command_cp_gain_cap_reached"
     assert capped.status is CommandPointGainStatus.CAPPED
+    assert capped.applied_amount == 0
+    assert capped.transaction is None
     assert capped.capped_reason == "non_command_cp_gain_cap_reached"
-    assert exempt.status is CommandPointGainStatus.APPLIED
     assert state.command_point_total("player-a") == 2
 
 
@@ -1305,7 +1314,7 @@ def test_command_point_and_step_state_validation_is_fail_fast() -> None:
             transaction=transaction,
             capped_reason="not-valid",
         )
-    with pytest.raises(GameLifecycleError, match="Capped CommandPointGainResult cannot"):
+    with pytest.raises(GameLifecycleError, match=r"Zero-applied capped.*cannot"):
         CommandPointGainResult(
             player_id="player-a",
             battle_round=1,
@@ -1317,7 +1326,7 @@ def test_command_point_and_step_state_validation_is_fail_fast() -> None:
             transaction=transaction,
             capped_reason="cap",
         )
-    with pytest.raises(GameLifecycleError, match="Capped CommandPointGainResult applies no CP"):
+    with pytest.raises(GameLifecycleError, match="must apply less than requested"):
         CommandPointGainResult(
             player_id="player-a",
             battle_round=1,
