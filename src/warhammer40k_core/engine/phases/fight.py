@@ -150,6 +150,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantPayload,
     FightUnitSelectedGrantRegistry,
     FightUnitSelectedHookRegistry,
+    fight_unit_selected_grant_options,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -2863,7 +2864,12 @@ def _request_fight_unit_selected_grant_decision_if_available(
                 "activation_result_id": activation.result_id,
             }
         ),
-        options=_fight_unit_selected_grant_options(activation=activation, grants=grants),
+        options=fight_unit_selected_grant_options(
+            unit_instance_id=activation.unit_instance_id,
+            activation_request_id=activation.request_id,
+            activation_result_id=activation.result_id,
+            grants=grants,
+        ),
     )
     decisions.request_decision(request)
     decisions.event_log.append(
@@ -2894,45 +2900,6 @@ def _request_fight_unit_selected_grant_decision_if_available(
             "unit_instance_id": activation.unit_instance_id,
         },
     )
-
-
-def _fight_unit_selected_grant_options(
-    *,
-    activation: FightActivationSelection,
-    grants: tuple[FightUnitSelectedGrant, ...],
-) -> tuple[DecisionOption, ...]:
-    options: list[DecisionOption] = [
-        DecisionOption(
-            option_id=DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
-            label="Decline fight unit grant",
-            payload=validate_json_value(
-                {
-                    "submission_kind": SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
-                    "unit_instance_id": activation.unit_instance_id,
-                    "activation_request_id": activation.request_id,
-                    "activation_result_id": activation.result_id,
-                    "selected_fight_unit_grants": [],
-                }
-            ),
-        )
-    ]
-    for grant in grants:
-        options.append(
-            DecisionOption(
-                option_id=grant.hook_id,
-                label=grant.label,
-                payload=validate_json_value(
-                    {
-                        "submission_kind": SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
-                        "unit_instance_id": activation.unit_instance_id,
-                        "activation_request_id": activation.request_id,
-                        "activation_result_id": activation.result_id,
-                        "selected_fight_unit_grants": [grant.to_payload()],
-                    }
-                ),
-            )
-        )
-    return tuple(options)
 
 
 def _apply_fight_unit_selected_grant_decision(

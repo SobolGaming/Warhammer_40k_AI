@@ -17,10 +17,24 @@ def clause_has_optional_once_per_battle_activation(clause: RuleClause) -> bool:
 def clause_has_unconsumed_once_per_battle_activation(clause: RuleClause) -> bool:
     return clause_has_optional_once_per_battle_activation(
         clause
-    ) and not clause_is_fight_start_once_per_battle_activation(clause)
+    ) and not clause_is_runtime_once_per_battle_activation(clause)
+
+
+def clause_is_runtime_once_per_battle_activation(clause: RuleClause) -> bool:
+    return clause_is_fight_start_once_per_battle_activation(
+        clause
+    ) or clause_is_any_phase_start_once_per_battle_activation(clause)
+
+
+def clause_is_any_phase_start_once_per_battle_activation(clause: RuleClause) -> bool:
+    return _clause_is_phase_start_once_per_battle_activation(clause, phase="any")
 
 
 def clause_is_fight_start_once_per_battle_activation(clause: RuleClause) -> bool:
+    return _clause_is_phase_start_once_per_battle_activation(clause, phase=BattlePhase.FIGHT.value)
+
+
+def _clause_is_phase_start_once_per_battle_activation(clause: RuleClause, *, phase: str) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog once-per-battle classification requires RuleClause.")
     if not clause.is_supported or not clause.effects:
@@ -31,7 +45,7 @@ def clause_is_fight_start_once_per_battle_activation(clause: RuleClause) -> bool
     if clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
         return False
     trigger = parameter_payload(clause.trigger.parameters)
-    if trigger.get("edge") != "start" or trigger.get("phase") != BattlePhase.FIGHT.value:
+    if trigger.get("edge") != "start" or trigger.get("phase") != phase:
         return False
     usage_subject = parameter_payload(condition.parameters).get("usage_subject")
     if usage_subject in {"this_model", "bearer"}:

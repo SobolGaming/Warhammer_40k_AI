@@ -160,10 +160,12 @@ RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-cov
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
+UNDIVIDED_DAEMON_DATASHEET_IDS = ("000001149", "000002758", "000001151")
 CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.DEFILER_DATASHEET_IDS
 ABILITY_SUPPORT_DATASHEET_IDS = (
     *BELAKOR_DATASHEET_IDS,
     *DAEMON_WARGEAR_DATASHEET_IDS,
+    *UNDIVIDED_DAEMON_DATASHEET_IDS,
     *CHAOS_DEFILER_DATASHEET_IDS,
 )
 BELAKOR_HEIGHT_OVERRIDES = (
@@ -174,6 +176,32 @@ BELAKOR_HEIGHT_OVERRIDES = (
         height_units=GeometrySourceUnits.MILLIMETERS,
         height_source_id="geometry-review:chaos-daemons:belakor:height",
         height_document_reference="Chaos Daemons Be'lakor product listing",
+    ),
+)
+UNDIVIDED_DAEMON_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000001149",
+        model_name="Daemon Prince of Chaos",
+        height=4.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:daemon-prince:height",
+        height_document_reference="Chaos Daemons Faction Pack p.116-117",
+    ),
+    ModelHeightOverride(
+        datasheet_id="000002758",
+        model_name="Daemon Prince of Chaos with Wings",
+        height=5.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:daemon-prince-with-wings:height",
+        height_document_reference="Chaos Daemons Faction Pack p.118-119",
+    ),
+    ModelHeightOverride(
+        datasheet_id="000001151",
+        model_name="Soul Grinder",
+        height=6.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:soul-grinder:height",
+        height_document_reference="Chaos Daemons Faction Pack p.114-115",
     ),
 )
 DATASHEET_SUPPORT_FULL = "Full"
@@ -1276,6 +1304,7 @@ def _ability_support_catalog_package(
         datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
         height_overrides=(
             BELAKOR_HEIGHT_OVERRIDES
+            + UNDIVIDED_DAEMON_HEIGHT_OVERRIDES
             + CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
             + BLOODLETTERS_HEIGHT_OVERRIDES
             + FLESH_HOUNDS_HEIGHT_OVERRIDES
@@ -3103,7 +3132,7 @@ def _chaos_daemons_allegiance_review_markdown(
         "",
         (
             f"{intro} `All consumed` means every known non-core datasheet or wargear "
-            "ability is currently consumed by a named runtime host. `IR parsed; host needed` "
+            "ability is currently consumed by an engine runtime host. `IR parsed; host needed` "
             "means the rule text compiles to supported structured IR but at least one compiled "
             "semantic still has no phase/query consumer. `Unsupported IR` means at least one "
             "known ability still compiles with unsupported diagnostics. `Bridge/catalog blocked` "
@@ -3137,7 +3166,7 @@ def _chaos_daemons_khorne_review_markdown() -> list[str]:
             "Juggernaut, are excluded. The PDF Karanak datasheet supersedes the duplicate "
             "Wahapedia Karanak row, so it is not counted separately. "
             "`All consumed` means every known non-core datasheet or wargear ability is "
-            "currently consumed by a named runtime host. `IR parsed; host needed` means "
+            "currently consumed by an engine runtime host. `IR parsed; host needed` means "
             "the rule text compiles to supported structured IR but at least one compiled "
             "semantic still has no phase/query consumer. `Unsupported IR` means at least "
             "one known ability still compiles with unsupported diagnostics. "
@@ -3881,49 +3910,42 @@ def _chaos_daemons_undivided_review_rows() -> tuple[DatasheetGroupReviewRow, ...
             datasheet="Daemon Prince of Chaos",
             datasheet_id="000001149",
             source_basis="PDF pages 116-117; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D3, The Shadow of Chaos, Daemonic Lord Lone "
-                "Operative condition, Prince of Darkness Stealth aura, and Daemonic "
-                "Allegiance keyword choice semantics are structured paths."
+                "Operative condition, Prince of Darkness Stealth aura, Daemonic Allegiance "
+                "mustering and characteristic/weapon modifiers, and Unholy Vigour's "
+                "any-phase once-per-battle invulnerable save are consumed by generic IR."
             ),
-            semantics_needed=(
-                "Daemonic Allegiance characteristic modifiers; Unholy Vigour once-per-battle "
-                "invulnerable-save timing; aura runtime hosts."
-            ),
+            semantics_needed="None.",
             catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Daemon Prince of Chaos with Wings",
             datasheet_id="000002758",
             source_basis="PDF pages 118-119; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D3, The Shadow of Chaos, Malefic Destruction "
-                "Attacks modifier, and Harbinger of Death named weapon ability choice "
-                "semantics are structured paths. Daemonic Allegiance keyword choice is "
-                "represented as a mustering option."
+                "Attacks modifier, mandatory Harbinger of Death named-weapon ability choice, "
+                "and Daemonic Allegiance mustering and characteristic/weapon modifiers are "
+                "consumed by generic IR."
             ),
-            semantics_needed=(
-                "Daemonic Allegiance characteristic modifiers; Fight-start host for Malefic "
-                "Destruction and Harbinger of Death."
-            ),
+            semantics_needed="None.",
             catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Soul Grinder",
             datasheet_id="000001151",
             source_basis="PDF pages 114-115; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D3, The Shadow of Chaos, and the "
                 "warpsword-to-warpclaw replacement option are known structured paths. "
-                "Daemonic Allegiance keyword and additional equipment choice is "
-                "represented as a mustering option."
+                "Daemonic Allegiance mustering/equipment choice and Scuttling Walker "
+                "model-group movement transit are consumed by generic engine paths."
             ),
-            semantics_needed=(
-                "Scuttling Walker movement through friendly Monster/Vehicle models and terrain."
-            ),
+            semantics_needed="None.",
             catalog_blockers="No known catalog blocker.",
         ),
     )

@@ -12,6 +12,10 @@ from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartRequestContext,
     BattleRoundStartResultContext,
 )
+from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
+    SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
+    apply_any_phase_once_per_battle_result,
+)
 from warhammer40k_core.engine.cult_ambush import (
     resolve_cult_ambush_marker_removal_for_completed_moves,
 )
@@ -158,6 +162,18 @@ class BattleRoundFlow:
             ruleset_descriptor=self._ruleset_descriptor,
             army_catalog=self._army_catalog,
         )
+        pending_start_request = _pending_decision_request(decisions)
+        if pending_start_request is not None:
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=pending_start_request,
+                payload={
+                    "battle_round": state.battle_round,
+                    "phase": current_phase.value,
+                    "phase_body_status": "start_timing_window_decision_required",
+                    "request_id": pending_start_request.request_id,
+                },
+            )
         start_request = (
             self._battle_round_start_hooks.next_request_for(
                 BattleRoundStartRequestContext(state=state, decisions=decisions)
@@ -345,6 +361,14 @@ class BattleRoundFlow:
         result: DecisionResult,
         decisions: DecisionController,
     ) -> None:
+        if result.decision_type == SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE:
+            apply_any_phase_once_per_battle_result(
+                state=state,
+                decisions=decisions,
+                request=decisions.record_for_result(result).request,
+                result=result,
+            )
+            return
         if result.decision_type != SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE:
             if result.decision_type != SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE:
                 raise GameLifecycleError("BattleRoundFlow received unsupported decision_type.")

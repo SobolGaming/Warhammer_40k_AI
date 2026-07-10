@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.decision_request import DecisionOption
 from warhammer40k_core.engine.effects import PersistingEffect, PersistingEffectPayload
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
@@ -22,6 +23,7 @@ class FightUnitSelectedGrantPayload(TypedDict):
     decision_effect_payload: JsonValue
     unit_effect_payload: JsonValue
     unit_effect_expiration: str | None
+    decline_allowed: NotRequired[bool]
 
 
 class FightUnitSelectedPersistingEffectPayload(TypedDict):
@@ -107,6 +109,7 @@ class FightUnitSelectedGrant:
     decision_effect_payload: JsonValue = None
     unit_effect_payload: JsonValue = None
     unit_effect_expiration: str | None = None
+    decline_allowed: bool = True
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
@@ -132,9 +135,11 @@ class FightUnitSelectedGrant:
             raise GameLifecycleError("Fight-unit-selected grant expiration requires an effect.")
         if self.unit_effect_payload is not None and self.unit_effect_expiration is None:
             raise GameLifecycleError("Fight-unit-selected grant effect requires expiration.")
+        if type(self.decline_allowed) is not bool:
+            raise GameLifecycleError("Fight-unit-selected decline_allowed must be bool.")
 
     def to_payload(self) -> FightUnitSelectedGrantPayload:
-        return {
+        payload: FightUnitSelectedGrantPayload = {
             "hook_id": self.hook_id,
             "source_id": self.source_id,
             "label": self.label,
@@ -143,6 +148,9 @@ class FightUnitSelectedGrant:
             "unit_effect_payload": self.unit_effect_payload,
             "unit_effect_expiration": self.unit_effect_expiration,
         }
+        if not self.decline_allowed:
+            payload["decline_allowed"] = False
+        return payload
 
     @classmethod
     def from_payload(cls, payload: FightUnitSelectedGrantPayload) -> Self:
@@ -154,7 +162,99 @@ class FightUnitSelectedGrant:
             decision_effect_payload=payload["decision_effect_payload"],
             unit_effect_payload=payload["unit_effect_payload"],
             unit_effect_expiration=payload["unit_effect_expiration"],
+            decline_allowed=payload.get("decline_allowed", True),
         )
+
+
+def fight_unit_selected_grant_options(
+    *,
+    unit_instance_id: str,
+    activation_request_id: str,
+    activation_result_id: str,
+    grants: tuple[FightUnitSelectedGrant, ...],
+) -> tuple[DecisionOption, ...]:
+    unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    request_id = _validate_identifier("activation_request_id", activation_request_id)
+    result_id = _validate_identifier("activation_result_id", activation_result_id)
+    mandatory_grants = tuple(grant for grant in grants if not grant.decline_allowed)
+    optional_grants = tuple(grant for grant in grants if grant.decline_allowed)
+    options: list[DecisionOption] = []
+    if not mandatory_grants:
+        options.append(
+            DecisionOption(
+                option_id=DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
+                label="Decline fight unit grant",
+                payload=_grant_option_payload(
+                    unit_instance_id=unit_id,
+                    activation_request_id=request_id,
+                    activation_result_id=result_id,
+                    grants=(),
+                ),
+            )
+        )
+    for grant in mandatory_grants or optional_grants:
+        options.append(
+            _grant_decision_option(
+                option_id=grant.hook_id,
+                label=grant.label,
+                unit_instance_id=unit_id,
+                activation_request_id=request_id,
+                activation_result_id=result_id,
+                grants=(grant,),
+            )
+        )
+        if mandatory_grants:
+            options.extend(
+                _grant_decision_option(
+                    option_id=f"{grant.hook_id}:with:{optional.hook_id}",
+                    label=f"{grant.label} and {optional.label}",
+                    unit_instance_id=unit_id,
+                    activation_request_id=request_id,
+                    activation_result_id=result_id,
+                    grants=(grant, optional),
+                )
+                for optional in optional_grants
+            )
+    return tuple(options)
+
+
+def _grant_decision_option(
+    *,
+    option_id: str,
+    label: str,
+    unit_instance_id: str,
+    activation_request_id: str,
+    activation_result_id: str,
+    grants: tuple[FightUnitSelectedGrant, ...],
+) -> DecisionOption:
+    return DecisionOption(
+        option_id=option_id,
+        label=label,
+        payload=_grant_option_payload(
+            unit_instance_id=unit_instance_id,
+            activation_request_id=activation_request_id,
+            activation_result_id=activation_result_id,
+            grants=grants,
+        ),
+    )
+
+
+def _grant_option_payload(
+    *,
+    unit_instance_id: str,
+    activation_request_id: str,
+    activation_result_id: str,
+    grants: tuple[FightUnitSelectedGrant, ...],
+) -> JsonValue:
+    return validate_json_value(
+        {
+            "submission_kind": SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+            "unit_instance_id": unit_instance_id,
+            "activation_request_id": activation_request_id,
+            "activation_result_id": activation_result_id,
+            "selected_fight_unit_grants": [grant.to_payload() for grant in grants],
+        }
+    )
 
 
 @dataclass(frozen=True, slots=True)

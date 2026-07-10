@@ -6,7 +6,6 @@ from typing import Literal, cast
 
 from warhammer40k_core.core.attributes import (
     Characteristic,
-    CharacteristicValue,
     characteristic_from_token,
 )
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
@@ -14,9 +13,6 @@ from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
-    AttackProfile,
-    DamageProfile,
-    RangeProfileKind,
     WeaponKeyword,
     WeaponProfile,
     WeaponProfileError,
@@ -37,6 +33,10 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
     generic_rule_target_proximity_keyword_gate_applies,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
+    rule_ir_modified_weapon_profile,
+    rule_ir_weapon_selector_applies,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     DamageRollModifierContext,
@@ -49,7 +49,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
     WoundRollModifierContext,
 )
-from warhammer40k_core.engine.saves import SaveOption
+from warhammer40k_core.engine.saves import SaveKind, SaveOption
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
 
 type AttackRole = Literal["attacker", "target"]
@@ -238,6 +238,24 @@ def generic_rule_modified_save_options(
     ):
         return context.save_options
     current = context.save_options
+    for effect in _matching_generic_unit_effects(
+        state=context.state,
+        unit_instance_id=context.target_unit_instance_id,
+        effect_kind=RuleEffectKind.SET_CHARACTERISTIC,
+    ):
+        if _characteristic_parameter(effect.parameters) is not Characteristic.INVULNERABLE_SAVE:
+            continue
+        if not _generic_this_model_effect_targets_only_alive_model(
+            state=context.state,
+            effect=effect,
+            unit_instance_id=context.target_unit_instance_id,
+        ):
+            continue
+        current = _save_options_with_invulnerable_save(
+            current,
+            target_number=_required_int_parameter(effect.parameters, key="value"),
+            source_id=_modifier_source_id(effect),
+        )
     for effect in _matching_generic_attack_effects(
         state=context.state,
         attacking_unit_instance_id=context.attacking_unit_instance_id,
@@ -269,6 +287,46 @@ def generic_rule_modified_save_options(
             _save_option_with_roll_modifier(option, delta, source_id) for option in current
         )
     return current
+
+
+def _generic_this_model_effect_targets_only_alive_model(
+    *, state: object, effect: _GenericAttackEffect, unit_instance_id: str
+) -> bool:
+    if effect.target_kind is not RuleTargetKind.THIS_MODEL:
+        return True
+    source_model_id = effect.source_model_instance_id
+    if source_model_id is None:
+        raise GameLifecycleError("Generic THIS_MODEL save effect requires source model.")
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic THIS_MODEL save effect requires GameState.")
+    alive_ids = tuple(
+        model.model_instance_id
+        for model in rules_unit_view_by_id(
+            state=state, unit_instance_id=unit_instance_id
+        ).alive_models()
+    )
+    return alive_ids == (source_model_id,)
+
+
+def _save_options_with_invulnerable_save(
+    options: tuple[SaveOption, ...], *, target_number: int, source_id: str
+) -> tuple[SaveOption, ...]:
+    if target_number < 2 or target_number > 6:
+        raise GameLifecycleError("Generic invulnerable save target must be 2-6.")
+    replacement = SaveOption(
+        save_kind=SaveKind.INVULNERABLE,
+        target_number=target_number,
+        characteristic_target_number=target_number,
+        armor_penetration=0,
+        source_rule_ids=(source_id,),
+    )
+    return (
+        *tuple(option for option in options if option.save_kind is not SaveKind.INVULNERABLE),
+        replacement,
+    )
 
 
 def generic_rule_modified_weapon_profile(context: WeaponProfileModifierContext) -> WeaponProfile:
@@ -923,11 +981,14 @@ def _generic_effect_weapon_scope_applies(
     effect: _GenericAttackEffect,
     weapon_profile: WeaponProfile | None,
 ) -> bool:
-    if "weapon_scope" not in effect.parameters:
+    if not any(key in effect.parameters for key in ("weapon_scope", "weapon_name", "weapon_names")):
         return True
     if weapon_profile is None:
         return False
-    return _weapon_scope_matches_profile(effect.parameters, weapon_profile)
+    return rule_ir_weapon_selector_applies(
+        parameters=effect.parameters,
+        profile=weapon_profile,
+    )
 
 
 def _generic_effect_target_constraint_applies(
@@ -1040,73 +1101,10 @@ def _profile_with_characteristic_modifier(
     profile: WeaponProfile,
     effect: _GenericAttackEffect,
 ) -> WeaponProfile:
-    characteristic = _characteristic_parameter(effect.parameters)
-    delta = _required_int_parameter(effect.parameters, key="delta")
-    source_ids = _source_ids_with(profile.source_ids, _modifier_source_id(effect))
-    if characteristic is Characteristic.STRENGTH:
-        return replace(
-            profile,
-            strength=_modified_characteristic_value(profile.strength, delta),
-            source_ids=source_ids,
-        )
-    if characteristic is Characteristic.ARMOR_PENETRATION:
-        return replace(
-            profile,
-            armor_penetration=_modified_characteristic_value(profile.armor_penetration, delta),
-            source_ids=source_ids,
-        )
-    if characteristic in {Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL}:
-        if profile.skill.characteristic is not characteristic:
-            return replace(profile, source_ids=source_ids)
-        return replace(
-            profile,
-            skill=_modified_characteristic_value(profile.skill, delta),
-            source_ids=source_ids,
-        )
-    if characteristic is Characteristic.ATTACKS:
-        return replace(
-            profile,
-            attack_profile=_modified_attack_profile(profile.attack_profile, delta),
-            source_ids=source_ids,
-        )
-    if characteristic is Characteristic.DAMAGE:
-        return replace(
-            profile,
-            damage_profile=_modified_damage_profile(profile.damage_profile, delta),
-            source_ids=source_ids,
-        )
-    return profile
-
-
-def _modified_characteristic_value(value: CharacteristicValue, delta: int) -> CharacteristicValue:
-    if type(value) is not CharacteristicValue:
-        raise GameLifecycleError("Generic characteristic modifier requires value.")
-    if not value.is_numeric:
-        raise GameLifecycleError("Generic characteristic modifier cannot modify dash values.")
-    return CharacteristicValue.from_raw(value.characteristic, value.final + delta)
-
-
-def _modified_attack_profile(profile: AttackProfile, delta: int) -> AttackProfile:
-    if type(profile) is not AttackProfile:
-        raise GameLifecycleError("Generic Attacks modifier requires AttackProfile.")
-    if profile.fixed_attacks is not None:
-        return AttackProfile.fixed(max(1, profile.fixed_attacks + delta))
-    if profile.dice_expression is None:
-        raise GameLifecycleError("AttackProfile requires fixed attacks or dice expression.")
-    return AttackProfile.dice(
-        replace(profile.dice_expression, modifier=profile.dice_expression.modifier + delta)
-    )
-
-
-def _modified_damage_profile(profile: DamageProfile, delta: int) -> DamageProfile:
-    if type(profile) is not DamageProfile:
-        raise GameLifecycleError("Generic Damage modifier requires DamageProfile.")
-    if profile.fixed_damage is not None:
-        return DamageProfile.fixed(max(1, profile.fixed_damage + delta))
-    if profile.dice_expression is None:
-        raise GameLifecycleError("DamageProfile requires fixed damage or dice expression.")
-    return DamageProfile.dice(
-        replace(profile.dice_expression, modifier=profile.dice_expression.modifier + delta)
+    return rule_ir_modified_weapon_profile(
+        parameters=effect.parameters,
+        profile=profile,
+        source_id=_modifier_source_id(effect),
     )
 
 
@@ -1114,20 +1112,7 @@ def _weapon_scope_matches_profile(
     parameters: dict[str, JsonValue],
     profile: WeaponProfile,
 ) -> bool:
-    if type(profile) is not WeaponProfile:
-        raise GameLifecycleError("Generic weapon scope requires WeaponProfile.")
-    scope = parameters.get("weapon_scope")
-    if scope is None:
-        return True
-    if type(scope) is not str:
-        raise GameLifecycleError("Generic weapon_scope must be a string.")
-    if scope == "all":
-        return True
-    if scope == "melee":
-        return profile.range_profile.kind is RangeProfileKind.MELEE
-    if scope == "ranged":
-        return profile.range_profile.kind is RangeProfileKind.DISTANCE
-    raise GameLifecycleError("Unsupported generic weapon_scope.")
+    return rule_ir_weapon_selector_applies(parameters=parameters, profile=profile)
 
 
 def _weapon_keyword_parameter(parameters: dict[str, JsonValue]) -> WeaponKeyword:

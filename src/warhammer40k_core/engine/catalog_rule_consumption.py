@@ -26,7 +26,8 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine import catalog_command_point_support as _command_points
 from warhammer40k_core.engine import catalog_contextual_status_consumption as _contextual
-from warhammer40k_core.engine import catalog_movement_transit as _catalog_transit
+from warhammer40k_core.engine import catalog_datasheet_rule_support as _datasheet
+from warhammer40k_core.engine import catalog_movement_transit as _t
 from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
 from warhammer40k_core.engine import catalog_rule_selected_target_classification as _st
 from warhammer40k_core.engine.abilities import (
@@ -121,14 +122,10 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.healing import HealingEffect
 
-CatalogMovementTransitPermission = _catalog_transit.CatalogMovementTransitPermission
-_clause_is_supported_movement_transit_permission = (
-    _catalog_transit.clause_is_supported_movement_transit_permission
-)
-_movement_mode_token = _catalog_transit.movement_mode_token
-_movement_transit_permissions_from_clause = (
-    _catalog_transit.movement_transit_permissions_from_clause
-)
+CatalogMovementTransitPermission = _t.CatalogMovementTransitPermission
+_is_movement_transit = _t.clause_is_supported_movement_transit_permission
+_movement_mode_token = _t.movement_mode_token
+_movement_transit_permissions_from_clause = _t.movement_transit_permissions_from_clause
 
 CATALOG_IR_CHARGE_ROLL_CONSUMER_ID = "catalog-ir:charge-roll-modifier"
 CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID = "catalog-ir:leadership-characteristic-query"
@@ -1379,6 +1376,7 @@ def catalog_weapon_profile_modifier_bindings(
 
 def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefinition, ...]:
     hook_ids = {
+        *_datasheet.registered_consumer_ids(),
         *_CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.values(),
         *_CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.values(),
         *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
@@ -3829,7 +3827,8 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _frequency.clause_has_unconsumed_once_per_battle_activation(clause):
         return ()
     consumer_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
-    if _frequency.clause_is_fight_start_once_per_battle_activation(clause):
+    consumer_ids.update(_datasheet.consumer_ids_for_clause(clause))
+    if _frequency.clause_is_runtime_once_per_battle_activation(clause):
         consumer_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)
     if _clause_targets_this_model(clause):
         for effect in clause.effects:
@@ -3851,7 +3850,7 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
     if _clause_is_supported_unit_move_completed_mortal_wounds(clause):
         consumer_ids.add(CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID)
-    if _clause_is_supported_movement_transit_permission(clause):
+    if _is_movement_transit(clause):
         consumer_ids.add(CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID)
     if _clause_is_supported_setup_reactive_shoot_charge(clause):
         consumer_ids.add(CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID)
@@ -3925,7 +3924,8 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
 
 def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     hook_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
-    if _frequency.clause_is_fight_start_once_per_battle_activation(clause):
+    hook_ids.update(_datasheet.consumer_ids_for_clause(clause))
+    if _frequency.clause_is_runtime_once_per_battle_activation(clause):
         hook_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)
     if _clause_is_supported_tracked_target_selection(clause):
         hook_ids.add(CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID)
@@ -3936,7 +3936,7 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _clause_is_supported_first_death_return(clause):
         hook_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID)
         hook_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID)
-    if _clause_is_supported_movement_transit_permission(clause):
+    if _is_movement_transit(clause):
         hook_ids.add(CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID)
     if _clause_is_supported_post_shoot_hit_target_status_denial(clause):
         hook_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)

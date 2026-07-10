@@ -231,11 +231,13 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 
 | Hook / consumer | Abilities / rules |
 | --- | --- |
+| `army-mustering:required-datasheet-option` | No current generated rows |
 | `catalog-ir:advance-roll-reroll` | No current generated rows |
 | `catalog-ir:armor-penetration-characteristic-modifier` | No current generated rows |
 | `catalog-ir:armor-penetration-characteristic-query` | No current generated rows |
-| `catalog-ir:attacks-characteristic-modifier` | No current generated rows |
+| `catalog-ir:attacks-characteristic-modifier` | Daemon Prince of Tzeentch |
 | `catalog-ir:attacks-characteristic-query` | No current generated rows |
+| `catalog-ir:aura-ability:stealth` | Prince of Darkness (Aura) |
 | `catalog-ir:ballistic-skill-characteristic-modifier` | No current generated rows |
 | `catalog-ir:ballistic-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:battle-shock-failed-heal` | Pall of Despair (Aura, Psychic) |
@@ -247,6 +249,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:can-fallback-and-shoot` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
 | `catalog-ir:charge-roll-reroll` | No current generated rows |
+| `catalog-ir:conditional-ability:lone-operative` | Daemonic Lord |
 | `catalog-ir:critical-hit-value-modifier` | No current generated rows |
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |
@@ -257,6 +260,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
+| `catalog-ir:fight-selected-weapon-ability-choice` | Harbinger of Death |
 | `catalog-ir:first-death-return` | No current generated rows |
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
 | `catalog-ir:force-desperate-escape` | Bane of Cowards |
@@ -268,13 +272,13 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon |
 | `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures |
-| `catalog-ir:movement-characteristic-modifier` | No current generated rows |
+| `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
 | `catalog-ir:movement-transit-permission` | Scuttling Walker |
 | `catalog-ir:named-weapon-ability-choice` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
-| `catalog-ir:once-per-battle-ability` | No current generated rows |
+| `catalog-ir:once-per-battle-ability` | Malefic Destruction<br>Unholy Vigour |
 | `catalog-ir:post-shoot-hit-target-effect` | No current generated rows |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
@@ -287,15 +291,15 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:shadow-form-choice` | Shadow Form |
 | `catalog-ir:shadow-of-chaos-aura` | The Dark Master (Aura) |
 | `catalog-ir:shooting-target-range-restriction` | Wreathed in Shadows (Aura, Psychic) |
-| `catalog-ir:strength-characteristic-modifier` | No current generated rows |
+| `catalog-ir:strength-characteristic-modifier` | Daemon Prince of Khorne |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
-| `catalog-ir:toughness-characteristic-modifier` | No current generated rows |
+| `catalog-ir:toughness-characteristic-modifier` | Daemon Prince of Nurgle |
 | `catalog-ir:toughness-characteristic-query` | No current generated rows |
 | `catalog-ir:tracked-target-destroyed-reselect` | No current generated rows |
 | `catalog-ir:tracked-target-reroll` | No current generated rows |
 | `catalog-ir:tracked-target-selection` | No current generated rows |
 | `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede |
-| `catalog-ir:weapon-keyword-grant` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant` | Harbinger of Death |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:cleave` | No current generated rows |
@@ -308,14 +312,14 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-keyword-grant:ignores-cover` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:indirect-fire` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:lance` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:lethal-hits` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:lethal-hits` | Harbinger of Death |
 | `catalog-ir:weapon-keyword-grant:melta` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:one-shot` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:pistol` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:precision` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:precision` | Harbinger of Death |
 | `catalog-ir:weapon-keyword-grant:psychic` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:rapid-fire` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:sustained-hits` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:sustained-hits` | Harbinger of Death |
 | `catalog-ir:weapon-keyword-grant:torrent` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:twin-linked` | No current generated rows |
 | `catalog-ir:weapon-skill-characteristic-modifier` | No current generated rows |

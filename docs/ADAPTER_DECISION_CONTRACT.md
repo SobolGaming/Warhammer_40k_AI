@@ -65,6 +65,9 @@ The shared contract uses these objects and payloads:
 - `FactionRuleFightPhaseStartSelection`: finite Fight-start faction-rule answer selecting one engine-emitted source-backed option before the normal `FightPhaseState` opens.
 - `CatalogOncePerBattleAbilitySelection`: finite Fight-start catalog RuleIR answer selecting
   use or decline for one engine-emitted, source-model-scoped once-per-battle activation.
+- `CatalogAnyPhaseOncePerBattleAbilitySelection`: finite start-of-phase catalog RuleIR answer
+  selecting use or decline for one engine-emitted, source-model-scoped any-phase
+  once-per-battle activation.
 - `FactionRuleShootingPhaseStartSelection`: finite Shooting-start faction-rule answer selecting one engine-emitted source-backed option before the normal `ShootingPhaseState` opens.
 - `CatalogNamedWeaponAbilityChoiceSelection`: finite Shooting-start catalog RuleIR answer selecting one engine-emitted weapon ability option for one source-backed unit/model named-weapon group before the normal `ShootingPhaseState` opens.
 - `CatalogPostShootHitTargetStatusSelection`: finite post-attack catalog RuleIR answer selecting one engine-emitted enemy unit hit by the just-completed Shooting attack sequence for a source-backed contextual status denial.
@@ -594,7 +597,7 @@ Phase 15C emits finite Fight phase activation decisions with decision type `sele
 
 Phase 17G may emit a finite selected-to-fight ability decision with decision type `select_fight_activation_ability` after a unit is selected to fight and before its melee declaration request. The pending request payload includes the active `FightActivationSelection`, the selected unit, battle round, active/actor player IDs, one or more source-backed `ability_options`, and `decline_option_id: "decline_fight_activation_ability"`. Use options have deterministic option IDs `use:<ability_id>` and payloads containing `submission_kind: "use_fight_activation_ability"`, `hook_id`, `source_id`, `ability_id`, `enhancement_id`, selected unit, activation request/result IDs, `effect_kind`, and replay payload. `effect_kind: "fight_activation_melee_targeting_distance"` options carry `model_proximity_inches` and scope melee targeting permission to the current activation result. `effect_kind: "fight_activation_movement_distance"` options carry `pile_in_distance_inches` and `consolidate_distance_inches`; accepted use records an engine-owned `PersistingEffect` that the Fight movement proposal path consumes when exposing and validating Pile In or Consolidate `maximum_distance_inches`. The decline option uses `decline_fight_activation_ability` and records no effect. Adapters must not mutate melee target lists, attack pools, or fight movement distances directly. Stale activation context, repeated window use, wrong unit/player, malformed payloads, or option drift reject before queue pop.
 
-Phase 17G may emit a finite selected-to-fight grant decision with decision type `select_fight_unit_grant` after a unit is selected to fight and before its melee declaration request when runtime content exposes legal selected-to-fight grants. Option IDs are deterministic source hook IDs, plus `decline_fight_unit_grant`. Accepted options may record engine-owned source spend and unit effects; adapters must not spend resources, invent grant IDs, or mutate reroll permissions locally. Drukhari `Power from Pain: Hatred Eternal` uses this surface to spend one Pain token and record a Fight-phase hit-reroll empowerment before the unit declares its melee attacks. Stale activation context, wrong unit/player, malformed payloads, source-resource drift, or option drift reject before queue pop.
+Phase 17G may emit a finite selected-to-fight grant decision with decision type `select_fight_unit_grant` after a unit is selected to fight and before its melee declaration request when runtime content exposes legal selected-to-fight grants. Option IDs are deterministic source hook IDs. Optional grants also expose `decline_fight_unit_grant`. A grant payload may set `decline_allowed: false`; if any emitted grant is mandatory, the request has no global decline option. It exposes each mandatory grant by itself, plus deterministic `<mandatory_hook_id>:with:<optional_hook_id>` combinations so one existing optional grant can be accepted alongside the required choice. Accepted options may record engine-owned source spend and unit effects; adapters must not spend resources, invent grant IDs, locally add a decline option, or mutate reroll permissions locally. Drukhari `Power from Pain: Hatred Eternal` uses the optional surface to spend one Pain token and record a Fight-phase hit-reroll empowerment before the unit declares its melee attacks. Daemon Prince of Chaos with Wings `Harbinger of Death` uses the mandatory surface to select exactly one engine-emitted weapon ability for the source-backed Hellforged weapon profiles. Stale activation context, wrong unit/player, malformed payloads, source-resource drift, or option drift reject before queue pop.
 
 Adeptus Custodes `Martial Ka'tah` uses the existing `select_fight_unit_grant` surface. The engine may emit `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:dacatarai` or `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:rendax`, plus `decline_fight_unit_grant`, after an eligible Custodes unit with Martial Ka'tah is selected to fight. Accepted option payloads record `effect_kind: "adeptus_custodes_martial_katah"`, `unit_instance_id`, `target_unit_instance_ids`, `trigger: "selected_to_fight"`, `phase: "fight"`, `selected_martial_katah` (`dacatarai` or `rendax`), and replay-safe `source_context`. The selected stance is consumed by the shared Fight attack-resolution path: Dacatarai grants melee `SUSTAINED HITS 1`, and Rendax grants melee `LETHAL HITS`, for the selected rules unit until the Fight phase effect expires. Adapters must not locally add melee weapon keywords or infer stance effects outside the accepted engine effect.
 
@@ -1173,6 +1176,35 @@ Required Phase 17G Fight-start faction-rule tests:
 - deterministic JSON-safe decision, event, generic RuleIR effect, lifecycle, and replay payload round-trip;
 - valid once-per-battle use and decline through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`, including battle-use exhaustion and source-model drift without mutation;
 - viewer-scoped projection/event redaction for any future hidden Fight-start faction-rule selections.
+
+## Phase 17K Any-Phase Catalog Once-Per-Battle Decisions
+
+Generic catalog RuleIR may emit the finite decision type
+`select_catalog_any_phase_once_per_battle_ability` immediately after a
+`START_PHASE` runtime event and before that phase's normal body opens. Each public
+pending request is source-model scoped and contains `submission_kind`, consumer ID,
+game ID, battle round, phase, active player ID, actor/player ID, catalog record and
+ability IDs, stable source rule ID, RuleIR hash and payload, clause ID, source unit
+and model IDs, deterministic battle usage key, runtime event ID, and the two emitted
+option IDs. Use and decline option payloads repeat that context and add
+`activate: true|false`. Adapters must submit one emitted option unchanged through
+`FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`.
+
+Before queue pop or mutation, the engine validates finite-option integrity, game,
+round, phase, active player, actor, RuleIR shape/hash, live placed source model, and
+the once-per-battle ledger. Accepted use executes the scoped RuleIR through the
+generic executor, records the frequency consumption, and persists only the emitted
+effects for their IR duration. Accepted decline records no frequency use or effect.
+Daemon Prince of Chaos `Unholy Vigour` uses this surface at the start of any phase to
+set the source model's invulnerable save to 3+ until that phase ends. Adapters must
+not consume the usage key or alter a save characteristic locally.
+
+These requests and their current decision/event records are public table
+information and therefore appear in both viewer-scoped projections. Any future
+hidden source using this family must add shared adapter redaction and tests before
+shipping. Required coverage includes valid adapter-facade submission, stale round
+and source-model drift before mutation, deterministic JSON/replay round-trip,
+battle-use exhaustion, and both-player projection behavior.
 
 ## Phase 17G Fight-End Faction-Rule Decisions
 

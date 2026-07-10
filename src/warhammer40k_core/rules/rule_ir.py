@@ -129,6 +129,7 @@ class RuleEffectKind(StrEnum):
     MODIFY_COMMAND_POINTS = "modify_command_points"
     MODIFY_DICE_ROLL = "modify_dice_roll"
     MODIFY_MOVE_DISTANCE = "modify_move_distance"
+    MUSTERING_SELECTION = "mustering_selection"
     MOVEMENT_TRANSIT_PERMISSION = "movement_transit_permission"
     OUT_OF_PHASE_ACTION = "out_of_phase_action"
     PLACEMENT_PERMISSION = "placement_permission"
