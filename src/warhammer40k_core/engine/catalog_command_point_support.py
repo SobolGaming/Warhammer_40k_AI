@@ -173,6 +173,7 @@ def clause_is_supported_stratagem_cost_modifier(clause: RuleClause) -> bool:
         or stratagem_user not in {"source_player", "opponent"}
         or relationship
         not in {
+            "stratagem_targets_friendly_unit",
             "stratagem_targets_source_unit",
             "stratagem_targets_unit_within_source_model_range",
         }

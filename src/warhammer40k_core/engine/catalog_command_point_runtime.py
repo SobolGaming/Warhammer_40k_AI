@@ -364,7 +364,6 @@ class CatalogCommandPointRuntime:
             amount=amount,
             source_id=record.definition.source_id,
             source_kind=CommandPointSourceKind.OTHER,
-            cap_exempt=False,
         )
         context.decisions.event_log.append(
             "command_points_gained"
@@ -524,7 +523,7 @@ class CatalogCommandPointRuntime:
                 range_inches=_cost_source_range_inches(source.clause),
             ):
                 return False
-        else:
+        elif relationship != "stratagem_targets_friendly_unit":
             raise GameLifecycleError("Catalog Stratagem cost source relationship is malformed.")
         return not _cost_source_frequency_is_exhausted(source=source, context=context)
 
@@ -947,7 +946,6 @@ def _resolve_phase_command_point_gain(
             amount=_command_point_gain_amount(source.clause),
             source_id=source.record.definition.source_id,
             source_kind=CommandPointSourceKind.OTHER,
-            cap_exempt=False,
         )
         gain_payload = cast(JsonValue, gain.to_payload())
         context.decisions.event_log.append(

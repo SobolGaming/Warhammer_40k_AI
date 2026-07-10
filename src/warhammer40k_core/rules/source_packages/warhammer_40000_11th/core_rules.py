@@ -19,6 +19,10 @@ SOURCE_VERSION = "11e-core-rules"
 LOCAL_CORE_RULES_PDF = (
     "docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf"
 )
+NON_CORE_CP_GAIN_CAP_SOURCE_ID = f"{SOURCE_PACKAGE_ID}:command-points:non-core-round-cap"
+UNNAMED_ZERO_CP_STRATAGEM_COST_SOURCE_ID = (
+    f"{SOURCE_PACKAGE_ID}:stratagems:unnamed-zero-cp-cost-update"
+)
 
 
 def source_catalog() -> SourceCatalog:
@@ -46,7 +50,25 @@ def source_catalog() -> SourceCatalog:
             SourceDocument(
                 document_id=document_id,
                 title=f"{SOURCE_TITLE} ({LOCAL_CORE_RULES_PDF})",
-                source_texts=(source_text,),
+                source_texts=(
+                    source_text,
+                    RuleSourceText.from_raw(
+                        source_id=NON_CORE_CP_GAIN_CAP_SOURCE_ID,
+                        raw_text=(
+                            "Excluding Core CP, each player can gain a maximum of 1 CP per "
+                            "battle round. This includes the CP gained when a player discards "
+                            "an active Secondary Mission card."
+                        ),
+                    ),
+                    RuleSourceText.from_raw(
+                        source_id=UNNAMED_ZERO_CP_STRATAGEM_COST_SOURCE_ID,
+                        raw_text=(
+                            "Rules that enable you to target a friendly unit with a Stratagem "
+                            "for 0CP, but that do not specify the name of the Stratagem, instead "
+                            "reduce the CP cost of that use of that Stratagem by 1CP."
+                        ),
+                    ),
+                ),
             ),
         ),
         ruleset_bundles=(

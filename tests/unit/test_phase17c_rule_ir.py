@@ -208,6 +208,12 @@ DIRECT_OWN_STRATAGEM_COST_TEXT = (
     "Once per turn, when you target this model with a Stratagem, you may reduce the CP cost "
     "of that use of that Stratagem by 1CP."
 )
+UNNAMED_ZERO_CP_STRATAGEM_COST_TEXT = (
+    "Once per battle round, you can target a friendly unit with a Stratagem for 0CP."
+)
+NAMED_ZERO_CP_STRATAGEM_COST_TEXT = (
+    "Once per battle round, you can target this unit with the Fire Overwatch Stratagem for 0CP."
+)
 POST_TRIGGER_RANGE_STRATAGEM_COST_TEXT = (
     "Each time your opponent targets a unit from their army with a Stratagem, if that unit "
     'is within 12" of the bearer, increase the cost of that use of that Stratagem by 1CP '
@@ -665,6 +671,57 @@ def test_phase17c_stratagem_cost_range_after_trigger_and_stacking_are_structured
         "optional": False,
         "stacking": "non_cumulative_cost_increase",
     }
+
+
+def test_phase17c_unnamed_zero_cp_stratagem_rule_reduces_current_use_cost_by_one() -> None:
+    rule_ir = _compiled(UNNAMED_ZERO_CP_STRATAGEM_COST_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert parameter_payload(clause.trigger.parameters) == {
+        "selected_unit_allegiance": "friendly",
+        "selection": "stratagem_target",
+        "source_relationship": "stratagem_targets_friendly_unit",
+        "stratagem_user": "source_player",
+        "timing_window": "after_unit_selected_as_stratagem_target",
+        "usage_scope": "source_model",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.STRATAGEM_USE
+    assert _condition_payload(clause, RuleConditionKind.FREQUENCY_LIMIT) == {
+        "scope": "battle round",
+    }
+    assert _condition_payload(clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "gate_subject": "stratagem_target",
+        "relationship": "stratagem_targets_friendly_unit",
+        "selected_unit_allegiance": "friendly",
+    }
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "affected_player": "source_player",
+        "application_scope": "current_stratagem_use",
+        "delta": -1,
+        "minimum_cost": 0,
+        "operation": "modify_stratagem_cost",
+        "optional": True,
+        "stacking": "cumulative",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    )
+
+
+def test_phase17c_named_zero_cp_stratagem_rule_is_not_reinterpreted_as_reduction() -> None:
+    rule_ir = _compiled(NAMED_ZERO_CP_STRATAGEM_COST_TEXT).rule_ir
+
+    assert all(
+        effect.kind is not RuleEffectKind.MODIFY_COMMAND_POINTS
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+    )
+    assert CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID not in (
+        catalog_rule_ir_consumers_for_rule(rule_ir)
+    )
 
 
 def test_phase17c_leadership_gated_command_point_gain_is_structured() -> None:

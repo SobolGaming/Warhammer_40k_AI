@@ -35,6 +35,7 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
 from warhammer40k_core.engine.command_points import (
     CommandPointGainResult,
     CommandPointGainResultPayload,
+    CommandPointGainStatus,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -446,7 +447,10 @@ def test_code_chivalric_lay_low_honours_army_from_destroyed_character_model() ->
     evidence = cast(dict[str, JsonValue], payload["evidence"])
     assert evidence["model_destroyed_event_id"] == destroyed_event.event_id
     gain_payload = cast(CommandPointGainResultPayload, payload["command_point_gain"])
-    assert CommandPointGainResult.from_payload(gain_payload).applied_amount == 2
+    gain = CommandPointGainResult.from_payload(gain_payload)
+    assert gain.status is CommandPointGainStatus.APPLIED
+    assert gain.requested_amount == 2
+    assert gain.applied_amount == 2
 
 
 def test_code_chivalric_reclaim_honours_army_at_opponent_turn_end() -> None:
@@ -549,6 +553,8 @@ def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_unit
     assert evidence["enemy_units_destroyed_this_battle_round"] == 2
     gain_payload = cast(CommandPointGainResultPayload, payload["command_point_gain"])
     gain = CommandPointGainResult.from_payload(gain_payload)
+    assert gain.status is CommandPointGainStatus.APPLIED
+    assert gain.requested_amount == 2
     assert gain.applied_amount == 2
     assert gain.transaction is not None
     assert gain.transaction.cap_exempt is True

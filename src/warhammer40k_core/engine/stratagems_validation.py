@@ -71,17 +71,15 @@ def _apply_command_point_effects(
     gain_payload = effect_payload.get("command_point_gain")
     if isinstance(gain_payload, dict):
         amount = gain_payload.get("amount")
-        cap_exempt = gain_payload.get("cap_exempt", False)
         if type(amount) is not int:
             raise GameLifecycleError("command_point_gain amount must be an integer.")
-        if type(cap_exempt) is not bool:
-            raise GameLifecycleError("command_point_gain cap_exempt must be a bool.")
+        if "cap_exempt" in gain_payload:
+            raise GameLifecycleError("Generic Stratagem CP gains cannot declare a cap exemption.")
         gain = state.gain_command_points(
             player_id=player_id,
             amount=amount,
             source_id=f"{source_id}:cp-gain",
             source_kind=CommandPointSourceKind.OTHER,
-            cap_exempt=cap_exempt,
         )
         event_type = (
             "command_points_gained"
@@ -92,16 +90,14 @@ def _apply_command_point_effects(
     refund_payload = effect_payload.get("command_point_refund")
     if isinstance(refund_payload, dict):
         amount = refund_payload.get("amount")
-        cap_exempt = refund_payload.get("cap_exempt", False)
         if type(amount) is not int:
             raise GameLifecycleError("command_point_refund amount must be an integer.")
-        if type(cap_exempt) is not bool:
-            raise GameLifecycleError("command_point_refund cap_exempt must be a bool.")
+        if "cap_exempt" in refund_payload:
+            raise GameLifecycleError("Generic Stratagem CP refunds cannot declare a cap exemption.")
         refund = state.refund_command_points(
             player_id=player_id,
             amount=amount,
             source_id=f"{source_id}:cp-refund",
-            cap_exempt=cap_exempt,
         )
         event_type = (
             "command_points_refunded"

@@ -7,6 +7,8 @@ from typing import Self, TypedDict, cast
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.phase import GameLifecycleError
 
+NON_CORE_CP_GAIN_LIMIT_PER_BATTLE_ROUND = 1
+
 
 class CommandPhaseStep(StrEnum):
     COMMAND = "command"
@@ -321,6 +323,10 @@ class CommandPointTransaction:
             "cap_exempt",
             _validate_bool("CommandPointTransaction cap_exempt", self.cap_exempt),
         )
+        if self.source_kind is CommandPointSourceKind.COMMAND_PHASE_START and not self.cap_exempt:
+            raise GameLifecycleError("Core Command phase CP transactions must be cap-exempt.")
+        if self.source_kind is CommandPointSourceKind.STRATAGEM_SPEND and self.cap_exempt:
+            raise GameLifecycleError("Command-point spend transactions cannot be cap-exempt.")
 
     def to_payload(self) -> CommandPointTransactionPayload:
         return {
@@ -418,12 +424,22 @@ class CommandPointGainResult:
                     "Applied CommandPointGainResult cannot have capped_reason."
                 )
         if self.status is CommandPointGainStatus.CAPPED:
-            if self.transaction is not None:
-                raise GameLifecycleError("Capped CommandPointGainResult cannot have a transaction.")
-            if self.applied_amount != 0:
-                raise GameLifecycleError("Capped CommandPointGainResult applies no CP.")
             if self.capped_reason is None:
                 raise GameLifecycleError("Capped CommandPointGainResult requires capped_reason.")
+            if self.applied_amount >= self.requested_amount:
+                raise GameLifecycleError(
+                    "Capped CommandPointGainResult must apply less than requested."
+                )
+            if self.applied_amount == 0 and self.transaction is not None:
+                raise GameLifecycleError(
+                    "Zero-applied capped CommandPointGainResult cannot have a transaction."
+                )
+            if self.applied_amount > 0 and self.transaction is None:
+                raise GameLifecycleError(
+                    "Partially applied capped CommandPointGainResult requires a transaction."
+                )
+            if self.transaction is not None and self.transaction.amount != self.applied_amount:
+                raise GameLifecycleError("Capped CommandPointGainResult transaction amount drift.")
 
     def to_payload(self) -> CommandPointGainResultPayload:
         return {
@@ -660,14 +676,24 @@ class CommandPointRefundResult:
                     "Applied CommandPointRefundResult cannot have capped_reason."
                 )
         if self.status is CommandPointRefundStatus.CAPPED:
-            if self.transaction is not None:
-                raise GameLifecycleError(
-                    "Capped CommandPointRefundResult cannot have a transaction."
-                )
-            if self.applied_amount != 0:
-                raise GameLifecycleError("Capped CommandPointRefundResult applies no CP.")
             if self.capped_reason is None:
                 raise GameLifecycleError("Capped CommandPointRefundResult requires capped_reason.")
+            if self.applied_amount >= self.requested_amount:
+                raise GameLifecycleError(
+                    "Capped CommandPointRefundResult must apply less than requested."
+                )
+            if self.applied_amount == 0 and self.transaction is not None:
+                raise GameLifecycleError(
+                    "Zero-applied capped CommandPointRefundResult cannot have a transaction."
+                )
+            if self.applied_amount > 0 and self.transaction is None:
+                raise GameLifecycleError(
+                    "Partially applied capped CommandPointRefundResult requires a transaction."
+                )
+            if self.transaction is not None and self.transaction.amount != self.applied_amount:
+                raise GameLifecycleError(
+                    "Capped CommandPointRefundResult transaction amount drift."
+                )
 
     def to_payload(self) -> CommandPointRefundResultPayload:
         return {
@@ -754,21 +780,32 @@ class CommandPointLedger:
             raise GameLifecycleError(
                 "CommandPointLedger.gain cannot use stratagem spend/refund source kinds."
             )
-
+        applied_amount = requested_amount
+        status = CommandPointGainStatus.APPLIED
+        capped_reason: str | None = None
         if (
             _source_kind_counts_toward_non_command_gain_cap(requested_kind)
             and not requested_cap_exempt
-            and self.non_command_points_gained_in_round(requested_round) + requested_amount > 1
         ):
+            remaining_capacity = max(
+                0,
+                NON_CORE_CP_GAIN_LIMIT_PER_BATTLE_ROUND
+                - self.non_command_points_gained_in_round(requested_round),
+            )
+            applied_amount = min(requested_amount, remaining_capacity)
+            if applied_amount < requested_amount:
+                status = CommandPointGainStatus.CAPPED
+                capped_reason = "non_command_cp_gain_cap_reached"
+        if applied_amount == 0:
             result = CommandPointGainResult(
                 player_id=self.player_id,
                 battle_round=requested_round,
                 requested_amount=requested_amount,
                 applied_amount=0,
-                status=CommandPointGainStatus.CAPPED,
+                status=status,
                 source_id=requested_source,
                 source_kind=requested_kind,
-                capped_reason="non_command_cp_gain_cap_reached",
+                capped_reason=capped_reason,
             )
             return self, result
 
@@ -779,25 +816,28 @@ class CommandPointLedger:
             ),
             player_id=self.player_id,
             battle_round=requested_round,
-            amount=requested_amount,
+            amount=applied_amount,
             source_id=requested_source,
             source_kind=requested_kind,
-            cap_exempt=requested_cap_exempt,
+            cap_exempt=(
+                requested_kind is CommandPointSourceKind.COMMAND_PHASE_START or requested_cap_exempt
+            ),
         )
         updated = type(self)(
             player_id=self.player_id,
-            command_points=self.command_points + requested_amount,
+            command_points=self.command_points + applied_amount,
             transactions=(*self.transactions, transaction),
         )
         result = CommandPointGainResult(
             player_id=self.player_id,
             battle_round=requested_round,
             requested_amount=requested_amount,
-            applied_amount=requested_amount,
-            status=CommandPointGainStatus.APPLIED,
+            applied_amount=applied_amount,
+            status=status,
             source_id=requested_source,
             source_kind=requested_kind,
             transaction=transaction,
+            capped_reason=capped_reason,
         )
         return updated, result
 
@@ -864,19 +904,36 @@ class CommandPointLedger:
         requested_amount = _validate_positive_int("amount", amount)
         requested_source = _validate_identifier("source_id", source_id)
         requested_cap_exempt = _validate_bool("cap_exempt", cap_exempt)
-        if (
-            not requested_cap_exempt
-            and self.non_command_points_gained_in_round(requested_round) + requested_amount > 1
-        ):
+        remaining_capacity = (
+            requested_amount
+            if requested_cap_exempt
+            else max(
+                0,
+                NON_CORE_CP_GAIN_LIMIT_PER_BATTLE_ROUND
+                - self.non_command_points_gained_in_round(requested_round),
+            )
+        )
+        applied_amount = min(requested_amount, remaining_capacity)
+        status = (
+            CommandPointRefundStatus.APPLIED
+            if applied_amount == requested_amount
+            else CommandPointRefundStatus.CAPPED
+        )
+        capped_reason = (
+            None
+            if status is CommandPointRefundStatus.APPLIED
+            else "non_command_cp_gain_cap_reached"
+        )
+        if applied_amount == 0:
             result = CommandPointRefundResult(
                 player_id=self.player_id,
                 battle_round=requested_round,
                 requested_amount=requested_amount,
                 applied_amount=0,
-                status=CommandPointRefundStatus.CAPPED,
+                status=status,
                 source_id=requested_source,
                 source_kind=CommandPointSourceKind.STRATAGEM_REFUND,
-                capped_reason="non_command_cp_gain_cap_reached",
+                capped_reason=capped_reason,
             )
             return self, result
 
@@ -887,25 +944,26 @@ class CommandPointLedger:
             ),
             player_id=self.player_id,
             battle_round=requested_round,
-            amount=requested_amount,
+            amount=applied_amount,
             source_id=requested_source,
             source_kind=CommandPointSourceKind.STRATAGEM_REFUND,
             cap_exempt=requested_cap_exempt,
         )
         updated = type(self)(
             player_id=self.player_id,
-            command_points=self.command_points + requested_amount,
+            command_points=self.command_points + applied_amount,
             transactions=(*self.transactions, transaction),
         )
         result = CommandPointRefundResult(
             player_id=self.player_id,
             battle_round=requested_round,
             requested_amount=requested_amount,
-            applied_amount=requested_amount,
-            status=CommandPointRefundStatus.APPLIED,
+            applied_amount=applied_amount,
+            status=status,
             source_id=requested_source,
             source_kind=CommandPointSourceKind.STRATAGEM_REFUND,
             transaction=transaction,
+            capped_reason=capped_reason,
         )
         return updated, result
 
