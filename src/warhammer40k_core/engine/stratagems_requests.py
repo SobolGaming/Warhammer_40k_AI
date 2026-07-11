@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_generic_metadata import (
+    CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND,
     SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
     companion_effect_selections_for_binding,
+    controlled_objective_effect_selections_for_binding,
 )
 from warhammer40k_core.engine.stratagems_model import *
 
@@ -498,6 +500,12 @@ def _effect_selections_for_binding(
         return companion_effect_selections_for_binding(
             state=state,
             definition=definition,
+            context=context,
+            target_binding=target_binding,
+        )
+    if selection_kind == CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND:
+        return controlled_objective_effect_selections_for_binding(
+            state=state,
             context=context,
             target_binding=target_binding,
         )

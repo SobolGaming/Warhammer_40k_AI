@@ -81,11 +81,17 @@ def test_ws14_stratagem_activation_profiles_cover_source_only_detachment_rows() 
         | set(lords_ir.LORDS_OF_THE_WARP_STRATAGEM_SOURCE_ROW_IDS)
         | set(warptide_ir.WARPTIDE_STRATAGEM_SOURCE_ROW_IDS)
     )
+    runtime_supported_profile_row_ids = set(
+        faction_generic_ir_support_2026_27.supported_daemonic_incursion_stratagem_source_row_ids()
+    )
 
-    assert len(source_only_rows) == 1086
+    assert len(source_only_rows) == 1080
     assert len(profiles) == 1076
     assert source_backed_generic_row_ids <= source_only_row_ids
-    assert profile_source_row_ids == source_only_row_ids - source_backed_generic_row_ids
+    assert (
+        profile_source_row_ids
+        == (source_only_row_ids - source_backed_generic_row_ids) | runtime_supported_profile_row_ids
+    )
 
     for profile in profiles:
         rule_ir = RuleIR.from_payload(cast(RuleIRPayload, profile.rule_ir_payload()))

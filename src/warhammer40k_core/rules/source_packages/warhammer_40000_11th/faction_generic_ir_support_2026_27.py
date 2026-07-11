@@ -274,6 +274,11 @@ def generic_supported_stratagem_rule_ir_hash(
     if type(source_row) is not faction_subrules_2026_27.SourceStratagemRow:
         raise Phase17FGenericIrSupportError("Generic Stratagem support requires source row.")
     descriptor_id = f"phase17e:{source_row.source_row_id}"
+    rule_ir_hash = daemonic_incursion_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_daemonic_incursion_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
+        return rule_ir_hash
     if source_row.source_row_id in _SUPPORTED_CAVALCADE_OF_CHAOS_STRATAGEM_SOURCE_ROW_IDS:
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
         _validate_cavalcade_of_chaos_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
@@ -394,6 +399,10 @@ def supported_court_of_the_phoenician_mixed_enhancement_source_row_ids() -> tupl
 
 def supported_cavalcade_of_chaos_stratagem_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_SUPPORTED_CAVALCADE_OF_CHAOS_STRATAGEM_SOURCE_ROW_IDS))
+
+
+def supported_daemonic_incursion_stratagem_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(daemonic_incursion_ir.DAEMONIC_INCURSION_STRATAGEM_SOURCE_ROW_IDS))
 
 
 def supported_hit_target_cover_denial_stratagem_source_row_ids() -> tuple[str, ...]:
@@ -670,6 +679,62 @@ def _validate_daemonic_incursion_detachment_rule_ir(rule_ir: RuleIR) -> None:
                 raise Phase17FGenericIrSupportError(
                     "Daemonic Incursion detachment RuleIR has unexpected condition family."
                 )
+
+
+def _validate_daemonic_incursion_stratagem_rule_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Daemonic Incursion Stratagem requires RuleIR.")
+    if type(source_row) is not faction_subrules_2026_27.SourceStratagemRow:
+        raise Phase17FGenericIrSupportError("Daemonic Incursion Stratagem requires source row.")
+    if (
+        source_row.source_row_id
+        not in daemonic_incursion_ir.DAEMONIC_INCURSION_STRATAGEM_SOURCE_ROW_IDS
+    ):
+        raise Phase17FGenericIrSupportError("Daemonic Incursion Stratagem source row is unknown.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Daemonic Incursion Stratagem RuleIR must deserialize as supported."
+        )
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Daemonic Incursion Stratagem RuleIR produced an unexpected source ID."
+        )
+    if not rule_ir.clauses:
+        raise Phase17FGenericIrSupportError(
+            "Daemonic Incursion Stratagem RuleIR requires a target binding clause."
+        )
+    if rule_ir.clauses[0].template_id != daemonic_incursion_ir.STRATAGEM_TARGET_BINDING_TEMPLATE_ID:
+        raise Phase17FGenericIrSupportError(
+            "Daemonic Incursion Stratagem RuleIR has an unexpected target binding."
+        )
+    effect_kinds = tuple(effect.kind for clause in rule_ir.clauses for effect in clause.effects)
+    if effect_kinds != _daemonic_incursion_stratagem_effect_kinds(source_row.source_row_id):
+        raise Phase17FGenericIrSupportError(
+            "Daemonic Incursion Stratagem RuleIR has unexpected effect kinds."
+        )
+
+
+def _daemonic_incursion_stratagem_effect_kinds(
+    source_row_id: str,
+) -> tuple[RuleEffectKind, ...]:
+    if source_row_id == daemonic_incursion_ir.CORRUPT_REALSPACE_SOURCE_ROW_ID:
+        return (RuleEffectKind.SET_CONTEXTUAL_STATUS,)
+    if source_row_id == daemonic_incursion_ir.WARP_SURGE_SOURCE_ROW_ID:
+        return (RuleEffectKind.GRANT_ABILITY,)
+    if source_row_id == daemonic_incursion_ir.DRAUGHT_OF_TERROR_SOURCE_ROW_ID:
+        return (RuleEffectKind.MODIFY_CHARACTERISTIC, RuleEffectKind.REROLL_PERMISSION)
+    if source_row_id == daemonic_incursion_ir.DENIZENS_OF_THE_WARP_SOURCE_ROW_ID:
+        return (RuleEffectKind.GRANT_ABILITY,)
+    if source_row_id == daemonic_incursion_ir.THE_REALM_OF_CHAOS_SOURCE_ROW_ID:
+        return (RuleEffectKind.PLACEMENT_PERMISSION,)
+    if source_row_id == daemonic_incursion_ir.DAEMONIC_INVULNERABILITY_SOURCE_ROW_ID:
+        return (RuleEffectKind.REROLL_PERMISSION,)
+    raise Phase17FGenericIrSupportError("Daemonic Incursion Stratagem source row is unknown.")
 
 
 def _validate_shadow_legion_detachment_rule_ir(rule_ir: RuleIR) -> None:

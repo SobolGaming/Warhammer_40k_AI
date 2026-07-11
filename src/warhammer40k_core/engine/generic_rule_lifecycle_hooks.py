@@ -83,6 +83,9 @@ from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
 )
+from warhammer40k_core.engine.generic_rule_lifecycle_ability_sources import (
+    generic_rule_ability_sources as _generic_rule_ability_sources,
+)
 from warhammer40k_core.engine.generic_rule_lifecycle_hook_handlers import (
     battle_formation_request_handler_for_descriptor,
     battle_formation_result_handler_for_descriptor,
@@ -1217,39 +1220,6 @@ def _fight_activation_option_for_context(
             }
         ),
     )
-
-
-def _generic_rule_ability_sources(
-    *,
-    activation: RuntimeContentActivation,
-    execution_records: tuple[_Phase17FExecutionRecord, ...],
-    coverage_descriptor_id: str,
-    ability_ids: tuple[str, ...],
-) -> tuple[GenericRuleAbilitySource, ...]:
-    if type(activation) is not RuntimeContentActivation:
-        raise GameLifecycleError("Generic RuleIR ability bindings require activation.")
-    if type(execution_records) is not tuple:
-        raise GameLifecycleError("Generic RuleIR ability bindings require execution records.")
-    selected_detachment_ids = set(activation.selected_detachment_ids)
-    requested_descriptor_id = _validate_identifier(
-        "coverage_descriptor_id",
-        coverage_descriptor_id,
-    )
-    sources: list[GenericRuleAbilitySource] = []
-    for record in execution_records:
-        if type(record) is not _Phase17FExecutionRecord:
-            raise GameLifecycleError("Generic RuleIR ability bindings require execution records.")
-        if not _record_is_generic_detachment_rule(record):
-            continue
-        if record.coverage_descriptor_id != requested_descriptor_id:
-            continue
-        if record.detachment_id not in selected_detachment_ids:
-            continue
-        rule_ir = _rule_ir_for_record(record)
-        if not rule_ir_grants_any_ability(rule_ir, abilities=ability_ids):
-            continue
-        sources.append(GenericRuleAbilitySource(record=record, rule_ir=rule_ir))
-    return tuple(sorted(sources, key=lambda source: source.record.execution_id))
 
 
 def _generic_rule_enhancement_ability_sources(

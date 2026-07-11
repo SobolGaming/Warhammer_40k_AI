@@ -32,7 +32,7 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
     generic_rule_target_constraints_apply,
     generic_rule_target_proximity_keyword_gate_applies,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_modified_weapon_profile,
     rule_ir_weapon_selector_applies,
@@ -1016,8 +1016,11 @@ def _generic_effect_target_constraint_applies(
 def _source_phase_value_or_none(source_phase: object) -> str | None:
     if source_phase is None:
         return None
-    value = getattr(source_phase, "value", source_phase)
-    if type(value) is not str:
+    if type(source_phase) is BattlePhase:
+        value = source_phase.value
+    elif type(source_phase) is str:
+        value = source_phase
+    else:
         raise GameLifecycleError("Generic RuleIR source phase must be a phase token.")
     return _validate_identifier("source_phase", value)
 
@@ -1292,6 +1295,9 @@ def _generic_source_payload(
     conditional_wound_reroll = _conditional_wound_reroll_payload(effect)
     if conditional_wound_reroll is not None:
         payload["conditional_wound_reroll"] = conditional_wound_reroll
+    conditional_save_reroll = _conditional_save_reroll_payload(effect)
+    if conditional_save_reroll is not None:
+        payload["conditional_save_reroll"] = conditional_save_reroll
     return payload
 
 
@@ -1328,20 +1334,53 @@ def _conditional_wound_reroll_payload(
         raise GameLifecycleError(
             "Generic RuleIR full_reroll_if_target_within_objective_range must be boolean."
         )
+    full_battle_shock_reroll = effect.parameters.get("full_reroll_if_target_battle_shocked")
+    if full_battle_shock_reroll is None:
+        full_battle_shock_reroll = False
+    if type(full_battle_shock_reroll) is not bool:
+        raise GameLifecycleError(
+            "Generic RuleIR full_reroll_if_target_battle_shocked must be boolean."
+        )
     required_keyword = effect.parameters.get("full_reroll_required_attacker_keyword")
     if required_keyword is not None and type(required_keyword) is not str:
         raise GameLifecycleError(
             "Generic RuleIR full_reroll_required_attacker_keyword must be a string."
         )
-    if not reroll_values and full_reroll is False and required_keyword is None:
+    if (
+        not reroll_values
+        and full_reroll is False
+        and full_battle_shock_reroll is False
+        and required_keyword is None
+    ):
         return None
     payload: dict[str, JsonValue] = {
         "reroll_unmodified_values": reroll_values,
-        "full_reroll_if_target_within_objective_range": full_reroll,
     }
+    if full_reroll:
+        payload["full_reroll_if_target_within_objective_range"] = True
+    if full_battle_shock_reroll:
+        payload["full_reroll_if_target_battle_shocked"] = True
     if required_keyword is not None:
         payload["full_reroll_required_attacker_keyword"] = required_keyword
     return payload
+
+
+def _conditional_save_reroll_payload(
+    effect: _GenericAttackEffect,
+) -> dict[str, JsonValue] | None:
+    if effect.effect_kind is not RuleEffectKind.REROLL_PERMISSION:
+        return None
+    roll_type = _required_string_parameter(effect.parameters, key="roll_type")
+    if not roll_type.startswith("attack_sequence.save."):
+        return None
+    reroll_value = effect.parameters.get("reroll_unmodified_value")
+    if reroll_value is None:
+        return None
+    if type(reroll_value) is not int:
+        raise GameLifecycleError("Generic RuleIR save reroll_unmodified_value must be an int.")
+    if reroll_value < 1 or reroll_value > 6:
+        raise GameLifecycleError("Generic RuleIR save reroll_unmodified_value must be 1-6.")
+    return {"reroll_unmodified_values": [reroll_value]}
 
 
 def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:

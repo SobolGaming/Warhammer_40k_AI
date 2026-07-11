@@ -178,6 +178,38 @@ def apply_generic_rule_ir_reserve_removal(
     ):
         raise GameLifecycleError("Generic reserve removal requires Stratagem origin.")
     source_rule_id = _rule_effect_source_id(effect_payload)
+    required_arrival_round_offset = _optional_rule_effect_int_parameter(
+        effect_payload,
+        "required_arrival_battle_round_offset",
+    )
+    required_arrival_battle_round = (
+        None
+        if required_arrival_round_offset is None
+        else context.battle_round + required_arrival_round_offset
+    )
+    required_arrival_phase = _optional_rule_effect_string_parameter(
+        effect_payload,
+        "required_arrival_phase",
+    )
+    required_arrival_source_rule_id = _optional_rule_effect_string_parameter(
+        effect_payload,
+        "required_arrival_source_rule_id",
+    )
+    required_arrival_placement_kind = _optional_rule_effect_string_parameter(
+        effect_payload,
+        "required_arrival_placement_kind",
+    )
+    required_arrival_fields = (
+        required_arrival_round_offset,
+        required_arrival_phase,
+        required_arrival_source_rule_id,
+    )
+    if any(value is not None for value in required_arrival_fields) and any(
+        value is None for value in required_arrival_fields
+    ):
+        raise GameLifecycleError("Generic reserve removal required arrival is incomplete.")
+    if required_arrival_round_offset is not None and required_arrival_round_offset <= 0:
+        raise GameLifecycleError("Generic reserve removal arrival offset must be positive.")
     reserve_payloads: list[JsonValue] = []
     for unit_id in generic_rule_ir_execution_target_unit_ids(use_record):
         reserve_state = state.reposition_unit_to_strategic_reserves(
@@ -185,6 +217,10 @@ def apply_generic_rule_ir_reserve_removal(
             unit_instance_id=unit_id,
             reserve_origin=ReserveOrigin.DURING_BATTLE_STRATAGEM,
             source_rule_ids=(source_rule_id,),
+            required_arrival_battle_round=required_arrival_battle_round,
+            required_arrival_phase=required_arrival_phase,
+            required_arrival_source_rule_id=required_arrival_source_rule_id,
+            required_arrival_placement_kind=required_arrival_placement_kind,
         )
         reserve_payloads.append(validate_json_value(reserve_state.to_payload()))
     decisions.event_log.append(
@@ -1033,6 +1069,18 @@ def _optional_rule_effect_string_parameter(
 
 def _required_rule_effect_int_parameter(effect_payload: dict[str, JsonValue], key: str) -> int:
     value = _rule_effect_parameter(effect_payload, key)
+    if type(value) is not int:
+        raise GameLifecycleError(f"Generic Stratagem effect parameter {key} must be an int.")
+    return value
+
+
+def _optional_rule_effect_int_parameter(
+    effect_payload: dict[str, JsonValue],
+    key: str,
+) -> int | None:
+    value = _rule_effect_parameter(effect_payload, key)
+    if value is None:
+        return None
     if type(value) is not int:
         raise GameLifecycleError(f"Generic Stratagem effect parameter {key} must be an int.")
     return value

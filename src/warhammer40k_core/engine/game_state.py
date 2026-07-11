@@ -13,6 +13,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     setup_step_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.aircraft import HoverModeState
 from warhammer40k_core.engine.army_mustering import (
@@ -4033,6 +4034,7 @@ class GameState:
         required_arrival_battle_round: int | None = None,
         required_arrival_phase: BattlePhase | str | None = None,
         required_arrival_source_rule_id: str | None = None,
+        required_arrival_placement_kind: str | None = None,
     ) -> ReserveState:
         if self.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("Repositioned units can only enter reserves during battle.")
@@ -4067,19 +4069,10 @@ class GameState:
         if unit_placement.player_id != requested_player_id:
             raise GameLifecycleError("Repositioned unit placement player_id drift.")
         cargo_state = self.transport_cargo_state_for_transport(requested_unit_id)
-        policy = destruction_deadline_policy
-        if policy is None:
-            policy = (
-                reserve_destruction_policy_from_scoring_policy(
-                    mission_scoring_policy_from_setup(self.mission_setup)
-                )
-                if self.mission_setup is not None
-                else ReserveDestructionTimingPolicy.core_rules_default()
-            )
-        if type(policy) is not ReserveDestructionTimingPolicy:
-            raise GameLifecycleError(
-                "Repositioned unit destruction_deadline_policy must be a policy."
-            )
+        policy = _arrival.reposition_destruction_policy(
+            mission_setup=self.mission_setup,
+            destruction_deadline_policy=destruction_deadline_policy,
+        )
         reserve_state = ReserveState.entered_during_battle(
             player_id=requested_player_id,
             unit_instance_id=requested_unit_id,
@@ -4095,6 +4088,7 @@ class GameState:
             required_arrival_battle_round=required_arrival_battle_round,
             required_arrival_phase=required_arrival_phase,
             required_arrival_source_rule_id=required_arrival_source_rule_id,
+            required_arrival_placement_kind=required_arrival_placement_kind,
         )
         try:
             updated_battlefield = self.battlefield_state.without_unit_placement(requested_unit_id)

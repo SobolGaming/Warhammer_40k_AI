@@ -8,14 +8,18 @@ from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
 
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_generic_metadata import (
+    CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND,
     EFFECT_SELECTION_KIND_KEY,
     REQUIRED_TRIGGER_CONTEXT_KEYS_KEY,
     SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
+    TARGET_REQUIRED_CONTEXTUAL_STATUS_KEY,
     TARGET_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY,
     TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
     companion_selection_error,
     companion_unit_id_or_none,
+    objective_selection_error,
     unit_arrived_from_reserves_this_turn,
+    unit_has_contextual_status,
 )
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -481,6 +485,21 @@ def _generic_rule_ir_stratagem_unavailable_reason(
         and not unit_arrived_from_reserves_this_turn(state=state, unit_instance_id=target_unit_id)
     ):
         return "target_unit_not_arrived_from_reserves_this_turn"
+    target_contextual_status = _optional_generic_metadata_identifier(
+        effect_payload,
+        key=TARGET_REQUIRED_CONTEXTUAL_STATUS_KEY,
+    )
+    if (
+        target_contextual_status is not None
+        and target_unit_id is not None
+        and not unit_has_contextual_status(
+            state=state,
+            player_id=context.player_id,
+            unit_instance_id=target_unit_id,
+            status=target_contextual_status,
+        )
+    ):
+        return "target_unit_missing_contextual_status"
     if (
         effect_payload.get(EFFECT_SELECTION_KIND_KEY)
         == SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND
@@ -494,6 +513,18 @@ def _generic_rule_ir_stratagem_unavailable_reason(
         )
         if companion_error is not None:
             return companion_error
+    if (
+        effect_payload.get(EFFECT_SELECTION_KIND_KEY)
+        == CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND
+    ):
+        objective_error = objective_selection_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+        )
+        if objective_error is not None:
+            return objective_error
     if effect_payload.get(EFFECT_SELECTION_KIND_KEY) == VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND:
         visible_enemy_error = _visible_enemy_selection_error(
             state=state,

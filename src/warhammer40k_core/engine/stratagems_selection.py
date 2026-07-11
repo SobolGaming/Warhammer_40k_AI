@@ -7,8 +7,11 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_generic_metadata import (
     COMPANION_OPTIONAL_KEY,
+    CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND,
+    OBJECTIVE_MARKER_CONTEXT_KEY,
     SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
     companion_unit_id_or_none,
+    objective_marker_id_or_none,
 )
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -138,6 +141,9 @@ def _effect_selection_token(effect_selection: JsonValue) -> str:
     companion_unit_id = companion_unit_id_or_none(effect_selection)
     if companion_unit_id is not None:
         return f"{SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND}:{companion_unit_id}"
+    objective_marker_id = objective_marker_id_or_none(effect_selection)
+    if objective_marker_id is not None:
+        return f"{CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND}:{objective_marker_id}"
     raise GameLifecycleError("Unsupported Stratagem effect selection token.")
 
 
@@ -484,6 +490,26 @@ def _effect_selection_error(
             return "effect_selection_kind_mismatch"
         if companion_unit_id_or_none(effect_selection) is None:
             return "companion_unit_instance_id_required"
+        return None
+    if selection_kind == CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND:
+        if effect_selection is None:
+            return f"{OBJECTIVE_MARKER_CONTEXT_KEY}_required"
+        field_error = _required_effect_selection_fields_error(
+            effect_selection=effect_selection,
+            field_names=(OBJECTIVE_MARKER_CONTEXT_KEY,),
+        )
+        if field_error is not None:
+            return field_error
+        if (
+            _effect_selection_string_or_none(
+                effect_selection=effect_selection,
+                key="effect_selection_kind",
+            )
+            != CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND
+        ):
+            return "effect_selection_kind_mismatch"
+        if objective_marker_id_or_none(effect_selection) is None:
+            return f"{OBJECTIVE_MARKER_CONTEXT_KEY}_required"
         return None
     if effect_selection is not None:
         return "effect_selection_not_supported"

@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 6 | 29 | 46 | 32 |
+| 9 | 6 | 29 | 46 | 38 |
 
 ## Semantic Support Snapshot
 
@@ -40,7 +40,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 | --- | --- | --- |
 | Blood Legion | None | BLOOD BEGETS SKULLS<br>FOOLS’ FLIGHT<br>GORE‑HUNGRY ONSLAUGHT<br>SHEATHED IN BRASS<br>SKULLS BEGET BLOOD<br>WRATH UNDENIABLE |
 | Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations<br>Warp-Riders | None |
-| Daemonic Incursion | None | CORRUPT REALSPACE<br>DAEMONIC INVULNERABILITY<br>DENIZENS OF THE WARP<br>DRAUGHT OF TERROR<br>THE REALM OF CHAOS<br>WARP SURGE |
+| Daemonic Incursion | CORRUPT REALSPACE<br>DAEMONIC INVULNERABILITY<br>DENIZENS OF THE WARP<br>DRAUGHT OF TERROR<br>THE REALM OF CHAOS<br>WARP SURGE | None |
 | Legion of Excess | None | ARCHAGONISTS<br>CAVALCADE OF BLADES<br>OVERWHELMING EXCESS<br>PHANTASMAL LONGING<br>SENSORY EXCRUCIATION<br>THIEVES OF PAIN |
 | Lords of the Warp | Bilious Blessing<br>Call to Murder<br>Carnival of Excess<br>Skirling Magicks | None |
 | Plague Legion | None | FEVER VISIONS<br>FOETID RESURGENCE<br>MURKSHADOWS<br>PLAGUE OF WOES<br>ROT AND RENEWAL<br>SEEPING VIRULENCE |
