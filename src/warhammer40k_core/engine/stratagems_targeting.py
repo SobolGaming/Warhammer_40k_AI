@@ -39,6 +39,8 @@ __all__ = (
     "_command_reroll_permission",
     "_command_reroll_roll_class",
     "_command_reroll_state",
+    "_controlled_objective_marker_ids_for_target",
+    "_deep_strike_arriving_unit_ids",
     "_destroyed_target_by_just_shot_unit_target_context_error",
     "_effect_selection_required_target_keywords",
     "_engaged_enemy_unit_id_or_none",
@@ -230,6 +232,23 @@ def _target_binding_error(
         ):
             return "unit_not_eligible_for_strategic_reserves_ingress"
         return None
+    if target_spec.target_policy_id == DEEP_STRIKE_ARRIVING_TARGET_POLICY_ID:
+        if _require_target_unit_id(target_binding) not in _deep_strike_arriving_unit_ids(
+            state=state,
+            player_id=player_id,
+        ):
+            return "unit_not_eligible_for_deep_strike_arrival"
+        return None
+    if target_spec.target_policy_id == CONTROLLED_OBJECTIVE_UNIT_TARGET_POLICY_ID:
+        if not _target_unit_within_controlled_objective_range(
+            state=state,
+            player_id=player_id,
+            context=context,
+            target_binding=target_binding,
+            ruleset_descriptor=ruleset_descriptor,
+        ):
+            return "unit_not_within_controlled_objective_range"
+        return None
     if target_spec.target_policy_id == GO_TO_GROUND_TARGET_POLICY_ID:
         if context is not None:
             selected_context_error = _selected_target_context_error(
@@ -415,10 +434,29 @@ def _target_unit_within_controlled_objective_range(
     target_binding: StratagemTargetBinding,
     ruleset_descriptor: RulesetDescriptor | None,
 ) -> bool:
+    return bool(
+        _controlled_objective_marker_ids_for_target(
+            state=state,
+            player_id=player_id,
+            context=context,
+            target_binding=target_binding,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+    )
+
+
+def _controlled_objective_marker_ids_for_target(
+    *,
+    state: GameState,
+    player_id: str,
+    context: StratagemEligibilityContext | None,
+    target_binding: StratagemTargetBinding,
+    ruleset_descriptor: RulesetDescriptor | None,
+) -> tuple[str, ...]:
     if state.mission_setup is None or state.battlefield_state is None:
-        return False
+        return ()
     if state.active_player_id is None:
-        return False
+        return ()
     target_unit_id = _require_target_unit_id(target_binding)
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
@@ -428,13 +466,22 @@ def _target_unit_within_controlled_objective_range(
             ruleset_descriptor=ruleset_descriptor,
         )
     )
-    return any(
-        result.controlled_by_player_id == player_id
-        and _objective_control_result_has_unit(
-            result=result,
-            unit_instance_id=target_unit_id,
+    from warhammer40k_core.engine.sticky_objective_control import apply_sticky_objective_control
+
+    record = apply_sticky_objective_control(
+        record=record,
+        states=tuple(state.sticky_objective_control_states),
+    )
+    return tuple(
+        sorted(
+            result.objective_id
+            for result in record.results
+            if result.controlled_by_player_id == player_id
+            and _objective_control_result_has_unit(
+                result=result,
+                unit_instance_id=target_unit_id,
+            )
         )
-        for result in record.results
     )
 
 
@@ -611,6 +658,23 @@ def _strategic_reserves_ingress_unit_ids(
             and reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
         )
     )
+
+
+def _deep_strike_arriving_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ...]:
+    army = state.army_definition_for_player(player_id)
+    if army is None:
+        return ()
+    units_by_id = {unit.unit_instance_id: unit for unit in army.units}
+    unit_ids: list[str] = []
+    for reserve_state in state.unarrived_reserve_states_for_player(player_id):
+        unit = units_by_id.get(reserve_state.unit_instance_id)
+        if unit is None:
+            raise GameLifecycleError("ReserveState references an unknown unit.")
+        if reserve_state.status is ReserveStatus.IN_RESERVES and (
+            reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE or unit_has_deep_strike(unit)
+        ):
+            unit_ids.append(reserve_state.unit_instance_id)
+    return tuple(sorted(unit_ids))
 
 
 def _command_reroll_context_error(

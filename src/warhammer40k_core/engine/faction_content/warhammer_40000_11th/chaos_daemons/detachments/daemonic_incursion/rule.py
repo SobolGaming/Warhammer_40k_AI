@@ -34,6 +34,9 @@ from warhammer40k_core.engine.reserve_arrival_hooks import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model as GeometryModel
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_daemonic_incursion_ir_support_2026_27 as daemonic_incursion_ir,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.generic_rule_ability_registry import GenericRuleAbilitySource
@@ -41,11 +44,15 @@ if TYPE_CHECKING:
 CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:rule:warp_rifts"
 WARP_RIFTS_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts"
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:daemonic-incursion:rule"
+DENIZENS_OF_THE_WARP_SOURCE_RULE_ID = daemonic_incursion_ir.DENIZENS_OF_THE_WARP_SOURCE_RULE_ID
 CHAOS_DAEMONS_FACTION_ID = _CHAOS_DAEMONS_FACTION_ID
 LEGIONES_DAEMONICA = _LEGIONES_DAEMONICA
 DAEMONIC_INCURSION_DETACHMENT_ID = "daemonic-incursion"
 WARP_RIFTS_ENEMY_DISTANCE_INCHES = 6.0
 WARP_RIFTS_ANCHOR_RANGE_INCHES = 6.0
+DENIZENS_OF_THE_WARP_ENEMY_DISTANCE_INCHES = (
+    daemonic_incursion_ir.DENIZENS_OF_THE_WARP_ENEMY_DISTANCE_INCHES
+)
 GOD_KEYWORDS = ("KHORNE", "TZEENTCH", "NURGLE", "SLAANESH")
 
 
@@ -99,6 +106,61 @@ def warp_rifts_distance_grants(
     )
 
 
+def denizens_of_the_warp_distance_grants(
+    context: ReserveArrivalDistanceContext,
+    *,
+    source: GenericRuleAbilitySource,
+) -> tuple[ReserveArrivalDistanceGrant, ...]:
+    if type(context) is not ReserveArrivalDistanceContext:
+        raise GameLifecycleError("Denizens of the Warp requires a reserve arrival context.")
+    _validate_generic_rule_source(source)
+    if context.placement_kind is not BattlefieldPlacementKind.DEEP_STRIKE:
+        return ()
+    if context.attempted_placement.unit_instance_id != context.reserve_state.unit_instance_id:
+        return ()
+    if context.attempted_placement.player_id != context.reserve_state.player_id:
+        return ()
+    if not _unit_has_faction_keyword(context.unit, LEGIONES_DAEMONICA):
+        return ()
+
+    from warhammer40k_core.engine.generic_rule_ability_effects import (
+        generic_rule_ability_effects_for_unit,
+        generic_rule_ability_source_context_payload,
+    )
+
+    matching_effects = generic_rule_ability_effects_for_unit(
+        state=context.state,
+        source=source,
+        unit_instance_id=context.reserve_state.unit_instance_id,
+        ability=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DEEP_STRIKE_DISTANCE_ABILITY,
+    )
+    if not matching_effects:
+        return ()
+    return (
+        ReserveArrivalDistanceGrant(
+            hook_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_HOOK_ID,
+            source_id=DENIZENS_OF_THE_WARP_SOURCE_RULE_ID,
+            enemy_horizontal_distance_inches=DENIZENS_OF_THE_WARP_ENEMY_DISTANCE_INCHES,
+            replay_payload=generic_rule_ability_source_context_payload(
+                source=source,
+                matching_effects=matching_effects,
+                source_rule_id=DENIZENS_OF_THE_WARP_SOURCE_RULE_ID,
+                extra_context={
+                    "effect_kind": "denizens_of_the_warp",
+                    "player_id": context.reserve_state.player_id,
+                    "unit_instance_id": context.reserve_state.unit_instance_id,
+                    "placement_kind": context.placement_kind.value,
+                    "base_enemy_horizontal_distance_inches": (
+                        context.base_enemy_horizontal_distance_inches
+                    ),
+                    "enemy_horizontal_distance_inches": DENIZENS_OF_THE_WARP_ENEMY_DISTANCE_INCHES,
+                    "required_faction_keyword": LEGIONES_DAEMONICA,
+                },
+            ),
+        ),
+    )
+
+
 def _warp_rifts_replay_payload(
     *,
     context: ReserveArrivalDistanceContext,
@@ -136,7 +198,9 @@ def _validate_generic_rule_source(source: object) -> None:
     from warhammer40k_core.engine.generic_rule_ability_registry import GenericRuleAbilitySource
 
     if type(source) is not GenericRuleAbilitySource:
-        raise GameLifecycleError("Warp Rifts generic RuleIR source requires ability source.")
+        raise GameLifecycleError(
+            "Daemonic Incursion generic RuleIR source requires ability source."
+        )
 
 
 def _attempted_unit_wholly_within_shadow(

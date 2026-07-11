@@ -247,6 +247,7 @@ GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
         *lords_ir.LORDS_OF_THE_WARP_STRATAGEM_SOURCE_ROW_IDS,
         *warptide_ir.WARPTIDE_STRATAGEM_SOURCE_ROW_IDS,
     }
+    | set(generic_ir_support_source.supported_daemonic_incursion_stratagem_source_row_ids())
     | set(generic_ir_support_source.supported_shadow_legion_stratagem_source_row_ids())
 )
 COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS = frozenset(

@@ -82,6 +82,7 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
     UnitPlacement,
     UnitPlacementPayload,
+    battlefield_placement_kind_from_token,
     geometry_model_for_placement,
     model_displacement_kind_from_token,
 )
@@ -285,6 +286,7 @@ __all__ = (
     "BattlefieldScenario",
     "BattlefieldTransitionBatch",
     "BattlefieldTransitionBatchPayload",
+    "battlefield_placement_kind_from_token",
     "CORE_FIRE_OVERWATCH_HANDLER_ID",
     "CORE_RAPID_INGRESS_HANDLER_ID",
     "Callable",

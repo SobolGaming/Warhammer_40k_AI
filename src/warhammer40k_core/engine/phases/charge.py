@@ -53,6 +53,7 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationGrantPayload,
     ChargeDeclarationHookRegistry,
 )
+from warhammer40k_core.engine.charge_effects import charge_after_advance_allowed_by_effects
 from warhammer40k_core.engine.charge_rule_effects import (
     charge_path_context_with_rule_effect_permissions,
     enemy_vehicle_monster_model_ids_for_player,
@@ -2475,6 +2476,10 @@ def _charge_unit_ineligibility_reason(
         advanced_state is not None
         and ruleset_descriptor.charge_policy.forbids_advance
         and not advanced_state.can_declare_charge
+        and not charge_after_advance_allowed_by_effects(
+            state=state,
+            unit_instance_id=requested_unit_id,
+        )
     ):
         return "charge_unit_advanced"
     fell_back_state = state.fell_back_unit_state_for_unit(

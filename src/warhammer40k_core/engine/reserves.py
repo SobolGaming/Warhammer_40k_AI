@@ -14,6 +14,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     reserve_destruction_timing_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusteringError
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -146,6 +147,7 @@ class ReserveStatePayload(TypedDict):
     required_arrival_battle_round: int | None
     required_arrival_phase: str | None
     required_arrival_source_rule_id: str | None
+    required_arrival_placement_kind: str | None
     destruction_deadline_policy: ReserveDestructionTimingPolicyPayload
     status: str
     embarked_unit_instance_ids: list[str]
@@ -404,6 +406,7 @@ class ReserveState:
     required_arrival_battle_round: int | None = None
     required_arrival_phase: str | None = None
     required_arrival_source_rule_id: str | None = None
+    required_arrival_placement_kind: str | None = None
     status: ReserveStatus = ReserveStatus.IN_RESERVES
     embarked_unit_instance_ids: tuple[str, ...] = ()
     arrived_battle_round: int | None = None
@@ -495,6 +498,11 @@ class ReserveState:
                 "ReserveState required_arrival_source_rule_id",
                 self.required_arrival_source_rule_id,
             ),
+        )
+        object.__setattr__(
+            self,
+            "required_arrival_placement_kind",
+            _arrival.kind_token(self.required_arrival_placement_kind),
         )
         if type(self.destruction_deadline_policy) is not ReserveDestructionTimingPolicy:
             raise GameLifecycleError("ReserveState destruction_deadline_policy must be a policy.")
@@ -604,6 +612,7 @@ class ReserveState:
         required_arrival_battle_round: int | None = None,
         required_arrival_phase: BattlePhase | str | None = None,
         required_arrival_source_rule_id: str | None = None,
+        required_arrival_placement_kind: BattlefieldPlacementKind | str | None = None,
     ) -> Self:
         resolved_reserve_kind = reserve_kind_from_token(reserve_kind)
         return cls(
@@ -627,6 +636,7 @@ class ReserveState:
                 else battle_phase_token(required_arrival_phase)
             ),
             required_arrival_source_rule_id=required_arrival_source_rule_id,
+            required_arrival_placement_kind=_arrival.kind_token(required_arrival_placement_kind),
             destruction_deadline_policy=(
                 destruction_deadline_policy or ReserveDestructionTimingPolicy.core_rules_default()
             ),
@@ -730,6 +740,7 @@ class ReserveState:
             "required_arrival_battle_round": self.required_arrival_battle_round,
             "required_arrival_phase": self.required_arrival_phase,
             "required_arrival_source_rule_id": self.required_arrival_source_rule_id,
+            "required_arrival_placement_kind": self.required_arrival_placement_kind,
             "destruction_deadline_policy": self.destruction_deadline_policy.to_payload(),
             "status": self.status.value,
             "embarked_unit_instance_ids": list(self.embarked_unit_instance_ids),
@@ -758,6 +769,7 @@ class ReserveState:
             required_arrival_battle_round=payload["required_arrival_battle_round"],
             required_arrival_phase=payload["required_arrival_phase"],
             required_arrival_source_rule_id=payload["required_arrival_source_rule_id"],
+            required_arrival_placement_kind=payload["required_arrival_placement_kind"],
             destruction_deadline_policy=ReserveDestructionTimingPolicy.from_payload(
                 payload["destruction_deadline_policy"]
             ),
@@ -775,46 +787,7 @@ class ReserveState:
         )
 
     def _validate_status_fields(self) -> None:
-        required_arrival_fields = (
-            self.required_arrival_battle_round,
-            self.required_arrival_phase,
-            self.required_arrival_source_rule_id,
-        )
-        if any(value is None for value in required_arrival_fields) and any(
-            value is not None for value in required_arrival_fields
-        ):
-            raise GameLifecycleError("ReserveState required arrival fields must be complete.")
-        if self.status is ReserveStatus.IN_RESERVES:
-            if self.arrived_battle_round is not None or self.arrived_phase is not None:
-                raise GameLifecycleError("Unarrived ReserveState must not have arrival fields.")
-            if self.destroyed_battle_round is not None:
-                raise GameLifecycleError("Unarrived ReserveState must not have destruction fields.")
-        if self.status is ReserveStatus.ARRIVED:
-            if self.arrived_battle_round is None or self.arrived_phase is None:
-                raise GameLifecycleError("Arrived ReserveState requires arrival fields.")
-            if self.destroyed_battle_round is not None:
-                raise GameLifecycleError("Arrived ReserveState must not have destruction fields.")
-            if self.has_required_arrival and (
-                self.arrived_battle_round != self.required_arrival_battle_round
-                or self.arrived_phase != self.required_arrival_phase
-            ):
-                raise GameLifecycleError("Arrived ReserveState must satisfy required arrival.")
-        if self.status is ReserveStatus.DESTROYED:
-            if self.destroyed_battle_round is None:
-                raise GameLifecycleError("Destroyed ReserveState requires destroyed_battle_round.")
-            if self.post_arrival_restrictions:
-                raise GameLifecycleError("Destroyed ReserveState must not keep restrictions.")
-        if self.post_arrival_restrictions and self.restriction_battle_round is None:
-            raise GameLifecycleError("ReserveState restrictions require restriction_battle_round.")
-        if (
-            self.large_model_exception_used
-            and self.post_arrival_restrictions
-            and set(self.post_arrival_restrictions)
-            != set(LARGE_MODEL_STRATEGIC_RESERVE_RESTRICTIONS)
-        ):
-            raise GameLifecycleError(
-                "Large-model ReserveState must record all post-arrival restrictions."
-            )
+        _arrival.validate_status_fields(self)
 
 
 @dataclass(frozen=True, slots=True)

@@ -1,8 +1,10 @@
+# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from typing import cast
 
+import pytest
 from tests.phase10p_reserves_helpers import (
     base_radius_inches,
     battle_state_with_reserve,
@@ -17,6 +19,7 @@ from tests.phase10p_reserves_helpers import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     BaseSizeDefinition,
     CatalogAbilitySourceKind,
@@ -25,17 +28,54 @@ from warhammer40k_core.core.datasheet import (
     DatasheetKeywordSet,
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    DiceRollState,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
+)
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import (
+    AttackProfile,
+    DamageProfile,
+    RangeProfile,
+    WeaponProfile,
+)
+from warhammer40k_core.engine import (
+    generic_rule_lifecycle_ability_sources,
+    reserve_arrival_requirements,
+    stratagems_generic_rule_ir,
+    stratagems_targeting,
+)
+from warhammer40k_core.engine import stratagems_generic_metadata as generic_metadata
+from warhammer40k_core.engine import stratagems_generic_persisted as generic_persisted
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.engine.attack_sequence_dice_rerolls import (
+    _source_backed_save_permission_for_attack,
+    _source_backed_wound_permission_for_attack,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
     ModelPlacement,
     UnitPlacement,
 )
+from warhammer40k_core.engine.charge_effects import (
+    CHARGE_AFTER_ADVANCE_EFFECT_KIND,
+    charge_after_advance_allowed_by_effects,
+)
+from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    EffectExpirationKind,
+    PersistingEffect,
+)
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.runtime import (
     build_runtime_content_bundle,
     build_runtime_content_bundle_for_armies,
@@ -46,6 +86,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
     rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
+    stratagems as daemonic_stratagems,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -53,7 +96,12 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.movement import (
     MovementPhaseHandler,
     MovementPhaseState,
@@ -63,15 +111,37 @@ from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalDistanceHookRegistry,
 )
 from warhammer40k_core.engine.reserves import (
+    ReserveDestructionTimingPolicy,
     ReserveKind,
     ReservePlacementViolationCode,
     ReserveState,
     ReserveStatus,
 )
+from warhammer40k_core.engine.rule_execution import RuleExecutionResult
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    WeaponProfileModifierContext,
+)
+from warhammer40k_core.engine.source_backed_rerolls import (
+    SourceBackedRerollPermissionContext,
+    source_backed_reroll_permission_context_for_unit,
+)
+from warhammer40k_core.engine.stratagems_generic_metadata import (
+    objective_marker_effect_selection,
+)
+from warhammer40k_core.engine.stratagems_model import (
+    StratagemDefinition,
+    StratagemEligibilityContext,
+    StratagemTargetBinding,
+    StratagemTargetKind,
+    StratagemUseRecord,
+)
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_daemonic_incursion_ir_support_2026_27 as daemonic_incursion_ir,
 )
@@ -112,6 +182,14 @@ def test_daemonic_incursion_runtime_hook_materializes_only_for_selected_detachme
     ).to_summary_payload()
 
     assert rule.WARP_RIFTS_HOOK_ID not in other_summary["reserve_arrival_distance_hook_ids"]
+    assert (
+        daemonic_incursion_ir.DENIZENS_OF_THE_WARP_HOOK_ID
+        in summary["reserve_arrival_distance_hook_ids"]
+    )
+    assert (
+        daemonic_incursion_ir.DENIZENS_OF_THE_WARP_HOOK_ID
+        not in other_summary["reserve_arrival_distance_hook_ids"]
+    )
 
 
 def test_daemonic_incursion_execution_record_is_generic_rule_ir() -> None:
@@ -123,6 +201,1143 @@ def test_daemonic_incursion_execution_record_is_generic_rule_ir() -> None:
         faction_generic_ir_support_2026_27.generic_rule_ir_hash_by_coverage_descriptor_id(
             daemonic_incursion_ir.DAEMONIC_INCURSION_DETACHMENT_RULE_DESCRIPTOR_ID
         )
+    )
+
+
+def test_daemonic_incursion_stratagem_runtime_records_are_source_backed() -> None:
+    contribution = daemonic_stratagems.runtime_contribution()
+    records = contribution.stratagem_records
+
+    assert contribution.contribution_id == daemonic_stratagems.CONTRIBUTION_ID
+    assert not contribution.contribution_id.endswith(":scaffold")
+    assert len(records) == 8
+    assert {record.definition.stratagem_id for record in records} == {
+        daemonic_incursion_ir.CORRUPT_REALSPACE_STRATAGEM_ID,
+        daemonic_incursion_ir.WARP_SURGE_STRATAGEM_ID,
+        daemonic_incursion_ir.DRAUGHT_OF_TERROR_STRATAGEM_ID,
+        daemonic_incursion_ir.DENIZENS_OF_THE_WARP_STRATAGEM_ID,
+        daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID,
+        daemonic_incursion_ir.DAEMONIC_INVULNERABILITY_STRATAGEM_ID,
+    }
+    assert all(
+        record.detachment_id == rule.DAEMONIC_INCURSION_DETACHMENT_ID
+        and record.definition.handler_id == "generic:rule-ir"
+        and not record.disabled
+        for record in records
+    )
+    realm_records = tuple(
+        record
+        for record in records
+        if record.definition.stratagem_id == daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID
+    )
+    assert len(realm_records) == 2
+    assert any(
+        isinstance(record.definition.effect_payload, dict)
+        and record.definition.effect_payload.get("effect_selection_kind")
+        == "selected_friendly_companion_unit"
+        for record in realm_records
+    )
+
+
+def test_daemonic_incursion_stratagem_execution_records_are_generic_rule_ir() -> None:
+    stratagem_descriptor_ids = (
+        daemonic_incursion_ir.CORRUPT_REALSPACE_DESCRIPTOR_ID,
+        daemonic_incursion_ir.WARP_SURGE_DESCRIPTOR_ID,
+        daemonic_incursion_ir.DRAUGHT_OF_TERROR_DESCRIPTOR_ID,
+        daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+        daemonic_incursion_ir.THE_REALM_OF_CHAOS_DESCRIPTOR_ID,
+        daemonic_incursion_ir.DAEMONIC_INVULNERABILITY_DESCRIPTOR_ID,
+    )
+
+    for descriptor_id in stratagem_descriptor_ids:
+        record = _execution_record_by_descriptor_id(descriptor_id)
+        assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+        assert record.handler_id is None
+        assert record.rule_ir_hash == (
+            faction_generic_ir_support_2026_27.generic_rule_ir_hash_by_coverage_descriptor_id(
+                descriptor_id
+            )
+        )
+
+
+def test_warp_surge_generic_stratagem_records_charge_after_advance_effect() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    target_unit_id = _ANCHOR_UNIT_ID
+    definition = _daemonic_stratagem_definition(daemonic_incursion_ir.WARP_SURGE_STRATAGEM_ID)
+    decisions = DecisionController()
+    use_record = _daemonic_stratagem_use_record(
+        definition=definition,
+        target_unit_id=target_unit_id,
+        phase=BattlePhase.CHARGE,
+    )
+
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=decisions,
+        definition=definition,
+        use_record=use_record,
+        context=_daemonic_stratagem_context(
+            state=state,
+            phase=BattlePhase.CHARGE,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
+    )
+
+    assert charge_after_advance_allowed_by_effects(
+        state=state,
+        unit_instance_id=target_unit_id,
+    )
+    effect = _persisting_effect_by_kind(
+        state,
+        unit_instance_id=target_unit_id,
+        effect_kind=CHARGE_AFTER_ADVANCE_EFFECT_KIND,
+    )
+    payload = cast(dict[str, JsonValue], effect.effect_payload)
+    assert effect.source_rule_id == _rule_ir_source_id(
+        daemonic_incursion_ir.WARP_SURGE_DESCRIPTOR_ID
+    )
+    assert payload["source_effect_kind"] == "warp_surge"
+    assert payload["stratagem_id"] == daemonic_incursion_ir.WARP_SURGE_STRATAGEM_ID
+    execution_payload = cast(dict[str, JsonValue], payload["generic_rule_execution_result"])
+    assert execution_payload["status"] == "applied"
+    event = last_event_payload(decisions, "generic_stratagem_charge_after_advance_registered")
+    event_effect = cast(dict[str, JsonValue], event["persisting_effect"])
+    assert event_effect["effect_id"] == effect.effect_id
+
+
+def test_corrupt_realspace_generic_stratagem_records_sticky_objective_shadow_state() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    if state.mission_setup is None:
+        raise AssertionError("test state requires mission setup")
+    target_unit_id = _ANCHOR_UNIT_ID
+    objective_id = state.mission_setup.objective_markers[0].objective_marker_id
+    definition = _daemonic_stratagem_definition(
+        daemonic_incursion_ir.CORRUPT_REALSPACE_STRATAGEM_ID
+    )
+    decisions = DecisionController()
+    use_record = _daemonic_stratagem_use_record(
+        definition=definition,
+        target_unit_id=target_unit_id,
+        phase=BattlePhase.COMMAND,
+        effect_selection=objective_marker_effect_selection(objective_id),
+    )
+
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=decisions,
+        definition=definition,
+        use_record=use_record,
+        context=_daemonic_stratagem_context(
+            state=state,
+            phase=BattlePhase.COMMAND,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
+    )
+
+    assert len(state.sticky_objective_control_states) == 1
+    sticky_state = state.sticky_objective_control_states[0]
+    assert sticky_state.objective_id == objective_id
+    assert sticky_state.originating_unit_instance_id == target_unit_id
+    assert sticky_state.source_rule_id == _rule_ir_source_id(
+        daemonic_incursion_ir.CORRUPT_REALSPACE_DESCRIPTOR_ID
+    )
+    replay_payload = cast(dict[str, JsonValue], sticky_state.replay_payload)
+    assert replay_payload["shadow_of_chaos_aura_inches"] == 6.0
+    assert replay_payload["stratagem_id"] == daemonic_incursion_ir.CORRUPT_REALSPACE_STRATAGEM_ID
+    event = last_event_payload(
+        decisions,
+        "generic_stratagem_sticky_objective_control_registered",
+    )
+    event_state = cast(dict[str, JsonValue], event["sticky_objective_control_state"])
+    assert event_state["objective_id"] == objective_id
+
+
+def test_corrupt_realspace_generic_stratagem_requires_objective_selection() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    definition = _daemonic_stratagem_definition(
+        daemonic_incursion_ir.CORRUPT_REALSPACE_STRATAGEM_ID
+    )
+
+    with pytest.raises(GameLifecycleError, match="requires objective selection"):
+        _apply_daemonic_stratagem(
+            state=state,
+            decisions=DecisionController(),
+            definition=definition,
+            use_record=_daemonic_stratagem_use_record(
+                definition=definition,
+                target_unit_id=_ANCHOR_UNIT_ID,
+                phase=BattlePhase.COMMAND,
+            ),
+            context=_daemonic_stratagem_context(
+                state=state,
+                phase=BattlePhase.COMMAND,
+                trigger_kind=TimingTriggerKind.START_PHASE,
+            ),
+        )
+
+
+def test_corrupt_realspace_target_policy_uses_controlled_objective_selection() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    if state.mission_setup is None:
+        raise AssertionError("test state requires mission setup")
+    state.active_player_id = "player-a"
+    target_unit = _unit_by_id(state, _ANCHOR_UNIT_ID)
+    marker = state.mission_setup.objective_markers[0]
+    _place_model(
+        state=state,
+        model_instance_id=target_unit.own_models[0].model_instance_id,
+        pose=Pose.at(
+            x=marker.x_inches,
+            y=marker.y_inches,
+            z=0.0,
+            facing_degrees=0.0,
+        ),
+    )
+    context = _daemonic_stratagem_context(
+        state=state,
+        phase=BattlePhase.COMMAND,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    target_binding = _friendly_daemon_target_binding(_ANCHOR_UNIT_ID)
+    definition = _daemonic_stratagem_definition(
+        daemonic_incursion_ir.CORRUPT_REALSPACE_STRATAGEM_ID
+    )
+
+    selections = generic_metadata.controlled_objective_effect_selections_for_binding(
+        state=state,
+        context=context,
+        target_binding=target_binding,
+    )
+    selected_marker = objective_marker_effect_selection(marker.objective_marker_id)
+
+    assert selected_marker in selections
+    assert (
+        generic_metadata.objective_selection_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=selected_marker,
+        )
+        is None
+    )
+    assert (
+        generic_metadata.objective_selection_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=None,
+        )
+        == "objective_marker_id_required"
+    )
+    assert (
+        generic_metadata.objective_selection_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=objective_marker_effect_selection("uncontrolled-objective"),
+        )
+        == "objective_marker_not_controlled_by_target_unit"
+    )
+    assert (
+        generic_metadata.objective_selection_error(
+            state=state,
+            context=context,
+            target_binding=None,
+            effect_selection=selected_marker,
+        )
+        == "target_unit_required"
+    )
+    assert (
+        generic_metadata.objective_selection_error(
+            state=state,
+            context=context,
+            target_binding=_friendly_daemon_target_binding(_RESERVE_UNIT_ID),
+            effect_selection=selected_marker,
+        )
+        == "no_controlled_objective_marker"
+    )
+    assert (
+        generic_metadata.objective_marker_id_or_none(
+            {
+                generic_metadata.EFFECT_SELECTION_KIND_KEY: "wrong-selection-kind",
+                generic_metadata.OBJECTIVE_MARKER_CONTEXT_KEY: marker.objective_marker_id,
+            }
+        )
+        is None
+    )
+    assert (
+        generic_metadata.objective_marker_id_or_none(
+            {
+                generic_metadata.EFFECT_SELECTION_KIND_KEY: (
+                    generic_metadata.CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND
+                )
+            }
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="must contain a marker ID"):
+        generic_metadata.objective_marker_id_or_none(
+            {
+                generic_metadata.EFFECT_SELECTION_KIND_KEY: (
+                    generic_metadata.CONTROLLED_OBJECTIVE_MARKER_EFFECT_SELECTION_KIND
+                ),
+                generic_metadata.OBJECTIVE_MARKER_CONTEXT_KEY: 1,
+            }
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported contextual status"):
+        generic_metadata.unit_has_contextual_status(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=_ANCHOR_UNIT_ID,
+            status="unsupported-status",
+        )
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        generic_metadata._payload_string("phase17g-metadata", 1)
+    with pytest.raises(GameLifecycleError, match="must not be empty"):
+        generic_metadata._payload_string("phase17g-metadata", "   ")
+    assert (
+        stratagems_targeting._target_binding_error(
+            state=state,
+            player_id="player-a",
+            target_spec=definition.target_spec,
+            policy=definition.restriction_policy,
+            target_binding=target_binding,
+            context=context,
+            ruleset_descriptor=_ruleset(),
+            army_catalog=_daemonic_incursion_catalog(),
+        )
+        is None
+    )
+
+
+def test_denizens_target_policy_requires_deep_strike_arriving_unit() -> None:
+    state, reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    context = _daemonic_stratagem_context(
+        state=state,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    target_binding = _friendly_daemon_target_binding(reserve_state.unit_instance_id)
+    definition = _daemonic_stratagem_definition(
+        daemonic_incursion_ir.DENIZENS_OF_THE_WARP_STRATAGEM_ID
+    )
+
+    assert stratagems_targeting._deep_strike_arriving_unit_ids(
+        state=state,
+        player_id="player-a",
+    ) == (reserve_state.unit_instance_id,)
+    assert (
+        stratagems_targeting._target_binding_error(
+            state=state,
+            player_id="player-a",
+            target_spec=definition.target_spec,
+            policy=definition.restriction_policy,
+            target_binding=target_binding,
+            context=context,
+            ruleset_descriptor=_ruleset(),
+            army_catalog=_daemonic_incursion_catalog(),
+        )
+        is None
+    )
+
+    state.replace_reserve_state(
+        replace(
+            reserve_state,
+            status=ReserveStatus.ARRIVED,
+            arrived_battle_round=1,
+            arrived_phase=BattlePhase.MOVEMENT.value,
+        )
+    )
+
+    assert (
+        stratagems_targeting._deep_strike_arriving_unit_ids(
+            state=state,
+            player_id="player-a",
+        )
+        == ()
+    )
+    assert (
+        stratagems_targeting._target_binding_error(
+            state=state,
+            player_id="player-a",
+            target_spec=definition.target_spec,
+            policy=definition.restriction_policy,
+            target_binding=target_binding,
+            context=context,
+            ruleset_descriptor=_ruleset(),
+            army_catalog=_daemonic_incursion_catalog(),
+        )
+        == "unit_not_eligible_for_deep_strike_arrival"
+    )
+
+
+def test_daemonic_invulnerability_save_reroll_permission_filters_unmodified_ones() -> None:
+    permission_context = _daemonic_invulnerability_permission_context(
+        {"conditional_save_reroll": {"reroll_unmodified_values": [1]}}
+    )
+    failed_save = _save_roll_state(value=1)
+    passed_save = _save_roll_state(value=2)
+
+    permission = _source_backed_save_permission_for_attack(
+        permission_context=permission_context,
+        roll_state=failed_save,
+    )
+
+    assert permission is not None
+    assert (
+        permission.component_selection_policy is RerollComponentSelectionPolicy.COMPONENT_SELECTION
+    )
+    assert permission.allowed_component_selections == ((0,),)
+    assert (
+        _source_backed_save_permission_for_attack(
+            permission_context=permission_context,
+            roll_state=passed_save,
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="must be an object"):
+        _source_backed_save_permission_for_attack(
+            permission_context=_daemonic_invulnerability_permission_context(
+                {"conditional_save_reroll": "bad-payload"}
+            ),
+            roll_state=failed_save,
+        )
+    with pytest.raises(GameLifecycleError, match="requires integer reroll values"):
+        _source_backed_save_permission_for_attack(
+            permission_context=_daemonic_invulnerability_permission_context(
+                {"conditional_save_reroll": {"reroll_unmodified_values": [True]}}
+            ),
+            roll_state=failed_save,
+        )
+
+
+def test_draught_of_terror_exposes_battle_shocked_wound_reroll_permission() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    target_unit_id = _ANCHOR_UNIT_ID
+    enemy_unit_id = _enemy_unit_id(state)
+    definition = _daemonic_stratagem_definition_for_phase(
+        daemonic_incursion_ir.DRAUGHT_OF_TERROR_STRATAGEM_ID,
+        phase=BattlePhase.SHOOTING,
+    )
+    decisions = DecisionController()
+
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=decisions,
+        definition=definition,
+        use_record=_daemonic_stratagem_use_record(
+            definition=definition,
+            target_unit_id=target_unit_id,
+            phase=BattlePhase.SHOOTING,
+        ),
+        context=_daemonic_stratagem_context(
+            state=state,
+            phase=BattlePhase.SHOOTING,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
+    )
+
+    permission_context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+        roll_type="attack_sequence.wound",
+        timing_window="attack_sequence.wound",
+        target_unit_instance_id=enemy_unit_id,
+    )
+
+    assert permission_context is not None
+    conditional = permission_context.source_payload["conditional_wound_reroll"]
+    assert isinstance(conditional, dict)
+    assert conditional["reroll_unmodified_values"] == []
+    assert conditional["full_reroll_if_target_battle_shocked"] is True
+    wound_roll = _wound_roll_state(value=2)
+    assert (
+        _source_backed_wound_permission_for_attack(
+            state=state,
+            permission_context=permission_context,
+            roll_state=wound_roll,
+            target_unit_instance_id=enemy_unit_id,
+            attacker_keywords=_unit_by_id(state, target_unit_id).keywords,
+        )
+        is None
+    )
+
+    state.battle_shocked_unit_ids.append(enemy_unit_id)
+    permission = _source_backed_wound_permission_for_attack(
+        state=state,
+        permission_context=permission_context,
+        roll_state=wound_roll,
+        target_unit_instance_id=enemy_unit_id,
+        attacker_keywords=_unit_by_id(state, target_unit_id).keywords,
+    )
+
+    assert permission is not None
+    assert permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+    assert permission.allowed_component_selections is None
+
+
+def test_draught_of_terror_improves_weapon_ap_through_generic_attack_hook() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    target_unit = _unit_by_id(state, _ANCHOR_UNIT_ID)
+    enemy_unit_id = _enemy_unit_id(state)
+    definition = _daemonic_stratagem_definition_for_phase(
+        daemonic_incursion_ir.DRAUGHT_OF_TERROR_STRATAGEM_ID,
+        phase=BattlePhase.SHOOTING,
+    )
+    profile = _weapon_profile()
+
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=DecisionController(),
+        definition=definition,
+        use_record=_daemonic_stratagem_use_record(
+            definition=definition,
+            target_unit_id=target_unit.unit_instance_id,
+            phase=BattlePhase.SHOOTING,
+        ),
+        context=_daemonic_stratagem_context(
+            state=state,
+            phase=BattlePhase.SHOOTING,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
+    )
+
+    modified = RuntimeModifierRegistry.empty().modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=target_unit.unit_instance_id,
+            attacker_model_instance_id=target_unit.own_models[0].model_instance_id,
+            target_unit_instance_id=enemy_unit_id,
+            weapon_profile=profile,
+        )
+    )
+
+    assert modified.armor_penetration.final == profile.armor_penetration.final - 1
+
+
+def test_draught_of_terror_wound_reroll_payload_validation_is_fail_fast() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    enemy_unit_id = _enemy_unit_id(state)
+    wound_roll = _wound_roll_state(value=1)
+
+    with pytest.raises(GameLifecycleError, match="must be an object"):
+        _source_backed_wound_permission_for_attack(
+            state=state,
+            permission_context=_daemonic_wound_permission_context(
+                {"conditional_wound_reroll": "bad-payload"}
+            ),
+            roll_state=wound_roll,
+            target_unit_instance_id=enemy_unit_id,
+            attacker_keywords=(),
+        )
+    with pytest.raises(GameLifecycleError, match="requires integer reroll values"):
+        _source_backed_wound_permission_for_attack(
+            state=state,
+            permission_context=_daemonic_wound_permission_context(
+                {"conditional_wound_reroll": {"reroll_unmodified_values": [True]}}
+            ),
+            roll_state=wound_roll,
+            target_unit_instance_id=enemy_unit_id,
+            attacker_keywords=(),
+        )
+    with pytest.raises(GameLifecycleError, match="battle-shock reroll must be bool"):
+        _source_backed_wound_permission_for_attack(
+            state=state,
+            permission_context=_daemonic_wound_permission_context(
+                {
+                    "conditional_wound_reroll": {
+                        "full_reroll_if_target_battle_shocked": "yes",
+                        "reroll_unmodified_values": [1],
+                    }
+                }
+            ),
+            roll_state=wound_roll,
+            target_unit_instance_id=enemy_unit_id,
+            attacker_keywords=(),
+        )
+
+
+def test_daemonic_invulnerability_save_reroll_without_condition_uses_permission() -> None:
+    permission_context = _daemonic_invulnerability_permission_context({})
+    permission = _source_backed_save_permission_for_attack(
+        permission_context=permission_context,
+        roll_state=_save_roll_state(value=4),
+    )
+
+    assert permission is permission_context.permission
+
+
+def test_the_realm_of_chaos_removes_unit_to_deep_strike_required_reserves() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    definition = _daemonic_stratagem_definition_by_effect_selection_kind(
+        daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID,
+        effect_selection_kind=None,
+    )
+    decisions = DecisionController()
+
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=decisions,
+        definition=definition,
+        use_record=_daemonic_stratagem_use_record(
+            definition=definition,
+            target_unit_id=_ANCHOR_UNIT_ID,
+            phase=BattlePhase.MOVEMENT,
+        ),
+        context=_daemonic_stratagem_context(
+            state=state,
+            phase=BattlePhase.MOVEMENT,
+            trigger_kind=TimingTriggerKind.END_TURN,
+        ),
+    )
+
+    reserve_state = state.reserve_state_for_unit(_ANCHOR_UNIT_ID)
+    assert reserve_state is not None
+    assert reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
+    assert reserve_state.required_arrival_battle_round == state.battle_round + 1
+    assert reserve_state.required_arrival_phase == BattlePhase.MOVEMENT.value
+    assert (
+        reserve_state.required_arrival_placement_kind == BattlefieldPlacementKind.DEEP_STRIKE.value
+    )
+    assert (
+        reserve_state.required_arrival_source_rule_id
+        == daemonic_incursion_ir.THE_REALM_OF_CHAOS_SOURCE_RULE_ID
+    )
+    event = last_event_payload(decisions, "generic_stratagem_reserve_removal_resolved")
+    reserve_payloads = cast(list[JsonValue], event["reserve_states"])
+    assert len(reserve_payloads) == 1
+    reserve_payload = cast(dict[str, JsonValue], reserve_payloads[0])
+    assert reserve_payload["unit_instance_id"] == _ANCHOR_UNIT_ID
+    assert reserve_payload["required_arrival_placement_kind"] == "deep_strike"
+
+
+def test_the_realm_of_chaos_companion_selection_requires_shadow_units() -> None:
+    state, _reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
+    if state.mission_setup is None:
+        raise AssertionError("test state requires mission setup")
+    target_unit = _unit_by_id(state, _ANCHOR_UNIT_ID)
+    marker = state.mission_setup.objective_markers[0]
+    marker_pose = Pose.at(
+        x=marker.x_inches,
+        y=marker.y_inches,
+        z=0.0,
+        facing_degrees=0.0,
+    )
+    _place_model(
+        state=state,
+        model_instance_id=target_unit.own_models[0].model_instance_id,
+        pose=marker_pose,
+    )
+    _place_unit_on_battlefield(state=state, unit=reserve_unit, pose=marker_pose)
+    corrupt_definition = _daemonic_stratagem_definition(
+        daemonic_incursion_ir.CORRUPT_REALSPACE_STRATAGEM_ID
+    )
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=DecisionController(),
+        definition=corrupt_definition,
+        use_record=_daemonic_stratagem_use_record(
+            definition=corrupt_definition,
+            target_unit_id=target_unit.unit_instance_id,
+            phase=BattlePhase.COMMAND,
+            effect_selection=objective_marker_effect_selection(marker.objective_marker_id),
+        ),
+        context=_daemonic_stratagem_context(
+            state=state,
+            phase=BattlePhase.COMMAND,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
+    )
+    definition = _daemonic_stratagem_definition_by_effect_selection_kind(
+        daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID,
+        effect_selection_kind=generic_metadata.SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
+    )
+    context = _daemonic_stratagem_context(
+        state=state,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.END_TURN,
+    )
+    target_binding = _friendly_daemon_target_binding(target_unit.unit_instance_id)
+    companion_selection = generic_metadata.companion_unit_effect_selection(
+        reserve_unit.unit_instance_id
+    )
+
+    selections = generic_metadata.companion_effect_selections_for_binding(
+        state=state,
+        definition=definition,
+        context=context,
+        target_binding=target_binding,
+    )
+
+    assert companion_selection in selections
+    assert (
+        generic_metadata.companion_selection_error(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=companion_selection,
+        )
+        is None
+    )
+    assert generic_metadata.generic_rule_ir_execution_target_unit_ids(
+        _daemonic_stratagem_use_record(
+            definition=definition,
+            target_unit_id=target_unit.unit_instance_id,
+            phase=BattlePhase.MOVEMENT,
+            effect_selection=companion_selection,
+        )
+    ) == tuple(sorted((target_unit.unit_instance_id, reserve_unit.unit_instance_id)))
+
+
+def test_denizens_lifecycle_ability_sources_filter_selected_daemonic_incursion() -> None:
+    execution_records = faction_execution_2026_27.phase17f_execution_package().execution_records
+    selected_sources = generic_rule_lifecycle_ability_sources.generic_rule_ability_sources(
+        activation=_runtime_activation(
+            selected_detachment_ids=(rule.DAEMONIC_INCURSION_DETACHMENT_ID,),
+        ),
+        execution_records=execution_records,
+        coverage_descriptor_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+        ability_ids=(daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DEEP_STRIKE_DISTANCE_ABILITY,),
+    )
+
+    assert len(selected_sources) == 1
+    assert (
+        selected_sources[0].record.coverage_descriptor_id
+        == daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID
+    )
+    assert (
+        generic_rule_lifecycle_ability_sources.generic_rule_ability_sources(
+            activation=_runtime_activation(selected_detachment_ids=(_OTHER_DAEMON_DETACHMENT_ID,)),
+            execution_records=execution_records,
+            coverage_descriptor_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+            ability_ids=(daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DEEP_STRIKE_DISTANCE_ABILITY,),
+        )
+        == ()
+    )
+    assert (
+        generic_rule_lifecycle_ability_sources.generic_rule_ability_sources(
+            activation=_runtime_activation(
+                selected_detachment_ids=(rule.DAEMONIC_INCURSION_DETACHMENT_ID,),
+            ),
+            execution_records=execution_records,
+            coverage_descriptor_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+            ability_ids=("phase17g-daemonic-incursion:missing-ability",),
+        )
+        == ()
+    )
+
+    with pytest.raises(GameLifecycleError, match="require activation"):
+        generic_rule_lifecycle_ability_sources.generic_rule_ability_sources(
+            activation=cast(RuntimeContentActivation, object()),
+            execution_records=execution_records,
+            coverage_descriptor_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+            ability_ids=(daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DEEP_STRIKE_DISTANCE_ABILITY,),
+        )
+    with pytest.raises(GameLifecycleError, match="require execution records"):
+        generic_rule_lifecycle_ability_sources.generic_rule_ability_sources(
+            activation=_runtime_activation(
+                selected_detachment_ids=(rule.DAEMONIC_INCURSION_DETACHMENT_ID,),
+            ),
+            execution_records=cast(
+                tuple[faction_execution_2026_27.Phase17FExecutionRecord, ...],
+                [],
+            ),
+            coverage_descriptor_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+            ability_ids=(daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DEEP_STRIKE_DISTANCE_ABILITY,),
+        )
+    with pytest.raises(GameLifecycleError, match="require execution records"):
+        generic_rule_lifecycle_ability_sources.generic_rule_ability_sources(
+            activation=_runtime_activation(
+                selected_detachment_ids=(rule.DAEMONIC_INCURSION_DETACHMENT_ID,),
+            ),
+            execution_records=(cast(faction_execution_2026_27.Phase17FExecutionRecord, object()),),
+            coverage_descriptor_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+            ability_ids=(daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DEEP_STRIKE_DISTANCE_ABILITY,),
+        )
+    with pytest.raises(GameLifecycleError, match="requires RuleIR"):
+        generic_rule_lifecycle_ability_sources._validate_record_rule_ir_hash(
+            record=selected_sources[0].record,
+            rule_ir=cast(RuleIR, object()),
+        )
+    missing_hash_record = replace(selected_sources[0].record)
+    object.__setattr__(missing_hash_record, "rule_ir_hash", None)
+    with pytest.raises(GameLifecycleError, match="requires rule_ir_hash"):
+        generic_rule_lifecycle_ability_sources._validate_record_rule_ir_hash(
+            record=missing_hash_record,
+            rule_ir=_rule_ir_by_descriptor_id(
+                daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="hash drift"):
+        generic_rule_lifecycle_ability_sources.generic_rule_ability_sources(
+            activation=_runtime_activation(
+                selected_detachment_ids=(rule.DAEMONIC_INCURSION_DETACHMENT_ID,),
+            ),
+            execution_records=(replace(selected_sources[0].record, rule_ir_hash="0" * 64),),
+            coverage_descriptor_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+            ability_ids=(daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DEEP_STRIKE_DISTANCE_ABILITY,),
+        )
+
+
+def test_reserve_arrival_requirement_helpers_are_fail_fast() -> None:
+    _state, reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    assert reserve_arrival_requirements.kind_token(None) is None
+    assert (
+        reserve_arrival_requirements.kind_token(BattlefieldPlacementKind.DEEP_STRIKE)
+        == BattlefieldPlacementKind.DEEP_STRIKE.value
+    )
+    assert (
+        reserve_arrival_requirements.kind_token("deep_strike")
+        == BattlefieldPlacementKind.DEEP_STRIKE.value
+    )
+    with pytest.raises(GameLifecycleError, match="fields must be complete"):
+        reserve_arrival_requirements.validate_fields(
+            battle_round=2,
+            phase=None,
+            source_rule_id=daemonic_incursion_ir.THE_REALM_OF_CHAOS_SOURCE_RULE_ID,
+            placement_kind=None,
+        )
+    with pytest.raises(GameLifecycleError, match="placement kind requires required arrival"):
+        reserve_arrival_requirements.validate_fields(
+            battle_round=None,
+            phase=None,
+            source_rule_id=None,
+            placement_kind=BattlefieldPlacementKind.DEEP_STRIKE.value,
+        )
+    with pytest.raises(GameLifecycleError, match="satisfy required arrival"):
+        reserve_arrival_requirements.validate_status_fields(
+            replace(
+                reserve_state,
+                status=ReserveStatus.ARRIVED,
+                arrived_battle_round=3,
+                arrived_phase=BattlePhase.MOVEMENT.value,
+                required_arrival_battle_round=2,
+                required_arrival_phase=BattlePhase.MOVEMENT.value,
+                required_arrival_source_rule_id=(
+                    daemonic_incursion_ir.THE_REALM_OF_CHAOS_SOURCE_RULE_ID
+                ),
+                required_arrival_placement_kind=BattlefieldPlacementKind.DEEP_STRIKE.value,
+            )
+        )
+    assert (
+        reserve_arrival_requirements.reposition_destruction_policy(
+            mission_setup=None,
+            destruction_deadline_policy=None,
+        )
+        == ReserveDestructionTimingPolicy.core_rules_default()
+    )
+    explicit_policy = ReserveDestructionTimingPolicy.core_rules_default()
+    assert (
+        reserve_arrival_requirements.reposition_destruction_policy(
+            mission_setup=None,
+            destruction_deadline_policy=explicit_policy,
+        )
+        is explicit_policy
+    )
+    with pytest.raises(GameLifecycleError, match="must be a policy"):
+        reserve_arrival_requirements.reposition_destruction_policy(
+            mission_setup=None,
+            destruction_deadline_policy="invalid-policy",
+        )
+
+
+def test_warp_surge_persisted_duration_validation_is_fail_fast() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    context = _daemonic_stratagem_context(
+        state=state,
+        phase=BattlePhase.CHARGE,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    use_record = _daemonic_stratagem_use_record(
+        definition=_daemonic_stratagem_definition(daemonic_incursion_ir.WARP_SURGE_STRATAGEM_ID),
+        target_unit_id=_ANCHOR_UNIT_ID,
+        phase=BattlePhase.CHARGE,
+    )
+    rule_ir = _rule_ir_by_descriptor_id(daemonic_incursion_ir.WARP_SURGE_DESCRIPTOR_ID)
+    effect_payload = _single_rule_effect_payload(
+        descriptor_id=daemonic_incursion_ir.WARP_SURGE_DESCRIPTOR_ID,
+        effect_kind="grant_ability",
+    )
+    decisions = DecisionController()
+
+    generic_persisted.record_generic_charge_after_advance_effect(
+        state=state,
+        decisions=decisions,
+        context=context,
+        use_record=use_record,
+        rule_result=_rule_result(rule_ir, effect_payload),
+        effect_payload={
+            **effect_payload,
+            "duration": {"kind": "permanent", "parameters": []},
+        },
+    )
+
+    effect = _persisting_effect_by_kind(
+        state,
+        unit_instance_id=_ANCHOR_UNIT_ID,
+        effect_kind=CHARGE_AFTER_ADVANCE_EFFECT_KIND,
+    )
+    assert effect.expiration.expiration_kind is EffectExpirationKind.END_OF_BATTLE
+    with pytest.raises(GameLifecycleError, match="requires duration"):
+        generic_persisted.record_generic_charge_after_advance_effect(
+            state=state,
+            decisions=DecisionController(),
+            context=context,
+            use_record=use_record,
+            rule_result=_rule_result(rule_ir, effect_payload),
+            effect_payload={
+                key: value for key, value in effect_payload.items() if key != "duration"
+            },
+        )
+    with pytest.raises(GameLifecycleError, match="endpoint is unsupported"):
+        generic_persisted.record_generic_charge_after_advance_effect(
+            state=state,
+            decisions=DecisionController(),
+            context=context,
+            use_record=use_record,
+            rule_result=_rule_result(rule_ir, effect_payload),
+            effect_payload={
+                **effect_payload,
+                "duration": {
+                    "kind": "until_timing_endpoint",
+                    "parameters": [{"key": "endpoint", "value": "unsupported-endpoint"}],
+                },
+            },
+        )
+
+
+def test_warp_surge_persisted_payload_validation_is_fail_fast() -> None:
+    _state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    definition = _daemonic_stratagem_definition(daemonic_incursion_ir.WARP_SURGE_STRATAGEM_ID)
+    use_record = _daemonic_stratagem_use_record(
+        definition=definition,
+        target_unit_id=_ANCHOR_UNIT_ID,
+        phase=BattlePhase.CHARGE,
+    )
+
+    with pytest.raises(GameLifecycleError, match="requires use record"):
+        generic_persisted._single_target_unit_id(cast(StratagemUseRecord, object()))
+    with pytest.raises(GameLifecycleError, match="requires one target unit"):
+        generic_persisted._single_target_unit_id(replace(use_record, targeted_unit_instance_ids=()))
+    with pytest.raises(GameLifecycleError, match="requires source_id"):
+        generic_persisted._rule_effect_source_id({})
+
+    with pytest.raises(GameLifecycleError, match="requires effect object"):
+        generic_persisted._rule_effect_parameter({}, "source_effect_kind")
+    with pytest.raises(GameLifecycleError, match="parameters must be a list"):
+        generic_persisted._rule_effect_parameter(
+            {"effect": {"parameters": "not-a-list"}},
+            "source_effect_kind",
+        )
+    with pytest.raises(GameLifecycleError, match="parameter must be an object"):
+        generic_persisted._rule_effect_parameter(
+            {"effect": {"parameters": ["not-an-object"]}},
+            "source_effect_kind",
+        )
+
+    missing_parameter_payload: dict[str, JsonValue] = {
+        "effect": {"parameters": [{"key": "other", "value": "ignored"}]}
+    }
+    assert (
+        generic_persisted._optional_rule_effect_string_parameter(
+            missing_parameter_payload,
+            "source_effect_kind",
+        )
+        is None
+    )
+    bad_string_payload: dict[str, JsonValue] = {
+        "effect": {"parameters": [{"key": "source_effect_kind", "value": 1}]}
+    }
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        generic_persisted._required_rule_effect_string_parameter(
+            bad_string_payload,
+            "source_effect_kind",
+        )
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        generic_persisted._optional_rule_effect_string_parameter(
+            bad_string_payload,
+            "source_effect_kind",
+        )
+
+
+def test_warp_surge_persisted_duration_helper_supports_turn_and_battle_endpoints() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    context = _daemonic_stratagem_context(
+        state=state,
+        phase=BattlePhase.CHARGE,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    use_record = _daemonic_stratagem_use_record(
+        definition=_daemonic_stratagem_definition(daemonic_incursion_ir.WARP_SURGE_STRATAGEM_ID),
+        target_unit_id=_ANCHOR_UNIT_ID,
+        phase=BattlePhase.CHARGE,
+    )
+    effect_payload = _single_rule_effect_payload(
+        descriptor_id=daemonic_incursion_ir.WARP_SURGE_DESCRIPTOR_ID,
+        effect_kind="grant_ability",
+    )
+
+    turn_expiration = generic_persisted._expiration_for_rule_effect_payload(
+        effect_payload={
+            **effect_payload,
+            "duration": {
+                "kind": "until_timing_endpoint",
+                "parameters": [{"key": "endpoint", "value": "turn"}],
+            },
+        },
+        context=context,
+        use_record=use_record,
+    )
+    assert turn_expiration.expiration_kind is EffectExpirationKind.END_TURN
+    assert turn_expiration.player_id == "player-a"
+    battle_expiration = generic_persisted._expiration_for_rule_effect_payload(
+        effect_payload={
+            **effect_payload,
+            "duration": {
+                "kind": "until_timing_endpoint",
+                "parameters": [{"key": "endpoint", "value": "battle"}],
+            },
+        },
+        context=context,
+        use_record=use_record,
+    )
+    assert battle_expiration.expiration_kind is EffectExpirationKind.END_OF_BATTLE
+
+    with pytest.raises(GameLifecycleError, match="duration is unsupported"):
+        generic_persisted._expiration_for_rule_effect_payload(
+            effect_payload={**effect_payload, "duration": {"kind": "unsupported"}},
+            context=context,
+            use_record=use_record,
+        )
+    with pytest.raises(GameLifecycleError, match="parameters must be a list"):
+        generic_persisted._duration_parameter({"parameters": "not-a-list"}, "endpoint")
+    with pytest.raises(GameLifecycleError, match="parameter must be an object"):
+        generic_persisted._duration_parameter({"parameters": ["bad"]}, "endpoint")
+    assert (
+        generic_persisted._duration_parameter(
+            {
+                "parameters": [
+                    {"key": "other", "value": "ignored"},
+                    {"key": "endpoint", "value": "turn"},
+                ]
+            },
+            "endpoint",
+        )
+        == "turn"
+    )
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        generic_persisted._duration_parameter(
+            {"parameters": [{"key": "endpoint", "value": 1}]},
+            "endpoint",
+        )
+    with pytest.raises(GameLifecycleError, match="parameter is missing"):
+        generic_persisted._duration_parameter(
+            {"parameters": [{"key": "other", "value": "turn"}]},
+            "endpoint",
+        )
+
+
+def test_corrupt_realspace_persisted_payload_validation_is_fail_fast() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    if state.mission_setup is None:
+        raise AssertionError("test state requires mission setup")
+    objective_id = state.mission_setup.objective_markers[0].objective_marker_id
+    definition = _daemonic_stratagem_definition(
+        daemonic_incursion_ir.CORRUPT_REALSPACE_STRATAGEM_ID
+    )
+    use_record = _daemonic_stratagem_use_record(
+        definition=definition,
+        target_unit_id=_ANCHOR_UNIT_ID,
+        phase=BattlePhase.COMMAND,
+        effect_selection=objective_marker_effect_selection(objective_id),
+    )
+    context = _daemonic_stratagem_context(
+        state=state,
+        phase=BattlePhase.COMMAND,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    rule_ir = _rule_ir_by_descriptor_id(daemonic_incursion_ir.CORRUPT_REALSPACE_DESCRIPTOR_ID)
+    effect_payload = _single_rule_effect_payload(
+        descriptor_id=daemonic_incursion_ir.CORRUPT_REALSPACE_DESCRIPTOR_ID,
+        effect_kind="set_contextual_status",
+    )
+    rule_result = _rule_result(rule_ir, effect_payload)
+
+    with pytest.raises(GameLifecycleError, match="requires active player"):
+        generic_persisted.record_generic_sticky_objective_control_state(
+            state=state,
+            decisions=DecisionController(),
+            context=replace(context, active_player_id=None),
+            use_record=use_record,
+            rule_result=rule_result,
+            effect_payload=effect_payload,
+        )
+    with pytest.raises(GameLifecycleError, match="requires objective selection"):
+        generic_persisted.record_generic_sticky_objective_control_state(
+            state=state,
+            decisions=DecisionController(),
+            context=context,
+            use_record=use_record,
+            rule_result=rule_result,
+            effect_payload=_with_rule_effect_parameter(
+                effect_payload,
+                key="objective_selection",
+                value="wrong-selection",
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        generic_persisted.record_generic_sticky_objective_control_state(
+            state=state,
+            decisions=DecisionController(),
+            context=context,
+            use_record=use_record,
+            rule_result=rule_result,
+            effect_payload=_with_rule_effect_parameter(
+                effect_payload,
+                key="sticky_effect_kind",
+                value=1,
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="must be numeric"):
+        generic_persisted.record_generic_sticky_objective_control_state(
+            state=state,
+            decisions=DecisionController(),
+            context=context,
+            use_record=use_record,
+            rule_result=rule_result,
+            effect_payload=_with_rule_effect_parameter(
+                effect_payload,
+                key="shadow_of_chaos_aura_inches",
+                value="six",
+            ),
+        )
+
+
+def test_charge_after_advance_effect_helper_ignores_non_object_payloads() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="phase17g-daemonic-incursion:list-payload-effect",
+            source_rule_id=daemonic_incursion_ir.WARP_SURGE_SOURCE_RULE_ID,
+            owner_player_id="player-a",
+            target_unit_instance_ids=(_ANCHOR_UNIT_ID,),
+            started_battle_round=1,
+            started_phase=BattlePhase.CHARGE,
+            expiration=EffectExpiration.end_phase(
+                battle_round=1,
+                phase=BattlePhase.CHARGE,
+                player_id="player-a",
+            ),
+            effect_payload=["not-an-object"],
+        )
+    )
+
+    assert not charge_after_advance_allowed_by_effects(
+        state=state,
+        unit_instance_id=_ANCHOR_UNIT_ID,
     )
 
 
@@ -393,6 +1608,331 @@ def test_warp_rifts_replay_payload_preserves_generic_rule_ir_source_context() ->
     assert payload["shared_god_keywords"] == ["KHORNE"]
 
 
+def test_denizens_of_the_warp_effect_allows_deep_strike_more_than_six_from_enemy() -> None:
+    state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
+    _set_movement_ready_for_reinforcements(state, battle_round=1)
+    target_pose = Pose.at(x=30.0, y=22.0, z=0.0, facing_degrees=0.0)
+    _place_enemy_at_base_distance(state=state, target_pose=target_pose, distance_inches=7.0)
+    context = _reserve_arrival_distance_context(
+        state=state,
+        reserve_state=reserve_state,
+        reserve_unit=reserve_unit,
+        attempted_placement=single_model_reserve_placement(
+            reserve_unit=reserve_unit,
+            pose=target_pose,
+        ),
+        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+    )
+
+    assert _runtime_reserve_arrival_registry(state).grants_for(context) == ()
+
+    state.record_persisting_effect(
+        _denizens_of_the_warp_effect(
+            state=state,
+            unit_instance_id=reserve_state.unit_instance_id,
+        )
+    )
+    grants = _runtime_reserve_arrival_registry(state).grants_for(context)
+
+    assert len(grants) == 1
+    grant = grants[0]
+    assert grant.hook_id == daemonic_incursion_ir.DENIZENS_OF_THE_WARP_HOOK_ID
+    assert grant.source_id == daemonic_incursion_ir.DENIZENS_OF_THE_WARP_SOURCE_RULE_ID
+    assert grant.enemy_horizontal_distance_inches == 6.0
+    payload = grant.replay_payload
+    assert isinstance(payload, dict)
+    assert payload["effect_kind"] == "denizens_of_the_warp"
+    assert payload["persisting_effect_ids"] == [
+        f"phase17g-denizens:{reserve_state.unit_instance_id}"
+    ]
+
+
+def test_daemonic_invulnerability_exposes_target_save_reroll_permission() -> None:
+    state, reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    state.record_persisting_effect(
+        _generic_stratagem_persisting_effect(
+            descriptor_id=daemonic_incursion_ir.DAEMONIC_INVULNERABILITY_DESCRIPTOR_ID,
+            source_rule_id=daemonic_incursion_ir.DAEMONIC_INVULNERABILITY_SOURCE_RULE_ID,
+            effect_kind="reroll_permission",
+            effect_id=f"phase17g-invulnerability:{reserve_state.unit_instance_id}",
+            target_unit_instance_id=reserve_state.unit_instance_id,
+        )
+    )
+
+    context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=_ANCHOR_UNIT_ID,
+        roll_type="attack_sequence.save.invulnerable",
+        timing_window="attack_sequence.save.invulnerable",
+        target_unit_instance_id=reserve_state.unit_instance_id,
+    )
+
+    assert context is not None
+    assert context.permission.owning_player_id == "player-a"
+    assert context.permission.eligible_roll_type == "attack_sequence.save.invulnerable"
+    assert context.source_payload["conditional_save_reroll"] == {
+        "reroll_unmodified_values": [1],
+    }
+
+
+def _daemonic_stratagem_definition(stratagem_id: str) -> StratagemDefinition:
+    matches = tuple(
+        record.definition
+        for record in daemonic_stratagems.runtime_contribution().stratagem_records
+        if record.definition.stratagem_id == stratagem_id
+    )
+    if len(matches) != 1:
+        raise AssertionError("test requires exactly one Daemonic Incursion Stratagem definition")
+    return matches[0]
+
+
+def _daemonic_stratagem_definition_for_phase(
+    stratagem_id: str,
+    *,
+    phase: BattlePhase,
+) -> StratagemDefinition:
+    matches = tuple(
+        record.definition
+        for record in daemonic_stratagems.runtime_contribution().stratagem_records
+        if record.definition.stratagem_id == stratagem_id
+        and record.definition.timing.phase is phase
+    )
+    if len(matches) != 1:
+        raise AssertionError("test requires exactly one phase-specific Daemonic stratagem")
+    return matches[0]
+
+
+def _daemonic_stratagem_definition_by_effect_selection_kind(
+    stratagem_id: str,
+    *,
+    effect_selection_kind: str | None,
+) -> StratagemDefinition:
+    matches: list[StratagemDefinition] = []
+    for record in daemonic_stratagems.runtime_contribution().stratagem_records:
+        definition = record.definition
+        if definition.stratagem_id != stratagem_id:
+            continue
+        payload = definition.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("effect_selection_kind") == effect_selection_kind:
+            matches.append(definition)
+    if len(matches) != 1:
+        raise AssertionError("test requires exactly one effect-selection Daemonic stratagem")
+    return matches[0]
+
+
+def _daemonic_stratagem_context(
+    *,
+    state: GameState,
+    phase: BattlePhase,
+    trigger_kind: TimingTriggerKind,
+) -> StratagemEligibilityContext:
+    return StratagemEligibilityContext(
+        game_id=state.game_id,
+        player_id="player-a",
+        battle_round=state.battle_round,
+        phase=phase,
+        active_player_id="player-a",
+        trigger_kind=trigger_kind,
+        timing_window_id=f"phase17g-daemonic-incursion:{phase.value}:window",
+    )
+
+
+def _daemonic_stratagem_use_record(
+    *,
+    definition: StratagemDefinition,
+    target_unit_id: str,
+    phase: BattlePhase,
+    effect_selection: JsonValue = None,
+) -> StratagemUseRecord:
+    target_binding = _friendly_daemon_target_binding(target_unit_id)
+    return StratagemUseRecord(
+        use_id=f"phase17g-daemonic-incursion:{definition.stratagem_id}:use",
+        player_id="player-a",
+        stratagem_id=definition.stratagem_id,
+        source_id=definition.source_id,
+        battle_round=1,
+        phase=phase,
+        active_player_id="player-a",
+        timing_window_id=f"phase17g-daemonic-incursion:{definition.stratagem_id}:window",
+        request_id=f"phase17g-daemonic-incursion:{definition.stratagem_id}:request",
+        result_id=f"phase17g-daemonic-incursion:{definition.stratagem_id}:result",
+        selected_option_id=f"phase17g-daemonic-incursion:{definition.stratagem_id}:option",
+        target_binding=target_binding,
+        targeted_unit_instance_ids=(target_unit_id,),
+        affected_unit_instance_ids=(target_unit_id,),
+        command_point_cost=1,
+        command_point_transaction_id=None,
+        handler_id=definition.handler_id,
+        effect_selection=effect_selection,
+        effect_payload=definition.effect_payload,
+    )
+
+
+def _friendly_daemon_target_binding(unit_instance_id: str) -> StratagemTargetBinding:
+    return StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-a",
+        target_unit_instance_id=unit_instance_id,
+    )
+
+
+def _apply_daemonic_stratagem(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    definition: StratagemDefinition,
+    use_record: StratagemUseRecord,
+    context: StratagemEligibilityContext,
+) -> None:
+    stratagems_generic_rule_ir._apply_generic_rule_ir_stratagem_handler(
+        state=state,
+        decisions=decisions,
+        context=context,
+        target_binding=use_record.target_binding,
+        definition=definition,
+        use_record=use_record,
+        ruleset_descriptor=_ruleset(),
+        army_catalog=_daemonic_incursion_catalog(),
+        shooting_unit_selected_grant_hooks=None,
+    )
+
+
+def _persisting_effect_by_kind(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    effect_kind: str,
+) -> PersistingEffect:
+    for effect in state.persisting_effects_for_unit(unit_instance_id):
+        payload = effect.effect_payload
+        if isinstance(payload, dict) and payload.get("effect_kind") == effect_kind:
+            return effect
+    raise AssertionError(f"effect not found: {effect_kind}")
+
+
+def _daemonic_invulnerability_permission_context(
+    source_payload: dict[str, JsonValue],
+) -> SourceBackedRerollPermissionContext:
+    return SourceBackedRerollPermissionContext(
+        permission=RerollPermission(
+            source_id=daemonic_incursion_ir.DAEMONIC_INVULNERABILITY_SOURCE_RULE_ID,
+            timing_window="attack_sequence.save.invulnerable",
+            owning_player_id="player-a",
+            eligible_roll_type="attack_sequence.save.invulnerable",
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        ),
+        source_payload=source_payload,
+    )
+
+
+def _daemonic_wound_permission_context(
+    source_payload: dict[str, JsonValue],
+) -> SourceBackedRerollPermissionContext:
+    return SourceBackedRerollPermissionContext(
+        permission=RerollPermission(
+            source_id=daemonic_incursion_ir.DRAUGHT_OF_TERROR_SOURCE_RULE_ID,
+            timing_window="attack_sequence.wound",
+            owning_player_id="player-a",
+            eligible_roll_type="attack_sequence.wound",
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        ),
+        source_payload=source_payload,
+    )
+
+
+def _save_roll_state(*, value: int) -> DiceRollState:
+    return DiceRollManager("phase17g-daemonic-invulnerability-save").roll_fixed(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason="phase17g daemonic invulnerability save",
+            roll_type="attack_sequence.save.invulnerable",
+            actor_id="player-a",
+        ),
+        [value],
+    )
+
+
+def _wound_roll_state(*, value: int) -> DiceRollState:
+    return DiceRollManager("phase17g-draught-of-terror-wound").roll_fixed(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason="phase17g draught of terror wound",
+            roll_type="attack_sequence.wound",
+            actor_id="player-a",
+        ),
+        [value],
+    )
+
+
+def _weapon_profile() -> WeaponProfile:
+    return WeaponProfile(
+        profile_id="phase17g-daemonic-incursion-ranged-profile",
+        name="Daemonic Incursion ranged weapon",
+        range_profile=RangeProfile.distance(24),
+        attack_profile=AttackProfile.fixed(1),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+        damage_profile=DamageProfile.fixed(1),
+        source_ids=("phase17g-daemonic-incursion-test-profile",),
+    )
+
+
+def _runtime_activation(
+    *,
+    selected_detachment_ids: tuple[str, ...],
+) -> RuntimeContentActivation:
+    return RuntimeContentActivation(
+        selected_faction_ids=(rule.CHAOS_DAEMONS_FACTION_ID,),
+        selected_detachment_ids=selected_detachment_ids,
+        selected_enhancement_ids=(),
+        selected_stratagem_ids=(),
+        selected_datasheet_ids=(),
+        selected_wargear_ids=(),
+        selected_weapon_profile_ids=(),
+        selected_weapon_keywords=(),
+        loaded_unit_instance_ids=(),
+    )
+
+
+def _enemy_unit_id(state: GameState) -> str:
+    for army in state.army_definitions:
+        if army.player_id != "player-b":
+            continue
+        for unit in army.units:
+            return unit.unit_instance_id
+    raise AssertionError("test state requires enemy unit")
+
+
+def _place_unit_on_battlefield(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    pose: Pose,
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    placement = UnitPlacement(
+        army_id="army-alpha",
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                pose=pose,
+            )
+            for model in unit.own_models
+        ),
+    )
+    state.replace_battlefield_state(state.battlefield_state.with_added_unit_placement(placement))
+
+
 def _daemonic_incursion_reserve_state(
     *,
     reserve_god_keyword: str = "Khorne",
@@ -534,11 +2074,197 @@ def _reserve_arrival_distance_context(
 
 
 def _daemonic_incursion_execution_record() -> faction_execution_2026_27.Phase17FExecutionRecord:
+    return _execution_record_by_descriptor_id(
+        daemonic_incursion_ir.DAEMONIC_INCURSION_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
+
+
+def _execution_record_by_descriptor_id(
+    descriptor_id: str,
+) -> faction_execution_2026_27.Phase17FExecutionRecord:
     return next(
         record
         for record in faction_execution_2026_27.phase17f_execution_package().execution_records
-        if record.coverage_descriptor_id
-        == daemonic_incursion_ir.DAEMONIC_INCURSION_DETACHMENT_RULE_DESCRIPTOR_ID
+        if record.coverage_descriptor_id == descriptor_id
+    )
+
+
+def _rule_ir_source_id(descriptor_id: str) -> str:
+    return faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        descriptor_id
+    ).source_id
+
+
+def _rule_ir_by_descriptor_id(descriptor_id: str) -> RuleIR:
+    return faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        descriptor_id
+    )
+
+
+def _single_rule_effect_payload(
+    *,
+    descriptor_id: str,
+    effect_kind: str,
+) -> dict[str, JsonValue]:
+    rule_ir = _rule_ir_by_descriptor_id(descriptor_id)
+    matching_effects = tuple(
+        (clause, effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind.value == effect_kind
+    )
+    if len(matching_effects) != 1:
+        raise AssertionError("Generic stratagem test requires exactly one matching effect.")
+    clause, effect = matching_effects[0]
+    return {
+        "rule_id": rule_ir.rule_id,
+        "source_id": rule_ir.source_id,
+        "rule_ir_hash": rule_ir.ir_hash(),
+        "clause_id": clause.clause_id,
+        "target": validate_json_value(
+            None if clause.target is None else clause.target.to_payload()
+        ),
+        "target_unit_instance_ids": [_ANCHOR_UNIT_ID],
+        "duration": validate_json_value(
+            None if clause.duration is None else clause.duration.to_payload()
+        ),
+        "effect": validate_json_value(effect.to_payload()),
+    }
+
+
+def _with_rule_effect_parameter(
+    effect_payload: dict[str, JsonValue],
+    *,
+    key: str,
+    value: JsonValue,
+) -> dict[str, JsonValue]:
+    effect_value = effect_payload.get("effect")
+    if not isinstance(effect_value, dict):
+        raise TypeError("test effect payload requires effect object")
+    effect = effect_value
+    parameters_value = effect.get("parameters")
+    if not isinstance(parameters_value, list):
+        raise TypeError("test effect payload requires parameter list")
+    updated_parameters: list[JsonValue] = []
+    replaced = False
+    for parameter_value in parameters_value:
+        if not isinstance(parameter_value, dict):
+            raise TypeError("test effect payload requires parameter objects")
+        parameter = parameter_value
+        if parameter.get("key") == key:
+            updated_parameters.append({**parameter, "value": value})
+            replaced = True
+            continue
+        updated_parameters.append(parameter)
+    if not replaced:
+        raise AssertionError(f"test effect payload missing parameter: {key}")
+    updated_effect: dict[str, JsonValue] = {**effect, "parameters": updated_parameters}
+    return {**effect_payload, "effect": updated_effect}
+
+
+def _rule_result(
+    rule_ir: RuleIR,
+    effect_payload: dict[str, JsonValue],
+) -> RuleExecutionResult:
+    clause_id = effect_payload.get("clause_id")
+    if type(clause_id) is not str:
+        raise AssertionError("test effect payload requires clause_id")
+    return RuleExecutionResult.applied(
+        rule_ir,
+        applied_clause_ids=(clause_id,),
+        effect_payloads=(effect_payload,),
+    )
+
+
+def _denizens_of_the_warp_effect(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> PersistingEffect:
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID
+    )
+    grant_effects = tuple(
+        effect.to_payload()
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind.value == "grant_ability"
+    )
+    if len(grant_effects) != 1:
+        raise AssertionError("Denizens test requires exactly one grant ability effect.")
+    return PersistingEffect(
+        effect_id=f"phase17g-denizens:{unit_instance_id}",
+        source_rule_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_SOURCE_RULE_ID,
+        owner_player_id="player-a",
+        target_unit_instance_ids=(unit_instance_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhase.MOVEMENT,
+        expiration=EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            player_id="player-a",
+        ),
+        effect_payload={
+            "effect_kind": GENERIC_RULE_EFFECT_KIND,
+            "coverage_descriptor_id": daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+            "execution_id": _execution_record_by_descriptor_id(
+                daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID
+            ).execution_id,
+            "rule_ir_source_id": rule_ir.source_id,
+            "rule_ir_hash": rule_ir.ir_hash(),
+            "target": {"kind": "this_unit"},
+            "effect": validate_json_value(grant_effects[0]),
+        },
+    )
+
+
+def _generic_stratagem_persisting_effect(
+    *,
+    descriptor_id: str,
+    source_rule_id: str,
+    effect_kind: str,
+    effect_id: str,
+    target_unit_instance_id: str,
+) -> PersistingEffect:
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        descriptor_id
+    )
+    matching_effects = tuple(
+        (clause, effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind.value == effect_kind
+    )
+    if len(matching_effects) != 1:
+        raise AssertionError("Generic stratagem test requires exactly one matching effect.")
+    clause, effect = matching_effects[0]
+    return PersistingEffect(
+        effect_id=effect_id,
+        source_rule_id=source_rule_id,
+        owner_player_id="player-a",
+        target_unit_instance_ids=(target_unit_instance_id,),
+        started_battle_round=1,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhase.SHOOTING,
+            player_id="player-a",
+        ),
+        effect_payload={
+            "effect_kind": GENERIC_RULE_EFFECT_KIND,
+            "rule_id": rule_ir.rule_id,
+            "source_id": rule_ir.source_id,
+            "rule_ir_hash": rule_ir.ir_hash(),
+            "clause_id": clause.clause_id,
+            "target": validate_json_value(
+                None if clause.target is None else clause.target.to_payload()
+            ),
+            "target_unit_instance_ids": [target_unit_instance_id],
+            "duration": validate_json_value(
+                None if clause.duration is None else clause.duration.to_payload()
+            ),
+            "effect": validate_json_value(effect.to_payload()),
+        },
     )
 
 

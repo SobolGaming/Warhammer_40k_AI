@@ -51,6 +51,42 @@ def _daemonic_incursion_warp_rifts_hook_id(source: GenericRuleAbilitySource) -> 
     )
 
 
+def _daemonic_incursion_denizens_context_predicate(
+    context: ReserveArrivalDistanceContext,
+    source: GenericRuleAbilitySource,
+) -> bool:
+    if type(context) is not ReserveArrivalDistanceContext:
+        raise GameLifecycleError("Daemonic Incursion Denizens distance requires context.")
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Daemonic Incursion Denizens distance requires source.")
+    return (
+        source.record.coverage_descriptor_id
+        == daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID
+    )
+
+
+def _daemonic_incursion_denizens_grants(
+    context: ReserveArrivalDistanceContext,
+    source: GenericRuleAbilitySource,
+) -> tuple[ReserveArrivalDistanceGrant, ...]:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Daemonic Incursion Denizens grants require source.")
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
+        rule,
+    )
+
+    return rule.denizens_of_the_warp_distance_grants(context, source=source)
+
+
+def _daemonic_incursion_denizens_hook_id(source: GenericRuleAbilitySource) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Daemonic Incursion Denizens hook ID requires source.")
+    return _validate_identifier(
+        "generic Daemonic Incursion Denizens hook_id",
+        daemonic_incursion_ir.DENIZENS_OF_THE_WARP_HOOK_ID,
+    )
+
+
 daemonic_incursion_reserve_arrival_distance_abilities = (
     GenericRuleReserveArrivalDistanceAbility(
         ability_id=daemonic_incursion_ir.WARP_RIFTS_DEEP_STRIKE_DISTANCE_ABILITY,
@@ -61,6 +97,14 @@ daemonic_incursion_reserve_arrival_distance_abilities = (
         hook_id_builder=_daemonic_incursion_warp_rifts_hook_id,
         context_predicate=_daemonic_incursion_warp_rifts_context_predicate,
         grant_builder=_daemonic_incursion_warp_rifts_grants,
+    ),
+    GenericRuleReserveArrivalDistanceAbility(
+        ability_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DEEP_STRIKE_DISTANCE_ABILITY,
+        coverage_descriptor_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_DESCRIPTOR_ID,
+        source_rule_id=daemonic_incursion_ir.DENIZENS_OF_THE_WARP_SOURCE_RULE_ID,
+        hook_id_builder=_daemonic_incursion_denizens_hook_id,
+        context_predicate=_daemonic_incursion_denizens_context_predicate,
+        grant_builder=_daemonic_incursion_denizens_grants,
     ),
 )
 

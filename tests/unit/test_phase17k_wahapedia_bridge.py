@@ -6233,7 +6233,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert ("| Orks | 12 | 1 | 44 | 66 | 13 | [orks](factions/orks.md) |") in generated_markdown
     assert (
-        "| Chaos Daemons | 9 | 6 | 29 | 46 | 32 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 6 | 29 | 46 | 38 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (
@@ -6719,7 +6719,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "SHADE PATH<br>SINGLE-MINDED STRIKE" in generic_rule_ir_inventory_row
     assert (
         "SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Soulseeing"
-        "<br>Vengeful Sorrow<br>Warp-Riders |" in generic_rule_ir_inventory_row
+        "<br>The Realm of Chaos<br>Vengeful Sorrow<br>Warp Surge<br>Warp-Riders |"
+        in generic_rule_ir_inventory_row
     )
     assert (
         "| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:"

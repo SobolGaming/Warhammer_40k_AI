@@ -12,9 +12,8 @@ from warhammer40k_core.engine.stratagems_eligibility import *
 from warhammer40k_core.engine.stratagems_targeting import *
 from warhammer40k_core.engine.stratagems_geometry import *
 from warhammer40k_core.engine.stratagems_ingress import *
-from warhammer40k_core.engine.stratagems_generic_metadata import (
-    generic_rule_ir_execution_target_unit_ids,
-)
+from warhammer40k_core.engine import stratagems_generic_metadata as _meta
+from warhammer40k_core.engine import stratagems_generic_persisted as _persisted
 from warhammer40k_core.engine.stratagems_generic_rule_ir_context import (
     effect_selection_unit_id as _effect_selection_unit_id,
     rule_effect_source_unit_id_for_context as _rule_effect_source_unit_id_for_context,
@@ -96,7 +95,7 @@ def _apply_generic_rule_ir_stratagem_handler(
             active_player_id=context.active_player_id,
             timing_window_id=context.timing_window_id,
             source_unit_instance_id=_single_target_unit_id_or_none(use_record),
-            target_unit_instance_ids=generic_rule_ir_execution_target_unit_ids(use_record),
+            target_unit_instance_ids=_meta.generic_rule_ir_execution_target_unit_ids(use_record),
             target_player_id=target_binding.target_player_id,
             trigger_payload=_generic_stratagem_rule_trigger_payload(
                 context=context,
@@ -284,6 +283,15 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
                     rule_result=rule_result,
                     effect_payload=effect_payload,
                 )
+            elif ability == "can_advance_and_charge":
+                _persisted.record_generic_charge_after_advance_effect(
+                    state=state,
+                    decisions=decisions,
+                    context=context,
+                    use_record=use_record,
+                    rule_result=rule_result,
+                    effect_payload=effect_payload,
+                )
             continue
         if effect_kind == "set_contextual_status":
             status = _rule_effect_parameter(effect_payload, "status")
@@ -346,6 +354,15 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
                         use_record=use_record,
                         effect_payload=effect_payload,
                     )
+            elif status == "sticky_objective_control":
+                _persisted.record_generic_sticky_objective_control_state(
+                    state=state,
+                    decisions=decisions,
+                    context=context,
+                    use_record=use_record,
+                    rule_result=rule_result,
+                    effect_payload=effect_payload,
+                )
             continue
         if effect_kind == "inflict_mortal_wounds":
             resolve_generic_rule_ir_mortal_wounds(

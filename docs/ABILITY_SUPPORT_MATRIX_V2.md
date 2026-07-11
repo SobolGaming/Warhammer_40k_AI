@@ -206,7 +206,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 6 | 29 | 46 | 32 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 6 | 29 | 46 | 38 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 2 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
@@ -347,7 +347,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:lost-wound:feel-no-pain-source` | Feel No Pain |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
-| `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>DEATH DENIED<br>Daemonic Infestation<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Soulseeing<br>Vengeful Sorrow<br>Warp-Riders |
+| `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>Corrupt Realspace<br>DEATH DENIED<br>Daemonic Infestation<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Soulseeing<br>The Realm of Chaos<br>Vengeful Sorrow<br>Warp Surge<br>Warp-Riders |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |

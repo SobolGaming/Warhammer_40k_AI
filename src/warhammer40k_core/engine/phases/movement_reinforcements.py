@@ -258,6 +258,10 @@ def _reserve_placement_kinds_for_unit(
     reserve_state: ReserveState,
     unit: UnitInstance,
 ) -> tuple[BattlefieldPlacementKind, ...]:
+    if reserve_state.required_arrival_placement_kind is not None:
+        return (
+            battlefield_placement_kind_from_token(reserve_state.required_arrival_placement_kind),
+        )
     if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
         kinds = [BattlefieldPlacementKind.STRATEGIC_RESERVES]
         if _unit_has_deep_strike_keyword(unit):
@@ -269,6 +273,8 @@ def _reserve_placement_kinds_for_unit(
 
 
 def _reserve_proposal_kind(reserve_state: ReserveState) -> ProposalKind:
+    if reserve_state.required_arrival_placement_kind == BattlefieldPlacementKind.DEEP_STRIKE.value:
+        return ProposalKind.DEEP_STRIKE
     if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
         return ProposalKind.DEEP_STRIKE
     if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:

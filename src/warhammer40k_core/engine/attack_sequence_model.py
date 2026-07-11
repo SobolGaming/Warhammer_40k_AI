@@ -112,6 +112,8 @@ def _validate_bool(field_name: str, value: object) -> None:
 SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS = {
     "attack_sequence.hit": "hit_roll_state",
     "attack_sequence.wound": "wound_roll_state",
+    "attack_sequence.save.armour": "save_roll_state",
+    "attack_sequence.save.invulnerable": "save_roll_state",
 }
 DAMAGE_ALLOCATION_RULE_ID = "core_rules_damage_allocation"
 DEADLY_DEMISE_SOURCE_KIND = "deadly_demise"

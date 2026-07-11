@@ -47,8 +47,11 @@ from warhammer40k_core.engine.rule_execution import (
     default_rule_execution_registry,
     execute_rule_ir,
 )
+from warhammer40k_core.engine.sticky_objective_control import apply_sticky_objective_control
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry import shapely_backend
+from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.rule_ir import (
     RuleEffectKind,
@@ -65,6 +68,8 @@ HOOK_ID = "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:army-rule"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 LEGIONES_DAEMONICA = "LEGIONES DAEMONICA"
+CORRUPTED_REALSPACE_STICKY_EFFECT_KIND = "chaos_daemons_corrupted_realspace_objective"
+CORRUPTED_REALSPACE_SHADOW_AURA_INCHES = 6.0
 GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID = (
     (chaos_daemons_datasheets.BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID, "KHORNE"),
     (chaos_daemons_datasheets.SKARBRAND_GREATER_DAEMON_SOURCE_ID, "KHORNE"),
@@ -368,6 +373,10 @@ def shadow_regions_for_player(
             ),
         )
     objective_record = resolve_objective_control(objective_context)
+    objective_record = apply_sticky_objective_control(
+        record=objective_record,
+        states=tuple(state.sticky_objective_control_states),
+    )
     no_mans_land_objective_ids = _no_mans_land_objective_ids(state)
     if _controls_at_least_half(
         objective_record=objective_record,
@@ -386,6 +395,22 @@ def shadow_regions_for_player(
     ):
         regions.append(ShadowRegion.OPPONENT_DEPLOYMENT_ZONE)
     return tuple(regions)
+
+
+def unit_within_shadow_of_chaos(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+) -> bool:
+    if type(state) is not GameState:
+        raise GameLifecycleError("Shadow of Chaos unit lookup requires a GameState.")
+    return _unit_within_shadow(
+        state=state,
+        player_id=_validate_identifier("player_id", player_id),
+        unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
+        battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+    )
 
 
 def _daemonic_manifestation_applies(
@@ -453,14 +478,103 @@ def _unit_within_shadow(
         unit_instance_id=unit_instance_id,
     ):
         return True
-    return _unit_within_greater_daemon_shadow_aura(
-        state=state,
-        player_id=player_id,
-        unit_instance_id=unit_instance_id,
-    ) or _unit_within_semantic_shadow_aura(
-        state=state,
-        player_id=player_id,
-        unit_instance_id=unit_instance_id,
+    return (
+        _unit_within_greater_daemon_shadow_aura(
+            state=state,
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+        )
+        or _unit_within_semantic_shadow_aura(
+            state=state,
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+        )
+        or _unit_within_corrupted_realspace_shadow(
+            state=state,
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+        )
+    )
+
+
+def _unit_within_corrupted_realspace_shadow(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+) -> bool:
+    if state.mission_setup is None:
+        raise GameLifecycleError("Corrupted Realspace Shadow check requires MissionSetup.")
+    target_models = _unit_geometry_models(state=state, unit_instance_id=unit_instance_id)
+    if not target_models:
+        return False
+    marker_by_id = {
+        marker.objective_marker_id: marker.to_objective_marker()
+        for marker in state.mission_setup.objective_markers
+    }
+    for sticky_state in state.sticky_objective_control_states:
+        if sticky_state.player_id != player_id:
+            continue
+        if not isinstance(sticky_state.replay_payload, dict):
+            raise GameLifecycleError("Corrupted Realspace sticky payload must be an object.")
+        if sticky_state.replay_payload.get("effect_kind") != CORRUPTED_REALSPACE_STICKY_EFFECT_KIND:
+            continue
+        raw_aura_inches = sticky_state.replay_payload.get("shadow_of_chaos_aura_inches")
+        if type(raw_aura_inches) not in (float, int):
+            raise GameLifecycleError("Corrupted Realspace aura payload must contain inches.")
+        aura_inches = float(cast(float | int, raw_aura_inches))
+        if aura_inches <= 0:
+            raise GameLifecycleError("Corrupted Realspace aura inches must be positive.")
+        if not _objective_controlled_by_player(
+            state=state,
+            objective_id=sticky_state.objective_id,
+            player_id=player_id,
+        ):
+            continue
+        marker = marker_by_id.get(sticky_state.objective_id)
+        if marker is None:
+            raise GameLifecycleError("Corrupted Realspace objective marker is unknown.")
+        marker_pose = Pose.at(marker.x_inches, marker.y_inches, marker.z_inches)
+        if any(
+            DistanceMeasurementContext.from_objective_marker_to_model(
+                marker_id=marker.objective_marker_id,
+                marker_pose=marker_pose,
+                model=target_model,
+                marker_diameter_inches=marker.marker_diameter_inches,
+            ).horizontal_distance_inches()
+            <= aura_inches
+            for target_model in target_models
+        ):
+            return True
+    return False
+
+
+def _objective_controlled_by_player(
+    *,
+    state: GameState,
+    objective_id: str,
+    player_id: str,
+) -> bool:
+    if state.mission_setup is None:
+        raise GameLifecycleError("Objective control lookup requires MissionSetup.")
+    objective_context = ObjectiveControlContext.from_game_state(
+        state,
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=state.current_battle_phase or BattlePhase.COMMAND,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+    )
+    objective_record = apply_sticky_objective_control(
+        record=resolve_objective_control(objective_context),
+        states=tuple(state.sticky_objective_control_states),
+    )
+    result = objective_record.result_by_objective_id(
+        _validate_identifier("objective_id", objective_id)
+    )
+    if result.status is ObjectiveControlStatus.UNSUPPORTED:
+        raise GameLifecycleError("Shadow of Chaos cannot use unsupported objective control.")
+    return (
+        result.status is ObjectiveControlStatus.CONTROLLED
+        and result.controlled_by_player_id == player_id
     )
 
 
