@@ -9,7 +9,12 @@ from warhammer40k_core.core.datasheet import (
     DamagedWeaponScope,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfileKind, WeaponProfile
+from warhammer40k_core.core.weapon_profiles import (
+    AttackProfile,
+    RangeProfileKind,
+    WeaponKeyword,
+    WeaponProfile,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -31,6 +36,71 @@ CATALOG_DAMAGED_OBJECTIVE_CONTROL_MODIFIER_ID = (
     "catalog-datasheet:damaged:objective-control-modifier"
 )
 CATALOG_DAMAGED_WEAPON_ATTACKS_MODIFIER_ID = "catalog-datasheet:damaged:weapon-attacks-modifier"
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogDamagedShootingWeaponSelectionLimit:
+    damaged_effect_id: str
+    source_id: str
+    model_instance_id: str
+    weapon_keyword: WeaponKeyword
+    max_selections: int
+    baseline_max_selections: int
+    damaged_profile_active: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "damaged_effect_id",
+            _validate_identifier(
+                "DAMAGED shooting weapon selection limit damaged_effect_id",
+                self.damaged_effect_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier(
+                "DAMAGED shooting weapon selection limit source_id",
+                self.source_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "model_instance_id",
+            _validate_identifier(
+                "DAMAGED shooting weapon selection limit model_instance_id",
+                self.model_instance_id,
+            ),
+        )
+        if type(self.weapon_keyword) is not WeaponKeyword:
+            raise GameLifecycleError(
+                "DAMAGED shooting weapon selection limit requires a weapon keyword."
+            )
+        object.__setattr__(
+            self,
+            "max_selections",
+            _validate_positive_int(
+                "DAMAGED shooting weapon selection limit max_selections",
+                self.max_selections,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "baseline_max_selections",
+            _validate_positive_int(
+                "DAMAGED shooting weapon selection limit baseline_max_selections",
+                self.baseline_max_selections,
+            ),
+        )
+        if self.baseline_max_selections < self.max_selections:
+            raise GameLifecycleError(
+                "DAMAGED shooting weapon selection limit baseline is below max."
+            )
+        if type(self.damaged_profile_active) is not bool:
+            raise GameLifecycleError(
+                "DAMAGED shooting weapon selection limit active flag must be a bool."
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -146,6 +216,51 @@ def catalog_damaged_effect_weapon_profile_modifier_bindings(
     return CatalogDamagedEffectRuntime(armies=armies).weapon_profile_bindings()
 
 
+def catalog_damaged_shooting_weapon_selection_limit_for_profile(
+    *,
+    unit: UnitInstance,
+    model: ModelInstance,
+    profile: WeaponProfile,
+) -> CatalogDamagedShootingWeaponSelectionLimit | None:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("DAMAGED shooting weapon selection limit requires a unit.")
+    if type(model) is not ModelInstance:
+        raise GameLifecycleError("DAMAGED shooting weapon selection limit requires a model.")
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("DAMAGED shooting weapon selection limit requires a profile.")
+    if not model.is_alive:
+        return None
+    keyword = _shooting_weapon_selection_keyword_for_profile(profile)
+    if keyword is None:
+        return None
+    effects: list[DamagedEffectDefinition] = []
+    for effect in unit.damaged_effects:
+        if effect.effect_kind is not DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT:
+            continue
+        if not _damaged_effect_targets_model(effect=effect, model=model):
+            continue
+        effects.append(effect)
+    if len(effects) == 0:
+        return None
+    if len(effects) != 1:
+        raise GameLifecycleError("DAMAGED shooting weapon selection limit is ambiguous.")
+    effect = effects[0]
+    if effect.max_selections is None:
+        raise GameLifecycleError("DAMAGED shooting weapon selection limit is missing max.")
+    if effect.baseline_max_selections is None:
+        raise GameLifecycleError("DAMAGED shooting weapon selection limit is missing baseline.")
+    active = effect.applies_to_wounds(model.wounds_remaining)
+    return CatalogDamagedShootingWeaponSelectionLimit(
+        damaged_effect_id=effect.damaged_effect_id,
+        source_id=effect.source_id,
+        model_instance_id=model.model_instance_id,
+        weapon_keyword=keyword,
+        max_selections=effect.max_selections if active else effect.baseline_max_selections,
+        baseline_max_selections=effect.baseline_max_selections,
+        damaged_profile_active=active,
+    )
+
+
 def _active_damaged_effects_for_model(
     *,
     unit: UnitInstance,
@@ -231,6 +346,16 @@ def _damaged_weapon_scope_matches(
     raise GameLifecycleError("DAMAGED weapon Attacks effect is missing weapon scope.")
 
 
+def _shooting_weapon_selection_keyword_for_profile(
+    profile: WeaponProfile,
+) -> WeaponKeyword | None:
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("DAMAGED shooting weapon selection requires a profile.")
+    if WeaponKeyword.CTAN_POWER in profile.keywords:
+        return WeaponKeyword.CTAN_POWER
+    return None
+
+
 def _has_damaged_effect_kind(
     armies: tuple[ArmyDefinition, ...],
     effect_kind: DamagedEffectKind,
@@ -284,6 +409,14 @@ def _validate_game_state(value: object) -> None:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def _validate_positive_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an int.")
+    if value <= 0:
+        raise GameLifecycleError(f"{field_name} must be greater than zero.")
+    return value
 
 
 def _name_key(value: str) -> str:

@@ -60,6 +60,7 @@ def test_weapon_keywords_are_canonical_tokens_shared_with_rule_normalization() -
     assert weapon_keyword_from_token("Rapid Fire") is WeaponKeyword.RAPID_FIRE
     assert weapon_keyword_from_token("Close-quarters") is WeaponKeyword.CLOSE_QUARTERS
     assert weapon_keyword_from_token("Cleave") is WeaponKeyword.CLEAVE
+    assert weapon_keyword_from_token("C'tan Power") is WeaponKeyword.CTAN_POWER
 
     with pytest.raises(WeaponProfileError):
         weapon_keyword_from_token("rapid fire")

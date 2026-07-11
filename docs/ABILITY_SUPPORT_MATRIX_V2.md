@@ -303,6 +303,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-keyword-grant` | Harbinger of Death |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:c'tan-power` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:cleave` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:close-quarters` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:devastating-wounds` | No current generated rows |

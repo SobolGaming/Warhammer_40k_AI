@@ -20,12 +20,14 @@ from tests.phase13b_shooting_declaration_helpers import (
     _decision_request,
     _dense_solid_woods,
     _display_geometry,
+    _first_shooting_type,
     _first_weapon_profile,
     _gone_to_ground_detection_context,
     _last_event_payload,
     _non_solid_hill_with_wall,
     _phase13f_cover_effect,
     _phase13f_gate_weapon_profile,
+    _proposal_from_declarations,
     _proposal_from_request,
     _replace_unit_instance_in_state,
     _ruleset,
@@ -43,6 +45,11 @@ from tests.phase13b_shooting_declaration_helpers import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import (
+    DamagedEffectDefinition,
+    DamagedEffectKind,
+    DatasheetDefinition,
+)
 from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
@@ -51,6 +58,7 @@ from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AttackProfile,
     DamageProfile,
+    RangeProfile,
     WeaponKeyword,
     WeaponProfile,
     WeaponProfilePayload,
@@ -63,6 +71,7 @@ from warhammer40k_core.engine.attack_sequence import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
 )
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.game_state import (
     GameState,
     GameStatePayload,
@@ -310,6 +319,149 @@ def test_invalid_shooting_declaration_submissions_do_not_consume_pending_request
     )
     assert len(lifecycle.decision_controller.records) == before_records
     assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
+
+
+def test_ctan_power_selection_limits_are_exposed_and_validated_before_queue_pop() -> None:
+    catalog = _catalog_with_ctan_power_selection_limit()
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        alpha_datasheets={
+            "intercessor-1": ("core-intercessor-like-infantry", "core-intercessor-like", 1)
+        },
+        catalog=catalog,
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase13b-ctan-baseline-select",
+    )
+    baseline_payload = _shooting_proposal_request_payload(declaration_request)
+    baseline_limits = cast(
+        list[dict[str, object]],
+        baseline_payload["shooting_weapon_selection_limits"],
+    )
+
+    assert len(baseline_limits) == 1
+    assert baseline_limits[0]["weapon_keyword"] == WeaponKeyword.CTAN_POWER.value
+    assert baseline_limits[0]["max_selections"] == 2
+    assert baseline_limits[0]["baseline_max_selections"] == 2
+    assert baseline_limits[0]["damaged_profile_active"] is False
+    assert baseline_limits[0]["weapon_profile_ids"] == [
+        "ctan-antimatter-meteor",
+        "ctan-cosmic-fire",
+        "ctan-times-arrow",
+    ]
+
+    over_baseline = _ctan_power_proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        weapon_count=3,
+    )
+    over_baseline_status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=over_baseline.to_payload(),
+        result_id="phase13b-ctan-baseline-over-limit",
+    )
+    over_baseline_validation = cast(
+        dict[str, object],
+        cast(dict[str, object], over_baseline_status.payload)["proposal_validation"],
+    )
+    over_baseline_violation = cast(
+        list[dict[str, object]],
+        over_baseline_validation["violations"],
+    )[0]
+    assert over_baseline_status.status_kind is LifecycleStatusKind.INVALID
+    assert over_baseline_violation["violation_code"] == "shooting_weapon_selection_limit_exceeded"
+    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
+
+    under_baseline = _ctan_power_proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        weapon_count=2,
+    )
+    under_baseline_status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=under_baseline.to_payload(),
+        result_id="phase13b-ctan-baseline-under-limit",
+    )
+    assert under_baseline_status.status_kind is not LifecycleStatusKind.INVALID
+
+    damaged_lifecycle, damaged_units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        alpha_datasheets={
+            "intercessor-1": ("core-intercessor-like-infantry", "core-intercessor-like", 1)
+        },
+        catalog=catalog,
+    )
+    damaged_unit = _unit_with_first_model_wounds(
+        damaged_units["intercessor-1"],
+        wounds_remaining=1,
+    )
+    damaged_state = damaged_lifecycle.state
+    assert damaged_state is not None
+    _replace_unit_instance_in_state(state=damaged_state, replacement=damaged_unit)
+    damaged_units["intercessor-1"] = damaged_unit
+    damaged_selection_request = _decision_request(
+        damaged_lifecycle.advance_until_decision_or_terminal()
+    )
+    damaged_declaration_request = _select_shooting_unit_and_type(
+        damaged_lifecycle,
+        selection_request=damaged_selection_request,
+        unit_instance_id=damaged_unit.unit_instance_id,
+        selection_result_id="phase13b-ctan-damaged-select",
+    )
+    damaged_payload = _shooting_proposal_request_payload(damaged_declaration_request)
+    damaged_limits = cast(
+        list[dict[str, object]],
+        damaged_payload["shooting_weapon_selection_limits"],
+    )
+
+    assert len(damaged_limits) == 1
+    assert damaged_limits[0]["max_selections"] == 1
+    assert damaged_limits[0]["baseline_max_selections"] == 2
+    assert damaged_limits[0]["damaged_profile_active"] is True
+
+    over_damaged = _ctan_power_proposal_from_request(
+        request=damaged_declaration_request,
+        target_unit_id=damaged_units["enemy"].unit_instance_id,
+        weapon_count=2,
+    )
+    over_damaged_status = _submit_payload(
+        damaged_lifecycle,
+        request=damaged_declaration_request,
+        payload=over_damaged.to_payload(),
+        result_id="phase13b-ctan-damaged-over-limit",
+    )
+    over_damaged_validation = cast(
+        dict[str, object],
+        cast(dict[str, object], over_damaged_status.payload)["proposal_validation"],
+    )
+    over_damaged_violation = cast(
+        list[dict[str, object]],
+        over_damaged_validation["violations"],
+    )[0]
+    assert over_damaged_status.status_kind is LifecycleStatusKind.INVALID
+    assert over_damaged_violation["violation_code"] == "shooting_weapon_selection_limit_exceeded"
+    assert damaged_lifecycle.decision_controller.queue.pending_requests == (
+        damaged_declaration_request,
+    )
+
+    under_damaged = _ctan_power_proposal_from_request(
+        request=damaged_declaration_request,
+        target_unit_id=damaged_units["enemy"].unit_instance_id,
+        weapon_count=1,
+    )
+    under_damaged_status = _submit_payload(
+        damaged_lifecycle,
+        request=damaged_declaration_request,
+        payload=under_damaged.to_payload(),
+        result_id="phase13b-ctan-damaged-under-limit",
+    )
+    assert under_damaged_status.status_kind is not LifecycleStatusKind.INVALID
 
 
 def test_shooting_phase_completion_uses_finite_lifecycle_option() -> None:
@@ -2366,3 +2518,120 @@ def _unit_with_dead_model(unit: UnitInstance, *, index: int) -> UnitInstance:
     model = models[index]
     models[index] = replace(model, wounds_remaining=0)
     return replace(unit, own_models=tuple(models))
+
+
+def _unit_with_first_model_wounds(
+    unit: UnitInstance,
+    *,
+    wounds_remaining: int,
+) -> UnitInstance:
+    models = list(unit.own_models)
+    models[0] = replace(models[0], wounds_remaining=wounds_remaining)
+    return replace(unit, own_models=tuple(models))
+
+
+def _shooting_proposal_request_payload(request: DecisionRequest) -> dict[str, object]:
+    payload = cast(dict[str, object], request.payload)
+    return cast(dict[str, object], payload["proposal_request"])
+
+
+def _ctan_power_proposal_from_request(
+    *,
+    request: DecisionRequest,
+    target_unit_id: str,
+    weapon_count: int,
+) -> ShootingDeclarationProposal:
+    proposal_request = _shooting_proposal_request_payload(request)
+    weapons = [
+        weapon
+        for weapon in cast(list[dict[str, object]], proposal_request["available_weapons"])
+        if _weapon_payload_has_keyword(weapon, WeaponKeyword.CTAN_POWER)
+    ]
+    if len(weapons) < weapon_count:
+        raise AssertionError("Test request did not expose enough C'tan Power weapons.")
+    target_candidate = next(
+        candidate
+        for candidate in cast(list[dict[str, object]], proposal_request["target_candidates"])
+        if candidate["target_unit_instance_id"] == target_unit_id and candidate["is_legal"] is True
+    )
+    declarations = tuple(
+        WeaponDeclaration(
+            attacker_model_instance_id=cast(str, weapon["model_instance_id"]),
+            wargear_id=cast(str, weapon["wargear_id"]),
+            weapon_profile_id=cast(str, weapon["weapon_profile_id"]),
+            target_unit_instance_id=target_unit_id,
+            shooting_type=_first_shooting_type(target_candidate),
+        )
+        for weapon in weapons[:weapon_count]
+    )
+    return _proposal_from_declarations(
+        request=request,
+        declarations=declarations,
+    )
+
+
+def _weapon_payload_has_keyword(
+    weapon: dict[str, object],
+    keyword: WeaponKeyword,
+) -> bool:
+    profile_payload = cast(dict[str, object], weapon["weapon_profile"])
+    keywords = cast(list[str], profile_payload["keywords"])
+    return keyword.value in keywords
+
+
+def _catalog_with_ctan_power_selection_limit() -> ArmyCatalog:
+    base = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    ctan_profiles = (
+        _ctan_power_profile(base, profile_id="ctan-antimatter-meteor", name="Antimatter Meteor"),
+        _ctan_power_profile(base, profile_id="ctan-cosmic-fire", name="Cosmic Fire"),
+        _ctan_power_profile(base, profile_id="ctan-times-arrow", name="Time's Arrow"),
+    )
+    catalog = _catalog_with_replaced_bolt_profiles(ctan_profiles)
+    damaged_effect = DamagedEffectDefinition(
+        damaged_effect_id="core-intercessor-like-infantry:damaged:ctan-power-selection",
+        model_profile_id="core-intercessor-like",
+        wounds_min=1,
+        wounds_max=1,
+        effect_kind=DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT,
+        max_selections=1,
+        baseline_max_selections=2,
+        selection_group="C'tan Powers weapons",
+        source_id="datasheet:tesseract-vault:damaged:ctan-power-selection",
+    )
+    datasheets: list[DatasheetDefinition] = []
+    for datasheet in catalog.datasheets:
+        if datasheet.datasheet_id == "core-intercessor-like-infantry":
+            datasheets.append(
+                replace(
+                    datasheet,
+                    composition=tuple(
+                        replace(composition, min_models=1) for composition in datasheet.composition
+                    ),
+                    damaged_effects=(damaged_effect,),
+                )
+            )
+            continue
+        datasheets.append(datasheet)
+    return replace(catalog, datasheets=tuple(datasheets))
+
+
+def _ctan_power_profile(
+    base: WeaponProfile,
+    *,
+    profile_id: str,
+    name: str,
+) -> WeaponProfile:
+    return replace(
+        base,
+        profile_id=profile_id,
+        name=name,
+        range_profile=RangeProfile.distance(60),
+        attack_profile=AttackProfile.fixed(1),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(WeaponKeyword.CTAN_POWER,),
+        abilities=(),
+        source_ids=(f"datasheet:tesseract-vault:wargear:{profile_id}",),
+    )

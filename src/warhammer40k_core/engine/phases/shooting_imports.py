@@ -81,6 +81,10 @@ from warhammer40k_core.engine.damage_allocation import (
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
 )
+from warhammer40k_core.engine.damaged_effects import (
+    CatalogDamagedShootingWeaponSelectionLimit,
+    catalog_damaged_shooting_weapon_selection_limit_for_profile,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     DecisionError,
@@ -241,6 +245,7 @@ __all__ = (
     "BattlePhaseKind",
     "BattlefieldScenario",
     "CLOSE_QUARTERS_RULE_ID",
+    "CatalogDamagedShootingWeaponSelectionLimit",
     "DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID",
     "DICE_REROLL_DECISION_TYPE",
     "DecisionController",
@@ -348,6 +353,7 @@ __all__ = (
     "build_select_attack_weapon_group_request",
     "build_select_resolve_target_unit_request",
     "canonical_json",
+    "catalog_damaged_shooting_weapon_selection_limit_for_profile",
     "cast",
     "dataclass",
     "detection_range_bonus_inches_for_effects",
