@@ -337,6 +337,18 @@ def _request_advance_move_grant_decision_if_available(
     automatic_grants = tuple(grant for grant in grants if grant.automatic)
     optional_grants = tuple(grant for grant in grants if not grant.automatic)
     if not optional_grants:
+        persisting_effects = tuple(
+            effect
+            for grant in automatic_grants
+            for effect in _record_movement_action_grant_effects(
+                state=state,
+                player_id=pending_action.player_id,
+                unit_instance_id=pending_action.unit_instance_id,
+                source_request_id=pending_action.request_id,
+                source_result_id=pending_action.result_id,
+                grant=grant,
+            )
+        )
         decisions.event_log.append(
             "advance_move_grants_auto_selected",
             {
@@ -350,6 +362,9 @@ def _request_advance_move_grant_decision_if_available(
                 "source_decision_result_id": pending_action.result_id,
                 "selected_grants": validate_json_value(
                     [grant.to_payload() for grant in automatic_grants]
+                ),
+                "persisting_effects": validate_json_value(
+                    [effect.to_payload() for effect in persisting_effects]
                 ),
             },
         )
@@ -555,7 +570,8 @@ def _apply_advance_move_grant_decision(
             state=state,
             player_id=active_player_id,
             unit_instance_id=pending_action.unit_instance_id,
-            result=result,
+            source_request_id=result.request_id,
+            source_result_id=result.result_id,
             grant=grant,
         )
     )
@@ -627,19 +643,22 @@ def _record_movement_action_grant_effects(
     state: GameState,
     player_id: str,
     unit_instance_id: str,
-    result: DecisionResult,
+    source_request_id: str,
+    source_result_id: str,
     grant: AdvanceMoveGrant,
 ) -> tuple[PersistingEffect, ...]:
+    source_request_id = _validate_identifier("source_request_id", source_request_id)
+    source_result_id = _validate_identifier("source_result_id", source_result_id)
     effects: list[PersistingEffect] = []
     if grant.decision_effect_payload is not None:
         resource_spend_result = apply_faction_resource_spend_effect(
             state=state,
             player_id=player_id,
-            source_id=f"{grant.source_id}:{result.request_id}:{result.result_id}:spend",
+            source_id=f"{grant.source_id}:{source_request_id}:{source_result_id}:spend",
             effect_payload=grant.decision_effect_payload,
         )
         spend_effect = PersistingEffect(
-            effect_id=f"{grant.hook_id}:{result.request_id}:{result.result_id}:decision",
+            effect_id=f"{grant.hook_id}:{source_request_id}:{source_result_id}:decision",
             source_rule_id=grant.source_id,
             owner_player_id=player_id,
             target_unit_instance_ids=(unit_instance_id,),
@@ -655,7 +674,7 @@ def _record_movement_action_grant_effects(
         effects.append(spend_effect)
     if grant.unit_effect_payload is not None:
         unit_effect = PersistingEffect(
-            effect_id=f"{grant.hook_id}:{result.request_id}:{result.result_id}:unit",
+            effect_id=f"{grant.hook_id}:{source_request_id}:{source_result_id}:unit",
             source_rule_id=grant.source_id,
             owner_player_id=player_id,
             target_unit_instance_ids=_movement_action_grant_unit_effect_target_ids(

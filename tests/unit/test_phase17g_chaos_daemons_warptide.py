@@ -5,28 +5,68 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tests.movement_submission_helpers import (
+    straight_line_witness_for_unit,
+    submit_movement_proposal,
+)
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.datasheet import BaseSizeDefinition
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.datasheet import (
+    BaseSizeDefinition,
+    DatasheetDefinition,
+    DatasheetKeywordSet,
+)
+from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine import generic_detachment_rule_effects as generic_detachment_effects
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, EffectExpiration
+from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    EffectExpirationKind,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.warptide import (  # noqa: E501
     manifest,
     stratagems,
 )
-from warhammer40k_core.engine.list_validation import DetachmentSelection
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.list_validation import (
+    DetachmentSelection,
+    ModelProfileSelection,
+    UnitMusterSelection,
+)
+from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import MOVEMENT_PROPOSAL_DECISION_TYPE
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementPhaseActionKind,
+)
+from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     ENGAGED_ENEMY_UNIT_CONTEXT_KEY,
     ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HIT_ENEMY_UNIT_CONTEXT_KEY,
     HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     SELECTED_TARGET_UNIT_TARGET_POLICY_ID,
+    STRATAGEM_DECISION_TYPE,
     TARGET_BINDING_UNIT_CONTEXT_KEY,
     VISIBLE_ENEMY_RANGE_INCHES_KEY,
     VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY,
@@ -45,6 +85,8 @@ from warhammer40k_core.engine.stratagems_generic_rule_ir_context import (
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_ir import (
     RuleEffectKind,
     RuleIR,
@@ -63,6 +105,12 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionStatus,
 )
+
+_WARPTIDE_LIFECYCLE_DATASHEET_ID = "phase17g-warptide-daemonettes"
+_WARPTIDE_LIFECYCLE_UNIT_SELECTION_ID = "daemonettes"
+_WARPTIDE_LIFECYCLE_UNIT_ID = f"army-alpha:{_WARPTIDE_LIFECYCLE_UNIT_SELECTION_ID}"
+_WARPTIDE_LIFECYCLE_ENEMY_UNIT_SELECTION_ID = "enemy-unit"
+_WARPTIDE_LIFECYCLE_ENEMY_UNIT_ID = f"army-beta:{_WARPTIDE_LIFECYCLE_ENEMY_UNIT_SELECTION_ID}"
 
 
 def test_warptide_source_backed_rule_ir_rows_are_executable_generic_ir() -> None:
@@ -175,6 +223,93 @@ def test_warptide_manifest_aggregates_rule_enhancement_and_stratagem_contributio
     assert len(contribution.stratagem_records) == 3
     assert contribution.stratagem_handler_bindings == ()
     assert contribution.faction_named_handlers == {}
+
+
+def test_warptide_shudderblink_automatic_advance_grant_persists_assault_effect() -> None:
+    config = _warptide_lifecycle_config()
+    lifecycle, movement_status = _advance_to_warptide_movement_unit_selection(config)
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-warptide-select-daemonettes",
+            request=_decision_request(movement_status),
+            selected_option_id=_WARPTIDE_LIFECYCLE_UNIT_ID,
+        )
+    )
+    action_status = _decline_stratagem_window_if_present(
+        lifecycle,
+        action_status,
+        result_id="phase17g-warptide-decline-selected-to-move",
+    )
+    action_request = _decision_request(action_status)
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+
+    proposal_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-warptide-advance-action",
+            request=action_request,
+            selected_option_id=MovementPhaseActionKind.ADVANCE.value,
+        )
+    )
+    proposal_request = _decision_request(proposal_status)
+    assert proposal_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+
+    auto_event = _event_payload(lifecycle, "advance_move_grants_auto_selected")
+    grants = cast(list[JsonValue], auto_event["selected_grants"])
+    grant = cast(dict[str, JsonValue], grants[0])
+    assert grant["hook_id"] == warptide_ir.SHUDDERBLINK_ADVANCE_MOVE_HOOK_ID
+    assert grant["source_id"] == warptide_ir.WARPTIDE_SOURCE_RULE_ID
+    assert grant["automatic"] is True
+
+    auto_effects = cast(list[JsonValue], auto_event["persisting_effects"])
+    assert len(auto_effects) == 1
+
+    advance_status = submit_movement_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase17g-warptide-advance-proposal",
+        unit_instance_id=_WARPTIDE_LIFECYCLE_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.ADVANCE,
+        movement_mode=MovementMode.ADVANCE,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=_WARPTIDE_LIFECYCLE_UNIT_ID,
+            dx=6.0,
+        ),
+    )
+    _decline_stratagem_window_if_present(
+        lifecycle,
+        advance_status,
+        result_id="phase17g-warptide-decline-after-advance",
+    )
+
+    state = _state(lifecycle)
+    advanced_state = state.advanced_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=_WARPTIDE_LIFECYCLE_UNIT_ID,
+    )
+    assert advanced_state is not None
+    assert advanced_state.can_shoot
+    assert advanced_state.can_declare_charge
+
+    effect = _single_persisting_effect_for_unit_by_kind(
+        state,
+        _WARPTIDE_LIFECYCLE_UNIT_ID,
+        "ranged_weapon_keyword_grant",
+    )
+    effect_payload = cast(dict[str, JsonValue], effect.effect_payload)
+    assert effect.source_rule_id == warptide_ir.WARPTIDE_SOURCE_RULE_ID
+    assert effect.owner_player_id == "player-a"
+    assert effect.target_unit_instance_ids == (_WARPTIDE_LIFECYCLE_UNIT_ID,)
+    assert effect.expiration.expiration_kind is EffectExpirationKind.END_TURN
+    assert effect_payload == {
+        "effect_kind": "ranged_weapon_keyword_grant",
+        "granted_weapon_keywords": [warptide_ir.ASSAULT_WEAPON_KEYWORD],
+        "source_movement_request_id": action_request.request_id,
+        "source_movement_result_id": "phase17g-warptide-advance-action",
+    }
+    auto_effect = cast(dict[str, JsonValue], auto_effects[0])
+    assert auto_effect["effect_id"] == effect.effect_id
 
 
 def test_warptide_visible_enemy_effect_selection_context_helpers() -> None:
@@ -845,6 +980,245 @@ def _model(
         wargear_ids=(),
         source_ids=(f"source:{model_profile_id}",),
     )
+
+
+def _warptide_lifecycle_config() -> GameConfig:
+    catalog = _warptide_lifecycle_catalog()
+    return GameConfig(
+        game_id="phase17g-warptide-shudderblink",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="core-v2-phase17g-warptide-test"
+        ),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _warptide_lifecycle_muster_request(
+                catalog=catalog,
+                army_id="army-alpha",
+                player_id="player-a",
+                faction_id=warptide_ir.CHAOS_DAEMONS_FACTION_ID,
+                detachment_id=warptide_ir.WARPTIDE_DETACHMENT_ID,
+                unit_selection_id=_WARPTIDE_LIFECYCLE_UNIT_SELECTION_ID,
+                datasheet_id=_WARPTIDE_LIFECYCLE_DATASHEET_ID,
+                model_profile_id="core-intercessor-like",
+                model_count=5,
+            ),
+            _warptide_lifecycle_muster_request(
+                catalog=catalog,
+                army_id="army-beta",
+                player_id="player-b",
+                faction_id="core-marine-force",
+                detachment_id="core-combined-arms",
+                unit_selection_id=_WARPTIDE_LIFECYCLE_ENEMY_UNIT_SELECTION_ID,
+                datasheet_id="core-intercessor-like-infantry",
+                model_profile_id="core-intercessor-like",
+                model_count=5,
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
+        mission_setup=_warptide_lifecycle_mission_setup(),
+    )
+
+
+def _warptide_lifecycle_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    daemon_datasheet = _warptide_daemon_datasheet(
+        base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    )
+    return replace(
+        base_catalog,
+        datasheets=(*base_catalog.datasheets, daemon_datasheet),
+        factions=(
+            *base_catalog.factions,
+            FactionDefinition(
+                faction_id=warptide_ir.CHAOS_DAEMONS_FACTION_ID,
+                name="Chaos Daemons",
+                faction_keywords=(warptide_ir.LEGIONES_DAEMONICA_KEYWORD,),
+                source_ids=("gw-11e-faction-detachments-2026-27:faction:chaos-daemons",),
+            ),
+        ),
+        detachments=(
+            *base_catalog.detachments,
+            DetachmentDefinition(
+                detachment_id=warptide_ir.WARPTIDE_DETACHMENT_ID,
+                name="Warptide",
+                faction_id=warptide_ir.CHAOS_DAEMONS_FACTION_ID,
+                detachment_point_cost=3,
+                unit_datasheet_ids=(_WARPTIDE_LIFECYCLE_DATASHEET_ID,),
+                force_disposition_ids=("phase17g-force",),
+                source_ids=(
+                    "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:warptide",
+                ),
+            ),
+        ),
+    )
+
+
+def _warptide_daemon_datasheet(base_datasheet: DatasheetDefinition) -> DatasheetDefinition:
+    return replace(
+        base_datasheet,
+        datasheet_id=_WARPTIDE_LIFECYCLE_DATASHEET_ID,
+        name="Shudderblink Test Daemonettes",
+        keywords=DatasheetKeywordSet(
+            keywords=(warptide_ir.BATTLELINE_KEYWORD, "INFANTRY"),
+            faction_keywords=(warptide_ir.LEGIONES_DAEMONICA_KEYWORD,),
+        ),
+        attachment_eligibilities=(),
+        source_ids=("phase17g:test:warptide:daemonettes",),
+    )
+
+
+def _warptide_lifecycle_muster_request(
+    *,
+    catalog: ArmyCatalog,
+    army_id: str,
+    player_id: str,
+    faction_id: str,
+    detachment_id: str,
+    unit_selection_id: str,
+    datasheet_id: str,
+    model_profile_id: str,
+    model_count: int,
+) -> ArmyMusterRequest:
+    return ArmyMusterRequest(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=faction_id,
+            detachment_ids=(detachment_id,),
+        ),
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id=unit_selection_id,
+                datasheet_id=datasheet_id,
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id=model_profile_id,
+                        model_count=model_count,
+                    ),
+                ),
+            ),
+        ),
+    )
+
+
+def _warptide_lifecycle_mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+
+
+def _advance_to_warptide_movement_unit_selection(
+    config: GameConfig,
+) -> tuple[GameLifecycle, LifecycleStatus]:
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    status = lifecycle.advance_until_decision_or_terminal()
+    secondary_index = 1
+    while (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
+    ):
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase17g-warptide-secondary-{secondary_index:06d}",
+                request=_decision_request(status),
+                selected_option_id="fixed:assassination:bring_it_down",
+            )
+        )
+        secondary_index += 1
+    status = submit_all_deployments_if_pending(
+        lifecycle,
+        status,
+        result_id_prefix="phase17g-warptide-deploy",
+        pose_factory=_warptide_lifecycle_deployment_pose,
+    )
+    request = _decision_request(status)
+    assert request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    return lifecycle, status
+
+
+def _decline_stratagem_window_if_present(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    result_id: str,
+) -> LifecycleStatus:
+    request = _decision_request(status)
+    if request.decision_type != STRATAGEM_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id=result_id,
+            request=request,
+            selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        )
+    )
+
+
+def _warptide_lifecycle_deployment_pose(
+    index: int,
+    player_id: str,
+    model_instance_id: str,
+) -> Pose:
+    unit_instance_id = model_instance_id.rsplit(":", 2)[0]
+    if unit_instance_id == _WARPTIDE_LIFECYCLE_UNIT_ID:
+        return Pose.at(15.5, 17.0 + (index * 1.8), 0.0, facing_degrees=0.0)
+    if unit_instance_id == _WARPTIDE_LIFECYCLE_ENEMY_UNIT_ID:
+        return Pose.at(43.5, 17.0 + (index * 1.8), 0.0, facing_degrees=180.0)
+    if player_id == "player-b":
+        return Pose.at(57.0, 24.0 + (index * 1.8), 0.0, facing_degrees=180.0)
+    return Pose.at(3.0, 24.0 + (index * 1.8), 0.0, facing_degrees=0.0)
+
+
+def _single_persisting_effect_for_unit_by_kind(
+    state: GameState,
+    unit_instance_id: str,
+    effect_kind: str,
+) -> PersistingEffect:
+    effects = _persisting_effects_for_unit_by_kind(state, unit_instance_id, effect_kind)
+    assert len(effects) == 1
+    return effects[0]
+
+
+def _persisting_effects_for_unit_by_kind(
+    state: GameState,
+    unit_instance_id: str,
+    effect_kind: str,
+) -> tuple[PersistingEffect, ...]:
+    effects: list[PersistingEffect] = []
+    for effect in state.persisting_effects_for_unit(unit_instance_id):
+        payload = cast(dict[str, JsonValue], effect.effect_payload)
+        if payload.get("effect_kind") == effect_kind:
+            effects.append(effect)
+    return tuple(effects)
+
+
+def _event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, JsonValue]:
+    for event in lifecycle.decision_controller.event_log.records:
+        if event.event_type == event_type:
+            return cast(dict[str, JsonValue], event.payload)
+    raise AssertionError(f"missing event {event_type}")
+
+
+def _decision_request(status: LifecycleStatus) -> DecisionRequest:
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    return status.decision_request
+
+
+def _state(lifecycle: GameLifecycle) -> GameState:
+    assert lifecycle.state is not None
+    return lifecycle.state
 
 
 def _source_unit_context_effect_payload(context_key: str) -> dict[str, JsonValue]:
