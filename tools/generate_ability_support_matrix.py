@@ -706,6 +706,20 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
             "public lifecycle decision entrypoint."
         ),
     ),
+    (
+        "chaos-daemons",
+        "warptide",
+    ): SupportSectionRow(
+        subject="Warptide",
+        engine="Shudderblink generic IR advance-move and advance-eligibility hooks",
+        documentation="Source row, execution record, and generated matrix",
+        tests="Focused generic registry, advance-grant, and Warptide RuleIR tests",
+        overall="Full",
+        notes=(
+            "Qualifying LEGIONES DAEMONICA BATTLELINE units gain automatic Assault "
+            "weapon-keyword effects after Advances and remain eligible to declare charges."
+        ),
+    ),
 }
 
 _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
@@ -727,6 +741,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     ),
     "phase17f:phase17e:chaos-daemons:daemonic-incursion:rule": "Warp Rifts",
     "phase17f:phase17e:chaos-daemons:shadow-legion:rule": "Shadow Legion",
+    "phase17f:phase17e:chaos-daemons:warptide:rule": "Shudderblink",
     adepta_sororitas_army_rule.SOURCE_RULE_ID: "Acts of Faith",
     adeptus_custodes_army_rule.SOURCE_RULE_ID: "Martial Ka'tah",
     adeptus_mechanicus_army_rule.SOURCE_RULE_ID: "Doctrina Imperatives",

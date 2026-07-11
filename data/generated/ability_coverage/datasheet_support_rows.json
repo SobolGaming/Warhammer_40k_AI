@@ -30,13 +30,14 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
-      "shadow-legion"
+      "shadow-legion",
+      "warptide"
     ],
     "tests_evidence": "Runtime consumers: `army-mustering:supreme-commander`, `catalog-ir:battle-shock-failed-heal`, `catalog-ir:battle-shock-forced-test`, `catalog-ir:hit-roll-reroll`, `catalog-ir:shadow-form-choice`, `catalog-ir:shadow-of-chaos-aura`, `catalog-ir:shooting-target-range-restriction`, `core:stealth`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
@@ -68,13 +69,14 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
-      "shadow-legion"
+      "shadow-legion",
+      "warptide"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:leadership-characteristic-query`, `catalog-ir:unit-move-completed-mortal-wounds`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
@@ -106,13 +108,14 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
-      "shadow-legion"
+      "shadow-legion",
+      "warptide"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:desperate-escape-roll-modifier`, `catalog-ir:force-desperate-escape`, `catalog-ir:leadership-characteristic-query`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
@@ -150,13 +153,14 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
-      "shadow-legion"
+      "shadow-legion",
+      "warptide"
     ],
     "tests_evidence": "Runtime consumers: `army-mustering:required-datasheet-option`, `catalog-ir:attacks-characteristic-modifier`, `catalog-ir:aura-ability:stealth`, `catalog-ir:conditional-ability:lone-operative`, `catalog-ir:movement-characteristic-modifier`, `catalog-ir:once-per-battle-ability`, `catalog-ir:strength-characteristic-modifier`, `catalog-ir:toughness-characteristic-modifier`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
@@ -193,13 +197,14 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
-      "shadow-legion"
+      "shadow-legion",
+      "warptide"
     ],
     "tests_evidence": "Runtime consumers: `army-mustering:required-datasheet-option`, `catalog-ir:attacks-characteristic-modifier`, `catalog-ir:fight-selected-weapon-ability-choice`, `catalog-ir:movement-characteristic-modifier`, `catalog-ir:once-per-battle-ability`, `catalog-ir:strength-characteristic-modifier`, `catalog-ir:toughness-characteristic-modifier`, `catalog-ir:weapon-keyword-grant`, `catalog-ir:weapon-keyword-grant:lethal-hits`, `catalog-ir:weapon-keyword-grant:precision`, `catalog-ir:weapon-keyword-grant:sustained-hits`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
@@ -230,13 +235,14 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
-      "shadow-legion"
+      "shadow-legion",
+      "warptide"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:can-be-placed-in-reserves`, `catalog-ir:feel-no-pain-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
@@ -268,13 +274,14 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
-      "shadow-legion"
+      "shadow-legion",
+      "warptide"
     ],
     "tests_evidence": "Runtime consumers: `army-mustering:required-datasheet-option`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",

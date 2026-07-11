@@ -342,6 +342,12 @@ def _stratagem_affected_unit_ids(
     engaged_enemy_unit_id = _engaged_enemy_unit_id_or_none(effect_selection)
     if engaged_enemy_unit_id is not None:
         raw_unit_ids.append(engaged_enemy_unit_id)
+    if isinstance(effect_selection, dict) and (
+        effect_selection.get("effect_selection_kind") == VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND
+    ):
+        visible_enemy_unit_id = effect_selection.get(VISIBLE_ENEMY_UNIT_CONTEXT_KEY)
+        if type(visible_enemy_unit_id) is str:
+            raw_unit_ids.append(visible_enemy_unit_id)
     companion_unit_id = companion_unit_id_or_none(effect_selection)
     if companion_unit_id is not None:
         raw_unit_ids.append(companion_unit_id)
@@ -418,6 +424,16 @@ def _generic_rule_ir_stratagem_unavailable_reason(
     )
     if trigger_context_error is not None:
         return trigger_context_error
+    if (
+        _optional_generic_metadata_bool(effect_payload, key="requires_own_turn")
+        and context.active_player_id != context.player_id
+    ):
+        return "stratagem_requires_own_turn"
+    if (
+        _optional_generic_metadata_bool(effect_payload, key="requires_opponent_turn")
+        and context.active_player_id == context.player_id
+    ):
+        return "stratagem_requires_opponent_turn"
     target_unit_id = target_binding.target_unit_instance_id if target_binding is not None else None
     if (
         _optional_generic_metadata_bool(
@@ -478,6 +494,16 @@ def _generic_rule_ir_stratagem_unavailable_reason(
         )
         if companion_error is not None:
             return companion_error
+    if effect_payload.get(EFFECT_SELECTION_KIND_KEY) == VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND:
+        visible_enemy_error = _visible_enemy_selection_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+            effect_payload=effect_payload,
+        )
+        if visible_enemy_error is not None:
+            return visible_enemy_error
     effect_selection_battle_shock_key = _optional_generic_metadata_identifier(
         effect_payload,
         key="effect_selection_unit_forbidden_if_battle_shocked",
@@ -489,6 +515,51 @@ def _generic_rule_ir_stratagem_unavailable_reason(
         )
         if selected_unit_id is not None and selected_unit_id in state.battle_shocked_unit_ids:
             return "target_already_battle_shocked"
+    return None
+
+
+def _visible_enemy_selection_error(
+    *,
+    state: GameState,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+    effect_selection: JsonValue,
+    effect_payload: dict[str, JsonValue],
+) -> str | None:
+    source_context_key = effect_payload.get(VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY)
+    if source_context_key != TARGET_BINDING_UNIT_CONTEXT_KEY:
+        raise GameLifecycleError("Visible enemy selection requires target binding source metadata.")
+    raw_range = effect_payload.get(VISIBLE_ENEMY_RANGE_INCHES_KEY)
+    if type(raw_range) is not int or raw_range <= 0:
+        raise GameLifecycleError("Visible enemy selection requires positive range metadata.")
+    if target_binding is None:
+        return None
+    source_unit_id = target_binding.target_unit_instance_id
+    if source_unit_id is None:
+        return "target_unit_required"
+    if _rules_unit_owner(state=state, unit_instance_id=source_unit_id) != context.player_id:
+        return "target_not_friendly"
+    if state.battlefield_state is None:
+        return "visible_enemy_requires_battlefield"
+    from warhammer40k_core.engine.stratagems_geometry import visible_enemy_unit_ids_for_source
+    from warhammer40k_core.engine.stratagems_targeting import _visible_enemy_unit_id_or_none
+
+    eligible_unit_ids = visible_enemy_unit_ids_for_source(
+        state=state,
+        player_id=context.player_id,
+        source_unit_instance_id=source_unit_id,
+        range_inches=raw_range,
+    )
+    selected_unit_id = _visible_enemy_unit_id_or_none(effect_selection)
+    if selected_unit_id is None:
+        return "no_visible_enemy_unit" if not eligible_unit_ids else "visible_enemy_unit_required"
+    selected_owner = _rules_unit_owner(state=state, unit_instance_id=selected_unit_id)
+    if selected_owner is None:
+        return "unknown_visible_enemy_unit"
+    if selected_owner == context.player_id:
+        return "visible_enemy_unit_not_enemy"
+    if selected_unit_id not in eligible_unit_ids:
+        return "visible_enemy_unit_not_visible_and_within_range"
     return None
 
 

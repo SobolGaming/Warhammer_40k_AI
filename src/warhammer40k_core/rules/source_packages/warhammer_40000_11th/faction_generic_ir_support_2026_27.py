@@ -56,6 +56,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_stratagem_activation_2026_27 as stratagem_activation,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_warptide_ir_support_2026_27 as warptide_ir,
+)
 
 SOURCE_PACKAGE_ID = static_payloads.SOURCE_PACKAGE_ID
 CAVALCADE_OF_CHAOS_DETACHMENT_RULE_DESCRIPTOR_ID = "phase17e:chaos-daemons:cavalcade-of-chaos:rule"
@@ -98,6 +101,7 @@ _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         corsair_coterie_ir.WEBWAY_PATHSTONE_SOURCE_ROW_ID,
         path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID,
         path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID,
+        warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654002",
         "enhancement:emperors-children:court-of-the-phoenician:000010654004",
         "enhancement:emperors-children:spectacle-of-slaughter:000010900002",
@@ -118,6 +122,7 @@ _SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         CAVALCADE_OF_CHAOS_APOCALYPTIC_STEEDS_SOURCE_ROW_ID,
+        warptide_ir.BANE_FORGED_WEAPONS_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654005",
         "enhancement:necrons:cryptek-conclave:000010664004",
     }
@@ -246,6 +251,11 @@ def generic_supported_detachment_rule_ir_hash(
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
         _validate_blood_legion_detachment_rule_ir(rule_ir)
         return rule_ir_hash
+    rule_ir_hash = warptide_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_warptide_detachment_rule_ir(rule_ir)
+        return rule_ir_hash
     return court_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
 
 
@@ -287,6 +297,11 @@ def generic_supported_stratagem_rule_ir_hash(
     rule_ir_hash = spectacle_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
+    rule_ir_hash = warptide_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_warptide_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
+        return rule_ir_hash
     return court_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
 
 
@@ -305,6 +320,8 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
         payload = blood_legion_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = court_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
+    if payload is None:
+        payload = warptide_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = path_outcast_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
@@ -738,6 +755,104 @@ def _validate_blood_legion_detachment_rule_ir(rule_ir: RuleIR) -> None:
                 raise Phase17FGenericIrSupportError(
                     "Blood Legion detachment RuleIR has unexpected keyword gate."
                 )
+
+
+def _validate_warptide_detachment_rule_ir(rule_ir: RuleIR) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Warptide detachment requires RuleIR.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Warptide detachment RuleIR must deserialize as supported."
+        )
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:chaos-daemons:warptide:rule:source-text"
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Warptide detachment RuleIR produced an unexpected source ID."
+        )
+    template_ids = frozenset(
+        clause.template_id for clause in rule_ir.clauses if clause.template_id is not None
+    )
+    if template_ids != frozenset({GRANT_ABILITY_TEMPLATE_ID}):
+        raise Phase17FGenericIrSupportError(
+            "Warptide detachment RuleIR uses an unregistered template family."
+        )
+    granted_abilities = frozenset(
+        _ability_parameter(effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+    if granted_abilities != frozenset(
+        {
+            warptide_ir.SHUDDERBLINK_ASSAULT_AFTER_ADVANCE_ABILITY,
+            warptide_ir.SHUDDERBLINK_CHARGE_AFTER_ADVANCE_ABILITY,
+        }
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Warptide detachment RuleIR has unexpected granted abilities."
+        )
+    hook_families = frozenset(
+        parameter_payload(effect.parameters).get("hook_family")
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+    if hook_families != frozenset({"advance_move", "advance_eligibility"}):
+        raise Phase17FGenericIrSupportError(
+            "Warptide detachment RuleIR has unexpected hook families."
+        )
+    for clause in rule_ir.clauses:
+        for effect in clause.effects:
+            if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+                continue
+            parameters = parameter_payload(effect.parameters)
+            if parameters.get("required_faction_keyword_sequence") != (
+                warptide_ir.LEGIONES_DAEMONICA_KEYWORD,
+            ):
+                raise Phase17FGenericIrSupportError(
+                    "Warptide detachment RuleIR has unexpected faction keyword gate."
+                )
+            if parameters.get("required_keyword_sequence") != (warptide_ir.BATTLELINE_KEYWORD,):
+                raise Phase17FGenericIrSupportError(
+                    "Warptide detachment RuleIR has unexpected keyword gate."
+                )
+
+
+def _validate_warptide_stratagem_rule_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Warptide Stratagem support requires RuleIR.")
+    if source_row.source_row_id not in warptide_ir.WARPTIDE_STRATAGEM_SOURCE_ROW_IDS:
+        raise Phase17FGenericIrSupportError("Warptide Stratagem source row is unknown.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Warptide Stratagem RuleIR must deserialize as supported."
+        )
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Warptide Stratagem RuleIR produced an unexpected source ID."
+        )
+    if not any(clause.target is not None and not clause.effects for clause in rule_ir.clauses):
+        raise Phase17FGenericIrSupportError("Warptide Stratagem RuleIR is missing target binding.")
+    effect_kinds = tuple(effect.kind for clause in rule_ir.clauses for effect in clause.effects)
+    if effect_kinds != _warptide_stratagem_effect_kinds(source_row.source_row_id):
+        raise Phase17FGenericIrSupportError(
+            "Warptide Stratagem RuleIR has unexpected effect kinds."
+        )
+
+
+def _warptide_stratagem_effect_kinds(source_row_id: str) -> tuple[RuleEffectKind, ...]:
+    if source_row_id == warptide_ir.DAEMONIC_INFESTATION_SOURCE_ROW_ID:
+        return (RuleEffectKind.RESTORE_LOST_WOUNDS,)
+    if source_row_id == warptide_ir.SOULSEEING_SOURCE_ROW_ID:
+        return (RuleEffectKind.SET_CONTEXTUAL_STATUS,)
+    if source_row_id == warptide_ir.INCORPOREAL_ENTITIES_SOURCE_ROW_ID:
+        return (RuleEffectKind.MODIFY_DICE_ROLL,)
+    raise Phase17FGenericIrSupportError("Warptide Stratagem source row is unknown.")
 
 
 def _validate_shadow_legion_stratagem_rule_ir(

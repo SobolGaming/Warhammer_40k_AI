@@ -191,9 +191,16 @@ def _apply_movement_action_decision(  # noqa: RET503
             unit_placement=unit_placement,
             pending_action=pending_action,
             registry=advance_move_hooks,
+            ruleset_descriptor=ruleset_descriptor,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
+            ability_index=ability_index,
         )
         if movement_grant_status is not None:
-            state.replace_movement_phase_state(movement_state.with_pending_action(pending_action))
+            if _is_movement_action_grant_decision_pending(movement_grant_status):
+                state.replace_movement_phase_state(
+                    movement_state.with_pending_action(pending_action)
+                )
             return movement_grant_status
         return _request_movement_proposal(
             state=state,
@@ -222,9 +229,16 @@ def _apply_movement_action_decision(  # noqa: RET503
             unit_placement=unit_placement,
             pending_action=pending_action,
             registry=advance_move_hooks,
+            ruleset_descriptor=ruleset_descriptor,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
+            ability_index=ability_index,
         )
         if advance_grant_status is not None:
-            state.replace_movement_phase_state(movement_state.with_pending_action(pending_action))
+            if _is_movement_action_grant_decision_pending(advance_grant_status):
+                state.replace_movement_phase_state(
+                    movement_state.with_pending_action(pending_action)
+                )
             return advance_grant_status
         return _resolve_pending_advance_action(
             state=state,
@@ -266,9 +280,16 @@ def _apply_movement_action_decision(  # noqa: RET503
             unit_placement=unit_placement,
             pending_action=pending_action,
             registry=advance_move_hooks,
+            ruleset_descriptor=ruleset_descriptor,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
+            ability_index=ability_index,
         )
         if movement_grant_status is not None:
-            state.replace_movement_phase_state(movement_state.with_pending_action(pending_action))
+            if _is_movement_action_grant_decision_pending(movement_grant_status):
+                state.replace_movement_phase_state(
+                    movement_state.with_pending_action(pending_action)
+                )
             return movement_grant_status
         return _request_movement_proposal(
             state=state,
@@ -291,6 +312,10 @@ def _request_advance_move_grant_decision_if_available(
     unit_placement: UnitPlacement,
     pending_action: PendingMovementActionSelection,
     registry: AdvanceMoveHookRegistry,
+    ruleset_descriptor: RulesetDescriptor,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+    ability_index: AbilityCatalogIndex,
 ) -> LifecycleStatus | None:
     if type(pending_action) is not PendingMovementActionSelection:
         raise GameLifecycleError("Movement action grant decision requires a pending action.")
@@ -309,6 +334,36 @@ def _request_advance_move_grant_decision_if_available(
     )
     if not grants:
         return None
+    automatic_grants = tuple(grant for grant in grants if grant.automatic)
+    optional_grants = tuple(grant for grant in grants if not grant.automatic)
+    if not optional_grants:
+        decisions.event_log.append(
+            "advance_move_grants_auto_selected",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": pending_action.player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": unit_placement.unit_instance_id,
+                "movement_phase_action": pending_action.movement_phase_action.value,
+                "source_decision_request_id": pending_action.request_id,
+                "source_decision_result_id": pending_action.result_id,
+                "selected_grants": validate_json_value(
+                    [grant.to_payload() for grant in automatic_grants]
+                ),
+            },
+        )
+        return _resolve_pending_movement_action_after_grants(
+            state=state,
+            decisions=decisions,
+            pending_action=pending_action,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            selected_advance_move_grants=automatic_grants,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
+            ability_index=ability_index,
+        )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
@@ -326,10 +381,17 @@ def _request_advance_move_grant_decision_if_available(
             "available_grants": validate_json_value([grant.to_payload() for grant in grants]),
         },
         options=(
-            _decline_advance_move_grant_option(pending_action=pending_action),
+            _decline_advance_move_grant_option(
+                pending_action=pending_action,
+                automatic_grants=automatic_grants,
+            ),
             *tuple(
-                _advance_move_grant_option(pending_action=pending_action, grant=grant)
-                for grant in grants
+                _advance_move_grant_option(
+                    pending_action=pending_action,
+                    grant=grant,
+                    automatic_grants=automatic_grants,
+                )
+                for grant in optional_grants
             ),
         ),
     )
@@ -363,9 +425,20 @@ def _request_advance_move_grant_decision_if_available(
     )
 
 
+def _is_movement_action_grant_decision_pending(status: LifecycleStatus) -> bool:
+    if type(status) is not LifecycleStatus:
+        raise GameLifecycleError("Movement action grant status requires LifecycleStatus.")
+    payload = status.payload
+    return (
+        isinstance(payload, dict)
+        and payload.get("phase_body_status") == "movement_action_grant_decision_pending"
+    )
+
+
 def _decline_advance_move_grant_option(
     *,
     pending_action: PendingMovementActionSelection,
+    automatic_grants: tuple[AdvanceMoveGrant, ...] = (),
 ) -> DecisionOption:
     return DecisionOption(
         option_id=DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID,
@@ -377,7 +450,9 @@ def _decline_advance_move_grant_option(
             "movement_mode": pending_action.movement_mode.value,
             "source_decision_request_id": pending_action.request_id,
             "source_decision_result_id": pending_action.result_id,
-            "selected_movement_action_grants": [],
+            "selected_movement_action_grants": validate_json_value(
+                [grant.to_payload() for grant in automatic_grants]
+            ),
         },
     )
 
@@ -386,7 +461,9 @@ def _advance_move_grant_option(
     *,
     pending_action: PendingMovementActionSelection,
     grant: AdvanceMoveGrant,
+    automatic_grants: tuple[AdvanceMoveGrant, ...] = (),
 ) -> DecisionOption:
+    selected_grants = tuple(sorted((*automatic_grants, grant), key=lambda item: item.hook_id))
     return DecisionOption(
         option_id=grant.hook_id,
         label=grant.label,
@@ -397,7 +474,9 @@ def _advance_move_grant_option(
             "movement_mode": pending_action.movement_mode.value,
             "source_decision_request_id": pending_action.request_id,
             "source_decision_result_id": pending_action.result_id,
-            "selected_movement_action_grants": validate_json_value([grant.to_payload()]),
+            "selected_movement_action_grants": validate_json_value(
+                [selected_grant.to_payload() for selected_grant in selected_grants]
+            ),
         },
     )
 
@@ -448,18 +527,24 @@ def _apply_advance_move_grant_decision(
         raise GameLifecycleError("Movement action grant movement mode drift.")
 
     selected_grants = _advance_move_grants_from_context(payload)
+    optional_selected_grants = tuple(grant for grant in selected_grants if not grant.automatic)
     if result.selected_option_id == DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID:
-        if selected_grants:
-            raise GameLifecycleError("Declined movement action grant cannot carry selected grants.")
+        if optional_selected_grants:
+            raise GameLifecycleError(
+                "Declined movement action grant cannot carry optional selected grants."
+            )
     else:
-        if len(selected_grants) != 1:
-            raise GameLifecycleError("Movement action grant selection must carry one grant.")
-        if selected_grants[0].hook_id != result.selected_option_id:
+        if len(optional_selected_grants) != 1:
+            raise GameLifecycleError(
+                "Movement action grant selection must carry one optional grant."
+            )
+        if optional_selected_grants[0].hook_id != result.selected_option_id:
             raise GameLifecycleError("Movement action grant selected option drift.")
+    for selected_grant in selected_grants:
         _assert_advance_move_grant_still_available(
             state=state,
             pending_action=pending_action,
-            selected_grant=selected_grants[0],
+            selected_grant=selected_grant,
             registry=advance_move_hooks,
         )
 

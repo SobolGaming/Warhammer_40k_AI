@@ -12,6 +12,7 @@ from warhammer40k_core.engine import (
     generic_rule_lifecycle_hooks,
     generic_target_restriction_effects,
 )
+from warhammer40k_core.engine import generic_rule_advance_move_lifecycle_hooks as amh
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
@@ -1257,6 +1258,7 @@ class RuntimeContentBundle:
         if type(catalog) is not ArmyCatalog:
             raise GameLifecycleError("Runtime content bundle requires ArmyCatalog.")
         validated_contributions = _validate_contributions(contributions)
+        vc = validated_contributions
         ability_records = _merge_records(
             "ability_records",
             base_ability_records,
@@ -1466,16 +1468,13 @@ class RuntimeContentBundle:
                     activation=activation,
                     execution_records=records,
                 ),
-                *_contribution_values(
-                    validated_contributions,
-                    lambda contribution: contribution.advance_eligibility_hook_bindings,
-                ),
+                *_contribution_values(vc, lambda c: c.advance_eligibility_hook_bindings),
             )
         )
         advance_move_hook_registry = AdvanceMoveHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.advance_move_hook_bindings,
+            (
+                *amh.advance_move_hook_bindings(activation=activation, execution_records=records),
+                *_contribution_values(vc, lambda c: c.advance_move_hook_bindings),
             )
         )
         fall_back_hook_registry = FallBackEligibilityHookRegistry.from_bindings(

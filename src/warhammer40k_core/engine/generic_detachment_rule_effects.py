@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
@@ -18,6 +19,9 @@ from warhammer40k_core.engine.effects import (
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.fight_order import FIGHTS_FIRST_EFFECT_KIND
+from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
+    DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
+)
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
 )
@@ -28,7 +32,12 @@ from warhammer40k_core.engine.rule_execution import (
     execute_rule_ir,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.rules.rule_ir import RuleIR
+from warhammer40k_core.rules.rule_ir import (
+    RuleIR,
+    RuleParameterValue,
+    RuleTargetKind,
+    parameter_payload,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
 )
@@ -72,6 +81,20 @@ BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID = (
 )
 BLOOD_LEGION_FACTION_KEYWORD = blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD
 BLOOD_LEGION_KEYWORD = blood_legion_ir.KHORNE_KEYWORD
+
+
+def _registered_battle_formation_descriptor_ids() -> frozenset[str]:
+    descriptor_ids = {
+        descriptor.coverage_descriptor_id
+        for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.advance_move_abilities
+    }
+    descriptor_ids.update(
+        descriptor.coverage_descriptor_id
+        for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.advance_eligibility_abilities
+    )
+    return frozenset(descriptor_ids)
+
+
 _BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS = frozenset(
     {
         MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID,
@@ -80,7 +103,14 @@ _BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS = frozenset(
         SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID,
         BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID,
     }
-)
+).union(_registered_battle_formation_descriptor_ids())
+
+
+@dataclass(frozen=True, slots=True)
+class _UnitKeywordRequirement:
+    required_keywords: tuple[str, ...]
+    required_faction_keywords: tuple[str, ...]
+    required_keyword_any: tuple[str, ...] | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -171,6 +201,7 @@ def _apply_generic_detachment_rule_effects(
             continue
         target_unit_ids = _target_unit_ids_for_record(
             record=binding_source.record,
+            rule_ir=binding_source.rule_ir,
             army=army,
         )
         if not target_unit_ids:
@@ -320,6 +351,7 @@ def _army_uses_record(
 def _target_unit_ids_for_record(
     *,
     record: _Phase17FExecutionRecord,
+    rule_ir: RuleIR,
     army: ArmyDefinition,
 ) -> tuple[str, ...]:
     if record.coverage_descriptor_id == MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID:
@@ -357,6 +389,12 @@ def _target_unit_ids_for_record(
             if _unit_is_blood_legion_detachment_target(unit)
         )
         return tuple(sorted(target_ids))
+    target_ids = _target_unit_ids_from_rule_ir_keyword_requirements(
+        rule_ir=rule_ir,
+        army=army,
+    )
+    if target_ids:
+        return target_ids
     raise GameLifecycleError("Generic detachment record is not supported by runtime.")
 
 
@@ -399,6 +437,129 @@ def _unit_is_blood_legion_detachment_target(unit: UnitInstance) -> bool:
     return (
         _canonical_keyword(BLOOD_LEGION_FACTION_KEYWORD) in faction_keywords
         and _canonical_keyword(BLOOD_LEGION_KEYWORD) in keywords
+    )
+
+
+def _target_unit_ids_from_rule_ir_keyword_requirements(
+    *,
+    rule_ir: RuleIR,
+    army: ArmyDefinition,
+) -> tuple[str, ...]:
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Generic detachment keyword target lookup requires RuleIR.")
+    if type(army) is not ArmyDefinition:
+        raise GameLifecycleError("Generic detachment keyword target lookup requires army.")
+    requirements = _unit_keyword_requirements_from_rule_ir(rule_ir)
+    target_ids = {
+        unit.unit_instance_id
+        for unit in army.units
+        if any(_unit_matches_keyword_requirement(unit, requirement) for requirement in requirements)
+    }
+    return tuple(sorted(target_ids))
+
+
+def _unit_keyword_requirements_from_rule_ir(
+    rule_ir: RuleIR,
+) -> tuple[_UnitKeywordRequirement, ...]:
+    requirements: list[_UnitKeywordRequirement] = []
+    seen: set[_UnitKeywordRequirement] = set()
+    for clause in rule_ir.clauses:
+        if clause.target is None or clause.target.kind is not RuleTargetKind.THIS_UNIT:
+            continue
+        for effect in clause.effects:
+            requirement = _unit_keyword_requirement_from_parameters(
+                parameter_payload(effect.parameters)
+            )
+            if requirement is None or requirement in seen:
+                continue
+            seen.add(requirement)
+            requirements.append(requirement)
+    return tuple(requirements)
+
+
+def _unit_keyword_requirement_from_parameters(
+    parameters: Mapping[str, RuleParameterValue],
+) -> _UnitKeywordRequirement | None:
+    required_keywords = _keyword_values_from_parameters(
+        parameters=parameters,
+        singular_key="required_keyword",
+        sequence_key="required_keyword_sequence",
+    )
+    required_faction_keywords = _keyword_values_from_parameters(
+        parameters=parameters,
+        singular_key="required_faction_keyword",
+        sequence_key="required_faction_keyword_sequence",
+    )
+    required_keyword_any = _required_keyword_any_values(parameters)
+    if not required_keywords and not required_faction_keywords and required_keyword_any is None:
+        return None
+    return _UnitKeywordRequirement(
+        required_keywords=required_keywords,
+        required_faction_keywords=required_faction_keywords,
+        required_keyword_any=required_keyword_any,
+    )
+
+
+def _keyword_values_from_parameters(
+    *,
+    parameters: Mapping[str, RuleParameterValue],
+    singular_key: str,
+    sequence_key: str,
+) -> tuple[str, ...]:
+    values: list[str] = []
+    singular = parameters.get(singular_key)
+    if singular is not None:
+        if type(singular) is not str:
+            raise GameLifecycleError(f"Generic detachment {singular_key} must be a string.")
+        values.append(singular)
+    sequence = parameters.get(sequence_key)
+    if sequence is not None:
+        if type(sequence) is not tuple:
+            raise GameLifecycleError(f"Generic detachment {sequence_key} must be a tuple.")
+        for item in sequence:
+            if type(item) is not str:
+                raise GameLifecycleError(f"Generic detachment {sequence_key} must contain strings.")
+            values.append(item)
+    return tuple(values)
+
+
+def _required_keyword_any_values(
+    parameters: Mapping[str, RuleParameterValue],
+) -> tuple[str, ...] | None:
+    raw_value = parameters.get("required_keyword_any")
+    if raw_value is None:
+        return None
+    if type(raw_value) is not tuple:
+        raise GameLifecycleError("Generic detachment required_keyword_any must be a tuple.")
+    if not raw_value:
+        raise GameLifecycleError("Generic detachment required_keyword_any must not be empty.")
+    values: list[str] = []
+    for item in raw_value:
+        if type(item) is not str:
+            raise GameLifecycleError("Generic detachment required_keyword_any item is invalid.")
+        values.append(item)
+    return tuple(values)
+
+
+def _unit_matches_keyword_requirement(
+    unit: UnitInstance,
+    requirement: _UnitKeywordRequirement,
+) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Generic detachment target requires UnitInstance.")
+    keywords = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    faction_keywords = {_canonical_keyword(keyword) for keyword in unit.faction_keywords}
+    if not all(
+        _canonical_keyword(keyword) in keywords for keyword in requirement.required_keywords
+    ):
+        return False
+    if not all(
+        _canonical_keyword(keyword) in faction_keywords
+        for keyword in requirement.required_faction_keywords
+    ):
+        return False
+    return requirement.required_keyword_any is None or any(
+        _canonical_keyword(keyword) in keywords for keyword in requirement.required_keyword_any
     )
 
 

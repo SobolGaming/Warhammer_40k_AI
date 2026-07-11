@@ -6233,7 +6233,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert ("| Orks | 12 | 1 | 44 | 66 | 13 | [orks](factions/orks.md) |") in generated_markdown
     assert (
-        "| Chaos Daemons | 9 | 4 | 26 | 39 | 20 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 5 | 28 | 42 | 26 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (
@@ -6341,9 +6341,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert attachment_support_row.support_stage == "full"
     assert attachment_support_row.source_id == army_mustering.ATTACHMENT_ELIGIBILITY_SOURCE_ID
     assert (
-        "| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Shadow Legion | "
-        "Legion of Excess<br>Lords of the Warp<br>Plague Legion<br>Scintillating Legion"
-        "<br>Warptide |"
+        "| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Shadow Legion<br>Warptide | "
+        "Legion of Excess<br>Lords of the Warp<br>Plague Legion<br>Scintillating Legion |"
     ) in chaos_daemons_markdown
     assert (
         "| Shadow Legion | Fade to Darkness<br>Leaping Shadows<br>Malice Made Manifest"
@@ -6637,6 +6636,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         "| Daemonic Incursion | `Full` | Warp Rifts generic IR reserve-arrival distance hook |"
     ) in chaos_daemons_markdown
+    assert (
+        "| Warptide | `Full` | Shudderblink generic IR advance-move and advance-eligibility hooks |"
+    ) in chaos_daemons_markdown
     assert "| Legion of Excess | `None` | Generated scaffold only |" in chaos_daemons_markdown
     assert "## Detachment Rule Coverage Rows" not in chaos_daemons_markdown
     assert "| Corsair Coterie | Pirates' Due |" in aeldari_markdown
@@ -6701,8 +6703,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert "BINDING SHADOW<br>CALL DAT DAKKA?" in generic_rule_ir_inventory_row
     assert "SHADE PATH<br>SINGLE-MINDED STRIKE" in generic_rule_ir_inventory_row
-    assert "SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Vengeful Sorrow<br>Warp-Riders |" in (
-        generic_rule_ir_inventory_row
+    assert (
+        "SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Soulseeing<br>Vengeful Sorrow<br>Warp-Riders |"
+        in generic_rule_ir_inventory_row
     )
     assert (
         "| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:"

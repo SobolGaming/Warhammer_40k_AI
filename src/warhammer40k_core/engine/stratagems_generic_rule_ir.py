@@ -15,6 +15,10 @@ from warhammer40k_core.engine.stratagems_ingress import *
 from warhammer40k_core.engine.stratagems_generic_metadata import (
     generic_rule_ir_execution_target_unit_ids,
 )
+from warhammer40k_core.engine.stratagems_generic_rule_ir_context import (
+    effect_selection_unit_id as _effect_selection_unit_id,
+    rule_effect_source_unit_id_for_context as _rule_effect_source_unit_id_for_context,
+)
 from warhammer40k_core.engine.stratagems_generic_rule_ir_runtime import (
     apply_generic_rule_ir_reserve_removal,
     record_generic_rule_ir_charge_roll_modifier,
@@ -582,9 +586,10 @@ def _record_generic_detection_range_bonus_effect(
             "effect_selection_kind",
         ),
     )
-    source_unit_id = _trigger_payload_identifier(
-        context,
-        key=_required_rule_effect_string_parameter(effect_payload, "source_unit_context_key"),
+    source_unit_id = _rule_effect_source_unit_id_for_context(
+        context=context,
+        use_record=use_record,
+        effect_payload=effect_payload,
     )
     effect = PersistingEffect(
         effect_id=f"{use_record.use_id}:detection-range-bonus:{target_unit_id}",
@@ -1231,29 +1236,6 @@ def _single_target_unit_id(use_record: StratagemUseRecord) -> str:
     if unit_id is None:
         raise GameLifecycleError("Generic Stratagem effect requires one target unit.")
     return unit_id
-
-
-def _effect_selection_unit_id(
-    use_record: StratagemUseRecord,
-    *,
-    expected_selection_kind: str,
-) -> str:
-    selection_kind = _validate_identifier("effect_selection_kind", expected_selection_kind)
-    selection = use_record.effect_selection
-    if not isinstance(selection, dict):
-        raise GameLifecycleError("Generic Stratagem effect requires effect selection.")
-    if selection.get("effect_selection_kind") != selection_kind:
-        raise GameLifecycleError("Generic Stratagem effect selection kind drift.")
-    if selection_kind == HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND:
-        key = HIT_ENEMY_UNIT_CONTEXT_KEY
-    elif selection_kind == ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND:
-        key = ENGAGED_ENEMY_UNIT_CONTEXT_KEY
-    else:
-        raise GameLifecycleError("Generic Stratagem effect selection kind is unsupported.")
-    value = selection.get(key)
-    if type(value) is not str:
-        raise GameLifecycleError("Generic Stratagem effect selection is missing unit.")
-    return _validate_identifier("effect_selection_unit_id", value)
 
 
 def _trigger_payload_identifier(context: StratagemEligibilityContext, *, key: str) -> str:

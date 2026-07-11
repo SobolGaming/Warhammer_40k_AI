@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -19,6 +19,7 @@ class AdvanceMoveGrantPayload(TypedDict):
     label: str
     granted_ranged_weapon_keywords: list[str]
     movement_bonus_inches: int
+    automatic: NotRequired[bool]
     replay_payload: JsonValue
     decision_effect_payload: JsonValue
     unit_effect_payload: JsonValue
@@ -88,6 +89,7 @@ class AdvanceMoveGrant:
     label: str
     granted_ranged_weapon_keywords: tuple[str, ...]
     movement_bonus_inches: int = 0
+    automatic: bool = False
     replay_payload: JsonValue = None
     decision_effect_payload: JsonValue = None
     unit_effect_payload: JsonValue = None
@@ -110,6 +112,7 @@ class AdvanceMoveGrant:
             "movement_bonus_inches",
             _validate_non_negative_int("movement_bonus_inches", self.movement_bonus_inches),
         )
+        object.__setattr__(self, "automatic", _validate_bool("automatic", self.automatic))
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
         object.__setattr__(
             self,
@@ -138,6 +141,7 @@ class AdvanceMoveGrant:
             "label": self.label,
             "granted_ranged_weapon_keywords": list(self.granted_ranged_weapon_keywords),
             "movement_bonus_inches": self.movement_bonus_inches,
+            "automatic": self.automatic,
             "replay_payload": self.replay_payload,
             "decision_effect_payload": self.decision_effect_payload,
             "unit_effect_payload": self.unit_effect_payload,
@@ -152,6 +156,7 @@ class AdvanceMoveGrant:
             label=payload["label"],
             granted_ranged_weapon_keywords=tuple(payload["granted_ranged_weapon_keywords"]),
             movement_bonus_inches=payload["movement_bonus_inches"],
+            automatic=payload.get("automatic", False),
             replay_payload=payload["replay_payload"],
             decision_effect_payload=payload["decision_effect_payload"],
             unit_effect_payload=payload["unit_effect_payload"],
@@ -247,6 +252,12 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
         raise GameLifecycleError(f"Advance hook {field_name} must be an int.")
     if value < 0:
         raise GameLifecycleError(f"Advance hook {field_name} must not be negative.")
+    return value
+
+
+def _validate_bool(field_name: str, value: object) -> bool:
+    if type(value) is not bool:
+        raise GameLifecycleError(f"Advance hook {field_name} must be a bool.")
     return value
 
 

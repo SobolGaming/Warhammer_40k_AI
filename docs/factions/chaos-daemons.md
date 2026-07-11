@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 4 | 26 | 39 | 20 |
+| 9 | 5 | 28 | 42 | 26 |
 
 ## Semantic Support Snapshot
 
@@ -18,7 +18,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 
 | Fully supported | Still needs semantic support |
 | --- | --- |
-| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Shadow Legion | Legion of Excess<br>Lords of the Warp<br>Plague Legion<br>Scintillating Legion<br>Warptide |
+| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Shadow Legion<br>Warptide | Legion of Excess<br>Lords of the Warp<br>Plague Legion<br>Scintillating Legion |
 
 ### Enhancements
 
@@ -31,6 +31,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 | Plague Legion | None | Cankerblight<br>Droning Shroud (Aura)<br>Font of Spores (Aura)<br>Maggot Maws |
 | Scintillating Legion | None | Improbable Shield (Aura)<br>Inescapable Eye<br>Infernal Puppeteer<br>Neverblade |
 | Shadow Legion | Fade to Darkness<br>Leaping Shadows<br>Malice Made Manifest<br>Mantle of Gloom (Aura) | None |
+| Warptide | Bane-forged Weapons Upgrade<br>Soul-hungry Slaughterers Upgrade | None |
 
 ### Stratagems
 
@@ -43,6 +44,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 | Plague Legion | None | FEVER VISIONS<br>FOETID RESURGENCE<br>MURKSHADOWS<br>PLAGUE OF WOES<br>ROT AND RENEWAL<br>SEEPING VIRULENCE |
 | Scintillating Legion | None | DELIRIUM UNMADE<br>FATEBORNE NIGHTMARES<br>FICKLEFIRE<br>FLICKERING REALITY<br>IMPOSSIBLE ECLIPSE<br>PYROGENESIS |
 | Shadow Legion | BINDING SHADOW<br>CHANNELLED WRATH<br>DEATH DENIED<br>ENCROACHING DARKNESS<br>SHADE PATH<br>SPITEFUL DEMISE | None |
+| Warptide | Daemonic Infestation<br>Incorporeal Entities<br>Soulseeing | None |
 
 ### Unit Datasheets
 
@@ -68,7 +70,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Plague Legion | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Scintillating Legion | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Shadow Legion | `Full` | Mustering restrictions and keyword grants, Murderer's Cowl Advance eligibility, Penumbral Puppetry hit modifiers, Gloam Rot wound modifiers, Shadow's Caress snap-target restriction, Leaping Shadows Scouts grants, Mantle of Gloom Objective Control aura, Malice Made Manifest Fight-start mortal wounds, and Disciples of Be'lakor Dark Pacts hooks | Focused mustering, runtime hook, modifier, target-restriction, Scouts enhancement, Mantle of Gloom engagement aura, Malice Made Manifest target/FNP routing, out-of-phase shooting, Be'lakor auto-pass, and Feel No Pain routing tests | Includes Shadow Legion/Undivided/Deep Strike keyword grants, Thralls of the First Prince roster caps and exclusions, attached rules-unit Scouts 9 grants from Leaping Shadows, attached rules-unit Engagement Range OC reduction from Mantle of Gloom, Fight-start D6/D3 mortal wounds from Malice Made Manifest, Dark Pacts selected-to-shoot/fight grants for Undivided units, Be'lakor Leadership auto-pass, and Shadow-source D3 mortal-wound Feel No Pain continuation. |
-| Warptide | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Warptide | `Full` | Shudderblink generic IR advance-move and advance-eligibility hooks | Focused generic registry, advance-grant, and Warptide RuleIR tests | Qualifying LEGIONES DAEMONICA BATTLELINE units gain automatic Assault weapon-keyword effects after Advances and remain eligible to declare charges. |
 
 ## Datasheet / Unit Support
 

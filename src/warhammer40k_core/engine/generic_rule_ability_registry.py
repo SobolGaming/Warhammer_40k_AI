@@ -28,6 +28,9 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
 )
+from warhammer40k_core.engine.generic_rule_advance_move_abilities import (
+    GenericRuleAdvanceMoveAbility,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHandler,
 )
@@ -74,6 +77,7 @@ _Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
 
 
 class GenericRuleAbilityHookFamily(StrEnum):
+    ADVANCE_MOVE = "advance_move"
     ADVANCE_ELIGIBILITY = "advance_eligibility"
     SHOOTING_TARGET_RESTRICTION = "shooting_target_restriction"
     SHOOTING_UNIT_SELECTED_GRANT = "shooting_unit_selected_grant"
@@ -1204,6 +1208,7 @@ class GenericRuleReserveArrivalDistanceAbility:
 
 @dataclass(frozen=True, slots=True)
 class GenericRuleAbilityRegistry:
+    advance_move_abilities: tuple[GenericRuleAdvanceMoveAbility, ...] = ()
     advance_eligibility_abilities: tuple[GenericRuleAdvanceEligibilityAbility, ...] = ()
     shooting_target_restriction_abilities: tuple[
         GenericRuleShootingTargetRestrictionAbility,
@@ -1303,7 +1308,8 @@ class _GroupDescriptorIdentitySetter(Protocol):
 
 
 type _AnyGenericRuleAbilityDescriptor = (
-    GenericRuleAdvanceEligibilityAbility
+    GenericRuleAdvanceMoveAbility
+    | GenericRuleAdvanceEligibilityAbility
     | GenericRuleShootingTargetRestrictionAbility
     | GenericRuleShootingUnitSelectedGrantAbility
     | GenericRuleFightUnitSelectedGrantAbility
@@ -1326,6 +1332,7 @@ type _AnyGenericRuleAbilityDescriptor = (
 
 
 _REGISTRY_DESCRIPTOR_FIELDS: tuple[tuple[str, type[object]], ...] = (
+    ("advance_move_abilities", GenericRuleAdvanceMoveAbility),
     ("advance_eligibility_abilities", GenericRuleAdvanceEligibilityAbility),
     ("shooting_target_restriction_abilities", GenericRuleShootingTargetRestrictionAbility),
     ("shooting_unit_selected_grant_abilities", GenericRuleShootingUnitSelectedGrantAbility),

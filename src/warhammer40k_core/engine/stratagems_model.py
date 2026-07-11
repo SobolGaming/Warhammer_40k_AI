@@ -98,7 +98,12 @@ __all__ = (
     "STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE",
     "STRATAGEM_WINDOW_DECLINED_EVENT_TYPE",
     "STRATEGIC_RESERVES_INGRESS_TARGET_POLICY_ID",
+    "TARGET_BINDING_UNIT_CONTEXT_KEY",
     "UNSUPPORTED_STRATAGEM_HANDLER_PREFIX",
+    "VISIBLE_ENEMY_RANGE_INCHES_KEY",
+    "VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY",
+    "VISIBLE_ENEMY_UNIT_CONTEXT_KEY",
+    "VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND",
     "StratagemAvailabilityKind",
     "StratagemCatalogIndex",
     "StratagemCatalogRecord",
@@ -190,6 +195,11 @@ HIT_ENEMY_UNIT_CONTEXT_KEY = "hit_enemy_unit_instance_id"
 ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND = "engaged_enemy_unit"
 ENGAGED_ENEMY_UNIT_CONTEXT_KEY = "engaged_enemy_unit_instance_id"
 ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY = "engaged_enemy_unit_instance_ids"
+VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND = "visible_enemy_unit"
+VISIBLE_ENEMY_UNIT_CONTEXT_KEY = "visible_enemy_unit_instance_id"
+VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY = "visible_enemy_source_unit_context_key"
+VISIBLE_ENEMY_RANGE_INCHES_KEY = "visible_enemy_range_inches"
+TARGET_BINDING_UNIT_CONTEXT_KEY = "target_binding_unit"
 FALL_BACK_UNIT_CONTEXT_KEY = "fall_back_unit_instance_id"
 FALL_BACK_MODE_CONTEXT_KEY = "fall_back_mode"
 FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND = "forced_fall_back_desperate_escape"
