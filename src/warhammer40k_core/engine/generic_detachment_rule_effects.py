@@ -111,6 +111,7 @@ class _UnitKeywordRequirement:
     required_keywords: tuple[str, ...]
     required_faction_keywords: tuple[str, ...]
     required_keyword_any: tuple[str, ...] | None
+    excluded_keywords: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -491,12 +492,23 @@ def _unit_keyword_requirement_from_parameters(
         sequence_key="required_faction_keyword_sequence",
     )
     required_keyword_any = _required_keyword_any_values(parameters)
-    if not required_keywords and not required_faction_keywords and required_keyword_any is None:
+    excluded_keywords = _keyword_values_from_parameters(
+        parameters=parameters,
+        singular_key="excluded_keyword",
+        sequence_key="excluded_keyword_sequence",
+    )
+    if (
+        not required_keywords
+        and not required_faction_keywords
+        and required_keyword_any is None
+        and not excluded_keywords
+    ):
         return None
     return _UnitKeywordRequirement(
         required_keywords=required_keywords,
         required_faction_keywords=required_faction_keywords,
         required_keyword_any=required_keyword_any,
+        excluded_keywords=excluded_keywords,
     )
 
 
@@ -558,8 +570,13 @@ def _unit_matches_keyword_requirement(
         for keyword in requirement.required_faction_keywords
     ):
         return False
-    return requirement.required_keyword_any is None or any(
+    if requirement.required_keyword_any is not None and not any(
         _canonical_keyword(keyword) in keywords for keyword in requirement.required_keyword_any
+    ):
+        return False
+    return not any(
+        _canonical_keyword(keyword) in keywords or _canonical_keyword(keyword) in faction_keywords
+        for keyword in requirement.excluded_keywords
     )
 
 

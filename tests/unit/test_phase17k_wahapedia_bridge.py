@@ -6233,7 +6233,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert ("| Orks | 12 | 1 | 44 | 66 | 13 | [orks](factions/orks.md) |") in generated_markdown
     assert (
-        "| Chaos Daemons | 9 | 5 | 28 | 42 | 26 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 6 | 29 | 46 | 32 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (
@@ -6341,8 +6341,19 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert attachment_support_row.support_stage == "full"
     assert attachment_support_row.source_id == army_mustering.ATTACHMENT_ELIGIBILITY_SOURCE_ID
     assert (
-        "| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Shadow Legion<br>Warptide | "
-        "Legion of Excess<br>Lords of the Warp<br>Plague Legion<br>Scintillating Legion |"
+        "| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Lords of the Warp"
+        "<br>Shadow Legion<br>Warptide | Legion of Excess<br>Plague Legion"
+        "<br>Scintillating Legion |"
+    ) in chaos_daemons_markdown
+    assert "| Lords of the Warp | Swollen with Power Upgrade | None |" in chaos_daemons_markdown
+    assert (
+        "| Lords of the Warp | Bilious Blessing<br>Call to Murder<br>Carnival of Excess"
+        "<br>Skirling Magicks | None |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Lords of the Warp | `Full` | Loci of Power generic IR Leadership and "
+        "Objective Control modifiers | Focused RuleIR, target-filtering, runtime "
+        "manifest, and Stratagem targeting tests |"
     ) in chaos_daemons_markdown
     assert (
         "| Shadow Legion | Fade to Darkness<br>Leaping Shadows<br>Malice Made Manifest"
@@ -6701,11 +6712,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     generic_rule_ir_inventory_row = next(
         line for line in generated_markdown.splitlines() if line.startswith("| `generic:rule-ir` |")
     )
-    assert "BINDING SHADOW<br>CALL DAT DAKKA?" in generic_rule_ir_inventory_row
+    assert "BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?" in generic_rule_ir_inventory_row
+    assert "CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil" in (
+        generic_rule_ir_inventory_row
+    )
     assert "SHADE PATH<br>SINGLE-MINDED STRIKE" in generic_rule_ir_inventory_row
     assert (
-        "SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Soulseeing<br>Vengeful Sorrow<br>Warp-Riders |"
-        in generic_rule_ir_inventory_row
+        "SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Soulseeing"
+        "<br>Vengeful Sorrow<br>Warp-Riders |" in generic_rule_ir_inventory_row
     )
     assert (
         "| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:"

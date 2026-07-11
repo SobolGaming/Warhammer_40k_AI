@@ -58,8 +58,12 @@ __all__ = (
     "_rapid_ingress_unit_ids",
     "_selected_target_context_error",
     "_selected_target_unit_ids_or_none",
+    "_selected_to_fight_target_context_error",
+    "_selected_to_fight_unit_id_or_none",
     "_selected_to_move_target_context_error",
     "_selected_to_move_unit_id_or_none",
+    "_selected_to_shoot_target_context_error",
+    "_selected_to_shoot_unit_id_or_none",
     "_strategic_reserves_ingress_unit_ids",
     "_target_binding_error",
     "_target_unit_has_all_keywords",
@@ -171,6 +175,27 @@ def _target_binding_error(
         return _selected_target_context_error(
             context=context,
             target_binding=target_binding,
+        )
+    if target_spec.target_policy_id == SELECTED_TO_SHOOT_TARGET_POLICY_ID:
+        if context is None:
+            return None
+        return _selected_to_shoot_target_context_error(
+            context=context,
+            target_binding=target_binding,
+        )
+    if target_spec.target_policy_id in {
+        SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+        SELECTED_TO_FIGHT_CHARGED_TARGET_POLICY_ID,
+    }:
+        if context is None:
+            return None
+        return _selected_to_fight_target_context_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+            requires_charge_move=(
+                target_spec.target_policy_id == SELECTED_TO_FIGHT_CHARGED_TARGET_POLICY_ID
+            ),
         )
     if target_spec.target_policy_id == NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID:
         return _not_selected_to_shoot_target_error(
@@ -777,6 +802,88 @@ def _selected_to_move_unit_id_or_none(context: StratagemEligibilityContext) -> s
     if type(raw_unit_id) is not str:
         return None
     return _validate_identifier("Selected to move unit id", raw_unit_id)
+
+
+def _selected_to_shoot_target_context_error(
+    *,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+) -> str | None:
+    if context.trigger_kind is not TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_SHOOT:
+        return "selected_to_shoot_requires_unit_selection_trigger"
+    if context.phase is not BattlePhase.SHOOTING:
+        return "selected_to_shoot_requires_shooting_phase"
+    selected_unit_id = _selected_to_shoot_unit_id_or_none(context)
+    if selected_unit_id is None:
+        return "missing_selected_to_shoot_context"
+    if target_binding is None:
+        return None
+    if _require_target_unit_id(target_binding) != selected_unit_id:
+        return "unit_not_selected_to_shoot"
+    return None
+
+
+def _selected_to_shoot_unit_id_or_none(context: StratagemEligibilityContext) -> str | None:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return None
+    raw_unit_id = trigger_payload.get(SELECTED_TO_SHOOT_UNIT_CONTEXT_KEY)
+    if type(raw_unit_id) is not str:
+        return None
+    return _validate_identifier("Selected to shoot unit id", raw_unit_id)
+
+
+def _selected_to_fight_target_context_error(
+    *,
+    state: GameState,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+    requires_charge_move: bool,
+) -> str | None:
+    if type(requires_charge_move) is not bool:
+        raise GameLifecycleError("Selected-to-fight charge flag must be boolean.")
+    if context.trigger_kind is not TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT:
+        return "selected_to_fight_requires_unit_selection_trigger"
+    if context.phase is not BattlePhase.FIGHT:
+        return "selected_to_fight_requires_fight_phase"
+    selected_unit_id = _selected_to_fight_unit_id_or_none(context)
+    if selected_unit_id is None:
+        return "missing_selected_to_fight_context"
+    if target_binding is not None and _require_target_unit_id(target_binding) != selected_unit_id:
+        return "unit_not_selected_to_fight"
+    if requires_charge_move and not _unit_made_charge_move_for_selected_to_fight(
+        state=state,
+        unit_instance_id=selected_unit_id,
+    ):
+        return "unit_did_not_make_charge_move"
+    return None
+
+
+def _selected_to_fight_unit_id_or_none(context: StratagemEligibilityContext) -> str | None:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return None
+    raw_unit_id = trigger_payload.get(SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY)
+    if type(raw_unit_id) is not str:
+        raw_unit_id = trigger_payload.get("selected_unit_instance_id")
+    if type(raw_unit_id) is not str:
+        return None
+    return _validate_identifier("Selected to fight unit id", raw_unit_id)
+
+
+def _unit_made_charge_move_for_selected_to_fight(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> bool:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for effect in state.persisting_effects_for_unit(requested_unit_id):
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("effect_kind") == "charge_grants_fights_first":
+            return True
+    return False
 
 
 def _just_fell_back_target_context_error(

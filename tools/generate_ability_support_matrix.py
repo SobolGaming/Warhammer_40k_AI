@@ -670,6 +670,21 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
         ),
     ),
     (
+        "chaos-daemons",
+        "lords-of-the-warp",
+    ): SupportSectionRow(
+        subject="Lords of the Warp",
+        engine="Loci of Power generic IR Leadership and Objective Control modifiers",
+        documentation="Source row, execution record, adapter contract, and generated matrix",
+        tests="Focused RuleIR, target-filtering, runtime manifest, and Stratagem targeting tests",
+        overall="Full",
+        notes=(
+            "Friendly LEGIONES DAEMONICA CHARACTER models excluding MONSTER models gain "
+            "+1 Leadership and +1 Objective Control through the shared characteristic "
+            "modifier path."
+        ),
+    ),
+    (
         "emperors-children",
         "spectacle-of-slaughter",
     ): SupportSectionRow(

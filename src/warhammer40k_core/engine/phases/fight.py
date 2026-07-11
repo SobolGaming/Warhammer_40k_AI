@@ -171,13 +171,18 @@ from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratage
 from warhammer40k_core.engine.stratagems import (
     CORE_COUNTEROFFENSIVE_HANDLER_ID,
     CORE_EPIC_CHALLENGE_HANDLER_ID,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+    SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogIndex,
     StratagemEligibilityContext,
     StratagemTargetProposal,
+    create_stratagem_use_decision_request,
     request_stratagem_target_proposal,
+    stratagem_decline_option,
     stratagem_target_proposal_from_index,
     stratagem_target_proposal_request_payload,
+    stratagem_use_options_for_handler_from_index,
     stratagem_window_declined_for_context,
 )
 from warhammer40k_core.engine.timing_windows import (
@@ -724,6 +729,14 @@ def _advance_active_fight_activation(
     )
     if epic_status is not None:
         return epic_status
+    selected_to_fight_stratagem_status = _request_selected_to_fight_stratagem_if_available(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        activation=activation,
+    )
+    if selected_to_fight_stratagem_status is not None:
+        return selected_to_fight_stratagem_status
     request = build_melee_declaration_request(
         request_id=state.next_decision_request_id(),
         game_id=state.game_id,
@@ -2571,6 +2584,16 @@ def _active_fight_phase_stratagem_timing_window_id(fight_state: FightPhaseState)
     )
 
 
+def _selected_to_fight_timing_window_id(activation: FightActivationSelection) -> str:
+    if type(activation) is not FightActivationSelection:
+        raise GameLifecycleError("Selected-to-fight stratagem timing requires activation.")
+    return (
+        f"selected-to-fight:round-{activation.battle_round}:"
+        f"player-{activation.player_id}:unit-{activation.unit_instance_id}:"
+        f"request-{activation.request_id}:result-{activation.result_id}"
+    )
+
+
 def _stratagem_used_for_context(
     *,
     decisions: DecisionController,
@@ -3411,6 +3434,74 @@ def _request_counteroffensive_if_available(
             },
         )
     return None
+
+
+def _request_selected_to_fight_stratagem_if_available(
+    *,
+    handler: FightPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    activation: FightActivationSelection,
+) -> LifecycleStatus | None:
+    trigger_payload = validate_json_value(
+        {
+            SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY: activation.unit_instance_id,
+            "selected_unit_instance_id": activation.unit_instance_id,
+            "activation_selection": activation.to_payload(),
+        }
+    )
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=activation.player_id,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+        timing_window_id=_selected_to_fight_timing_window_id(activation),
+        trigger_payload=trigger_payload,
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    if _stratagem_used_for_context(decisions=decisions, context=context):
+        return None
+    options = stratagem_use_options_for_handler_from_index(
+        state=state,
+        index=handler.stratagem_index,
+        context=context,
+        handler_id=GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+    )
+    if not options:
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "selected_to_fight_stratagem_window_opened",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "player_id": activation.player_id,
+                "stratagem_context": context.to_payload(),
+                "request_id": request.request_id,
+                "phase_body_status": "selected_to_fight_stratagem_pending",
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.FIGHT.value,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": activation.player_id,
+            "phase_body_status": "selected_to_fight_stratagem_pending",
+            "pending_request_id": request.request_id,
+        },
+    )
 
 
 def _request_epic_challenge_if_available(

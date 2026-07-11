@@ -32,6 +32,7 @@ class TimingTriggerKind(StrEnum):
     JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_MOVE = "just_after_friendly_unit_selected_to_move"
     JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK = "just_after_enemy_unit_selected_to_fall_back"
     JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK = "just_after_friendly_unit_falls_back"
+    JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_SHOOT = "just_after_friendly_unit_selected_to_shoot"
     JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT = "just_after_friendly_unit_has_shot"
     JUST_AFTER_ENEMY_UNIT_HAS_SHOT = "just_after_enemy_unit_has_shot"
     AFTER_ENEMY_UNIT_ENDS_MOVE = "after_enemy_unit_ends_move"

@@ -685,6 +685,7 @@ def test_warptide_generic_detachment_effect_helpers_cover_error_branches() -> No
                 required_keywords=(),
                 required_faction_keywords=(),
                 required_keyword_any=None,
+                excluded_keywords=(),
             ),
         )
     with pytest.raises(GameLifecycleError, match="payload requires clause_id"):

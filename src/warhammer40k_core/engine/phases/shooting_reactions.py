@@ -38,9 +38,11 @@ __all__ = (
     "_request_after_unit_selected_as_target_stratagem_if_available",
     "_request_enemy_unit_has_shot_stratagem_if_available",
     "_request_friendly_unit_has_shot_stratagem_if_available",
+    "_request_selected_to_shoot_stratagem_if_available",
     "_request_shooting_end_surge_if_available",
     "_resolve_completed_shooting_attack_sequence_continuation",
     "_selected_as_target_timing_window_id",
+    "_selected_to_shoot_timing_window_id",
     "_shooting_end_surge_distance_roll_spec",
     "_shooting_end_surge_event_already_processed",
     "_shooting_end_surge_grant_distance_bonus",
@@ -160,6 +162,92 @@ def _request_active_shooting_phase_stratagem_if_available(
             "active_player_id": state.active_player_id,
             "player_id": shooting_state.active_player_id,
             "phase_body_status": "active_shooting_phase_stratagem_pending",
+            "pending_request_id": request.request_id,
+        },
+    )
+
+
+def _request_selected_to_shoot_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    shooting_state: ShootingPhaseState,
+    stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.stratagems import (
+        SELECTED_TO_SHOOT_UNIT_CONTEXT_KEY,
+        StratagemEligibilityContext,
+        create_stratagem_use_decision_request,
+        stratagem_decline_option,
+        stratagem_use_options_from_index,
+        stratagem_window_declined_for_context,
+    )
+    from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+
+    if type(shooting_state) is not ShootingPhaseState:
+        raise GameLifecycleError("Selected-to-shoot stratagem trigger requires shooting state.")
+    selection = shooting_state.active_selection
+    if selection is None:
+        return None
+    if shooting_state.selected_shooting_type is not None:
+        return None
+    trigger_payload = validate_json_value(
+        {
+            SELECTED_TO_SHOOT_UNIT_CONTEXT_KEY: selection.unit_instance_id,
+            "selected_unit_instance_id": selection.unit_instance_id,
+            "shooting_unit_selection": selection.to_payload(),
+        }
+    )
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=selection.player_id,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_SHOOT,
+        timing_window_id=_selected_to_shoot_timing_window_id(selection),
+        trigger_payload=trigger_payload,
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    if _stratagem_used_for_context(decisions=decisions, context=context):
+        return None
+    options = stratagem_use_options_from_index(
+        state=state,
+        index=stratagem_index,
+        context=context,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+    )
+    if not options:
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "selected_to_shoot_stratagem_window_opened",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.SHOOTING.value,
+                "player_id": selection.player_id,
+                "stratagem_context": context.to_payload(),
+                "request_id": request.request_id,
+                "phase_body_status": "selected_to_shoot_stratagem_pending",
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.SHOOTING.value,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": selection.player_id,
+            "phase_body_status": "selected_to_shoot_stratagem_pending",
             "pending_request_id": request.request_id,
         },
     )
@@ -732,6 +820,16 @@ def _active_shooting_phase_stratagem_timing_window_id(
         f"active-shooting-stratagem:round-{shooting_state.battle_round}:"
         f"player-{shooting_state.active_player_id}:selected-{len(shooting_state.selected_unit_ids)}:"
         f"shot-{len(shooting_state.shot_unit_ids)}:skipped-{len(shooting_state.skipped_unit_ids)}"
+    )
+
+
+def _selected_to_shoot_timing_window_id(selection: ShootingUnitSelection) -> str:
+    if type(selection) is not ShootingUnitSelection:
+        raise GameLifecycleError("Selected-to-shoot timing requires shooting unit selection.")
+    return (
+        f"selected-to-shoot:round-{selection.battle_round}:"
+        f"player-{selection.player_id}:unit-{selection.unit_instance_id}:"
+        f"request-{selection.request_id}:result-{selection.result_id}"
     )
 
 
