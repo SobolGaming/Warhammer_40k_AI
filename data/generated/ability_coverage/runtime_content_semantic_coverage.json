@@ -1,7 +1,7 @@
 {
   "detachment_status_counts": {
-    "implemented": 7,
-    "partial": 18,
+    "implemented": 8,
+    "partial": 17,
     "placeholder": 241
   },
   "faction_status_counts": {
@@ -5400,8 +5400,8 @@
     },
     {
       "detachment_status_counts": {
-        "implemented": 4,
-        "partial": 2,
+        "implemented": 5,
+        "partial": 1,
         "placeholder": 3
       },
       "detachments": [
@@ -5507,7 +5507,7 @@
           "detachment_name": "Daemonic Incursion",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion.manifest",
-          "semantic_status": "partial",
+          "semantic_status": "implemented",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:daemonic-incursion",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008438002",
@@ -5530,7 +5530,11 @@
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000008437005",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000008437006",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:daemonic-incursion:000008437007",
-            "gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons"
+            "gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons",
+            "phase17f:phase17e:enhancement:chaos-daemons:daemonic-incursion:000008438002",
+            "phase17f:phase17e:enhancement:chaos-daemons:daemonic-incursion:000008438003",
+            "phase17f:phase17e:enhancement:chaos-daemons:daemonic-incursion:000008438004",
+            "phase17f:phase17e:enhancement:chaos-daemons:daemonic-incursion:000008438005"
           ]
         },
         {
@@ -7103,6 +7107,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "5522d140fab422276dc1f6ca719e3ad34858f830df97f7a71ba9ef5c0baf22f0",
+  "source_package_hash": "46d8950c4ecc0a2c705105a67acf991f7e9b9bbb89f37392eeb6acf0472ccf11",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-27"
 }

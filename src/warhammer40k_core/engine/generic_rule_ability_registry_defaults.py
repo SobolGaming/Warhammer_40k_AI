@@ -76,7 +76,10 @@ from warhammer40k_core.engine.generic_rule_ability_registry_aeldari_defaults imp
     aeldari_path_of_the_outcast_enhancement_effect_abilities,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_daemonic_incursion_defaults import (
+    daemonic_incursion_attack_sequence_completed_abilities,
+    daemonic_incursion_enhancement_effect_abilities,
     daemonic_incursion_reserve_arrival_distance_abilities,
+    daemonic_incursion_weapon_profile_modifier_abilities,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_emperors_children_defaults import (
     emperors_children_court_of_the_phoenician_stratagem_cost_modifier_abilities,
@@ -1359,6 +1362,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             hook_id_builder=_shadow_legion_dark_pact_completion_hook_id,
             handler=_resolve_shadow_legion_dark_pact_attack_sequence_completion,
         ),
+        *daemonic_incursion_attack_sequence_completed_abilities(),
     ),
     mortal_wound_feel_no_pain_abilities=(
         GenericRuleMortalWoundFeelNoPainAbility(
@@ -1388,6 +1392,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             modifier_id_builder=_shadow_legion_dark_pact_weapon_profile_modifier_id,
             handler=_shadow_legion_dark_pact_weapon_profile_modifier,
         ),
+        *daemonic_incursion_weapon_profile_modifier_abilities(),
     ),
     movement_end_surge_abilities=(
         GenericRuleMovementEndSurgeAbility(
@@ -1414,6 +1419,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
     enhancement_effect_abilities=(
         *aeldari_path_of_the_outcast_enhancement_effect_abilities(),
         *aeldari_corsair_coterie_enhancement_effect_abilities(),
+        *daemonic_incursion_enhancement_effect_abilities(),
         GenericRuleEnhancementEffectAbility(
             ability_id=shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,
             coverage_descriptor_id=shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID,

@@ -7,6 +7,7 @@ from typing import cast
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleClausePayload,
+    RuleConditionPayload,
     RuleDurationPayload,
     RuleEffectSpecPayload,
     RuleIR,
@@ -18,6 +19,7 @@ from warhammer40k_core.rules.rule_templates import (
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
     CONTEXTUAL_STATUS_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
+    KEYWORD_GATE_TEMPLATE_ID,
     PLACEMENT_TEMPLATE_ID,
     REROLL_PERMISSION_TEMPLATE_ID,
 )
@@ -57,6 +59,11 @@ DENIZENS_OF_THE_WARP_STRATAGEM_ID = "000008437005"
 THE_REALM_OF_CHAOS_STRATAGEM_ID = "000008437006"
 DAEMONIC_INVULNERABILITY_STRATAGEM_ID = "000008437007"
 
+ARGATH_ENHANCEMENT_ID = "000008438002"
+SOULSTEALER_ENHANCEMENT_ID = "000008438003"
+ENDLESS_GIFT_ENHANCEMENT_ID = "000008438004"
+EVERSTAVE_ENHANCEMENT_ID = "000008438005"
+
 CORRUPT_REALSPACE_SOURCE_ROW_ID = (
     f"stratagem:chaos-daemons:daemonic-incursion:{CORRUPT_REALSPACE_STRATAGEM_ID}"
 )
@@ -74,6 +81,15 @@ DAEMONIC_INVULNERABILITY_SOURCE_ROW_ID = (
     f"stratagem:chaos-daemons:daemonic-incursion:{DAEMONIC_INVULNERABILITY_STRATAGEM_ID}"
 )
 
+ARGATH_SOURCE_ROW_ID = f"enhancement:chaos-daemons:daemonic-incursion:{ARGATH_ENHANCEMENT_ID}"
+SOULSTEALER_SOURCE_ROW_ID = (
+    f"enhancement:chaos-daemons:daemonic-incursion:{SOULSTEALER_ENHANCEMENT_ID}"
+)
+ENDLESS_GIFT_SOURCE_ROW_ID = (
+    f"enhancement:chaos-daemons:daemonic-incursion:{ENDLESS_GIFT_ENHANCEMENT_ID}"
+)
+EVERSTAVE_SOURCE_ROW_ID = f"enhancement:chaos-daemons:daemonic-incursion:{EVERSTAVE_ENHANCEMENT_ID}"
+
 DAEMONIC_INCURSION_STRATAGEM_SOURCE_ROW_IDS = (
     CORRUPT_REALSPACE_SOURCE_ROW_ID,
     WARP_SURGE_SOURCE_ROW_ID,
@@ -83,12 +99,24 @@ DAEMONIC_INCURSION_STRATAGEM_SOURCE_ROW_IDS = (
     DAEMONIC_INVULNERABILITY_SOURCE_ROW_ID,
 )
 
+DAEMONIC_INCURSION_ENHANCEMENT_SOURCE_ROW_IDS = (
+    ARGATH_SOURCE_ROW_ID,
+    SOULSTEALER_SOURCE_ROW_ID,
+    ENDLESS_GIFT_SOURCE_ROW_ID,
+    EVERSTAVE_SOURCE_ROW_ID,
+)
+
 CORRUPT_REALSPACE_DESCRIPTOR_ID = f"phase17e:{CORRUPT_REALSPACE_SOURCE_ROW_ID}"
 WARP_SURGE_DESCRIPTOR_ID = f"phase17e:{WARP_SURGE_SOURCE_ROW_ID}"
 DRAUGHT_OF_TERROR_DESCRIPTOR_ID = f"phase17e:{DRAUGHT_OF_TERROR_SOURCE_ROW_ID}"
 DENIZENS_OF_THE_WARP_DESCRIPTOR_ID = f"phase17e:{DENIZENS_OF_THE_WARP_SOURCE_ROW_ID}"
 THE_REALM_OF_CHAOS_DESCRIPTOR_ID = f"phase17e:{THE_REALM_OF_CHAOS_SOURCE_ROW_ID}"
 DAEMONIC_INVULNERABILITY_DESCRIPTOR_ID = f"phase17e:{DAEMONIC_INVULNERABILITY_SOURCE_ROW_ID}"
+
+ARGATH_ENHANCEMENT_DESCRIPTOR_ID = f"phase17e:{ARGATH_SOURCE_ROW_ID}"
+SOULSTEALER_ENHANCEMENT_DESCRIPTOR_ID = f"phase17e:{SOULSTEALER_SOURCE_ROW_ID}"
+ENDLESS_GIFT_ENHANCEMENT_DESCRIPTOR_ID = f"phase17e:{ENDLESS_GIFT_SOURCE_ROW_ID}"
+EVERSTAVE_ENHANCEMENT_DESCRIPTOR_ID = f"phase17e:{EVERSTAVE_SOURCE_ROW_ID}"
 
 CORRUPT_REALSPACE_SOURCE_RULE_ID = f"phase17f:phase17e:{CORRUPT_REALSPACE_SOURCE_ROW_ID}"
 WARP_SURGE_SOURCE_RULE_ID = f"phase17f:phase17e:{WARP_SURGE_SOURCE_ROW_ID}"
@@ -97,6 +125,20 @@ DENIZENS_OF_THE_WARP_SOURCE_RULE_ID = f"phase17f:phase17e:{DENIZENS_OF_THE_WARP_
 THE_REALM_OF_CHAOS_SOURCE_RULE_ID = f"phase17f:phase17e:{THE_REALM_OF_CHAOS_SOURCE_ROW_ID}"
 DAEMONIC_INVULNERABILITY_SOURCE_RULE_ID = (
     f"phase17f:phase17e:{DAEMONIC_INVULNERABILITY_SOURCE_ROW_ID}"
+)
+
+ARGATH_SOURCE_RULE_ID = f"phase17f:phase17e:{ARGATH_SOURCE_ROW_ID}"
+SOULSTEALER_SOURCE_RULE_ID = f"phase17f:phase17e:{SOULSTEALER_SOURCE_ROW_ID}"
+ENDLESS_GIFT_SOURCE_RULE_ID = f"phase17f:phase17e:{ENDLESS_GIFT_SOURCE_ROW_ID}"
+EVERSTAVE_SOURCE_RULE_ID = f"phase17f:phase17e:{EVERSTAVE_SOURCE_ROW_ID}"
+
+ARGATH_MELEE_WEAPON_PROFILE_ABILITY = "chaos-daemons:daemonic-incursion:argath:melee-weapon-profile"
+SOULSTEALER_MODEL_DESTROYED_HEAL_ABILITY = (
+    "chaos-daemons:daemonic-incursion:soulstealer:model-destroyed-heal"
+)
+ENDLESS_GIFT_FEEL_NO_PAIN_ABILITY = "chaos-daemons:daemonic-incursion:endless-gift:feel-no-pain-5"
+EVERSTAVE_RANGED_WEAPON_PROFILE_ABILITY = (
+    "chaos-daemons:daemonic-incursion:everstave:ranged-weapon-profile"
 )
 
 
@@ -360,6 +402,139 @@ def _daemonic_invulnerability_payload() -> RuleIRPayload:
     )
 
 
+def _argath_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Khorne Legiones Daemonica model only. Add 1 to the Attacks and Strength "
+        "characteristics of the bearer's melee weapons. While the bearer is within your "
+        "army's Shadow of Chaos, add 2 to the Attacks and Strength characteristics of "
+        "the bearer's melee weapons instead."
+    )
+    return _enhancement_payload(
+        ARGATH_SOURCE_ROW_ID,
+        normalized_text,
+        keyword_text="Khorne Legiones Daemonica",
+        required_keyword_sequence=("KHORNE", LEGIONES_DAEMONICA_KEYWORD),
+        clauses=(
+            _ability_clause(
+                clause_id=_enhancement_clause_id(ARGATH_SOURCE_ROW_ID, "effect:001"),
+                normalized_text=normalized_text,
+                source_text="Add 1 to the Attacks and Strength characteristics",
+                effect_text="Attacks and Strength characteristics",
+                ability=ARGATH_MELEE_WEAPON_PROFILE_ABILITY,
+                extra_parameters=(
+                    _parameter("hook_family", "weapon_profile_modifier"),
+                    _parameter("weapon_scope", "melee"),
+                    _parameter("required_faction_keyword", LEGIONES_DAEMONICA_KEYWORD),
+                    _parameter("required_keyword", "KHORNE"),
+                    _parameter("base_attacks_delta", 1),
+                    _parameter("base_strength_delta", 1),
+                    _parameter("shadow_of_chaos_attacks_delta", 2),
+                    _parameter("shadow_of_chaos_strength_delta", 2),
+                ),
+                duration=_permanent_duration(normalized_text),
+            ),
+        ),
+    )
+
+
+def _soulstealer_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Slaanesh Legiones Daemonica model only. Each time the bearer destroys an enemy "
+        "model with a melee attack, roll one D6, adding 1 to the result if the bearer is "
+        "within your army's Shadow of Chaos. On a 4+, the bearer regains 1 lost wound."
+    )
+    return _enhancement_payload(
+        SOULSTEALER_SOURCE_ROW_ID,
+        normalized_text,
+        keyword_text="Slaanesh Legiones Daemonica",
+        required_keyword_sequence=("SLAANESH", LEGIONES_DAEMONICA_KEYWORD),
+        clauses=(
+            _ability_clause(
+                clause_id=_enhancement_clause_id(SOULSTEALER_SOURCE_ROW_ID, "effect:001"),
+                normalized_text=normalized_text,
+                source_text="Each time the bearer destroys an enemy model with a melee attack",
+                effect_text="bearer destroys an enemy model with a melee attack",
+                ability=SOULSTEALER_MODEL_DESTROYED_HEAL_ABILITY,
+                extra_parameters=(
+                    _parameter("hook_family", "attack_sequence_completed"),
+                    _parameter("required_faction_keyword", LEGIONES_DAEMONICA_KEYWORD),
+                    _parameter("required_keyword", "SLAANESH"),
+                    _parameter("trigger", "bearer_destroyed_enemy_model_with_melee_attack"),
+                    _parameter("roll", "D6"),
+                    _parameter("shadow_of_chaos_bonus", 1),
+                    _parameter("success_threshold", 4),
+                    _parameter("heal_lost_wounds", 1),
+                ),
+                duration=_permanent_duration(normalized_text),
+            ),
+        ),
+    )
+
+
+def _endless_gift_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Nurgle Legiones Daemonica model only. The bearer has the Feel No Pain 5+ ability."
+    )
+    return _enhancement_payload(
+        ENDLESS_GIFT_SOURCE_ROW_ID,
+        normalized_text,
+        keyword_text="Nurgle Legiones Daemonica",
+        required_keyword_sequence=("NURGLE", LEGIONES_DAEMONICA_KEYWORD),
+        clauses=(
+            _ability_clause(
+                clause_id=_enhancement_clause_id(ENDLESS_GIFT_SOURCE_ROW_ID, "effect:001"),
+                normalized_text=normalized_text,
+                source_text="The bearer has the Feel No Pain 5+ ability",
+                effect_text="Feel No Pain 5+ ability",
+                ability=ENDLESS_GIFT_FEEL_NO_PAIN_ABILITY,
+                extra_parameters=(
+                    _parameter("hook_family", "enhancement_effect"),
+                    _parameter("required_faction_keyword", LEGIONES_DAEMONICA_KEYWORD),
+                    _parameter("required_keyword", "NURGLE"),
+                    _parameter("feel_no_pain_threshold", 5),
+                ),
+                duration=_permanent_duration(normalized_text),
+            ),
+        ),
+    )
+
+
+def _everstave_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Tzeentch Legiones Daemonica model only. Add 1 to the Strength characteristic "
+        "of the bearer's ranged weapons and increase the Range characteristic of such "
+        "weapons by 3 inches. While the bearer is within your army's Shadow of Chaos, "
+        "add 2 to the Strength characteristic of the bearer's ranged weapons and "
+        "increase the Range characteristic of such weapons by 6 inches instead."
+    )
+    return _enhancement_payload(
+        EVERSTAVE_SOURCE_ROW_ID,
+        normalized_text,
+        keyword_text="Tzeentch Legiones Daemonica",
+        required_keyword_sequence=("TZEENTCH", LEGIONES_DAEMONICA_KEYWORD),
+        clauses=(
+            _ability_clause(
+                clause_id=_enhancement_clause_id(EVERSTAVE_SOURCE_ROW_ID, "effect:001"),
+                normalized_text=normalized_text,
+                source_text="Add 1 to the Strength characteristic",
+                effect_text="Strength characteristic",
+                ability=EVERSTAVE_RANGED_WEAPON_PROFILE_ABILITY,
+                extra_parameters=(
+                    _parameter("hook_family", "weapon_profile_modifier"),
+                    _parameter("weapon_scope", "ranged"),
+                    _parameter("required_faction_keyword", LEGIONES_DAEMONICA_KEYWORD),
+                    _parameter("required_keyword", "TZEENTCH"),
+                    _parameter("base_strength_delta", 1),
+                    _parameter("base_range_delta_inches", 3),
+                    _parameter("shadow_of_chaos_strength_delta", 2),
+                    _parameter("shadow_of_chaos_range_delta_inches", 6),
+                ),
+                duration=_permanent_duration(normalized_text),
+            ),
+        ),
+    )
+
+
 def _coverage_payload(
     source_row_id: str,
     normalized_text: str,
@@ -387,6 +562,32 @@ def _stratagem_payload(
         normalized_text=normalized_text,
         clauses=clauses,
         parser_version="phase17s-stratagem-activation-static-rule-ir-v1",
+    )
+
+
+def _enhancement_payload(
+    source_row_id: str,
+    normalized_text: str,
+    *,
+    keyword_text: str,
+    required_keyword_sequence: tuple[str, ...],
+    clauses: tuple[RuleClausePayload, ...],
+) -> RuleIRPayload:
+    source_id = _coverage_rule_id(source_row_id)
+    return _payload(
+        rule_id=source_id,
+        source_id=source_id,
+        normalized_text=normalized_text,
+        clauses=(
+            _keyword_gate_clause(
+                clause_id=_enhancement_clause_id(source_row_id, "gate:001"),
+                normalized_text=normalized_text,
+                keyword_text=keyword_text,
+                required_keyword_sequence=required_keyword_sequence,
+            ),
+            *clauses,
+        ),
+        parser_version="phase17f-daemonic-incursion-enhancement-static-rule-ir-v1",
     )
 
 
@@ -451,6 +652,52 @@ def _ability_clause(
         effect_text=effect_text,
         parameters=(_parameter("ability", ability), *extra_parameters),
         duration=duration,
+    )
+
+
+def _keyword_gate_clause(
+    *,
+    clause_id: str,
+    normalized_text: str,
+    keyword_text: str,
+    required_keyword_sequence: tuple[str, ...],
+) -> RuleClausePayload:
+    return cast(
+        RuleClausePayload,
+        {
+            "clause_id": clause_id,
+            "template_id": KEYWORD_GATE_TEMPLATE_ID,
+            "source_span": _span(normalized_text, keyword_text),
+            "trigger": None,
+            "conditions": [
+                _keyword_gate_condition(
+                    normalized_text=normalized_text,
+                    keyword_text=keyword_text,
+                    required_keyword_sequence=required_keyword_sequence,
+                )
+            ],
+            "target": None,
+            "effects": [],
+            "duration": None,
+            "unsupported_reason": None,
+            "diagnostics": [],
+        },
+    )
+
+
+def _keyword_gate_condition(
+    *,
+    normalized_text: str,
+    keyword_text: str,
+    required_keyword_sequence: tuple[str, ...],
+) -> RuleConditionPayload:
+    return cast(
+        RuleConditionPayload,
+        {
+            "kind": "keyword_gate",
+            "source_span": _span(normalized_text, keyword_text),
+            "parameters": [_parameter("required_keyword_sequence", required_keyword_sequence)],
+        },
     )
 
 
@@ -648,6 +895,10 @@ def _stratagem_clause_id(source_row_id: str, suffix: str) -> str:
     return f"{_coverage_rule_id(source_row_id)}:{suffix}"
 
 
+def _enhancement_clause_id(source_row_id: str, suffix: str) -> str:
+    return f"{_coverage_rule_id(source_row_id)}:{suffix}"
+
+
 def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
     return MappingProxyType(
         {
@@ -658,6 +909,10 @@ def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
             DENIZENS_OF_THE_WARP_DESCRIPTOR_ID: _denizens_of_the_warp_payload(),
             THE_REALM_OF_CHAOS_DESCRIPTOR_ID: _the_realm_of_chaos_payload(),
             DAEMONIC_INVULNERABILITY_DESCRIPTOR_ID: _daemonic_invulnerability_payload(),
+            ARGATH_ENHANCEMENT_DESCRIPTOR_ID: _argath_payload(),
+            SOULSTEALER_ENHANCEMENT_DESCRIPTOR_ID: _soulstealer_payload(),
+            ENDLESS_GIFT_ENHANCEMENT_DESCRIPTOR_ID: _endless_gift_payload(),
+            EVERSTAVE_ENHANCEMENT_DESCRIPTOR_ID: _everstave_payload(),
         }
     )
 

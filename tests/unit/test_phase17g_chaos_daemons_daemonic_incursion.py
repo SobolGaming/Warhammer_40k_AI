@@ -30,6 +30,7 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.dice import (
     DiceExpression,
+    DiceRollResult,
     DiceRollSpec,
     DiceRollState,
     RerollComponentSelectionPolicy,
@@ -51,7 +52,15 @@ from warhammer40k_core.engine import (
 )
 from warhammer40k_core.engine import stratagems_generic_metadata as generic_metadata
 from warhammer40k_core.engine import stratagems_generic_persisted as generic_persisted
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusterRequest,
+    EnhancementAssignment,
+)
+from warhammer40k_core.engine.attack_sequence import AttackSequence
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedContext,
+)
 from warhammer40k_core.engine.attack_sequence_dice_rerolls import (
     _source_backed_save_permission_for_attack,
     _source_backed_wound_permission_for_attack,
@@ -74,8 +83,10 @@ from warhammer40k_core.engine.effects import (
     EffectExpirationKind,
     PersistingEffect,
 )
+from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import (
     build_runtime_content_bundle,
     build_runtime_content_bundle_for_armies,
@@ -83,7 +94,8 @@ from warhammer40k_core.engine.faction_content.runtime import (
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     datasheets,
 )
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501  # noqa: E501
+    enhancements,
     rule,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
@@ -122,6 +134,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
     source_backed_reroll_permission_context_for_unit,
@@ -138,6 +151,7 @@ from warhammer40k_core.engine.stratagems_model import (
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -190,6 +204,286 @@ def test_daemonic_incursion_runtime_hook_materializes_only_for_selected_detachme
         daemonic_incursion_ir.DENIZENS_OF_THE_WARP_HOOK_ID
         not in other_summary["reserve_arrival_distance_hook_ids"]
     )
+
+
+def test_daemonic_incursion_enhancement_runtime_bindings_materialize_for_assignments() -> None:
+    argath_state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    _assign_daemonic_enhancement(
+        argath_state,
+        unit=_unit_by_id(argath_state, _ANCHOR_UNIT_ID),
+        enhancement_id=enhancements.ARGATH_ENHANCEMENT_ID,
+        source_id=enhancements.ARGATH_SOURCE_RULE_ID,
+    )
+    argath_bundle = _daemonic_incursion_runtime_bundle(argath_state)
+
+    assert enhancements.ARGATH_WEAPON_PROFILE_MODIFIER_ID in {
+        binding.modifier_id
+        for binding in argath_bundle.runtime_modifier_registry.all_weapon_profile_bindings()
+    }
+
+    soulstealer_state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state(
+        anchor_god_keyword="Slaanesh"
+    )
+    _assign_daemonic_enhancement(
+        soulstealer_state,
+        unit=_unit_by_id(soulstealer_state, _ANCHOR_UNIT_ID),
+        enhancement_id=enhancements.SOULSTEALER_ENHANCEMENT_ID,
+        source_id=enhancements.SOULSTEALER_SOURCE_RULE_ID,
+    )
+    soulstealer_bundle = _daemonic_incursion_runtime_bundle(soulstealer_state)
+
+    assert enhancements.SOULSTEALER_HOOK_ID in {
+        binding.hook_id
+        for binding in soulstealer_bundle.attack_sequence_completed_hook_registry.all_bindings()
+    }
+
+    endless_state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state(
+        anchor_god_keyword="Nurgle"
+    )
+    _assign_daemonic_enhancement(
+        endless_state,
+        unit=_unit_by_id(endless_state, _ANCHOR_UNIT_ID),
+        enhancement_id=enhancements.ENDLESS_GIFT_ENHANCEMENT_ID,
+        source_id=enhancements.ENDLESS_GIFT_SOURCE_RULE_ID,
+    )
+    endless_bundle = _daemonic_incursion_runtime_bundle(endless_state)
+
+    assert enhancements.ENDLESS_GIFT_EFFECT_ID in {
+        binding.effect_id for binding in endless_bundle.enhancement_effect_registry.all_bindings()
+    }
+
+    everstave_state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state(
+        anchor_god_keyword="Tzeentch"
+    )
+    _assign_daemonic_enhancement(
+        everstave_state,
+        unit=_unit_by_id(everstave_state, _ANCHOR_UNIT_ID),
+        enhancement_id=enhancements.EVERSTAVE_ENHANCEMENT_ID,
+        source_id=enhancements.EVERSTAVE_SOURCE_RULE_ID,
+    )
+    everstave_bundle = _daemonic_incursion_runtime_bundle(everstave_state)
+
+    assert enhancements.EVERSTAVE_WEAPON_PROFILE_MODIFIER_ID in {
+        binding.modifier_id
+        for binding in everstave_bundle.runtime_modifier_registry.all_weapon_profile_bindings()
+    }
+
+
+def test_argath_adds_shadow_bonus_to_bearer_melee_attacks_and_strength() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    bearer = _unit_by_id(state, _ANCHOR_UNIT_ID)
+    enemy_unit_id = _enemy_unit_id(state)
+    _assign_daemonic_enhancement(
+        state,
+        unit=bearer,
+        enhancement_id=enhancements.ARGATH_ENHANCEMENT_ID,
+        source_id=enhancements.ARGATH_SOURCE_RULE_ID,
+    )
+    _place_model(
+        state=state,
+        model_instance_id=bearer.own_models[0].model_instance_id,
+        pose=Pose.at(x=16.0, y=4.25, z=0.0, facing_degrees=0.0),
+    )
+    profile = _weapon_profile(melee=True)
+
+    modified = _daemonic_incursion_runtime_bundle(
+        state
+    ).runtime_modifier_registry.modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=bearer.unit_instance_id,
+            attacker_model_instance_id=bearer.own_models[0].model_instance_id,
+            target_unit_instance_id=enemy_unit_id,
+            weapon_profile=profile,
+        )
+    )
+
+    assert modified.attack_profile.fixed_attacks == 3
+    assert modified.strength.final == profile.strength.final + 2
+    assert enhancements.ARGATH_SOURCE_RULE_ID in modified.source_ids
+
+
+def test_everstave_adds_non_shadow_bonus_to_bearer_ranged_strength_and_range() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state(
+        anchor_god_keyword="Tzeentch"
+    )
+    bearer = _unit_by_id(state, _ANCHOR_UNIT_ID)
+    enemy_unit_id = _enemy_unit_id(state)
+    _assign_daemonic_enhancement(
+        state,
+        unit=bearer,
+        enhancement_id=enhancements.EVERSTAVE_ENHANCEMENT_ID,
+        source_id=enhancements.EVERSTAVE_SOURCE_RULE_ID,
+    )
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.without_unit_placement(bearer.unit_instance_id)
+    )
+    profile = _weapon_profile()
+
+    modified = _daemonic_incursion_runtime_bundle(
+        state
+    ).runtime_modifier_registry.modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=bearer.unit_instance_id,
+            attacker_model_instance_id=bearer.own_models[0].model_instance_id,
+            target_unit_instance_id=enemy_unit_id,
+            weapon_profile=profile,
+        )
+    )
+
+    assert modified.strength.final == profile.strength.final + 1
+    assert modified.range_profile.distance_inches == 27
+    assert enhancements.EVERSTAVE_SOURCE_RULE_ID in modified.source_ids
+
+
+def test_endless_gift_registers_model_feel_no_pain_once() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state(
+        anchor_god_keyword="Nurgle"
+    )
+    bearer = _unit_by_id(state, _ANCHOR_UNIT_ID)
+    _assign_daemonic_enhancement(
+        state,
+        unit=bearer,
+        enhancement_id=enhancements.ENDLESS_GIFT_ENHANCEMENT_ID,
+        source_id=enhancements.ENDLESS_GIFT_SOURCE_RULE_ID,
+    )
+    bundle = _daemonic_incursion_runtime_bundle(state)
+    decisions = DecisionController()
+
+    apply_enhancement_effects(
+        state=state,
+        registry=bundle.enhancement_effect_registry,
+        decisions=decisions,
+    )
+    apply_enhancement_effects(
+        state=state,
+        registry=bundle.enhancement_effect_registry,
+        decisions=decisions,
+    )
+
+    model_id = bearer.own_models[0].model_instance_id
+    sources = state.feel_no_pain_sources_for_model(model_instance_id=model_id)
+    assert len(sources) == 1
+    assert sources[0].threshold == 5
+    assert (
+        sources[0].source_id
+        == f"{enhancements.ENDLESS_GIFT_SOURCE_RULE_ID}:{model_id}:feel-no-pain"
+    )
+    assert [
+        record.event_type
+        for record in decisions.event_log.records
+        if record.event_type == "enhancement_effects_applied"
+    ] == ["enhancement_effects_applied"]
+
+
+def test_soulstealer_heals_bearer_after_destroying_enemy_model_with_melee_attack() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state(
+        anchor_god_keyword="Slaanesh"
+    )
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    bearer = _unit_by_id(state, _ANCHOR_UNIT_ID)
+    target = _unit_by_id(state, _enemy_unit_id(state))
+    bearer_model = bearer.own_models[0]
+    target_model = target.own_models[0]
+    _set_model_wounds(
+        state,
+        model_instance_id=bearer_model.model_instance_id,
+        wounds_remaining=bearer_model.starting_wounds - 1,
+    )
+    _assign_daemonic_enhancement(
+        state,
+        unit=bearer,
+        enhancement_id=enhancements.SOULSTEALER_ENHANCEMENT_ID,
+        source_id=enhancements.SOULSTEALER_SOURCE_RULE_ID,
+    )
+    profile = _weapon_profile(melee=True)
+    attack_pool = _attack_pool(
+        attacker=bearer,
+        target=target,
+        weapon_profile=profile,
+    )
+    attack_sequence = AttackSequence(
+        sequence_id="phase17g-soulstealer-sequence",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=bearer.unit_instance_id,
+        attack_pools=(attack_pool,),
+        source_phase=BattlePhase.FIGHT,
+        used_pool_indices=(0,),
+        pool_index=1,
+    )
+    decisions = DecisionController()
+    destroyed_event = decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.FIGHT.value,
+            "destroying_player_id": "player-a",
+            "attacking_unit_instance_id": bearer.unit_instance_id,
+            "attacking_model_instance_id": bearer_model.model_instance_id,
+            "sequence_id": attack_sequence.sequence_id,
+            "attack_context_id": "phase17g-soulstealer-sequence:pool-001:attack-001",
+            "target_unit_instance_id": target.unit_instance_id,
+            "model_instance_id": target_model.model_instance_id,
+            "damage_kind": "normal",
+            "damage_event_id": "phase17g-soulstealer-damage-event",
+            "destroyed_model_rules_triggered": True,
+        },
+    )
+    completed_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": "player-a",
+            "attacking_unit_instance_id": bearer.unit_instance_id,
+        },
+    )
+    roll_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Soulstealer",
+        roll_type=enhancements.SOULSTEALER_D6_ROLL_TYPE,
+        actor_id=bearer_model.model_instance_id,
+    )
+    dice_manager = DiceRollManager(
+        state.game_id,
+        event_log=decisions.event_log,
+        injected_results=(
+            DiceRollResult.from_values(
+                roll_id="phase17g-soulstealer-injected-roll",
+                spec=roll_spec,
+                values=(4,),
+                source="injected",
+            ),
+        ),
+    )
+
+    status = _daemonic_incursion_runtime_bundle(
+        state
+    ).attack_sequence_completed_hook_registry.resolve_completed_sequence(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=dice_manager,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.FIGHT,
+            attack_sequence=attack_sequence,
+            attack_sequence_completed_event_id=completed_event.event_id,
+        )
+    )
+
+    assert status is None
+    healed_bearer = _unit_by_id(state, bearer.unit_instance_id)
+    assert healed_bearer.own_models[0].wounds_remaining == bearer_model.starting_wounds
+    payload = last_event_payload(decisions, enhancements.SOULSTEALER_RESOLVED_EVENT)
+    assert payload["destroyed_model_event_id"] == destroyed_event.event_id
+    assert payload["roll_total"] == 5
+    assert payload["heal_succeeded"] is True
+    assert payload["healed_wounds"] == 1
 
 
 def test_daemonic_incursion_execution_record_is_generic_rule_ir() -> None:
@@ -1867,13 +2161,20 @@ def _wound_roll_state(*, value: int) -> DiceRollState:
     )
 
 
-def _weapon_profile() -> WeaponProfile:
+def _weapon_profile(*, melee: bool = False) -> WeaponProfile:
     return WeaponProfile(
-        profile_id="phase17g-daemonic-incursion-ranged-profile",
-        name="Daemonic Incursion ranged weapon",
-        range_profile=RangeProfile.distance(24),
+        profile_id=(
+            "phase17g-daemonic-incursion-melee-profile"
+            if melee
+            else "phase17g-daemonic-incursion-ranged-profile"
+        ),
+        name="Daemonic Incursion melee weapon" if melee else "Daemonic Incursion ranged weapon",
+        range_profile=RangeProfile.melee() if melee else RangeProfile.distance(24),
         attack_profile=AttackProfile.fixed(1),
-        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        skill=CharacteristicValue.from_raw(
+            Characteristic.WEAPON_SKILL if melee else Characteristic.BALLISTIC_SKILL,
+            3,
+        ),
         strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
         damage_profile=DamageProfile.fixed(1),
@@ -2031,6 +2332,96 @@ def _runtime_reserve_arrival_registry(state: GameState) -> ReserveArrivalDistanc
         armies=tuple(state.army_definitions),
     )
     return bundle.reserve_arrival_distance_hook_registry
+
+
+def _daemonic_incursion_runtime_bundle(state: GameState) -> RuntimeContentBundle:
+    return build_runtime_content_bundle_for_armies(
+        config=_daemonic_incursion_config(game_id=f"{state.game_id}:runtime-content"),
+        armies=tuple(state.army_definitions),
+    )
+
+
+def _assign_daemonic_enhancement(
+    state: GameState,
+    *,
+    unit: UnitInstance,
+    enhancement_id: str,
+    source_id: str,
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != "player-a":
+            updated_armies.append(army)
+            continue
+        prefix = f"{army.army_id}:"
+        if not unit.unit_instance_id.startswith(prefix):
+            raise AssertionError(f"Unit {unit.unit_instance_id} is not owned by {army.army_id}.")
+        updated_armies.append(
+            replace(
+                army,
+                enhancement_assignments=(
+                    EnhancementAssignment(
+                        enhancement_id=enhancement_id,
+                        target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
+                        source_id=source_id,
+                    ),
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+
+
+def _set_current_battle_phase(state: GameState, phase: BattlePhase) -> None:
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_phase_index = state.battle_phase_sequence.index(phase)
+    state.battle_round = 1
+    state.active_player_id = "player-a"
+
+
+def _set_model_wounds(
+    state: GameState,
+    *,
+    model_instance_id: str,
+    wounds_remaining: int,
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    found_model = False
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            updated_models: list[ModelInstance] = []
+            for model in unit.own_models:
+                if model.model_instance_id != model_instance_id:
+                    updated_models.append(model)
+                    continue
+                updated_models.append(replace(model, wounds_remaining=wounds_remaining))
+                found_model = True
+            updated_units.append(replace(unit, own_models=tuple(updated_models)))
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not found_model:
+        raise AssertionError(f"Missing model {model_instance_id}.")
+    state.army_definitions = updated_armies
+
+
+def _attack_pool(
+    *,
+    attacker: UnitInstance,
+    target: UnitInstance,
+    weapon_profile: WeaponProfile,
+) -> RangedAttackPool:
+    target_model_ids = tuple(model.model_instance_id for model in target.own_models)
+    return RangedAttackPool(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id="phase17g-daemonic-incursion-test-wargear",
+        weapon_profile_id=weapon_profile.profile_id,
+        weapon_profile=weapon_profile,
+        target_unit_instance_id=target.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        attacks=1,
+        target_visible_model_ids=target_model_ids,
+        target_in_range_model_ids=target_model_ids,
+    )
 
 
 def _reserve_arrival_distance_context(
