@@ -11,6 +11,7 @@ from warhammer40k_core.engine.stratagems_apply import *
 from warhammer40k_core.engine.stratagems_selection import *
 from warhammer40k_core.engine.stratagems_eligibility import *
 from warhammer40k_core.engine.stratagems_targeting import *
+from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 
 # fmt: off
 if TYPE_CHECKING:
@@ -80,6 +81,7 @@ __all__ = (
     "_unit_owner",
     "_units_are_engaged",
     "_units_are_within_range_inches",
+    "visible_enemy_unit_ids_for_source",
 )
 
 
@@ -488,6 +490,66 @@ def _explosives_target_is_visible_and_in_range(
         if candidate.is_legal:
             return True
     return False
+
+
+def visible_enemy_unit_ids_for_source(
+    *,
+    state: GameState,
+    player_id: str,
+    source_unit_instance_id: str,
+    range_inches: int,
+) -> tuple[str, ...]:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    requested_source_id = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
+    distance = _visible_enemy_range_inches(range_inches)
+    if _unit_owner(state=state, unit_instance_id=requested_source_id) != requested_player_id:
+        return ()
+    candidate_ids: list[str] = []
+    for army in state.army_definitions:
+        if army.player_id == requested_player_id:
+            continue
+        for unit in army.units:
+            if _visible_enemy_target_is_visible_and_in_range(
+                state=state,
+                source_unit_instance_id=requested_source_id,
+                target_unit_instance_id=unit.unit_instance_id,
+                range_inches=distance,
+            ):
+                candidate_ids.append(unit.unit_instance_id)
+    return tuple(sorted(candidate_ids))
+
+
+def _visible_enemy_target_is_visible_and_in_range(
+    *,
+    state: GameState,
+    source_unit_instance_id: str,
+    target_unit_instance_id: str,
+    range_inches: int,
+) -> bool:
+    if not _units_are_within_range_inches(
+        state=state,
+        first_unit_instance_id=source_unit_instance_id,
+        second_unit_instance_id=target_unit_instance_id,
+        distance_inches=range_inches,
+    ):
+        return False
+    scenario = _battlefield_scenario_for_stratagem(state)
+    source_unit = _unit_by_id(state=state, unit_instance_id=source_unit_instance_id)
+    return unit_has_line_of_sight_to_target(
+        scenario=scenario,
+        ruleset_descriptor=_stratagem_ruleset_descriptor(),
+        observing_unit=source_unit,
+        target_unit_id=target_unit_instance_id,
+        terrain_features=_stratagem_terrain_features(state),
+    )
+
+
+def _visible_enemy_range_inches(range_inches: object) -> int:
+    if type(range_inches) is not int:
+        raise GameLifecycleError("Visible enemy range must be an int.")
+    if range_inches <= 0:
+        raise GameLifecycleError("Visible enemy range must be greater than zero.")
+    return range_inches
 
 
 def _unit_is_within_enemy_engagement_range(

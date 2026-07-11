@@ -40,7 +40,6 @@ from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDe
 from warhammer40k_core.core.weapon_profiles import AttackProfile
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.advance_hooks import (
-    SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
     AdvanceMoveContext,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -344,14 +343,8 @@ def test_lithe_agility_advance_grant_spends_pain_token_and_empowers_unit() -> No
         state=state,
         player_id="player-a",
         unit_instance_id=unit.unit_instance_id,
-        result=DecisionResult(
-            result_id="drukhari-test:lithe-advance-grant-result",
-            request_id="drukhari-test:lithe-advance-grant-request",
-            decision_type=SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
-            actor_id="player-a",
-            selected_option_id=grant.hook_id,
-            payload=validate_json_value(grant.to_payload()),
-        ),
+        source_request_id="drukhari-test:lithe-advance-grant-request",
+        source_result_id="drukhari-test:lithe-advance-grant-result",
         grant=grant,
     )
 

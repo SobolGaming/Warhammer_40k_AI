@@ -1,8 +1,8 @@
 {
   "detachment_status_counts": {
-    "implemented": 5,
+    "implemented": 6,
     "partial": 18,
-    "placeholder": 243
+    "placeholder": 242
   },
   "faction_status_counts": {
     "implemented": 0,
@@ -5400,9 +5400,9 @@
     },
     {
       "detachment_status_counts": {
-        "implemented": 2,
+        "implemented": 3,
         "partial": 2,
-        "placeholder": 5
+        "placeholder": 4
       },
       "detachments": [
         {
@@ -5440,12 +5440,24 @@
         {
           "detachment_id": "warptide",
           "detachment_name": "Warptide",
-          "execution_record_count": 1,
+          "execution_record_count": 6,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.warptide.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "implemented",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:warptide",
-            "gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons"
+            "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:warptide:enhancement:bane-forged-weapons",
+            "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:warptide:enhancement:soul-hungry-slaughterers",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:warptide:chaos-daemons:warptide:bane-forged-weapons",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:warptide:chaos-daemons:warptide:soul-hungry-slaughterers",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:warptide:chaos-daemons:warptide:daemonic-infestation",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:warptide:chaos-daemons:warptide:incorporeal-entities",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:warptide:chaos-daemons:warptide:soulseeing",
+            "gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons",
+            "phase17f:phase17e:enhancement:chaos-daemons:warptide:chaos-daemons:warptide:bane-forged-weapons",
+            "phase17f:phase17e:enhancement:chaos-daemons:warptide:chaos-daemons:warptide:soul-hungry-slaughterers",
+            "phase17f:phase17e:stratagem:chaos-daemons:warptide:chaos-daemons:warptide:daemonic-infestation",
+            "phase17f:phase17e:stratagem:chaos-daemons:warptide:chaos-daemons:warptide:incorporeal-entities",
+            "phase17f:phase17e:stratagem:chaos-daemons:warptide:chaos-daemons:warptide:soulseeing"
           ]
         },
         {
@@ -7080,6 +7092,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "fd81a7c2017fa1a7a1da37dedb3e24149854a7fed20d1e84e1470397156a133b",
+  "source_package_hash": "492e5cee52f223140f578716a63a63bc2c7c548c54c7f1f6b3aa7d45f0892202",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-27"
 }

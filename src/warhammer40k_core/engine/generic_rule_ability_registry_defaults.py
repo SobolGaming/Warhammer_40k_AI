@@ -81,6 +81,11 @@ from warhammer40k_core.engine.generic_rule_ability_registry_daemonic_incursion_d
 from warhammer40k_core.engine.generic_rule_ability_registry_emperors_children_defaults import (
     emperors_children_court_of_the_phoenician_stratagem_cost_modifier_abilities,
 )
+from warhammer40k_core.engine.generic_rule_ability_registry_warptide_defaults import (
+    warptide_advance_eligibility_abilities,
+    warptide_advance_move_abilities,
+    warptide_stratagem_cost_modifier_abilities,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
 )
@@ -1320,6 +1325,7 @@ def _blood_legion_blood_tainted_hook_id(source: GenericRuleAbilitySource) -> str
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
+    advance_move_abilities=(*warptide_advance_move_abilities(),),
     advance_eligibility_abilities=(
         GenericRuleAdvanceEligibilityAbility(
             ability_id=shadow_legion_ir.CAN_ADVANCE_AND_SHOOT_AND_CHARGE_ABILITY,
@@ -1330,6 +1336,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             context_predicate=_shadow_legion_advance_context_predicate,
             grant_builder=_shadow_legion_advance_grant,
         ),
+        *warptide_advance_eligibility_abilities(),
     ),
     shooting_target_restriction_abilities=(
         GenericRuleShootingTargetRestrictionAbility(
@@ -1432,6 +1439,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
     stratagem_cost_modifier_abilities=(
         *aeldari_corsair_coterie_stratagem_cost_modifier_abilities(),
         *emperors_children_court_of_the_phoenician_stratagem_cost_modifier_abilities(),
+        *warptide_stratagem_cost_modifier_abilities(),
     ),
     save_option_modifier_abilities=(*aeldari_corsair_coterie_save_option_modifier_abilities(),),
     unit_destroyed_abilities=(

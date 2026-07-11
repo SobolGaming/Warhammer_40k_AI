@@ -5,6 +5,7 @@ from typing import cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilityContext
+from warhammer40k_core.engine.advance_hooks import AdvanceMoveContext
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -137,6 +138,12 @@ def generic_rule_army_uses_record(
 def generic_rule_advance_context_unit_id(context: AdvanceEligibilityContext) -> str:
     if type(context) is not AdvanceEligibilityContext:
         raise GameLifecycleError("Generic RuleIR advance ability requires context.")
+    return context.unit_instance_id
+
+
+def generic_rule_advance_move_context_unit_id(context: AdvanceMoveContext) -> str:
+    if type(context) is not AdvanceMoveContext:
+        raise GameLifecycleError("Generic RuleIR advance move ability requires context.")
     return context.unit_instance_id
 
 

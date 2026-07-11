@@ -32,6 +32,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_subrules_2026_27 as faction_subrule_source,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_warptide_ir_support_2026_27 as warptide_ir,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
     Phase17ECoverageRow,
@@ -133,6 +136,7 @@ GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         LEAPING_SHADOWS_SOURCE_ROW_ID,
         MALICE_MADE_MANIFEST_SOURCE_ROW_ID,
         MANTLE_OF_GLOOM_SOURCE_ROW_ID,
+        warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_SOURCE_ROW_ID,
         "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade",
         "enhancement:emperors-children:court-of-the-phoenician:000010654002",
         "enhancement:emperors-children:court-of-the-phoenician:000010654004",
@@ -150,6 +154,7 @@ GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
+        warptide_ir.BANE_FORGED_WEAPONS_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654005",
         "enhancement:necrons:cryptek-conclave:000010664004",
     }
@@ -198,6 +203,7 @@ GENERIC_DETACHMENT_RULE_KEYS = frozenset(
         ("chaos-daemons", "daemonic-incursion"),
         ("chaos-daemons", "shadow-legion"),
         ("chaos-daemons", "cavalcade-of-chaos"),
+        ("chaos-daemons", "warptide"),
         ("emperors-children", "court-of-the-phoenician"),
         ("emperors-children", "spectacle-of-slaughter"),
         ("orks", "more-dakka"),
@@ -233,6 +239,7 @@ GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
         "stratagem:orks:more-dakka:000009992005",
         "stratagem:orks:more-dakka:000009992006",
         "stratagem:orks:more-dakka:000009992007",
+        *warptide_ir.WARPTIDE_STRATAGEM_SOURCE_ROW_IDS,
     }
     | set(generic_ir_support_source.supported_shadow_legion_stratagem_source_row_ids())
 )

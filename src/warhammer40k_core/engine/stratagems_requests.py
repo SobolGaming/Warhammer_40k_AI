@@ -52,6 +52,7 @@ __all__ = (
     "stratagem_window_decline_allowed",
     "stratagem_window_decline_event_payload",
     "stratagem_window_declined_for_context",
+    "visible_enemy_unit_effect_selection",
 )
 
 
@@ -350,6 +351,16 @@ def engaged_enemy_unit_effect_selection(unit_instance_id: str) -> JsonValue:
     }
 
 
+def visible_enemy_unit_effect_selection(unit_instance_id: str) -> JsonValue:
+    return {
+        "effect_selection_kind": VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        VISIBLE_ENEMY_UNIT_CONTEXT_KEY: _validate_identifier(
+            VISIBLE_ENEMY_UNIT_CONTEXT_KEY,
+            unit_instance_id,
+        ),
+    }
+
+
 def _stratagem_use_options_for_records(
     *,
     state: GameState,
@@ -458,6 +469,31 @@ def _effect_selections_for_binding(
         if not engaged_enemy_ids:
             return ()
         return tuple(engaged_enemy_unit_effect_selection(unit_id) for unit_id in engaged_enemy_ids)
+    if selection_kind == VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND:
+        source_context_key = payload.get(VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY)
+        if source_context_key != TARGET_BINDING_UNIT_CONTEXT_KEY:
+            raise GameLifecycleError(
+                "Visible enemy effect selection requires target binding source."
+            )
+        source_unit_id = target_binding.target_unit_instance_id
+        if source_unit_id is None:
+            return ()
+        range_inches = payload.get(VISIBLE_ENEMY_RANGE_INCHES_KEY)
+        if type(range_inches) is not int or range_inches <= 0:
+            raise GameLifecycleError("Visible enemy effect selection requires positive range.")
+        if state.battlefield_state is None:
+            return ()
+        from warhammer40k_core.engine.stratagems_geometry import visible_enemy_unit_ids_for_source
+
+        return tuple(
+            visible_enemy_unit_effect_selection(unit_id)
+            for unit_id in visible_enemy_unit_ids_for_source(
+                state=state,
+                player_id=context.player_id,
+                source_unit_instance_id=source_unit_id,
+                range_inches=range_inches,
+            )
+        )
     if selection_kind == SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND:
         return companion_effect_selections_for_binding(
             state=state,

@@ -126,6 +126,15 @@ def _effect_selection_token(effect_selection: JsonValue) -> str:
     engaged_enemy_unit_id = _engaged_enemy_unit_id_or_none(effect_selection)
     if engaged_enemy_unit_id is not None:
         return f"{ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND}:{engaged_enemy_unit_id}"
+    if isinstance(effect_selection, dict) and (
+        effect_selection.get("effect_selection_kind") == VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND
+    ):
+        visible_enemy_unit_id = _effect_selection_string_or_none(
+            effect_selection=effect_selection,
+            key=VISIBLE_ENEMY_UNIT_CONTEXT_KEY,
+        )
+        if visible_enemy_unit_id is not None:
+            return f"{VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND}:{visible_enemy_unit_id}"
     companion_unit_id = companion_unit_id_or_none(effect_selection)
     if companion_unit_id is not None:
         return f"{SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND}:{companion_unit_id}"
@@ -430,6 +439,32 @@ def _effect_selection_error(
             return f"{ENGAGED_ENEMY_UNIT_CONTEXT_KEY}_required"
         if selected_unit_id not in _engaged_enemy_unit_ids_or_empty(context):
             return "engaged_enemy_unit_not_in_trigger_context"
+        return None
+    if selection_kind == VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND:
+        if effect_selection is None:
+            return None
+        field_error = _required_effect_selection_fields_error(
+            effect_selection=effect_selection,
+            field_names=(VISIBLE_ENEMY_UNIT_CONTEXT_KEY,),
+        )
+        if field_error is not None:
+            return field_error
+        if (
+            _effect_selection_string_or_none(
+                effect_selection=effect_selection,
+                key="effect_selection_kind",
+            )
+            != VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND
+        ):
+            return "effect_selection_kind_mismatch"
+        if (
+            _effect_selection_string_or_none(
+                effect_selection=effect_selection,
+                key=VISIBLE_ENEMY_UNIT_CONTEXT_KEY,
+            )
+            is None
+        ):
+            return f"{VISIBLE_ENEMY_UNIT_CONTEXT_KEY}_required"
         return None
     if selection_kind == SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND:
         if payload_object is None:

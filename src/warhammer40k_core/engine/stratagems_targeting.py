@@ -70,6 +70,7 @@ __all__ = (
     "_target_unit_satisfies_required_keywords_any",
     "_target_unit_within_controlled_objective_range",
     "_unit_has_keyword",
+    "_visible_enemy_unit_id_or_none",
     "destroyed_enemy_unit_ids_from_context",
     "destroyed_target_unit_ids_from_context",
 )
@@ -976,6 +977,17 @@ def _engaged_enemy_unit_id_or_none(effect_selection: JsonValue) -> str | None:
     if type(raw_unit_id) is not str:
         return None
     return _validate_identifier("Engaged enemy unit id", raw_unit_id)
+
+
+def _visible_enemy_unit_id_or_none(effect_selection: JsonValue) -> str | None:
+    if not isinstance(effect_selection, dict):
+        return None
+    if effect_selection.get("effect_selection_kind") != VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND:
+        return None
+    raw_unit_id = effect_selection.get(VISIBLE_ENEMY_UNIT_CONTEXT_KEY)
+    if type(raw_unit_id) is not str:
+        return None
+    return _validate_identifier("Visible enemy unit id", raw_unit_id)
 
 
 def _engaged_with_fall_back_unit_target_context_error(
