@@ -721,12 +721,21 @@ def attack_sequence_completed_hook_bindings(
 ) -> tuple[AttackSequenceCompletedHookBinding, ...]:
     bindings: list[AttackSequenceCompletedHookBinding] = []
     for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.attack_sequence_completed_abilities:
-        for source in _generic_rule_ability_sources(
-            activation=activation,
-            execution_records=execution_records,
-            coverage_descriptor_id=descriptor.coverage_descriptor_id,
-            ability_ids=descriptor.ability_ids(),
-        ):
+        sources = (
+            *_generic_rule_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+            *_generic_rule_enhancement_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+        )
+        for source in sources:
             bindings.append(
                 AttackSequenceCompletedHookBinding(
                     hook_id=descriptor.hook_id(source),
@@ -777,12 +786,21 @@ def weapon_profile_modifier_bindings(
 ) -> tuple[WeaponProfileModifierBinding, ...]:
     bindings: list[WeaponProfileModifierBinding] = []
     for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.weapon_profile_modifier_abilities:
-        for source in _generic_rule_ability_sources(
-            activation=activation,
-            execution_records=execution_records,
-            coverage_descriptor_id=descriptor.coverage_descriptor_id,
-            ability_ids=descriptor.ability_ids(),
-        ):
+        sources = (
+            *_generic_rule_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+            *_generic_rule_enhancement_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+        )
+        for source in sources:
             bindings.append(
                 WeaponProfileModifierBinding(
                     modifier_id=descriptor.modifier_id(source),

@@ -25,7 +25,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Family | Placeholder | Partial | Implemented |
 | --- | ---: | ---: | ---: |
 | Faction | 5 | 23 | 0 |
-| Detachment | 241 | 18 | 7 |
+| Detachment | 241 | 17 | 8 |
 
 | Faction | Faction semantic status | Placeholder detachments | Partial detachments | Implemented detachments |
 | --- | --- | ---: | ---: | ---: |
@@ -50,7 +50,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Death Guard | `partial` | 9 | 0 | 0 |
 | Thousand Sons | `partial` | 9 | 0 | 0 |
 | Chaos Knights | `partial` | 8 | 0 | 0 |
-| Chaos Daemons | `partial` | 3 | 2 | 4 |
+| Chaos Daemons | `partial` | 3 | 1 | 5 |
 | Astra Militarum | `partial` | 10 | 1 | 0 |
 | Adepta Sororitas | `partial` | 8 | 0 | 0 |
 | Adeptus Mechanicus | `partial` | 10 | 0 | 0 |
@@ -206,7 +206,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 6 | 29 | 46 | 38 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 6 | 29 | 46 | 42 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 2 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |

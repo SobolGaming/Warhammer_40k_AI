@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `4c6a23036cbd5df9b55de553cf1cf9a298d6578e66c951cc1e1c6756e28a0f0a`
+  `15d24d212d6282dfc431d7ad6b450bcb91a7fb3fb5717942df2445cd814b509e`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -126,7 +126,7 @@ implemented. Datasheet intake is fail-closed as an approved unsupported
 diagnostic. Exact Enhancement and Stratagem rows are generated from the exact
 subrule source package and include stable rule IDs, owner faction/detachment IDs,
 timing/category metadata, source IDs, and support status. Source-only exact rows
-outside generic IR are named-handler-required; 39 exact Enhancement rows in
+outside generic IR are named-handler-required; 43 exact Enhancement rows in
 the conditional weapon-ability grant, grant-ability, characteristic-modification,
 movement-distance, dice-roll modification, and Court of the Phoenician mixed-family
 template groups are generic-supported with checksum-covered RuleIR hashes. The
@@ -140,11 +140,11 @@ three Stratagem rows are also generic-supported through semantic RuleIR.
 The Chaos Daemons Shadow Legion, Blood Legion, and Daemonic Incursion
 detachment rules are generic-supported through semantic RuleIR. Shadow Legion
 also adds six generic-supported Stratagem rows, and Daemonic Incursion adds six
-generic-supported Stratagem rows. Aeldari Corsair Coterie and
+generic-supported Stratagem rows and four generic-supported Enhancements. Aeldari Corsair Coterie and
 Path of the Outcast add nine generic-supported Stratagem rows. Chaos Daemons
 Warptide adds a generic-supported detachment rule, two Enhancements, and three
 Stratagem rows. Chaos Daemons Lords of the Warp adds a generic-supported
-detachment rule, one Enhancement, and four Stratagem rows, for a total of 95
+detachment rule, one Enhancement, and four Stratagem rows, for a total of 99
 generic-supported rows; exact rows outside generic IR with existing runtime consumers are marked
 implemented. No
 aggregate faction-pack Enhancement or Stratagem row is used to
@@ -176,13 +176,13 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `5522d140fab422276dc1f6ca719e3ad34858f830df97f7a71ba9ef5c0baf22f0`
+  `46d8950c4ecc0a2c705105a67acf991f7e9b9bbb89f37392eeb6acf0472ccf11`
 - upstream Phase 17E checksum:
-  `4c6a23036cbd5df9b55de553cf1cf9a298d6578e66c951cc1e1c6756e28a0f0a`
+  `15d24d212d6282dfc431d7ad6b450bcb91a7fb3fb5717942df2445cd814b509e`
 
 The package emits 2149 execution records, one for every Phase 17E coverage row:
-2003 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 95 rows are executable generic IR
+1999 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 99 rows are executable generic IR
 rows, and 23 rows are executable named-handler rows because they already have
 runtime consumers: 23 faction army rules.
 The engine dispatcher can route every record and returns typed `unsupported`
@@ -443,15 +443,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `f01df2728c82b04db5b2768fcfda891940b9735023ca1b905172ee3a245d1197`
+  `f5f8b82c9abdd658d9eeabfcd7ad78d8202889ede79389792efec889af048bde`
 - upstream Phase 17F checksum:
-  `5522d140fab422276dc1f6ca719e3ad34858f830df97f7a71ba9ef5c0baf22f0`
+  `46d8950c4ecc0a2c705105a67acf991f7e9b9bbb89f37392eeb6acf0472ccf11`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 2003 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1914 rows from Wahapedia
+The report emits 1999 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1910 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 89 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -485,9 +485,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `f482a035f401f9bea45387988a9ac847e2d266104001f85b4dea2a8e846d3059`
+  `fb7bc37f94798fca15653d5821259c1b2c96c607340db0aae149f32e2ee201a4`
 - upstream Phase 17F checksum:
-  `5522d140fab422276dc1f6ca719e3ad34858f830df97f7a71ba9ef5c0baf22f0`
+  `46d8950c4ecc0a2c705105a67acf991f7e9b9bbb89f37392eeb6acf0472ccf11`
 
 The budget report tracks 23 executable named-handler Phase 17F rows and 23
 approved entries. The current approved reason is
@@ -749,8 +749,8 @@ already engine-consumed named handlers.
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 3 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 6 | `executable_generic_ir` | `applied` | `none` |
-| Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 9 | `executable_generic_ir` | `applied` | `none` |
+| Enhancements | 16 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 13 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 22 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |

@@ -24,6 +24,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27 as faction_coverage_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_daemonic_incursion_ir_support_2026_27 as daemonic_incursion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as faction_detachment_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -116,6 +119,22 @@ MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:malice_made_manifest:mortal-wound-fnp",
 )
+DAEMONIC_INCURSION_ARGATH_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:"
+    "enhancement:argath:melee-weapon-profile",
+)
+DAEMONIC_INCURSION_SOULSTEALER_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:"
+    "enhancement:soulstealer:model-destroyed-heal",
+)
+DAEMONIC_INCURSION_ENDLESS_GIFT_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:"
+    "enhancement:endless_gift:feel-no-pain-5",
+)
+DAEMONIC_INCURSION_EVERSTAVE_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:"
+    "enhancement:everstave:ranged-weapon-profile",
+)
 GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         "enhancement:chaos-space-marines:renegade-warband:000010694003",
@@ -133,6 +152,10 @@ GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         corsair_ir.INFAMY_SOURCE_ROW_ID,
         corsair_ir.VOIDSTONE_SOURCE_ROW_ID,
         corsair_ir.WEBWAY_PATHSTONE_SOURCE_ROW_ID,
+        daemonic_incursion_ir.ARGATH_SOURCE_ROW_ID,
+        daemonic_incursion_ir.ENDLESS_GIFT_SOURCE_ROW_ID,
+        daemonic_incursion_ir.EVERSTAVE_SOURCE_ROW_ID,
+        daemonic_incursion_ir.SOULSTEALER_SOURCE_ROW_ID,
         path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID,
         path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID,
         FADE_TO_DARKNESS_SOURCE_ROW_ID,
@@ -196,6 +219,14 @@ GENERIC_ENGINE_CONSUMED_ENHANCEMENT_RUNTIME_CONSUMERS_BY_SOURCE_ROW_ID = {
     corsair_ir.WEBWAY_PATHSTONE_SOURCE_ROW_ID: CORSAIR_WEBWAY_PATHSTONE_RUNTIME_CONSUMERS,
     path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID: ASSASSINS_EYE_RUNTIME_CONSUMERS,
     path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID: CAMOUFLAGED_SNIPERS_RUNTIME_CONSUMERS,
+    daemonic_incursion_ir.ARGATH_SOURCE_ROW_ID: DAEMONIC_INCURSION_ARGATH_RUNTIME_CONSUMERS,
+    daemonic_incursion_ir.ENDLESS_GIFT_SOURCE_ROW_ID: (
+        DAEMONIC_INCURSION_ENDLESS_GIFT_RUNTIME_CONSUMERS
+    ),
+    daemonic_incursion_ir.EVERSTAVE_SOURCE_ROW_ID: DAEMONIC_INCURSION_EVERSTAVE_RUNTIME_CONSUMERS,
+    daemonic_incursion_ir.SOULSTEALER_SOURCE_ROW_ID: (
+        DAEMONIC_INCURSION_SOULSTEALER_RUNTIME_CONSUMERS
+    ),
     FADE_TO_DARKNESS_SOURCE_ROW_ID: FADE_TO_DARKNESS_RUNTIME_CONSUMERS,
     LEAPING_SHADOWS_SOURCE_ROW_ID: LEAPING_SHADOWS_RUNTIME_CONSUMERS,
     MALICE_MADE_MANIFEST_SOURCE_ROW_ID: MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS,

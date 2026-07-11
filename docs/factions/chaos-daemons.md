@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 6 | 29 | 46 | 38 |
+| 9 | 6 | 29 | 46 | 42 |
 
 ## Semantic Support Snapshot
 
@@ -26,7 +26,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 | --- | --- | --- |
 | Blood Legion | None | Brazenmaw<br>Fury’s Cage<br>Gateway Unto Damnation<br>Slaughterthirst (Aura) |
 | Cavalcade of Chaos | Apocalyptic Steeds Upgrade<br>Soul Shattering Charge Upgrade | None |
-| Daemonic Incursion | None | A’rgath, the King of Blades<br>Soulstealer<br>The Endless Gift<br>The Everstave |
+| Daemonic Incursion | A’rgath, the King of Blades<br>Soulstealer<br>The Endless Gift<br>The Everstave | None |
 | Legion of Excess | None | Avatar of Perfection<br>Dreaming Crown (Aura)<br>False Majesty (Aura)<br>Soul Glutton |
 | Lords of the Warp | Swollen with Power Upgrade | None |
 | Plague Legion | None | Cankerblight<br>Droning Shroud (Aura)<br>Font of Spores (Aura)<br>Maggot Maws |

@@ -15,6 +15,10 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     EnhancementAssignment,
 )
+from warhammer40k_core.engine.damage_allocation import (
+    FeelNoPainSource,
+    FeelNoPainSourcePayload,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -61,6 +65,16 @@ class EnhancementDatasheetAbilityGrantPayload(TypedDict):
     enhancement_id: str
     target_unit_instance_id: str
     datasheet_ability: DatasheetAbilityDescriptorPayload
+    replay_payload: JsonValue
+
+
+class EnhancementFeelNoPainGrantPayload(TypedDict):
+    effect_id: str
+    source_id: str
+    enhancement_id: str
+    target_unit_instance_id: str
+    model_instance_id: str
+    feel_no_pain_source: FeelNoPainSourcePayload
     replay_payload: JsonValue
 
 
@@ -271,6 +285,61 @@ class EnhancementDatasheetAbilityGrant:
 
 
 @dataclass(frozen=True, slots=True)
+class EnhancementFeelNoPainGrant:
+    effect_id: str
+    source_id: str
+    enhancement_id: str
+    target_unit_instance_id: str
+    model_instance_id: str
+    source: FeelNoPainSource
+    replay_payload: JsonValue = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "effect_id", _validate_identifier("effect_id", self.effect_id))
+        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        object.__setattr__(
+            self,
+            "enhancement_id",
+            _validate_identifier("enhancement_id", self.enhancement_id),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "model_instance_id",
+            _validate_identifier("model_instance_id", self.model_instance_id),
+        )
+        if type(self.source) is not FeelNoPainSource:
+            raise GameLifecycleError("EnhancementFeelNoPainGrant source must be FeelNoPainSource.")
+        if not self.source.source_id.startswith(f"{self.source_id}:"):
+            raise GameLifecycleError("Enhancement Feel No Pain source drift.")
+        object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
+
+    def to_payload(self) -> EnhancementFeelNoPainGrantPayload:
+        return {
+            "effect_id": self.effect_id,
+            "source_id": self.source_id,
+            "enhancement_id": self.enhancement_id,
+            "target_unit_instance_id": self.target_unit_instance_id,
+            "model_instance_id": self.model_instance_id,
+            "feel_no_pain_source": self.source.to_payload(),
+            "replay_payload": self.replay_payload,
+        }
+
+
+type EnhancementEffect = (
+    EnhancementCharacteristicModifier
+    | EnhancementPersistingEffectGrant
+    | EnhancementUnitKeywordGrant
+    | EnhancementDatasheetAbilityGrant
+    | EnhancementFeelNoPainGrant
+)
+
+
+@dataclass(frozen=True, slots=True)
 class EnhancementEffectBinding:
     effect_id: str
     source_id: str
@@ -289,12 +358,7 @@ class EnhancementEffectBinding:
             raise GameLifecycleError("EnhancementEffectBinding handler must be callable.")
 
 
-def _enhancement_effect_sort_key(
-    effect: EnhancementCharacteristicModifier
-    | EnhancementPersistingEffectGrant
-    | EnhancementUnitKeywordGrant
-    | EnhancementDatasheetAbilityGrant,
-) -> str:
+def _enhancement_effect_sort_key(effect: EnhancementEffect) -> str:
     return effect.effect_id
 
 
@@ -322,12 +386,7 @@ class EnhancementEffectRegistry:
     ) -> tuple[object, ...]:
         if type(context) is not EnhancementEffectContext:
             raise GameLifecycleError("Enhancement effects require a context.")
-        effects: list[
-            EnhancementCharacteristicModifier
-            | EnhancementPersistingEffectGrant
-            | EnhancementUnitKeywordGrant
-            | EnhancementDatasheetAbilityGrant
-        ] = []
+        effects: list[EnhancementEffect] = []
         allowed_target_unit_ids = _effect_target_unit_instance_ids(context)
         for binding in self.bindings:
             if binding.enhancement_id != context.assignment.enhancement_id:
@@ -336,24 +395,14 @@ class EnhancementEffectRegistry:
             if type(binding_effects) is not tuple:
                 raise GameLifecycleError("Enhancement effect handlers must return a tuple.")
             for effect in binding_effects:
-                if type(effect) is EnhancementCharacteristicModifier:
-                    supported_effect: (
-                        EnhancementCharacteristicModifier
-                        | EnhancementPersistingEffectGrant
-                        | EnhancementUnitKeywordGrant
-                        | EnhancementDatasheetAbilityGrant
-                    ) = effect
-                elif type(effect) in (
+                if type(effect) in (
+                    EnhancementCharacteristicModifier,
                     EnhancementPersistingEffectGrant,
                     EnhancementUnitKeywordGrant,
                     EnhancementDatasheetAbilityGrant,
+                    EnhancementFeelNoPainGrant,
                 ):
-                    supported_effect = cast(
-                        EnhancementPersistingEffectGrant
-                        | EnhancementUnitKeywordGrant
-                        | EnhancementDatasheetAbilityGrant,
-                        effect,
-                    )
+                    supported_effect = cast(EnhancementEffect, effect)
                 else:
                     raise GameLifecycleError(
                         "Enhancement effect handlers must return supported enhancement effects."
@@ -430,6 +479,15 @@ def apply_enhancement_effects(
                     continue
                 if type(effect) is EnhancementDatasheetAbilityGrant:
                     updated_army, payload = _apply_datasheet_ability_grant(
+                        army=updated_army,
+                        effect=effect,
+                    )
+                    if payload is not None:
+                        event_payloads.append(payload)
+                    continue
+                if type(effect) is EnhancementFeelNoPainGrant:
+                    payload = _apply_feel_no_pain_grant(
+                        state=state,
                         army=updated_army,
                         effect=effect,
                     )
@@ -572,6 +630,56 @@ def _apply_datasheet_ability_grant(
         units=tuple(sorted(updated_units, key=lambda stored: stored.unit_instance_id)),
     )
     return updated_army, payload
+
+
+def _apply_feel_no_pain_grant(
+    *,
+    state: GameState,
+    army: ArmyDefinition,
+    effect: EnhancementFeelNoPainGrant,
+) -> dict[str, JsonValue] | None:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Enhancement Feel No Pain grant requires GameState.")
+    target_seen = False
+    model_seen = False
+    for unit in army.units:
+        if unit.unit_instance_id != effect.target_unit_instance_id:
+            continue
+        target_seen = True
+        model_seen = any(
+            model.model_instance_id == effect.model_instance_id for model in unit.own_models
+        )
+        break
+    if not target_seen:
+        raise GameLifecycleError("Enhancement Feel No Pain target unit is not in the army.")
+    if not model_seen:
+        raise GameLifecycleError("Enhancement Feel No Pain target model is not in the unit.")
+    existing_sources = state.feel_no_pain_sources_for_model(
+        model_instance_id=effect.model_instance_id,
+    )
+    for existing_source in existing_sources:
+        if existing_source.source_id != effect.source.source_id:
+            continue
+        if existing_source != effect.source:
+            raise GameLifecycleError("Enhancement Feel No Pain source conflicts with state.")
+        return None
+    updated_sources = (*existing_sources, effect.source)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=effect.model_instance_id,
+        sources=updated_sources,
+        decline_allowed=state.feel_no_pain_decline_allowed_for_model(
+            model_instance_id=effect.model_instance_id
+        ),
+    )
+    return {
+        **cast(dict[str, JsonValue], effect.to_payload()),
+        "player_id": army.player_id,
+        "army_id": army.army_id,
+        "before_source_ids": [source.source_id for source in existing_sources],
+        "after_source_ids": [source.source_id for source in updated_sources],
+    }
 
 
 def _apply_model_characteristic_modifier(
