@@ -45,6 +45,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_generic_ir_static_payloads_2026_27 as static_payloads,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_lords_of_the_warp_ir_support_2026_27 as lords_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_more_dakka_ir_support_2026_27 as more_dakka_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -122,6 +125,7 @@ _SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         CAVALCADE_OF_CHAOS_APOCALYPTIC_STEEDS_SOURCE_ROW_ID,
+        lords_ir.SWOLLEN_WITH_POWER_SOURCE_ROW_ID,
         warptide_ir.BANE_FORGED_WEAPONS_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654005",
         "enhancement:necrons:cryptek-conclave:000010664004",
@@ -251,6 +255,11 @@ def generic_supported_detachment_rule_ir_hash(
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
         _validate_blood_legion_detachment_rule_ir(rule_ir)
         return rule_ir_hash
+    rule_ir_hash = lords_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_lords_of_the_warp_detachment_rule_ir(rule_ir)
+        return rule_ir_hash
     rule_ir_hash = warptide_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
@@ -297,6 +306,11 @@ def generic_supported_stratagem_rule_ir_hash(
     rule_ir_hash = spectacle_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
+    rule_ir_hash = lords_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_lords_of_the_warp_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
+        return rule_ir_hash
     rule_ir_hash = warptide_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
@@ -318,6 +332,8 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
         payload = shadow_legion_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = blood_legion_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
+    if payload is None:
+        payload = lords_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = court_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
@@ -818,6 +834,66 @@ def _validate_warptide_detachment_rule_ir(rule_ir: RuleIR) -> None:
                 )
 
 
+def _validate_lords_of_the_warp_detachment_rule_ir(rule_ir: RuleIR) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Lords of the Warp detachment requires RuleIR.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Lords of the Warp detachment RuleIR must deserialize as supported."
+        )
+    expected_source_id = (
+        f"{SOURCE_PACKAGE_ID}:phase17e:chaos-daemons:lords-of-the-warp:rule:source-text"
+    )
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Lords of the Warp detachment RuleIR produced an unexpected source ID."
+        )
+    template_ids = frozenset(
+        clause.template_id for clause in rule_ir.clauses if clause.template_id is not None
+    )
+    if template_ids != frozenset({CHARACTERISTIC_MODIFIER_TEMPLATE_ID}):
+        raise Phase17FGenericIrSupportError(
+            "Lords of the Warp detachment RuleIR uses an unregistered template family."
+        )
+    effects = tuple(effect for clause in rule_ir.clauses for effect in clause.effects)
+    if tuple(effect.kind for effect in effects) != (
+        RuleEffectKind.MODIFY_CHARACTERISTIC,
+        RuleEffectKind.MODIFY_CHARACTERISTIC,
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Lords of the Warp detachment RuleIR has unexpected effect kinds."
+        )
+    expected_characteristics = {"leadership": -1, "objective_control": 1}
+    actual_characteristics: dict[str, int] = {}
+    for effect in effects:
+        parameters = parameter_payload(effect.parameters)
+        characteristic = parameters.get("characteristic")
+        delta = parameters.get("delta")
+        if type(characteristic) is not str or type(delta) is not int:
+            raise Phase17FGenericIrSupportError(
+                "Lords of the Warp detachment RuleIR has malformed characteristic parameters."
+            )
+        actual_characteristics[characteristic] = delta
+        if parameters.get("required_faction_keyword_sequence") != (
+            lords_ir.LEGIONES_DAEMONICA_KEYWORD,
+        ):
+            raise Phase17FGenericIrSupportError(
+                "Lords of the Warp detachment RuleIR has unexpected faction keyword gate."
+            )
+        if parameters.get("required_keyword_sequence") != (lords_ir.CHARACTER_KEYWORD,):
+            raise Phase17FGenericIrSupportError(
+                "Lords of the Warp detachment RuleIR has unexpected keyword gate."
+            )
+        if parameters.get("excluded_keyword_sequence") != (lords_ir.MONSTER_KEYWORD,):
+            raise Phase17FGenericIrSupportError(
+                "Lords of the Warp detachment RuleIR has unexpected excluded keyword gate."
+            )
+    if actual_characteristics != expected_characteristics:
+        raise Phase17FGenericIrSupportError(
+            "Lords of the Warp detachment RuleIR has unexpected characteristic modifiers."
+        )
+
+
 def _validate_warptide_stratagem_rule_ir(
     *,
     rule_ir: RuleIR,
@@ -853,6 +929,47 @@ def _warptide_stratagem_effect_kinds(source_row_id: str) -> tuple[RuleEffectKind
     if source_row_id == warptide_ir.INCORPOREAL_ENTITIES_SOURCE_ROW_ID:
         return (RuleEffectKind.MODIFY_DICE_ROLL,)
     raise Phase17FGenericIrSupportError("Warptide Stratagem source row is unknown.")
+
+
+def _validate_lords_of_the_warp_stratagem_rule_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Lords of the Warp Stratagem support requires RuleIR.")
+    if source_row.source_row_id not in lords_ir.LORDS_OF_THE_WARP_STRATAGEM_SOURCE_ROW_IDS:
+        raise Phase17FGenericIrSupportError("Lords of the Warp Stratagem source row is unknown.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Lords of the Warp Stratagem RuleIR must deserialize as supported."
+        )
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Lords of the Warp Stratagem RuleIR produced an unexpected source ID."
+        )
+    if not any(clause.target is not None and not clause.effects for clause in rule_ir.clauses):
+        raise Phase17FGenericIrSupportError(
+            "Lords of the Warp Stratagem RuleIR is missing target binding."
+        )
+    effect_kinds = tuple(effect.kind for clause in rule_ir.clauses for effect in clause.effects)
+    if effect_kinds != _lords_of_the_warp_stratagem_effect_kinds(source_row.source_row_id):
+        raise Phase17FGenericIrSupportError(
+            "Lords of the Warp Stratagem RuleIR has unexpected effect kinds."
+        )
+
+
+def _lords_of_the_warp_stratagem_effect_kinds(source_row_id: str) -> tuple[RuleEffectKind, ...]:
+    if source_row_id == lords_ir.CARNIVAL_OF_EXCESS_SOURCE_ROW_ID:
+        return (RuleEffectKind.GRANT_ABILITY,)
+    if source_row_id == lords_ir.CALL_TO_MURDER_SOURCE_ROW_ID:
+        return (RuleEffectKind.MODIFY_CHARACTERISTIC,)
+    if source_row_id == lords_ir.BILIOUS_BLESSING_SOURCE_ROW_ID:
+        return (RuleEffectKind.INFLICT_MORTAL_WOUNDS,)
+    if source_row_id == lords_ir.SKIRLING_MAGICKS_SOURCE_ROW_ID:
+        return (RuleEffectKind.GRANT_WEAPON_ABILITY,)
+    raise Phase17FGenericIrSupportError("Lords of the Warp Stratagem source row is unknown.")
 
 
 def _validate_shadow_legion_stratagem_rule_ir(

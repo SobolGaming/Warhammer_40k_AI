@@ -1,8 +1,8 @@
 {
   "detachment_status_counts": {
-    "implemented": 6,
+    "implemented": 7,
     "partial": 18,
-    "placeholder": 242
+    "placeholder": 241
   },
   "faction_status_counts": {
     "implemented": 0,
@@ -5400,9 +5400,9 @@
     },
     {
       "detachment_status_counts": {
-        "implemented": 3,
+        "implemented": 4,
         "partial": 2,
-        "placeholder": 4
+        "placeholder": 3
       },
       "detachments": [
         {
@@ -5429,12 +5429,23 @@
         {
           "detachment_id": "lords-of-the-warp",
           "detachment_name": "Lords of the Warp",
-          "execution_record_count": 1,
+          "execution_record_count": 6,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.lords_of_the_warp.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "implemented",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:lords-of-the-warp",
-            "gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons"
+            "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:lords-of-the-warp:enhancement:swollen-with-power",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:swollen-with-power-upgrade",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:bilious-blessing",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:call-to-murder",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:carnival-of-excess",
+            "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:skirling-magicks",
+            "gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons",
+            "phase17f:phase17e:enhancement:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:swollen-with-power-upgrade",
+            "phase17f:phase17e:stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:bilious-blessing",
+            "phase17f:phase17e:stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:call-to-murder",
+            "phase17f:phase17e:stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:carnival-of-excess",
+            "phase17f:phase17e:stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:skirling-magicks"
           ]
         },
         {
@@ -7092,6 +7103,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "492e5cee52f223140f578716a63a63bc2c7c548c54c7f1f6b3aa7d45f0892202",
+  "source_package_hash": "5a88d7869b300a8bac959ae6ad319eb4e0660829ceb7d7fa0c54681d048d7142",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-27"
 }

@@ -30,12 +30,13 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
+      "lords-of-the-warp",
       "shadow-legion",
       "warptide"
     ],
@@ -69,12 +70,13 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
+      "lords-of-the-warp",
       "shadow-legion",
       "warptide"
     ],
@@ -108,12 +110,13 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
+      "lords-of-the-warp",
       "shadow-legion",
       "warptide"
     ],
@@ -153,12 +156,13 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
+      "lords-of-the-warp",
       "shadow-legion",
       "warptide"
     ],
@@ -197,12 +201,13 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
+      "lords-of-the-warp",
       "shadow-legion",
       "warptide"
     ],
@@ -235,12 +240,13 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
+      "lords-of-the-warp",
       "shadow-legion",
       "warptide"
     ],
@@ -274,12 +280,13 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 5/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
+      "lords-of-the-warp",
       "shadow-legion",
       "warptide"
     ],

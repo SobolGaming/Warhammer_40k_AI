@@ -57,6 +57,7 @@ CAVALCADE_OF_CHAOS_RULE_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.cavalcade_of_chaos.rule"
 )
 WARPTIDE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.warptide"
+LORDS_OF_THE_WARP_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.lords_of_the_warp"
 SPECTACLE_OF_SLAUGHTER_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.emperors_children.detachments.spectacle_of_slaughter"
 )
@@ -137,6 +138,18 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     ),
     f"{WARPTIDE_MODULE_PATH}.stratagems": (
         "warhammer_40000_11th:chaos_daemons:detachment:warptide:stratagems"
+    ),
+    f"{LORDS_OF_THE_WARP_MODULE_PATH}.manifest": (
+        "warhammer_40000_11th:chaos_daemons:detachment:lords_of_the_warp:manifest"
+    ),
+    f"{LORDS_OF_THE_WARP_MODULE_PATH}.rule": (
+        "warhammer_40000_11th:chaos_daemons:detachment:lords_of_the_warp:rule"
+    ),
+    f"{LORDS_OF_THE_WARP_MODULE_PATH}.enhancements": (
+        "warhammer_40000_11th:chaos_daemons:detachment:lords_of_the_warp:enhancements"
+    ),
+    f"{LORDS_OF_THE_WARP_MODULE_PATH}.stratagems": (
+        "warhammer_40000_11th:chaos_daemons:detachment:lords_of_the_warp:stratagems"
     ),
     f"{SPECTACLE_OF_SLAUGHTER_MODULE_PATH}.manifest": (
         "warhammer_40000_11th:emperors_children:detachment:spectacle_of_slaughter:manifest:rule_ir"

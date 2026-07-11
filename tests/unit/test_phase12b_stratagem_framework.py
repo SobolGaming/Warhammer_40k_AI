@@ -328,6 +328,8 @@ def test_source_backed_stratagem_index_matches_tuple_options_for_trigger_windows
         TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE: BattlePhase.MOVEMENT,
         TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE: BattlePhase.CHARGE,
         TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT: BattlePhase.FIGHT,
+        TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT: BattlePhase.FIGHT,
+        TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_SHOOT: BattlePhase.SHOOTING,
     }
 
     assert index.all_records() == tuple(sorted(catalog, key=lambda record: record.record_id))

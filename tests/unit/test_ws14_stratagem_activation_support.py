@@ -60,6 +60,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_subrules_2026_27,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_lords_of_the_warp_ir_support_2026_27 as lords_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_warptide_ir_support_2026_27 as warptide_ir,
 )
 
@@ -71,11 +74,15 @@ def test_ws14_stratagem_activation_profiles_cover_source_only_detachment_rows() 
     profiles = faction_stratagem_activation_2026_27.stratagem_activation_profiles()
     source_only_row_ids = {row.source_row_id for row in source_only_rows}
     profile_source_row_ids = {profile.source_row_id for profile in profiles}
-    source_backed_generic_row_ids = set(
-        faction_generic_ir_support_2026_27.supported_cavalcade_of_chaos_stratagem_source_row_ids()
-    ) | set(warptide_ir.WARPTIDE_STRATAGEM_SOURCE_ROW_IDS)
+    source_backed_generic_row_ids = (
+        set(
+            faction_generic_ir_support_2026_27.supported_cavalcade_of_chaos_stratagem_source_row_ids()
+        )
+        | set(lords_ir.LORDS_OF_THE_WARP_STRATAGEM_SOURCE_ROW_IDS)
+        | set(warptide_ir.WARPTIDE_STRATAGEM_SOURCE_ROW_IDS)
+    )
 
-    assert len(source_only_rows) == 1082
+    assert len(source_only_rows) == 1086
     assert len(profiles) == 1076
     assert source_backed_generic_row_ids <= source_only_row_ids
     assert profile_source_row_ids == source_only_row_ids - source_backed_generic_row_ids

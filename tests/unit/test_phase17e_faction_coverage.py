@@ -30,6 +30,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_generic_ir_support_2026_27 as generic_ir_support_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_lords_of_the_warp_ir_support_2026_27 as lords_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_subrules_2026_27 as faction_subrule_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -154,6 +157,7 @@ GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
+        lords_ir.SWOLLEN_WITH_POWER_SOURCE_ROW_ID,
         warptide_ir.BANE_FORGED_WEAPONS_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654005",
         "enhancement:necrons:cryptek-conclave:000010664004",
@@ -203,6 +207,7 @@ GENERIC_DETACHMENT_RULE_KEYS = frozenset(
         ("chaos-daemons", "daemonic-incursion"),
         ("chaos-daemons", "shadow-legion"),
         ("chaos-daemons", "cavalcade-of-chaos"),
+        ("chaos-daemons", "lords-of-the-warp"),
         ("chaos-daemons", "warptide"),
         ("emperors-children", "court-of-the-phoenician"),
         ("emperors-children", "spectacle-of-slaughter"),
@@ -239,6 +244,7 @@ GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
         "stratagem:orks:more-dakka:000009992005",
         "stratagem:orks:more-dakka:000009992006",
         "stratagem:orks:more-dakka:000009992007",
+        *lords_ir.LORDS_OF_THE_WARP_STRATAGEM_SOURCE_ROW_IDS,
         *warptide_ir.WARPTIDE_STRATAGEM_SOURCE_ROW_IDS,
     }
     | set(generic_ir_support_source.supported_shadow_legion_stratagem_source_row_ids())

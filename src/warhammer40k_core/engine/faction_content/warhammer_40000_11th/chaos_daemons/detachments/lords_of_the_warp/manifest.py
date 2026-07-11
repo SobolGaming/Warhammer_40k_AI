@@ -11,16 +11,7 @@ from .enhancements import runtime_contribution as enhancements_contribution
 from .rule import runtime_contribution as rule_contribution
 from .stratagems import runtime_contribution as stratagems_contribution
 
-CONTRIBUTION_ID = ":".join(
-    (
-        "warhammer_40000_11th",
-        "chaos_daemons",
-        "detachment",
-        "lords_of_the_warp",
-        "manifest",
-        "scaffold",
-    )
-)
+CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:lords_of_the_warp:manifest"
 
 
 def runtime_contribution() -> RuntimeContentContribution:

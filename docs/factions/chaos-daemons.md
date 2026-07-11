@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 5 | 28 | 42 | 26 |
+| 9 | 6 | 29 | 46 | 32 |
 
 ## Semantic Support Snapshot
 
@@ -18,7 +18,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 
 | Fully supported | Still needs semantic support |
 | --- | --- |
-| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Shadow Legion<br>Warptide | Legion of Excess<br>Lords of the Warp<br>Plague Legion<br>Scintillating Legion |
+| Blood Legion<br>Cavalcade of Chaos<br>Daemonic Incursion<br>Lords of the Warp<br>Shadow Legion<br>Warptide | Legion of Excess<br>Plague Legion<br>Scintillating Legion |
 
 ### Enhancements
 
@@ -28,6 +28,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 | Cavalcade of Chaos | Apocalyptic Steeds Upgrade<br>Soul Shattering Charge Upgrade | None |
 | Daemonic Incursion | None | A’rgath, the King of Blades<br>Soulstealer<br>The Endless Gift<br>The Everstave |
 | Legion of Excess | None | Avatar of Perfection<br>Dreaming Crown (Aura)<br>False Majesty (Aura)<br>Soul Glutton |
+| Lords of the Warp | Swollen with Power Upgrade | None |
 | Plague Legion | None | Cankerblight<br>Droning Shroud (Aura)<br>Font of Spores (Aura)<br>Maggot Maws |
 | Scintillating Legion | None | Improbable Shield (Aura)<br>Inescapable Eye<br>Infernal Puppeteer<br>Neverblade |
 | Shadow Legion | Fade to Darkness<br>Leaping Shadows<br>Malice Made Manifest<br>Mantle of Gloom (Aura) | None |
@@ -41,6 +42,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 | Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations<br>Warp-Riders | None |
 | Daemonic Incursion | None | CORRUPT REALSPACE<br>DAEMONIC INVULNERABILITY<br>DENIZENS OF THE WARP<br>DRAUGHT OF TERROR<br>THE REALM OF CHAOS<br>WARP SURGE |
 | Legion of Excess | None | ARCHAGONISTS<br>CAVALCADE OF BLADES<br>OVERWHELMING EXCESS<br>PHANTASMAL LONGING<br>SENSORY EXCRUCIATION<br>THIEVES OF PAIN |
+| Lords of the Warp | Bilious Blessing<br>Call to Murder<br>Carnival of Excess<br>Skirling Magicks | None |
 | Plague Legion | None | FEVER VISIONS<br>FOETID RESURGENCE<br>MURKSHADOWS<br>PLAGUE OF WOES<br>ROT AND RENEWAL<br>SEEPING VIRULENCE |
 | Scintillating Legion | None | DELIRIUM UNMADE<br>FATEBORNE NIGHTMARES<br>FICKLEFIRE<br>FLICKERING REALITY<br>IMPOSSIBLE ECLIPSE<br>PYROGENESIS |
 | Shadow Legion | BINDING SHADOW<br>CHANNELLED WRATH<br>DEATH DENIED<br>ENCROACHING DARKNESS<br>SHADE PATH<br>SPITEFUL DEMISE | None |
@@ -66,7 +68,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Cavalcade of Chaos | `Full` | Unholy Avalanche Fall Back eligibility hook, three named Stratagem records, and two Enhancement bindings | Focused Fall Back, Shoot, Charge, Stratagem, Enhancement, and handler-drift tests | Includes MOUNTED LEGIONES DAEMONICA Shoot and Charge permissions after Fall Back, Warp-Riders MOBILE, From Beyond the Veil ingress, Inescapable Manifestations Desperate Escape, Apocalyptic Steeds +1 Movement, and Soul-Shattering Charge melee targeting. |
 | Daemonic Incursion | `Full` | Warp Rifts generic IR reserve-arrival distance hook | Focused runtime hook and Deep Strike placement tests | Allows qualifying LEGIONES DAEMONICA Deep Strike units wholly within Shadow of Chaos or within 6 inches of a matching source-backed Greater Daemon anchor to use the 6 inch enemy distance. |
 | Legion of Excess | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
-| Lords of the Warp | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Lords of the Warp | `Full` | Loci of Power generic IR Leadership and Objective Control modifiers | Focused RuleIR, target-filtering, runtime manifest, and Stratagem targeting tests | Friendly LEGIONES DAEMONICA CHARACTER models excluding MONSTER models gain +1 Leadership and +1 Objective Control through the shared characteristic modifier path. |
 | Plague Legion | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Scintillating Legion | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Shadow Legion | `Full` | Mustering restrictions and keyword grants, Murderer's Cowl Advance eligibility, Penumbral Puppetry hit modifiers, Gloam Rot wound modifiers, Shadow's Caress snap-target restriction, Leaping Shadows Scouts grants, Mantle of Gloom Objective Control aura, Malice Made Manifest Fight-start mortal wounds, and Disciples of Be'lakor Dark Pacts hooks | Focused mustering, runtime hook, modifier, target-restriction, Scouts enhancement, Mantle of Gloom engagement aura, Malice Made Manifest target/FNP routing, out-of-phase shooting, Be'lakor auto-pass, and Feel No Pain routing tests | Includes Shadow Legion/Undivided/Deep Strike keyword grants, Thralls of the First Prince roster caps and exclusions, attached rules-unit Scouts 9 grants from Leaping Shadows, attached rules-unit Engagement Range OC reduction from Mantle of Gloom, Fight-start D6/D3 mortal wounds from Malice Made Manifest, Dark Pacts selected-to-shoot/fight grants for Undivided units, Be'lakor Leadership auto-pass, and Shadow-source D3 mortal-wound Feel No Pain continuation. |

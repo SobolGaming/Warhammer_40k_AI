@@ -505,6 +505,25 @@ engine-owned temporary movement keyword effects, such as `MOBILE`, that are
 consumed by later movement proposal validation. Adapters must not add movement
 keywords, adjust terrain traversal, spend CP, or mutate movement state directly.
 
+Phase 17G also adds selected-unit Shooting and Fight Stratagem windows to the
+same finite `use_stratagem` contract. After `select_shooting_unit` records a
+unit selection and before `select_shooting_type` is emitted, the Shooting engine
+may emit an optional active-player request with trigger kind
+`just_after_friendly_unit_selected_to_shoot`. The trigger payload includes
+`selected_to_shoot_unit_instance_id`, `selected_unit_instance_id`, and the
+engine-owned shooting-unit selection payload. After `select_fight_activation`
+records a unit selection and before melee declaration, the Fight engine may emit
+an optional active-player request with trigger kind
+`just_after_friendly_unit_selected_to_fight`. The trigger payload includes
+`selected_to_fight_unit_instance_id`, `selected_unit_instance_id`, and the
+engine-owned activation selection payload. Target policies
+`selected_to_shoot_unit`, `selected_to_fight_unit`, and
+`selected_to_fight_charged_unit` bind only the selected rules unit; the charged
+variant additionally requires the engine-recorded charge-move effect for that
+unit. Adapters must submit one emitted option or decline the window, and must
+not infer selected units, charge history, weapon keywords, attack modifiers, or
+CP spend locally.
+
 Phase 17G also adds Shooting post-resolution Stratagem windows to the finite
 `use_stratagem` contract. After a friendly shooting attack sequence completes,
 the Shooting engine may emit an optional active-player request with trigger kind
