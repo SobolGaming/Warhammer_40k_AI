@@ -36,9 +36,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Needgaard Oathband | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Persecution Prospect | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -48,7 +46,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_09-06_warhammer40000_faction_pack_leagues_of_votann-awex3qmdiz-clwoaoyyos.pdf` (SHA-256 `82f19ac07e96a28374cc042b1afdcbe99b7c96fb32d33bce03c872d00a80c2de`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -77,24 +75,34 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Sagitaur (`000002602`) | `rules_update` | Rules Updates, physical PDF page 11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Ûthar the Destined (`000002593`) | `rules_update` | Rules Updates, physical PDF page 11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for Leagues of Votann | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Armoured Trailblazers | Armoured Trailblazers detachment rule | `phase17e:leagues-of-votann:armoured-trailblazers:rule` | `named_handler_required` | `phase17e:detachment:armoured-trailblazers:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:armoured-trailblazers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
-| Brandfast Oathband | Brandfast Oathband detachment rule | `phase17e:leagues-of-votann:brandfast-oathband:rule` | `named_handler_required` | `phase17e:detachment:brandfast-oathband:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:brandfast-oathband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
-| Delve Assault Shift | Delve Assault Shift detachment rule | `phase17e:leagues-of-votann:delve-assault-shift:rule` | `named_handler_required` | `phase17e:detachment:delve-assault-shift:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:delve-assault-shift`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
-| Farseekers | Farseekers detachment rule | `phase17e:leagues-of-votann:farseekers:rule` | `named_handler_required` | `phase17e:detachment:farseekers:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:farseekers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
-| Hearthband | Hearthband detachment rule | `phase17e:leagues-of-votann:hearthband:rule` | `named_handler_required` | `phase17e:detachment:hearthband:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:hearthband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
-| Hearthfyre Arsenal | Hearthfyre Arsenal detachment rule | `phase17e:leagues-of-votann:hearthfyre-arsenal:rule` | `named_handler_required` | `phase17e:detachment:hearthfyre-arsenal:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:hearthfyre-arsenal`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
-| Hearthguard Covenant | Hearthguard Covenant detachment rule | `phase17e:leagues-of-votann:hearthguard-covenant:rule` | `named_handler_required` | `phase17e:detachment:hearthguard-covenant:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:hearthguard-covenant`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
-| Mercenary Oathband | Mercenary Oathband detachment rule | `phase17e:leagues-of-votann:mercenary-oathband:rule` | `named_handler_required` | `phase17e:detachment:mercenary-oathband:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:mercenary-oathband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
-| Needgaard Oathband | Needgaard Oathband detachment rule | `phase17e:leagues-of-votann:needgaard-oathband:rule` | `named_handler_required` | `phase17e:detachment:needgaard-oathband:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:needgaard-oathband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
-| Persecution Prospect | Persecution Prospect detachment rule | `phase17e:leagues-of-votann:persecution-prospect:rule` | `named_handler_required` | `phase17e:detachment:persecution-prospect:rule` | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:persecution-prospect`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Armoured Trailblazers | Armoured Trailblazers detachment rule | `phase17e:leagues-of-votann:armoured-trailblazers:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:armoured-trailblazers:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:armoured-trailblazers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Brandfast Oathband | Brandfast Oathband detachment rule | `phase17e:leagues-of-votann:brandfast-oathband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:brandfast-oathband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:brandfast-oathband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Delve Assault Shift | Delve Assault Shift detachment rule | `phase17e:leagues-of-votann:delve-assault-shift:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:delve-assault-shift:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:delve-assault-shift`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Farseekers | Farseekers detachment rule | `phase17e:leagues-of-votann:farseekers:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:farseekers:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:farseekers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Hearthband | Hearthband detachment rule | `phase17e:leagues-of-votann:hearthband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hearthband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:hearthband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Hearthfyre Arsenal | Hearthfyre Arsenal detachment rule | `phase17e:leagues-of-votann:hearthfyre-arsenal:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hearthfyre-arsenal:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:hearthfyre-arsenal`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Hearthguard Covenant | Hearthguard Covenant detachment rule | `phase17e:leagues-of-votann:hearthguard-covenant:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hearthguard-covenant:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:hearthguard-covenant`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Mercenary Oathband | Mercenary Oathband detachment rule | `phase17e:leagues-of-votann:mercenary-oathband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:mercenary-oathband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:mercenary-oathband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Needgaard Oathband | Needgaard Oathband detachment rule | `phase17e:leagues-of-votann:needgaard-oathband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:needgaard-oathband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:needgaard-oathband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
+| Persecution Prospect | Persecution Prospect detachment rule | `phase17e:leagues-of-votann:persecution-prospect:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:persecution-prospect:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:persecution-prospect`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -128,6 +136,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Persecution Prospect | Writ of Acquisition | `000010439003` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:leagues-of-votann:persecution-prospect:enhancement:000010439003` | None | `gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:persecution-prospect`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010439003`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:leagues-of-votann:persecution-prospect:000010439003`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:leagues-of-votann` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

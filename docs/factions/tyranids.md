@@ -36,9 +36,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Vanguard Onslaught | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Warrior Bioform Onslaught | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -48,7 +46,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_09-06_warhammer40000_faction_pack_tyranids-avhhzmcte8-j0kseag7td.pdf` (SHA-256 `de2105f97171812369288cb5d5da3da9730f47dc7daa67aa06b1ebc771ad6c36`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -105,24 +103,34 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Winged Tyranid Prime (`000002694`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Zoanthropes (`000000475`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for Tyranids | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Ambush Predators | Ambush Predators detachment rule | `phase17e:tyranids:ambush-predators:rule` | `named_handler_required` | `phase17e:detachment:ambush-predators:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:ambush-predators`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
-| Assimilation Swarm | Assimilation Swarm detachment rule | `phase17e:tyranids:assimilation-swarm:rule` | `named_handler_required` | `phase17e:detachment:assimilation-swarm:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:assimilation-swarm`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
-| Crusher Stampede | Crusher Stampede detachment rule | `phase17e:tyranids:crusher-stampede:rule` | `named_handler_required` | `phase17e:detachment:crusher-stampede:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:crusher-stampede`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
-| Invasion Fleet | Invasion Fleet detachment rule | `phase17e:tyranids:invasion-fleet:rule` | `named_handler_required` | `phase17e:detachment:invasion-fleet:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:invasion-fleet`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
-| Subterranean Assault | Subterranean Assault detachment rule | `phase17e:tyranids:subterranean-assault:rule` | `named_handler_required` | `phase17e:detachment:subterranean-assault:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:subterranean-assault`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
-| Synaptic Nexus | Synaptic Nexus detachment rule | `phase17e:tyranids:synaptic-nexus:rule` | `named_handler_required` | `phase17e:detachment:synaptic-nexus:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:synaptic-nexus`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
-| Talons of the Norn Queen | Talons of the Norn Queen detachment rule | `phase17e:tyranids:talons-of-the-norn-queen:rule` | `named_handler_required` | `phase17e:detachment:talons-of-the-norn-queen:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:talons-of-the-norn-queen`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
-| Unending Swarm | Unending Swarm detachment rule | `phase17e:tyranids:unending-swarm:rule` | `named_handler_required` | `phase17e:detachment:unending-swarm:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:unending-swarm`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
-| Vanguard Onslaught | Vanguard Onslaught detachment rule | `phase17e:tyranids:vanguard-onslaught:rule` | `named_handler_required` | `phase17e:detachment:vanguard-onslaught:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:vanguard-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
-| Warrior Bioform Onslaught | Warrior Bioform Onslaught detachment rule | `phase17e:tyranids:warrior-bioform-onslaught:rule` | `named_handler_required` | `phase17e:detachment:warrior-bioform-onslaught:rule` | `gw-11e-faction-detachments-2026-27:detachment:tyranids:warrior-bioform-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Ambush Predators | Ambush Predators detachment rule | `phase17e:tyranids:ambush-predators:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:ambush-predators:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:ambush-predators`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Assimilation Swarm | Assimilation Swarm detachment rule | `phase17e:tyranids:assimilation-swarm:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:assimilation-swarm:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:assimilation-swarm`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Crusher Stampede | Crusher Stampede detachment rule | `phase17e:tyranids:crusher-stampede:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:crusher-stampede:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:crusher-stampede`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Invasion Fleet | Invasion Fleet detachment rule | `phase17e:tyranids:invasion-fleet:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:invasion-fleet:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:invasion-fleet`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Subterranean Assault | Subterranean Assault detachment rule | `phase17e:tyranids:subterranean-assault:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:subterranean-assault:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:subterranean-assault`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Synaptic Nexus | Synaptic Nexus detachment rule | `phase17e:tyranids:synaptic-nexus:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:synaptic-nexus:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:synaptic-nexus`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Talons of the Norn Queen | Talons of the Norn Queen detachment rule | `phase17e:tyranids:talons-of-the-norn-queen:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:talons-of-the-norn-queen:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:talons-of-the-norn-queen`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Unending Swarm | Unending Swarm detachment rule | `phase17e:tyranids:unending-swarm:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:unending-swarm:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:unending-swarm`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Vanguard Onslaught | Vanguard Onslaught detachment rule | `phase17e:tyranids:vanguard-onslaught:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:vanguard-onslaught:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:vanguard-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
+| Warrior Bioform Onslaught | Warrior Bioform Onslaught detachment rule | `phase17e:tyranids:warrior-bioform-onslaught:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:warrior-bioform-onslaught:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:warrior-bioform-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -160,6 +168,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Warrior Bioform Onslaught | Synaptic Tyrant | `000009737002` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:tyranids:warrior-bioform-onslaught:enhancement:000009737002` | None | `gw-11e-faction-detachments-2026-27:detachment:tyranids:warrior-bioform-onslaught`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009737002`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:tyranids:warrior-bioform-onslaught:000009737002`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tyranids` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

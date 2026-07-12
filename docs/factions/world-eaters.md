@@ -34,9 +34,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Possessed Slaughterband | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Vessels of Wrath | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -46,7 +44,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_10-06_warhammer40000_faction_pack_world_eaters-az7rivdn6x-d9rvbncqvt.pdf` (SHA-256 `c773ef3a9c73ab354a18bd9b0c1e9a190ee89c9155a1e2bba52286fa6e39be30`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -83,22 +81,41 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Skarbrand (`000004104`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Slaughterbound (`000004103`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Defiler (`000004207`) | `Partial` | Full | Full | Full | Full | Partial | Partial; supported detachments 0/8 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only | `000008428` Blessings of Khorne: `descriptor_only` Faction ability row is not fully consumed; detachment support 0/8. |
+
+### Datasheet Ability Details
+
+| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
+| --- | --- | --- | --- | --- | --- | --- |
+| Defiler (`000004207`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
+| Defiler (`000004207`) | Scuttling Walker (`000004207:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
+| Defiler (`000004207`) | Unleash Wrath (`000004207:unleash-wrath`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.out_of_phase_action.enemy_unit` | `catalog-ir:setup-reactive-shoot-charge` | None |
+| Defiler (`000004207`) | Blessings of Khorne (`000008428`) | `faction` | `descriptor_only` | `unknown.ability_text` | None | None |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Berzerker Warband | Berzerker Warband detachment rule | `phase17e:world-eaters:berzerker-warband:rule` | `named_handler_required` | `phase17e:detachment:berzerker-warband:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:berzerker-warband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Brazen Engines | Brazen Engines detachment rule | `phase17e:world-eaters:brazen-engines:rule` | `named_handler_required` | `phase17e:detachment:brazen-engines:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:brazen-engines`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Butchers of Khorne | Butchers of Khorne detachment rule | `phase17e:world-eaters:butchers-of-khorne:rule` | `named_handler_required` | `phase17e:detachment:butchers-of-khorne:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:butchers-of-khorne`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Cult of Blood | Cult of Blood detachment rule | `phase17e:world-eaters:cult-of-blood:rule` | `named_handler_required` | `phase17e:detachment:cult-of-blood:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:cult-of-blood`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Goretrack Onslaught | Goretrack Onslaught detachment rule | `phase17e:world-eaters:goretrack-onslaught:rule` | `named_handler_required` | `phase17e:detachment:goretrack-onslaught:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:goretrack-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Khorne Daemonkin | Khorne Daemonkin detachment rule | `phase17e:world-eaters:khorne-daemonkin:rule` | `named_handler_required` | `phase17e:detachment:khorne-daemonkin:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:khorne-daemonkin`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Possessed Slaughterband | Possessed Slaughterband detachment rule | `phase17e:world-eaters:possessed-slaughterband:rule` | `named_handler_required` | `phase17e:detachment:possessed-slaughterband:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:possessed-slaughterband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Vessels of Wrath | Vessels of Wrath detachment rule | `phase17e:world-eaters:vessels-of-wrath:rule` | `named_handler_required` | `phase17e:detachment:vessels-of-wrath:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:vessels-of-wrath`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Berzerker Warband | Berzerker Warband detachment rule | `phase17e:world-eaters:berzerker-warband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:berzerker-warband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:berzerker-warband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Brazen Engines | Brazen Engines detachment rule | `phase17e:world-eaters:brazen-engines:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:brazen-engines:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:brazen-engines`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Butchers of Khorne | Butchers of Khorne detachment rule | `phase17e:world-eaters:butchers-of-khorne:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:butchers-of-khorne:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:butchers-of-khorne`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Cult of Blood | Cult of Blood detachment rule | `phase17e:world-eaters:cult-of-blood:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:cult-of-blood:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:cult-of-blood`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Goretrack Onslaught | Goretrack Onslaught detachment rule | `phase17e:world-eaters:goretrack-onslaught:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:goretrack-onslaught:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:goretrack-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Khorne Daemonkin | Khorne Daemonkin detachment rule | `phase17e:world-eaters:khorne-daemonkin:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:khorne-daemonkin:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:khorne-daemonkin`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Possessed Slaughterband | Possessed Slaughterband detachment rule | `phase17e:world-eaters:possessed-slaughterband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:possessed-slaughterband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:possessed-slaughterband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Vessels of Wrath | Vessels of Wrath detachment rule | `phase17e:world-eaters:vessels-of-wrath:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:vessels-of-wrath:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:vessels-of-wrath`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -128,6 +145,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Vessels of Wrath | Vox-diabolus | `000009847003` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:world-eaters:vessels-of-wrath:enhancement:000009847003` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:vessels-of-wrath`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009847003`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:world-eaters:vessels-of-wrath:000009847003`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

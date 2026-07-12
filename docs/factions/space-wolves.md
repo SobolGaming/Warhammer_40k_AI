@@ -33,9 +33,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Saga of the Hunter | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Veterans of the Fang | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -45,7 +43,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_08-06_warhammer40000_faction_pack_space_wolves-secweiq0m1-z9ayyyugii.pdf` (SHA-256 `98adc2602ffba4714a8c453f54a0ff2afc08ed034cb0e305b0364da24cfc8942`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -73,27 +71,39 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Wulfen Dreadnought (`000004133`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Wulfen with Storm Shields (`000004132`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for Space Wolves | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Champions of Fenris | Champions of Fenris detachment rule | `phase17e:space-wolves:champions-of-fenris:rule` | `named_handler_required` | `phase17e:detachment:champions-of-fenris:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:champions-of-fenris`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
-| Legends of Saga and Song | Legends of Saga and Song detachment rule | `phase17e:space-wolves:legends-of-saga-and-song:rule` | `named_handler_required` | `phase17e:detachment:legends-of-saga-and-song:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:legends-of-saga-and-song`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
-| Saga of the Beastslayer | Saga of the Beastslayer detachment rule | `phase17e:space-wolves:saga-of-the-beastslayer:rule` | `named_handler_required` | `phase17e:detachment:saga-of-the-beastslayer:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:saga-of-the-beastslayer`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
-| Saga of the Bold | Saga of the Bold detachment rule | `phase17e:space-wolves:saga-of-the-bold:rule` | `named_handler_required` | `phase17e:detachment:saga-of-the-bold:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:saga-of-the-bold`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
-| Saga of the Great Wolf | Saga of the Great Wolf detachment rule | `phase17e:space-wolves:saga-of-the-great-wolf:rule` | `named_handler_required` | `phase17e:detachment:saga-of-the-great-wolf:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:saga-of-the-great-wolf`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
-| Saga of the Hunter | Saga of the Hunter detachment rule | `phase17e:space-wolves:saga-of-the-hunter:rule` | `named_handler_required` | `phase17e:detachment:saga-of-the-hunter:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:saga-of-the-hunter`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
-| Veterans of the Fang | Veterans of the Fang detachment rule | `phase17e:space-wolves:veterans-of-the-fang:rule` | `named_handler_required` | `phase17e:detachment:veterans-of-the-fang:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:veterans-of-the-fang`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Champions of Fenris | Champions of Fenris detachment rule | `phase17e:space-wolves:champions-of-fenris:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:champions-of-fenris:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:champions-of-fenris`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
+| Legends of Saga and Song | Legends of Saga and Song detachment rule | `phase17e:space-wolves:legends-of-saga-and-song:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:legends-of-saga-and-song:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:legends-of-saga-and-song`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
+| Saga of the Beastslayer | Saga of the Beastslayer detachment rule | `phase17e:space-wolves:saga-of-the-beastslayer:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:saga-of-the-beastslayer:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:saga-of-the-beastslayer`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
+| Saga of the Bold | Saga of the Bold detachment rule | `phase17e:space-wolves:saga-of-the-bold:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:saga-of-the-bold:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:saga-of-the-bold`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
+| Saga of the Great Wolf | Saga of the Great Wolf detachment rule | `phase17e:space-wolves:saga-of-the-great-wolf:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:saga-of-the-great-wolf:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:saga-of-the-great-wolf`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
+| Saga of the Hunter | Saga of the Hunter detachment rule | `phase17e:space-wolves:saga-of-the-hunter:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:saga-of-the-hunter:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:saga-of-the-hunter`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
+| Veterans of the Fang | Veterans of the Fang detachment rule | `phase17e:space-wolves:veterans-of-the-fang:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:veterans-of-the-fang:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-wolves:veterans-of-the-fang`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-wolves` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | No exact source rows generated yet |  |  |  |  |  |  |  |  |  |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

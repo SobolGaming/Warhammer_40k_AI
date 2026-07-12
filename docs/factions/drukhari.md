@@ -35,9 +35,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Spectacle of Spite | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Tools of Torment | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -47,7 +45,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_09-06_warhammer40000_faction_pack_drukhari-wp9pdv8x9l-dhoh0i94sx.pdf` (SHA-256 `e438923611efffea389ec46f37e2f58795440fc8e00e3734480690f9e238391a`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -77,23 +75,33 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Wracks (`000000650`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Wyches (`000000646`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for Drukhari | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Covenite Coterie | Covenite Coterie detachment rule | `phase17e:drukhari:covenite-coterie:rule` | `named_handler_required` | `phase17e:detachment:covenite-coterie:rule` | `gw-11e-faction-detachments-2026-27:detachment:drukhari:covenite-coterie`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
-| Exhibition of Slaughter | Exhibition of Slaughter detachment rule | `phase17e:drukhari:exhibition-of-slaughter:rule` | `named_handler_required` | `phase17e:detachment:exhibition-of-slaughter:rule` | `gw-11e-faction-detachments-2026-27:detachment:drukhari:exhibition-of-slaughter`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
-| Kabalite Agonysts | Kabalite Agonysts detachment rule | `phase17e:drukhari:kabalite-agonysts:rule` | `named_handler_required` | `phase17e:detachment:kabalite-agonysts:rule` | `gw-11e-faction-detachments-2026-27:detachment:drukhari:kabalite-agonysts`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
-| Kabalite Cartel | Kabalite Cartel detachment rule | `phase17e:drukhari:kabalite-cartel:rule` | `named_handler_required` | `phase17e:detachment:kabalite-cartel:rule` | `gw-11e-faction-detachments-2026-27:detachment:drukhari:kabalite-cartel`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
-| Realspace Raiders | Realspace Raiders detachment rule | `phase17e:drukhari:realspace-raiders:rule` | `named_handler_required` | `phase17e:detachment:realspace-raiders:rule` | `gw-11e-faction-detachments-2026-27:detachment:drukhari:realspace-raiders`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
-| Reaper's Wager | Reaper's Wager detachment rule | `phase17e:drukhari:reapers-wager:rule` | `named_handler_required` | `phase17e:detachment:reapers-wager:rule` | `gw-11e-faction-detachments-2026-27:detachment:drukhari:reapers-wager`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
-| Skysplinter Assault | Skysplinter Assault detachment rule | `phase17e:drukhari:skysplinter-assault:rule` | `named_handler_required` | `phase17e:detachment:skysplinter-assault:rule` | `gw-11e-faction-detachments-2026-27:detachment:drukhari:skysplinter-assault`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
-| Spectacle of Spite | Spectacle of Spite detachment rule | `phase17e:drukhari:spectacle-of-spite:rule` | `named_handler_required` | `phase17e:detachment:spectacle-of-spite:rule` | `gw-11e-faction-detachments-2026-27:detachment:drukhari:spectacle-of-spite`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
-| Tools of Torment | Tools of Torment detachment rule | `phase17e:drukhari:tools-of-torment:rule` | `named_handler_required` | `phase17e:detachment:tools-of-torment:rule` | `gw-11e-faction-detachments-2026-27:detachment:drukhari:tools-of-torment`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Covenite Coterie | Covenite Coterie detachment rule | `phase17e:drukhari:covenite-coterie:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:covenite-coterie:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:covenite-coterie`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
+| Exhibition of Slaughter | Exhibition of Slaughter detachment rule | `phase17e:drukhari:exhibition-of-slaughter:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:exhibition-of-slaughter:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:exhibition-of-slaughter`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
+| Kabalite Agonysts | Kabalite Agonysts detachment rule | `phase17e:drukhari:kabalite-agonysts:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:kabalite-agonysts:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:kabalite-agonysts`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
+| Kabalite Cartel | Kabalite Cartel detachment rule | `phase17e:drukhari:kabalite-cartel:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:kabalite-cartel:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:kabalite-cartel`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
+| Realspace Raiders | Realspace Raiders detachment rule | `phase17e:drukhari:realspace-raiders:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:realspace-raiders:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:realspace-raiders`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
+| Reaper's Wager | Reaper's Wager detachment rule | `phase17e:drukhari:reapers-wager:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:reapers-wager:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:reapers-wager`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
+| Skysplinter Assault | Skysplinter Assault detachment rule | `phase17e:drukhari:skysplinter-assault:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:skysplinter-assault:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:skysplinter-assault`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
+| Spectacle of Spite | Spectacle of Spite detachment rule | `phase17e:drukhari:spectacle-of-spite:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:spectacle-of-spite:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:spectacle-of-spite`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
+| Tools of Torment | Tools of Torment detachment rule | `phase17e:drukhari:tools-of-torment:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:tools-of-torment:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:tools-of-torment`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -123,6 +131,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Spectacle of Spite | Pharmacophex | `000010580002` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:drukhari:spectacle-of-spite:enhancement:000010580002` | None | `gw-11e-faction-detachments-2026-27:detachment:drukhari:spectacle-of-spite`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010580002`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:drukhari:spectacle-of-spite:000010580002`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:drukhari` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

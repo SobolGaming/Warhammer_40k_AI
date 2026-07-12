@@ -34,9 +34,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | The Lost Brethren | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Wrath of the Doomed | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -46,7 +44,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_08-06_warhammer40000_faction_pack_blood_angels-iinnedwcaa-bsyp1349et.pdf` (SHA-256 `e0c06b2cdeff8be5a94721f96854d35f9f6fa4d6c410453e61ece14c1aa0bce7`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -68,28 +66,40 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Sanguinary Priest (`000000158`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | The Sanguinor (`000000156`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for Blood Angels | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Angelic Inheritors | Angelic Inheritors detachment rule | `phase17e:blood-angels:angelic-inheritors:rule` | `named_handler_required` | `phase17e:detachment:angelic-inheritors:rule` | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:angelic-inheritors`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
-| Encarmine Speartip | Encarmine Speartip detachment rule | `phase17e:blood-angels:encarmine-speartip:rule` | `named_handler_required` | `phase17e:detachment:encarmine-speartip:rule` | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:encarmine-speartip`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
-| Legacy of Grace | Legacy of Grace detachment rule | `phase17e:blood-angels:legacy-of-grace:rule` | `named_handler_required` | `phase17e:detachment:legacy-of-grace:rule` | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:legacy-of-grace`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
-| Liberator Assault Group | Liberator Assault Group detachment rule | `phase17e:blood-angels:liberator-assault-group:rule` | `named_handler_required` | `phase17e:detachment:liberator-assault-group:rule` | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:liberator-assault-group`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
-| Rage-cursed Onslaught | Rage-cursed Onslaught detachment rule | `phase17e:blood-angels:rage-cursed-onslaught:rule` | `named_handler_required` | `phase17e:detachment:rage-cursed-onslaught:rule` | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:rage-cursed-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
-| The Angelic Host | The Angelic Host detachment rule | `phase17e:blood-angels:the-angelic-host:rule` | `named_handler_required` | `phase17e:detachment:the-angelic-host:rule` | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:the-angelic-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
-| The Lost Brethren | The Lost Brethren detachment rule | `phase17e:blood-angels:the-lost-brethren:rule` | `named_handler_required` | `phase17e:detachment:the-lost-brethren:rule` | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:the-lost-brethren`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
-| Wrath of the Doomed | Wrath of the Doomed detachment rule | `phase17e:blood-angels:wrath-of-the-doomed:rule` | `named_handler_required` | `phase17e:detachment:wrath-of-the-doomed:rule` | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:wrath-of-the-doomed`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Angelic Inheritors | Angelic Inheritors detachment rule | `phase17e:blood-angels:angelic-inheritors:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:angelic-inheritors:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:angelic-inheritors`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
+| Encarmine Speartip | Encarmine Speartip detachment rule | `phase17e:blood-angels:encarmine-speartip:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:encarmine-speartip:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:encarmine-speartip`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
+| Legacy of Grace | Legacy of Grace detachment rule | `phase17e:blood-angels:legacy-of-grace:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:legacy-of-grace:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:legacy-of-grace`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
+| Liberator Assault Group | Liberator Assault Group detachment rule | `phase17e:blood-angels:liberator-assault-group:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:liberator-assault-group:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:liberator-assault-group`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
+| Rage-cursed Onslaught | Rage-cursed Onslaught detachment rule | `phase17e:blood-angels:rage-cursed-onslaught:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:rage-cursed-onslaught:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:rage-cursed-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
+| The Angelic Host | The Angelic Host detachment rule | `phase17e:blood-angels:the-angelic-host:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:the-angelic-host:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:the-angelic-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
+| The Lost Brethren | The Lost Brethren detachment rule | `phase17e:blood-angels:the-lost-brethren:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:the-lost-brethren:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:the-lost-brethren`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
+| Wrath of the Doomed | Wrath of the Doomed detachment rule | `phase17e:blood-angels:wrath-of-the-doomed:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:wrath-of-the-doomed:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:blood-angels:wrath-of-the-doomed`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:blood-angels` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | No exact source rows generated yet |  |  |  |  |  |  |  |  |  |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

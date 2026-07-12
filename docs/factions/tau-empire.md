@@ -33,9 +33,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Mont'ka | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Retaliation Cadre | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -45,7 +43,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_09-06_warhammer40000_faction_pack_tau_empire-avmkx2gg8i-jezqgeb55k.pdf` (SHA-256 `da70143aea942aa016f760287bb389f66d10f9e3de3449a2263a0c04f009a6f0`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -91,21 +89,31 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Tidewall Shieldline (`000000436`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Vespid Stingwings (`000000427`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-18 | The Faction Pack reprints this complete datasheet and is authoritative. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for T'au Empire | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Advanced Acquisition Cadre | Advanced Acquisition Cadre detachment rule | `phase17e:tau-empire:advanced-acquisition-cadre:rule` | `named_handler_required` | `phase17e:detachment:advanced-acquisition-cadre:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:advanced-acquisition-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Auxillary Cadre | Auxillary Cadre detachment rule | `phase17e:tau-empire:auxillary-cadre:rule` | `named_handler_required` | `phase17e:detachment:auxillary-cadre:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:auxillary-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Experimental Prototype Cadre | Experimental Prototype Cadre detachment rule | `phase17e:tau-empire:experimental-prototype-cadre:rule` | `named_handler_required` | `phase17e:detachment:experimental-prototype-cadre:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:experimental-prototype-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Kauyon | Kauyon detachment rule | `phase17e:tau-empire:kauyon:rule` | `named_handler_required` | `phase17e:detachment:kauyon:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:kauyon`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Kroot Hunting Pack | Kroot Hunting Pack detachment rule | `phase17e:tau-empire:kroot-hunting-pack:rule` | `named_handler_required` | `phase17e:detachment:kroot-hunting-pack:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:kroot-hunting-pack`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Mont'ka | Mont'ka detachment rule | `phase17e:tau-empire:montka:rule` | `named_handler_required` | `phase17e:detachment:montka:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:montka`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Retaliation Cadre | Retaliation Cadre detachment rule | `phase17e:tau-empire:retaliation-cadre:rule` | `named_handler_required` | `phase17e:detachment:retaliation-cadre:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:retaliation-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Advanced Acquisition Cadre | Advanced Acquisition Cadre detachment rule | `phase17e:tau-empire:advanced-acquisition-cadre:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:advanced-acquisition-cadre:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:advanced-acquisition-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Auxillary Cadre | Auxillary Cadre detachment rule | `phase17e:tau-empire:auxillary-cadre:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:auxillary-cadre:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:auxillary-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Experimental Prototype Cadre | Experimental Prototype Cadre detachment rule | `phase17e:tau-empire:experimental-prototype-cadre:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:experimental-prototype-cadre:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:experimental-prototype-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Kauyon | Kauyon detachment rule | `phase17e:tau-empire:kauyon:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:kauyon:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:kauyon`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Kroot Hunting Pack | Kroot Hunting Pack detachment rule | `phase17e:tau-empire:kroot-hunting-pack:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:kroot-hunting-pack:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:kroot-hunting-pack`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Mont'ka | Mont'ka detachment rule | `phase17e:tau-empire:montka:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:montka:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:montka`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Retaliation Cadre | Retaliation Cadre detachment rule | `phase17e:tau-empire:retaliation-cadre:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:retaliation-cadre:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:retaliation-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -131,6 +139,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Retaliation Cadre | Starflare Ignition System | `000008815005` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:tau-empire:retaliation-cadre:enhancement:000008815005` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:retaliation-cadre`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008815005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:tau-empire:retaliation-cadre:000008815005`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

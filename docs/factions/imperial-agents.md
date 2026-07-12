@@ -31,9 +31,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Ordo Xenos, Alien Hunters | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Veiled Blade Elimination Force | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -43,7 +41,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_11-06_warhammer40000_faction_pack_imperial_agents-qhp2xzepry-gapdknla3x.pdf` (SHA-256 `219fb2a4973b0a6ff393f13544adb4ccb7bae81bc4cbd6138ebd3179661b5fee`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -79,19 +77,29 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Watch Captain Artemis (`000003814`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Watch Master (`000003815`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for Imperial Agents | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Imperialis Fleet | Imperialis Fleet detachment rule | `phase17e:imperial-agents:imperialis-fleet:rule` | `named_handler_required` | `phase17e:detachment:imperialis-fleet:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:imperialis-fleet`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
-| Ordo Hereticus, Purgation Force | Ordo Hereticus, Purgation Force detachment rule | `phase17e:imperial-agents:ordo-hereticus-purgation-force:rule` | `named_handler_required` | `phase17e:detachment:ordo-hereticus-purgation-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-hereticus-purgation-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
-| Ordo Malleus, Daemon Hunters | Ordo Malleus, Daemon Hunters detachment rule | `phase17e:imperial-agents:ordo-malleus-daemon-hunters:rule` | `named_handler_required` | `phase17e:detachment:ordo-malleus-daemon-hunters:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-malleus-daemon-hunters`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
-| Ordo Xenos, Alien Hunters | Ordo Xenos, Alien Hunters detachment rule | `phase17e:imperial-agents:ordo-xenos-alien-hunters:rule` | `named_handler_required` | `phase17e:detachment:ordo-xenos-alien-hunters:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-xenos-alien-hunters`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
-| Veiled Blade Elimination Force | Veiled Blade Elimination Force detachment rule | `phase17e:imperial-agents:veiled-blade-elimination-force:rule` | `named_handler_required` | `phase17e:detachment:veiled-blade-elimination-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:veiled-blade-elimination-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Imperialis Fleet | Imperialis Fleet detachment rule | `phase17e:imperial-agents:imperialis-fleet:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:imperialis-fleet:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:imperialis-fleet`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
+| Ordo Hereticus, Purgation Force | Ordo Hereticus, Purgation Force detachment rule | `phase17e:imperial-agents:ordo-hereticus-purgation-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:ordo-hereticus-purgation-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-hereticus-purgation-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
+| Ordo Malleus, Daemon Hunters | Ordo Malleus, Daemon Hunters detachment rule | `phase17e:imperial-agents:ordo-malleus-daemon-hunters:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:ordo-malleus-daemon-hunters:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-malleus-daemon-hunters`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
+| Ordo Xenos, Alien Hunters | Ordo Xenos, Alien Hunters detachment rule | `phase17e:imperial-agents:ordo-xenos-alien-hunters:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:ordo-xenos-alien-hunters:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-xenos-alien-hunters`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
+| Veiled Blade Elimination Force | Veiled Blade Elimination Force detachment rule | `phase17e:imperial-agents:veiled-blade-elimination-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:veiled-blade-elimination-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:veiled-blade-elimination-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -117,6 +125,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Veiled Blade Elimination Force | Micromelta Rounds | `000009757005` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:imperial-agents:veiled-blade-elimination-force:enhancement:000009757005` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-agents:veiled-blade-elimination-force`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009757005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:imperial-agents:veiled-blade-elimination-force:000009757005`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-agents` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

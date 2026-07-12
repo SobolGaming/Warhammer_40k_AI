@@ -35,9 +35,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Warpforged Cabal | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Warpmeld Pact | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -47,7 +45,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_10-06_warhammer40000_faction_pack_thousand_sons-qxnr1lbasx-i6ee7zitrl.pdf` (SHA-256 `b6d2f04a1fda50200f779ee56ff9b977284f9945beceefa2910084b321da7984`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -88,23 +86,42 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Tzaangor Shaman (`000001472`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Tzaangors (`000001034`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Defiler (`000001030`) | `Playable` | Full | Full | Full | Full | Full | Partial; supported detachments 0/9 (None) | Runtime consumers: `catalog-ir:minimum-unmodified-hit-success`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:lost-wound:feel-no-pain-resolution`, `descriptor:lost-wound:feel-no-pain-source`; coverage artifact only | No source-backed faction ability row; detachment support 0/9. |
+
+### Datasheet Ability Details
+
+| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
+| --- | --- | --- | --- | --- | --- | --- |
+| Defiler (`000001030`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
+| Defiler (`000001030`) | Feel No Pain (`000008338`) | `core` | `engine_consumed` | `core.feel_no_pain` | `descriptor:lost-wound:feel-no-pain-source`, `descriptor:lost-wound:feel-no-pain-resolution` | None |
+| Defiler (`000001030`) | Destroyer of Futures (`000001030:destroyer-of-futures`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.set_contextual_status.this_unit` | `catalog-ir:minimum-unmodified-hit-success` | None |
+| Defiler (`000001030`) | Scuttling Walker (`000001030:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Changehost of Deceit | Changehost of Deceit detachment rule | `phase17e:thousand-sons:changehost-of-deceit:rule` | `named_handler_required` | `phase17e:detachment:changehost-of-deceit:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:changehost-of-deceit`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Grand Coven | Grand Coven detachment rule | `phase17e:thousand-sons:grand-coven:rule` | `named_handler_required` | `phase17e:detachment:grand-coven:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:grand-coven`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Hexwarp Thrallband | Hexwarp Thrallband detachment rule | `phase17e:thousand-sons:hexwarp-thrallband:rule` | `named_handler_required` | `phase17e:detachment:hexwarp-thrallband:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:hexwarp-thrallband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Ritual of Regeneration | Ritual of Regeneration detachment rule | `phase17e:thousand-sons:ritual-of-regeneration:rule` | `named_handler_required` | `phase17e:detachment:ritual-of-regeneration:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:ritual-of-regeneration`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Rubricae Phalanx | Rubricae Phalanx detachment rule | `phase17e:thousand-sons:rubricae-phalanx:rule` | `named_handler_required` | `phase17e:detachment:rubricae-phalanx:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:rubricae-phalanx`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Sekhetar Cohort | Sekhetar Cohort detachment rule | `phase17e:thousand-sons:sekhetar-cohort:rule` | `named_handler_required` | `phase17e:detachment:sekhetar-cohort:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:sekhetar-cohort`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Servants of Change | Servants of Change detachment rule | `phase17e:thousand-sons:servants-of-change:rule` | `named_handler_required` | `phase17e:detachment:servants-of-change:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:servants-of-change`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Warpforged Cabal | Warpforged Cabal detachment rule | `phase17e:thousand-sons:warpforged-cabal:rule` | `named_handler_required` | `phase17e:detachment:warpforged-cabal:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpforged-cabal`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Warpmeld Pact | Warpmeld Pact detachment rule | `phase17e:thousand-sons:warpmeld-pact:rule` | `named_handler_required` | `phase17e:detachment:warpmeld-pact:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpmeld-pact`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Changehost of Deceit | Changehost of Deceit detachment rule | `phase17e:thousand-sons:changehost-of-deceit:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:changehost-of-deceit:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:changehost-of-deceit`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Grand Coven | Grand Coven detachment rule | `phase17e:thousand-sons:grand-coven:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:grand-coven:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:grand-coven`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Hexwarp Thrallband | Hexwarp Thrallband detachment rule | `phase17e:thousand-sons:hexwarp-thrallband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hexwarp-thrallband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:hexwarp-thrallband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Ritual of Regeneration | Ritual of Regeneration detachment rule | `phase17e:thousand-sons:ritual-of-regeneration:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:ritual-of-regeneration:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:ritual-of-regeneration`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Rubricae Phalanx | Rubricae Phalanx detachment rule | `phase17e:thousand-sons:rubricae-phalanx:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:rubricae-phalanx:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:rubricae-phalanx`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Sekhetar Cohort | Sekhetar Cohort detachment rule | `phase17e:thousand-sons:sekhetar-cohort:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:sekhetar-cohort:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:sekhetar-cohort`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Servants of Change | Servants of Change detachment rule | `phase17e:thousand-sons:servants-of-change:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:servants-of-change:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:servants-of-change`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Warpforged Cabal | Warpforged Cabal detachment rule | `phase17e:thousand-sons:warpforged-cabal:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:warpforged-cabal:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpforged-cabal`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Warpmeld Pact | Warpmeld Pact detachment rule | `phase17e:thousand-sons:warpmeld-pact:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:warpmeld-pact:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpmeld-pact`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -134,6 +151,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Warpmeld Pact | Warpmeld Dagger | `000010201002` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:thousand-sons:warpmeld-pact:enhancement:000010201002` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpmeld-pact`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010201002`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:thousand-sons:warpmeld-pact:000010201002`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

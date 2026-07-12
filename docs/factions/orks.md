@@ -38,9 +38,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Taktikal Brigade | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | War Horde | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -50,7 +48,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_09-06_warhammer40000_faction_pack_orks-agh9kwrtno-0xarrl5fjj.pdf` (SHA-256 `2c15bcd7dde77ad2e3656175410516135f52d6874577e27769d76394f763f7d1`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -114,26 +112,36 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Wurrboy (`000002492`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Zodgrod Wortsnagga (`000002488`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for Orks | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Blitz Brigade | Blitz Brigade detachment rule | `phase17e:orks:blitz-brigade:rule` | `named_handler_required` | `phase17e:detachment:blitz-brigade:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:blitz-brigade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Bully Boyz | Bully Boyz detachment rule | `phase17e:orks:bully-boyz:rule` | `named_handler_required` | `phase17e:detachment:bully-boyz:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Da Big Hunt | Da Big Hunt detachment rule | `phase17e:orks:da-big-hunt:rule` | `named_handler_required` | `phase17e:detachment:da-big-hunt:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:da-big-hunt`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Dread Mob | Dread Mob detachment rule | `phase17e:orks:dread-mob:rule` | `named_handler_required` | `phase17e:detachment:dread-mob:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:dread-mob`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Freebooter Krew | Freebooter Krew detachment rule | `phase17e:orks:freebooter-krew:rule` | `named_handler_required` | `phase17e:detachment:freebooter-krew:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:freebooter-krew`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Green Tide | Green Tide detachment rule | `phase17e:orks:green-tide:rule` | `named_handler_required` | `phase17e:detachment:green-tide:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:green-tide`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Kult of Speed | Kult of Speed detachment rule | `phase17e:orks:kult-of-speed:rule` | `named_handler_required` | `phase17e:detachment:kult-of-speed:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:kult-of-speed`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| More Dakka! | More Dakka! detachment rule | `phase17e:orks:more-dakka:rule` | `generic_supported` |  | `gw-11e-faction-detachments-2026-27:detachment:orks:more-dakka`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Rollin' Deff | Rollin' Deff detachment rule | `phase17e:orks:rollin-deff:rule` | `named_handler_required` | `phase17e:detachment:rollin-deff:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:rollin-deff`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Speedwaaagh! | Speedwaaagh! detachment rule | `phase17e:orks:speedwaaagh:rule` | `named_handler_required` | `phase17e:detachment:speedwaaagh:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:speedwaaagh`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Taktikal Brigade | Taktikal Brigade detachment rule | `phase17e:orks:taktikal-brigade:rule` | `named_handler_required` | `phase17e:detachment:taktikal-brigade:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:taktikal-brigade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| War Horde | War Horde detachment rule | `phase17e:orks:war-horde:rule` | `named_handler_required` | `phase17e:detachment:war-horde:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:war-horde`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Blitz Brigade | Blitz Brigade detachment rule | `phase17e:orks:blitz-brigade:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:blitz-brigade:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:blitz-brigade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Bully Boyz | Bully Boyz detachment rule | `phase17e:orks:bully-boyz:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:bully-boyz:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Da Big Hunt | Da Big Hunt detachment rule | `phase17e:orks:da-big-hunt:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:da-big-hunt:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:da-big-hunt`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Dread Mob | Dread Mob detachment rule | `phase17e:orks:dread-mob:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:dread-mob:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:dread-mob`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Freebooter Krew | Freebooter Krew detachment rule | `phase17e:orks:freebooter-krew:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:freebooter-krew:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:freebooter-krew`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Green Tide | Green Tide detachment rule | `phase17e:orks:green-tide:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:green-tide:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:green-tide`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Kult of Speed | Kult of Speed detachment rule | `phase17e:orks:kult-of-speed:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:kult-of-speed:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:kult-of-speed`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| More Dakka! | More Dakka! detachment rule | `phase17e:orks:more-dakka:rule` | `generic_supported` | `executable_generic_ir` |  | None | `gw-11e-faction-detachments-2026-27:detachment:orks:more-dakka`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Rollin' Deff | Rollin' Deff detachment rule | `phase17e:orks:rollin-deff:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:rollin-deff:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:rollin-deff`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Speedwaaagh! | Speedwaaagh! detachment rule | `phase17e:orks:speedwaaagh:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:speedwaaagh:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:speedwaaagh`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Taktikal Brigade | Taktikal Brigade detachment rule | `phase17e:orks:taktikal-brigade:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:taktikal-brigade:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:taktikal-brigade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| War Horde | War Horde detachment rule | `phase17e:orks:war-horde:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:war-horde:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:war-horde`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -183,6 +191,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | War Horde | Supa-Cybork Body | `000008367005` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:orks:war-horde:enhancement:000008367005` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:war-horde`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008367005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:orks:war-horde:000008367005`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

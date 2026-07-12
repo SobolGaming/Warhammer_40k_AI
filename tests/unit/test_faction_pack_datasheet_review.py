@@ -12,6 +12,11 @@ from tools.faction_pack_datasheet_review import (
     faction_pack_datasheet_reviews,
     reviewed_faction_ids,
 )
+from tools.generate_ability_support_matrix import (
+    ability_support_matrix_rows,
+    datasheet_support_rows,
+    faction_support_markdown_files,
+)
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
@@ -159,3 +164,40 @@ def test_manifest_is_a_versioned_data_artifact() -> None:
     assert payload["schema_version"] == "1"
     assert payload["source_snapshot"]["datasheets_artifact_hash"]
     assert payload["source_snapshot"]["datasheets_sha256"]
+
+
+def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None:
+    ability_rows = ability_support_matrix_rows()
+    support_rows = datasheet_support_rows()
+    markdown_by_filename = faction_support_markdown_files(
+        datasheet_support_rows=support_rows,
+        ability_rows=ability_rows,
+    )
+    ability_rows_by_id = {row.coverage_row_id: row for row in ability_rows}
+
+    non_daemons_rows = tuple(row for row in support_rows if row.faction_id != "chaos-daemons")
+    assert {(row.faction_id, row.datasheet_id, row.overall) for row in non_daemons_rows} == {
+        ("death-guard", "000004209", "Partial"),
+        ("emperors-children", "000004208", "Partial"),
+        ("thousand-sons", "000001030", "Playable"),
+        ("world-eaters", "000004207", "Partial"),
+    }
+    for row in non_daemons_rows:
+        markdown = markdown_by_filename[f"{row.faction_id}.md"]
+        assert markdown.index("## Datasheet Source Review") < markdown.index(
+            "## Datasheet / Unit Support"
+        )
+        assert f"| {row.datasheet_name} (`{row.datasheet_id}`) | `{row.overall}` |" in markdown
+        for coverage_row_id in row.ability_coverage_row_ids:
+            coverage_row = ability_rows_by_id[coverage_row_id]
+            assert (
+                f"| {row.datasheet_name} (`{row.datasheet_id}`) | "
+                f"{coverage_row.ability_name} (`{coverage_row.ability_id}`) |"
+            ) in markdown
+
+    world_eaters_markdown = markdown_by_filename["world-eaters.md"]
+    assert "`catalog-ir:movement-transit-permission`" in world_eaters_markdown
+    assert "`catalog-ir:setup-reactive-shoot-charge`" in world_eaters_markdown
+    assert "Blessings of Khorne (`000008428`) | `faction` | `descriptor_only`" in (
+        world_eaters_markdown
+    )

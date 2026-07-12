@@ -34,9 +34,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Throne-bonded Outriders | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Valourstrike Lance | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -46,7 +44,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_11-06_warhammer40000_faction_pack_imperial_knights-uoieohputz-totyd7mvs6.pdf` (SHA-256 `45e9a921b807ab677e688adf43f0aaa207165991b6bf9d9039b96a4950fd1ab1`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -67,22 +65,32 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Knight Warden (`000000857`) | `rules_update` | Rules Updates, physical PDF page 27 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Sir Hekhtur (`000002770`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for Imperial Knights | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Dominus Foebreakers | Dominus Foebreakers detachment rule | `phase17e:imperial-knights:dominus-foebreakers:rule` | `named_handler_required` | `phase17e:detachment:dominus-foebreakers:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:dominus-foebreakers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
-| Freeblade Company | Freeblade Company detachment rule | `phase17e:imperial-knights:freeblade-company:rule` | `named_handler_required` | `phase17e:detachment:freeblade-company:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:freeblade-company`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
-| Gate Warden Lance | Gate Warden Lance detachment rule | `phase17e:imperial-knights:gate-warden-lance:rule` | `named_handler_required` | `phase17e:detachment:gate-warden-lance:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:gate-warden-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
-| Questor Forgepact | Questor Forgepact detachment rule | `phase17e:imperial-knights:questor-forgepact:rule` | `named_handler_required` | `phase17e:detachment:questor-forgepact:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:questor-forgepact`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
-| Questoris Companions | Questoris Companions detachment rule | `phase17e:imperial-knights:questoris-companions:rule` | `named_handler_required` | `phase17e:detachment:questoris-companions:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:questoris-companions`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
-| Spearhead-at-arms | Spearhead-at-arms detachment rule | `phase17e:imperial-knights:spearhead-at-arms:rule` | `named_handler_required` | `phase17e:detachment:spearhead-at-arms:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:spearhead-at-arms`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
-| Throne-bonded Outriders | Throne-bonded Outriders detachment rule | `phase17e:imperial-knights:throne-bonded-outriders:rule` | `named_handler_required` | `phase17e:detachment:throne-bonded-outriders:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:throne-bonded-outriders`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
-| Valourstrike Lance | Valourstrike Lance detachment rule | `phase17e:imperial-knights:valourstrike-lance:rule` | `named_handler_required` | `phase17e:detachment:valourstrike-lance:rule` | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:valourstrike-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Dominus Foebreakers | Dominus Foebreakers detachment rule | `phase17e:imperial-knights:dominus-foebreakers:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:dominus-foebreakers:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:dominus-foebreakers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
+| Freeblade Company | Freeblade Company detachment rule | `phase17e:imperial-knights:freeblade-company:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:freeblade-company:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:freeblade-company`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
+| Gate Warden Lance | Gate Warden Lance detachment rule | `phase17e:imperial-knights:gate-warden-lance:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:gate-warden-lance:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:gate-warden-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
+| Questor Forgepact | Questor Forgepact detachment rule | `phase17e:imperial-knights:questor-forgepact:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:questor-forgepact:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:questor-forgepact`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
+| Questoris Companions | Questoris Companions detachment rule | `phase17e:imperial-knights:questoris-companions:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:questoris-companions:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:questoris-companions`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
+| Spearhead-at-arms | Spearhead-at-arms detachment rule | `phase17e:imperial-knights:spearhead-at-arms:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:spearhead-at-arms:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:spearhead-at-arms`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
+| Throne-bonded Outriders | Throne-bonded Outriders detachment rule | `phase17e:imperial-knights:throne-bonded-outriders:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:throne-bonded-outriders:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:throne-bonded-outriders`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
+| Valourstrike Lance | Valourstrike Lance detachment rule | `phase17e:imperial-knights:valourstrike-lance:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:valourstrike-lance:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:valourstrike-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -112,6 +120,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Valourstrike Lance | Bearer of the Lancer’s Sigil | `000010493005` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:imperial-knights:valourstrike-lance:enhancement:000010493005` | None | `gw-11e-faction-detachments-2026-27:detachment:imperial-knights:valourstrike-lance`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010493005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:imperial-knights:valourstrike-lance:000010493005`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:imperial-knights` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

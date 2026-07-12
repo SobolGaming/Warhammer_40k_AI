@@ -36,9 +36,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Rad-zone Corps | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Skitarii Hunter Cohort | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
-## Datasheet / Unit Support
-
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+## Datasheet Source Review
 
 ### Source scope, provenance, and exclusions
 
@@ -48,7 +46,7 @@ Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded u
 
 The review is pinned to `eng_11-06_warhammer40000_faction_pack_adeptus_mechanicus-4dczibqdew-ebqqmotlpe.pdf` (SHA-256 `7f01dd2ce7e35c762b0ab625ade779022275574cf2d01ee46ee16b2f5582341c`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
 
-These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
 
 ### Current datasheets
 
@@ -89,24 +87,34 @@ These rows are source-reviewed only. They do not claim catalog load support or s
 | Technoarcheologist (`000002477`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Thulia Ghuld (`000004210`) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-16 | The Faction Pack reprints this complete datasheet and is authoritative. |
 
+## Datasheet / Unit Support
+
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+
+| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| No generated catalog datasheets for Adeptus Mechanicus | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Cohort Acquisitus | Cohort Acquisitus detachment rule | `phase17e:adeptus-mechanicus:cohort-acquisitus:rule` | `named_handler_required` | `phase17e:detachment:cohort-acquisitus:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:cohort-acquisitus`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
-| Cohort Cybernetica | Cohort Cybernetica detachment rule | `phase17e:adeptus-mechanicus:cohort-cybernetica:rule` | `named_handler_required` | `phase17e:detachment:cohort-cybernetica:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:cohort-cybernetica`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
-| Data-psalm Conclave | Data-psalm Conclave detachment rule | `phase17e:adeptus-mechanicus:data-psalm-conclave:rule` | `named_handler_required` | `phase17e:detachment:data-psalm-conclave:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:data-psalm-conclave`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
-| Eradication Cohort | Eradication Cohort detachment rule | `phase17e:adeptus-mechanicus:eradication-cohort:rule` | `named_handler_required` | `phase17e:detachment:eradication-cohort:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:eradication-cohort`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
-| Explorator Maniple | Explorator Maniple detachment rule | `phase17e:adeptus-mechanicus:explorator-maniple:rule` | `named_handler_required` | `phase17e:detachment:explorator-maniple:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:explorator-maniple`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
-| Haloscreed Battle Clade | Haloscreed Battle Clade detachment rule | `phase17e:adeptus-mechanicus:haloscreed-battle-clade:rule` | `named_handler_required` | `phase17e:detachment:haloscreed-battle-clade:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:haloscreed-battle-clade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
-| Lords of the Forge | Lords of the Forge detachment rule | `phase17e:adeptus-mechanicus:lords-of-the-forge:rule` | `named_handler_required` | `phase17e:detachment:lords-of-the-forge:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:lords-of-the-forge`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
-| Luminen Auto-Choir | Luminen Auto-Choir detachment rule | `phase17e:adeptus-mechanicus:luminen-auto-choir:rule` | `named_handler_required` | `phase17e:detachment:luminen-auto-choir:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:luminen-auto-choir`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
-| Rad-zone Corps | Rad-zone Corps detachment rule | `phase17e:adeptus-mechanicus:rad-zone-corps:rule` | `named_handler_required` | `phase17e:detachment:rad-zone-corps:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:rad-zone-corps`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
-| Skitarii Hunter Cohort | Skitarii Hunter Cohort detachment rule | `phase17e:adeptus-mechanicus:skitarii-hunter-cohort:rule` | `named_handler_required` | `phase17e:detachment:skitarii-hunter-cohort:rule` | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:skitarii-hunter-cohort`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Cohort Acquisitus | Cohort Acquisitus detachment rule | `phase17e:adeptus-mechanicus:cohort-acquisitus:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:cohort-acquisitus:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:cohort-acquisitus`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Cohort Cybernetica | Cohort Cybernetica detachment rule | `phase17e:adeptus-mechanicus:cohort-cybernetica:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:cohort-cybernetica:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:cohort-cybernetica`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Data-psalm Conclave | Data-psalm Conclave detachment rule | `phase17e:adeptus-mechanicus:data-psalm-conclave:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:data-psalm-conclave:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:data-psalm-conclave`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Eradication Cohort | Eradication Cohort detachment rule | `phase17e:adeptus-mechanicus:eradication-cohort:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:eradication-cohort:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:eradication-cohort`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Explorator Maniple | Explorator Maniple detachment rule | `phase17e:adeptus-mechanicus:explorator-maniple:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:explorator-maniple:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:explorator-maniple`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Haloscreed Battle Clade | Haloscreed Battle Clade detachment rule | `phase17e:adeptus-mechanicus:haloscreed-battle-clade:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:haloscreed-battle-clade:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:haloscreed-battle-clade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Lords of the Forge | Lords of the Forge detachment rule | `phase17e:adeptus-mechanicus:lords-of-the-forge:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:lords-of-the-forge:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:lords-of-the-forge`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Luminen Auto-Choir | Luminen Auto-Choir detachment rule | `phase17e:adeptus-mechanicus:luminen-auto-choir:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:luminen-auto-choir:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:luminen-auto-choir`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Rad-zone Corps | Rad-zone Corps detachment rule | `phase17e:adeptus-mechanicus:rad-zone-corps:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:rad-zone-corps:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:rad-zone-corps`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
+| Skitarii Hunter Cohort | Skitarii Hunter Cohort detachment rule | `phase17e:adeptus-mechanicus:skitarii-hunter-cohort:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:skitarii-hunter-cohort:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:skitarii-hunter-cohort`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -140,6 +148,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Skitarii Hunter Cohort | Veiled Hunter | `000008560004` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:adeptus-mechanicus:skitarii-hunter-cohort:enhancement:000008560004` | None | `gw-11e-faction-detachments-2026-27:detachment:adeptus-mechanicus:skitarii-hunter-cohort`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008560004`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:adeptus-mechanicus:skitarii-hunter-cohort:000008560004`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adeptus-mechanicus` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
