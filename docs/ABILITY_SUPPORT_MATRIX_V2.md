@@ -262,6 +262,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
+| `catalog-ir:fight-activation-movement-distance` | No current generated rows |
 | `catalog-ir:fight-selected-weapon-ability-choice` | Harbinger of Death |
 | `catalog-ir:first-death-return` | No current generated rows |
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
@@ -300,6 +301,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:tracked-target-destroyed-reselect` | No current generated rows |
 | `catalog-ir:tracked-target-reroll` | No current generated rows |
 | `catalog-ir:tracked-target-selection` | No current generated rows |
+| `catalog-ir:unit-move-completed-battle-shock` | No current generated rows |
 | `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede |
 | `catalog-ir:weapon-keyword-grant` | Harbinger of Death |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |

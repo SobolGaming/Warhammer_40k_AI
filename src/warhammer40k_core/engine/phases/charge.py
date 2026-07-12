@@ -19,6 +19,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.aircraft import AircraftMovementPolicy, HoverModeState
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
@@ -87,6 +88,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.phases.charge_move_completed_hooks import (
+    resolve_charge_move_completed_hooks,
+    validate_charge_move_completed_hook_provider,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     RuntimeModifierRegistry,
@@ -106,8 +111,8 @@ from warhammer40k_core.engine.unit_coherency import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UnitMoveCompletedBattleShockHookRegistry,
     UnitMoveCompletedMortalWoundHookRegistry,
-    resolve_unit_move_completed_mortal_wound_hooks,
 )
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
@@ -829,6 +834,12 @@ class ChargePhaseHandler:
     unit_move_completed_mortal_wound_hooks: UnitMoveCompletedMortalWoundHookRegistry = field(
         default_factory=UnitMoveCompletedMortalWoundHookRegistry.empty
     )
+    unit_move_completed_battle_shock_hooks: UnitMoveCompletedBattleShockHookRegistry = field(
+        default_factory=UnitMoveCompletedBattleShockHookRegistry.empty
+    )
+    battle_shock_hooks: BattleShockHookRegistry = field(
+        default_factory=BattleShockHookRegistry.empty
+    )
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
         default_factory=_empty_ability_indexes
     )
@@ -852,13 +863,7 @@ class ChargePhaseHandler:
             raise GameLifecycleError(
                 "ChargePhaseHandler charge_target_restriction_hooks must be a registry."
             )
-        if (
-            type(self.unit_move_completed_mortal_wound_hooks)
-            is not UnitMoveCompletedMortalWoundHookRegistry
-        ):
-            raise GameLifecycleError(
-                "ChargePhaseHandler unit_move_completed_mortal_wound_hooks must be a registry."
-            )
+        validate_charge_move_completed_hook_provider(self)
         object.__setattr__(
             self,
             "ability_indexes_by_player_id",
@@ -893,15 +898,11 @@ class ChargePhaseHandler:
             )
         if charge_state.active_selection is not None:
             raise GameLifecycleError("Charge active_selection requires pending charge movement.")
-        move_completed_status = resolve_unit_move_completed_mortal_wound_hooks(
+        move_completed_status = resolve_charge_move_completed_hooks(
             state=state,
             decisions=decisions,
-            registry=self.unit_move_completed_mortal_wound_hooks,
-            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
-            runtime_modifier_registry=self.runtime_modifier_registry,
-            completed_phase=BattlePhase.CHARGE,
-            event_type="charge_move_completed",
-            movement_actions=(CHARGE_MOVE_ACTION,),
+            handler=self,
+            movement_action=CHARGE_MOVE_ACTION,
         )
         if move_completed_status is not None:
             return move_completed_status

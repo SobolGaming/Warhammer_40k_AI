@@ -54,6 +54,7 @@ from warhammer40k_core.engine.target_restriction_hooks import (
 from warhammer40k_core.engine.turn_end_hooks import TurnEndHookBinding
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookBinding
 from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UnitMoveCompletedBattleShockHookBinding,
     UnitMoveCompletedMortalWoundHookBinding,
 )
 
@@ -120,6 +121,9 @@ _HOOK_EVENT_BY_BINDING_TYPE: Mapping[type[object], LifecycleHookEvent] = Mapping
         UnitMoveCompletedMortalWoundHookBinding: (
             LifecycleHookEvent.UNIT_MOVE_COMPLETED_MORTAL_WOUND
         ),
+        UnitMoveCompletedBattleShockHookBinding: (
+            LifecycleHookEvent.UNIT_MOVE_COMPLETED_BATTLE_SHOCK
+        ),
         MortalWoundFeelNoPainContinuationHookBinding: (
             LifecycleHookEvent.MORTAL_WOUND_FEEL_NO_PAIN_CONTINUATION
         ),
@@ -156,6 +160,9 @@ HOOK_BINDING_COMBINE_NAME_BY_EVENT: Mapping[LifecycleHookEvent, str] = MappingPr
         LifecycleHookEvent.RESERVE_ARRIVAL_DISTANCE: "reserve arrival distance hook binding",
         LifecycleHookEvent.UNIT_MOVE_COMPLETED_MORTAL_WOUND: (
             "unit move completed mortal wound hook binding"
+        ),
+        LifecycleHookEvent.UNIT_MOVE_COMPLETED_BATTLE_SHOCK: (
+            "unit move completed Battle-shock hook binding"
         ),
         LifecycleHookEvent.MORTAL_WOUND_FEEL_NO_PAIN_CONTINUATION: (
             "mortal wound Feel No Pain hook binding"

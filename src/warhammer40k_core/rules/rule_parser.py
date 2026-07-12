@@ -178,9 +178,13 @@ _TRACKED_TARGET_DESTROYED_RE = re.compile(
 )
 _DESTROYED_MODEL_RE = re.compile(r"\bwhen\s+.*\bmodel\s+is\s+destroyed\b", re.IGNORECASE)
 _CHARGE_MOVE_END_RE = re.compile(
-    r"\b(?:each\s+time|when)\s+(?P<subject>that\s+unit|this\s+unit|a\s+unit)\s+ends\s+"
-    r"a\s+charge\s+move\b",
+    r"\b(?:each\s+time|when)\s+(?P<subject>"
+    r"this\s+model's\s+unit|that\s+unit|this\s+unit|a\s+unit"
+    r")\s+ends\s+a\s+charge\s+move\b",
     re.IGNORECASE,
+)
+_THIS_MODEL_UNIT_CONSOLIDATES_RE = re.compile(
+    r"\beach\s+time\s+this\s+model's\s+unit\s+Consolidates\b", re.IGNORECASE
 )
 _THIS_MODEL_NORMAL_OR_ADVANCE_MOVE_RE = re.compile(
     r"\beach\s+time\s+this\s+model\s+makes\s+a\s+"
@@ -230,7 +234,8 @@ _TARGET_RE = re.compile(
 _THIS_UNIT_RE = re.compile(r"\bthis\s+unit\b", re.IGNORECASE)
 _THIS_MODEL_RE = re.compile(r"\bthis\s+model\b", re.IGNORECASE)
 _THIS_MODEL_UNIT_RE = re.compile(
-    r"\b(?:a\s+)?models?\s+in\s+this\s+model's\s+unit\b",
+    r"\b(?:a\s+)?models?\s+in\s+this\s+model's\s+unit\b|"
+    r"\bthis\s+model's\s+unit\b",
     re.IGNORECASE,
 )
 _BEARER_APOSTROPHE_RE = r"'?"
@@ -291,8 +296,19 @@ _OBJECTIVE_REROLL_INSTEAD_RE = re.compile(
 )
 _SELECTED_UNIT_MAKES_ATTACK_RE = re.compile(
     r"\b(?:a\s+model|models?)\s+in\s+"
-    r"(?:that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit)\s+"
+    r"(?:this\s+model's\s+unit|that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit)\s+"
     r"makes?\s+an?\s+attack\b",
+    re.IGNORECASE,
+)
+_CONSOLIDATE_MOVE_DISTANCE_RE = re.compile(
+    r"\bit\s+can\s+move\s+up\s+to\s+(?P<new_distance>\d+(?:\.\d+)?)\"?\s+"
+    r"instead\s+of\s+up\s+to\s+(?P<replaced_distance>\d+(?:\.\d+)?)\"?\b",
+    re.IGNORECASE,
+)
+_BATTLE_SHOCK_TEST_RE = re.compile(
+    r"\b(?P<target>each\s+enemy\s+unit)\s+within\s+Engagement\s+Range\s+of\s+"
+    r"(?P<source>that\s+unit|this\s+unit|this\s+model's\s+unit)\s+must\s+take\s+"
+    r"a\s+Battle-shock\s+test\b",
     re.IGNORECASE,
 )
 _VP_RE = re.compile(
@@ -761,6 +777,8 @@ def _compile_clause(
             *_parse_restore_lost_wounds_effects(clause_text),
             *_parse_mortal_wound_effects(clause_text),
             *_parse_desperate_escape_effects(clause_text),
+            *_parse_battle_shock_test_effects(clause_text),
+            *_parse_fight_movement_distance_effects(clause_text),
             *_parse_movement_transit_permission_effects(clause_text),
         )
     )
@@ -978,7 +996,22 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                     ("edge", "after"),
                     ("phase", "charge"),
                     ("timing_window", "charge_move_end"),
-                    ("subject", _lower_group(charge_move_end_match, "subject")),
+                    ("subject", _charge_move_subject_token(charge_move_end_match.group("subject"))),
+                )
+            ),
+        )
+    consolidate_match = _THIS_MODEL_UNIT_CONSOLIDATES_RE.search(clause_text.text)
+    if consolidate_match is not None:
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, consolidate_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", "during"),
+                    ("phase", "fight"),
+                    ("timing_window", "consolidate_move"),
+                    ("subject", "this_unit"),
+                    ("movement_mode", "consolidate"),
                 )
             ),
         )
@@ -1773,6 +1806,17 @@ def _mortal_wounds_target_scope_token(value: str) -> str:
     raise RuleIRError(f"Unsupported mortal-wounds target: {value}.")
 
 
+def _charge_move_subject_token(value: str) -> str:
+    token = " ".join(value.lower().split())
+    if token in {"this model's unit", "this unit"}:
+        return "this_unit"
+    if token == "that unit":
+        return "that_unit"
+    if token == "a unit":
+        return "a_unit"
+    raise RuleIRError(f"Unsupported charge-move subject: {value}.")
+
+
 def _match_is_within_any_span(
     *,
     match: re.Match[str],
@@ -2181,6 +2225,52 @@ def _parse_desperate_escape_effects(clause_text: _ClauseText) -> tuple[RuleEffec
                         ("required", True),
                         ("roll_type", "desperate_escape"),
                         ("target_scope", "models_in_target_unit"),
+                    )
+                ),
+            )
+        )
+    return tuple(effects)
+
+
+def _parse_battle_shock_test_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+    effects: list[RuleEffectSpec] = []
+    for match in _BATTLE_SHOCK_TEST_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("status", "force_battle_shock_test"),
+                        ("required", True),
+                        ("rules_context", "battle_shock"),
+                        ("reason", "forced_by_ability"),
+                        ("target_scope", "enemy_units_within_engagement_range"),
+                        ("range_anchor", "this_unit"),
+                    )
+                ),
+            )
+        )
+    return tuple(effects)
+
+
+def _parse_fight_movement_distance_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+    effects: list[RuleEffectSpec] = []
+    for match in _CONSOLIDATE_MOVE_DISTANCE_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("movement_mode", "consolidate"),
+                        ("operation", "set_maximum"),
+                        ("distance_inches", float(match.group("new_distance"))),
+                        (
+                            "replaced_distance_inches",
+                            float(match.group("replaced_distance")),
+                        ),
+                        ("optional", True),
                     )
                 ),
             )

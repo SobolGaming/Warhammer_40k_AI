@@ -36,6 +36,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     movement_end_surge_hook_ids: list[str]
     reserve_arrival_distance_hook_ids: list[str]
     unit_move_completed_mortal_wound_hook_ids: list[str]
+    unit_move_completed_battle_shock_hook_ids: list[str]
     mortal_wound_feel_no_pain_hook_ids: list[str]
     charge_declaration_hook_ids: list[str]
     shooting_target_restriction_hook_ids: list[str]
@@ -142,6 +143,10 @@ def runtime_content_bundle_summary_payload(
         "unit_move_completed_mortal_wound_hook_ids": [
             binding.hook_id
             for binding in (bundle.unit_move_completed_mortal_wound_hook_registry.all_bindings())
+        ],
+        "unit_move_completed_battle_shock_hook_ids": [
+            binding.hook_id
+            for binding in (bundle.unit_move_completed_battle_shock_hook_registry.all_bindings())
         ],
         "mortal_wound_feel_no_pain_hook_ids": [
             binding.hook_id

@@ -2406,16 +2406,17 @@ class GameLifecycle:
         ):
             self._runtime_content_activation_input_hash = activation_input_hash
             return
-        self._runtime_content_bundle = build_runtime_content_bundle_for_armies(
+        bundle = build_runtime_content_bundle_for_armies(
             config=self._config,
             armies=armies,
         )
+        self._runtime_content_bundle = bundle
         self._setup_flow = replace(
             self._setup_flow,
-            battle_formation_hooks=self._runtime_content_bundle.battle_formation_hook_registry,
+            battle_formation_hooks=bundle.battle_formation_hook_registry,
         )
         runtime_stratagem_index = _combined_runtime_stratagem_index(
-            self._runtime_content_bundle,
+            bundle,
             base_indexes=(
                 self._command_phase_handler.stratagem_index,
                 self._movement_phase_handler.stratagem_index,
@@ -2425,119 +2426,81 @@ class GameLifecycle:
         )
         apply_enhancement_effects(
             state=state,
-            registry=self._runtime_content_bundle.enhancement_effect_registry,
+            registry=bundle.enhancement_effect_registry,
             decisions=self.decision_controller,
         )
         self._command_phase_handler = CommandPhaseHandler(
             stratagem_index=runtime_stratagem_index,
-            battle_shock_hooks=self._runtime_content_bundle.battle_shock_hook_registry,
-            command_phase_start_hooks=(
-                self._runtime_content_bundle.command_phase_start_hook_registry
-            ),
-            ability_indexes_by_player_id=(
-                self._runtime_content_bundle.ability_indexes_by_player_id
-            ),
-            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
+            battle_shock_hooks=bundle.battle_shock_hook_registry,
+            command_phase_start_hooks=bundle.command_phase_start_hook_registry,
+            ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
+            runtime_modifier_registry=bundle.runtime_modifier_registry,
         )
         self._movement_phase_handler = MovementPhaseHandler(
             ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
             army_catalog=self._movement_phase_handler.army_catalog,
             parameterized_proposals=self._movement_phase_handler.parameterized_proposals,
             stratagem_index=runtime_stratagem_index,
-            advance_eligibility_hooks=(
-                self._runtime_content_bundle.advance_eligibility_hook_registry
-            ),
-            advance_move_hooks=self._runtime_content_bundle.advance_move_hook_registry,
-            fall_back_hooks=self._runtime_content_bundle.fall_back_hook_registry,
-            movement_end_surge_hooks=(
-                self._runtime_content_bundle.movement_end_surge_hook_registry
-            ),
-            reserve_arrival_distance_hooks=(
-                self._runtime_content_bundle.reserve_arrival_distance_hook_registry
-            ),
+            advance_eligibility_hooks=bundle.advance_eligibility_hook_registry,
+            advance_move_hooks=bundle.advance_move_hook_registry,
+            fall_back_hooks=bundle.fall_back_hook_registry,
+            movement_end_surge_hooks=bundle.movement_end_surge_hook_registry,
+            reserve_arrival_distance_hooks=bundle.reserve_arrival_distance_hook_registry,
             unit_move_completed_mortal_wound_hooks=(
-                self._runtime_content_bundle.unit_move_completed_mortal_wound_hook_registry
+                bundle.unit_move_completed_mortal_wound_hook_registry
             ),
-            charge_target_restriction_hooks=(
-                self._runtime_content_bundle.charge_target_restriction_hook_registry
-            ),
-            stratagem_cost_modifier_registry=(
-                self._runtime_content_bundle.stratagem_cost_modifier_registry
-            ),
-            ability_indexes_by_player_id=(
-                self._runtime_content_bundle.ability_indexes_by_player_id
-            ),
-            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
+            charge_target_restriction_hooks=bundle.charge_target_restriction_hook_registry,
+            stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
+            ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
+            runtime_modifier_registry=bundle.runtime_modifier_registry,
         )
         self._charge_phase_handler = ChargePhaseHandler(
             ruleset_descriptor=self._charge_phase_handler.ruleset_descriptor,
-            charge_declaration_hooks=self._runtime_content_bundle.charge_declaration_hook_registry,
-            charge_target_restriction_hooks=(
-                self._runtime_content_bundle.charge_target_restriction_hook_registry
-            ),
+            charge_declaration_hooks=bundle.charge_declaration_hook_registry,
+            charge_target_restriction_hooks=bundle.charge_target_restriction_hook_registry,
             unit_move_completed_mortal_wound_hooks=(
-                self._runtime_content_bundle.unit_move_completed_mortal_wound_hook_registry
+                bundle.unit_move_completed_mortal_wound_hook_registry
             ),
-            ability_indexes_by_player_id=(
-                self._runtime_content_bundle.ability_indexes_by_player_id
+            unit_move_completed_battle_shock_hooks=(
+                bundle.unit_move_completed_battle_shock_hook_registry
             ),
-            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
+            battle_shock_hooks=bundle.battle_shock_hook_registry,
+            ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
+            runtime_modifier_registry=bundle.runtime_modifier_registry,
         )
         self._shooting_phase_handler = ShootingPhaseHandler(
             ruleset_descriptor=self._shooting_phase_handler.ruleset_descriptor,
             army_catalog=self._shooting_phase_handler.army_catalog,
             stratagem_index=runtime_stratagem_index,
-            shooting_unit_selected_hooks=(
-                self._runtime_content_bundle.shooting_unit_selected_hook_registry
-            ),
-            shooting_unit_selected_grant_hooks=(
-                self._runtime_content_bundle.shooting_unit_selected_grant_hook_registry
-            ),
-            shooting_target_restriction_hooks=(
-                self._runtime_content_bundle.shooting_target_restriction_hook_registry
-            ),
-            shooting_phase_start_hooks=(
-                self._runtime_content_bundle.shooting_phase_start_hook_registry
-            ),
-            shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
-            attack_sequence_completed_hooks=(
-                self._runtime_content_bundle.attack_sequence_completed_hook_registry
-            ),
-            stratagem_cost_modifier_registry=(
-                self._runtime_content_bundle.stratagem_cost_modifier_registry
-            ),
-            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
+            shooting_unit_selected_hooks=bundle.shooting_unit_selected_hook_registry,
+            shooting_unit_selected_grant_hooks=(bundle.shooting_unit_selected_grant_hook_registry),
+            shooting_target_restriction_hooks=bundle.shooting_target_restriction_hook_registry,
+            shooting_phase_start_hooks=bundle.shooting_phase_start_hook_registry,
+            shooting_end_surge_hooks=bundle.shooting_end_surge_hook_registry,
+            attack_sequence_completed_hooks=bundle.attack_sequence_completed_hook_registry,
+            stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
+            runtime_modifier_registry=bundle.runtime_modifier_registry,
         )
         self._fight_phase_handler = FightPhaseHandler(
             ruleset_descriptor=self._fight_phase_handler.ruleset_descriptor,
             army_catalog=self._fight_phase_handler.army_catalog,
             stratagem_index=runtime_stratagem_index,
-            fight_activation_ability_hooks=(
-                self._runtime_content_bundle.fight_activation_ability_hook_registry
-            ),
-            fight_unit_selected_hooks=(
-                self._runtime_content_bundle.fight_unit_selected_hook_registry
-            ),
-            fight_unit_selected_grant_hooks=(
-                self._runtime_content_bundle.fight_unit_selected_grant_hook_registry
-            ),
-            attack_sequence_completed_hooks=(
-                self._runtime_content_bundle.attack_sequence_completed_hook_registry
-            ),
-            fight_phase_start_hooks=self._runtime_content_bundle.fight_phase_start_hook_registry,
-            fight_phase_end_hooks=self._runtime_content_bundle.fight_phase_end_hook_registry,
-            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
+            fight_activation_ability_hooks=(bundle.fight_activation_ability_hook_registry),
+            fight_unit_selected_hooks=bundle.fight_unit_selected_hook_registry,
+            fight_unit_selected_grant_hooks=(bundle.fight_unit_selected_grant_hook_registry),
+            attack_sequence_completed_hooks=bundle.attack_sequence_completed_hook_registry,
+            fight_phase_start_hooks=bundle.fight_phase_start_hook_registry,
+            fight_phase_end_hooks=bundle.fight_phase_end_hook_registry,
+            runtime_modifier_registry=bundle.runtime_modifier_registry,
         )
         self._battle_round_flow = BattleRoundFlow(
             phase_handlers=self._phase_handlers(),
-            battle_round_start_hooks=self._runtime_content_bundle.battle_round_start_hook_registry,
-            turn_end_hooks=self._runtime_content_bundle.turn_end_hook_registry,
-            phase_end_objective_control_hooks=(
-                self._runtime_content_bundle.phase_end_objective_control_hook_registry
-            ),
-            unit_destroyed_hooks=self._runtime_content_bundle.unit_destroyed_hook_registry,
-            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
-            runtime_event_index=self._runtime_content_bundle.event_index,
+            battle_round_start_hooks=bundle.battle_round_start_hook_registry,
+            turn_end_hooks=bundle.turn_end_hook_registry,
+            phase_end_objective_control_hooks=bundle.phase_end_objective_control_hook_registry,
+            unit_destroyed_hooks=bundle.unit_destroyed_hook_registry,
+            runtime_modifier_registry=bundle.runtime_modifier_registry,
+            runtime_event_index=bundle.event_index,
             ruleset_descriptor=self._config.ruleset_descriptor,
             army_catalog=self._config.army_catalog,
         )
@@ -2545,7 +2508,7 @@ class GameLifecycle:
             config=self._config,
             armies=tuple(state.army_definitions),
         )
-        summary = self._runtime_content_bundle.to_summary_payload()
+        summary = bundle.to_summary_payload()
         self._runtime_content_audit = cast(
             Mapping[str, JsonValue],
             validate_json_value(summary),

@@ -50,7 +50,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_fall_back_eligibility_hook_bindings,
     catalog_named_weapon_ability_choice_hook_bindings,
     catalog_post_shoot_hit_target_status_hook_bindings,
-    catalog_unit_move_completed_mortal_wound_hook_bindings,
     catalog_weapon_profile_modifier_bindings,
 )
 from warhammer40k_core.engine.charge_declaration_hooks import (
@@ -69,6 +68,7 @@ from warhammer40k_core.engine.enhancement_effects import (
 from warhammer40k_core.engine.faction_content import bundle_payloads as _bundle_payloads
 from warhammer40k_core.engine.faction_content import bundle_validation as _bundle_validation
 from warhammer40k_core.engine.faction_content import catalog_runtime_hooks
+from warhammer40k_core.engine.faction_content import unit_move_completed as _unit_move_completed
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
@@ -193,6 +193,7 @@ from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedHookRegistry,
 )
 from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UnitMoveCompletedBattleShockHookRegistry,
     UnitMoveCompletedMortalWoundHookBinding,
     UnitMoveCompletedMortalWoundHookRegistry,
 )
@@ -201,6 +202,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction
 DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID = "runtime-content:module-default"
 EMPTY_NAMED_HANDLERS: Mapping[str, FactionRuleNamedHandler] = MappingProxyType({})
 _BundleSummaryPayload = _bundle_payloads.RuntimeContentBundleSummaryPayload
+_bundle_summary_payload = _bundle_payloads.runtime_content_bundle_summary_payload
 _Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
 _xrecords = faction_execution_2026_27.execution_records
 _summary_hash = _bundle_validation.summary_hash
@@ -1034,6 +1036,7 @@ class RuntimeContentBundle:
     movement_end_surge_hook_registry: MovementEndSurgeHookRegistry
     reserve_arrival_distance_hook_registry: ReserveArrivalDistanceHookRegistry
     unit_move_completed_mortal_wound_hook_registry: UnitMoveCompletedMortalWoundHookRegistry
+    unit_move_completed_battle_shock_hook_registry: UnitMoveCompletedBattleShockHookRegistry
     mortal_wound_feel_no_pain_hook_registry: MortalWoundFeelNoPainContinuationHookRegistry
     charge_declaration_hook_registry: ChargeDeclarationHookRegistry
     shooting_target_restriction_hook_registry: ShootingTargetRestrictionHookRegistry
@@ -1129,6 +1132,13 @@ class RuntimeContentBundle:
         ):
             raise GameLifecycleError(
                 "RuntimeContentBundle requires UnitMoveCompletedMortalWoundHookRegistry."
+            )
+        if (
+            type(self.unit_move_completed_battle_shock_hook_registry)
+            is not UnitMoveCompletedBattleShockHookRegistry
+        ):
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires UnitMoveCompletedBattleShockHookRegistry."
             )
         if (
             type(self.mortal_wound_feel_no_pain_hook_registry)
@@ -1506,19 +1516,16 @@ class RuntimeContentBundle:
             )
         )
         unit_move_completed_mortal_wound_hook_registry = (
-            UnitMoveCompletedMortalWoundHookRegistry.from_bindings(
-                (
-                    *catalog_unit_move_completed_mortal_wound_hook_bindings(
-                        ability_indexes_by_player_id=ability_indexes_by_player_id,
-                        armies=validated_armies,
-                    ),
-                    *_contribution_values(
-                        validated_contributions,
-                        lambda contribution: (
-                            contribution.unit_move_completed_mortal_wound_hook_bindings
-                        ),
-                    ),
-                )
+            _unit_move_completed.unit_move_completed_mortal_wound_hook_registry(
+                ability_indexes_by_player_id=ability_indexes_by_player_id,
+                armies=validated_armies,
+                contributions=validated_contributions,
+            )
+        )
+        unit_move_completed_battle_shock_hook_registry = (
+            _unit_move_completed.catalog_unit_move_completed_battle_shock_hook_registry(
+                ability_indexes_by_player_id=ability_indexes_by_player_id,
+                armies=validated_armies,
             )
         )
         mortal_wound_feel_no_pain_hook_registry = (
@@ -1633,6 +1640,7 @@ class RuntimeContentBundle:
                     activation=activation,
                     execution_records=records,
                 ),
+                *catalog_rules.fight_activation_ability_hook_bindings(),
                 *_contribution_values(
                     validated_contributions,
                     lambda contribution: contribution.fight_activation_ability_hook_bindings,
@@ -1715,7 +1723,8 @@ class RuntimeContentBundle:
                 lambda contribution: contribution.hit_roll_modifier_bindings,
             )
             + damaged_runtime.hit_roll_bindings(),
-            wound_roll_modifier_bindings=_contribution_values(
+            wound_roll_modifier_bindings=catalog_rules.wound_roll_modifier_bindings()
+            + _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.wound_roll_modifier_bindings,
             ),
@@ -1798,6 +1807,9 @@ class RuntimeContentBundle:
             unit_move_completed_mortal_wound_hook_registry=(
                 unit_move_completed_mortal_wound_hook_registry
             ),
+            unit_move_completed_battle_shock_hook_registry=(
+                unit_move_completed_battle_shock_hook_registry
+            ),
             mortal_wound_feel_no_pain_hook_registry=mortal_wound_feel_no_pain_hook_registry,
             charge_declaration_hook_registry=charge_declaration_hook_registry,
             shooting_target_restriction_hook_registry=shooting_target_restriction_hook_registry,
@@ -1825,10 +1837,7 @@ class RuntimeContentBundle:
         )
 
     def to_summary_payload(self) -> _BundleSummaryPayload:
-        return _bundle_payloads.runtime_content_bundle_summary_payload(
-            self,
-            summary_hash=_summary_hash,
-        )
+        return _bundle_summary_payload(self, summary_hash=_summary_hash)
 
 
 def _validate_contributions(contributions: object) -> tuple[RuntimeContentContribution, ...]:

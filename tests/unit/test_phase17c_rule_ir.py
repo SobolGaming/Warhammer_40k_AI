@@ -44,6 +44,9 @@ from warhammer40k_core.engine.catalog_command_point_support import (
     command_point_consumer_ids_for_clause,
     command_point_effect,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_support import (
+    CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_movement_transit import (
     movement_mode_tokens_or_none as _movement_mode_tokens_or_none,
 )
@@ -76,6 +79,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     _movement_transit_permissions_from_clause,  # pyright: ignore[reportPrivateUsage]
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
+)
+from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_support import (
+    CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -3442,6 +3448,119 @@ def test_phase17c_selected_enemy_attack_wound_debuff_marks_attacker_role() -> No
     assert CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(rule_ir)
     assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(
         rule_ir
+    )
+
+
+def test_phase17c_leading_unit_wound_roll_bonus_is_runtime_consumed() -> None:
+    rule_ir = _compiled(
+        "While this model is leading a unit, each time a model in that unit makes an "
+        "attack, add 1 to the Wound roll."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    condition = clause.conditions[0]
+    effect = clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.DICE_ROLL
+    assert parameter_payload(clause.trigger.parameters) == {"roll_type": "wound"}
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.SELECTED_UNIT
+    assert condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+    assert parameter_payload(condition.parameters) == {"relationship": "this_model_leading_unit"}
+    assert effect.kind is RuleEffectKind.MODIFY_DICE_ROLL
+    assert parameter_payload(effect.parameters) == {
+        "attack_role": "attacker",
+        "delta": 1,
+        "roll_type": "wound",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+    )
+
+
+def test_phase17c_consolidation_distance_modifier_is_runtime_consumed() -> None:
+    rule_ir = _compiled(
+        'Each time this model\'s unit Consolidates, it can move up to 6" instead of up to 3".'
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    effect = clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "during",
+        "movement_mode": "consolidate",
+        "phase": "fight",
+        "subject": "this_unit",
+        "timing_window": "consolidate_move",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert effect.kind is RuleEffectKind.MODIFY_MOVE_DISTANCE
+    assert parameter_payload(effect.parameters) == {
+        "distance_inches": 6.0,
+        "movement_mode": "consolidate",
+        "operation": "set_maximum",
+        "optional": True,
+        "replaced_distance_inches": 3.0,
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
+    )
+
+
+def test_phase17c_charge_end_engagement_battle_shock_is_runtime_consumed() -> None:
+    rule_ir = _compiled(
+        "Each time this model's unit ends a Charge move, each enemy unit within Engagement "
+        "Range of that unit must take a Battle-shock test."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    condition = clause.conditions[0]
+    effect = clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "after",
+        "phase": "charge",
+        "subject": "this_unit",
+        "timing_window": "charge_move_end",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+    assert parameter_payload(condition.parameters) == {
+        "distance_inches": None,
+        "negated": False,
+        "object_kind": "unit",
+        "object_reference": "that",
+        "predicate": "within_engagement_range",
+        "qualifier": None,
+        "range_kind": "engagement_range",
+    }
+    assert effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS
+    assert parameter_payload(effect.parameters) == {
+        "range_anchor": "this_unit",
+        "reason": "forced_by_ability",
+        "required": True,
+        "rules_context": "battle_shock",
+        "status": "force_battle_shock_test",
+        "target_scope": "enemy_units_within_engagement_range",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID,
     )
 
 

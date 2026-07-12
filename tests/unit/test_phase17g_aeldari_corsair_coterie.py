@@ -42,6 +42,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.advance_hooks import (
     DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
     SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE,
@@ -64,6 +65,7 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationRequestContext,
     BattleFormationResultContext,
 )
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     ModelPlacement,
@@ -202,14 +204,19 @@ from warhammer40k_core.engine.turn_end_hooks import (
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UNIT_MOVE_COMPLETED_BATTLE_SHOCK_RESOLVED_EVENT,
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_IGNORED_EVENT,
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_PENDING_EVENT,
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT,
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_ROLLED_EVENT,
+    UnitMoveCompletedBattleShockEffect,
+    UnitMoveCompletedBattleShockHookBinding,
+    UnitMoveCompletedBattleShockHookRegistry,
     UnitMoveCompletedContext,
     UnitMoveCompletedMortalWoundEffect,
     UnitMoveCompletedMortalWoundHookBinding,
     UnitMoveCompletedMortalWoundHookRegistry,
+    resolve_unit_move_completed_battle_shock_hooks,
     resolve_unit_move_completed_mortal_wound_hooks,
 )
 from warhammer40k_core.engine.unit_state import starting_strength_records_for_units
@@ -4255,6 +4262,175 @@ def test_unit_move_completed_mortal_wound_hooks_resolve_and_validate() -> None:
         ).effects_for(context)
 
 
+def test_unit_move_completed_battle_shock_hooks_resolve_and_validate() -> None:
+    state, corsair_army, enemy_army = _corsair_state(
+        phase=BattlePhase.CHARGE,
+        active_player_id="player-a",
+    )
+    enemy_unit = _unit_with_leadership(enemy_army.units[0], leadership=6)
+    enemy_army = replace(enemy_army, units=(enemy_unit,))
+    state.army_definitions = [corsair_army, enemy_army]
+    state.starting_strength_records = [
+        record
+        for army in state.army_definitions
+        for record in starting_strength_records_for_units(
+            player_id=army.player_id,
+            units=army.units,
+        )
+    ]
+    decisions = DecisionController()
+    decisions.event_log.append(
+        "test_charge_completed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.CHARGE.value,
+            "active_player_id": "player-a",
+            "unit_instance_id": _CORSAIR_UNIT_ID,
+            "movement_phase_action": "charge_move",
+        },
+    )
+
+    def battle_shock_handler(
+        context: UnitMoveCompletedContext,
+    ) -> tuple[UnitMoveCompletedBattleShockEffect, ...]:
+        return (
+            UnitMoveCompletedBattleShockEffect(
+                hook_id="battle-shock-hook",
+                source_id="battle-shock-source",
+                source_rule_id="battle-shock-source",
+                target_unit_instance_id=_ENEMY_UNIT_ID,
+                target_player_id="player-b",
+                trigger_event_id=context.trigger_event_id,
+                replay_payload={"test": "battle-shock"},
+            ),
+        )
+
+    registry = UnitMoveCompletedBattleShockHookRegistry.from_bindings(
+        (
+            UnitMoveCompletedBattleShockHookBinding(
+                hook_id="battle-shock-hook",
+                source_id="battle-shock-source",
+                handler=battle_shock_handler,
+            ),
+        )
+    )
+    ability_indexes = {"player-b": AbilityCatalogIndex.from_records(())}
+
+    resolve_unit_move_completed_battle_shock_hooks(
+        state=state,
+        decisions=decisions,
+        registry=registry,
+        battle_shock_hooks=BattleShockHookRegistry.empty(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.CHARGE,
+        event_type="test_charge_completed",
+        movement_actions=("charge_move",),
+        ability_indexes_by_player_id=ability_indexes,
+    )
+
+    event_types = {record.event_type for record in decisions.event_log.records}
+    assert "battle_shock_test_requested" in event_types
+    assert "battle_shock_test_resolved" in event_types
+    assert UNIT_MOVE_COMPLETED_BATTLE_SHOCK_RESOLVED_EVENT in event_types
+    event_count_after_first_resolution = len(decisions.event_log.records)
+    resolve_unit_move_completed_battle_shock_hooks(
+        state=state,
+        decisions=decisions,
+        registry=registry,
+        battle_shock_hooks=BattleShockHookRegistry.empty(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.CHARGE,
+        event_type="test_charge_completed",
+        movement_actions=("charge_move",),
+        ability_indexes_by_player_id=ability_indexes,
+    )
+    assert len(decisions.event_log.records) == event_count_after_first_resolution
+
+    context = UnitMoveCompletedContext(
+        state=state,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.CHARGE,
+        trigger_event_id="event-drift",
+        trigger_event_payload={"payload": "ok"},
+        triggering_unit_instance_id=_CORSAIR_UNIT_ID,
+        triggering_player_id="player-a",
+        movement_action="charge_move",
+        ability_indexes_by_player_id=ability_indexes,
+        decisions=decisions,
+    )
+    with pytest.raises(GameLifecycleError, match="Unsupported BattleShockTestReason"):
+        UnitMoveCompletedBattleShockEffect(
+            hook_id="battle-shock-hook",
+            source_id="battle-shock-source",
+            source_rule_id="battle-shock-source",
+            target_unit_instance_id=_ENEMY_UNIT_ID,
+            target_player_id="player-b",
+            trigger_event_id="event-drift",
+            reason=cast(Any, "bad-reason"),
+        )
+    with pytest.raises(GameLifecycleError, match="hook IDs must be unique"):
+        UnitMoveCompletedBattleShockHookRegistry.from_bindings(
+            (registry.all_bindings()[0], registry.all_bindings()[0])
+        )
+    with pytest.raises(GameLifecycleError, match="handler must be callable"):
+        UnitMoveCompletedBattleShockHookBinding(
+            hook_id="bad-handler",
+            source_id="battle-shock-source",
+            handler=cast(Any, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="Battle-shock hooks require a context"):
+        registry.effects_for(cast(UnitMoveCompletedContext, object()))
+    with pytest.raises(GameLifecycleError, match="effect tuple"):
+        UnitMoveCompletedBattleShockHookRegistry.from_bindings(
+            (
+                UnitMoveCompletedBattleShockHookBinding(
+                    hook_id="bad-return",
+                    source_id="battle-shock-source",
+                    handler=lambda _context: cast(
+                        tuple[UnitMoveCompletedBattleShockEffect, ...],
+                        [],
+                    ),
+                ),
+            )
+        ).effects_for(context)
+    with pytest.raises(GameLifecycleError, match="hook_id drift"):
+        UnitMoveCompletedBattleShockHookRegistry.from_bindings(
+            (
+                UnitMoveCompletedBattleShockHookBinding(
+                    hook_id="expected-hook",
+                    source_id="battle-shock-source",
+                    handler=lambda _context: (
+                        UnitMoveCompletedBattleShockEffect(
+                            hook_id="drifted-hook",
+                            source_id="battle-shock-source",
+                            source_rule_id="battle-shock-source",
+                            target_unit_instance_id=_ENEMY_UNIT_ID,
+                            target_player_id="player-b",
+                            trigger_event_id="event-drift",
+                        ),
+                    ),
+                ),
+            )
+        ).effects_for(context)
+    with pytest.raises(GameLifecycleError, match="requires Battle-shock hooks"):
+        resolve_unit_move_completed_battle_shock_hooks(
+            state=state,
+            decisions=decisions,
+            registry=registry,
+            battle_shock_hooks=cast(BattleShockHookRegistry, object()),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.CHARGE,
+            event_type="test_charge_completed",
+            movement_actions=("charge_move",),
+            ability_indexes_by_player_id=ability_indexes,
+        )
+
+
 def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
     state, _corsair_army, _enemy_army = _corsair_state(
         phase=BattlePhase.MOVEMENT,
@@ -5431,6 +5607,22 @@ def _unit(
         datasheet_source_ids=(f"source:{datasheet_id}",),
         own_models=(model,),
         wargear_selections=(),
+    )
+
+
+def _unit_with_leadership(unit: UnitInstance, *, leadership: int) -> UnitInstance:
+    model = unit.own_models[0]
+    return replace(
+        unit,
+        own_models=(
+            replace(
+                model,
+                characteristics=(
+                    *model.characteristics,
+                    CharacteristicValue.from_raw(Characteristic.LEADERSHIP, leadership),
+                ),
+            ),
+        ),
     )
 
 

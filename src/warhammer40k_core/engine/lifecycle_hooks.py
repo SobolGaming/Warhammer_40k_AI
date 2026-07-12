@@ -26,6 +26,7 @@ class LifecycleHookEvent(StrEnum):
     MOVEMENT_END_SURGE = "movement_end_surge"
     RESERVE_ARRIVAL_DISTANCE = "reserve_arrival_distance"
     UNIT_MOVE_COMPLETED_MORTAL_WOUND = "unit_move_completed_mortal_wound"
+    UNIT_MOVE_COMPLETED_BATTLE_SHOCK = "unit_move_completed_battle_shock"
     MORTAL_WOUND_FEEL_NO_PAIN_CONTINUATION = "mortal_wound_feel_no_pain_continuation"
     CHARGE_DECLARATION = "charge_declaration"
     SHOOTING_TARGET_RESTRICTION = "shooting_target_restriction"
