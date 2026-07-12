@@ -7743,7 +7743,7 @@ def test_phase17k_bridge_normalizes_core_keyword_ability_timing_and_parameters()
 
 def test_phase17k_bridge_normalizes_conditioned_wargear_weapon_keywords() -> None:
     artifacts = _conditioned_weapon_keyword_bridge_artifacts(
-        "[LETHAL HITS: non-MONSTER/VEHICLE, RAPID FIRE 1]"
+        "[LETHAL HITS: non-MONSTER/VEHICLE, RAPID FIRE 1, C'tan Power]"
     )
     wargear_row = _artifact_by_table(artifacts, "Datasheets_wargear").rows[0]
     wargear_fields = wargear_row.runtime_fields_payload()
@@ -7756,9 +7756,10 @@ def test_phase17k_bridge_normalizes_conditioned_wargear_weapon_keywords() -> Non
     abilities_by_kind = {ability.ability_kind: ability for ability in profile.abilities}
     lethal = abilities_by_kind[AbilityKind.LETHAL_HITS]
 
-    assert wargear_fields["weapon_keywords"] == "Lethal Hits,Rapid Fire"
+    assert wargear_fields["weapon_keywords"] == "C'tan Power,Lethal Hits,Rapid Fire"
     assert wargear_fields["weapon_abilities"]
     assert tuple(keyword.value for keyword in profile.keywords) == (
+        WeaponKeyword.CTAN_POWER.value,
         WeaponKeyword.LETHAL_HITS.value,
         WeaponKeyword.RAPID_FIRE.value,
     )

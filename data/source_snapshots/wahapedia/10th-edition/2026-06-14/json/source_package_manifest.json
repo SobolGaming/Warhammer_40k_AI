@@ -49,7 +49,7 @@
       "artifact_name": "Datasheets_unit_composition.json"
     },
     {
-      "artifact_hash": "75c7de227690056f634b7d6d5038500a1185e8d4c8a0b3e17c5ee044eedeec68",
+      "artifact_hash": "21a0f8444e15a20f3481df4a83f52f7eb676e682e89ab08757556b48949f1b93",
       "artifact_name": "Datasheets_wargear.json"
     },
     {
@@ -85,7 +85,7 @@
     "source_date": "2026-06-14",
     "version_id": "wahapedia-10th-edition-2026-06-14"
   },
-  "package_hash": "8d864acb52e813bc22176b85dc4c21e28d4fef4bc581b90f2a84ee575cb10129",
+  "package_hash": "a5492e18e9980848b6e09bde137d6fda3cb72dd2c73263b20407c299a7799bcd",
   "package_id": {
     "namespace": "wahapedia",
     "package_name": "source-mirror",

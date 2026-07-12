@@ -30,6 +30,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
     ModelHeightDefinition,
     ModelZOffsetDefinition,
 )
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.geometry.model_geometry import (
     GeometrySourceKind,
     HeightSourceKind,
@@ -195,6 +196,13 @@ def test_phase17b_oval_base_and_melee_weapon_source_rows_are_canonicalized() -> 
     assert math.isclose(runtime_geometry.primary_part().radius_x_inches, 75.0 / 25.4 / 2.0)
     assert weapon_profile.range_profile.kind.value == "melee"
     assert weapon_profile.keywords[0].value == "Sustained Hits"
+
+
+def test_phase17b_canonical_catalog_accepts_ctan_power_weapon_keyword() -> None:
+    package = _catalog_package(weapon_keywords="Blast,C'tan Power")
+    profile = package.army_catalog.wargear[0].weapon_profiles[0]
+
+    assert profile.keywords == (WeaponKeyword.BLAST, WeaponKeyword.CTAN_POWER)
 
 
 def test_phase17b_wargear_faction_detachment_enhancement_and_stratagem_records_round_trip() -> None:

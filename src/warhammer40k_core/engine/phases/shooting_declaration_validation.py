@@ -47,6 +47,7 @@ __all__ = (
     "_validate_duplicate_weapon_ability_selection",
     "_validate_model_pistol_exclusivity",
     "_validate_out_of_phase_declaration_submission",
+    "_validate_shooting_weapon_selection_limit",
 )
 
 
@@ -267,6 +268,7 @@ def _attack_pools_or_validation(
     attack_pools: list[RangedAttackPool] = []
     seen_declaration_keys: set[tuple[str, str, str, str | None, str | None]] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
+    shooting_weapon_selection_counts: dict[tuple[str, str, WeaponKeyword, str], int] = {}
     snap_target_unit_ids: set[str] = set()
     for declaration_index, declaration in enumerate(proposal.declarations, start=1):
         key = _declaration_available_weapon_key(declaration)
@@ -374,6 +376,15 @@ def _attack_pools_or_validation(
             target_unit_instance_id=declaration.target_unit_instance_id,
             profile=weapon_profile,
         )
+        selection_limit_validation = _validate_shooting_weapon_selection_limit(
+            proposal=proposal,
+            source_unit=source_unit,
+            declaration=declaration,
+            weapon_profile=weapon_profile,
+            selection_counts=shooting_weapon_selection_counts,
+        )
+        if selection_limit_validation is not None:
+            return selection_limit_validation
         ability_selection_validation = _validate_duplicate_weapon_ability_selection(
             proposal=proposal,
             declaration=declaration,
@@ -469,6 +480,51 @@ def _attack_pools_or_validation(
             field="declarations",
         )
     return (tuple(attack_pools), ineligible_unit_ids)
+
+
+def _validate_shooting_weapon_selection_limit(
+    *,
+    proposal: ShootingDeclarationProposal,
+    source_unit: UnitInstance,
+    declaration: WeaponDeclaration,
+    weapon_profile: WeaponProfile,
+    selection_counts: dict[tuple[str, str, WeaponKeyword, str], int],
+) -> ShootingProposalValidationResult | None:
+    if type(proposal) is not ShootingDeclarationProposal:
+        raise GameLifecycleError("Shooting weapon selection limit requires a proposal.")
+    if type(source_unit) is not UnitInstance:
+        raise GameLifecycleError("Shooting weapon selection limit requires a source unit.")
+    if type(declaration) is not WeaponDeclaration:
+        raise GameLifecycleError("Shooting weapon selection limit requires a declaration.")
+    if type(weapon_profile) is not WeaponProfile:
+        raise GameLifecycleError("Shooting weapon selection limit requires a weapon profile.")
+    if type(selection_counts) is not dict:
+        raise GameLifecycleError("Shooting weapon selection limit counts must be a dict.")
+    model = _model_by_id(source_unit, declaration.attacker_model_instance_id)
+    if model is None:
+        raise GameLifecycleError("Shooting weapon selection limit model was not found.")
+    limit = catalog_damaged_shooting_weapon_selection_limit_for_profile(
+        unit=source_unit,
+        model=model,
+        profile=weapon_profile,
+    )
+    if limit is None:
+        return None
+    key = (
+        source_unit.unit_instance_id,
+        model.model_instance_id,
+        limit.weapon_keyword,
+        limit.damaged_effect_id,
+    )
+    selection_counts[key] = selection_counts.get(key, 0) + 1
+    if selection_counts[key] <= limit.max_selections:
+        return None
+    return ShootingProposalValidationResult.invalid(
+        proposal_request_id=proposal.proposal_request_id,
+        violation_code="shooting_weapon_selection_limit_exceeded",
+        message="Declared shooting weapons exceed the engine-emitted selection limit.",
+        field="declarations",
+    )
 
 
 def _validate_duplicate_weapon_ability_selection(

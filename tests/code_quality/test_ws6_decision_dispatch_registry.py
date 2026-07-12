@@ -24,8 +24,9 @@ ADAPTER_CONTRACT = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
 _NESTED_DECISION_TYPE_ALLOWLIST = {
     WEAPON_ABILITY_SELECTION_DECISION_TYPE: (
         "Nested allowlist entry for duplicate weapon-ability descriptor disambiguation in "
-        "shooting declarations. Tesseract Vault C'tan Power weapon selection is a separate "
-        "top-level decision family using DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT."
+        "shooting declarations. Tesseract Vault C'tan Power weapon selection is emitted "
+        "inside submit_shooting_declaration using "
+        "DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT."
     ),
 }
 

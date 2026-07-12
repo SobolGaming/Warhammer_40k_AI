@@ -34,6 +34,7 @@ __all__ = (
     "_shooting_types_for_candidate_payload",
     "_shooting_types_for_selected_type",
     "_shooting_types_for_selected_type_for_rules_unit",
+    "_shooting_weapon_selection_limits_for_request",
     "_target_candidate_payload_for_request",
     "request_out_of_phase_shooting_declaration",
 )
@@ -255,6 +256,10 @@ def _request_shooting_declaration(
             army_catalog=army_catalog,
         ),
         "available_weapons": [_available_weapon_to_payload(weapon) for weapon in available_weapons],
+        "shooting_weapon_selection_limits": _shooting_weapon_selection_limits_for_request(
+            rules_unit=rules_unit,
+            available_weapons=available_weapons,
+        ),
         "target_candidates": target_candidates,
     }
     request = DecisionRequest(
@@ -377,6 +382,68 @@ def request_out_of_phase_shooting_declaration(
             ShootingType.SNAP if source_rule_id == FIRE_OVERWATCH_RULE_ID else None
         ),
     )
+
+
+def _shooting_weapon_selection_limits_for_request(
+    *,
+    rules_unit: RulesUnitView,
+    available_weapons: tuple[_AvailableWeapon, ...],
+) -> list[ShootingWeaponSelectionLimitPayload]:
+    limits_by_key: dict[
+        tuple[str, str, WeaponKeyword, str],
+        tuple[CatalogDamagedShootingWeaponSelectionLimit, set[str]],
+    ] = {}
+    for weapon in available_weapons:
+        unit = _component_unit_for_available_weapon(
+            rules_unit=rules_unit,
+            weapon=weapon,
+        )
+        model = _model_by_id(unit, weapon["model_instance_id"])
+        if model is None:
+            raise GameLifecycleError("Shooting weapon selection limit model was not found.")
+        limit = catalog_damaged_shooting_weapon_selection_limit_for_profile(
+            unit=unit,
+            model=model,
+            profile=weapon["weapon_profile"],
+        )
+        if limit is None:
+            continue
+        key = (
+            unit.unit_instance_id,
+            model.model_instance_id,
+            limit.weapon_keyword,
+            limit.damaged_effect_id,
+        )
+        stored = limits_by_key.get(key)
+        if stored is None:
+            limits_by_key[key] = (limit, {weapon["weapon_profile"].profile_id})
+            continue
+        stored_limit, profile_ids = stored
+        if stored_limit != limit:
+            raise GameLifecycleError("Shooting weapon selection limit drifted within request.")
+        profile_ids.add(weapon["weapon_profile"].profile_id)
+    return [
+        {
+            "unit_instance_id": unit_id,
+            "model_instance_id": model_id,
+            "weapon_keyword": limit.weapon_keyword.value,
+            "max_selections": limit.max_selections,
+            "baseline_max_selections": limit.baseline_max_selections,
+            "damaged_effect_id": limit.damaged_effect_id,
+            "source_id": limit.source_id,
+            "damaged_profile_active": limit.damaged_profile_active,
+            "weapon_profile_ids": sorted(profile_ids),
+        }
+        for (unit_id, model_id, _keyword, _effect_id), (limit, profile_ids) in sorted(
+            limits_by_key.items(),
+            key=lambda item: (
+                item[0][0],
+                item[0][1],
+                item[0][2].value,
+                item[0][3],
+            ),
+        )
+    ]
 
 
 def _target_candidate_payload_for_request(

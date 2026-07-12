@@ -42,6 +42,7 @@ class WeaponKeyword(StrEnum):
     MELTA = "Melta"
     ONE_SHOT = "One Shot"
     HUNTER = "Hunter"
+    CTAN_POWER = "C'tan Power"
 
 
 class AbilityKind(StrEnum):
