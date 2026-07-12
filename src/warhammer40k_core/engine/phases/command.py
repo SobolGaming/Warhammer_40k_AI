@@ -15,7 +15,10 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockDiceExpressionContext,
     BattleShockForcedTestContext,
     BattleShockHookRegistry,
-    BattleShockRerollPermissionContext,
+)
+from warhammer40k_core.engine.battle_shock_resolution import (
+    record_battle_shock_result_and_outcome_events,
+    resolve_battle_shock_test_with_optional_reroll,
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
@@ -49,9 +52,8 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.phases.command_battle_shock_rerolls import (
+    COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
     apply_battle_shock_reroll_decision,
-    build_battle_shock_reroll_request,
-    record_battle_shock_result_and_outcomes,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
@@ -1162,6 +1164,34 @@ def _battle_shock_auto_pass_effect(
     return matched_effect
 
 
+def _battle_shock_result_base_payload(
+    *,
+    state: GameState,
+    active_player_id: str,
+) -> dict[str, JsonValue]:
+    return {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "active_player_id": active_player_id,
+        "phase": BattlePhase.COMMAND.value,
+    }
+
+
+def _battle_shock_result_payload(resolved_payload: dict[str, JsonValue]) -> JsonValue:
+    return validate_json_value(
+        _json_object(
+            resolved_payload.get("battle_shock_result"),
+            context="Battle-shock result payload",
+        )
+    )
+
+
+def _json_object(value: JsonValue, *, context: str) -> dict[str, JsonValue]:
+    if not isinstance(value, dict):
+        raise GameLifecycleError(f"{context} must be an object.")
+    return value
+
+
 def _resolve_battle_shock_step(
     *,
     state: GameState,
@@ -1243,39 +1273,32 @@ def _resolve_battle_shock_step(
             state=state,
             unit_instance_id=request.unit_instance_id,
         )
+        base_payload = _battle_shock_result_base_payload(
+            state=state,
+            active_player_id=active_player_id,
+        )
         if auto_pass_effect is None:
             roll_state = manager.roll(request.spec)
-            permission = battle_shock_hooks.reroll_permission_for(
-                BattleShockRerollPermissionContext(
-                    state=state,
-                    request=request,
-                    active_player_id=active_player_id,
-                    phase=BattlePhase.COMMAND,
-                    phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
-                )
+            resolution = resolve_battle_shock_test_with_optional_reroll(
+                state=state,
+                decisions=decisions,
+                manager=manager,
+                battle_shock_hooks=battle_shock_hooks,
+                request=request,
+                roll_state=roll_state,
+                active_player_id=active_player_id,
+                phase=BattlePhase.COMMAND,
+                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+                source_kind=COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
+                base_payload=base_payload,
+                resolved_event_types=("battle_shock_test_resolved",),
+                pending_phase_body_status="battle_shock_reroll_pending",
             )
-            if permission is not None:
-                reroll_request = build_battle_shock_reroll_request(
-                    state=state,
-                    decisions=decisions,
-                    request=request,
-                    roll_state=roll_state,
-                    permission=permission,
-                    active_player_id=active_player_id,
-                    phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
-                )
-                decisions.request_decision(reroll_request)
-                return LifecycleStatus.waiting_for_decision(
-                    stage=GameLifecycleStage.BATTLE,
-                    decision_request=reroll_request,
-                    payload={
-                        "phase": BattlePhase.COMMAND.value,
-                        "phase_body_status": "battle_shock_reroll_pending",
-                        "battle_round": state.battle_round,
-                        "active_player_id": active_player_id,
-                        "unit_instance_id": request.unit_instance_id,
-                    },
-                )
+            if resolution.pending_status is not None:
+                return resolution.pending_status
+            if resolution.resolved_payload is None:
+                raise GameLifecycleError("Battle-shock resolution did not return a result.")
+            result_payload = _battle_shock_result_payload(resolution.resolved_payload)
         else:
             roll_state = manager.roll_fixed(
                 request.spec,
@@ -1292,17 +1315,26 @@ def _resolve_battle_shock_step(
                     "persisting_effect": validate_json_value(auto_pass_effect.to_payload()),
                 },
             )
-        result_payload = record_battle_shock_result_and_outcomes(
-            state=state,
-            decisions=decisions,
-            manager=manager,
-            battle_shock_hooks=battle_shock_hooks,
-            request=request,
-            roll_state=roll_state,
-            active_player_id=active_player_id,
-            auto_passed=auto_pass_effect is not None,
-            phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
-        )
+            resolved_payload = record_battle_shock_result_and_outcome_events(
+                state=state,
+                decisions=decisions,
+                manager=manager,
+                battle_shock_hooks=battle_shock_hooks,
+                request=request,
+                roll_state=roll_state,
+                active_player_id=active_player_id,
+                phase=BattlePhase.COMMAND,
+                auto_passed=True,
+                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+                base_payload=base_payload,
+                resolved_event_types=("battle_shock_test_resolved",),
+            )
+            result_payload = _battle_shock_result_payload(
+                _json_object(
+                    resolved_payload,
+                    context="Battle-shock resolved payload",
+                )
+            )
         result_payloads.append(result_payload)
         command_state = _command_step_state(state).with_completed_battle_shock_test_request(
             request.request_id
