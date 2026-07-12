@@ -8,11 +8,16 @@ from typing import cast
 import pytest
 from tests.phase11c_command_phase_helpers import (
     battle_state,
+    ruleset,
 )
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DamagedEffectDefinition, DamagedEffectKind
-from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
+from warhammer40k_core.core.dice import (
+    DiceRollResult,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
+)
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.weapon_profiles import (
     AttackProfile,
@@ -21,6 +26,12 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+    resolve_attack_sequence_until_blocked,
+)
 from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartHookRegistry,
     BattleRoundStartRequestContext,
@@ -30,6 +41,7 @@ from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
@@ -43,12 +55,14 @@ from warhammer40k_core.engine.runtime_modifiers import (
     MovementBudgetModifierContext,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_context_for_unit,
     source_backed_reroll_permission_effect_payload,
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 
 
 def test_battle_round_start_gains_miracle_die_once_for_adepta_army() -> None:
@@ -421,7 +435,7 @@ def test_triumph_relics_censer_and_argent_shroud_expose_reroll_support() -> None
         state=state,
         player_id="player-a",
         unit_instance_id=triumph.unit_instance_id,
-        roll_type="wound_roll",
+        roll_type="attack_sequence.wound",
         timing_window="attack_sequence.wound",
         attack_kind="ranged",
     )
@@ -429,7 +443,7 @@ def test_triumph_relics_censer_and_argent_shroud_expose_reroll_support() -> None
         state=state,
         player_id="player-a",
         unit_instance_id=triumph.unit_instance_id,
-        roll_type="wound_roll",
+        roll_type="attack_sequence.wound",
         timing_window="attack_sequence.wound",
         attack_kind="melee",
     )
@@ -462,6 +476,40 @@ def test_triumph_relics_censer_and_argent_shroud_expose_reroll_support() -> None
             weapon_profile=melee_profile,
         )
         == ()
+    )
+
+
+def test_triumph_argent_shroud_attack_sequence_requests_ranged_wound_reroll_only() -> None:
+    ranged_request = _source_backed_argent_shroud_attack_reroll_request(
+        source_phase=BattlePhase.SHOOTING,
+        melee=False,
+    )
+    assert ranged_request is not None
+    assert ranged_request.decision_type == DICE_REROLL_DECISION_TYPE
+    payload = cast(dict[str, object], ranged_request.payload)
+    permission_payload = cast(dict[str, object], payload["permission"])
+    attack_context = cast(dict[str, object], payload["attack_context"])
+    source_payload = cast(dict[str, object], attack_context["source_payload"])
+
+    assert payload["roll_type"] == "attack_sequence.wound"
+    assert payload["current_values"] == [1]
+    assert tuple(option.option_id for option in ranged_request.options) == ("decline", "reroll:0")
+    assert permission_payload["timing_window"] == "attack_sequence.wound"
+    assert permission_payload["eligible_roll_type"] == "attack_sequence.wound"
+    assert permission_payload["component_selection_policy"] == "component_selection"
+    assert permission_payload["allowed_component_selections"] == [[0]]
+    assert (
+        source_payload["relic_id"] == army_rule.TriumphRelic.SIMULACRUM_OF_THE_ARGENT_SHROUD.value
+    )
+    assert source_payload["attack_kind"] == "ranged"
+    assert source_payload["conditional_wound_reroll"] == {"reroll_unmodified_values": [1]}
+
+    assert (
+        _source_backed_argent_shroud_attack_reroll_request(
+            source_phase=BattlePhase.FIGHT,
+            melee=True,
+        )
+        is None
     )
 
 
@@ -1186,6 +1234,105 @@ def _triumph_option_id(
         if payload["selected_relic_ids"] == selected_ids:
             return option.option_id
     raise AssertionError(f"Missing Triumph relic option {selected_ids}.")
+
+
+def _source_backed_argent_shroud_attack_reroll_request(
+    *,
+    source_phase: BattlePhase,
+    melee: bool,
+) -> DecisionRequest | None:
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    triumph = _make_first_unit_triumph(state, player_id="player-a", wounds_remaining=7)
+    defender = _unit_for_player(state, player_id="player-b")
+    decisions = DecisionController()
+    request = _next_triumph_relics_request(state=state, decisions=decisions)
+    _apply_triumph_relics_selection(
+        state=state,
+        decisions=decisions,
+        request=request,
+        selected_relics=(army_rule.TriumphRelic.SIMULACRUM_OF_THE_ARGENT_SHROUD,),
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(source_phase)
+    weapon_profile = _weapon_profile(
+        f"phase17g-adepta-argent-{source_phase.value}",
+        melee=melee,
+        armor_penetration=0,
+    )
+    attack_pool = _attack_pool_for_triumph_test(
+        attacker=triumph,
+        defender=defender,
+        weapon_profile=weapon_profile,
+    )
+    sequence_id = f"phase17g-adepta-argent-{source_phase.value}"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    attack_sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=triumph.unit_instance_id,
+        source_phase=source_phase,
+        attack_pools=(attack_pool,),
+    )
+    _remaining_sequence, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset(),
+        attack_sequence=attack_sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            state.game_id,
+            event_log=decisions.event_log,
+            injected_results=(
+                DiceRollResult.from_values(
+                    roll_id=f"{sequence_id}:hit",
+                    spec=attack_sequence_hit_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                    ),
+                    values=(4,),
+                    source="fixed",
+                ),
+                DiceRollResult.from_values(
+                    roll_id=f"{sequence_id}:wound",
+                    spec=attack_sequence_wound_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                    ),
+                    values=(1,),
+                    source="fixed",
+                ),
+            ),
+        ),
+    )
+    assert allocated_model_ids == ()
+    if status is None:
+        return None
+    decision_request = status.decision_request
+    if decision_request is None:
+        raise AssertionError("Expected a source-backed wound reroll request.")
+    return decision_request
+
+
+def _attack_pool_for_triumph_test(
+    *,
+    attacker: UnitInstance,
+    defender: UnitInstance,
+    weapon_profile: WeaponProfile,
+) -> RangedAttackPool:
+    defender_model_ids = tuple(model.model_instance_id for model in defender.own_models)
+    return RangedAttackPool(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id=f"{weapon_profile.profile_id}:wargear",
+        weapon_profile_id=weapon_profile.profile_id,
+        weapon_profile=weapon_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        attacks=1,
+        target_visible_model_ids=defender_model_ids,
+        target_in_range_model_ids=defender_model_ids,
+    )
 
 
 def _weapon_profile(

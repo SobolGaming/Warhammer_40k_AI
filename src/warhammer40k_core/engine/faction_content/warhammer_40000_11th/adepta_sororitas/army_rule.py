@@ -1276,7 +1276,7 @@ def _triumph_relic_source_backed_reroll_effects(
                 relic=TriumphRelic.SIMULACRUM_OF_THE_ARGENT_SHROUD,
                 roll_kind="ranged_wound",
                 timing_window="attack_sequence.wound",
-                eligible_roll_type="wound_roll",
+                eligible_roll_type="attack_sequence.wound",
             )
         )
     return tuple(effects)
