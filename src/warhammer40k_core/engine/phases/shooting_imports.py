@@ -2,7 +2,9 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -25,6 +27,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
@@ -58,6 +61,7 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     attack_sequence_completed_event_id,
     successful_hit_target_unit_ids_for_sequence,
 )
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
@@ -235,6 +239,7 @@ __all__ = (
     "ATTACK_RESOLUTION_SELECTION_DECISION_TYPES",
     "AbilityDescriptor",
     "AbilityKind",
+    "AbilityCatalogIndex",
     "ArmyCatalog",
     "AttackSequence",
     "AttackSequenceCompletedContext",
@@ -243,6 +248,7 @@ __all__ = (
     "AvailableWeaponPayload",
     "BattlePhase",
     "BattlePhaseKind",
+    "BattleShockHookRegistry",
     "BattlefieldScenario",
     "CLOSE_QUARTERS_RULE_ID",
     "CatalogDamagedShootingWeaponSelectionLimit",
@@ -268,6 +274,8 @@ __all__ = (
     "IdentifierValidator",
     "JsonValue",
     "LifecycleStatus",
+    "Mapping",
+    "MappingProxyType",
     "ModelInstance",
     "MovementMode",
     "NotRequired",

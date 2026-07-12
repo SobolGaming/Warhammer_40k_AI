@@ -5,7 +5,7 @@ from dataclasses import replace
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -23,6 +23,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.volume import Model
@@ -91,16 +92,48 @@ def clause_is_post_shoot_hit_target_selection(clause: RuleClause) -> bool:
 def selected_effect_clauses_after(
     clauses: tuple[RuleClause, ...],
     selection_index: int,
+    *,
+    include_immediate_effects: bool = False,
 ) -> tuple[RuleClause, ...]:
     selected: list[RuleClause] = []
     for clause in clauses[selection_index + 1 :]:
         if clause.template_id == "phase17c:selected-target-constraint":
             break
-        if clause.duration is None or not clause.effects:
+        if not clause.effects:
+            continue
+        if clause.duration is None and not (
+            include_immediate_effects and clause_has_immediate_selected_target_effect(clause)
+        ):
             continue
         if any(effect.kind in SUPPORTED_SELECTED_EFFECT_KINDS for effect in clause.effects):
             selected.append(clause)
     return tuple(selected)
+
+
+def clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog selected-target matcher requires RuleClause.")
+    if clause.duration is not None or clause.target is None:
+        return False
+    if clause.target.kind not in {RuleTargetKind.SELECTED_UNIT, RuleTargetKind.SELECTED_TARGET}:
+        return False
+    return any(
+        effect_is_immediate_selected_target_battle_shock(effect) for effect in clause.effects
+    )
+
+
+def effect_is_immediate_selected_target_battle_shock(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog selected-target matcher requires RuleEffectSpec.")
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("rules_context") == "battle_shock"
+        and parameters.get("status") == "force_battle_shock_test"
+        and parameters.get("required") is True
+        and parameters.get("target_scope") == "selected_unit"
+    )
 
 
 def eligible_selection_target_unit_ids(
@@ -120,7 +153,10 @@ def eligible_selection_target_unit_ids(
         armies=tuple(state.army_definitions),
         battlefield_state=state.battlefield_state,
     )
+    source_army = army_for_player(tuple(state.army_definitions), player_id=source_player)
+    source_unit = unit_in_army_by_id(source_army, unit_instance_id=source_unit_id)
     source_placement = state.battlefield_state.unit_placement_by_id(source_unit_id)
+    ruleset_descriptor = state.runtime_ruleset_descriptor()
     explicit_ids = (
         None
         if explicit_target_unit_ids is None
@@ -133,8 +169,11 @@ def eligible_selection_target_unit_ids(
         for target_placement in placed_army.unit_placements:
             if explicit_ids is not None and target_placement.unit_instance_id not in explicit_ids:
                 continue
-            if selection_distance_conditions_apply(
+            if selection_target_conditions_apply(
+                state=state,
                 scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                source_unit=source_unit,
                 source_placement=source_placement,
                 source_model_instance_id=source_model_instance_id,
                 target_placement=target_placement,
@@ -142,6 +181,36 @@ def eligible_selection_target_unit_ids(
             ):
                 target_ids.append(target_placement.unit_instance_id)
     return tuple(sorted(target_ids))
+
+
+def selection_target_conditions_apply(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    source_unit: UnitInstance,
+    source_placement: UnitPlacement,
+    source_model_instance_id: str | None,
+    target_placement: UnitPlacement,
+    selection_clause: RuleClause,
+) -> bool:
+    if not selection_distance_conditions_apply(
+        scenario=scenario,
+        source_placement=source_placement,
+        source_model_instance_id=source_model_instance_id,
+        target_placement=target_placement,
+        selection_clause=selection_clause,
+    ):
+        return False
+    return selection_visibility_conditions_apply(
+        state=state,
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        source_unit=source_unit,
+        source_model_instance_id=source_model_instance_id,
+        target_placement=target_placement,
+        selection_clause=selection_clause,
+    )
 
 
 def selection_distance_conditions_apply(
@@ -181,6 +250,54 @@ def selection_distance_conditions_apply(
             source_models=source_models,
             target_models=target_models,
             parameters=parameters,
+        ):
+            return False
+    return True
+
+
+def selection_visibility_conditions_apply(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    source_unit: UnitInstance,
+    source_model_instance_id: str | None,
+    target_placement: UnitPlacement,
+    selection_clause: RuleClause,
+) -> bool:
+    visibility_conditions = tuple(
+        condition
+        for condition in selection_clause.conditions
+        if condition.kind is RuleConditionKind.VISIBILITY_PREDICATE
+    )
+    if not visibility_conditions:
+        return True
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Catalog selected-target visibility requires battlefield_state.")
+    for condition in visibility_conditions:
+        parameters = parameter_payload(condition.parameters)
+        if parameters.get("predicate") != "visible_to":
+            raise GameLifecycleError("Catalog selected-target visibility predicate is unsupported.")
+        if parameters.get("target_reference") != "selected_unit":
+            raise GameLifecycleError("Catalog selected-target visibility target is unsupported.")
+        observer = parameters.get("observer")
+        if observer == "this_model":
+            observer_model_id = source_model_instance_id
+            if observer_model_id is None:
+                raise GameLifecycleError(
+                    "Catalog selected-target this-model visibility requires source model."
+                )
+        elif observer == "this_unit":
+            observer_model_id = None
+        else:
+            raise GameLifecycleError("Catalog selected-target visibility observer is unsupported.")
+        if not unit_has_line_of_sight_to_target(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            observing_unit=source_unit,
+            target_unit_id=target_placement.unit_instance_id,
+            observer_model_instance_id=observer_model_id,
+            terrain_features=state.battlefield_state.terrain_features,
         ):
             return False
     return True

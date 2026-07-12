@@ -103,6 +103,7 @@ class RuleConditionKind(StrEnum):
     KEYWORD_GATE = "keyword_gate"
     PHASE_GATE = "phase_gate"
     TARGET_CONSTRAINT = "target_constraint"
+    VISIBILITY_PREDICATE = "visibility_predicate"
 
 
 class RuleTargetKind(StrEnum):

@@ -52,6 +52,14 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
             )
             token = ability.value.lower().replace("_", "-").replace(" ", "-")
             consumer_ids.add(f"catalog-ir:weapon-keyword-grant:{token}")
+    if clause_is_charge_end_leading_unit_weapon_ability_grant(clause):
+        consumer_ids.add(CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID)
+        for effect in clause.effects:
+            ability = weapon_keyword_from_token(
+                _required_string(parameter_payload(effect.parameters), "weapon_ability")
+            )
+            token = ability.value.lower().replace("_", "-").replace(" ", "-")
+            consumer_ids.add(f"catalog-ir:weapon-keyword-grant:{token}")
     if clause_is_leading_unit_wound_roll_modifier(clause):
         consumer_ids.add(CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID)
     if clause_is_consolidation_move_distance_modifier(clause):
@@ -67,6 +75,7 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
                 CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
                 CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+                CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
                 CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID,
                 CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
             }
@@ -256,6 +265,54 @@ def clause_is_consolidation_move_distance_modifier(clause: RuleClause) -> bool:
         and _is_positive_number(distance)
         and _is_positive_number(replaced)
     )
+
+
+def clause_is_charge_end_leading_unit_weapon_ability_grant(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.SELECTED_UNIT
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or len(clause.effects) != 1
+    ):
+        return False
+    trigger_parameters = parameter_payload(clause.trigger.parameters)
+    duration_parameters = parameter_payload(clause.duration.parameters)
+    if (
+        trigger_parameters.get("edge") != "after"
+        or trigger_parameters.get("phase") != "charge"
+        or trigger_parameters.get("timing_window") != "charge_move_end"
+        or trigger_parameters.get("subject") != "that_unit"
+        or duration_parameters.get("endpoint") != "turn"
+        or duration_parameters.get("boundary", "end") != "end"
+    ):
+        return False
+    if not any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters).get("relationship") == "this_model_leading_unit"
+        for condition in clause.conditions
+    ):
+        return False
+    effect = clause.effects[0]
+    if effect.kind is not RuleEffectKind.GRANT_WEAPON_ABILITY:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    if parameters.get("target_scope") != "models_in_selected_unit":
+        return False
+    if not (
+        type(parameters.get("weapon_name")) is str
+        or type(parameters.get("weapon_names")) is tuple
+        or parameters.get("weapon_scope") in {"all", "melee", "ranged"}
+    ):
+        return False
+    try:
+        weapon_keyword_from_token(_required_string(parameters, "weapon_ability"))
+    except WeaponProfileError:
+        return False
+    return True
 
 
 def _is_while_condition_ability_grant(clause: RuleClause, *, ability: str) -> bool:

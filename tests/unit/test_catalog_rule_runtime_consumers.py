@@ -14,8 +14,10 @@ from warhammer40k_core.core.ruleset_descriptor import (
     FightOrderingBandKind,
     FightTypeKind,
     RulesetDescriptor,
+    TerrainFeatureKind,
 )
-from warhammer40k_core.core.weapon_profiles import WeaponProfile
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine import (
     catalog_command_point_runtime as command_point_runtime,
 )
@@ -33,6 +35,11 @@ from warhammer40k_core.engine.army_mustering import (
     EnhancementAssignment,
     muster_army,
 )
+from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedContext,
+)
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     ModelPlacement,
@@ -62,6 +69,7 @@ from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_clauses_from_record
 from warhammer40k_core.engine.catalog_selected_target_effects import (
+    CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
     CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
     CatalogSelectedTargetEffectRuntime,
     apply_catalog_post_shoot_hit_target_effect_result,
@@ -103,6 +111,8 @@ from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_support i
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
@@ -116,7 +126,10 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
 )
-from warhammer40k_core.engine.fight_order import FightActivationSelection
+from warhammer40k_core.engine.fight_order import (
+    CHARGE_FIGHTS_FIRST_EFFECT_KIND,
+    FightActivationSelection,
+)
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartRequestContext,
@@ -140,8 +153,10 @@ from warhammer40k_core.engine.placement import create_deterministic_battlefield_
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
+    WeaponProfileModifierContext,
     WoundRollModifierContext,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     StratagemCostChoiceRequestContext,
     StratagemCostChoiceResultContext,
@@ -164,7 +179,13 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import UnitMoveCompletedContext
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import (
+    TerrainFeatureDefinition,
+    TerrainFloorDefinition,
+    TerrainWallDefinition,
+)
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
@@ -628,6 +649,116 @@ def test_catalog_selected_target_fight_start_runtime_records_selected_effect() -
     )
 
 
+def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_without_battlefield(
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    for army in (source_army, target_army):
+        state.record_army_definition(army)
+    state.battlefield_state = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=10.0,
+        target_army=target_army,
+        target_unit=target_unit,
+        target_x=20.0,
+    )
+    record = _compiled_record(
+        record_id="record:selected-target:post-shoot-battle-shock",
+        raw_text=(
+            "In your Shooting phase, after this model has shot, select one enemy unit that "
+            "was hit by one or more of those attacks. That unit must take a Battle-shock test."
+        ),
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+    )
+    ability_indexes_by_player_id = {
+        source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+        target_army.player_id: AbilityCatalogIndex.from_records(()),
+    }
+    runtime = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=(source_army, target_army),
+    )
+    profile = _first_catalog_weapon_profile()
+    sequence = AttackSequence(
+        sequence_id="attack-sequence:post-shoot-battle-shock",
+        attacker_player_id=source_army.player_id,
+        attacking_unit_instance_id=source_unit.unit_instance_id,
+        source_phase=BattlePhase.SHOOTING,
+        attack_pools=(
+            RangedAttackPool(
+                attacker_model_instance_id=source_unit.own_models[0].model_instance_id,
+                wargear_id="catalog-post-shoot-test-wargear",
+                weapon_profile_id=profile.profile_id,
+                weapon_profile=profile,
+                target_unit_instance_id=target_unit.unit_instance_id,
+                shooting_type=ShootingType.NORMAL,
+                attacks=1,
+                target_visible_model_ids=target_unit.own_model_ids(),
+                target_in_range_model_ids=target_unit.own_model_ids(),
+            ),
+        ),
+    )
+    decisions = DecisionController()
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+
+    bindings = runtime.attack_sequence_completed_bindings()
+    status = bindings[0].handler(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=sequence,
+            attack_sequence_completed_event_id="event:post-shoot-battle-shock:completed",
+        )
+    )
+
+    assert len(bindings) == 1
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    queued = decisions.queue.peek_next()
+    queued_payload = cast(dict[str, JsonValue], queued.payload)
+    assert queued_payload["available_target_unit_instance_ids"] == [target_unit.unit_instance_id]
+    result = DecisionResult.for_request(
+        result_id="result:selected-target:post-shoot-battle-shock",
+        request=queued,
+        selected_option_id=queued.options[0].option_id,
+    )
+    decisions.submit_result(result)
+
+    apply_status = apply_catalog_post_shoot_hit_target_effect_result(
+        state=state,
+        decisions=decisions,
+        result=result,
+        battle_shock_hooks=BattleShockHookRegistry.empty(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+    )
+
+    assert apply_status is None
+    assert state.persisting_effects == []
+    event_types = tuple(event.event_type for event in decisions.event_log.records)
+    assert "battle_shock_test_requested" in event_types
+    assert "battle_shock_test_resolved" in event_types
+    assert "catalog_selected_target_battle_shock_resolved" in event_types
+    assert CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT in event_types
+
+
 def test_catalog_once_per_battle_runtime_declines_then_activates_once_with_replay() -> None:
     source_army, target_army = _mustered_once_per_battle_armies()
     source_unit = source_army.units[0]
@@ -1029,6 +1160,91 @@ def test_catalog_datasheet_runtime_ignores_wound_modifier_when_source_not_leadin
     assert bindings[0].handler(context) == 0
 
 
+def test_catalog_datasheet_runtime_applies_charge_end_leading_weapon_ability_grant() -> None:
+    source_army, target_army = _mustered_attached_once_per_battle_armies()
+    leader_unit = next(
+        unit for unit in source_army.units if unit.datasheet_id == "core-character-leader"
+    )
+    bodyguard_unit = next(
+        unit for unit in source_army.units if unit.datasheet_id == "core-intercessor-like-infantry"
+    )
+    target_unit = target_army.units[0]
+    rules_unit_id = source_army.attached_units[0].attached_unit_instance_id
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="catalog-charge-end-weapon-grant-attached",
+        armies=(source_army, target_army),
+    )
+    state = _state_without_battlefield(
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    for army in (source_army, target_army):
+        state.record_army_definition(army)
+    state.battlefield_state = scenario.battlefield_state
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="effect:catalog-charge-end-weapon-grant:charged",
+            source_rule_id="core-rules:charge-fights-first",
+            owner_player_id=source_army.player_id,
+            target_unit_instance_ids=(rules_unit_id,),
+            started_battle_round=state.battle_round,
+            expiration=EffectExpiration.end_turn(
+                battle_round=state.battle_round,
+                player_id=source_army.player_id,
+            ),
+            effect_payload={"effect_kind": CHARGE_FIGHTS_FIRST_EFFECT_KIND},
+            started_phase=BattlePhaseKind.CHARGE,
+        )
+    )
+    record = _compiled_record(
+        record_id="record:catalog-datasheet:charge-end-weapon-grant",
+        raw_text=(
+            "While this model is leading a unit, each time that unit ends a Charge move, "
+            "until the end of the turn, Juggernaut's bladed horns equipped by models in "
+            "that unit have the [DEVASTATING WOUNDS] ability."
+        ),
+        source_unit=leader_unit,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+    )
+    runtime = CatalogDatasheetRuleRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    base_profile = replace(
+        _first_catalog_weapon_profile(),
+        profile_id="juggernauts-bladed-horns",
+        name="Juggernaut's bladed horns",
+        keywords=(),
+        abilities=(),
+        source_ids=(),
+    )
+    other_profile = replace(
+        base_profile,
+        profile_id="not-bladed-horns",
+        name="Bloodcrusher blade",
+    )
+    context = WeaponProfileModifierContext(
+        state=state,
+        source_phase=BattlePhase.FIGHT,
+        attacking_unit_instance_id=rules_unit_id,
+        attacker_model_instance_id=bodyguard_unit.own_models[0].model_instance_id,
+        target_unit_instance_id=target_unit.unit_instance_id,
+        weapon_profile=base_profile,
+    )
+
+    bindings = runtime.weapon_profile_modifier_bindings()
+    modified = bindings[0].handler(context)
+    unchanged = bindings[0].handler(replace(context, weapon_profile=other_profile))
+
+    assert len(bindings) == 1
+    assert WeaponKeyword.DEVASTATING_WOUNDS in modified.keywords
+    assert record.definition.source_id in modified.source_ids
+    assert unchanged == other_profile
+
+
 def test_catalog_datasheet_runtime_exposes_consolidation_distance_fight_activation() -> None:
     source_army, target_army = _mustered_core_armies()
     source_unit = source_army.units[0]
@@ -1280,12 +1496,24 @@ def test_catalog_selected_target_runtime_fail_fast_and_empty_paths() -> None:
             state=state,
             decisions=cast(DecisionController, object()),
             result=wrong_hook_result,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id={
+                source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+                target_army.player_id: empty_index,
+            },
         )
     with pytest.raises(GameLifecycleError, match="apply requires result"):
         apply_catalog_post_shoot_hit_target_effect_result(
             state=state,
             decisions=DecisionController(),
             result=cast(DecisionResult, object()),
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id={
+                source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+                target_army.player_id: empty_index,
+            },
         )
 
 
@@ -1521,6 +1749,68 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
             target_models=(),
             parameters={"range_kind": "numeric_range"},
         )
+
+
+def test_catalog_selected_target_visibility_gate_uses_real_line_of_sight() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    battlefield = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=10.0,
+        target_army=target_army,
+        target_unit=target_unit,
+        target_x=20.0,
+    )
+    visible_state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    record = _compiled_record(
+        record_id="record:selected-target:visible-gate",
+        raw_text=(
+            'At the start of the Fight phase, select one enemy unit within 18" of and '
+            "visible to this model. Until the end of the phase, each time a friendly "
+            "Khorne Legiones Daemonica unit makes an attack that targets that unit, "
+            "improve the Strength, Armour Penetration and Damage characteristics of "
+            "that attack by 1."
+        ),
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    selection_clause = catalog_selected_target_clauses_from_record(record)[0]
+    source_model_id = source_unit.own_model_ids()[0]
+
+    assert eligible_selection_target_unit_ids(
+        state=visible_state,
+        source_player_id=source_army.player_id,
+        source_unit_instance_id=source_unit.unit_instance_id,
+        source_model_instance_id=source_model_id,
+        selection_clause=selection_clause,
+        explicit_target_unit_ids=None,
+    ) == (target_unit.unit_instance_id,)
+
+    blocked_state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=replace(battlefield, terrain_features=(_line_blocking_ruin(),)),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+
+    assert (
+        eligible_selection_target_unit_ids(
+            state=blocked_state,
+            source_player_id=source_army.player_id,
+            source_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=source_model_id,
+            selection_clause=selection_clause,
+            explicit_target_unit_ids=None,
+        )
+        == ()
+    )
 
 
 def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None:
@@ -3134,6 +3424,47 @@ def _battlefield_for_units_with_model_xs(
             _placed_army(army=source_army, unit=source_unit, model_xs=source_model_xs),
             _placed_army(army=target_army, unit=target_unit, model_xs=target_model_xs),
         ),
+    )
+
+
+def _line_blocking_ruin() -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="catalog-selected-target-line-blocker",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=15.0,
+        footprint_center_y_inches=10.0,
+        footprint_width_inches=1.0,
+        footprint_depth_inches=20.0,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=15.0,
+            center_y_inches=10.0,
+            width_inches=1.0,
+            depth_inches=20.0,
+            display_template_id="catalog-selected-target-line-blocker-display",
+        ),
+        walls=(
+            TerrainWallDefinition(
+                wall_id="catalog-selected-target-line-blocking-wall",
+                center_x_inches=15.0,
+                center_y_inches=10.0,
+                bottom_z_inches=0.0,
+                width_inches=0.2,
+                depth_inches=20.0,
+                height_inches=6.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="catalog-selected-target-line-blocking-floor",
+                center_x_inches=15.0,
+                center_y_inches=10.0,
+                bottom_z_inches=0.0,
+                width_inches=1.0,
+                depth_inches=20.0,
+                thickness_inches=0.1,
+            ),
+        ),
+        source_id="catalog-selected-target-visibility-test",
     )
 
 

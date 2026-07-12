@@ -486,6 +486,7 @@ def unit_has_line_of_sight_to_target(
     ruleset_descriptor: RulesetDescriptor,
     observing_unit: UnitInstance,
     target_unit_id: str,
+    observer_model_instance_id: str | None = None,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> bool:
     if type(scenario) is not BattlefieldScenario:
@@ -495,6 +496,10 @@ def unit_has_line_of_sight_to_target(
     if type(observing_unit) is not UnitInstance:
         raise GameLifecycleError("Line of sight target query requires a UnitInstance.")
     _validate_identifier("target_unit_id", target_unit_id)
+    observer_model_id = _validate_optional_identifier(
+        "observer_model_instance_id",
+        observer_model_instance_id,
+    )
     if type(terrain_features) is not tuple:
         raise GameLifecycleError("terrain_features must be a tuple.")
     for feature in terrain_features:
@@ -524,10 +529,17 @@ def unit_has_line_of_sight_to_target(
         observing_unit_id=observing_unit.unit_instance_id,
         target_unit_id=target_rules_unit.unit_instance_id,
     )
-    for observer_model in _geometry_models_for_unit_placement(
+    observer_models = _geometry_models_for_unit_placement(
         scenario=scenario,
         unit_placement=observing_placement,
-    ):
+    )
+    if observer_model_id is not None:
+        observer_models = tuple(
+            model for model in observer_models if model.model_id == observer_model_id
+        )
+        if not observer_models:
+            raise GameLifecycleError("Line of sight target query observer model is not placed.")
+    for observer_model in observer_models:
         context = TerrainVisibilityContext.from_ruleset_descriptor(
             ruleset_descriptor=ruleset_descriptor,
             los_cache_key=visibility_cache_key,

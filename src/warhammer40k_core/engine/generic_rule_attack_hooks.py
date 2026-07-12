@@ -12,11 +12,7 @@ from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPe
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
-    AbilityDescriptor,
-    WeaponKeyword,
     WeaponProfile,
-    WeaponProfileError,
-    weapon_keyword_from_token,
 )
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -35,6 +31,7 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_modified_weapon_profile,
+    rule_ir_weapon_ability_granted_profile,
     rule_ir_weapon_selector_applies,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -1077,26 +1074,11 @@ def _profile_with_weapon_ability_grant(
     profile: WeaponProfile,
     effect: _GenericAttackEffect,
 ) -> WeaponProfile:
-    if type(profile) is not WeaponProfile:
-        raise GameLifecycleError("Generic weapon ability grant requires WeaponProfile.")
-    keyword = _weapon_keyword_parameter(effect.parameters)
-    ability = _weapon_ability_descriptor(effect.parameters, keyword=keyword)
-    keywords = profile.keywords
-    if keyword not in keywords:
-        keywords = tuple(sorted((*keywords, keyword), key=lambda value: value.value))
-    abilities = profile.abilities
-    if ability is not None and all(
-        existing.ability_id != ability.ability_id for existing in abilities
-    ):
-        abilities = tuple(sorted((*abilities, ability), key=lambda value: value.ability_id))
-    source_ids = _source_ids_with(profile.source_ids, _modifier_source_id(effect))
-    if (
-        keywords == profile.keywords
-        and abilities == profile.abilities
-        and source_ids == profile.source_ids
-    ):
-        return profile
-    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
+    return rule_ir_weapon_ability_granted_profile(
+        parameters=effect.parameters,
+        profile=profile,
+        source_id=_modifier_source_id(effect),
+    )
 
 
 def _profile_with_characteristic_modifier(
@@ -1116,38 +1098,6 @@ def _weapon_scope_matches_profile(
     profile: WeaponProfile,
 ) -> bool:
     return rule_ir_weapon_selector_applies(parameters=parameters, profile=profile)
-
-
-def _weapon_keyword_parameter(parameters: dict[str, JsonValue]) -> WeaponKeyword:
-    value = _required_string_parameter(parameters, key="weapon_ability")
-    try:
-        return weapon_keyword_from_token(value)
-    except WeaponProfileError as exc:
-        raise GameLifecycleError("Generic weapon ability grant has unsupported keyword.") from exc
-
-
-def _weapon_ability_descriptor(
-    parameters: dict[str, JsonValue],
-    *,
-    keyword: WeaponKeyword,
-) -> AbilityDescriptor | None:
-    if keyword is WeaponKeyword.LETHAL_HITS:
-        return AbilityDescriptor.lethal_hits()
-    if keyword is WeaponKeyword.DEVASTATING_WOUNDS:
-        return AbilityDescriptor.devastating_wounds()
-    if keyword is WeaponKeyword.HEAVY:
-        return AbilityDescriptor.heavy()
-    if keyword is WeaponKeyword.SUSTAINED_HITS:
-        return AbilityDescriptor.sustained_hits(_required_weapon_ability_value(parameters))
-    if keyword is WeaponKeyword.RAPID_FIRE:
-        return AbilityDescriptor.rapid_fire(_required_positive_int_parameter(parameters))
-    if keyword is WeaponKeyword.MELTA:
-        return AbilityDescriptor.melta(_required_positive_int_parameter(parameters))
-    if keyword is WeaponKeyword.CLEAVE:
-        return AbilityDescriptor.cleave(_required_positive_int_parameter(parameters))
-    if keyword is WeaponKeyword.HUNTER:
-        raise GameLifecycleError("Generic weapon ability grant cannot infer Hunter targets.")
-    return None
 
 
 def _characteristic_parameter(parameters: dict[str, JsonValue]) -> Characteristic:
@@ -1235,24 +1185,6 @@ def _required_numeric_parameter(parameters: dict[str, JsonValue], *, key: str) -
     return float(cast(int | float, value))
 
 
-def _required_weapon_ability_value(parameters: dict[str, JsonValue]) -> int | str:
-    value = parameters.get("weapon_ability_value")
-    if type(value) in {int, str}:
-        if type(value) is int and value < 1:
-            raise GameLifecycleError("Generic weapon_ability_value must be positive.")
-        if type(value) is str and not value.strip():
-            raise GameLifecycleError("Generic weapon_ability_value must not be empty.")
-        return cast(int | str, value)
-    raise GameLifecycleError("Generic weapon_ability_value is required.")
-
-
-def _required_positive_int_parameter(parameters: dict[str, JsonValue]) -> int:
-    value = parameters.get("weapon_ability_value")
-    if type(value) is not int or value < 1:
-        raise GameLifecycleError("Generic weapon_ability_value must be a positive int.")
-    return value
-
-
 def _required_identifier_payload(payload: dict[str, JsonValue], key: str) -> str:
     value = payload.get(key)
     if type(value) is not str:
@@ -1265,12 +1197,6 @@ def _modifier_source_id(effect: _GenericAttackEffect) -> str:
         "generic modifier source_id",
         f"{effect.source_id}:{effect.clause_id}:{effect.effect_kind.value}",
     )
-
-
-def _source_ids_with(source_ids: tuple[str, ...], source_id: str) -> tuple[str, ...]:
-    if source_id in source_ids:
-        return source_ids
-    return tuple(sorted((*source_ids, source_id)))
 
 
 def _generic_source_payload(

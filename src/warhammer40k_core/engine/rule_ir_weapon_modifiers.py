@@ -6,10 +6,14 @@ from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
     AttackProfile,
     DamageProfile,
     RangeProfileKind,
+    WeaponKeyword,
     WeaponProfile,
+    WeaponProfileError,
+    weapon_keyword_from_token,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 
@@ -76,6 +80,33 @@ def rule_ir_modified_weapon_profile(
     raise GameLifecycleError("RuleIR weapon modifier characteristic is unsupported.")
 
 
+def rule_ir_weapon_ability_granted_profile(
+    *, parameters: Mapping[str, object], profile: WeaponProfile, source_id: str
+) -> WeaponProfile:
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("RuleIR weapon ability grant requires WeaponProfile.")
+    if not rule_ir_weapon_selector_applies(parameters=parameters, profile=profile):
+        return profile
+    keyword = _weapon_keyword_parameter(parameters)
+    ability = _weapon_ability_descriptor(parameters, keyword=keyword)
+    keywords = profile.keywords
+    if keyword not in keywords:
+        keywords = tuple(sorted((*keywords, keyword), key=lambda value: value.value))
+    abilities = profile.abilities
+    if ability is not None and all(
+        existing.ability_id != ability.ability_id for existing in abilities
+    ):
+        abilities = tuple(sorted((*abilities, ability), key=lambda value: value.ability_id))
+    source_ids = _source_ids_with(profile.source_ids, source_id)
+    if (
+        keywords == profile.keywords
+        and abilities == profile.abilities
+        and source_ids == profile.source_ids
+    ):
+        return profile
+    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
+
+
 def _weapon_names(parameters: Mapping[str, object]) -> frozenset[str]:
     single_name = parameters.get("weapon_name")
     raw_names = parameters.get("weapon_names")
@@ -111,10 +142,67 @@ def _characteristic(parameters: Mapping[str, object]) -> Characteristic:
         raise GameLifecycleError("RuleIR weapon modifier characteristic is invalid.") from exc
 
 
+def _weapon_keyword_parameter(parameters: Mapping[str, object]) -> WeaponKeyword:
+    value = _required_string_parameter(parameters, "weapon_ability")
+    try:
+        return weapon_keyword_from_token(value)
+    except WeaponProfileError as exc:
+        raise GameLifecycleError("RuleIR weapon ability grant has unsupported keyword.") from exc
+
+
+def _weapon_ability_descriptor(
+    parameters: Mapping[str, object],
+    *,
+    keyword: WeaponKeyword,
+) -> AbilityDescriptor | None:
+    if keyword is WeaponKeyword.LETHAL_HITS:
+        return AbilityDescriptor.lethal_hits()
+    if keyword is WeaponKeyword.DEVASTATING_WOUNDS:
+        return AbilityDescriptor.devastating_wounds()
+    if keyword is WeaponKeyword.HEAVY:
+        return AbilityDescriptor.heavy()
+    if keyword is WeaponKeyword.SUSTAINED_HITS:
+        return AbilityDescriptor.sustained_hits(_required_weapon_ability_value(parameters))
+    if keyword is WeaponKeyword.RAPID_FIRE:
+        return AbilityDescriptor.rapid_fire(_required_positive_weapon_ability_value(parameters))
+    if keyword is WeaponKeyword.MELTA:
+        return AbilityDescriptor.melta(_required_positive_weapon_ability_value(parameters))
+    if keyword is WeaponKeyword.CLEAVE:
+        return AbilityDescriptor.cleave(_required_positive_weapon_ability_value(parameters))
+    if keyword is WeaponKeyword.HUNTER:
+        raise GameLifecycleError("RuleIR weapon ability grant cannot infer Hunter targets.")
+    return None
+
+
 def _int_parameter(parameters: Mapping[str, object], key: str) -> int:
     value = parameters.get(key)
     if type(value) is not int:
         raise GameLifecycleError(f"RuleIR weapon modifier {key} must be an integer.")
+    return value
+
+
+def _required_string_parameter(parameters: Mapping[str, object], key: str) -> str:
+    value = parameters.get(key)
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError(f"RuleIR weapon modifier {key} must be a string.")
+    return value
+
+
+def _required_weapon_ability_value(parameters: Mapping[str, object]) -> int | str:
+    value = parameters.get("weapon_ability_value")
+    if type(value) in {int, str}:
+        if type(value) is int and value < 1:
+            raise GameLifecycleError("RuleIR weapon_ability_value must be positive.")
+        if type(value) is str and not value.strip():
+            raise GameLifecycleError("RuleIR weapon_ability_value must not be empty.")
+        return cast(int | str, value)
+    raise GameLifecycleError("RuleIR weapon_ability_value is required.")
+
+
+def _required_positive_weapon_ability_value(parameters: Mapping[str, object]) -> int:
+    value = parameters.get("weapon_ability_value")
+    if type(value) is not int or value < 1:
+        raise GameLifecycleError("RuleIR weapon_ability_value must be a positive int.")
     return value
 
 

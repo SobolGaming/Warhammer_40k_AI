@@ -13,9 +13,9 @@ from warhammer40k_core.rules.rule_ir import (
 )
 
 _CHARACTERISTIC_NAMES = (
-    "Armor Penetration|AP|Attacks|Ballistic Skill|BS|Damage|Detection Range|Invulnerable Save|"
-    "Leadership|Move|Movement|Objective Control|OC|Range|Save|Strength|Toughness|Weapon Skill|"
-    "Wounds|WS"
+    "Armor Penetration|Armour Penetration|AP|Attacks|Ballistic Skill|BS|Damage|"
+    "Detection Range|Invulnerable Save|Leadership|Move|Movement|Objective Control|OC|Range|"
+    "Save|Strength|Toughness|Weapon Skill|Wounds|WS"
 )
 _CHARACTERISTIC_LIST_RE = re.compile(
     rf"\b(?P<verb>add|subtract)\s+(?P<value>\d+)(?:\")?\s+(?:to|from)\s+"
@@ -38,12 +38,19 @@ _SET_CHARACTERISTIC_RE = re.compile(
     r"characteristic\s+of\s+(?P<value>[A-Za-z0-9+/-]+)(?=[\s.,;)]|$)",
     re.IGNORECASE,
 )
+_IMPROVE_CHARACTERISTIC_LIST_RE = re.compile(
+    rf"\bimprove\s+(?:the\s+)?(?P<characteristics>(?:{_CHARACTERISTIC_NAMES})"
+    rf"(?:(?:\s*,\s*|\s+and\s+)(?:{_CHARACTERISTIC_NAMES}))+)\s+characteristics\s+"
+    r"of\s+that\s+attack\s+by\s+(?P<value>\d+)\b",
+    re.IGNORECASE,
+)
 _ADDITIONAL_MOVE_RE = re.compile(
     r"\bmove\s+an\s+additional\s+(?P<distance>\d+)(?:\")?\b",
     re.IGNORECASE,
 )
 _CHARACTERISTIC_BY_LABEL = {
     "armor penetration": Characteristic.ARMOR_PENETRATION,
+    "armour penetration": Characteristic.ARMOR_PENETRATION,
     "ap": Characteristic.ARMOR_PENETRATION,
     "attacks": Characteristic.ATTACKS,
     "ballistic skill": Characteristic.BALLISTIC_SKILL,
@@ -120,6 +127,22 @@ def parse_characteristic_effects(clause_span: TextSpan) -> tuple[RuleEffectSpec,
                 ),
             )
         )
+    for match in _IMPROVE_CHARACTERISTIC_LIST_RE.finditer(clause_span.text):
+        value = int(match.group("value"))
+        for characteristic in _characteristics_from_list(match.group("characteristics")):
+            effects.append(
+                RuleEffectSpec(
+                    kind=_characteristic_effect_kind(characteristic),
+                    source_span=_span_from_match(clause_span, match),
+                    parameters=parameters_from_pairs(
+                        (
+                            ("characteristic", characteristic.value),
+                            ("delta", value),
+                            ("attack_role", "attacker"),
+                        )
+                    ),
+                )
+            )
     for match in _ADDITIONAL_MOVE_RE.finditer(clause_span.text):
         effects.append(
             RuleEffectSpec(

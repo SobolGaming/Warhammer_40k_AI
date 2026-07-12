@@ -58,6 +58,12 @@ class ShootingPhaseHandler:
     attack_sequence_completed_hooks: AttackSequenceCompletedHookRegistry = field(
         default_factory=AttackSequenceCompletedHookRegistry.empty
     )
+    battle_shock_hooks: BattleShockHookRegistry = field(
+        default_factory=BattleShockHookRegistry.empty
+    )
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
         default_factory=StratagemCostModifierRegistry.empty
     )
@@ -105,6 +111,13 @@ class ShootingPhaseHandler:
             raise GameLifecycleError(
                 "ShootingPhaseHandler attack_sequence_completed_hooks must be a registry."
             )
+        if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
+            raise GameLifecycleError("ShootingPhaseHandler battle_shock_hooks must be a registry.")
+        object.__setattr__(
+            self,
+            "ability_indexes_by_player_id",
+            _validate_ability_index_mapping(self.ability_indexes_by_player_id),
+        )
         if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
             raise GameLifecycleError(
                 "ShootingPhaseHandler stratagem_cost_modifier_registry must be a registry."
@@ -638,6 +651,9 @@ class ShootingPhaseHandler:
                 state=state,
                 decisions=decisions,
                 result=result,
+                battle_shock_hooks=self.battle_shock_hooks,
+                runtime_modifier_registry=self.runtime_modifier_registry,
+                ability_indexes_by_player_id=self.ability_indexes_by_player_id,
             )
         if result.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
             return _apply_shooting_unit_selection_decision(
@@ -732,6 +748,19 @@ def invalid_catalog_post_shoot_decision_status(
             result=result,
         )
     return None
+
+
+def _validate_ability_index_mapping(
+    value: object,
+) -> Mapping[str, AbilityCatalogIndex]:
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError("ShootingPhaseHandler ability indexes must be a mapping.")
+    indexes: dict[str, AbilityCatalogIndex] = {}
+    for player_id, index in cast(Mapping[object, object], value).items():
+        if type(player_id) is not str or type(index) is not AbilityCatalogIndex:
+            raise GameLifecycleError("ShootingPhaseHandler ability index entry is invalid.")
+        indexes[player_id] = index
+    return MappingProxyType(indexes)
 
 
 def invalid_shooting_phase_start_faction_rule_status(

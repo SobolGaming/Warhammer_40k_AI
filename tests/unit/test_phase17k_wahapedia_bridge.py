@@ -115,6 +115,7 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     successful_hit_target_unit_ids_for_sequence,
 )
 from warhammer40k_core.engine.battle_shock import collect_battle_shock_test_requests
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     ModelPlacement,
@@ -2151,6 +2152,12 @@ def test_phase17k_bridge_supports_pdf_declared_no_equipment_and_no_wargear_optio
             row.runtime_fields_payload()["datasheet_id"] == datasheet_id for row in option_rows
         )
         assert model_fields_by_datasheet_id[datasheet_id]["base_size"] == "Hull"
+    assert model_fields_by_datasheet_id["000001588"]["height"] == "6.5"
+    assert (
+        model_fields_by_datasheet_id["000001588"]["height_document_reference"]
+        == "Reddit r/ChaosDaemons40k community measurement; "
+        "Battle Foam BFS-4.5 tray storage evidence"
+    )
 
 
 def test_phase17k_bloodcrushers_runtime_instances_manifest_model_wargear_and_abilities() -> None:
@@ -3847,6 +3854,12 @@ def test_phase17k_post_shoot_selected_target_effect_records_generic_rule_effect(
             state=state,
             decisions=decisions,
             result=result,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id={
+                army.player_id: player_index,
+                enemy_army.player_id: enemy_player_index,
+            },
         )
         is None
     )
@@ -6410,7 +6423,23 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Bloodletters (`000001114`) | PDF pages 28-29; supersedes Wahapedia. | All consumed |"
     ) in chaos_daemons_markdown
     assert (
+        "| Bloodmaster (`000001455`) | PDF pages 20-21; supersedes Wahapedia. | All consumed |"
+    ) in chaos_daemons_markdown
+    assert (
         "| Bloodthirster (`000002582`) | PDF pages 16-17; supersedes Wahapedia. | All consumed |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Rendmaster On Blood Throne (`000001111`) | PDF pages 24-25; supersedes "
+        "Wahapedia. | All consumed |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Skull Cannon (`000001116`) | PDF pages 34-35; supersedes Wahapedia. | All consumed |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Skullmaster (`000001456`) | PDF pages 22-23; supersedes Wahapedia. | All consumed |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Skulltaker (`000001106`) | PDF pages 18-19; supersedes Wahapedia. | All consumed |"
     ) in chaos_daemons_markdown
     assert (
         "| Lord of Change (`000001120`) | PDF pages 40-41; supersedes Wahapedia. | All consumed |"
@@ -9748,10 +9777,13 @@ def _no_equipment_daemon_fortification_bridge_artifacts() -> tuple[WahapediaJson
             ModelHeightOverride(
                 datasheet_id="000001588",
                 model_name="Skull Altar",
-                height=4.75,
+                height=6.5,
                 height_units=GeometrySourceUnits.INCHES,
                 height_source_id="geometry-review:chaos-daemons:skull-altar:height",
-                height_document_reference="Chaos Daemons Faction Pack p.36-37",
+                height_document_reference=(
+                    "Reddit r/ChaosDaemons40k community measurement; "
+                    "Battle Foam BFS-4.5 tray storage evidence"
+                ),
             ),
         ),
     )

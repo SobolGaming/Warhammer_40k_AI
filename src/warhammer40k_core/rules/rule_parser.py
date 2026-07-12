@@ -52,6 +52,66 @@ from warhammer40k_core.rules.rule_keyword_sequences import (
 from warhammer40k_core.rules.rule_keyword_sequences import (
     keyword_sequence_tokens as _keyword_sequence_tokens,
 )
+from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
+    parse_selected_target_attack_conditions as _parse_selected_target_attack_conditions,
+)
+from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
+    parse_selected_target_attack_trigger as _parse_selected_target_attack_trigger,
+)
+from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
+    parse_selected_unit_battle_shock_test_effects as _parse_selected_unit_battle_shock_test_effects,
+)
+from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
+    parse_shadow_of_chaos_area_effects as _parse_shadow_of_chaos_area_effects,
+)
+from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
+    parse_shadow_of_chaos_area_target as _parse_shadow_of_chaos_area_target,
+)
+from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
+    parse_visibility_conditions as _parse_visibility_conditions,
+)
+from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
+    selected_target_attack_match_ranges as _selected_target_attack_match_ranges,
+)
+from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
+    shadow_of_chaos_area_match as _shadow_of_chaos_area_match,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    ability_token as _ability_token,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    battle_round_number as _battle_round_number,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    catalog_like_token as _catalog_like_token,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    contextual_status_target_scope_token as _contextual_status_target_scope_token,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    is_weapon_keyword as _is_weapon_keyword,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    object_kind_token as _object_kind_token,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    owner_token as _owner_token,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    post_shoot_subject_token as _post_shoot_subject_token,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    quantity_token as _quantity_token,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    range_kind_token as _range_kind_token,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    roll_type as _roll_type,
+)
+from warhammer40k_core.rules.rule_parser_token_helpers import (
+    subject_token as _subject_token,
+)
 from warhammer40k_core.rules.rule_templates import (
     AURA_TEMPLATE_ID,
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
@@ -451,7 +511,7 @@ _DISTANCE_RELATION_RE = re.compile(
     r"(?P<negated>not\s+)?"
     r"(?P<predicate>wholly\s+within|within)\s+"
     r"(?P<range>Engagement\s+Range|Objective\s+Marker\s+Range|\d+(?:\.\d+)?\")\s+"
-    r"of\s+"
+    r"of\s+(?:and\s+visible\s+to\s+)?"
     r"(?:(?P<quantity>one\s+or\s+more|any|a|an)\s+)?"
     r"(?:(?P<allegiance>enemy|friendly)\s+)?"
     r"(?:(?P<object_reference>this|that|selected|target)\s+)?"
@@ -746,6 +806,10 @@ def _compile_clause(
             *_parse_aura_conditions(clause_text),
             *_parse_leading_unit_conditions(clause_text),
             *_parse_tracked_target_conditions(clause_text),
+            *_parse_selected_target_attack_conditions(
+                text=clause_text.text,
+                source_span=clause_text.span,
+            ),
             *parse_this_model_attack_target_conditions(clause_text.span),
             *_parse_return_on_death_conditions(clause_text),
             *parse_frequency_conditions(clause_text.span),
@@ -756,6 +820,7 @@ def _compile_clause(
                 parsed_text,
                 parser_context=parser_context,
             ),
+            *_parse_visibility_conditions(text=clause_text.text, source_span=clause_text.span),
             *_parse_status_conditions(clause_text),
         )
     )
@@ -859,6 +924,12 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                 )
             ),
         )
+    selected_target_attack_trigger = _parse_selected_target_attack_trigger(
+        text=clause_text.text,
+        source_span=clause_text.span,
+    )
+    if selected_target_attack_trigger is not None:
+        return selected_target_attack_trigger
     tracked_destroyed_match = _TRACKED_TARGET_DESTROYED_RE.search(clause_text.text)
     if tracked_destroyed_match is not None:
         return RuleTrigger(
@@ -1110,6 +1181,8 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
 def _parse_aura_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
     match = _AURA_RE.search(clause_text.text)
     if match is None:
+        match = _shadow_of_chaos_area_match(clause_text.text)
+    if match is None:
         return ()
     return (
         RuleCondition(
@@ -1217,6 +1290,7 @@ def _parse_keyword_conditions(
     target_match_ranges: list[tuple[int, int]] = []
     for match in _TRACKED_TARGET_SELECTION_RE.finditer(clause_text.text):
         target_match_ranges.append((match.start(), match.end()))
+    target_match_ranges.extend(_selected_target_attack_match_ranges(clause_text.text))
     target_match_ranges.extend(this_model_attack_target_match_ranges(clause_text.text))
     for match in _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE.finditer(clause_text.text):
         target_match_ranges.append((match.start(), match.end()))
@@ -1406,6 +1480,12 @@ def _parse_target(
                 )
             ),
         )
+    shadow_area_target = _parse_shadow_of_chaos_area_target(
+        text=clause_text.text,
+        source_span=clause_text.span,
+    )
+    if shadow_area_target is not None:
+        return shadow_area_target
     if (
         _THIS_MODEL_ATTACK_KEYWORD_TARGET_RE.search(clause_text.text) is not None
         or has_this_model_attack_target(clause_text.text)
@@ -1960,6 +2040,12 @@ def _parse_contextual_status_effects(
             )
         )
     effects.extend(
+        _parse_shadow_of_chaos_area_effects(
+            text=clause_text.text,
+            source_span=clause_text.span,
+        )
+    )
+    effects.extend(
         hit_success_threshold_effects(
             clause_text=clause_text.text,
             clause_start=clause_text.start,
@@ -2251,6 +2337,13 @@ def _parse_battle_shock_test_effects(clause_text: _ClauseText) -> tuple[RuleEffe
                 ),
             )
         )
+    effects.extend(
+        _parse_selected_unit_battle_shock_test_effects(
+            text=clause_text.text,
+            source_span=clause_text.span,
+            existing_effects=tuple(effects),
+        )
+    )
     return tuple(effects)
 
 
@@ -2688,90 +2781,6 @@ def _optional_weapon_ability_value_group(
     raise RuleIRError(f"Unsupported weapon ability value in rule language: {value}.")
 
 
-def _owner_token(owner: str | None) -> str | None:
-    if owner is None:
-        return None
-    lowered = owner.lower()
-    if "opponent" in lowered:
-        return "opponent"
-    if lowered == "your":
-        return "active_player"
-    return None
-
-
-def _battle_round_number(value: str) -> int:
-    token = value.lower().strip()
-    ordinal_numbers = {
-        "first": 1,
-        "second": 2,
-        "third": 3,
-        "fourth": 4,
-        "fifth": 5,
-    }
-    ordinal = ordinal_numbers.get(token)
-    if ordinal is not None:
-        return ordinal
-    suffixes = ("st", "nd", "rd", "th")
-    for suffix in suffixes:
-        if token.endswith(suffix):
-            token = token[: -len(suffix)]
-            break
-    if token.isdecimal():
-        return int(token)
-    raise RuleIRError(f"Unsupported battle round ordinal in rule language: {value}.")
-
-
-def _roll_type(value: str) -> str:
-    return value.lower().replace("-", "_").replace(" ", "_")
-
-
-def _subject_token(value: str) -> str:
-    return value.lower().replace(" ", "_").replace("-", "_")
-
-
-def _post_shoot_subject_token(value: str) -> str:
-    token = _subject_token(value.removeprefix("the "))
-    if token in {"bearer", "this_model", "this_unit"}:
-        return token
-    raise RuleIRError(f"Unsupported post-shoot subject in rule language: {value}.")
-
-
-def _contextual_status_target_scope_token(match: re.Match[str]) -> str:
-    subject = _subject_token(match.group("subject").removeprefix("the "))
-    if subject.startswith("models_in_"):
-        return "models_in_selected_unit"
-    if subject in {"that_enemy_unit", "that_unit", "selected_unit", "target_unit"}:
-        return "selected_unit"
-    raise RuleIRError(f"Unsupported contextual status target in rule language: {subject}.")
-
-
-def _range_kind_token(value: str) -> str:
-    stripped = value.strip()
-    if stripped.endswith('"'):
-        return "numeric_range"
-    return stripped.lower().replace(" ", "_").replace("-", "_")
-
-
-def _object_kind_token(value: str) -> str:
-    normalized = value.lower().replace(" ", "_").replace("-", "_")
-    if normalized in {"units", "unit"}:
-        return "unit"
-    if normalized in {"models", "model"}:
-        return "model"
-    if normalized in {"objective_markers", "objective_marker"}:
-        return "objective_marker"
-    raise RuleIRError(f"Unsupported distance relation object kind: {value}.")
-
-
-def _quantity_token(value: str) -> str:
-    return value.lower().replace(" ", "_").replace("-", "_")
-
-
-def _ability_token(value: str) -> str:
-    stripped = value.strip(" []().,;:")
-    return " ".join(stripped.split())
-
-
 def _feel_no_pain_attack_condition_token(value: str) -> str:
     normalized = value.strip().lower().replace("-", " ")
     if normalized in {"psychic attack", "psychic attacks"}:
@@ -2855,14 +2864,6 @@ def _weapon_scope_token(value: str) -> str:
     if scope is None:
         raise RuleIRError(f"Unsupported weapon scope in rule language: {value}.")
     return scope
-
-
-def _is_weapon_keyword(value: str) -> bool:
-    return value.lower() in {keyword.lower() for keyword in canonical_weapon_keyword_tokens()}
-
-
-def _catalog_like_token(value: str) -> str:
-    return value.strip().lower().replace("-", "_").replace(" ", "_")
 
 
 def _span_matches_existing_effect(

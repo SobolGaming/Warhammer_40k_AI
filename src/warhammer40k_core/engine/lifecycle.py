@@ -2478,6 +2478,8 @@ class GameLifecycle:
             shooting_phase_start_hooks=bundle.shooting_phase_start_hook_registry,
             shooting_end_surge_hooks=bundle.shooting_end_surge_hook_registry,
             attack_sequence_completed_hooks=bundle.attack_sequence_completed_hook_registry,
+            battle_shock_hooks=bundle.battle_shock_hook_registry,
+            ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
             stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
             runtime_modifier_registry=bundle.runtime_modifier_registry,
         )
