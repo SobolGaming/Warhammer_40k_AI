@@ -104,6 +104,71 @@ class CatalogDamagedShootingWeaponSelectionLimit:
 
 
 @dataclass(frozen=True, slots=True)
+class CatalogDamagedAbilitySelectionLimit:
+    damaged_effect_id: str
+    source_id: str
+    model_instance_id: str
+    selection_group: str
+    max_selections: int
+    baseline_max_selections: int
+    damaged_profile_active: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "damaged_effect_id",
+            _validate_identifier(
+                "DAMAGED ability selection limit damaged_effect_id",
+                self.damaged_effect_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier(
+                "DAMAGED ability selection limit source_id",
+                self.source_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "model_instance_id",
+            _validate_identifier(
+                "DAMAGED ability selection limit model_instance_id",
+                self.model_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "selection_group",
+            _validate_identifier(
+                "DAMAGED ability selection limit selection_group",
+                self.selection_group,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "max_selections",
+            _validate_positive_int(
+                "DAMAGED ability selection limit max_selections",
+                self.max_selections,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "baseline_max_selections",
+            _validate_positive_int(
+                "DAMAGED ability selection limit baseline_max_selections",
+                self.baseline_max_selections,
+            ),
+        )
+        if self.baseline_max_selections < self.max_selections:
+            raise GameLifecycleError("DAMAGED ability selection limit baseline is below max.")
+        if type(self.damaged_profile_active) is not bool:
+            raise GameLifecycleError("DAMAGED ability selection limit active flag must be a bool.")
+
+
+@dataclass(frozen=True, slots=True)
 class CatalogDamagedEffectRuntime:
     armies: tuple[ArmyDefinition, ...]
 
@@ -255,6 +320,54 @@ def catalog_damaged_shooting_weapon_selection_limit_for_profile(
         source_id=effect.source_id,
         model_instance_id=model.model_instance_id,
         weapon_keyword=keyword,
+        max_selections=effect.max_selections if active else effect.baseline_max_selections,
+        baseline_max_selections=effect.baseline_max_selections,
+        damaged_profile_active=active,
+    )
+
+
+def catalog_damaged_ability_selection_limit_for_model(
+    *,
+    unit: UnitInstance,
+    model: ModelInstance,
+    selection_group: str,
+) -> CatalogDamagedAbilitySelectionLimit | None:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("DAMAGED ability selection limit requires a unit.")
+    if type(model) is not ModelInstance:
+        raise GameLifecycleError("DAMAGED ability selection limit requires a model.")
+    requested_group = _validate_identifier(
+        "DAMAGED ability selection limit selection_group",
+        selection_group,
+    )
+    if not model.is_alive:
+        return None
+    effects: list[DamagedEffectDefinition] = []
+    for effect in unit.damaged_effects:
+        if effect.effect_kind is not DamagedEffectKind.ABILITY_SELECTION_LIMIT:
+            continue
+        if effect.selection_group != requested_group:
+            continue
+        if not _damaged_effect_targets_model(effect=effect, model=model):
+            continue
+        effects.append(effect)
+    if len(effects) == 0:
+        return None
+    if len(effects) != 1:
+        raise GameLifecycleError("DAMAGED ability selection limit is ambiguous.")
+    effect = effects[0]
+    if effect.max_selections is None:
+        raise GameLifecycleError("DAMAGED ability selection limit is missing max.")
+    if effect.baseline_max_selections is None:
+        raise GameLifecycleError("DAMAGED ability selection limit is missing baseline.")
+    if effect.selection_group is None:
+        raise GameLifecycleError("DAMAGED ability selection limit is missing selection group.")
+    active = effect.applies_to_wounds(model.wounds_remaining)
+    return CatalogDamagedAbilitySelectionLimit(
+        damaged_effect_id=effect.damaged_effect_id,
+        source_id=effect.source_id,
+        model_instance_id=model.model_instance_id,
+        selection_group=effect.selection_group,
         max_selections=effect.max_selections if active else effect.baseline_max_selections,
         baseline_max_selections=effect.baseline_max_selections,
         damaged_profile_active=active,

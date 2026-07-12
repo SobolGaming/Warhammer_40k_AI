@@ -130,6 +130,16 @@ SHADOW_LEGION_RUNTIME_CONSUMERS = (
 ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
     "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:"
+    "relics_of_the_matriarchs:battle-round-start",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:"
+    "relics_of_the_matriarchs:bloody-rose:weapon-profile",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:"
+    "relics_of_the_matriarchs:fiery-heart:advance",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:"
+    "relics_of_the_matriarchs:fiery-heart:charge",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:"
+    "relics_of_the_matriarchs:fiery-heart:movement",
 )
 ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",

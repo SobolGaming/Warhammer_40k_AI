@@ -98,6 +98,11 @@ AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS = (
 ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
     "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:battle-round-start",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:bloody-rose:weapon-profile",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:fiery-heart:advance",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:fiery-heart:charge",
+    "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:fiery-heart:movement",
 )
 ADEPTUS_CUSTODES_MARTIAL_KATAH_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:dacatarai",

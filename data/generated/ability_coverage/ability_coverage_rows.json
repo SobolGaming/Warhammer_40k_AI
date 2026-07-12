@@ -1282,7 +1282,8 @@
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
-      "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed"
+      "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed",
+      "warhammer_40000_11th:adepta_sororitas:triumph_of_saint_katherine:relics_of_the_matriarchs:battle-round-start"
     ],
     "semantic_categories": [
       "faction.army_rule.acts_of_faith"

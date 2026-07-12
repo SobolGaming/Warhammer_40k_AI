@@ -133,6 +133,9 @@ def source_backed_reroll_permission_context_for_unit(
             continue
         if not _source_payload_target_matches(
             permission_context.source_payload,
+            state=state,
+            unit_instance_id=requested_unit_id,
+            attack_kind=requested_attack_kind,
             target_unit_instance_id=requested_target_unit_id,
         ):
             continue
@@ -205,14 +208,119 @@ def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
 def _source_payload_target_matches(
     source_payload: dict[str, JsonValue],
     *,
+    state: object,
+    unit_instance_id: str,
+    attack_kind: str | None,
     target_unit_instance_id: str | None,
 ) -> bool:
+    conditional_attack_kind = source_payload.get("attack_kind")
+    if conditional_attack_kind is not None:
+        if type(conditional_attack_kind) is not str or not conditional_attack_kind.strip():
+            raise GameLifecycleError("Source-backed reroll attack_kind must be a string.")
+        if attack_kind != _validate_attack_kind("attack_kind", conditional_attack_kind):
+            return False
     conditional_target = source_payload.get("target_unit_instance_id")
-    if conditional_target is None:
+    if conditional_target is not None:
+        if type(conditional_target) is not str or not conditional_target.strip():
+            raise GameLifecycleError(
+                "Source-backed reroll target_unit_instance_id must be a string."
+            )
+        if target_unit_instance_id != conditional_target:
+            return False
+    return _source_payload_aura_range_matches(
+        source_payload,
+        state=state,
+        unit_instance_id=unit_instance_id,
+    )
+
+
+def _source_payload_aura_range_matches(
+    source_payload: dict[str, JsonValue],
+    *,
+    state: object,
+    unit_instance_id: str,
+) -> bool:
+    source_unit_id = source_payload.get("aura_source_unit_instance_id")
+    range_value = source_payload.get("aura_range_inches")
+    if source_unit_id is None and range_value is None:
         return True
-    if type(conditional_target) is not str or not conditional_target.strip():
-        raise GameLifecycleError("Source-backed reroll target_unit_instance_id must be a string.")
-    return target_unit_instance_id == conditional_target
+    if type(source_unit_id) is not str or not source_unit_id.strip():
+        raise GameLifecycleError(
+            "Source-backed reroll aura_source_unit_instance_id must be a string."
+        )
+    if type(range_value) not in {int, float}:
+        raise GameLifecycleError("Source-backed reroll aura_range_inches must be positive.")
+    range_inches = float(cast(int | float, range_value))
+    if range_inches <= 0.0:
+        raise GameLifecycleError("Source-backed reroll aura_range_inches must be positive.")
+    return _units_within_range(
+        state=state,
+        source_unit_instance_id=source_unit_id,
+        target_unit_instance_id=unit_instance_id,
+        range_inches=range_inches,
+    )
+
+
+def _units_within_range(
+    *,
+    state: object,
+    source_unit_instance_id: str,
+    target_unit_instance_id: str,
+    range_inches: float,
+) -> bool:
+    from warhammer40k_core.engine.battlefield_state import (
+        BattlefieldScenario,
+        geometry_model_for_placement,
+    )
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.geometry import shapely_backend
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Source-backed reroll aura lookup requires GameState.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Source-backed reroll aura lookup requires battlefield_state.")
+    requested_source_id = _validate_identifier(
+        "aura_source_unit_instance_id",
+        source_unit_instance_id,
+    )
+    requested_target_id = _validate_identifier("unit_instance_id", target_unit_instance_id)
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    source_placement = state.battlefield_state.unit_placement_or_none(requested_source_id)
+    target_placement = state.battlefield_state.unit_placement_or_none(requested_target_id)
+    if source_placement is None or target_placement is None:
+        return False
+    source_models = tuple(
+        geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(model_placement),
+            placement=model_placement,
+        )
+        for model_placement in source_placement.model_placements
+        if scenario.model_instance_for_placement(model_placement).is_alive
+    )
+    target_models = tuple(
+        geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(model_placement),
+            placement=model_placement,
+        )
+        for model_placement in target_placement.model_placements
+        if scenario.model_instance_for_placement(model_placement).is_alive
+    )
+    if not source_models or not target_models:
+        return False
+    return any(
+        shapely_backend.base_footprint_distance(
+            source_model.base,
+            source_model.pose,
+            target_model.base,
+            target_model.pose,
+        )
+        <= range_inches
+        for source_model in source_models
+        for target_model in target_models
+    )
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

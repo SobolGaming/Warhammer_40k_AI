@@ -130,6 +130,24 @@ def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
     return MappingProxyType({})
 
 
+def _validate_movement_roll_modifiers(
+    field_name: str,
+    value: object,
+) -> tuple[RollModifier, ...]:
+    if type(value) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    modifiers: list[RollModifier] = []
+    seen: set[str] = set()
+    for modifier in cast(tuple[object, ...], value):
+        if type(modifier) is not RollModifier:
+            raise GameLifecycleError(f"{field_name} must contain RollModifier values.")
+        if modifier.modifier_id in seen:
+            raise GameLifecycleError(f"{field_name} must not duplicate modifier IDs.")
+        seen.add(modifier.modifier_id)
+        modifiers.append(modifier)
+    return tuple(modifiers)
+
+
 type _MovementProposalParseResult = (
     tuple[MovementProposalRequest, MovementProposalPayload] | LifecycleStatus
 )
@@ -199,6 +217,7 @@ class AdvanceRollRequestPayload(TypedDict):
     player_id: str
     unit_instance_id: str
     spec: DiceRollSpecPayload
+    roll_modifiers: list[RollModifierPayload]
     reroll_permission: RerollPermissionPayload | None
 
 
@@ -458,6 +477,7 @@ class AdvanceRollRequest:
     player_id: str
     unit_instance_id: str
     spec: DiceRollSpec
+    roll_modifiers: tuple[RollModifier, ...] = ()
     reroll_permission: RerollPermission | None = None
 
     def __post_init__(self) -> None:
@@ -488,7 +508,16 @@ class AdvanceRollRequest:
         )
         if type(self.spec) is not DiceRollSpec:
             raise GameLifecycleError("AdvanceRollRequest spec must be a DiceRollSpec.")
-        _validate_advance_roll_spec(self.spec, unit_instance_id=self.unit_instance_id)
+        modifiers = _validate_movement_roll_modifiers(
+            "AdvanceRollRequest roll_modifiers",
+            self.roll_modifiers,
+        )
+        object.__setattr__(self, "roll_modifiers", modifiers)
+        _validate_advance_roll_spec(
+            self.spec,
+            unit_instance_id=self.unit_instance_id,
+            expression_modifier=sum(modifier.operand for modifier in modifiers),
+        )
         if self.reroll_permission is not None:
             if type(self.reroll_permission) is not RerollPermission:
                 raise GameLifecycleError(
@@ -512,8 +541,13 @@ class AdvanceRollRequest:
         battle_round: int,
         player_id: str,
         unit_instance_id: str,
+        roll_modifiers: tuple[RollModifier, ...] = (),
         reroll_permission: RerollPermission | None = None,
     ) -> Self:
+        modifiers = _validate_movement_roll_modifiers(
+            "AdvanceRollRequest roll_modifiers",
+            roll_modifiers,
+        )
         return cls(
             request_id=request_id,
             game_id=game_id,
@@ -521,11 +555,16 @@ class AdvanceRollRequest:
             player_id=player_id,
             unit_instance_id=unit_instance_id,
             spec=DiceRollSpec(
-                expression=DiceExpression(quantity=1, sides=6),
+                expression=DiceExpression(
+                    quantity=1,
+                    sides=6,
+                    modifier=sum(modifier.operand for modifier in modifiers),
+                ),
                 reason=f"Advance roll for {unit_instance_id}",
                 roll_type="advance_roll",
                 actor_id=unit_instance_id,
             ),
+            roll_modifiers=modifiers,
             reroll_permission=reroll_permission,
         )
 
@@ -537,6 +576,7 @@ class AdvanceRollRequest:
             "player_id": self.player_id,
             "unit_instance_id": self.unit_instance_id,
             "spec": self.spec.to_payload(),
+            "roll_modifiers": [modifier.to_payload() for modifier in self.roll_modifiers],
             "reroll_permission": (
                 None if self.reroll_permission is None else self.reroll_permission.to_payload()
             ),
@@ -552,6 +592,9 @@ class AdvanceRollRequest:
             player_id=payload["player_id"],
             unit_instance_id=payload["unit_instance_id"],
             spec=DiceRollSpec.from_payload(payload["spec"]),
+            roll_modifiers=tuple(
+                RollModifier.from_payload(modifier) for modifier in payload["roll_modifiers"]
+            ),
             reroll_permission=(
                 None
                 if reroll_permission_payload is None
@@ -575,8 +618,10 @@ class AdvanceRollResult:
             raise GameLifecycleError("AdvanceRollResult roll_state spec must match request.")
         if self.value != self.roll_state.current_total:
             raise GameLifecycleError("AdvanceRollResult value must match roll_state total.")
-        if self.value < 1 or self.value > 6:
-            raise GameLifecycleError("AdvanceRollResult value must be between 1 and 6.")
+        min_value = 1 + self.request.spec.expression.modifier
+        max_value = self.request.spec.expression.sides + self.request.spec.expression.modifier
+        if self.value < min_value or self.value > max_value:
+            raise GameLifecycleError("AdvanceRollResult value must match request bounds.")
 
     @classmethod
     def from_roll_state(cls, *, request: AdvanceRollRequest, roll_state: DiceRollState) -> Self:

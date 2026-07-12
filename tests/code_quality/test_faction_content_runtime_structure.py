@@ -281,6 +281,9 @@ def test_scaffold_contributions_have_stable_ids_and_placeholders_are_empty() -> 
             or contribution.save_option_modifier_bindings
             or contribution.movement_budget_modifier_bindings
             or contribution.objective_control_modifier_bindings
+            or contribution.advance_roll_modifier_bindings
+            or contribution.charge_roll_modifier_bindings
+            or contribution.weapon_profile_modifier_bindings
             or contribution.faction_named_handlers
         ):
             invalid_modules.append(module_path)

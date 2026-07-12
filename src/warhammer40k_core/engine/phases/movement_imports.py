@@ -162,6 +162,7 @@ from warhammer40k_core.engine.reserves import (
     resolve_reserve_arrival,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
+    AdvanceRollModifierContext,
     MovementBudgetModifierContext,
     RuntimeModifierRegistry,
 )
@@ -267,6 +268,7 @@ if TYPE_CHECKING:
 
 __all__ = (
     "AbilityCatalogIndex",
+    "AdvanceRollModifierContext",
     "AdvanceEligibilityContext",
     "AdvanceEligibilityHookRegistry",
     "AdvanceMoveContext",

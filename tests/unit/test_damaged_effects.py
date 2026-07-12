@@ -14,8 +14,10 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.damaged_effects import (
+    CatalogDamagedAbilitySelectionLimit,
     CatalogDamagedEffectRuntime,
     CatalogDamagedShootingWeaponSelectionLimit,
+    catalog_damaged_ability_selection_limit_for_model,
     catalog_damaged_effect_hit_roll_modifier_bindings,
     catalog_damaged_effect_objective_control_modifier_bindings,
     catalog_damaged_effect_weapon_profile_modifier_bindings,
@@ -394,6 +396,155 @@ def test_ctan_power_selection_limit_rejects_ambiguous_or_incomplete_effects() ->
         )
 
 
+def test_damaged_effects_expose_ability_selection_limit_by_wound_range() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    selection_limit_effect = _damaged_effect(
+        effect_id="core-vehicle-monster:damaged:ability-selection",
+        effect_kind=DamagedEffectKind.ABILITY_SELECTION_LIMIT,
+        max_selections=1,
+        baseline_max_selections=2,
+        selection_group="Relics of the Matriarchs ability",
+    )
+    fresh_unit = _unit_with_damaged_effects(
+        catalog=catalog,
+        datasheet_id="core-vehicle-monster",
+        wounds_remaining=6,
+        effects=(selection_limit_effect,),
+    )
+    damaged_unit = _unit_with_damaged_effects(
+        catalog=catalog,
+        datasheet_id="core-vehicle-monster",
+        wounds_remaining=5,
+        effects=(selection_limit_effect,),
+    )
+
+    fresh_limit = catalog_damaged_ability_selection_limit_for_model(
+        unit=fresh_unit,
+        model=fresh_unit.own_models[0],
+        selection_group="Relics of the Matriarchs ability",
+    )
+    damaged_limit = catalog_damaged_ability_selection_limit_for_model(
+        unit=damaged_unit,
+        model=damaged_unit.own_models[0],
+        selection_group="Relics of the Matriarchs ability",
+    )
+
+    assert fresh_limit is not None
+    assert fresh_limit.max_selections == 2
+    assert fresh_limit.baseline_max_selections == 2
+    assert not fresh_limit.damaged_profile_active
+    assert damaged_limit is not None
+    assert damaged_limit.max_selections == 1
+    assert damaged_limit.baseline_max_selections == 2
+    assert damaged_limit.damaged_profile_active
+
+
+def test_ability_selection_limit_ignores_unmatched_groups_models_and_dead_models() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    selection_limit_effect = _damaged_effect(
+        effect_id="core-vehicle-monster:damaged:ability-selection",
+        effect_kind=DamagedEffectKind.ABILITY_SELECTION_LIMIT,
+        max_selections=1,
+        baseline_max_selections=2,
+        selection_group="Relics of the Matriarchs ability",
+    )
+    unit = _unit_with_damaged_effects(
+        catalog=catalog,
+        datasheet_id="core-vehicle-monster",
+        wounds_remaining=5,
+        effects=(selection_limit_effect,),
+    )
+    model = unit.own_models[0]
+
+    assert (
+        catalog_damaged_ability_selection_limit_for_model(
+            unit=unit,
+            model=model,
+            selection_group="Other ability",
+        )
+        is None
+    )
+    assert (
+        catalog_damaged_ability_selection_limit_for_model(
+            unit=replace(unit, damaged_effects=()),
+            model=model,
+            selection_group="Relics of the Matriarchs ability",
+        )
+        is None
+    )
+
+    dead_model = replace(model, wounds_remaining=0)
+    assert (
+        catalog_damaged_ability_selection_limit_for_model(
+            unit=replace(unit, own_models=(dead_model,)),
+            model=dead_model,
+            selection_group="Relics of the Matriarchs ability",
+        )
+        is None
+    )
+
+    unmatched_effect = _damaged_effect(
+        effect_id="core-vehicle-monster:damaged:ability-unmatched",
+        effect_kind=DamagedEffectKind.ABILITY_SELECTION_LIMIT,
+        model_profile_id="other-model-profile",
+        max_selections=1,
+        baseline_max_selections=2,
+        selection_group="Relics of the Matriarchs ability",
+    )
+    assert (
+        catalog_damaged_ability_selection_limit_for_model(
+            unit=replace(unit, damaged_effects=(unmatched_effect,)),
+            model=model,
+            selection_group="Relics of the Matriarchs ability",
+        )
+        is None
+    )
+
+
+def test_ability_selection_limit_rejects_ambiguous_or_invalid_inputs() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    first_effect = _damaged_effect(
+        effect_id="core-vehicle-monster:damaged:ability-selection-a",
+        effect_kind=DamagedEffectKind.ABILITY_SELECTION_LIMIT,
+        max_selections=1,
+        baseline_max_selections=2,
+        selection_group="Relics of the Matriarchs ability",
+    )
+    second_effect = _damaged_effect(
+        effect_id="core-vehicle-monster:damaged:ability-selection-b",
+        effect_kind=DamagedEffectKind.ABILITY_SELECTION_LIMIT,
+        max_selections=1,
+        baseline_max_selections=2,
+        selection_group="Relics of the Matriarchs ability",
+    )
+    unit = _unit_with_damaged_effects(
+        catalog=catalog,
+        datasheet_id="core-vehicle-monster",
+        wounds_remaining=5,
+        effects=(first_effect, second_effect),
+    )
+    model = unit.own_models[0]
+
+    with pytest.raises(GameLifecycleError, match="ambiguous"):
+        catalog_damaged_ability_selection_limit_for_model(
+            unit=unit,
+            model=model,
+            selection_group="Relics of the Matriarchs ability",
+        )
+    with pytest.raises(GameLifecycleError, match="requires a unit"):
+        catalog_damaged_ability_selection_limit_for_model(
+            unit="damaged-unit",  # type: ignore[arg-type]
+            model=model,
+            selection_group="Relics of the Matriarchs ability",
+        )
+    with pytest.raises(GameLifecycleError, match="requires a model"):
+        catalog_damaged_ability_selection_limit_for_model(
+            unit=unit,
+            model="damaged-model",  # type: ignore[arg-type]
+            selection_group="Relics of the Matriarchs ability",
+        )
+
+
 def test_damaged_effect_runtime_rejects_invalid_context_and_armies() -> None:
     runtime = CatalogDamagedEffectRuntime(armies=())
 
@@ -456,6 +607,39 @@ def test_ctan_power_selection_limit_payload_is_fail_fast() -> None:
             source_id="source:damaged:ctan-selection",
             model_instance_id="model:ctan",
             weapon_keyword=WeaponKeyword.CTAN_POWER,
+            max_selections=1,
+            baseline_max_selections=2,
+            damaged_profile_active=1,  # type: ignore[arg-type]
+        )
+
+
+def test_ability_selection_limit_payload_is_fail_fast() -> None:
+    with pytest.raises(GameLifecycleError, match="selection_group must be a string"):
+        CatalogDamagedAbilitySelectionLimit(
+            damaged_effect_id="damaged:ability-selection",
+            source_id="source:damaged:ability-selection",
+            model_instance_id="model:triumph",
+            selection_group=1,  # type: ignore[arg-type]
+            max_selections=1,
+            baseline_max_selections=2,
+            damaged_profile_active=True,
+        )
+    with pytest.raises(GameLifecycleError, match="baseline is below max"):
+        CatalogDamagedAbilitySelectionLimit(
+            damaged_effect_id="damaged:ability-selection",
+            source_id="source:damaged:ability-selection",
+            model_instance_id="model:triumph",
+            selection_group="Relics of the Matriarchs ability",
+            max_selections=2,
+            baseline_max_selections=1,
+            damaged_profile_active=True,
+        )
+    with pytest.raises(GameLifecycleError, match="active flag must be a bool"):
+        CatalogDamagedAbilitySelectionLimit(
+            damaged_effect_id="damaged:ability-selection",
+            source_id="source:damaged:ability-selection",
+            model_instance_id="model:triumph",
+            selection_group="Relics of the Matriarchs ability",
             max_selections=1,
             baseline_max_selections=2,
             damaged_profile_active=1,  # type: ignore[arg-type]

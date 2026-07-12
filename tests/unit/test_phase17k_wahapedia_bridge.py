@@ -6202,6 +6202,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID,
         adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID,
     )
+    adepta_sororitas_coverage_runtime_ids = (
+        *adepta_sororitas_runtime_ids,
+        adepta_sororitas_army_rule.TRIUMPH_RELICS_BATTLE_ROUND_START_HOOK_ID,
+    )
     adeptus_custodes_runtime_ids = (
         adeptus_custodes_army_rule.DACATARAI_HOOK_ID,
         adeptus_custodes_army_rule.RENDAX_HOOK_ID,
@@ -6740,6 +6744,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     for runtime_id in adepta_sororitas_runtime_ids:
         assert f"| `{runtime_id}` | Acts of Faith |" in generated_markdown
     assert (
+        f"| `{adepta_sororitas_army_rule.TRIUMPH_RELICS_BATTLE_ROUND_START_HOOK_ID}` | "
+        "Relics of the Matriarchs |"
+    ) in generated_markdown
+    assert (
         f"| `{adeptus_custodes_army_rule.DACATARAI_HOOK_ID}` | Martial Ka'tah - Dacatarai |"
     ) in generated_markdown
     assert (
@@ -6991,7 +6999,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     }
     assert set(rows_by_name["Cult Ambush"][0].runtime_consumer_ids) == set(cult_ambush_runtime_ids)
     assert set(rows_by_name["Acts of Faith"][0].runtime_consumer_ids) == set(
-        adepta_sororitas_runtime_ids
+        adepta_sororitas_coverage_runtime_ids
     )
     assert set(rows_by_name["Martial Ka'tah"][0].runtime_consumer_ids) == set(
         adeptus_custodes_runtime_ids
@@ -7030,7 +7038,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         and row_payload["ability_name"] == "Acts of Faith"
         and row_payload["datasheet_name"] == "Adepta Sororitas"
         and row_payload["support_stage"] == AbilityCoverageSupportStage.ENGINE_CONSUMED.value
-        and set(row_payload["runtime_consumer_ids"]) == set(adepta_sororitas_runtime_ids)
+        and set(row_payload["runtime_consumer_ids"]) == set(adepta_sororitas_coverage_runtime_ids)
         for row_payload in snapshot
     )
     assert any(
@@ -7192,7 +7200,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert categories_by_name["Faction Army Rule Acts Of Faith"].ability_names == ("Acts of Faith",)
     assert categories_by_name["Faction Army Rule Acts Of Faith"].runtime_consumer_ids == tuple(
-        sorted(adepta_sororitas_runtime_ids)
+        sorted(adepta_sororitas_coverage_runtime_ids)
     )
     assert categories_by_name["Faction Army Rule Acts Of Faith"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
@@ -7242,7 +7250,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         row_payload["category_name"] == "Faction Army Rule Acts Of Faith"
         and row_payload["ability_names"] == ["Acts of Faith"]
         and row_payload["support_stages"] == [AbilityCoverageSupportStage.ENGINE_CONSUMED.value]
-        and set(row_payload["runtime_consumer_ids"]) == set(adepta_sororitas_runtime_ids)
+        and set(row_payload["runtime_consumer_ids"]) == set(adepta_sororitas_coverage_runtime_ids)
         for row_payload in category_snapshot
     )
     assert any(

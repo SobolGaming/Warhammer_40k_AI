@@ -19,6 +19,7 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
@@ -73,12 +74,18 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27
 
 
 def test_advance_roll_and_advanced_state_payloads_round_trip_without_object_reprs() -> None:
+    modifier = RollModifier(
+        modifier_id="phase10n-advance-roll-plus-one",
+        source_id="phase10n:test",
+        operand=1,
+    )
     request = AdvanceRollRequest.for_unit(
         request_id="phase10n-advance-roll",
         game_id="phase10n-game",
         battle_round=1,
         player_id="player-a",
         unit_instance_id="army-alpha:intercessor-unit-1",
+        roll_modifiers=(modifier,),
     )
     roll_state = DiceRollManager("phase10n-game").roll_fixed(request.spec, [4])
     roll = AdvanceRollResult.from_roll_state(request=request, roll_state=roll_state)
@@ -108,6 +115,8 @@ def test_advance_roll_and_advanced_state_payloads_round_trip_without_object_repr
 
     assert "<" not in blob
     assert "object at 0x" not in blob
+    assert roll.value == 5
+    assert roll_payload["request"]["roll_modifiers"] == [modifier.to_payload()]
     assert AdvanceRollResult.from_payload(roll_payload) == roll
     assert AdvancedUnitState.from_payload(state_payload) == advanced_state
     assert not advanced_state.can_shoot
@@ -545,7 +554,7 @@ def test_advance_domain_objects_fail_fast_on_drift() -> None:
             unit_instance_id="army-alpha:intercessor-unit-1",
             spec=cast(DiceRollSpec, "bad"),
         )
-    with pytest.raises(GameLifecycleError, match="unmodified D6"):
+    with pytest.raises(GameLifecycleError, match="D6 modifier payload"):
         AdvanceRollRequest(
             request_id="bad",
             game_id="phase10n-game",
@@ -557,6 +566,27 @@ def test_advance_domain_objects_fail_fast_on_drift() -> None:
                 reason="Advance validation",
                 roll_type="advance_roll",
                 actor_id="army-alpha:intercessor-unit-1",
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="D6 modifier payload"):
+        AdvanceRollRequest(
+            request_id="bad-modifier-drift",
+            game_id="phase10n-game",
+            battle_round=1,
+            player_id="player-a",
+            unit_instance_id="army-alpha:intercessor-unit-1",
+            spec=DiceRollSpec(
+                expression=DiceExpression(quantity=1, sides=6),
+                reason="Advance validation",
+                roll_type="advance_roll",
+                actor_id="army-alpha:intercessor-unit-1",
+            ),
+            roll_modifiers=(
+                RollModifier(
+                    modifier_id="phase10n-advance-drift-plus-one",
+                    source_id="phase10n:test",
+                    operand=1,
+                ),
             ),
         )
     with pytest.raises(GameLifecycleError, match="owner"):

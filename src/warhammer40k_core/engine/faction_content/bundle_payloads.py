@@ -57,6 +57,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     save_option_modifier_ids: list[str]
     movement_budget_modifier_ids: list[str]
     objective_control_modifier_ids: list[str]
+    advance_roll_modifier_ids: list[str]
     charge_roll_modifier_ids: list[str]
     weapon_profile_modifier_ids: list[str]
     faction_execution_record_ids: list[str]
@@ -220,6 +221,10 @@ def runtime_content_bundle_summary_payload(
         "objective_control_modifier_ids": [
             binding.modifier_id
             for binding in bundle.runtime_modifier_registry.all_objective_control_bindings()
+        ],
+        "advance_roll_modifier_ids": [
+            binding.modifier_id
+            for binding in bundle.runtime_modifier_registry.all_advance_roll_bindings()
         ],
         "charge_roll_modifier_ids": [
             binding.modifier_id
