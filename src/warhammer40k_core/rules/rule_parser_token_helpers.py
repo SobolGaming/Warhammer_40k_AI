@@ -78,6 +78,8 @@ def object_kind_token(value: str) -> str:
         return "model"
     if normalized in {"objective_markers", "objective_marker"}:
         return "objective_marker"
+    if normalized in {"fortifications", "fortification"}:
+        return "fortification"
     raise RuleIRError(f"Unsupported distance relation object kind: {value}.")
 
 

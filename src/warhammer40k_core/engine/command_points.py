@@ -46,6 +46,8 @@ class CommandStepStatePayload(TypedDict):
     tactical_secondary_resolved: bool
     tactical_secondary_replacement_resolved: bool
     battle_shock_step_resolved: bool
+    battle_shock_phase_start_unit_ids: list[str]
+    completed_battle_shock_test_request_ids: list[str]
 
 
 class CommandPointTransactionPayload(TypedDict):
@@ -110,6 +112,8 @@ class CommandStepState:
     tactical_secondary_resolved: bool = False
     tactical_secondary_replacement_resolved: bool = False
     battle_shock_step_resolved: bool = False
+    battle_shock_phase_start_unit_ids: tuple[str, ...] = ()
+    completed_battle_shock_test_request_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -157,6 +161,22 @@ class CommandStepState:
                 self.tactical_secondary_replacement_resolved,
             ),
         )
+        object.__setattr__(
+            self,
+            "battle_shock_phase_start_unit_ids",
+            _validate_identifier_tuple(
+                "CommandStepState battle_shock_phase_start_unit_ids",
+                self.battle_shock_phase_start_unit_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "completed_battle_shock_test_request_ids",
+            _validate_identifier_tuple(
+                "CommandStepState completed_battle_shock_test_request_ids",
+                self.completed_battle_shock_test_request_ids,
+            ),
+        )
         if self.current_step is CommandPhaseStep.BATTLE_SHOCK and not self.command_points_granted:
             raise GameLifecycleError(
                 "CommandStepState cannot enter Battle-shock before Command step CP gain."
@@ -183,6 +203,8 @@ class CommandStepState:
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
     def with_scoring_hooks_resolved(self) -> Self:
@@ -195,6 +217,8 @@ class CommandStepState:
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
     def with_tactical_secondary_resolved(self) -> Self:
@@ -207,6 +231,8 @@ class CommandStepState:
             tactical_secondary_resolved=True,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
     def with_tactical_secondary_replacement_resolved(self) -> Self:
@@ -219,11 +245,29 @@ class CommandStepState:
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=True,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
-    def enter_battle_shock_step(self) -> Self:
+    def enter_battle_shock_step(
+        self,
+        *,
+        phase_start_battle_shocked_unit_ids: tuple[str, ...] | None = None,
+    ) -> Self:
         if not self.command_points_granted:
             raise GameLifecycleError("Battle-shock step requires Command step CP gain.")
+        if phase_start_battle_shocked_unit_ids is None:
+            phase_start_ids = self.battle_shock_phase_start_unit_ids
+        else:
+            phase_start_ids = _validate_identifier_tuple(
+                "phase_start_battle_shocked_unit_ids",
+                phase_start_battle_shocked_unit_ids,
+            )
+            if (
+                self.current_step is CommandPhaseStep.BATTLE_SHOCK
+                and phase_start_ids != self.battle_shock_phase_start_unit_ids
+            ):
+                raise GameLifecycleError("Battle-shock phase-start unit IDs drifted.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
@@ -233,6 +277,28 @@ class CommandStepState:
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=phase_start_ids,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
+        )
+
+    def with_completed_battle_shock_test_request(self, request_id: str) -> Self:
+        completed_request_id = _validate_identifier("request_id", request_id)
+        if completed_request_id in self.completed_battle_shock_test_request_ids:
+            raise GameLifecycleError("Battle-shock test request was already completed.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            current_step=CommandPhaseStep.BATTLE_SHOCK,
+            command_points_granted=self.command_points_granted,
+            scoring_hooks_resolved=self.scoring_hooks_resolved,
+            tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
+            battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            completed_battle_shock_test_request_ids=(
+                *self.completed_battle_shock_test_request_ids,
+                completed_request_id,
+            ),
         )
 
     def with_battle_shock_step_resolved(self) -> Self:
@@ -245,6 +311,8 @@ class CommandStepState:
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=True,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
     def to_payload(self) -> CommandStepStatePayload:
@@ -259,6 +327,10 @@ class CommandStepState:
                 self.tactical_secondary_replacement_resolved
             ),
             "battle_shock_step_resolved": self.battle_shock_step_resolved,
+            "battle_shock_phase_start_unit_ids": list(self.battle_shock_phase_start_unit_ids),
+            "completed_battle_shock_test_request_ids": list(
+                self.completed_battle_shock_test_request_ids
+            ),
         }
 
     @classmethod
@@ -274,6 +346,10 @@ class CommandStepState:
                 "tactical_secondary_replacement_resolved"
             ],
             battle_shock_step_resolved=payload["battle_shock_step_resolved"],
+            battle_shock_phase_start_unit_ids=tuple(payload["battle_shock_phase_start_unit_ids"]),
+            completed_battle_shock_test_request_ids=tuple(
+                payload["completed_battle_shock_test_request_ids"]
+            ),
         )
 
 
@@ -1079,6 +1155,20 @@ def _validate_transaction_tuple(
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    identifiers: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+        identifiers.append(identifier)
+        seen.add(identifier)
+    return tuple(identifiers)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

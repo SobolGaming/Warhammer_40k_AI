@@ -290,8 +290,6 @@ def _cover_for_allocated_model(
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Allocated-model cover requires battlefield_state.")
-    if not battlefield.terrain_features:
-        return None
     try:
         scenario = BattlefieldScenario(
             armies=tuple(state.army_definitions),
@@ -344,4 +342,140 @@ def _cover_for_allocated_model(
             unit_instance_id=pool.target_unit_instance_id,
         ).keywords,
     )
-    return context.benefit_of_cover(context.resolve_line_of_sight())
+    witness = context.resolve_line_of_sight()
+    cover_result = context.benefit_of_cover(witness)
+    if cover_result.has_benefit:
+        return cover_result
+    fortification_cover = _fortification_cover_for_allocated_model(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        scenario=scenario,
+        pool=pool,
+        allocated_model_id=allocated_model_id,
+        attacking_unit_id=attacking_unit_id,
+        target_geometry=target_geometry,
+        terrain_features=terrain_features,
+        terrain_volumes=terrain_volumes,
+        dynamic_blockers=dynamic_blockers,
+    )
+    return fortification_cover if fortification_cover is not None else cover_result
+
+
+def _fortification_cover_for_allocated_model(
+    *,
+    state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
+    scenario: BattlefieldScenario,
+    pool: RangedAttackPool,
+    allocated_model_id: str,
+    attacking_unit_id: str,
+    target_geometry: GeometryModel,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+    terrain_volumes: tuple[TerrainVolume, ...],
+    dynamic_blockers: tuple[GeometryModel, ...],
+) -> BenefitOfCoverResult | None:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Fortification cover requires battlefield_state.")
+    try:
+        attacking_unit_placement = battlefield.unit_placement_by_id(attacking_unit_id)
+    except PlacementError as exc:
+        raise GameLifecycleError("Fortification cover attacker placement is invalid.") from exc
+    blocker_records: set[CoverSourceRecord] = set()
+    blocker_witness: LineOfSightWitness | None = None
+    for attacker_placement in attacking_unit_placement.model_placements:
+        attacker_model = model_by_id(
+            state=state,
+            model_instance_id=attacker_placement.model_instance_id,
+        )
+        observer_geometry = geometry_model_for_placement(
+            model=attacker_model,
+            placement=attacker_placement,
+        )
+        context = TerrainVisibilityContext.from_ruleset_descriptor(
+            ruleset_descriptor=ruleset_descriptor,
+            los_cache_key=shooting_visibility_cache_key(
+                scenario=scenario,
+                terrain_features=terrain_features,
+            ),
+            observer_model=observer_geometry,
+            target_models=(target_geometry,),
+            terrain_features=terrain_features,
+            terrain_volumes=terrain_volumes,
+            dynamic_model_blockers=dynamic_blockers,
+            observer_keywords=unit_by_id(
+                state=state,
+                unit_instance_id=attacking_unit_id,
+            ).keywords,
+            target_keywords=rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=pool.target_unit_instance_id,
+            ).keywords,
+        )
+        witness = context.resolve_line_of_sight()
+        fortification_blocker_ids = _fortification_full_visibility_blocker_ids(
+            state=state,
+            witness=witness,
+        )
+        if not fortification_blocker_ids:
+            continue
+        blocker_witness = witness
+        for blocker_id in fortification_blocker_ids:
+            blocker_records.add(
+                CoverSourceRecord(
+                    feature_id=blocker_id,
+                    feature_kind=TerrainFeatureKind.INDUSTRIAL_STRUCTURES,
+                    policy_kind=LineOfSightPolicy.TRUE_LINE_OF_SIGHT,
+                    reason=CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE,
+                )
+            )
+    if blocker_witness is None or not blocker_records:
+        return None
+    sorted_records = tuple(sorted(blocker_records, key=lambda item: item.feature_id))
+    return BenefitOfCoverResult(
+        has_benefit=True,
+        cover_effect=CoverEffect.SAVE_BONUS,
+        source_feature_ids=tuple(record.feature_id for record in sorted_records),
+        source_policy_kinds=(LineOfSightPolicy.TRUE_LINE_OF_SIGHT,),
+        source_records=sorted_records,
+        los_cache_key=blocker_witness.los_cache_key,
+        target_unit_visible=blocker_witness.unit_visible,
+        target_unit_fully_visible=blocker_witness.unit_fully_visible,
+        non_stacking=True,
+        ap_zero_save_bonus_excluded_for_save_3_plus_or_better=True,
+    )
+
+
+def _fortification_full_visibility_blocker_ids(
+    *,
+    state: GameState,
+    witness: LineOfSightWitness,
+) -> tuple[str, ...]:
+    blocker_ids: set[str] = set()
+    for blocker in witness.all_blocker_records():
+        if blocker.blocker_kind is not VisibilityBlockerKind.MODEL:
+            continue
+        if not blocker.blocks_full_visibility:
+            continue
+        if _model_owner_unit_has_keyword(
+            state=state,
+            model_instance_id=blocker.blocker_id,
+            keyword="FORTIFICATION",
+        ):
+            blocker_ids.add(blocker.blocker_id)
+    return tuple(sorted(blocker_ids))
+
+
+def _model_owner_unit_has_keyword(
+    *,
+    state: GameState,
+    model_instance_id: str,
+    keyword: str,
+) -> bool:
+    canonical = _canonical_keyword(keyword)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if not any(model.model_instance_id == model_instance_id for model in unit.own_models):
+                continue
+            return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
+    raise GameLifecycleError("Fortification cover blocker model is unknown.")

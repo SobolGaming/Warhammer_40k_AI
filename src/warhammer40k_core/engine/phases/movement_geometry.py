@@ -247,11 +247,22 @@ def _desperate_escape_requirements_for_fall_back(
         scenario=scenario,
         player_id=unit_placement.player_id,
     )
+    battle_shocked_desperate_escape_suppressed = (
+        unit_placement.unit_instance_id in battle_shocked_ids
+        and _unit_only_engaged_with_enemy_fortifications(
+            scenario=scenario,
+            unit_placement=unit_placement,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+    )
     requirements: list[DesperateEscapeRequirement] = []
     for index, placement in enumerate(unit_placement.model_placements, start=1):
         reasons: list[DesperateEscapeRequirementReason] = []
         enemy_model_ids: tuple[str, ...] = ()
-        if unit_placement.unit_instance_id in battle_shocked_ids:
+        if (
+            unit_placement.unit_instance_id in battle_shocked_ids
+            and not battle_shocked_desperate_escape_suppressed
+        ):
             reasons.append(DesperateEscapeRequirementReason.BATTLE_SHOCKED)
         if forced_source_ids:
             reasons.append(DesperateEscapeRequirementReason.FORCED_BY_RULE)
@@ -283,6 +294,49 @@ def _desperate_escape_requirements_for_fall_back(
             )
         )
     return tuple(requirements)
+
+
+def _unit_only_engaged_with_enemy_fortifications(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+    ruleset_descriptor: RulesetDescriptor,
+) -> bool:
+    engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+    if not engaged_enemy_unit_ids:
+        return False
+    return all(
+        _unit_has_fortification_keyword(
+            _unit_instance_by_id_in_scenario(
+                scenario=scenario,
+                unit_instance_id=enemy_unit_id,
+            )
+        )
+        for enemy_unit_id in engaged_enemy_unit_ids
+    )
+
+
+def _unit_instance_by_id_in_scenario(
+    *,
+    scenario: BattlefieldScenario,
+    unit_instance_id: str,
+) -> UnitInstance:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in scenario.armies:
+        for unit in army.units:
+            if unit.unit_instance_id == requested_unit_id:
+                return unit
+    raise GameLifecycleError("Scenario unit lookup failed.")
+
+
+def _unit_has_fortification_keyword(unit: UnitInstance) -> bool:
+    return _canonical_keyword("FORTIFICATION") in {
+        _canonical_keyword(keyword) for keyword in unit.keywords
+    }
 
 
 def _enemy_model_ids_crossed_by_witness(

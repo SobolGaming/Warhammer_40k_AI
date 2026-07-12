@@ -8,6 +8,7 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.dice import RerollComponentSelectionPolicy
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     FightEligibilityKind,
@@ -18,6 +19,9 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
+from warhammer40k_core.engine import (
+    catalog_battle_shock_runtime as battle_shock_runtime,
+)
 from warhammer40k_core.engine import (
     catalog_command_point_runtime as command_point_runtime,
 )
@@ -39,12 +43,24 @@ from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSeque
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
-from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockTestReason,
+    BattleShockTestRequest,
+)
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockHookRegistry,
+    BattleShockRerollPermissionContext,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
+    BattlefieldScenario,
     ModelPlacement,
     PlacedArmy,
     UnitPlacement,
+)
+from warhammer40k_core.engine.catalog_battle_shock_runtime import (
+    CatalogBattleShockRerollRuntime,
+    catalog_battle_shock_hook_bindings,
 )
 from warhammer40k_core.engine.catalog_command_point_runtime import (
     CATALOG_IR_COMMAND_POINT_GAIN_EVENT,
@@ -67,7 +83,10 @@ from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CATALOG_ONCE_PER_BATTLE_ABILITY_DECLINED_EVENT,
     CatalogOncePerBattleRuntime,
 )
-from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_clauses_from_record
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
+    catalog_rule_clauses_from_record,
+)
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
     CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
@@ -179,6 +198,10 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import UnitMoveCompletedContext
+from warhammer40k_core.engine.unit_state import (
+    BelowHalfStrengthContext,
+    starting_strength_records_for_units,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import (
@@ -246,6 +269,11 @@ DIRECT_PHASE_COMMAND_POINT_TEXT = (
 )
 FIXED_ROLL_COMMAND_POINT_TEXT = (
     "At the end of your Command phase, roll one D6: on a 1+, you gain 1CP."
+)
+SKULL_ALTAR_BATTLE_SHOCK_REROLL_TEXT = (
+    'While a friendly Khorne Legiones Daemonica unit is within 6" of this '
+    "FORTIFICATION, each time you take a Battle-shock test for that unit, you can "
+    "re-roll that test."
 )
 
 
@@ -433,6 +461,418 @@ def test_catalog_desperate_escape_consumer_ignores_dead_engagement_placements() 
         )
         == ()
     )
+
+
+def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_request = replace(
+        _muster_request(catalog=catalog, player_id="player-a", army_id="army-alpha"),
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id="skull-altar-source",
+                datasheet_id="core-intercessor-like-infantry",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="khorne-target",
+                datasheet_id="core-intercessor-like-infantry",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+            ),
+        ),
+    )
+    army = muster_army(catalog=catalog, request=source_request)
+    enemy_army = muster_army(
+        catalog=catalog,
+        request=_muster_request(catalog=catalog, player_id="player-b", army_id="army-beta"),
+    )
+    source_unit = next(
+        unit for unit in army.units if unit.unit_instance_id.endswith("skull-altar-source")
+    )
+    target_unit = next(
+        unit for unit in army.units if unit.unit_instance_id.endswith("khorne-target")
+    )
+    source_unit = replace(
+        source_unit,
+        keywords=tuple(sorted((*source_unit.keywords, "FORTIFICATION"))),
+        faction_keywords=("KHORNE", "LEGIONES DAEMONICA"),
+    )
+    target_unit = replace(
+        target_unit,
+        faction_keywords=("KHORNE", "LEGIONES DAEMONICA"),
+    )
+    army = replace(army, units=(source_unit, target_unit))
+    battlefield = BattlefieldRuntimeState(
+        battlefield_id="catalog-battle-shock-reroll",
+        battlefield_width_inches=60.0,
+        battlefield_depth_inches=44.0,
+        placed_armies=(
+            PlacedArmy(
+                army_id=army.army_id,
+                player_id=army.player_id,
+                unit_placements=(
+                    _unit_placement_for_test(
+                        army=army,
+                        unit=source_unit,
+                        model_xs=_model_xs_for_unit(unit=source_unit, start_x=10.0),
+                    ),
+                    _unit_placement_for_test(
+                        army=army,
+                        unit=target_unit,
+                        model_xs=_model_xs_for_unit(unit=target_unit, start_x=14.0),
+                    ),
+                ),
+            ),
+        ),
+    )
+    state = _state_with_battlefield(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.COMMAND,
+    )
+    starting_record = starting_strength_records_for_units(
+        player_id=army.player_id,
+        units=(target_unit,),
+    )[0]
+    request = BattleShockTestRequest.for_unit(
+        request_id="catalog-battle-shock-reroll-test",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id=army.player_id,
+        unit_instance_id=target_unit.unit_instance_id,
+        reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
+        leadership_target=6,
+        below_half_strength_context=BelowHalfStrengthContext.from_unit(
+            player_id=army.player_id,
+            unit=target_unit,
+            starting_strength=starting_record,
+            current_model_ids=target_unit.own_model_ids(),
+        ),
+    )
+    record = _compiled_record(
+        record_id="catalog-skull-altar-battle-shock-reroll",
+        raw_text=SKULL_ALTAR_BATTLE_SHOCK_REROLL_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+    )
+    runtime = CatalogBattleShockRerollRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: AbilityCatalogIndex.from_records((record,)),
+            enemy_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(army, enemy_army),
+    )
+
+    context = BattleShockRerollPermissionContext(
+        state=state,
+        request=request,
+        active_player_id=army.player_id,
+        phase=BattlePhase.COMMAND,
+        phase_start_battle_shocked_unit_ids=(),
+    )
+    permission = runtime.reroll_permission(context)
+
+    assert permission is not None
+    assert permission.eligible_roll_type == "battle_shock_roll"
+    assert permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+    assert runtime.reroll_permission(replace(context, phase=BattlePhase.MOVEMENT)) is None
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        runtime.reroll_permission(cast(Any, object()))
+
+    bindings = catalog_battle_shock_hook_bindings(
+        ability_indexes_by_player_id={
+            army.player_id: AbilityCatalogIndex.from_records((record,)),
+            enemy_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(army, enemy_army),
+    )
+    assert tuple(binding.hook_id for binding in bindings) == (
+        CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
+    )
+    assert BattleShockHookRegistry.from_bindings(bindings).reroll_permission_for(context) == (
+        permission
+    )
+
+    missing_index_runtime = CatalogBattleShockRerollRuntime(
+        ability_indexes_by_player_id={
+            enemy_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(army, enemy_army),
+    )
+    with pytest.raises(GameLifecycleError, match="missing ability index"):
+        missing_index_runtime.reroll_permission(context)
+    with pytest.raises(GameLifecycleError, match="requires battlefield state"):
+        battle_shock_runtime._units_within_distance(  # pyright: ignore[reportPrivateUsage]
+            context=replace(
+                context,
+                state=_state_without_battlefield(
+                    active_player_id=army.player_id,
+                    phase=BattlePhase.COMMAND,
+                ),
+            ),
+            first_unit=source_unit,
+            first_model_ids=source_unit.own_model_ids(),
+            second_unit=target_unit,
+            second_model_ids=target_unit.own_model_ids(),
+            distance_inches=6.0,
+        )
+    scenario = BattlefieldScenario(
+        armies=(army, enemy_army),
+        battlefield_state=battlefield,
+    )
+    with pytest.raises(GameLifecycleError, match="placement evidence drifted"):
+        battle_shock_runtime._geometry_models_for_unit_ids(  # pyright: ignore[reportPrivateUsage]
+            scenario=scenario,
+            unit=source_unit,
+            model_ids=("missing-model",),
+        )
+    with pytest.raises(GameLifecycleError, match="unit placement is missing"):
+        battle_shock_runtime._geometry_models_for_unit_ids(  # pyright: ignore[reportPrivateUsage]
+            scenario=scenario,
+            unit=enemy_army.units[0],
+            model_ids=enemy_army.units[0].own_model_ids(),
+        )
+
+
+def test_catalog_battle_shock_runtime_helpers_fail_fast_on_contract_drift() -> None:
+    source_army, target_army = _mustered_core_armies()
+    empty_index = AbilityCatalogIndex.from_records(())
+
+    validated_indexes = battle_shock_runtime._validate_ability_indexes(  # pyright: ignore[reportPrivateUsage]
+        {source_army.player_id: empty_index}
+    )
+    assert validated_indexes[source_army.player_id] is empty_index
+    with pytest.raises(GameLifecycleError, match="ability indexes must be a mapping"):
+        battle_shock_runtime._validate_ability_indexes(())  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="ability index player ID is invalid"):
+        battle_shock_runtime._validate_ability_indexes(  # pyright: ignore[reportPrivateUsage]
+            {1: empty_index}
+        )
+    with pytest.raises(GameLifecycleError, match="ability index value is invalid"):
+        battle_shock_runtime._validate_ability_indexes(  # pyright: ignore[reportPrivateUsage]
+            {source_army.player_id: object()}
+        )
+
+    assert battle_shock_runtime._validate_armies(  # pyright: ignore[reportPrivateUsage]
+        (source_army, target_army)
+    ) == (source_army, target_army)
+    with pytest.raises(GameLifecycleError, match="runtime armies must be a tuple"):
+        battle_shock_runtime._validate_armies(cast(Any, []))  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="runtime armies are invalid"):
+        battle_shock_runtime._validate_armies(cast(Any, (object(),)))  # pyright: ignore[reportPrivateUsage]
+
+    assert battle_shock_runtime._validate_identifier_tuple(  # pyright: ignore[reportPrivateUsage]
+        "consumer_ids",
+        ("one", "two"),
+    ) == ("one", "two")
+    with pytest.raises(GameLifecycleError, match="consumer_ids must be a tuple"):
+        battle_shock_runtime._validate_identifier_tuple(  # pyright: ignore[reportPrivateUsage]
+            "consumer_ids",
+            cast(Any, ["one"]),
+        )
+    with pytest.raises(GameLifecycleError, match="consumer_ids value must not be empty"):
+        battle_shock_runtime._validate_identifier_tuple(  # pyright: ignore[reportPrivateUsage]
+            "consumer_ids",
+            (" ",),
+        )
+    with pytest.raises(GameLifecycleError, match="consumer_ids must not contain duplicates"):
+        battle_shock_runtime._validate_identifier_tuple(  # pyright: ignore[reportPrivateUsage]
+            "consumer_ids",
+            ("one", "one"),
+        )
+    assert (
+        battle_shock_runtime._army_for_player(  # pyright: ignore[reportPrivateUsage]
+            (source_army, target_army),
+            player_id=source_army.player_id,
+        )
+        is source_army
+    )
+    with pytest.raises(GameLifecycleError, match="player army is unknown"):
+        battle_shock_runtime._army_for_player(  # pyright: ignore[reportPrivateUsage]
+            (source_army,),
+            player_id=target_army.player_id,
+        )
+    assert (
+        battle_shock_runtime._unit_in_army(  # pyright: ignore[reportPrivateUsage]
+            source_army,
+            unit_instance_id=source_army.units[0].unit_instance_id,
+        )
+        is source_army.units[0]
+    )
+    with pytest.raises(GameLifecycleError, match="runtime unit is unknown"):
+        battle_shock_runtime._unit_in_army(  # pyright: ignore[reportPrivateUsage]
+            source_army,
+            unit_instance_id=target_army.units[0].unit_instance_id,
+        )
+
+
+def test_catalog_battle_shock_reroll_clause_helpers_are_strict() -> None:
+    source_army, _ = _mustered_core_armies()
+    fortification_unit = replace(
+        source_army.units[0],
+        keywords=tuple(sorted((*source_army.units[0].keywords, "FORTIFICATION"))),
+        faction_keywords=("LEGIONES", "DAEMONICA", "KHORNE"),
+    )
+    non_fortification_unit = replace(
+        source_army.units[0],
+        faction_keywords=("LEGIONES", "DAEMONICA", "KHORNE"),
+    )
+
+    def reroll_clause(
+        *,
+        object_kind: str = "fortification",
+        distance: RuleParameterValue = 6,
+        effect_kind: RuleEffectKind = RuleEffectKind.REROLL_PERMISSION,
+        roll_type: str = "battle_shock",
+        timing_window: str = "battle_shock_test",
+        extra_conditions: tuple[RuleCondition, ...] = (),
+    ) -> RuleClause:
+        return RuleClause(
+            clause_id="test:catalog-battle-shock-reroll:clause",
+            source_span=_span(),
+            target=RuleTargetSpec(
+                kind=RuleTargetKind.FRIENDLY_UNIT,
+                source_span=_span(),
+                parameters=_parameters(
+                    ("required_keyword", "KHORNE"),
+                    ("required_keyword_sequence", ("LEGIONES", "DAEMONICA")),
+                ),
+            ),
+            conditions=(
+                _condition(
+                    RuleConditionKind.DISTANCE_PREDICATE,
+                    ("range_kind", "numeric_range"),
+                    ("predicate", "within"),
+                    ("object_kind", object_kind),
+                    ("object_reference", "this"),
+                    ("negated", False),
+                    ("distance_inches", distance),
+                ),
+                _condition(
+                    RuleConditionKind.KEYWORD_GATE,
+                    ("required_keyword_sequence", ("LEGIONES", "DAEMONICA")),
+                ),
+                *extra_conditions,
+            ),
+            effects=(
+                _effect(
+                    effect_kind,
+                    ("roll_type", roll_type),
+                    ("timing_window", timing_window),
+                ),
+            ),
+        )
+
+    clause = reroll_clause()
+
+    assert battle_shock_runtime._effect_is_battle_shock_reroll(  # pyright: ignore[reportPrivateUsage]
+        clause.effects[0]
+    )
+    assert not battle_shock_runtime._effect_is_battle_shock_reroll(  # pyright: ignore[reportPrivateUsage]
+        reroll_clause(effect_kind=RuleEffectKind.MODIFY_DICE_ROLL).effects[0]
+    )
+    assert not battle_shock_runtime._effect_is_battle_shock_reroll(  # pyright: ignore[reportPrivateUsage]
+        reroll_clause(roll_type="hit", timing_window="battle_shock_test").effects[0]
+    )
+    with pytest.raises(GameLifecycleError, match="reroll effect is invalid"):
+        battle_shock_runtime._effect_is_battle_shock_reroll(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, object())
+        )
+
+    assert battle_shock_runtime._source_distance_object_kind(clause) == "fortification"  # pyright: ignore[reportPrivateUsage]
+    assert battle_shock_runtime._battle_shock_reroll_distance_inches(clause) == 6.0  # pyright: ignore[reportPrivateUsage]
+    assert battle_shock_runtime._required_keywords_for_clause(clause) == (  # pyright: ignore[reportPrivateUsage]
+        "DAEMONICA",
+        "KHORNE",
+        "LEGIONES",
+    )
+    assert battle_shock_runtime._battle_shock_reroll_clause_matches_source(  # pyright: ignore[reportPrivateUsage]
+        clause,
+        source_unit=fortification_unit,
+    )
+    assert not battle_shock_runtime._battle_shock_reroll_clause_matches_source(  # pyright: ignore[reportPrivateUsage]
+        clause,
+        source_unit=non_fortification_unit,
+    )
+    assert battle_shock_runtime._battle_shock_reroll_clause_matches_target(  # pyright: ignore[reportPrivateUsage]
+        clause,
+        target_unit=fortification_unit,
+    )
+    with pytest.raises(GameLifecycleError, match="clause is invalid"):
+        battle_shock_runtime._battle_shock_reroll_clause_matches_target(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, object()),
+            target_unit=fortification_unit,
+        )
+    with pytest.raises(GameLifecycleError, match="target unit is invalid"):
+        battle_shock_runtime._battle_shock_reroll_clause_matches_target(  # pyright: ignore[reportPrivateUsage]
+            clause,
+            target_unit=cast(Any, object()),
+        )
+
+    assert battle_shock_runtime._unit_has_required_keyword(  # pyright: ignore[reportPrivateUsage]
+        fortification_unit,
+        required_keyword="legiones-daemonica",
+    )
+    assert not battle_shock_runtime._unit_has_required_keyword(  # pyright: ignore[reportPrivateUsage]
+        fortification_unit,
+        required_keyword="TZEENTCH",
+    )
+    assert battle_shock_runtime._keyword_sequence_is_covered(  # pyright: ignore[reportPrivateUsage]
+        ("LEGIONES", "DAEMONICA"),
+        frozenset(("LEGIONES", "DAEMONICA")),
+    )
+    assert not battle_shock_runtime._keyword_sequence_is_covered(  # pyright: ignore[reportPrivateUsage]
+        ("LEGIONES", "DAEMONICA"),
+        frozenset(("LEGIONES", "ASTARTES")),
+    )
+    with pytest.raises(GameLifecycleError, match="keyword must be a string"):
+        battle_shock_runtime._canonical_keyword(cast(Any, 1))  # pyright: ignore[reportPrivateUsage]
+    with pytest.raises(GameLifecycleError, match="keyword must be a string"):
+        battle_shock_runtime._canonical_keyword(" ")  # pyright: ignore[reportPrivateUsage]
+
+    with pytest.raises(GameLifecycleError, match="source object kind is malformed"):
+        battle_shock_runtime._battle_shock_reroll_clause_matches_source(  # pyright: ignore[reportPrivateUsage]
+            reroll_clause(object_kind="vehicle"),
+            source_unit=fortification_unit,
+        )
+    with pytest.raises(GameLifecycleError, match="exactly one source object kind"):
+        battle_shock_runtime._source_distance_object_kind(  # pyright: ignore[reportPrivateUsage]
+            RuleClause(
+                clause_id="test:missing-object-kind",
+                source_span=_span(),
+                effects=(_effect(RuleEffectKind.MODIFY_DICE_ROLL, ("delta", 1)),),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="distance predicate is malformed"):
+        battle_shock_runtime._battle_shock_reroll_distance_inches(  # pyright: ignore[reportPrivateUsage]
+            reroll_clause(distance=False)
+        )
+    with pytest.raises(GameLifecycleError, match="exactly one source distance predicate"):
+        battle_shock_runtime._battle_shock_reroll_distance_inches(  # pyright: ignore[reportPrivateUsage]
+            reroll_clause(
+                extra_conditions=(
+                    _condition(
+                        RuleConditionKind.DISTANCE_PREDICATE,
+                        ("range_kind", "numeric_range"),
+                        ("predicate", "within"),
+                        ("object_kind", "fortification"),
+                        ("object_reference", "this"),
+                        ("negated", False),
+                        ("distance_inches", 9),
+                    ),
+                )
+            )
+        )
 
 
 def test_catalog_selected_target_support_classifies_selection_and_effect_clauses() -> None:
@@ -3478,27 +3918,34 @@ def _placed_army(
     unit: UnitInstance,
     model_xs: tuple[float, ...],
 ) -> PlacedArmy:
-    if len(model_xs) != len(unit.own_models):
-        raise AssertionError("Test battlefield model positions must match unit models.")
     return PlacedArmy(
         army_id=army.army_id,
         player_id=army.player_id,
-        unit_placements=(
-            UnitPlacement(
+        unit_placements=(_unit_placement_for_test(army=army, unit=unit, model_xs=model_xs),),
+    )
+
+
+def _unit_placement_for_test(
+    *,
+    army: ArmyDefinition,
+    unit: UnitInstance,
+    model_xs: tuple[float, ...],
+) -> UnitPlacement:
+    if len(model_xs) != len(unit.own_models):
+        raise AssertionError("Test battlefield model positions must match unit models.")
+    return UnitPlacement(
+        army_id=army.army_id,
+        player_id=army.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
                 army_id=army.army_id,
                 player_id=army.player_id,
                 unit_instance_id=unit.unit_instance_id,
-                model_placements=tuple(
-                    ModelPlacement(
-                        army_id=army.army_id,
-                        player_id=army.player_id,
-                        unit_instance_id=unit.unit_instance_id,
-                        model_instance_id=model.model_instance_id,
-                        pose=Pose.at(x=model_xs[index], y=10.0),
-                    )
-                    for index, model in enumerate(unit.own_models)
-                ),
-            ),
+                model_instance_id=model.model_instance_id,
+                pose=Pose.at(x=model_xs[index], y=10.0),
+            )
+            for index, model in enumerate(unit.own_models)
         ),
     )
 

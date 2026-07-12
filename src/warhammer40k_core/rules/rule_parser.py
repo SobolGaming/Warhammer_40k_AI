@@ -5,6 +5,9 @@ from dataclasses import dataclass
 from typing import cast
 
 from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
+from warhammer40k_core.rules import (
+    rule_parser_selected_target_extensions as _selected_target_extensions,
+)
 from warhammer40k_core.rules.attack_target_parser import (
     has_this_model_attack_target,
     parse_this_model_attack_target_conditions,
@@ -51,30 +54,6 @@ from warhammer40k_core.rules.rule_keyword_sequences import (
 )
 from warhammer40k_core.rules.rule_keyword_sequences import (
     keyword_sequence_tokens as _keyword_sequence_tokens,
-)
-from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
-    parse_selected_target_attack_conditions as _parse_selected_target_attack_conditions,
-)
-from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
-    parse_selected_target_attack_trigger as _parse_selected_target_attack_trigger,
-)
-from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
-    parse_selected_unit_battle_shock_test_effects as _parse_selected_unit_battle_shock_test_effects,
-)
-from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
-    parse_shadow_of_chaos_area_effects as _parse_shadow_of_chaos_area_effects,
-)
-from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
-    parse_shadow_of_chaos_area_target as _parse_shadow_of_chaos_area_target,
-)
-from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
-    parse_visibility_conditions as _parse_visibility_conditions,
-)
-from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
-    selected_target_attack_match_ranges as _selected_target_attack_match_ranges,
-)
-from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
-    shadow_of_chaos_area_match as _shadow_of_chaos_area_match,
 )
 from warhammer40k_core.rules.rule_parser_token_helpers import (
     ability_token as _ability_token,
@@ -516,7 +495,7 @@ _DISTANCE_RELATION_RE = re.compile(
     r"(?:(?P<allegiance>enemy|friendly)\s+)?"
     r"(?:(?P<object_reference>this|that|selected|target)\s+)?"
     r"(?:(?P<keyword>[A-Z][A-Z0-9_'-]*(?:\s+[A-Z0-9_'-]+){0,5})\s+)?"
-    r"(?P<object_kind>units?|models?|objective\s+markers?)"
+    r"(?P<object_kind>units?|models?|objective\s+markers?|fortifications?)"
     r"(?:\s+from\s+(?P<object_owner>your\s+army)"
     r"(?:\s+with\s+(?P<object_ability_scope>this\s+ability))?)?\b",
     re.IGNORECASE,
@@ -525,6 +504,7 @@ _RESIDUAL_TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_+'-]*")
 _RESIDUAL_CONNECTOR_TOKENS = frozenset(
     {
         "a",
+        "addition",
         "an",
         "and",
         "any",
@@ -806,7 +786,7 @@ def _compile_clause(
             *_parse_aura_conditions(clause_text),
             *_parse_leading_unit_conditions(clause_text),
             *_parse_tracked_target_conditions(clause_text),
-            *_parse_selected_target_attack_conditions(
+            *_selected_target_extensions.parse_selected_target_attack_conditions(
                 text=clause_text.text,
                 source_span=clause_text.span,
             ),
@@ -820,7 +800,10 @@ def _compile_clause(
                 parsed_text,
                 parser_context=parser_context,
             ),
-            *_parse_visibility_conditions(text=clause_text.text, source_span=clause_text.span),
+            *_selected_target_extensions.parse_visibility_conditions(
+                text=clause_text.text,
+                source_span=clause_text.span,
+            ),
             *_parse_status_conditions(clause_text),
         )
     )
@@ -830,6 +813,10 @@ def _compile_clause(
         (
             *_parse_dice_roll_modifier_effects(clause_text),
             *_parse_reroll_effects(clause_text),
+            *_selected_target_extensions.parse_battle_shock_test_reroll_effects(
+                text=clause_text.text,
+                source_span=clause_text.span,
+            ),
             *_parse_characteristic_effects(clause_text.span),
             *parse_command_point_effects(clause_text.span),
             *_parse_victory_point_effects(clause_text),
@@ -837,6 +824,10 @@ def _compile_clause(
             *_parse_return_on_death_effects(clause_text),
             *_parse_grant_ability_effects(clause_text),
             *_parse_contextual_status_effects(clause_text, parser_context=parser_context),
+            *_selected_target_extensions.parse_fortification_contextual_status_effects(
+                text=clause_text.text,
+                source_span=clause_text.span,
+            ),
             *_parse_weapon_ability_effects(clause_text),
             *_parse_placement_effects(clause_text),
             *_parse_restore_lost_wounds_effects(clause_text),
@@ -924,9 +915,11 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                 )
             ),
         )
-    selected_target_attack_trigger = _parse_selected_target_attack_trigger(
-        text=clause_text.text,
-        source_span=clause_text.span,
+    selected_target_attack_trigger = (
+        _selected_target_extensions.parse_selected_target_attack_trigger(
+            text=clause_text.text,
+            source_span=clause_text.span,
+        )
     )
     if selected_target_attack_trigger is not None:
         return selected_target_attack_trigger
@@ -1181,7 +1174,7 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
 def _parse_aura_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
     match = _AURA_RE.search(clause_text.text)
     if match is None:
-        match = _shadow_of_chaos_area_match(clause_text.text)
+        match = _selected_target_extensions.shadow_of_chaos_area_match(clause_text.text)
     if match is None:
         return ()
     return (
@@ -1290,7 +1283,9 @@ def _parse_keyword_conditions(
     target_match_ranges: list[tuple[int, int]] = []
     for match in _TRACKED_TARGET_SELECTION_RE.finditer(clause_text.text):
         target_match_ranges.append((match.start(), match.end()))
-    target_match_ranges.extend(_selected_target_attack_match_ranges(clause_text.text))
+    target_match_ranges.extend(
+        _selected_target_extensions.selected_target_attack_match_ranges(clause_text.text)
+    )
     target_match_ranges.extend(this_model_attack_target_match_ranges(clause_text.text))
     for match in _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE.finditer(clause_text.text):
         target_match_ranges.append((match.start(), match.end()))
@@ -1480,7 +1475,7 @@ def _parse_target(
                 )
             ),
         )
-    shadow_area_target = _parse_shadow_of_chaos_area_target(
+    shadow_area_target = _selected_target_extensions.parse_shadow_of_chaos_area_target(
         text=clause_text.text,
         source_span=clause_text.span,
     )
@@ -2040,7 +2035,7 @@ def _parse_contextual_status_effects(
             )
         )
     effects.extend(
-        _parse_shadow_of_chaos_area_effects(
+        _selected_target_extensions.parse_shadow_of_chaos_area_effects(
             text=clause_text.text,
             source_span=clause_text.span,
         )
@@ -2338,7 +2333,7 @@ def _parse_battle_shock_test_effects(clause_text: _ClauseText) -> tuple[RuleEffe
             )
         )
     effects.extend(
-        _parse_selected_unit_battle_shock_test_effects(
+        _selected_target_extensions.parse_selected_unit_battle_shock_test_effects(
             text=clause_text.text,
             source_span=clause_text.span,
             existing_effects=tuple(effects),

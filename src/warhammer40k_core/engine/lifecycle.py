@@ -1245,6 +1245,11 @@ class GameLifecycle:
             return self._apply_charge_phase_decision(record, result)
         if (
             record.request.decision_type == DICE_REROLL_DECISION_TYPE
+            and state.current_battle_phase is BattlePhase.COMMAND
+        ):
+            return self._apply_command_phase_decision(record, result)
+        if (
+            record.request.decision_type == DICE_REROLL_DECISION_TYPE
             and state.current_battle_phase is BattlePhase.CHARGE
         ):
             return self._apply_charge_phase_decision(record, result)

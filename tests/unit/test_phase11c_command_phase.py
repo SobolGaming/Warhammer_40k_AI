@@ -13,6 +13,8 @@ from warhammer40k_core.core.dice import (
     DiceRollSpec,
     DiceRollState,
     ModifiedRollResult,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
     UnmodifiedRollResult,
 )
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
@@ -29,6 +31,11 @@ from warhammer40k_core.engine.battle_shock import (
     collect_battle_shock_test_requests,
     friendly_stratagem_target_permission,
     stratagem_target_permission_status_from_token,
+)
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockHookBinding,
+    BattleShockHookRegistry,
+    BattleShockRerollPermissionContext,
 )
 from warhammer40k_core.engine.battlefield_state import PlacementError, UnitPlacement
 from warhammer40k_core.engine.command_points import (
@@ -47,6 +54,7 @@ from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -73,9 +81,13 @@ from warhammer40k_core.engine.objective_control import (
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
+    GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
     SetupStep,
+)
+from warhammer40k_core.engine.phases import (
+    command_battle_shock_rerolls as battle_shock_rerolls,
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
@@ -235,6 +247,208 @@ def test_command_phase_resolves_non_reroll_battle_shock_dice_without_decision_pa
     assert event_types.index("battle_shock_test_requested") < event_types.index(
         "battle_shock_test_resolved"
     )
+
+
+def test_command_phase_battle_shock_reroll_permission_pauses_and_resumes() -> None:
+    state = _battle_state()
+    decisions = DecisionController()
+    _remove_first_models(state, unit_instance_id="army-alpha:intercessor-unit-1", count=3)
+
+    def reroll_permission(
+        context: BattleShockRerollPermissionContext,
+    ) -> RerollPermission | None:
+        return RerollPermission(
+            source_id="test:battle-shock-reroll",
+            timing_window="battle_shock_test",
+            owning_player_id=context.request.player_id,
+            eligible_roll_type=context.request.spec.roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
+
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=BattleShockHookRegistry.from_bindings(
+            (
+                BattleShockHookBinding(
+                    hook_id="test:battle-shock-reroll",
+                    source_id="test:battle-shock-reroll",
+                    reroll_permission_handler=reroll_permission,
+                ),
+            )
+        ),
+    )
+
+    waiting = handler.begin_phase(state=state, decisions=decisions)
+
+    reroll_request = _decision_request(waiting)
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    assert reroll_request.actor_id == "player-a"
+    assert state.command_step_state is not None
+    assert not state.command_step_state.battle_shock_step_resolved
+    assert state.command_step_state.completed_battle_shock_test_request_ids == ()
+    reroll_request_payload = cast(dict[str, Any], reroll_request.payload)
+    reroll_context = cast(dict[str, Any], reroll_request_payload["battle_shock_context"])
+    battle_shock_request_payload = cast(
+        dict[str, Any],
+        reroll_context["battle_shock_test_request"],
+    )
+    battle_shock_request_id = cast(str, battle_shock_request_payload["request_id"])
+
+    _submit_direct_decision(
+        decisions=decisions,
+        handler=handler,
+        state=state,
+        request=reroll_request,
+        option_id="decline",
+        result_id="phase11c-battle-shock-reroll-declined",
+    )
+
+    command_state = state.command_step_state
+    assert command_state is not None
+    assert command_state.completed_battle_shock_test_request_ids == (battle_shock_request_id,)
+    assert not command_state.battle_shock_step_resolved
+
+    completed = handler.begin_phase(state=state, decisions=decisions)
+
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    resolved_command_state = _command_step_state(state)
+    assert resolved_command_state.battle_shock_step_resolved
+    event_types = tuple(event.event_type for event in decisions.event_log.records)
+    assert "dice_reroll_declined" in event_types
+    assert "battle_shock_test_resolved" in event_types
+    assert event_types.count("battle_shock_test_requested") == 1
+
+
+def test_battle_shock_reroll_payload_helpers_fail_fast_on_contract_drift() -> None:
+    assert battle_shock_rerolls._payload_object(  # pyright: ignore[reportPrivateUsage]
+        {"payload": "ok"},
+        context="payload",
+    ) == {"payload": "ok"}
+    with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        battle_shock_rerolls._payload_object(  # pyright: ignore[reportPrivateUsage]
+            1,
+            context="payload",
+        )
+
+    assert (
+        battle_shock_rerolls._payload_int(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {"round": 1}),
+            key="round",
+        )
+        == 1
+    )
+    with pytest.raises(GameLifecycleError, match="missing required key: round"):
+        battle_shock_rerolls._payload_int(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {}),
+            key="round",
+        )
+    with pytest.raises(GameLifecycleError, match="must be an integer: round"):
+        battle_shock_rerolls._payload_int(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {"round": "1"}),
+            key="round",
+        )
+
+    assert (
+        battle_shock_rerolls._payload_string(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {"player_id": " player-a "}),
+            key="player_id",
+        )
+        == "player-a"
+    )
+    with pytest.raises(GameLifecycleError, match="missing required key: player_id"):
+        battle_shock_rerolls._payload_string(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {}),
+            key="player_id",
+        )
+    with pytest.raises(GameLifecycleError, match="must be a string: player_id"):
+        battle_shock_rerolls._payload_string(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {"player_id": 1}),
+            key="player_id",
+        )
+    with pytest.raises(GameLifecycleError, match="cannot be empty: player_id"):
+        battle_shock_rerolls._payload_string(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {"player_id": " "}),
+            key="player_id",
+        )
+
+    assert battle_shock_rerolls._payload_string_tuple(  # pyright: ignore[reportPrivateUsage]
+        cast(Any, {"unit_ids": [" unit-a ", "unit-b"]}),
+        key="unit_ids",
+    ) == ("unit-a", "unit-b")
+    with pytest.raises(GameLifecycleError, match="missing required key: unit_ids"):
+        battle_shock_rerolls._payload_string_tuple(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {}),
+            key="unit_ids",
+        )
+    with pytest.raises(GameLifecycleError, match="must be a list: unit_ids"):
+        battle_shock_rerolls._payload_string_tuple(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {"unit_ids": "unit-a"}),
+            key="unit_ids",
+        )
+    with pytest.raises(GameLifecycleError, match="list must contain strings: unit_ids"):
+        battle_shock_rerolls._payload_string_tuple(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {"unit_ids": [1]}),
+            key="unit_ids",
+        )
+    with pytest.raises(GameLifecycleError, match="list item is empty: unit_ids"):
+        battle_shock_rerolls._payload_string_tuple(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {"unit_ids": [" "]}),
+            key="unit_ids",
+        )
+    with pytest.raises(GameLifecycleError, match="contains duplicates: unit_ids"):
+        battle_shock_rerolls._payload_string_tuple(  # pyright: ignore[reportPrivateUsage]
+            cast(Any, {"unit_ids": ["unit-a", "unit-a"]}),
+            key="unit_ids",
+        )
+
+    state = _battle_state()
+    assert battle_shock_rerolls._active_player_id(state) == "player-a"  # pyright: ignore[reportPrivateUsage]
+    state.active_player_id = None
+    with pytest.raises(GameLifecycleError, match="requires an active player"):
+        battle_shock_rerolls._active_player_id(state)  # pyright: ignore[reportPrivateUsage]
+
+    state.active_player_id = "player-a"
+    state.command_step_state = CommandStepState.start(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+    )
+    assert battle_shock_rerolls._command_step_state(state) is state.command_step_state  # pyright: ignore[reportPrivateUsage]
+    state.command_step_state = None
+    with pytest.raises(GameLifecycleError, match="requires command step state"):
+        battle_shock_rerolls._command_step_state(state)  # pyright: ignore[reportPrivateUsage]
+
+
+def test_battle_shock_reroll_applier_rejects_wrong_lifecycle_window() -> None:
+    result = DecisionResult(
+        result_id="phase11c-reroll-window-result",
+        request_id="phase11c-reroll-window-request",
+        decision_type=DICE_REROLL_DECISION_TYPE,
+        actor_id="player-a",
+        selected_option_id="decline",
+        payload={},
+    )
+
+    setup_state = _battle_state()
+    setup_state.stage = GameLifecycleStage.SETUP
+    with pytest.raises(GameLifecycleError, match="only during battle"):
+        battle_shock_rerolls.apply_battle_shock_reroll_decision(
+            state=setup_state,
+            result=result,
+            decisions=DecisionController(),
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+        )
+
+    movement_state = _battle_state()
+    movement_state.battle_phase_index = movement_state.battle_phase_sequence.index(
+        BattlePhase.MOVEMENT
+    )
+    with pytest.raises(GameLifecycleError, match="only in command"):
+        battle_shock_rerolls.apply_battle_shock_reroll_decision(
+            state=movement_state,
+            result=result,
+            decisions=DecisionController(),
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+        )
 
 
 def test_below_starting_strength_forced_test_suppresses_duplicate_below_half() -> None:
@@ -1930,6 +2144,12 @@ def _submit_direct_decision(
     )
     decisions.submit_result(result)
     handler.apply_decision(state=state, result=result, decisions=decisions)
+
+
+def _command_step_state(state: GameState) -> CommandStepState:
+    if state.command_step_state is None:
+        raise AssertionError("Expected command step state.")
+    return state.command_step_state
 
 
 def _decision_request(status: LifecycleStatus) -> DecisionRequest:

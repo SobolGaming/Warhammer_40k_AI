@@ -3466,22 +3466,18 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Skull Altar",
             datasheet_id="000001588",
             source_basis="PDF pages 36-37; supersedes Wahapedia.",
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="All consumed",
             supported_semantics=(
-                "Infiltrators, The Shadow of Chaos, and Shadow of Khorne area semantics "
-                "are known structured paths."
+                "Infiltrators, The Shadow of Chaos, Shadow of Khorne Battle-shock test "
+                "re-roll permission, and Fortification cover, target-permission, "
+                "hit-roll, and Desperate Escape exception semantics are consumed."
             ),
-            semantics_needed=(
-                "Shadow of Khorne Battle-shock test re-roll permission; Cover and "
-                "Fortification datasheet terrain semantics; Fortification hit-roll and "
-                "Desperate Escape exceptions."
-            ),
+            semantics_needed="None.",
             catalog_blockers=(
                 "No-equipment/no-option source rows are normalized; Skull Altar height "
                 "was reviewed from internet sources, with a community 6.5-inch measurement "
-                "and Battle Foam's 4.5-inch tray evidence for storage orientation. Hull "
-                "footprint and source-backed Fortification terrain runtime semantics remain "
-                "blocked."
+                "and Battle Foam's 4.5-inch tray evidence for storage orientation. No known "
+                "datasheet-level blockers remain."
             ),
         ),
         DatasheetGroupReviewRow(

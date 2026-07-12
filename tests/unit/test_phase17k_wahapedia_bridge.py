@@ -6452,7 +6452,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in chaos_daemons_markdown
     assert (
         "| Skull Altar (`000001588`) | PDF pages 36-37; supersedes Wahapedia. | "
-        "Bridge/catalog blocked |"
+        "All consumed | Infiltrators, The Shadow of Chaos, Shadow of Khorne "
+        "Battle-shock test re-roll permission, and Fortification cover, "
+        "target-permission, hit-roll, and Desperate Escape exception semantics are consumed."
     ) in chaos_daemons_markdown
     for pdf_review_datasheet_id in (
         "000001117",
