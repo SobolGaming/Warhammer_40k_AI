@@ -142,6 +142,7 @@ from warhammer40k_core.engine.rule_execution import (
     RuleRuntimeBinding,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
+    AdvanceRollModifierBinding,
     ChargeRollModifierBinding,
     HitRollModifierBinding,
     MovementBudgetModifierBinding,
@@ -232,6 +233,7 @@ class RuntimeContentContribution:
     save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
     movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = ()
     objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
+    advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = ()
     charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = ()
     weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = EMPTY_NAMED_HANDLERS
@@ -308,6 +310,7 @@ class RuntimeContentContribution:
         save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = (),
         movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = (),
         objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = (),
+        advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = (),
         charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = (),
         weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = (),
         faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = EMPTY_NAMED_HANDLERS,
@@ -542,78 +545,55 @@ class RuntimeContentContribution:
                 StratagemCostModifierBinding,
             ),
         )
-        object.__setattr__(
-            self,
-            "unit_characteristic_modifier_bindings",
-            _validate_contribution_tuple(
+        modifier_binding_fields: tuple[tuple[str, object, type[object]], ...] = (
+            (
                 "unit_characteristic_modifier_bindings",
                 unit_characteristic_modifier_bindings,
                 UnitCharacteristicModifierBinding,
             ),
-        )
-        object.__setattr__(
-            self,
-            "hit_roll_modifier_bindings",
-            _validate_contribution_tuple(
-                "hit_roll_modifier_bindings",
-                hit_roll_modifier_bindings,
-                HitRollModifierBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "wound_roll_modifier_bindings",
-            _validate_contribution_tuple(
+            ("hit_roll_modifier_bindings", hit_roll_modifier_bindings, HitRollModifierBinding),
+            (
                 "wound_roll_modifier_bindings",
                 wound_roll_modifier_bindings,
                 WoundRollModifierBinding,
             ),
-        )
-        object.__setattr__(
-            self,
-            "save_option_modifier_bindings",
-            _validate_contribution_tuple(
+            (
                 "save_option_modifier_bindings",
                 save_option_modifier_bindings,
                 SaveOptionModifierBinding,
             ),
-        )
-        object.__setattr__(
-            self,
-            "movement_budget_modifier_bindings",
-            _validate_contribution_tuple(
+            (
                 "movement_budget_modifier_bindings",
                 movement_budget_modifier_bindings,
                 MovementBudgetModifierBinding,
             ),
-        )
-        object.__setattr__(
-            self,
-            "objective_control_modifier_bindings",
-            _validate_contribution_tuple(
+            (
                 "objective_control_modifier_bindings",
                 objective_control_modifier_bindings,
                 ObjectiveControlModifierBinding,
             ),
-        )
-        object.__setattr__(
-            self,
-            "charge_roll_modifier_bindings",
-            _validate_contribution_tuple(
+            (
+                "advance_roll_modifier_bindings",
+                advance_roll_modifier_bindings,
+                AdvanceRollModifierBinding,
+            ),
+            (
                 "charge_roll_modifier_bindings",
                 charge_roll_modifier_bindings,
                 ChargeRollModifierBinding,
             ),
-        )
-        object.__setattr__(
-            self,
-            "weapon_profile_modifier_bindings",
-            _validate_contribution_tuple(
+            (
                 "weapon_profile_modifier_bindings",
                 weapon_profile_modifier_bindings,
                 WeaponProfileModifierBinding,
             ),
         )
+        for field_name, field_value, binding_type in modifier_binding_fields:
+            object.__setattr__(
+                self,
+                field_name,
+                _validate_contribution_tuple(field_name, field_value, binding_type),
+            )
         object.__setattr__(
             self,
             "faction_named_handlers",
@@ -998,6 +978,14 @@ def combine_runtime_content_contributions(
             _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.objective_control_modifier_bindings,
+            ),
+            lambda binding: binding.modifier_id,
+        ),
+        advance_roll_modifier_bindings=_combine_unique_values(
+            "advance roll modifier binding",
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.advance_roll_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
@@ -1756,6 +1744,10 @@ class RuntimeContentBundle:
                     lambda contribution: contribution.objective_control_modifier_bindings,
                 )
                 + damaged_runtime.objective_control_bindings()
+            ),
+            advance_roll_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.advance_roll_modifier_bindings,
             ),
             charge_roll_modifier_bindings=_contribution_values(
                 validated_contributions,

@@ -195,6 +195,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
             ability_index=ability_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         if movement_grant_status is not None:
             if _is_movement_action_grant_decision_pending(movement_grant_status):
@@ -233,6 +234,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
             ability_index=ability_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         if advance_grant_status is not None:
             if _is_movement_action_grant_decision_pending(advance_grant_status):
@@ -250,6 +252,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
             ability_index=ability_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
 
     if action is MovementPhaseActionKind.FALL_BACK:
@@ -284,6 +287,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
             ability_index=ability_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         if movement_grant_status is not None:
             if _is_movement_action_grant_decision_pending(movement_grant_status):
@@ -316,6 +320,7 @@ def _request_advance_move_grant_decision_if_available(
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
     ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     if type(pending_action) is not PendingMovementActionSelection:
         raise GameLifecycleError("Movement action grant decision requires a pending action.")
@@ -378,6 +383,7 @@ def _request_advance_move_grant_decision_if_available(
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
             ability_index=ability_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
@@ -611,6 +617,7 @@ def _apply_advance_move_grant_decision(
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
         ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 
@@ -748,6 +755,7 @@ def _resolve_pending_movement_action_after_grants(
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
     ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     if pending_action.movement_phase_action is MovementPhaseActionKind.NORMAL_MOVE:
         return _request_movement_proposal(
@@ -778,6 +786,7 @@ def _resolve_pending_movement_action_after_grants(
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
             ability_index=ability_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     if pending_action.movement_phase_action is MovementPhaseActionKind.FALL_BACK:
         if pending_action.fall_back_mode is None:
@@ -814,6 +823,7 @@ def _resolve_pending_advance_action(
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
     ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     if pending_action.movement_phase_action is not MovementPhaseActionKind.ADVANCE:
         raise GameLifecycleError("Pending Advance resolution requires an Advance action.")
@@ -826,6 +836,7 @@ def _resolve_pending_advance_action(
         unit_placement=unit_placement,
         action_result=action_result,
         ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     advance_roll_state = _roll_advance_dice(
         state=state,

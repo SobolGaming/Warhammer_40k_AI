@@ -10,18 +10,43 @@ from tests.phase11c_command_phase_helpers import (
     battle_state,
 )
 
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.datasheet import DamagedEffectDefinition, DamagedEffectKind
+from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
+from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.weapon_profiles import (
+    AttackProfile,
+    DamageProfile,
+    RangeProfile,
+    WeaponProfile,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartHookRegistry,
     BattleRoundStartRequestContext,
+    BattleRoundStartResultContext,
 )
+from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
     army_rule,
 )
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.runtime_modifiers import (
+    AdvanceRollModifierContext,
+    ChargeRollModifierContext,
+    MovementBudgetModifierContext,
+    WeaponProfileModifierContext,
+)
+from warhammer40k_core.engine.source_backed_rerolls import (
+    source_backed_reroll_permission_context_for_unit,
+    source_backed_reroll_permission_effect_payload,
+)
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
@@ -165,10 +190,12 @@ def test_miracle_die_pool_spend_and_game_state_payload_round_trip() -> None:
     assert die is not None
 
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    unit = _unit_for_player(state, player_id="player-a")
     spent = army_rule.spend_miracle_die(
         state,
         decisions,
         player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
         miracle_die_id=die.miracle_die_id,
         source_id="phase17g-adepta-test:manual-spend",
         source_context={"test": "manual"},
@@ -190,10 +217,757 @@ def test_miracle_die_pool_spend_and_game_state_payload_round_trip() -> None:
             state,
             decisions,
             player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
             miracle_die_id=die.miracle_die_id,
             source_id="phase17g-adepta-test:manual-spend-again",
             source_context={"test": "manual"},
         )
+
+
+def test_triumph_relics_damaged_profile_limits_selection_to_one() -> None:
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    triumph = _make_first_unit_triumph(state, player_id="player-a", wounds_remaining=6)
+    decisions = DecisionController()
+
+    request = _next_triumph_relics_request(state=state, decisions=decisions)
+
+    payload = cast(dict[str, JsonValue], request.payload)
+    assert payload["source_unit_instance_id"] == triumph.unit_instance_id
+    assert payload["max_selections"] == 1
+    assert payload["baseline_max_selections"] == 2
+    assert payload["damaged_profile_active"] is True
+    for option in request.options:
+        option_payload = cast(dict[str, JsonValue], option.payload)
+        selected = cast(list[str], option_payload["selected_relic_ids"])
+        assert len(selected) <= 1
+
+    _apply_triumph_relics_selection(
+        state=state,
+        decisions=decisions,
+        request=request,
+        selected_relics=(army_rule.TriumphRelic.FIERY_HEART,),
+    )
+
+    assert army_rule.active_triumph_relics_for_unit(
+        state,
+        player_id="player-a",
+        unit_instance_id=triumph.unit_instance_id,
+    ) == (army_rule.TriumphRelic.FIERY_HEART,)
+    assert (
+        _last_event_payload(decisions, army_rule.TRIUMPH_RELICS_SELECTED_EVENT)[
+            "damaged_profile_active"
+        ]
+        is True
+    )
+
+
+def test_triumph_relics_apply_fiery_heart_and_bloody_rose_modifiers() -> None:
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    triumph = _make_first_unit_triumph(state, player_id="player-a", wounds_remaining=7)
+    target = _unit_for_player(state, player_id="player-b")
+    decisions = DecisionController()
+    request = _next_triumph_relics_request(state=state, decisions=decisions)
+    payload = cast(dict[str, JsonValue], request.payload)
+    assert payload["max_selections"] == 2
+    assert payload["damaged_profile_active"] is False
+
+    _apply_triumph_relics_selection(
+        state=state,
+        decisions=decisions,
+        request=request,
+        selected_relics=(
+            army_rule.TriumphRelic.FIERY_HEART,
+            army_rule.TriumphRelic.PETALS_OF_THE_BLOODY_ROSE,
+        ),
+    )
+
+    model = triumph.own_models[0]
+    moved = army_rule.triumph_fiery_heart_movement_modifier(
+        MovementBudgetModifierContext(
+            state=state,
+            unit_instance_id=triumph.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            base_movement_inches=6.0,
+            current_movement_inches=6.0,
+        )
+    )
+    charge_modifiers = army_rule.triumph_fiery_heart_charge_modifier(
+        ChargeRollModifierContext(
+            state=state,
+            unit_instance_id=triumph.unit_instance_id,
+            current_roll_modifiers=(),
+        )
+    )
+    advance_modifiers = army_rule.triumph_fiery_heart_advance_modifier(
+        AdvanceRollModifierContext(
+            state=state,
+            unit_instance_id=triumph.unit_instance_id,
+            current_roll_modifiers=(),
+        )
+    )
+    melee_profile = _weapon_profile("triumph-test-melee", melee=True, armor_penetration=0)
+    modified_profile = army_rule.triumph_bloody_rose_weapon_profile_modifier(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=triumph.unit_instance_id,
+            attacker_model_instance_id=model.model_instance_id,
+            target_unit_instance_id=target.unit_instance_id,
+            weapon_profile=melee_profile,
+        )
+    )
+
+    assert moved == 8.0
+    assert tuple(modifier.operand for modifier in advance_modifiers) == (1,)
+    assert tuple(modifier.operand for modifier in charge_modifiers) == (1,)
+    assert modified_profile.armor_penetration.final == -1
+    assert modified_profile.source_ids != melee_profile.source_ids
+
+
+def test_triumph_relics_ebon_chalice_raises_acts_limit_and_icon_syncs_fnp() -> None:
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    triumph = _make_first_unit_triumph(state, player_id="player-a", wounds_remaining=7)
+    decisions = DecisionController()
+    request = _next_triumph_relics_request(state=state, decisions=decisions)
+    _apply_triumph_relics_selection(
+        state=state,
+        decisions=decisions,
+        request=request,
+        selected_relics=(
+            army_rule.TriumphRelic.SIMULACRUM_OF_THE_EBON_CHALICE,
+            army_rule.TriumphRelic.ICON_OF_THE_VALOROUS_HEART,
+        ),
+    )
+
+    assert (
+        army_rule.acts_of_faith_phase_limit_for_unit(
+            state,
+            player_id="player-a",
+            unit_instance_id=triumph.unit_instance_id,
+        )
+        == 2
+    )
+    assert tuple(
+        source.threshold
+        for source in state.feel_no_pain_sources_for_model(
+            model_instance_id=triumph.own_models[0].model_instance_id,
+        )
+    ) == (6,)
+
+    dice = list(army_rule.miracle_dice_pool(state, player_id="player-a"))
+    for index in range(2):
+        die = army_rule.gain_miracle_die(
+            state,
+            decisions,
+            player_id="player-a",
+            trigger=army_rule.BATTLE_ROUND_START_TRIGGER,
+            source_id=f"phase17g-adepta-test:triumph-extra-gain-{index}",
+            source_context={"test": "triumph"},
+        )
+        assert die is not None
+        dice.append(die)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+
+    for index, die in enumerate(dice[:2], start=1):
+        army_rule.spend_miracle_die(
+            state,
+            decisions,
+            player_id="player-a",
+            unit_instance_id=triumph.unit_instance_id,
+            miracle_die_id=die.miracle_die_id,
+            source_id=f"phase17g-adepta-test:triumph-spend-{index}",
+            source_context={"test": "triumph"},
+        )
+
+    with pytest.raises(GameLifecycleError, match="phase limit"):
+        army_rule.spend_miracle_die(
+            state,
+            decisions,
+            player_id="player-a",
+            unit_instance_id=triumph.unit_instance_id,
+            miracle_die_id=dice[2].miracle_die_id,
+            source_id="phase17g-adepta-test:triumph-spend-3",
+            source_context={"test": "triumph"},
+        )
+
+
+def test_triumph_relics_censer_and_argent_shroud_expose_reroll_support() -> None:
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    triumph = _make_first_unit_triumph(state, player_id="player-a", wounds_remaining=7)
+    decisions = DecisionController()
+    request = _next_triumph_relics_request(state=state, decisions=decisions)
+    _apply_triumph_relics_selection(
+        state=state,
+        decisions=decisions,
+        request=request,
+        selected_relics=(
+            army_rule.TriumphRelic.CENSER_OF_THE_SACRED_ROSE,
+            army_rule.TriumphRelic.SIMULACRUM_OF_THE_ARGENT_SHROUD,
+        ),
+    )
+
+    permission_context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=triumph.unit_instance_id,
+        roll_type="battle_shock_roll",
+        timing_window="battle_shock_test",
+    )
+    argent_context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=triumph.unit_instance_id,
+        roll_type="wound_roll",
+        timing_window="attack_sequence.wound",
+        attack_kind="ranged",
+    )
+    melee_argent_context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=triumph.unit_instance_id,
+        roll_type="wound_roll",
+        timing_window="attack_sequence.wound",
+        attack_kind="melee",
+    )
+    ranged_profile = _weapon_profile("triumph-test-ranged", melee=False, armor_penetration=0)
+    melee_profile = _weapon_profile("triumph-test-melee", melee=True, armor_penetration=0)
+
+    assert permission_context is not None
+    assert permission_context.source_payload["relic_id"] == (
+        army_rule.TriumphRelic.CENSER_OF_THE_SACRED_ROSE.value
+    )
+    assert argent_context is not None
+    assert argent_context.source_payload["relic_id"] == (
+        army_rule.TriumphRelic.SIMULACRUM_OF_THE_ARGENT_SHROUD.value
+    )
+    assert argent_context.source_payload["conditional_wound_reroll"] == {
+        "reroll_unmodified_values": [1]
+    }
+    assert melee_argent_context is None
+    assert army_rule.triumph_argent_shroud_wound_reroll_values(
+        state,
+        player_id="player-a",
+        unit_instance_id=triumph.unit_instance_id,
+        weapon_profile=ranged_profile,
+    ) == (1,)
+    assert (
+        army_rule.triumph_argent_shroud_wound_reroll_values(
+            state,
+            player_id="player-a",
+            unit_instance_id=triumph.unit_instance_id,
+            weapon_profile=melee_profile,
+        )
+        == ()
+    )
+
+
+def test_triumph_relic_public_apis_noop_without_active_selection() -> None:
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    triumph = _make_first_unit_triumph(state, player_id="player-a", wounds_remaining=7)
+    target = _unit_for_player(state, player_id="player-b")
+    model = triumph.own_models[0]
+    existing_modifier = RollModifier(
+        modifier_id="phase17g-adepta-existing-modifier",
+        source_id="phase17g-adepta-test:existing",
+        operand=2,
+    )
+    ranged_profile = _weapon_profile("triumph-test-ranged", melee=False, armor_penetration=0)
+    melee_profile = _weapon_profile("triumph-test-melee", melee=True, armor_penetration=0)
+
+    assert (
+        army_rule.active_triumph_relics_for_unit(
+            state,
+            player_id="player-a",
+            unit_instance_id=triumph.unit_instance_id,
+        )
+        == ()
+    )
+    assert (
+        army_rule.acts_of_faith_phase_limit_for_unit(
+            state,
+            player_id="player-a",
+            unit_instance_id=triumph.unit_instance_id,
+        )
+        == 1
+    )
+    assert (
+        army_rule.triumph_fiery_heart_movement_modifier(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id=triumph.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                base_movement_inches=6.0,
+                current_movement_inches=6.0,
+            )
+        )
+        == 6.0
+    )
+    assert army_rule.triumph_fiery_heart_advance_modifier(
+        AdvanceRollModifierContext(
+            state=state,
+            unit_instance_id=triumph.unit_instance_id,
+            current_roll_modifiers=(existing_modifier,),
+        )
+    ) == (existing_modifier,)
+    assert army_rule.triumph_fiery_heart_charge_modifier(
+        ChargeRollModifierContext(
+            state=state,
+            unit_instance_id=triumph.unit_instance_id,
+            current_roll_modifiers=(existing_modifier,),
+        )
+    ) == (existing_modifier,)
+    assert (
+        army_rule.triumph_bloody_rose_weapon_profile_modifier(
+            WeaponProfileModifierContext(
+                state=state,
+                source_phase=BattlePhase.SHOOTING,
+                attacking_unit_instance_id=triumph.unit_instance_id,
+                attacker_model_instance_id=model.model_instance_id,
+                target_unit_instance_id=target.unit_instance_id,
+                weapon_profile=melee_profile,
+            )
+        )
+        == melee_profile
+    )
+    assert (
+        army_rule.triumph_bloody_rose_weapon_profile_modifier(
+            WeaponProfileModifierContext(
+                state=state,
+                source_phase=BattlePhase.FIGHT,
+                attacking_unit_instance_id=triumph.unit_instance_id,
+                attacker_model_instance_id=model.model_instance_id,
+                target_unit_instance_id=target.unit_instance_id,
+                weapon_profile=ranged_profile,
+            )
+        )
+        == ranged_profile
+    )
+    assert (
+        army_rule.triumph_argent_shroud_wound_reroll_values(
+            state,
+            player_id="player-a",
+            unit_instance_id=triumph.unit_instance_id,
+            weapon_profile=ranged_profile,
+        )
+        == ()
+    )
+
+
+def test_triumph_relic_public_apis_fail_fast_on_drift() -> None:
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    unit = _unit_for_player(state, player_id="player-a")
+    other_player_unit = _unit_for_player(state, player_id="player-b")
+    ranged_profile = _weapon_profile("triumph-test-ranged", melee=False, armor_penetration=0)
+
+    with pytest.raises(GameLifecycleError, match="player drift"):
+        army_rule.acts_of_faith_phase_limit_for_unit(
+            state,
+            player_id="player-a",
+            unit_instance_id=other_player_unit.unit_instance_id,
+        )
+
+    non_adepta_state = battle_state()
+    non_adepta_unit = _unit_for_player(non_adepta_state, player_id="player-a")
+    with pytest.raises(GameLifecycleError, match="requires Adepta Sororitas"):
+        army_rule.acts_of_faith_phase_limit_for_unit(
+            non_adepta_state,
+            player_id="player-a",
+            unit_instance_id=non_adepta_unit.unit_instance_id,
+        )
+
+    non_adepta_unit_state = battle_state()
+    _mark_player_as_adepta_sororitas(
+        non_adepta_unit_state,
+        player_id="player-a",
+        faction_keywords=("imperium",),
+    )
+    non_adepta_keyword_unit = _unit_for_player(non_adepta_unit_state, player_id="player-a")
+    with pytest.raises(GameLifecycleError, match="requires an Adepta Sororitas unit"):
+        army_rule.acts_of_faith_phase_limit_for_unit(
+            non_adepta_unit_state,
+            player_id="player-a",
+            unit_instance_id=non_adepta_keyword_unit.unit_instance_id,
+        )
+
+    with pytest.raises(GameLifecycleError, match="WeaponProfile"):
+        army_rule.triumph_argent_shroud_wound_reroll_values(
+            state,
+            player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
+            weapon_profile=cast(WeaponProfile, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="player drift"):
+        army_rule.triumph_argent_shroud_wound_reroll_values(
+            state,
+            player_id="player-b",
+            unit_instance_id=unit.unit_instance_id,
+            weapon_profile=ranged_profile,
+        )
+    assert (
+        army_rule.triumph_argent_shroud_wound_reroll_values(
+            non_adepta_state,
+            player_id="player-a",
+            unit_instance_id=non_adepta_unit.unit_instance_id,
+            weapon_profile=ranged_profile,
+        )
+        == ()
+    )
+    assert (
+        army_rule.triumph_argent_shroud_wound_reroll_values(
+            non_adepta_unit_state,
+            player_id="player-a",
+            unit_instance_id=non_adepta_keyword_unit.unit_instance_id,
+            weapon_profile=ranged_profile,
+        )
+        == ()
+    )
+
+
+def test_triumph_modifier_handlers_fail_fast_on_invalid_contexts() -> None:
+    with pytest.raises(GameLifecycleError, match="movement modifier requires context"):
+        army_rule.triumph_fiery_heart_movement_modifier(
+            cast(MovementBudgetModifierContext, object())
+        )
+    with pytest.raises(GameLifecycleError, match="advance modifier requires context"):
+        army_rule.triumph_fiery_heart_advance_modifier(cast(AdvanceRollModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="charge modifier requires context"):
+        army_rule.triumph_fiery_heart_charge_modifier(cast(ChargeRollModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="weapon modifier requires context"):
+        army_rule.triumph_bloody_rose_weapon_profile_modifier(
+            cast(WeaponProfileModifierContext, object())
+        )
+
+
+def test_triumph_modifiers_ignore_non_adepta_armies_and_units() -> None:
+    def assert_modifiers_noop(state: GameState, unit: UnitInstance) -> None:
+        target = _unit_for_player(state, player_id="player-b")
+        model = unit.own_models[0]
+        existing_modifier = RollModifier(
+            modifier_id=f"phase17g-adepta-existing:{unit.unit_instance_id}",
+            source_id="phase17g-adepta-test:existing",
+            operand=2,
+        )
+        profile = _weapon_profile(
+            f"triumph-test-melee:{unit.unit_instance_id}",
+            melee=True,
+            armor_penetration=0,
+        )
+
+        assert (
+            army_rule.triumph_fiery_heart_movement_modifier(
+                MovementBudgetModifierContext(
+                    state=state,
+                    unit_instance_id=unit.unit_instance_id,
+                    model_instance_id=model.model_instance_id,
+                    base_movement_inches=6.0,
+                    current_movement_inches=6.0,
+                )
+            )
+            == 6.0
+        )
+        assert army_rule.triumph_fiery_heart_advance_modifier(
+            AdvanceRollModifierContext(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                current_roll_modifiers=(existing_modifier,),
+            )
+        ) == (existing_modifier,)
+        assert army_rule.triumph_fiery_heart_charge_modifier(
+            ChargeRollModifierContext(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                current_roll_modifiers=(existing_modifier,),
+            )
+        ) == (existing_modifier,)
+        assert (
+            army_rule.triumph_bloody_rose_weapon_profile_modifier(
+                WeaponProfileModifierContext(
+                    state=state,
+                    source_phase=BattlePhase.FIGHT,
+                    attacking_unit_instance_id=unit.unit_instance_id,
+                    attacker_model_instance_id=model.model_instance_id,
+                    target_unit_instance_id=target.unit_instance_id,
+                    weapon_profile=profile,
+                )
+            )
+            == profile
+        )
+        assert (
+            army_rule.triumph_argent_shroud_wound_reroll_values(
+                state,
+                player_id="player-a",
+                unit_instance_id=unit.unit_instance_id,
+                weapon_profile=_weapon_profile(
+                    f"triumph-test-ranged:{unit.unit_instance_id}",
+                    melee=False,
+                    armor_penetration=0,
+                ),
+            )
+            == ()
+        )
+
+    non_adepta_state = battle_state()
+    assert_modifiers_noop(
+        non_adepta_state, _unit_for_player(non_adepta_state, player_id="player-a")
+    )
+
+    non_adepta_unit_state = battle_state()
+    _mark_player_as_adepta_sororitas(
+        non_adepta_unit_state,
+        player_id="player-a",
+        faction_keywords=("imperium",),
+    )
+    assert_modifiers_noop(
+        non_adepta_unit_state,
+        _unit_for_player(non_adepta_unit_state, player_id="player-a"),
+    )
+
+
+def test_triumph_feel_no_pain_sync_requires_adepta_and_clears_inactive_sources() -> None:
+    non_adepta_state = battle_state()
+    with pytest.raises(GameLifecycleError, match="requires Adepta Sororitas"):
+        army_rule.sync_triumph_relic_feel_no_pain_sources(
+            non_adepta_state,
+            player_id="player-a",
+        )
+
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    unit = _unit_for_player(state, player_id="player-a")
+    model = unit.own_models[0]
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=model.model_instance_id,
+        sources=(
+            FeelNoPainSource(
+                source_id=f"{army_rule.TRIUMPH_RELICS_FEEL_NO_PAIN_SOURCE_PREFIX}:stale",
+                threshold=6,
+            ),
+        ),
+    )
+
+    army_rule.sync_triumph_relic_feel_no_pain_sources(state, player_id="player-a")
+
+    assert state.feel_no_pain_sources_for_model(model_instance_id=model.model_instance_id) == ()
+
+
+@pytest.mark.parametrize(
+    ("payload_update", "message"),
+    [
+        ({"game_id": "phase17g-adepta-drift-game"}, "game_id drift"),
+        ({"battle_round": 2}, "battle_round drift"),
+        ({"phase": BattlePhase.MOVEMENT.value}, "phase drift"),
+        ({"active_player_id": "player-b"}, "active player drift"),
+        ({"source_model_instance_id": "phase17g-adepta-drift-model"}, "source model drift"),
+        ({"damaged_effect_id": "phase17g-adepta-drift-damaged"}, "DAMAGED effect drift"),
+        ({"damaged_profile_active": False}, "DAMAGED active drift"),
+        ({"max_selections": 2}, "max selection drift"),
+        ({"baseline_max_selections": 3}, "baseline selection drift"),
+        ({"available_relic_ids": [army_rule.TriumphRelic.FIERY_HEART.value]}, "available relic"),
+    ],
+)
+def test_triumph_relics_selection_rejects_stale_request_drift(
+    payload_update: dict[str, JsonValue],
+    message: str,
+) -> None:
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    _make_first_unit_triumph(state, player_id="player-a", wounds_remaining=6)
+    decisions = DecisionController()
+    request = _next_triumph_relics_request(state=state, decisions=decisions)
+    drifted_request = replace(
+        request,
+        payload={
+            **cast(dict[str, JsonValue], request.payload),
+            **payload_update,
+        },
+    )
+    result = DecisionResult.for_request(
+        result_id=f"phase17g-adepta-triumph-drift:{message.replace(' ', '-')}",
+        request=drifted_request,
+        selected_option_id="triumph-relics-none",
+    )
+    registry = BattleRoundStartHookRegistry.from_bindings(
+        army_rule.runtime_contribution().battle_round_start_hook_bindings
+    )
+
+    with pytest.raises(GameLifecycleError, match=message):
+        registry.apply_result(
+            BattleRoundStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=drifted_request,
+                result=result,
+            )
+        )
+
+
+def test_triumph_relics_selection_rejects_result_drift_and_duplicate_resolution() -> None:
+    state = battle_state()
+    _mark_player_as_adepta_sororitas(state, player_id="player-a")
+    _make_first_unit_triumph(state, player_id="player-a", wounds_remaining=7)
+    decisions = DecisionController()
+    request = _next_triumph_relics_request(state=state, decisions=decisions)
+    result = DecisionResult.for_request(
+        result_id="phase17g-adepta-triumph-result-drift",
+        request=request,
+        selected_option_id="triumph-relics-none",
+    )
+    registry = BattleRoundStartHookRegistry.from_bindings(
+        army_rule.runtime_contribution().battle_round_start_hook_bindings
+    )
+    invalid_results: tuple[tuple[DecisionResult, str], ...] = (
+        (replace(result, actor_id=None), "requires an actor"),
+        (replace(result, actor_id="player-b"), "actor drift"),
+        (replace(result, selected_option_id="phase17g-adepta-missing-option"), "not available"),
+        (replace(result, payload={}), "payload drift"),
+    )
+
+    for invalid_result, message in invalid_results:
+        with pytest.raises(GameLifecycleError, match=message):
+            registry.apply_result(
+                BattleRoundStartResultContext(
+                    state=state,
+                    decisions=decisions,
+                    request=request,
+                    result=invalid_result,
+                )
+            )
+
+    assert registry.apply_result(
+        BattleRoundStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="selection already exists"):
+        registry.apply_result(
+            BattleRoundStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+        )
+
+
+def test_source_backed_reroll_conditional_payloads_fail_fast() -> None:
+    def state_with_effect(source_payload: JsonValue) -> tuple[GameState, UnitInstance]:
+        state = battle_state()
+        unit = _unit_for_player(state, player_id="player-a")
+        state.record_persisting_effect(
+            PersistingEffect(
+                effect_id="phase17g-adepta-source-backed-reroll-effect",
+                source_rule_id="phase17g-adepta-source-backed-reroll",
+                owner_player_id="player-a",
+                target_unit_instance_ids=(unit.unit_instance_id,),
+                started_battle_round=state.battle_round,
+                expiration=EffectExpiration.end_of_battle(),
+                effect_payload=source_backed_reroll_permission_effect_payload(
+                    target_unit_instance_ids=(unit.unit_instance_id,),
+                    permission=RerollPermission(
+                        source_id="phase17g-adepta-source-backed-reroll",
+                        timing_window="attack_sequence.wound",
+                        owning_player_id="player-a",
+                        eligible_roll_type="wound_roll",
+                        component_selection_policy=(RerollComponentSelectionPolicy.WHOLE_ROLL),
+                    ),
+                    source_payload=source_payload,
+                ),
+            )
+        )
+        return state, unit
+
+    def query(
+        state: GameState,
+        unit: UnitInstance,
+        *,
+        attack_kind: str | None = "ranged",
+        target_unit_instance_id: str | None = None,
+    ) -> object:
+        return source_backed_reroll_permission_context_for_unit(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
+            roll_type="wound_roll",
+            timing_window="attack_sequence.wound",
+            attack_kind=attack_kind,
+            target_unit_instance_id=target_unit_instance_id,
+        )
+
+    def query_with_effect(
+        source_payload: JsonValue,
+        *,
+        attack_kind: str | None = "ranged",
+        target_unit_instance_id: str | None = None,
+    ) -> object:
+        state, unit = state_with_effect(source_payload)
+        return query(
+            state,
+            unit,
+            attack_kind=attack_kind,
+            target_unit_instance_id=target_unit_instance_id,
+        )
+
+    with pytest.raises(GameLifecycleError, match="attack_kind"):
+        query_with_effect({"attack_kind": ""})
+    with pytest.raises(GameLifecycleError, match="aura_source_unit_instance_id"):
+        query_with_effect({"aura_range_inches": 6.0}, attack_kind=None)
+    with pytest.raises(GameLifecycleError, match="aura_range_inches"):
+        query_with_effect(
+            {
+                "aura_source_unit_instance_id": "phase17g-adepta-source-unit",
+                "aura_range_inches": "six",
+            },
+            attack_kind=None,
+        )
+    with pytest.raises(GameLifecycleError, match="aura_range_inches"):
+        query_with_effect(
+            {
+                "aura_source_unit_instance_id": "phase17g-adepta-source-unit",
+                "aura_range_inches": 0,
+            },
+            attack_kind=None,
+        )
+    with pytest.raises(GameLifecycleError, match="unsupported attack_kind"):
+        query_with_effect({}, attack_kind="psychic")
+    with pytest.raises(GameLifecycleError, match="requires GameState"):
+        source_backed_reroll_permission_context_for_unit(
+            state=object(),
+            player_id="player-a",
+            unit_instance_id="phase17g-adepta-unit",
+            roll_type="wound_roll",
+            timing_window="attack_sequence.wound",
+        )
+
+    state, unit = state_with_effect({"attack_kind": "melee"})
+    assert query(state, unit, attack_kind="ranged") is None
+    state, unit = state_with_effect({"target_unit_instance_id": "phase17g-adepta-other-target"})
+    assert query(state, unit, target_unit_instance_id=unit.unit_instance_id) is None
+    state, unit = state_with_effect(
+        {
+            "aura_source_unit_instance_id": "phase17g-adepta-missing-source",
+            "aura_range_inches": 6.0,
+        }
+    )
+    assert query(state, unit, attack_kind=None) is None
+
+    state, unit = state_with_effect(
+        {
+            "aura_source_unit_instance_id": unit.unit_instance_id,
+            "aura_range_inches": 6.0,
+        }
+    )
+    state.battlefield_state = None
+    with pytest.raises(GameLifecycleError, match="battlefield_state"):
+        query(state, unit, attack_kind=None)
 
 
 def test_acts_of_faith_runtime_contribution_exposes_hooks() -> None:
@@ -206,10 +980,23 @@ def test_acts_of_faith_runtime_contribution_exposes_hooks() -> None:
     assert not contribution.contribution_id.endswith(":scaffold")
     assert tuple(binding.hook_id for binding in contribution.battle_round_start_hook_bindings) == (
         army_rule.BATTLE_ROUND_START_HOOK_ID,
+        army_rule.TRIUMPH_RELICS_BATTLE_ROUND_START_HOOK_ID,
     )
     assert tuple(binding.hook_id for binding in contribution.unit_destroyed_hook_bindings) == (
         army_rule.UNIT_DESTROYED_HOOK_ID,
     )
+    assert tuple(
+        binding.modifier_id for binding in contribution.movement_budget_modifier_bindings
+    ) == (army_rule.TRIUMPH_FIERY_HEART_MOVEMENT_MODIFIER_ID,)
+    assert tuple(
+        binding.modifier_id for binding in contribution.advance_roll_modifier_bindings
+    ) == (army_rule.TRIUMPH_FIERY_HEART_ADVANCE_MODIFIER_ID,)
+    assert tuple(binding.modifier_id for binding in contribution.charge_roll_modifier_bindings) == (
+        army_rule.TRIUMPH_FIERY_HEART_CHARGE_MODIFIER_ID,
+    )
+    assert tuple(
+        binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings
+    ) == (army_rule.TRIUMPH_BLOODY_ROSE_WEAPON_PROFILE_MODIFIER_ID,)
 
 
 def test_acts_of_faith_handlers_fail_fast_on_malformed_inputs() -> None:
@@ -244,6 +1031,7 @@ def test_acts_of_faith_handlers_fail_fast_on_malformed_inputs() -> None:
             state,
             decisions,
             player_id="player-a",
+            unit_instance_id=_unit_for_player(state, player_id="player-a").unit_instance_id,
             miracle_die_id="missing-die",
             source_id="phase17g-adepta-test:missing-spend",
             source_context={},
@@ -289,6 +1077,140 @@ def _unit_for_player(state: GameState, *, player_id: str) -> UnitInstance:
     if army is None:
         raise AssertionError(f"Missing army for {player_id}.")
     return army.units[0]
+
+
+def _make_first_unit_triumph(
+    state: GameState,
+    *,
+    player_id: str,
+    wounds_remaining: int,
+) -> UnitInstance:
+    source_unit = _unit_for_player(state, player_id=player_id)
+    updated_models = tuple(
+        replace(
+            model,
+            datasheet_id=army_rule.TRIUMPH_OF_SAINT_KATHERINE_DATASHEET_ID,
+            starting_wounds=18,
+            wounds_remaining=wounds_remaining if index == 0 else 0,
+        )
+        for index, model in enumerate(source_unit.own_models)
+    )
+    triumph = replace(
+        source_unit,
+        datasheet_id=army_rule.TRIUMPH_OF_SAINT_KATHERINE_DATASHEET_ID,
+        name="Triumph Of Saint Katherine",
+        own_models=updated_models,
+        damaged_effects=(
+            DamagedEffectDefinition(
+                damaged_effect_id="wahapedia:000002063:damaged:relics-selection-limit",
+                model_profile_id=None,
+                wounds_min=1,
+                wounds_max=6,
+                effect_kind=DamagedEffectKind.ABILITY_SELECTION_LIMIT,
+                max_selections=1,
+                baseline_max_selections=2,
+                selection_group=army_rule.TRIUMPH_RELICS_SELECTION_GROUP,
+                source_id=army_rule.TRIUMPH_RELICS_DAMAGED_SOURCE_RULE_ID,
+            ),
+        ),
+    )
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != player_id:
+            updated_armies.append(army)
+            continue
+        updated_armies.append(
+            replace(
+                army,
+                units=tuple(
+                    triumph if unit.unit_instance_id == source_unit.unit_instance_id else unit
+                    for unit in army.units
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+    return triumph
+
+
+def _next_triumph_relics_request(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> DecisionRequest:
+    registry = BattleRoundStartHookRegistry.from_bindings(
+        army_rule.runtime_contribution().battle_round_start_hook_bindings
+    )
+    request = registry.next_request_for(
+        BattleRoundStartRequestContext(state=state, decisions=decisions)
+    )
+    if request is None:
+        raise AssertionError("Expected Relics of the Matriarchs request.")
+    return request
+
+
+def _apply_triumph_relics_selection(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    selected_relics: tuple[army_rule.TriumphRelic, ...],
+) -> None:
+    registry = BattleRoundStartHookRegistry.from_bindings(
+        army_rule.runtime_contribution().battle_round_start_hook_bindings
+    )
+    option_id = _triumph_option_id(request, selected_relics=selected_relics)
+    result = DecisionResult.for_request(
+        result_id=f"phase17g-adepta-triumph:{option_id}:result",
+        request=request,
+        selected_option_id=option_id,
+    )
+    handled = registry.apply_result(
+        BattleRoundStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+    assert handled
+
+
+def _triumph_option_id(
+    request: DecisionRequest,
+    *,
+    selected_relics: tuple[army_rule.TriumphRelic, ...],
+) -> str:
+    selected_ids = [relic.value for relic in selected_relics]
+    for option in request.options:
+        payload = cast(dict[str, JsonValue], option.payload)
+        if payload["selected_relic_ids"] == selected_ids:
+            return option.option_id
+    raise AssertionError(f"Missing Triumph relic option {selected_ids}.")
+
+
+def _weapon_profile(
+    profile_id: str,
+    *,
+    melee: bool,
+    armor_penetration: int,
+) -> WeaponProfile:
+    return WeaponProfile(
+        profile_id=profile_id,
+        name=profile_id,
+        range_profile=RangeProfile.melee() if melee else RangeProfile.distance(24),
+        attack_profile=AttackProfile.fixed(2),
+        skill=CharacteristicValue.from_raw(
+            Characteristic.WEAPON_SKILL if melee else Characteristic.BALLISTIC_SKILL,
+            3,
+        ),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+        armor_penetration=CharacteristicValue.from_raw(
+            Characteristic.ARMOR_PENETRATION,
+            armor_penetration,
+        ),
+        damage_profile=DamageProfile.fixed(1),
+        source_ids=("phase17g-adepta-test:weapon-profile",),
+    )
 
 
 def _append_destroyed_model_event(

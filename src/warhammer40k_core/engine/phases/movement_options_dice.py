@@ -213,17 +213,26 @@ def _advance_roll_request_for_action(
     unit_placement: UnitPlacement,
     action_result: DecisionResult,
     ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> AdvanceRollRequest:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Advance roll requires a UnitInstance.")
     if type(unit_placement) is not UnitPlacement:
         raise GameLifecycleError("Advance roll requires a UnitPlacement.")
+    roll_modifiers = runtime_modifier_registry.advance_roll_modifiers(
+        AdvanceRollModifierContext(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            current_roll_modifiers=(),
+        )
+    )
     return AdvanceRollRequest.for_unit(
         request_id=f"{action_result.result_id}:advance-roll",
         game_id=state.game_id,
         battle_round=state.battle_round,
         player_id=unit_placement.player_id,
         unit_instance_id=unit_placement.unit_instance_id,
+        roll_modifiers=roll_modifiers,
         reroll_permission=_advance_reroll_permission_for_unit(
             state=state,
             unit=unit,

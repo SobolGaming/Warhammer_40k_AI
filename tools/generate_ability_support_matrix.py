@@ -758,6 +758,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:chaos-daemons:shadow-legion:rule": "Shadow Legion",
     "phase17f:phase17e:chaos-daemons:warptide:rule": "Shudderblink",
     adepta_sororitas_army_rule.SOURCE_RULE_ID: "Acts of Faith",
+    adepta_sororitas_army_rule.TRIUMPH_RELICS_SOURCE_RULE_ID: "Relics of the Matriarchs",
     adeptus_custodes_army_rule.SOURCE_RULE_ID: "Martial Ka'tah",
     adeptus_mechanicus_army_rule.SOURCE_RULE_ID: "Doctrina Imperatives",
     adeptus_mechanicus_army_rule.HOOK_ID: "Doctrina Imperatives",
@@ -797,6 +798,21 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     "warhammer_40000_11th:aeldari:army_rule:sudden_strike": ("Battle Focus - Sudden Strike"),
     "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind": (
         "Battle Focus - Swift as the Wind"
+    ),
+    adepta_sororitas_army_rule.TRIUMPH_RELICS_BATTLE_ROUND_START_HOOK_ID: (
+        "Relics of the Matriarchs"
+    ),
+    adepta_sororitas_army_rule.TRIUMPH_BLOODY_ROSE_WEAPON_PROFILE_MODIFIER_ID: (
+        "Relics of the Matriarchs - Petals of the Bloody Rose"
+    ),
+    adepta_sororitas_army_rule.TRIUMPH_FIERY_HEART_ADVANCE_MODIFIER_ID: (
+        "Relics of the Matriarchs - The Fiery Heart Advance"
+    ),
+    adepta_sororitas_army_rule.TRIUMPH_FIERY_HEART_CHARGE_MODIFIER_ID: (
+        "Relics of the Matriarchs - The Fiery Heart Charge"
+    ),
+    adepta_sororitas_army_rule.TRIUMPH_FIERY_HEART_MOVEMENT_MODIFIER_ID: (
+        "Relics of the Matriarchs - The Fiery Heart Move"
     ),
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command": ("Voice of Command"),
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock": (
@@ -5084,6 +5100,23 @@ def _structured_support_sections_markdown() -> list[str]:
                         "the start of each battle round and one D6 each time a friendly "
                         "ADEPTA SORORITAS unit is destroyed, persisted in the Miracle "
                         "dice pool with fixed non-rerollable values."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Adepta Sororitas - Relics of the Matriarchs",
+                    "Battle-round relic selection plus source-backed aura/runtime consumers",
+                    "Adapter contract, source coverage, generated matrix, and runtime inventory",
+                    (
+                        "Focused Relics selection, DAMAGED cap, movement, Advance, charge, "
+                        "weapon-profile, source-backed reroll, Feel No Pain, and Acts of Faith "
+                        "limit tests"
+                    ),
+                    "Full",
+                    (
+                        "Implements Triumph of Saint Katherine relic selection through the "
+                        "shared battle-round decision path, including the DAMAGED profile's "
+                        "one-relic cap and the selected relic effects used by live runtime "
+                        "queries."
                     ),
                 ),
                 SupportSectionRow(

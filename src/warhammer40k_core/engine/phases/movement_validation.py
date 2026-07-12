@@ -1174,11 +1174,18 @@ def _validate_objective_marker_tuple(
     return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
 
 
-def _validate_advance_roll_spec(spec: DiceRollSpec, *, unit_instance_id: str) -> None:
+def _validate_advance_roll_spec(
+    spec: DiceRollSpec,
+    *,
+    unit_instance_id: str,
+    expression_modifier: int,
+) -> None:
     if type(spec) is not DiceRollSpec:
         raise GameLifecycleError("Advance roll spec must be a DiceRollSpec.")
-    if spec.expression != DiceExpression(quantity=1, sides=6):
-        raise GameLifecycleError("Advance roll spec must be an unmodified D6.")
+    if type(expression_modifier) is not int:
+        raise GameLifecycleError("Advance roll expression_modifier must be an integer.")
+    if spec.expression != DiceExpression(quantity=1, sides=6, modifier=expression_modifier):
+        raise GameLifecycleError("Advance roll spec must match the D6 modifier payload.")
     if spec.roll_type != "advance_roll":
         raise GameLifecycleError("Advance roll spec roll_type must be advance_roll.")
     if spec.actor_id != unit_instance_id:

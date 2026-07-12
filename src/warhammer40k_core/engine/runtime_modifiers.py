@@ -28,6 +28,10 @@ type SaveOptionModifierHandler = Callable[
 ]
 type MovementBudgetModifierHandler = Callable[["MovementBudgetModifierContext"], float]
 type ObjectiveControlModifierHandler = Callable[["ObjectiveControlModifierContext"], int]
+type AdvanceRollModifierHandler = Callable[
+    ["AdvanceRollModifierContext"],
+    tuple[RollModifier, ...],
+]
 type ChargeRollModifierHandler = Callable[
     ["ChargeRollModifierContext"],
     tuple[RollModifier, ...],
@@ -378,6 +382,32 @@ class ObjectiveControlModifierContext:
 
 
 @dataclass(frozen=True, slots=True)
+class AdvanceRollModifierContext:
+    state: GameState
+    unit_instance_id: str
+    current_roll_modifiers: tuple[RollModifier, ...]
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Advance roll modifier state must be GameState.")
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("unit_instance_id", self.unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "current_roll_modifiers",
+            _validate_roll_modifier_tuple(
+                "current_roll_modifiers",
+                self.current_roll_modifiers,
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class ChargeRollModifierContext:
     state: GameState
     unit_instance_id: str
@@ -549,6 +579,21 @@ class ObjectiveControlModifierBinding:
 
 
 @dataclass(frozen=True, slots=True)
+class AdvanceRollModifierBinding:
+    modifier_id: str
+    source_id: str
+    handler: AdvanceRollModifierHandler
+
+    def __post_init__(self) -> None:
+        _validate_modifier_binding(
+            field_prefix="advance roll modifier",
+            modifier_id=self.modifier_id,
+            source_id=self.source_id,
+            handler=self.handler,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class ChargeRollModifierBinding:
     modifier_id: str
     source_id: str
@@ -587,6 +632,7 @@ class RuntimeModifierRegistry:
     save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
     movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = ()
     objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
+    advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = ()
     charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = ()
     weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
 
@@ -656,6 +702,15 @@ class RuntimeModifierRegistry:
         )
         object.__setattr__(
             self,
+            "advance_roll_modifier_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry advance_roll_modifier_bindings",
+                self.advance_roll_modifier_bindings,
+                AdvanceRollModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "charge_roll_modifier_bindings",
             _validate_bindings(
                 "RuntimeModifierRegistry charge_roll_modifier_bindings",
@@ -691,6 +746,7 @@ class RuntimeModifierRegistry:
         save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = (),
         movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = (),
         objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = (),
+        advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = (),
         charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = (),
         weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = (),
     ) -> Self:
@@ -702,6 +758,7 @@ class RuntimeModifierRegistry:
             save_option_modifier_bindings=save_option_modifier_bindings,
             movement_budget_modifier_bindings=movement_budget_modifier_bindings,
             objective_control_modifier_bindings=objective_control_modifier_bindings,
+            advance_roll_modifier_bindings=advance_roll_modifier_bindings,
             charge_roll_modifier_bindings=charge_roll_modifier_bindings,
             weapon_profile_modifier_bindings=weapon_profile_modifier_bindings,
         )
@@ -726,6 +783,9 @@ class RuntimeModifierRegistry:
 
     def all_objective_control_bindings(self) -> tuple[ObjectiveControlModifierBinding, ...]:
         return self.objective_control_modifier_bindings
+
+    def all_advance_roll_bindings(self) -> tuple[AdvanceRollModifierBinding, ...]:
+        return self.advance_roll_modifier_bindings
 
     def all_charge_roll_bindings(self) -> tuple[ChargeRollModifierBinding, ...]:
         return self.charge_roll_modifier_bindings
@@ -863,6 +923,20 @@ class RuntimeModifierRegistry:
             replace(context, current_objective_control=current)
         )
 
+    def advance_roll_modifiers(
+        self,
+        context: AdvanceRollModifierContext,
+    ) -> tuple[RollModifier, ...]:
+        if type(context) is not AdvanceRollModifierContext:
+            raise GameLifecycleError("Advance roll modifiers require a context.")
+        current = context.current_roll_modifiers
+        for binding in self.advance_roll_modifier_bindings:
+            current = _validate_roll_modifier_tuple(
+                f"{binding.modifier_id} returned advance roll modifiers",
+                binding.handler(replace(context, current_roll_modifiers=current)),
+            )
+        return current
+
     def charge_roll_modifiers(
         self,
         context: ChargeRollModifierContext,
@@ -920,6 +994,7 @@ def _validate_bindings[T](
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
             | ObjectiveControlModifierBinding
+            | AdvanceRollModifierBinding
             | ChargeRollModifierBinding
             | WeaponProfileModifierBinding,
             binding,
@@ -940,6 +1015,7 @@ def _modifier_id_for_binding(binding: object) -> str:
         DamageRollModifierBinding,
         MovementBudgetModifierBinding,
         ObjectiveControlModifierBinding,
+        AdvanceRollModifierBinding,
         ChargeRollModifierBinding,
         WeaponProfileModifierBinding,
     }:
@@ -951,6 +1027,7 @@ def _modifier_id_for_binding(binding: object) -> str:
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
             | ObjectiveControlModifierBinding
+            | AdvanceRollModifierBinding
             | ChargeRollModifierBinding
             | WeaponProfileModifierBinding,
             binding,
