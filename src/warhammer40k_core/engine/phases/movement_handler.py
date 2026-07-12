@@ -186,6 +186,7 @@ class MovementPhaseHandler:
                 MovementPhaseActionKind.ADVANCE.value,
                 MovementPhaseActionKind.FALL_BACK.value,
             ),
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
         )
         if move_completed_status is not None:
             return move_completed_status

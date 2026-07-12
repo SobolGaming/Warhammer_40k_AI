@@ -22,6 +22,10 @@ CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = (
     "catalog-ir:fight-selected-weapon-ability-choice"
 )
 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
+CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:wound-roll-modifier"
+CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID = (
+    "catalog-ir:fight-activation-movement-distance"
+)
 
 
 def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
@@ -48,6 +52,10 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
             )
             token = ability.value.lower().replace("_", "-").replace(" ", "-")
             consumer_ids.add(f"catalog-ir:weapon-keyword-grant:{token}")
+    if clause_is_leading_unit_wound_roll_modifier(clause):
+        consumer_ids.add(CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID)
+    if clause_is_consolidation_move_distance_modifier(clause):
+        consumer_ids.add(CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID)
     return tuple(sorted(consumer_ids))
 
 
@@ -59,6 +67,8 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
                 CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
                 CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+                CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+                CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
             }
         )
     )
@@ -185,6 +195,69 @@ def clause_is_fight_selected_weapon_ability_choice(clause: RuleClause) -> bool:
     return len(groups) == 1 and len(option_ids) == len(clause.effects)
 
 
+def clause_is_leading_unit_wound_roll_modifier(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.SELECTED_UNIT
+        or len(clause.effects) != 1
+    ):
+        return False
+    trigger_parameters = parameter_payload(clause.trigger.parameters)
+    if trigger_parameters.get("roll_type") not in {"wound", "wound_roll"}:
+        return False
+    if not any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters).get("relationship") == "this_model_leading_unit"
+        for condition in clause.conditions
+    ):
+        return False
+    effect = clause.effects[0]
+    if effect.kind is not RuleEffectKind.MODIFY_DICE_ROLL:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("roll_type") in {"wound", "wound_roll"}
+        and parameters.get("attack_role") == "attacker"
+        and type(parameters.get("delta")) is int
+    )
+
+
+def clause_is_consolidation_move_distance_modifier(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or len(clause.effects) != 1
+    ):
+        return False
+    trigger_parameters = parameter_payload(clause.trigger.parameters)
+    if (
+        trigger_parameters.get("edge") != "during"
+        or trigger_parameters.get("phase") != "fight"
+        or trigger_parameters.get("timing_window") != "consolidate_move"
+        or trigger_parameters.get("subject") != "this_unit"
+        or trigger_parameters.get("movement_mode") != "consolidate"
+    ):
+        return False
+    effect = clause.effects[0]
+    if effect.kind is not RuleEffectKind.MODIFY_MOVE_DISTANCE:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    distance = parameters.get("distance_inches")
+    replaced = parameters.get("replaced_distance_inches")
+    return (
+        parameters.get("movement_mode") == "consolidate"
+        and parameters.get("operation") == "set_maximum"
+        and _is_positive_number(distance)
+        and _is_positive_number(replaced)
+    )
+
+
 def _is_while_condition_ability_grant(clause: RuleClause, *, ability: str) -> bool:
     if (
         not clause.is_supported
@@ -207,3 +280,11 @@ def _required_string(parameters: Mapping[str, object], key: str) -> str:
     if type(value) is not str or not value:
         raise GameLifecycleError(f"Datasheet RuleIR {key} must be a non-empty string.")
     return value
+
+
+def _is_positive_number(value: object) -> bool:
+    if type(value) is int:
+        return value > 0
+    if type(value) is float:
+        return value > 0
+    return False

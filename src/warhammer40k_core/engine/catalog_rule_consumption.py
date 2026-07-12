@@ -30,6 +30,7 @@ from warhammer40k_core.engine import catalog_datasheet_rule_support as _datashee
 from warhammer40k_core.engine import catalog_movement_transit as _t
 from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
 from warhammer40k_core.engine import catalog_rule_selected_target_classification as _st
+from warhammer40k_core.engine import catalog_unit_move_completed_battle_shock_support as _ucbs
 from warhammer40k_core.engine import rules_units as _rules_units
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -1398,6 +1399,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+        *_ucbs.registered_hook_ids(),
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
         CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
     }
@@ -3848,6 +3850,7 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
     if _clause_is_supported_unit_move_completed_mortal_wounds(clause):
         consumer_ids.add(CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID)
+    consumer_ids.update(_ucbs.consumer_ids_for_clause(clause))
     if _is_movement_transit(clause):
         consumer_ids.add(CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID)
     if _clause_is_supported_setup_reactive_shoot_charge(clause):
@@ -3940,6 +3943,7 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         hook_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
     if _clause_is_supported_unit_move_completed_mortal_wounds(clause):
         hook_ids.add(CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID)
+    hook_ids.update(_ucbs.consumer_ids_for_clause(clause))
     if _clause_is_supported_setup_reactive_shoot_charge(clause):
         hook_ids.add(CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID)
     hook_ids.update(_contextual.consumer_ids_for_clause(clause))
@@ -4057,30 +4061,6 @@ def catalog_rule_clause_is_supported_tracked_target_destroyed_reselect(
     clause: RuleClause,
 ) -> bool:
     return _clause_is_supported_tracked_target_destroyed_reselect(clause)
-
-
-def catalog_rule_clause_is_supported_post_shoot_hit_target_status_denial(
-    clause: RuleClause,
-) -> bool:
-    return _clause_is_supported_post_shoot_hit_target_status_denial(clause)
-
-
-def catalog_rule_clause_is_supported_unit_move_completed_mortal_wounds(
-    clause: RuleClause,
-) -> bool:
-    return _clause_is_supported_unit_move_completed_mortal_wounds(clause)
-
-
-def catalog_rule_tracked_target_supported_roll_types_for_clause(
-    clause: RuleClause,
-) -> tuple[str, ...]:
-    return _tracked_target_supported_roll_types_for_clause(clause)
-
-
-def catalog_rule_tracked_target_supported_attack_kinds_for_clause(
-    clause: RuleClause,
-) -> tuple[str, ...]:
-    return _tracked_target_supported_attack_kinds_for_clause(clause)
 
 
 def catalog_rule_tracked_target_supported_attack_roll_pairs_for_clause(
@@ -4220,25 +4200,6 @@ def _trigger_supports_tracked_target_roll_type(
     if type(roll_types) is not tuple:
         raise GameLifecycleError("Catalog tracked-target roll_types must be a tuple.")
     return roll_type in roll_types
-
-
-def _tracked_target_supported_roll_types_for_clause(clause: RuleClause) -> tuple[str, ...]:
-    supported = {
-        roll_type for _, roll_type in _tracked_target_supported_attack_roll_pairs_for_clause(clause)
-    }
-    return tuple(
-        roll_type
-        for roll_type in ("attack_sequence.hit", "attack_sequence.wound")
-        if roll_type in supported
-    )
-
-
-def _tracked_target_supported_attack_kinds_for_clause(clause: RuleClause) -> tuple[str, ...]:
-    supported = {
-        attack_kind
-        for attack_kind, _ in _tracked_target_supported_attack_roll_pairs_for_clause(clause)
-    }
-    return tuple(kind for kind in ("melee", "ranged") if kind in supported)
 
 
 def _tracked_target_supported_attack_roll_pairs_for_clause(
@@ -5949,6 +5910,11 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         characteristic = _characteristic_parameter(parameters, key="characteristic")
         return (_catalog_ir_characteristic_modifier_consumer_id(characteristic),)
     if effect.kind is RuleEffectKind.MODIFY_MOVE_DISTANCE:
+        if (
+            parameters.get("movement_mode") == "consolidate"
+            and parameters.get("operation") == "set_maximum"
+        ):
+            return (_datasheet.CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,)
         return (_catalog_ir_characteristic_modifier_consumer_id(Characteristic.MOVEMENT),)
     if effect.kind is RuleEffectKind.OUT_OF_PHASE_ACTION:
         parameters = parameter_payload(effect.parameters)

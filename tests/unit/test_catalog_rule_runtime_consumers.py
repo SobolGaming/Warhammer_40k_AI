@@ -8,7 +8,14 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    FightEligibilityKind,
+    FightOrderingBandKind,
+    FightTypeKind,
+    RulesetDescriptor,
+)
+from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine import (
     catalog_command_point_runtime as command_point_runtime,
 )
@@ -43,6 +50,7 @@ from warhammer40k_core.engine.catalog_command_point_support import (
     CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
     CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_desperate_escape import (
     CATALOG_FORCED_DESPERATE_ESCAPE_SOURCE_KIND,
     catalog_forced_desperate_escape_sources_for_unit,
@@ -52,9 +60,7 @@ from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CATALOG_ONCE_PER_BATTLE_ABILITY_DECLINED_EVENT,
     CatalogOncePerBattleRuntime,
 )
-from warhammer40k_core.engine.catalog_rule_consumption import (
-    catalog_rule_clauses_from_record,
-)
+from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_clauses_from_record
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
     CatalogSelectedTargetEffectRuntime,
@@ -88,6 +94,12 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     validate_effect_record_tuple,
     validate_identifier_tuple,
 )
+from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_runtime import (
+    catalog_unit_move_completed_battle_shock_hook_bindings,
+)
+from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_support import (
+    CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -100,6 +112,11 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventIndex,
     RuntimeContentEventResult,
 )
+from warhammer40k_core.engine.fight_activation_abilities import (
+    FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
+    FightActivationAbilityContext,
+)
+from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartRequestContext,
@@ -121,7 +138,10 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
-from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    WoundRollModifierContext,
+)
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     StratagemCostChoiceRequestContext,
     StratagemCostChoiceResultContext,
@@ -143,6 +163,7 @@ from warhammer40k_core.engine.stratagems import (
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_move_completed_hooks import UnitMoveCompletedContext
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
@@ -904,6 +925,246 @@ def test_catalog_once_per_battle_runtime_targets_attached_rules_unit_for_leader_
         effect.target_unit_instance_ids == (source_rules_unit_id,)
         for effect in state.persisting_effects
     )
+
+
+def test_catalog_datasheet_runtime_applies_leading_unit_wound_roll_modifier() -> None:
+    source_army, target_army = _mustered_attached_once_per_battle_armies()
+    leader_unit = next(
+        unit for unit in source_army.units if unit.datasheet_id == "core-character-leader"
+    )
+    bodyguard_unit = next(
+        unit for unit in source_army.units if unit.datasheet_id == "core-intercessor-like-infantry"
+    )
+    target_unit = target_army.units[0]
+    rules_unit_id = source_army.attached_units[0].attached_unit_instance_id
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="catalog-leading-wound-attached",
+        armies=(source_army, target_army),
+    )
+    state = _state_without_battlefield(
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    for army in (source_army, target_army):
+        state.record_army_definition(army)
+    state.battlefield_state = scenario.battlefield_state
+    record = _compiled_record(
+        record_id="record:catalog-datasheet:leading-wound",
+        raw_text=(
+            "While this model is leading a unit, each time a model in that unit makes an "
+            "attack, add 1 to the Wound roll."
+        ),
+        source_unit=leader_unit,
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+    )
+    runtime = CatalogDatasheetRuleRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    context = WoundRollModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=rules_unit_id,
+        attacker_model_instance_id=bodyguard_unit.own_models[0].model_instance_id,
+        target_unit_instance_id=target_unit.unit_instance_id,
+        weapon_profile=_first_catalog_weapon_profile(),
+        strength=4,
+        toughness=4,
+    )
+
+    bindings = runtime.wound_roll_modifier_bindings()
+
+    assert len(bindings) == 1
+    assert bindings[0].handler(context) == 1
+
+
+def test_catalog_datasheet_runtime_ignores_wound_modifier_when_source_not_leading() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    leader_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="catalog-leading-wound-unattached",
+        armies=(source_army, target_army),
+    )
+    state = _state_without_battlefield(
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    for army in (source_army, target_army):
+        state.record_army_definition(army)
+    state.battlefield_state = scenario.battlefield_state
+    record = _compiled_record(
+        record_id="record:catalog-datasheet:leading-wound-unattached",
+        raw_text=(
+            "While this model is leading a unit, each time a model in that unit makes an "
+            "attack, add 1 to the Wound roll."
+        ),
+        source_unit=leader_unit,
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+    )
+    runtime = CatalogDatasheetRuleRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    context = WoundRollModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=leader_unit.unit_instance_id,
+        attacker_model_instance_id=leader_unit.own_models[0].model_instance_id,
+        target_unit_instance_id=target_unit.unit_instance_id,
+        weapon_profile=_first_catalog_weapon_profile(),
+        strength=4,
+        toughness=4,
+    )
+
+    bindings = runtime.wound_roll_modifier_bindings()
+
+    assert len(bindings) == 1
+    assert bindings[0].handler(context) == 0
+
+
+def test_catalog_datasheet_runtime_exposes_consolidation_distance_fight_activation() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=10.4,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    record = _compiled_record(
+        record_id="record:catalog-datasheet:consolidation-distance",
+        raw_text=(
+            'Each time this model\'s unit Consolidates, it can move up to 6" instead of up to 3".'
+        ),
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    runtime = CatalogDatasheetRuleRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    activation = FightActivationSelection(
+        player_id=source_army.player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=source_unit.unit_instance_id,
+        ordering_band=FightOrderingBandKind.REMAINING_COMBATS,
+        fight_type=FightTypeKind.NORMAL,
+        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+        request_id="request:catalog-datasheet:consolidation-distance",
+        result_id="result:catalog-datasheet:consolidation-distance",
+    )
+    context = FightActivationAbilityContext(
+        state=state,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id=source_army.player_id,
+        player_id=source_army.player_id,
+        unit_instance_id=source_unit.unit_instance_id,
+        activation=activation,
+        target_unit_instance_ids=(target_unit.unit_instance_id,),
+    )
+
+    bindings = runtime.fight_activation_ability_hook_bindings()
+    option = bindings[0].handler(context)
+
+    assert len(bindings) == 1
+    assert option is not None
+    assert option.effect_kind == FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND
+    assert option.pile_in_distance_inches == 3.0
+    assert option.consolidate_distance_inches == 6.0
+    replay_payload = cast(dict[str, JsonValue], option.replay_payload)
+    assert replay_payload["source_unit_instance_id"] == source_unit.unit_instance_id
+    assert replay_payload["rules_unit_instance_id"] == source_unit.unit_instance_id
+    assert replay_payload["movement_mode"] == "consolidate"
+
+
+def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemies() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=10.4,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.CHARGE,
+    )
+    record = _compiled_record(
+        record_id="record:catalog:charge-end-battle-shock",
+        raw_text=(
+            "Each time this model's unit ends a Charge move, each enemy unit within "
+            "Engagement Range of that unit must take a Battle-shock test."
+        ),
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+    )
+    ability_indexes_by_player_id = {
+        source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+        target_army.player_id: AbilityCatalogIndex.from_records(()),
+    }
+    bindings = catalog_unit_move_completed_battle_shock_hook_bindings(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=(source_army, target_army),
+    )
+    context = UnitMoveCompletedContext(
+        state=state,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.CHARGE,
+        trigger_event_id="event:catalog:charge-end-battle-shock",
+        trigger_event_payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.CHARGE.value,
+            "unit_instance_id": source_unit.unit_instance_id,
+            "active_player_id": source_army.player_id,
+            "movement_phase_action": "charge_move",
+        },
+        triggering_unit_instance_id=source_unit.unit_instance_id,
+        triggering_player_id=source_army.player_id,
+        movement_action="charge_move",
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        decisions=DecisionController(),
+    )
+
+    assert len(bindings) == 1
+    assert bindings[0].hook_id == CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID
+    effects = bindings[0].handler(context)
+    assert len(effects) == 1
+    effect = effects[0]
+    assert effect.hook_id == CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID
+    assert effect.source_rule_id == record.definition.source_id
+    assert effect.target_unit_instance_id == target_unit.unit_instance_id
+    assert effect.target_player_id == target_army.player_id
+    assert effect.trigger_event_id == "event:catalog:charge-end-battle-shock"
+    replay_payload = cast(dict[str, JsonValue], effect.replay_payload)
+    assert replay_payload["source_unit_instance_id"] == source_unit.unit_instance_id
+    assert replay_payload["target_unit_instance_id"] == target_unit.unit_instance_id
+    assert replay_payload["movement_action"] == "charge_move"
 
 
 def test_catalog_selected_target_runtime_fail_fast_and_empty_paths() -> None:
@@ -2400,6 +2661,21 @@ def _command_point_record(
     )
 
 
+def _compiled_record(
+    *,
+    record_id: str,
+    raw_text: str,
+    source_unit: UnitInstance,
+    trigger_kind: TimingTriggerKind,
+) -> AbilityCatalogRecord:
+    return _command_point_record(
+        record_id=record_id,
+        raw_text=raw_text,
+        source_unit=source_unit,
+        trigger_kind=trigger_kind,
+    )
+
+
 def _command_point_runtime(
     *,
     armies: tuple[ArmyDefinition, ...],
@@ -2432,6 +2708,14 @@ def _unit_with_leadership(unit: UnitInstance, *, leadership: int) -> UnitInstanc
             for model in unit.own_models
         ),
     )
+
+
+def _first_catalog_weapon_profile() -> WeaponProfile:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    for wargear in catalog.wargear:
+        if wargear.weapon_profiles:
+            return wargear.weapon_profiles[0]
+    raise AssertionError("Canonical catalog must contain a weapon profile.")
 
 
 def _test_stratagem_definition(*, command_point_cost: int) -> StratagemDefinition:

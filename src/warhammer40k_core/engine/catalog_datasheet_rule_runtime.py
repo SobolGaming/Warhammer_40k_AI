@@ -20,10 +20,13 @@ from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
+    CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
     CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
     clause_is_conditional_lone_operative,
+    clause_is_consolidation_move_distance_modifier,
     clause_is_fight_selected_weapon_ability_choice,
+    clause_is_leading_unit_wound_roll_modifier,
     clause_is_passive_characteristic_modifier,
     clause_is_stealth_aura,
 )
@@ -35,6 +38,12 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
     RuntimeContentEventSubscription,
+)
+from warhammer40k_core.engine.fight_activation_abilities import (
+    FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
+    FightActivationAbilityContext,
+    FightActivationAbilityHookBinding,
+    FightActivationAbilityOption,
 )
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
@@ -60,6 +69,8 @@ from warhammer40k_core.engine.runtime_modifiers import (
     UnitCharacteristicModifierContext,
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
+    WoundRollModifierBinding,
+    WoundRollModifierContext,
 )
 from warhammer40k_core.engine.shooting_selection_range import (
     target_within_shooting_selection_range,
@@ -162,6 +173,16 @@ class CatalogDatasheetRuleRuntime:
             ),
         )
 
+    def wound_roll_modifier_bindings(self) -> tuple[WoundRollModifierBinding, ...]:
+        return tuple(
+            WoundRollModifierBinding(
+                modifier_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                handler=self._wound_roll_handler(source),
+            )
+            for source in self._sources(clause_is_leading_unit_wound_roll_modifier)
+        )
+
     def shooting_target_restriction_bindings(
         self,
     ) -> tuple[ShootingTargetRestrictionHookBinding, ...]:
@@ -174,6 +195,18 @@ class CatalogDatasheetRuleRuntime:
                 source_id=CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
                 handler=self._lone_operative_handler(sources),
             ),
+        )
+
+    def fight_activation_ability_hook_bindings(
+        self,
+    ) -> tuple[FightActivationAbilityHookBinding, ...]:
+        return tuple(
+            FightActivationAbilityHookBinding(
+                hook_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                handler=self._fight_activation_movement_handler(source),
+            )
+            for source in self._sources(clause_is_consolidation_move_distance_modifier)
         )
 
     def fight_unit_selected_grant_bindings(
@@ -282,6 +315,28 @@ class CatalogDatasheetRuleRuntime:
 
         return handler
 
+    def _wound_roll_handler(
+        self, source: _CatalogClauseSource
+    ) -> Callable[[WoundRollModifierContext], int]:
+        def handler(context: WoundRollModifierContext) -> int:
+            if not _source_applies_to_rules_unit(
+                source=source,
+                context_unit_id=context.attacking_unit_instance_id,
+                state=context.state,
+            ) or not _source_currently_leading_rules_unit(
+                source=source,
+                context_unit_id=context.attacking_unit_instance_id,
+                state=context.state,
+            ):
+                return 0
+            parameters = parameter_payload(source.clause.effects[0].parameters)
+            delta = parameters.get("delta")
+            if type(delta) is not int:
+                raise GameLifecycleError("Catalog datasheet wound delta must be integer.")
+            return delta
+
+        return handler
+
     def _stealth_handler(
         self, sources: tuple[_CatalogClauseSource, ...]
     ) -> Callable[[HitRollModifierContext], int]:
@@ -309,6 +364,53 @@ class CatalogDatasheetRuleRuntime:
                 ):
                     return -1
             return 0
+
+        return handler
+
+    def _fight_activation_movement_handler(
+        self, source: _CatalogClauseSource
+    ) -> Callable[[FightActivationAbilityContext], FightActivationAbilityOption | None]:
+        def handler(
+            context: FightActivationAbilityContext,
+        ) -> FightActivationAbilityOption | None:
+            if context.player_id != source.player_id or not _source_applies_to_rules_unit(
+                source=source,
+                context_unit_id=context.unit_instance_id,
+                state=context.state,
+            ):
+                return None
+            parameters = parameter_payload(source.clause.effects[0].parameters)
+            if (
+                parameters.get("movement_mode") != "consolidate"
+                or parameters.get("operation") != "set_maximum"
+            ):
+                raise GameLifecycleError(
+                    "Catalog datasheet fight activation movement effect is malformed."
+                )
+            distance = _positive_float_parameter(parameters, "distance_inches")
+            replaced_distance = _positive_float_parameter(parameters, "replaced_distance_inches")
+            return FightActivationAbilityOption(
+                hook_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                ability_id=source.binding_id,
+                enhancement_id=source.record.record_id,
+                effect_kind=FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
+                pile_in_distance_inches=replaced_distance,
+                consolidate_distance_inches=distance,
+                replay_payload={
+                    "consumer_id": CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
+                    "catalog_record_id": source.record.record_id,
+                    "source_rule_id": source.rule_ir.source_id,
+                    "source_unit_instance_id": source.unit.unit_instance_id,
+                    "rules_unit_instance_id": context.unit_instance_id,
+                    "clause_id": source.clause.clause_id,
+                    "movement_mode": "consolidate",
+                    "distance_inches": distance,
+                    "replaced_distance_inches": replaced_distance,
+                    "activation_request_id": context.activation.request_id,
+                    "activation_result_id": context.activation.result_id,
+                },
+            )
 
         return handler
 
@@ -446,6 +548,23 @@ def _source_applies_to_rules_unit(
     )
 
 
+def _source_currently_leading_rules_unit(
+    *, source: _CatalogClauseSource, context_unit_id: str, state: object
+) -> bool:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Catalog datasheet leading query requires GameState.")
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=context_unit_id)
+    if not rules_unit.is_attached_rules_unit:
+        return False
+    return any(
+        component.unit.unit_instance_id == source.unit.unit_instance_id
+        and component.role in {"leader", "support"}
+        for component in rules_unit.components
+    )
+
+
 def _source_is_alive(state: object, source: _CatalogClauseSource) -> bool:
     return bool(_current_source_model_ids(state=state, source=source))
 
@@ -553,6 +672,19 @@ def _required_string(parameters: Mapping[str, object], key: str) -> str:
     if type(value) is not str or not value:
         raise GameLifecycleError(f"Catalog datasheet {key} must be a non-empty string.")
     return value
+
+
+def _positive_float_parameter(parameters: Mapping[str, object], key: str) -> float:
+    value = parameters.get(key)
+    if type(value) is int:
+        numeric = float(value)
+    elif type(value) is float:
+        numeric = value
+    else:
+        raise GameLifecycleError(f"Catalog datasheet {key} must be positive numeric.")
+    if numeric <= 0:
+        raise GameLifecycleError(f"Catalog datasheet {key} must be positive numeric.")
+    return numeric
 
 
 def _validate_indexes(value: object) -> Mapping[str, AbilityCatalogIndex]:
