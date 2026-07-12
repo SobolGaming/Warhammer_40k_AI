@@ -10,6 +10,15 @@ Source PDF: [eng_11-06_warhammer40000_faction_pack_adeptus_mechanicus-4dczibqdew
 | ---: | ---: | ---: | ---: | ---: |
 | 10 | 0 | 28 | 42 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 4 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 14 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 16 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **34** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -31,9 +40,54 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Adeptus Mechanicus | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_11-06_warhammer40000_faction_pack_adeptus_mechanicus-4dczibqdew-ebqqmotlpe.pdf` (SHA-256 `7f01dd2ce7e35c762b0ab625ade779022275574cf2d01ee46ee16b2f5582341c`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Archaeopter Fusilave (`000002087`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Archaeopter Stratoraptor (`000002086`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Archaeopter Transvector (`000002085`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Belisarius Cawl (`000000838`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Corpuscarii Electro-priests (`000000844`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cybernetica Datasmith (`000000846`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Fulgurite Electro-priests (`000000843`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Hastarii Exterminators (`000004211`) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-16 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Hastarii Fusiliers (`000004212`) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-16 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Ironstrider Ballistarii (`000000852`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kastelan Robots (`000000845`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kataphron Breachers (`000000841`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kataphron Destroyers (`000000842`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Onager Dunecrawler (`000000854`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Pteraxii Skystalkers (`000002084`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Pteraxii Sterylizors (`000002083`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Serberys Raiders (`000002082`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Serberys Sulphurhounds (`000002081`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Servitor Battleclade (`000004119`) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-16 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Sicarian Infiltrators (`000000850`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sicarian Ruststalkers (`000000851`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Skitarii Marshal (`000002478`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Skitarii Rangers (`000000848`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Skitarii Vanguard (`000000849`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Skorpius Disintegrator (`000001651`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Skorpius Dunerider (`000001650`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sydonian Dragoons With Radium Jezzails (`000003694`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sydonian Dragoons With Taser Lances (`000000853`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sydonian Skatros (`000003695`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tech-priest Dominus (`000000839`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tech-priest Enginseer (`000000840`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tech-priest Manipulus (`000001580`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Technoarcheologist (`000002477`) | `rules_update` | Rules Updates, physical PDF pages 17-18 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Thulia Ghuld (`000004210`) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-16 | The Faction Pack reprints this complete datasheet and is authoritative. |
 
 ## Detachment Rule Coverage Rows
 

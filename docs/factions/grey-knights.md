@@ -10,6 +10,15 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_grey_knights-geqfqwt3wh-g2fik
 | ---: | ---: | ---: | ---: | ---: |
 | 9 | 0 | 24 | 36 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 0 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 10 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 15 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **25** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -30,9 +39,45 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Grey Knights | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_08-06_warhammer40000_faction_pack_grey_knights-geqfqwt3wh-g2fikyrqup.pdf` (SHA-256 `3f5436dd0507ab03bf568b505da509dd4096250ebc60466f95618561a344e923`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Brother-captain (`000000376`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Brotherhood Champion (`000000379`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Brotherhood Chaplain (`000001362`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Brotherhood Librarian (`000001361`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Brotherhood Techmarine (`000000399`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Brotherhood Terminator Squad (`000000382`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Castellan Crowe (`000000380`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Grand Master (`000000375`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Grand Master In Nemesis Dreadknight (`000001360`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Grand Master Voldus (`000000374`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Interceptor Squad (`000000387`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Land Raider (`000000391`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Land Raider Crusader (`000000392`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Land Raider Redeemer (`000000393`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Nemesis Dreadknight (`000000389`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Paladin Squad (`000000384`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Purgation Squad (`000000388`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Purifier Squad (`000000383`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Razorback (`000000395`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Rhino (`000000396`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormhawk Interceptor (`000001363`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormraven Gunship (`000000398`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormtalon Gunship (`000001364`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Strike Squad (`000000381`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Venerable Dreadnought (`000000400`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
 ## Detachment Rule Coverage Rows
 

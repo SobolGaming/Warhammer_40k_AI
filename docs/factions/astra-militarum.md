@@ -10,6 +10,15 @@ Source PDF: [eng_11-06_warhammer40000_faction_pack_astra_militarum-etf9ihpodv-mb
 | ---: | ---: | ---: | ---: | ---: |
 | 11 | 0 | 36 | 54 | 2 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 8 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 42 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 20 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **70** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -32,9 +41,90 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Astra Militarum | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_11-06_warhammer40000_faction_pack_astra_militarum-etf9ihpodv-mbqdsa1bfv.pdf` (SHA-256 `ca0686dedc7c921970a5efbf779d9d85a7d427cdce252e64c3576899809acecd`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Aegis Defence Line (`000002619`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Armoured Sentinels (`000000691`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Artillery Team (`000003896`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Attilan Rough Riders (`000002616`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Baneblade (`000000702`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Banehammer (`000000703`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Banesword (`000000704`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Basilisk (`000000695`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Bullgryn Squad (`000000723`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cadian Castellan (`000002607`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cadian Command Squad (`000002609`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Cadian Heavy Weapons Squad (`000000686`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cadian Recon Squad (`000004224`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Cadian Shock Troops (`000002612`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Catachan Command Squad (`000003891`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Catachan Heavy Weapons Squad (`000003894`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Catachan Jungle Fighters (`000002614`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Centaur RSV (`000004220`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Chimera (`000000692`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Commissar (`000000716`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Commissar Graves (`000004217`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Commissar Graves on Foot (`000004218`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Commissar Yarrick (`000004216`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Death Korps Of Krieg (`000002613`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Death Riders (`000003898`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Deathstrike (`000000699`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Doomhammer (`000000705`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Field Ordnance Battery (`000003897`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Gaunt's Ghosts (`000002485`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hellhammer (`000000706`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hellhound (`000000694`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hippogriff AFV (`000004219`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Hydra (`000000696`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kasrkin (`000002615`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Krieg Combat Engineers (`000003893`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Krieg Command Squad (`000003889`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Krieg Heavy Weapons Squad (`000003895`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Battle Tank (`000000700`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Commander (`000000680`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Demolisher (`000000701`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Eradicator (`000002741`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Executioner (`000002742`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Exterminator (`000002743`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Punisher (`000002744`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Vanquisher (`000002745`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Lord Marshal Dreir (`000003890`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord Solar Leontus (`000002605`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Manticore (`000000698`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Militarum Tempestus Command Squad (`000000719`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ministorum Priest (`000001394`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Nork Deddog (`000000725`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Ogryn Bodyguard (`000001398`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ogryn Squad (`000000722`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Primaris Psyker (`000000889`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Ratlings (`000000724`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Rogal Dorn Battle Tank (`000002617`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Rogal Dorn Commander (`000003892`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Scout Sentinels (`000000690`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Shadowsword (`000000707`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sly Marbo (`000001406`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Stormlord (`000000708`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormsword (`000000709`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Taurox (`000000693`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Taurox Prime (`000000721`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tech-Priest Enginseer (`000001396`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tempestus Aquilons (`000003834`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Tempestus Scions (`000002746`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ursula Creed (`000002606`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Valkyrie (`000000727`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Wyvern (`000000697`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
 ## Detachment Rule Coverage Rows
 

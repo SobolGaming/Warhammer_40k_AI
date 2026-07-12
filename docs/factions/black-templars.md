@@ -10,6 +10,15 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_black_templars-3rhveur6zi-dsp
 | ---: | ---: | ---: | ---: | ---: |
 | 6 | 0 | 0 | 0 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 0 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 12 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 6 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **18** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -27,9 +36,38 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Black Templars | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_08-06_warhammer40000_faction_pack_black_templars-3rhveur6zi-dsptpcxpkh.pdf` (SHA-256 `8e83cebc9ab53113b20cd35075bab9ebe2563b8125f3692aeb82eaf6bd97e12a`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Castellan (`000002793`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaplain Grimaldus (`000002792`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Crusade Ancient (`000004136`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Crusader Squad (`000002799`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Emperor's Champion (`000002795`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Execrator (`000004135`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Gladiator Lancer (`000002787`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Gladiator Reaper (`000002789`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Gladiator Valiant (`000002788`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| High Marshal Helbrecht (`000002794`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Impulsor (`000002786`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Land Raider Crusader (`000004139`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Marshal (`000002796`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Repulsor (`000002791`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Repulsor Executioner (`000002790`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sternguard Veteran Squad (`000004137`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sword Brethren Squad (`000002798`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Terminator Squad (`000004138`) | `rules_update` | Rules Updates, physical PDF page 5 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
 ## Detachment Rule Coverage Rows
 

@@ -10,6 +10,15 @@ Source PDF: [eng_11-06_warhammer40000_faction_pack_imperial_agents-qhp2xzepry-ga
 | ---: | ---: | ---: | ---: | ---: |
 | 5 | 0 | 20 | 30 | 0 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 3 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 12 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 14 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **29** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -26,9 +35,49 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Imperial Agents | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_11-06_warhammer40000_faction_pack_imperial_agents-qhp2xzepry-gapdknla3x.pdf` (SHA-256 `219fb2a4973b0a6ff393f13544adb4ccb7bae81bc4cbd6138ebd3179661b5fee`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Aquila Kill Team (`000004174`) | `complete_pdf` | Complete Datasheets, physical PDF pages 4-9 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Callidus Assassin (`000000871`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Corvus Blackstar (`000003817`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Culexus Assassin (`000000873`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Deathwatch Kill Team (`000003816`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Eversor Assassin (`000000872`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Exaction Squad (`000002685`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Grey Knights Terminator Squad (`000003813`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Imperial Navy Breachers (`000002587`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Imperial Rhino (`000003830`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Inquisitor (`000000877`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Inquisitor Coteaz (`000000876`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Inquisitor Draxus (`000002090`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Inquisitor Greyfax (`000000874`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Inquisitor Kroyle (`000004214`) | `complete_pdf` | Complete Datasheets, physical PDF pages 4-9 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Inquisitorial Agents (`000002767`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Inquisitorial Chimera (`000003820`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ministorum Priest (`000003812`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Navigator (`000002765`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Rogue Trader Entourage (`000002762`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sanctifiers (`000004074`) | `complete_pdf` | Complete Datasheets, physical PDF pages 4-9 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Sisters of Battle Immolator (`000003819`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sisters of Battle Squad (`000003818`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Subductor Squad (`000002684`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Vigilant Squad (`000002683`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Vindicare Assassin (`000000870`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Voidsmen-at-arms (`000002509`) | `rules_update` | Rules Updates, physical PDF page 10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Watch Captain Artemis (`000003814`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Watch Master (`000003815`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
 ## Detachment Rule Coverage Rows
 

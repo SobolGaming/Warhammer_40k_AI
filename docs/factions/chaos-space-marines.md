@@ -10,6 +10,15 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_space_marines-h16lkqvvn
 | ---: | ---: | ---: | ---: | ---: |
 | 17 | 0 | 60 | 90 | 3 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 10 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 19 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 25 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **54** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -38,9 +47,74 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Chaos Space Marines | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_10-06_warhammer40000_faction_pack_chaos_space_marines-h16lkqvvnq-bcejav0qap.pdf` (SHA-256 `4065d5349c1417e9083474f3e35a006ae0fb8d4d3515f261a1c3f10a00902bcd`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Abaddon The Despoiler (`000000924`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Accursed Cultists (`000002571`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Bikers (`000000957`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Land Raider (`000000962`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Lord (`000000929`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Lord In Terminator Armour (`000000930`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Lord with Jump Pack (`000003711`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Predator Annihilator (`000002572`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Destructor (`000000963`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Rhino (`000000956`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Spawn (`000000960`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Terminator Squad (`000000947`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Vindicator (`000000964`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chosen (`000000952`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cultist Firebrand (`000003712`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cultist Mob (`000000946`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cypher (`000000926`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Dark Apostle (`000000936`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Dark Commune (`000002569`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Defiler (`000000969`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Fabius Bile (`000000928`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Fellgor Beastmen (`000001604`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Forgefiend (`000000967`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Haarken Worldclaimer (`000001556`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Havocs (`000000966`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Helbrute (`000000954`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Heldrake (`000000961`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Heretic Astartes Daemon Prince (`000000937`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Heretic Astartes Daemon Prince With Wings (`000002730`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Huron Blackheart (`000000925`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Khorne Lord Of Skulls (`000000970`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kravek Morne (`000004205`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Legionaries (`000002570`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord Discordant On Helstalker (`000001583`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Master Of Executions (`000001584`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Master Of Possession (`000001581`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Masters of the Maelstrom (`000004190`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Maulerfiend (`000000968`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Mutilators (`000004206`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Nemesis Claw (`000003876`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Noctilith Crown (`000001587`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Obliterators (`000000965`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Possessed (`000000953`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Raptors (`000000958`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Red Corsairs Raiders (`000004191`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Red Corsairs Reave-Captain (`000004192`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Sorcerer (`000000938`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sorcerer In Terminator Armour (`000000939`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Traitor Enforcer (`000002589`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Traitor Guardsmen Squad (`000002590`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Vashtorr The Arkifane (`000002679`) | `rules_update` | Rules Updates, physical PDF pages 37-39 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Venomcrawler (`000001586`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Warp Talons (`000000959`) | `complete_pdf` | Complete Datasheets, physical PDF pages 17-36 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Warpsmith (`000000944`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
 ## Detachment Rule Coverage Rows
 

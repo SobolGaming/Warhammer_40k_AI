@@ -6690,7 +6690,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "## Semantic Support Snapshot" in aeldari_markdown
     assert "| Complete Faction Pack datasheets | 5 |" in aeldari_markdown
     assert "| Faction Pack datasheet updates | 24 |" in aeldari_markdown
-    assert "| Unchanged current datasheets | 41 |" in aeldari_markdown
+    assert "| Unchanged predecessor datasheets | 41 |" in aeldari_markdown
     assert "`generic_supported` / `engine_consumed`" not in aeldari_markdown
     assert "`named_handler_required` / `source_only`" not in aeldari_markdown
     assert (

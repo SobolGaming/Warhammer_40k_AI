@@ -10,6 +10,15 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_tyranids-avhhzmcte8-j0kseag7t
 | ---: | ---: | ---: | ---: | ---: |
 | 10 | 0 | 32 | 48 | 2 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 3 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 19 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 28 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **50** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -31,9 +40,70 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Tyranids | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_09-06_warhammer40000_faction_pack_tyranids-avhhzmcte8-j0kseag7td.pdf` (SHA-256 `de2105f97171812369288cb5d5da3da9730f47dc7daa67aa06b1ebc771ad6c36`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Barbgaunts (`000002686`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Biovores (`000000491`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Broodlord (`000000463`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Carnifexes (`000000490`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Deathleaper (`000000479`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Exocrine (`000000495`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Gargoyles (`000000484`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Genestealers (`000000467`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Harpy (`000000485`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Haruspex (`000000478`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Hive Crone (`000000486`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hive Guard (`000000472`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Hive Tyrant (`000000460`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hormagaunts (`000000469`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Hyperadapted Raveners (`000004117`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lictor (`000000473`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Maleceptor (`000000474`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Mawloc (`000000494`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Mucolid Spores (`000000487`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Neurogaunts (`000002687`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Neurolictor (`000002753`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Neurotyrant (`000002688`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Norn Assimilator (`000002752`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Norn Emissary (`000002751`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Old One Eye (`000000462`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Parasite Of Mortrex (`000002529`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Psychophage (`000002689`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Pyrovores (`000000477`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Raveners (`000000482`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-18 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Ripper Swarms (`000000470`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Screamer-killer (`000002690`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Spore Mines (`000000488`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sporocyst (`000000498`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Termagants (`000000468`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tervigon (`000000465`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| The Red Terror (`000004225`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-18 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| The Swarmlord (`000000461`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Toxicrene (`000000497`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Trygon (`000000493`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tyranid Prime with Lash Whip (`000004202`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-18 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Tyranid Warriors With Melee Bio-weapons (`000002691`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tyranid Warriors With Ranged Bio-weapons (`000002692`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tyrannocyte (`000000489`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tyrannofex (`000000496`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tyrant Guard (`000000471`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Venomthropes (`000000476`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Von Ryan's Leapers (`000002693`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Winged Hive Tyrant (`000002528`) | `rules_update` | Rules Updates, physical PDF pages 19-21 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Winged Tyranid Prime (`000002694`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Zoanthropes (`000000475`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
 ## Detachment Rule Coverage Rows
 

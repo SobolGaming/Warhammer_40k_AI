@@ -10,6 +10,15 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_death_guard-dgm6djcpoa-iiqvms
 | ---: | ---: | ---: | ---: | ---: |
 | 9 | 0 | 28 | 42 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 1 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 8 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 27 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **36** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -30,18 +39,56 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Defiler (`000004209`) | `Partial` | Full | Full | Full | Full | Partial | Partial; supported detachments 0/9 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:post-shoot-hit-target-status`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only | `000008396` Nurgle's Gift (Aura): `descriptor_only` Faction ability row is not fully consumed; detachment support 0/9. |
+### Source scope, provenance, and exclusions
 
-### Datasheet Ability Details
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
 
-| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
-| --- | --- | --- | --- | --- | --- | --- |
-| Defiler (`000004209`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
-| Defiler (`000004209`) | Barrage of Filth (`000004209:barrage-of-filth`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.set_contextual_status.enemy_unit` | `catalog-ir:post-shoot-hit-target-status` | None |
-| Defiler (`000004209`) | Scuttling Walker (`000004209:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
-| Defiler (`000004209`) | Nurgle's Gift (Aura) (`000008396`) | `faction` | `descriptor_only` | `unknown.ability_text` | None | None |
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_10-06_warhammer40000_faction_pack_death_guard-dgm6djcpoa-iiqvmsh0op.pdf` (SHA-256 `5430fe8d89047644aab0102d0265783db725655c4535ad6600c3925f2cf32885`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Beasts of Nurgle (`000004115`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Biologus Putrifier (`000001368`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Blightlord Terminators (`000001372`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Land Raider (`000001049`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Annihilator (`000001050`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Destructor (`000002461`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Rhino (`000001047`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Spawn (`000001048`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemon Prince of Nurgle (`000001052`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemon Prince of Nurgle with Wings (`000002749`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Deathshroud Terminators (`000001371`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Defiler (`000004209`) | `complete_pdf` | Complete Datasheet, physical PDF pages 5-6 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Foetid Bloat-drone (`000001057`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Foetid Bloat-drone with Heavy Blight Launcher (`000004110`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Foul Blightspawn (`000001367`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Great Unclean One (`000004112`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Helbrute (`000001046`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Icon Bearer (`000002750`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord of Contagion (`000001054`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord of Poxes (`000004109`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord of Virulence (`000002460`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Malignant Plaguecaster (`000001055`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Miasmic Malignifier (`000002462`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Mortarion (`000001377`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Myphitic Blight-hauler (`000001374`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Noxious Blightbringer (`000001058`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Nurglings (`000004116`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plague Drones (`000004114`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plague Marines (`000001044`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plague Surgeon (`000001369`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plaguebearers (`000004113`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plagueburst Crawler (`000001376`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Poxwalkers (`000001056`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Rotigus (`000004111`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tallyman (`000001370`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Typhus (`000001053`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
 ## Detachment Rule Coverage Rows
 

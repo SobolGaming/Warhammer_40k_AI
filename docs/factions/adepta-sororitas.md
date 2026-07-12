@@ -10,6 +10,15 @@ Source PDF: [eng_11-06_warhammer40000_faction_pack_adepta_sororitas-ktlklgb0t5-k
 | ---: | ---: | ---: | ---: | ---: |
 | 8 | 0 | 20 | 30 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 3 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 13 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 17 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **33** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -29,9 +38,53 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Adepta Sororitas | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_11-06_warhammer40000_faction_pack_adepta_sororitas-ktlklgb0t5-knvswx9kyw.pdf` (SHA-256 `7cbcc25461d0ac00b0ae1ad33923845abf6ed3d86637b4833c150ad11df77c67`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Aestred Thurga And Agathae Dolan (`000002480`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Arco-flagellants (`000000896`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Battle Sisters Squad (`000000903`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Canoness (`000000899`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Canoness with Jump Pack (`000003714`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Castigator (`000002484`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Celestian Insidiants (`000004189`) | `complete_pdf` | Complete Datasheets, physical PDF pages 7-12 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Celestian Sacresants (`000002481`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemonifuge (`000002771`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Dialogus (`000000902`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Dogmata (`000002482`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Dominion Squad (`000000909`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Exorcist (`000000912`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hospitaller (`000000901`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Imagifier (`000000900`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Immolator (`000000911`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Intranzia Fraye (`000004215`) | `complete_pdf` | Complete Datasheets, physical PDF pages 7-12 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Junith Eruita (`000002064`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Ministorum Priest (`000001553`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Mortifiers (`000002067`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Morvenn Vahl (`000002479`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Palatine (`000002472`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Paragon Warsuits (`000002483`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Penitent Engines (`000000897`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Repentia Squad (`000000907`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Retributor Squad (`000000908`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Saint Celestine (`000000898`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sanctifiers (`000004075`) | `complete_pdf` | Complete Datasheets, physical PDF pages 7-12 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Seraphim Squad (`000000904`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sisters Novitiate Squad (`000002507`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sororitas Rhino (`000000910`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Triumph Of Saint Katherine (`000002063`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Zephyrim Squad (`000002066`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
 ## Detachment Rule Coverage Rows
 

@@ -10,6 +10,15 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_genestealer_cults-ee2tg004ty-
 | ---: | ---: | ---: | ---: | ---: |
 | 9 | 0 | 20 | 30 | 3 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 0 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 13 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 11 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **24** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -30,9 +39,44 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Genestealer Cults | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_09-06_warhammer40000_faction_pack_genestealer_cults-ee2tg004ty-lfbh6g1gr7.pdf` (SHA-256 `3a6060942f8862409d4f2d0d422b8f25c29ccd900a4b79ce3964c20a8fc40637`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Aberrants (`000000514`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Abominant (`000001546`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Achilles Ridgerunners (`000001573`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Acolyte Hybrids With Autopistols (`000000511`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Acolyte Hybrids With Hand Flamers (`000003716`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Acolyte Iconward (`000000510`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Atalan Jackals (`000001574`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Benefictus (`000003715`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Biophagus (`000001572`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Clamavus (`000001567`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Goliath Rockgrinder (`000000521`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Goliath Truck (`000000516`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hybrid Metamorphs (`000000513`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Jackal Alphus (`000001565`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kelermorph (`000001570`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Locus (`000001568`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Magus (`000000508`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Neophyte Hybrids (`000000512`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Nexos (`000001571`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Patriarch (`000000507`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Primus (`000000509`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Purestrain Genestealers (`000000515`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Reductus Saboteur (`000002525`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sanctus (`000001569`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
 ## Detachment Rule Coverage Rows
 

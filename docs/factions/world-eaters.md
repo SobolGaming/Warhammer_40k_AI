@@ -10,6 +10,15 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_world_eaters-az7rivdn6x-d9rvb
 | ---: | ---: | ---: | ---: | ---: |
 | 8 | 0 | 24 | 36 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 1 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 14 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 15 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **30** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -29,18 +38,50 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Defiler (`000004207`) | `Partial` | Full | Full | Full | Full | Partial | Partial; supported detachments 0/8 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only | `000008428` Blessings of Khorne: `descriptor_only` Faction ability row is not fully consumed; detachment support 0/8. |
+### Source scope, provenance, and exclusions
 
-### Datasheet Ability Details
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
 
-| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
-| --- | --- | --- | --- | --- | --- | --- |
-| Defiler (`000004207`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
-| Defiler (`000004207`) | Scuttling Walker (`000004207:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
-| Defiler (`000004207`) | Unleash Wrath (`000004207:unleash-wrath`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.out_of_phase_action.enemy_unit` | `catalog-ir:setup-reactive-shoot-charge` | None |
-| Defiler (`000004207`) | Blessings of Khorne (`000008428`) | `faction` | `descriptor_only` | `unknown.ability_text` | None | None |
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_10-06_warhammer40000_faction_pack_world_eaters-az7rivdn6x-d9rvbncqvt.pdf` (SHA-256 `c773ef3a9c73ab354a18bd9b0c1e9a190ee89c9155a1e2bba52286fa6e39be30`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Angron (`000002621`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Bloodcrushers (`000004107`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Bloodletters (`000004106`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Bloodthirster (`000004105`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Land Raider (`000002634`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Annihilator (`000002637`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Destructor (`000002636`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Rhino (`000002640`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Spawn (`000002633`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Terminators (`000002629`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Daemon Prince of Khorne (`000002624`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemon Prince of Khorne with Wings (`000002757`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Defiler (`000004207`) | `complete_pdf` | Complete Datasheet, physical PDF pages 5-6 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Eightbound (`000002630`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Exalted Eightbound (`000002631`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Flesh Hounds (`000004108`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Forgefiend (`000002638`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Goremongers (`000004076`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Helbrute (`000002632`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Heldrake (`000002641`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Jakhals (`000002628`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Khorne Berzerkers (`000002627`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Khorne Lord of Skulls (`000002642`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Khârn The Betrayer (`000002622`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord Invocatus (`000002623`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord on Juggernaut (`000002625`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Master of Executions (`000002626`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Maulerfiend (`000002639`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Skarbrand (`000004104`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Slaughterbound (`000004103`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 
 ## Detachment Rule Coverage Rows
 

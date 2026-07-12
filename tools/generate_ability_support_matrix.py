@@ -11,16 +11,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict, cast
 
 if TYPE_CHECKING or __package__:
-    from tools.aeldari_support_review import (
-        AELDARI_FACTION_ID,
-        aeldari_datasheet_review_markdown,
-        aeldari_datasheet_snapshot_markdown,
+    from tools.faction_pack_datasheet_review import (
+        faction_pack_datasheet_review_markdown,
+        faction_pack_datasheet_snapshot_markdown,
+        reviewed_faction_ids,
     )
 else:
-    from aeldari_support_review import (
-        AELDARI_FACTION_ID,
-        aeldari_datasheet_review_markdown,
-        aeldari_datasheet_snapshot_markdown,
+    from faction_pack_datasheet_review import (
+        faction_pack_datasheet_review_markdown,
+        faction_pack_datasheet_snapshot_markdown,
+        reviewed_faction_ids,
     )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
@@ -171,6 +171,7 @@ DEFAULT_DOCS_PATH = Path("docs") / "ABILITY_SUPPORT_MATRIX_V2.md"
 DEFAULT_FACTION_DOCS_DIR = Path("docs") / "factions"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
 RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-coverage-v1"
+AELDARI_FACTION_ID = "aeldari"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
@@ -2789,6 +2790,8 @@ def _faction_support_markdown(
         lines.extend(_chaos_daemons_semantic_snapshot_markdown())
     if faction_row.faction_id == AELDARI_FACTION_ID:
         lines.extend(_aeldari_semantic_snapshot_markdown())
+    elif faction_row.faction_id in reviewed_faction_ids():
+        lines.extend(faction_pack_datasheet_snapshot_markdown(faction_row.faction_id))
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
     lines.extend(
         _faction_datasheet_support_markdown(
@@ -2927,7 +2930,7 @@ def _aeldari_semantic_snapshot_markdown() -> list[str]:
     lines.extend(_aeldari_detachment_snapshot_markdown())
     lines.extend(_aeldari_exact_enhancement_snapshot_markdown())
     lines.extend(_aeldari_exact_stratagem_snapshot_markdown())
-    lines.extend(aeldari_datasheet_snapshot_markdown())
+    lines.extend(faction_pack_datasheet_snapshot_markdown(AELDARI_FACTION_ID))
     return lines
 
 
@@ -3134,8 +3137,8 @@ def _faction_datasheet_support_markdown(
             )
         )
         return lines
-    if faction_row.faction_id == AELDARI_FACTION_ID:
-        lines.extend(aeldari_datasheet_review_markdown())
+    if faction_row.faction_id in reviewed_faction_ids():
+        lines.extend(faction_pack_datasheet_review_markdown(faction_row.faction_id))
         return lines
     lines.extend(
         (

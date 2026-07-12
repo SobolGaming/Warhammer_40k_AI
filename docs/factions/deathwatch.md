@@ -10,6 +10,15 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_deathwatch-z0ebavrfze-muhcibn
 | ---: | ---: | ---: | ---: | ---: |
 | 1 | 0 | 0 | 0 | 0 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 10 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 0 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 0 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **10** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -22,9 +31,30 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Deathwatch | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_08-06_warhammer40000_faction_pack_deathwatch-z0ebavrfze-muhcibnets.pdf` (SHA-256 `698b7063a71e3f10301aab1498effcb88ad2be41f3f491e24737c2abc9f988ce`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Corvus Blackstar (`000000358`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Deathwatch Terminator Squad (`000003873`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Deathwatch Veterans (`000002783`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Decimus Kill Team (`000004175`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Fortis Kill Team (`000002780`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Indomitor Kill Team (`000002781`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Spectrus Kill Team (`000002779`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Talonstrike Kill Team (`000003874`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Watch Captain Artemis (`000003872`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Watch Master (`000003871`) | `complete_pdf` | Complete Datasheets, physical PDF pages 8-27 | The Faction Pack reprints this complete datasheet and is authoritative. |
 
 ## Detachment Rule Coverage Rows
 

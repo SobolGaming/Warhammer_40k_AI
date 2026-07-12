@@ -10,6 +10,15 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_thousand_sons-qxnr1lbasx-i6ee
 | ---: | ---: | ---: | ---: | ---: |
 | 9 | 0 | 24 | 36 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 1 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 17 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 16 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **34** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -30,18 +39,54 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
-| Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Defiler (`000001030`) | `Playable` | Full | Full | Full | Full | Full | Partial; supported detachments 0/9 (None) | Runtime consumers: `catalog-ir:minimum-unmodified-hit-success`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:lost-wound:feel-no-pain-resolution`, `descriptor:lost-wound:feel-no-pain-source`; coverage artifact only | No source-backed faction ability row; detachment support 0/9. |
+### Source scope, provenance, and exclusions
 
-### Datasheet Ability Details
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
 
-| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
-| --- | --- | --- | --- | --- | --- | --- |
-| Defiler (`000001030`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
-| Defiler (`000001030`) | Feel No Pain (`000008338`) | `core` | `engine_consumed` | `core.feel_no_pain` | `descriptor:lost-wound:feel-no-pain-source`, `descriptor:lost-wound:feel-no-pain-resolution` | None |
-| Defiler (`000001030`) | Destroyer of Futures (`000001030:destroyer-of-futures`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.set_contextual_status.this_unit` | `catalog-ir:minimum-unmodified-hit-success` | None |
-| Defiler (`000001030`) | Scuttling Walker (`000001030:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_10-06_warhammer40000_faction_pack_thousand_sons-qxnr1lbasx-i6ee7zitrl.pdf` (SHA-256 `b6d2f04a1fda50200f779ee56ff9b977284f9945beceefa2910084b321da7984`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+These rows are source-reviewed only. They do not claim catalog load support or semantic execution; those statuses require separate generated catalog and runtime evidence.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Ahriman (`000001032`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Blue Horrors (`000004128`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Land Raider (`000001025`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Annihilator (`000002501`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Destructor (`000001026`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Rhino (`000001022`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Spawn (`000001023`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Vindicator (`000001027`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Daemon Prince of Tzeentch (`000001036`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemon Prince of Tzeentch with Wings (`000004120`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Defiler (`000001030`) | `complete_pdf` | Complete Datasheet, physical PDF pages 7-8 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Exalted Sorcerer (`000001033`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Exalted Sorcerer on Disc of Tzeentch (`000002755`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Flamers (`000004125`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Forgefiend (`000001028`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Helbrute (`000001021`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Heldrake (`000001024`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Infernal Master (`000002500`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kairos Fateweaver (`000004123`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Lord of Change (`000004124`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Magnus The Red (`000001031`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Maulerfiend (`000001029`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Mutalith Vortex Beast (`000001476`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Pink Horrors (`000004127`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Rubric Marines (`000001020`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Scarab Occult Terminators (`000001035`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Screamers (`000004126`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sekhetar Robots (`000004121`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sorcerer (`000001016`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sorcerer In Terminator Armour (`000001017`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tzaangor Enlightened (`000001474`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tzaangor Enlightened with Fatecaster Greatbows (`000004122`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tzaangor Shaman (`000001472`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tzaangors (`000001034`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 
 ## Detachment Rule Coverage Rows
 
