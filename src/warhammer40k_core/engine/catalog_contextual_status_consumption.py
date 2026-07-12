@@ -19,16 +19,29 @@ CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID = (
 )
 CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID = "catalog-ir:battle-shock-forced-test"
 CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID = "catalog-ir:battle-shock-failed-heal"
+CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID = "catalog-ir:battle-shock-reroll"
+CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID = "catalog-ir:fortification-cover"
+CATALOG_IR_FORTIFICATION_TARGET_PERMISSION_CONSUMER_ID = (
+    "catalog-ir:fortification-target-permission"
+)
+CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID = "catalog-ir:fortification-desperate-escape"
 
 _RULE_EFFECT_SPEC_ERROR = "Catalog contextual status consumer requires RuleEffectSpec values."
 _HIT_REROLL_ROLL_TYPES = frozenset({"hit", "hit_roll", "attack_sequence_hit"})
 _WOUND_REROLL_ROLL_TYPES = frozenset({"wound", "wound_roll", "attack_sequence_wound"})
+_BATTLE_SHOCK_REROLL_ROLL_TYPES = frozenset(
+    {"battle_shock", "battle_shock_roll", "battle_shock_test"}
+)
 
 
 def registered_hook_ids() -> tuple[str, ...]:
     return (
         CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
         CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
+        CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
+        CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID,
+        CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID,
+        CATALOG_IR_FORTIFICATION_TARGET_PERMISSION_CONSUMER_ID,
         CATALOG_IR_SHADOW_FORM_CHOICE_CONSUMER_ID,
         CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
         CATALOG_IR_SHOOTING_TARGET_RANGE_RESTRICTION_CONSUMER_ID,
@@ -49,6 +62,14 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID)
     if _clause_is_battle_shock_failed_heal(clause):
         consumer_ids.add(CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID)
+    if _clause_is_battle_shock_reroll(clause):
+        consumer_ids.add(CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID)
+    if _clause_is_fortification_cover(clause):
+        consumer_ids.add(CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID)
+    if _clause_is_fortification_target_permission(clause):
+        consumer_ids.add(CATALOG_IR_FORTIFICATION_TARGET_PERMISSION_CONSUMER_ID)
+    if _clause_is_fortification_desperate_escape(clause):
+        consumer_ids.add(CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID)
     consumer_ids.update(aura_attack_roll_reroll_consumer_ids_for_clause(clause))
     return tuple(sorted(consumer_ids))
 
@@ -66,6 +87,14 @@ def hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         return (CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,)
     if _effect_is_battle_shock_failed_heal(effect):
         return (CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,)
+    if _effect_is_battle_shock_reroll(effect):
+        return (CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,)
+    if _effect_is_fortification_cover(effect):
+        return (CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID,)
+    if _effect_is_fortification_target_permission(effect):
+        return (CATALOG_IR_FORTIFICATION_TARGET_PERMISSION_CONSUMER_ID,)
+    if _effect_is_fortification_desperate_escape(effect):
+        return (CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID,)
     return ()
 
 
@@ -178,6 +207,71 @@ def _effect_is_battle_shock_failed_heal(effect: RuleEffectSpec) -> bool:
         parameters.get("amount") == "D3"
         and parameters.get("trigger") == "target_failed_battle_shock"
         and parameters.get("source_reference") == "aura_source"
+    )
+
+
+def _clause_is_battle_shock_reroll(clause: RuleClause) -> bool:
+    return any(_effect_is_battle_shock_reroll(effect) for effect in clause.effects)
+
+
+def _effect_is_battle_shock_reroll(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError(_RULE_EFFECT_SPEC_ERROR)
+    if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    roll_type = parameters.get("roll_type")
+    return type(roll_type) is str and _lookup_token(roll_type) in _BATTLE_SHOCK_REROLL_ROLL_TYPES
+
+
+def _clause_is_fortification_cover(clause: RuleClause) -> bool:
+    return any(_effect_is_fortification_cover(effect) for effect in clause.effects)
+
+
+def _effect_is_fortification_cover(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError(_RULE_EFFECT_SPEC_ERROR)
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("status") == "benefit_of_cover"
+        and parameters.get("rules_context") == "ranged_attack_allocation"
+        and parameters.get("source_reference") == "this_fortification"
+    )
+
+
+def _clause_is_fortification_target_permission(clause: RuleClause) -> bool:
+    return any(_effect_is_fortification_target_permission(effect) for effect in clause.effects)
+
+
+def _effect_is_fortification_target_permission(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError(_RULE_EFFECT_SPEC_ERROR)
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("status") == "fortification_engagement_ranged_target_permission"
+        and parameters.get("rules_context") == "shooting_target_selection"
+    )
+
+
+def _clause_is_fortification_desperate_escape(clause: RuleClause) -> bool:
+    return any(_effect_is_fortification_desperate_escape(effect) for effect in clause.effects)
+
+
+def _effect_is_fortification_desperate_escape(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError(_RULE_EFFECT_SPEC_ERROR)
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("status")
+        == "fortification_engagement_battle_shocked_desperate_escape_exception"
+        and parameters.get("rules_context") == "fall_back_desperate_escape"
+        and parameters.get("overflight_exception") is True
     )
 
 

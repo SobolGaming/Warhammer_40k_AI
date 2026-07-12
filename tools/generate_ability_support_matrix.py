@@ -3390,16 +3390,13 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Bloodmaster",
             datasheet_id="000001455",
             source_basis="PDF pages 20-21; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
-                "Deep Strike and The Shadow of Chaos are consumed; Bloodmaster wound "
-                "modifier compiles to generic IR."
+                "Deep Strike, The Shadow of Chaos, Bloodmaster led-unit wound modifier, "
+                "and A Gory Path Consolidate distance modifier are consumed."
             ),
-            semantics_needed=(
-                "A Gory Path unsupported diagnostics; Bloodmaster selected-unit wound "
-                "modifier host."
-            ),
-            catalog_blockers="Representative height remains unreviewed outside this report.",
+            semantics_needed="None.",
+            catalog_blockers="No known datasheet-level blockers.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Bloodthirster",
@@ -3443,13 +3440,14 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Rendmaster On Blood Throne",
             datasheet_id="000001111",
             source_basis="PDF pages 24-25; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Champion Slayer wound rerolls and lost-wound restoration, "
-                "and The Shadow of Chaos."
+                "The Shadow of Chaos, and Blood Throne visible selected-target Strength, "
+                "Armour Penetration, and Damage attack characteristic modifiers are consumed."
             ),
-            semantics_needed="Blood Throne aura/targeted bonus unsupported diagnostics.",
-            catalog_blockers="Representative height remains unreviewed outside this report.",
+            semantics_needed="None.",
+            catalog_blockers="No known datasheet-level blockers.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Skarbrand",
@@ -3468,51 +3466,57 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Skull Altar",
             datasheet_id="000001588",
             source_basis="PDF pages 36-37; supersedes Wahapedia.",
-            ir_coverage="Bridge/catalog blocked",
-            supported_semantics="Infiltrators and The Shadow of Chaos are known structured paths.",
-            semantics_needed=(
-                "Shadow of Khorne aura; Cover and Fortification datasheet terrain semantics; "
-                "Fortification hit-roll and Desperate Escape exceptions."
+            ir_coverage="All consumed",
+            supported_semantics=(
+                "Infiltrators, The Shadow of Chaos, Shadow of Khorne Battle-shock test "
+                "re-roll permission, and Fortification cover, target-permission, "
+                "hit-roll, and Desperate Escape exception semantics are consumed."
             ),
+            semantics_needed="None.",
             catalog_blockers=(
-                "No-equipment/no-option source rows are normalized; Hull footprint geometry "
-                "still requires an explicit geometry override."
+                "No-equipment/no-option source rows are normalized; Skull Altar height "
+                "was reviewed from internet sources, with a community 6.5-inch measurement "
+                "and Battle Foam's 4.5-inch tray evidence for storage orientation. No known "
+                "datasheet-level blockers remain."
             ),
         ),
         DatasheetGroupReviewRow(
             datasheet="Skull Cannon",
             datasheet_id="000001116",
             source_basis="PDF pages 34-35; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
-            supported_semantics="Deep Strike and The Shadow of Chaos are consumed.",
-            semantics_needed="Skulls of the Fallen Battle-shock trigger unsupported diagnostics.",
-            catalog_blockers="Representative height remains unreviewed outside this report.",
+            ir_coverage="All consumed",
+            supported_semantics=(
+                "Deep Strike, The Shadow of Chaos, and Skulls of the Fallen post-shoot "
+                "hit-target forced Battle-shock are consumed."
+            ),
+            semantics_needed="None.",
+            catalog_blockers="No known datasheet-level blockers.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Skullmaster",
             datasheet_id="000001456",
             source_basis="PDF pages 22-23; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
-                "Deep Strike and The Shadow of Chaos are consumed; Skullmaster's Fury "
-                "compiles to generic weapon-ability grant IR."
+                "Deep Strike, The Shadow of Chaos, Skullmaster's Fury charge-end led-unit "
+                "Juggernaut's bladed horns Devastating Wounds grant, and Devastating Charge "
+                "charge-end forced Battle-shock are consumed."
             ),
-            semantics_needed=(
-                "Devastating Charge unsupported diagnostics; Skullmaster's Fury runtime host."
-            ),
-            catalog_blockers="Representative height remains unreviewed outside this report.",
+            semantics_needed="None.",
+            catalog_blockers="No known datasheet-level blockers.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Skulltaker",
             datasheet_id="000001106",
             source_basis="PDF pages 18-19; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Lord of Decapitations Devastating Wounds grant, and The Shadow "
-                "of Chaos."
+                "of Chaos, plus Skulls for Khorne Character hit/wound rerolls and destroyed "
+                "Character CP gain, are consumed."
             ),
-            semantics_needed="Skulls for Khorne unsupported diagnostics.",
-            catalog_blockers="Representative height remains unreviewed outside this report.",
+            semantics_needed="None.",
+            catalog_blockers="No known datasheet-level blockers.",
         ),
     )
 

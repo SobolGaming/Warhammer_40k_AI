@@ -15,10 +15,21 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookBinding,
     successful_hit_target_unit_ids_for_sequence,
 )
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.battle_shock_resolution import (
+    apply_battle_shock_reroll_resolution_decision,
+    is_battle_shock_reroll_request,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
+)
+from warhammer40k_core.engine.catalog_selected_target_battle_shock import (
+    payload_optional_string as _payload_optional_string,
+)
+from warhammer40k_core.engine.catalog_selected_target_battle_shock import (
+    resolve_selected_target_battle_shock_effect as _resolve_selected_target_battle_shock_effect,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     SUPPORTED_SELECTED_EFFECT_KINDS as _SUPPORTED_SELECTED_EFFECT_KINDS,
@@ -40,6 +51,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     clause_is_post_shoot_hit_target_selection as _clause_is_post_shoot_hit_target_selection,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    effect_is_immediate_selected_target_battle_shock as _is_immediate_battle_shock,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     effect_target_unit_ids as _effect_target_unit_ids,
@@ -112,7 +126,7 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
-from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpiration,
@@ -132,6 +146,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -151,6 +166,7 @@ CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT = "catalog_selected_target_effect_
 CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT = (
     "catalog_post_shoot_hit_target_effect_selected"
 )
+CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND = "catalog_selected_target_effect"
 
 _FIGHT_START_SUBMISSION_KIND = "catalog_selected_target_fight_start_effect"
 
@@ -250,6 +266,17 @@ class _SelectedTargetGroup:
 
 
 @dataclass(frozen=True, slots=True)
+class _SelectedTargetEffectRecording:
+    effects: tuple[dict[str, JsonValue], ...]
+    pending_status: LifecycleStatus | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "effects", _validate_effect_record_tuple(self.effects))
+        if self.pending_status is not None and type(self.pending_status) is not LifecycleStatus:
+            raise GameLifecycleError("Catalog selected-target pending status is invalid.")
+
+
+@dataclass(frozen=True, slots=True)
 class CatalogSelectedTargetEffectRuntime:
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
     armies: tuple[ArmyDefinition, ...]
@@ -326,7 +353,7 @@ class CatalogSelectedTargetEffectRuntime:
         if invalid_status is not None:
             return invalid_status
         payload = _payload_object(context.result.payload)
-        effects = _record_selected_target_effects_from_payload(
+        recording = _record_selected_target_effects_from_payload(
             state=context.state,
             decisions=context.decisions,
             result=context.result,
@@ -334,12 +361,14 @@ class CatalogSelectedTargetEffectRuntime:
             phase=BattlePhase.FIGHT,
             event_type=CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
         )
+        if recording.pending_status is not None:
+            return recording.pending_status
         _append_selected_target_event(
             state=context.state,
             decisions=context.decisions,
             result=context.result,
             payload=payload,
-            effects=effects,
+            effects=recording.effects,
             event_type=CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
             phase=BattlePhase.FIGHT,
         )
@@ -460,11 +489,18 @@ def apply_catalog_post_shoot_hit_target_effect_result(
     state: GameState,
     decisions: DecisionController,
     result: DecisionResult,
+    battle_shock_hooks: BattleShockHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> LifecycleStatus | None:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Catalog post-shoot target effect apply requires decisions.")
     if type(result) is not DecisionResult:
         raise GameLifecycleError("Catalog post-shoot target effect apply requires result.")
+    if type(battle_shock_hooks) is not BattleShockHookRegistry:
+        raise GameLifecycleError("Catalog post-shoot target effect requires Battle-shock hooks.")
+    if type(runtime_modifier_registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Catalog post-shoot target effect requires runtime modifiers.")
     record = decisions.record_for_result(result)
     invalid_status = invalid_catalog_post_shoot_hit_target_effect_status(
         state=state,
@@ -474,19 +510,100 @@ def apply_catalog_post_shoot_hit_target_effect_result(
     if invalid_status is not None:
         return invalid_status
     payload = _payload_object(record.result.payload)
-    effects = _record_selected_target_effects_from_payload(
+    recording = _record_selected_target_effects_from_payload(
         state=state,
         decisions=decisions,
         result=record.result,
         payload=payload,
         phase=BattlePhase.SHOOTING,
         event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+        battle_shock_hooks=battle_shock_hooks,
+        runtime_modifier_registry=runtime_modifier_registry,
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
     )
+    if recording.pending_status is not None:
+        return recording.pending_status
     _append_selected_target_event(
         state=state,
         decisions=decisions,
         result=record.result,
         payload=payload,
+        effects=recording.effects,
+        event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+        phase=BattlePhase.SHOOTING,
+    )
+    return None
+
+
+def is_catalog_selected_target_battle_shock_reroll_request(request: DecisionRequest) -> bool:
+    return is_battle_shock_reroll_request(
+        request,
+        source_kind=CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND,
+    )
+
+
+def apply_catalog_selected_target_battle_shock_reroll_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    battle_shock_hooks: BattleShockHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+) -> LifecycleStatus | None:
+    resolved_payload = apply_battle_shock_reroll_resolution_decision(
+        state=state,
+        decisions=decisions,
+        result=result,
+        battle_shock_hooks=battle_shock_hooks,
+        expected_source_kind=CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND,
+    )
+    original_result = DecisionResult.from_payload(
+        cast(
+            DecisionResultPayload,
+            _payload_object(resolved_payload.get("selected_target_decision_result")),
+        )
+    )
+    selected_payload = _payload_object(resolved_payload.get("selected_target_payload"))
+    recorded_effects = list(
+        _payload_json_object_tuple(
+            resolved_payload,
+            key="selected_target_recorded_effects_before_battle_shock",
+        )
+    )
+    recorded_effects.append(resolved_payload)
+    remaining_records = _payload_json_object_tuple(
+        resolved_payload,
+        key="selected_target_remaining_effect_records_after_battle_shock",
+    )
+    if remaining_records:
+        recording = _record_selected_target_effect_records(
+            state=state,
+            decisions=decisions,
+            result=original_result,
+            payload=selected_payload,
+            effect_records=remaining_records,
+            phase=BattlePhase.SHOOTING,
+            event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+            battle_shock_hooks=battle_shock_hooks,
+            runtime_modifier_registry=runtime_modifier_registry,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            initial_recorded=tuple(recorded_effects),
+            effect_index_offset=_payload_int(
+                resolved_payload,
+                key="selected_target_remaining_effect_start_index",
+            ),
+        )
+        if recording.pending_status is not None:
+            return recording.pending_status
+        effects = recording.effects
+    else:
+        effects = tuple(recorded_effects)
+    _append_selected_target_event(
+        state=state,
+        decisions=decisions,
+        result=original_result,
+        payload=selected_payload,
         effects=effects,
         event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
         phase=BattlePhase.SHOOTING,
@@ -668,7 +785,11 @@ def _post_shoot_groups_for_record(
             continue
         if not _clause_is_post_shoot_hit_target_selection(selection_clause):
             continue
-        effect_clauses = _selected_effect_clauses_after(clauses, index)
+        effect_clauses = _selected_effect_clauses_after(
+            clauses,
+            index,
+            include_immediate_effects=True,
+        )
         if not effect_clauses:
             continue
         target_ids = _eligible_selection_target_unit_ids(
@@ -816,6 +937,11 @@ def _effect_records_for_selected_target(
                 effect,
                 selected_target_unit_instance_id=selected_target_id,
             )
+            immediate_effect_kind = (
+                "force_battle_shock_test"
+                if (clause.duration is None and _is_immediate_battle_shock(effect))
+                else None
+            )
             context = RuleExecutionContext(
                 game_id=state.game_id,
                 player_id=player_id,
@@ -841,75 +967,59 @@ def _effect_records_for_selected_target(
                 event_log=None,
                 record_persisting_effects=False,
             )
-            records.append(
-                cast(
-                    dict[str, JsonValue],
-                    validate_json_value(
-                        {
-                            "source_rule_id": record.definition.source_id,
-                            "owner_player_id": player_id,
-                            "target_unit_instance_ids": list(target_unit_ids),
-                            "started_battle_round": state.battle_round,
-                            "started_phase": _battle_phase_kind(phase).value,
-                            "expiration": EffectExpiration.end_phase(
-                                battle_round=state.battle_round,
-                                phase=_battle_phase_kind(phase),
-                                player_id=_active_player_id(state),
-                            ).to_payload(),
-                            "effect_payload": {
-                                "effect_kind": GENERIC_RULE_EFFECT_KIND,
-                                "rule_id": rule_ir.rule_id,
-                                "source_id": record.definition.source_id,
-                                "rule_ir_hash": rule_ir.ir_hash(),
-                                "clause_id": clause.clause_id,
-                                "source_span": clause.source_span.to_payload(),
-                                "target": None
-                                if clause.target is None
-                                else clause.target.to_payload(),
-                                "target_unit_instance_ids": list(target_unit_ids),
-                                "duration": (
-                                    None
-                                    if clause.duration is None
-                                    else clause.duration.to_payload()
-                                ),
-                                "effect": transformed_effect.to_payload(),
-                                "conditions": [
-                                    condition.to_payload() for condition in clause.conditions
-                                ],
-                                "context": context.to_payload(),
-                                "catalog_selected_target": {
-                                    "hook_id": hook_id,
-                                    "submission_kind": submission_kind,
-                                    "catalog_record_id": record.record_id,
-                                    "ability_id": record.definition.ability_id,
-                                    "ability_name": record.definition.name,
-                                    "source_unit_instance_id": unit.unit_instance_id,
-                                    "source_model_instance_id": source_model_instance_id,
-                                    "selection_clause_id": selection_clause.clause_id,
-                                    "selected_target_unit_instance_id": selected_target_id,
-                                    "attack_sequence_id": (
-                                        None
-                                        if attack_sequence is None
-                                        else attack_sequence.sequence_id
-                                    ),
-                                    "attack_sequence_completed_event_id": (
-                                        attack_sequence_completed_event_id
-                                    ),
-                                },
-                            },
-                            "catalog_record_id": record.record_id,
-                            "ability_id": record.definition.ability_id,
-                            "ability_name": record.definition.name,
-                            "source_unit_instance_id": unit.unit_instance_id,
-                            "source_model_instance_id": source_model_instance_id,
-                            "selection_clause_id": selection_clause.clause_id,
-                            "effect_clause_id": clause.clause_id,
-                            "effect_index": effect_index,
-                            "selected_target_unit_instance_id": selected_target_id,
-                        }
-                    ),
-                )
-            )
+            effect_record: dict[str, object] = {
+                "source_rule_id": record.definition.source_id,
+                "owner_player_id": player_id,
+                "target_unit_instance_ids": list(target_unit_ids),
+                "started_battle_round": state.battle_round,
+                "started_phase": _battle_phase_kind(phase).value,
+                "expiration": EffectExpiration.end_phase(
+                    battle_round=state.battle_round,
+                    phase=_battle_phase_kind(phase),
+                    player_id=_active_player_id(state),
+                ).to_payload(),
+                "effect_payload": {
+                    "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                    "rule_id": rule_ir.rule_id,
+                    "source_id": record.definition.source_id,
+                    "rule_ir_hash": rule_ir.ir_hash(),
+                    "clause_id": clause.clause_id,
+                    "source_span": clause.source_span.to_payload(),
+                    "target": None if clause.target is None else clause.target.to_payload(),
+                    "target_unit_instance_ids": list(target_unit_ids),
+                    "duration": None if clause.duration is None else clause.duration.to_payload(),
+                    "effect": transformed_effect.to_payload(),
+                    "conditions": [condition.to_payload() for condition in clause.conditions],
+                    "context": context.to_payload(),
+                    "catalog_selected_target": {
+                        "hook_id": hook_id,
+                        "submission_kind": submission_kind,
+                        "catalog_record_id": record.record_id,
+                        "ability_id": record.definition.ability_id,
+                        "ability_name": record.definition.name,
+                        "source_unit_instance_id": unit.unit_instance_id,
+                        "source_model_instance_id": source_model_instance_id,
+                        "selection_clause_id": selection_clause.clause_id,
+                        "selected_target_unit_instance_id": selected_target_id,
+                        "attack_sequence_id": (
+                            None if attack_sequence is None else attack_sequence.sequence_id
+                        ),
+                        "attack_sequence_completed_event_id": attack_sequence_completed_event_id,
+                    },
+                },
+                "catalog_record_id": record.record_id,
+                "ability_id": record.definition.ability_id,
+                "ability_name": record.definition.name,
+                "source_unit_instance_id": unit.unit_instance_id,
+                "source_model_instance_id": source_model_instance_id,
+                "selection_clause_id": selection_clause.clause_id,
+                "effect_clause_id": clause.clause_id,
+                "effect_index": effect_index,
+                "selected_target_unit_instance_id": selected_target_id,
+            }
+            if immediate_effect_kind is not None:
+                effect_record["immediate_effect_kind"] = immediate_effect_kind
+            records.append(cast(dict[str, JsonValue], validate_json_value(effect_record)))
     return tuple(records)
 
 
@@ -996,16 +1106,84 @@ def _record_selected_target_effects_from_payload(
     payload: Mapping[str, object],
     phase: BattlePhase,
     event_type: str,
-) -> tuple[dict[str, JsonValue], ...]:
+    battle_shock_hooks: BattleShockHookRegistry | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = MappingProxyType({}),
+) -> _SelectedTargetEffectRecording:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Catalog selected-target effect recording requires decisions.")
-    effect_records = _payload_effect_records(payload)
-    recorded: list[dict[str, JsonValue]] = []
+    return _record_selected_target_effect_records(
+        state=state,
+        decisions=decisions,
+        result=result,
+        payload=payload,
+        effect_records=tuple(
+            cast(dict[str, JsonValue], validate_json_value(effect_record))
+            for effect_record in _payload_effect_records(payload)
+        ),
+        phase=phase,
+        event_type=event_type,
+        battle_shock_hooks=battle_shock_hooks,
+        runtime_modifier_registry=runtime_modifier_registry,
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        initial_recorded=(),
+        effect_index_offset=0,
+    )
+
+
+def _record_selected_target_effect_records(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    payload: Mapping[str, object],
+    effect_records: tuple[dict[str, JsonValue], ...],
+    phase: BattlePhase,
+    event_type: str,
+    battle_shock_hooks: BattleShockHookRegistry | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    initial_recorded: tuple[dict[str, JsonValue], ...],
+    effect_index_offset: int,
+) -> _SelectedTargetEffectRecording:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Catalog selected-target effect recording requires decisions.")
+    recorded: list[dict[str, JsonValue]] = list(_validate_effect_record_tuple(initial_recorded))
     for index, record in enumerate(effect_records):
         target_unit_ids = _payload_string_tuple(record, key="target_unit_instance_ids")
         effect_payload = _payload_object(record["effect_payload"])
+        immediate_effect_kind = _payload_optional_string(record, key="immediate_effect_kind")
+        if immediate_effect_kind == "force_battle_shock_test":
+            if battle_shock_hooks is None or runtime_modifier_registry is None:
+                raise GameLifecycleError(
+                    "Catalog selected-target Battle-shock requires runtime hooks."
+                )
+            resolution = _resolve_selected_target_battle_shock_effect(
+                state=state,
+                decisions=decisions,
+                result=result,
+                payload=payload,
+                record=record,
+                effect_payload=effect_payload,
+                battle_shock_hooks=battle_shock_hooks,
+                runtime_modifier_registry=runtime_modifier_registry,
+                ability_indexes_by_player_id=ability_indexes_by_player_id,
+                target_unit_ids=target_unit_ids,
+                recorded_effects_before_battle_shock=tuple(recorded),
+                remaining_effect_records_after_battle_shock=tuple(effect_records[index + 1 :]),
+                remaining_effect_start_index=effect_index_offset + index + 1,
+            )
+            if resolution.pending_status is not None:
+                return _SelectedTargetEffectRecording(
+                    effects=tuple(recorded),
+                    pending_status=resolution.pending_status,
+                )
+            if resolution.resolved_payload is None:
+                raise GameLifecycleError("Catalog selected-target Battle-shock did not resolve.")
+            recorded.append(resolution.resolved_payload)
+            continue
         persisting_effect = generic_rule_persisting_effect(
-            effect_id=f"{result.result_id}:{event_type}:{index:03d}",
+            effect_id=f"{result.result_id}:{event_type}:{effect_index_offset + index:03d}",
             source_rule_id=_payload_string(record, key="source_rule_id"),
             owner_player_id=_payload_string(record, key="owner_player_id"),
             target_unit_instance_ids=target_unit_ids,
@@ -1025,7 +1203,7 @@ def _record_selected_target_effects_from_payload(
                 validate_json_value(persisting_effect.to_payload()),
             )
         )
-    return tuple(recorded)
+    return _SelectedTargetEffectRecording(effects=tuple(recorded), pending_status=None)
 
 
 def _append_selected_target_event(
@@ -1072,6 +1250,22 @@ def _append_selected_target_event(
             }
         ),
     )
+
+
+def _payload_json_object_tuple(
+    payload: Mapping[str, JsonValue],
+    *,
+    key: str,
+) -> tuple[dict[str, JsonValue], ...]:
+    value = payload.get(key)
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Catalog selected-target payload {key} must be a list.")
+    records: list[dict[str, JsonValue]] = []
+    for item in value:
+        if not isinstance(item, dict):
+            raise GameLifecycleError(f"Catalog selected-target payload {key} must be objects.")
+        records.append(cast(dict[str, JsonValue], validate_json_value(item)))
+    return tuple(records)
 
 
 def _invalid_selected_target_effect_status(

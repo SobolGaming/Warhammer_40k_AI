@@ -72,6 +72,7 @@ from warhammer40k_core.geometry.volume import Model
 
 BENEFIT_OF_COVER_RULE_ID = "core-rules:benefit-of-cover"
 BIG_GUNS_NEVER_TIRE_RULE_ID = "big_guns_never_tire"
+FORTIFICATION_ENGAGEMENT_RULE_ID = "core-rules:fortification-engagement"
 LONE_OPERATIVE_RULE_ID = "lone_operative"
 STEALTH_RULE_ID = "stealth"
 PLUNGING_FIRE_RULE_ID = "core-rules:plunging-fire"
@@ -486,6 +487,7 @@ def unit_has_line_of_sight_to_target(
     ruleset_descriptor: RulesetDescriptor,
     observing_unit: UnitInstance,
     target_unit_id: str,
+    observer_model_instance_id: str | None = None,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> bool:
     if type(scenario) is not BattlefieldScenario:
@@ -495,6 +497,10 @@ def unit_has_line_of_sight_to_target(
     if type(observing_unit) is not UnitInstance:
         raise GameLifecycleError("Line of sight target query requires a UnitInstance.")
     _validate_identifier("target_unit_id", target_unit_id)
+    observer_model_id = _validate_optional_identifier(
+        "observer_model_instance_id",
+        observer_model_instance_id,
+    )
     if type(terrain_features) is not tuple:
         raise GameLifecycleError("terrain_features must be a tuple.")
     for feature in terrain_features:
@@ -524,10 +530,17 @@ def unit_has_line_of_sight_to_target(
         observing_unit_id=observing_unit.unit_instance_id,
         target_unit_id=target_rules_unit.unit_instance_id,
     )
-    for observer_model in _geometry_models_for_unit_placement(
+    observer_models = _geometry_models_for_unit_placement(
         scenario=scenario,
         unit_placement=observing_placement,
-    ):
+    )
+    if observer_model_id is not None:
+        observer_models = tuple(
+            model for model in observer_models if model.model_id == observer_model_id
+        )
+        if not observer_models:
+            raise GameLifecycleError("Line of sight target query observer model is not placed.")
+    for observer_model in observer_models:
         context = TerrainVisibilityContext.from_ruleset_descriptor(
             ruleset_descriptor=ruleset_descriptor,
             los_cache_key=visibility_cache_key,
@@ -862,6 +875,12 @@ def _target_candidate(
     ):
         hit_roll_modifier -= 1
         targeting_rule_ids.append(BIG_GUNS_NEVER_TIRE_RULE_ID)
+    if (
+        target_engagement_context.is_engaged_only_by_friendly_fortifications
+        and not has_weapon_keyword(weapon_profile, WeaponKeyword.PISTOL)
+    ):
+        hit_roll_modifier -= 1
+        targeting_rule_ids.append(FORTIFICATION_ENGAGEMENT_RULE_ID)
 
     return ShootingTargetCandidate.legal(
         attacker_unit_instance_id=attacker_unit.unit_instance_id,
@@ -1303,6 +1322,7 @@ class _LockedInCombatContext:
 class _TargetEngagementContext:
     is_engaged_by_friendly: bool
     engaged_friendly_unit_ids: tuple[str, ...]
+    is_engaged_only_by_friendly_fortifications: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -1379,9 +1399,19 @@ def _target_engagement_context(
         raise GameLifecycleError("Target engagement context included the target unit.")
     if set(target_rules_unit.component_unit_instance_ids) & engaged_friendly_unit_ids:
         raise GameLifecycleError("Target engagement context included a target component.")
+    engaged_only_by_fortifications = bool(engaged_friendly_unit_ids) and all(
+        _rules_unit_has_fortification_keyword(
+            rules_unit_view_from_armies(
+                armies=scenario.armies,
+                unit_instance_id=friendly_unit_id,
+            )
+        )
+        for friendly_unit_id in engaged_friendly_unit_ids
+    )
     return _TargetEngagementContext(
         is_engaged_by_friendly=bool(engaged_friendly_unit_ids),
         engaged_friendly_unit_ids=tuple(sorted(engaged_friendly_unit_ids)),
+        is_engaged_only_by_friendly_fortifications=engaged_only_by_fortifications,
     )
 
 
@@ -1413,6 +1443,8 @@ def _target_engagement_validation(
     target_engagement_context: _TargetEngagementContext,
 ) -> str | None:
     if not target_engagement_context.is_engaged_by_friendly:
+        return None
+    if target_engagement_context.is_engaged_only_by_friendly_fortifications:
         return None
     if _keywords_include_vehicle_or_monster(target_keywords):
         return None
@@ -1464,7 +1496,10 @@ def _shooting_types_for_target_candidate(
 ) -> tuple[ShootingType, ...]:
     if indirect_no_visible:
         return (ShootingType.INDIRECT,)
-    if locked_context.is_locked or target_engagement_context.is_engaged_by_friendly:
+    if locked_context.is_locked or (
+        target_engagement_context.is_engaged_by_friendly
+        and not target_engagement_context.is_engaged_only_by_friendly_fortifications
+    ):
         return (ShootingType.CLOSE_QUARTERS,)
     return (ShootingType.NORMAL,)
 
@@ -1495,6 +1530,14 @@ def _rules_unit_has_stealth(rules_unit: RulesUnitView) -> bool:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Stealth target lookup requires a rules unit.")
     return any(unit_has_stealth(component.unit) for component in rules_unit.components)
+
+
+def _rules_unit_has_fortification_keyword(rules_unit: RulesUnitView) -> bool:
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Fortification target lookup requires a rules unit.")
+    return all(
+        _unit_has_keyword(component.unit, "FORTIFICATION") for component in rules_unit.components
+    )
 
 
 def _unit_has_vehicle_or_monster_keyword(unit: UnitInstance) -> bool:

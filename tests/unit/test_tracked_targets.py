@@ -39,6 +39,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 from warhammer40k_core.engine.catalog_battle_shock_runtime import (
     CATALOG_BATTLE_SHOCK_FAILED_HEAL_EVENT,
     CATALOG_BATTLE_SHOCK_FAILED_HEAL_ROLL_TYPE,
+    CatalogBattleShockRerollRuntime,
     catalog_battle_shock_hook_bindings,
     catalog_forced_battle_shock_unit_ids,
     resolve_catalog_battle_shock_failed_heal,
@@ -612,7 +613,7 @@ def test_catalog_battle_shock_runtime_noops_and_fail_fast_paths() -> None:
         ),
     )
     with pytest.raises(GameLifecycleError, match="armies are invalid"):
-        catalog_battle_shock_hook_bindings(
+        CatalogBattleShockRerollRuntime(
             ability_indexes_by_player_id={
                 "player-a": AbilityCatalogIndex.from_records(records),
             },

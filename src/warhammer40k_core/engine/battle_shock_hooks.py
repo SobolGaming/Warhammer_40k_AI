@@ -4,7 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, cast
 
-from warhammer40k_core.core.dice import DiceExpression
+from warhammer40k_core.core.dice import DiceExpression, RerollPermission
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battle_shock import (
@@ -25,6 +25,10 @@ if TYPE_CHECKING:
 type BattleShockModifierHandler = Callable[
     ["BattleShockModifierContext"],
     tuple[RollModifier, ...],
+]
+type BattleShockRerollPermissionHandler = Callable[
+    ["BattleShockRerollPermissionContext"],
+    RerollPermission | None,
 ]
 type BattleShockDiceExpressionHandler = Callable[
     ["BattleShockDiceExpressionContext"],
@@ -81,6 +85,41 @@ class BattleShockModifierContext:
         if type(self.request) is not BattleShockTestRequest:
             raise GameLifecycleError(
                 "BattleShockModifierContext request must be a BattleShockTestRequest."
+            )
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier("active_player_id", self.active_player_id),
+        )
+        object.__setattr__(self, "phase", _battle_phase_from_token(self.phase))
+        object.__setattr__(
+            self,
+            "phase_start_battle_shocked_unit_ids",
+            _validate_identifier_tuple(
+                "phase_start_battle_shocked_unit_ids",
+                self.phase_start_battle_shocked_unit_ids,
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class BattleShockRerollPermissionContext:
+    state: GameState
+    request: BattleShockTestRequest
+    active_player_id: str
+    phase: BattlePhase
+    phase_start_battle_shocked_unit_ids: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError(
+                "BattleShockRerollPermissionContext state must be a GameState."
+            )
+        if type(self.request) is not BattleShockTestRequest:
+            raise GameLifecycleError(
+                "BattleShockRerollPermissionContext request must be a BattleShockTestRequest."
             )
         object.__setattr__(
             self,
@@ -199,6 +238,7 @@ class BattleShockHookBinding:
     forced_test_handler: BattleShockForcedTestHandler | None = None
     dice_expression_handler: BattleShockDiceExpressionHandler | None = None
     modifier_handler: BattleShockModifierHandler | None = None
+    reroll_permission_handler: BattleShockRerollPermissionHandler | None = None
     outcome_handler: BattleShockOutcomeHandler | None = None
 
     def __post_init__(self) -> None:
@@ -208,6 +248,7 @@ class BattleShockHookBinding:
             self.forced_test_handler is None
             and self.dice_expression_handler is None
             and self.modifier_handler is None
+            and self.reroll_permission_handler is None
             and self.outcome_handler is None
         ):
             raise GameLifecycleError("BattleShockHookBinding requires at least one handler.")
@@ -219,6 +260,12 @@ class BattleShockHookBinding:
             )
         if self.modifier_handler is not None and not callable(self.modifier_handler):
             raise GameLifecycleError("BattleShockHookBinding modifier_handler must be callable.")
+        if self.reroll_permission_handler is not None and not callable(
+            self.reroll_permission_handler
+        ):
+            raise GameLifecycleError(
+                "BattleShockHookBinding reroll_permission_handler must be callable."
+            )
         if self.outcome_handler is not None and not callable(self.outcome_handler):
             raise GameLifecycleError("BattleShockHookBinding outcome_handler must be callable.")
 
@@ -256,6 +303,28 @@ class BattleShockHookRegistry:
             modifiers.extend(_validate_roll_modifier_tuple(handler_modifiers))
         _validate_unique_modifier_ids(tuple(modifiers))
         return tuple(sorted(modifiers, key=lambda modifier: modifier.modifier_id))
+
+    def reroll_permission_for(
+        self,
+        context: BattleShockRerollPermissionContext,
+    ) -> RerollPermission | None:
+        if type(context) is not BattleShockRerollPermissionContext:
+            raise GameLifecycleError("Battle-shock reroll hooks require a context.")
+        permissions: list[RerollPermission] = []
+        for binding in self.bindings:
+            if binding.reroll_permission_handler is None:
+                continue
+            permission = binding.reroll_permission_handler(context)
+            if permission is None:
+                continue
+            if type(permission) is not RerollPermission:
+                raise GameLifecycleError(
+                    "Battle-shock reroll handlers must return RerollPermission or None."
+                )
+            permissions.append(permission)
+        if len(permissions) > 1:
+            raise GameLifecycleError("Multiple Battle-shock reroll permissions are available.")
+        return permissions[0] if permissions else None
 
     def dice_expression_for(
         self,

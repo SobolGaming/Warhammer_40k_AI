@@ -501,7 +501,7 @@ def resolve_unit_move_completed_battle_shock_hooks(
     event_type: str,
     movement_actions: tuple[str, ...],
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
-) -> None:
+) -> LifecycleStatus | None:
     from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 
     if type(decisions) is not DecisionController:
@@ -523,7 +523,7 @@ def resolve_unit_move_completed_battle_shock_hooks(
     requested_actions = _validate_identifier_tuple("movement_actions", movement_actions)
     ability_indexes = _validate_ability_index_mapping(ability_indexes_by_player_id)
     if not registry.all_bindings():
-        return
+        return None
     processed_effect_keys = _processed_battle_shock_effect_keys(decisions)
     for event_id, payload in _unprocessed_move_completion_events(
         state=state,
@@ -551,7 +551,7 @@ def resolve_unit_move_completed_battle_shock_hooks(
         for effect in registry.effects_for(context):
             if _battle_shock_effect_key(effect) in processed_effect_keys:
                 continue
-            _resolve_battle_shock_effect(
+            status = _resolve_battle_shock_effect(
                 state=state,
                 decisions=decisions,
                 battle_shock_hooks=battle_shock_hooks,
@@ -561,6 +561,39 @@ def resolve_unit_move_completed_battle_shock_hooks(
                 completed_phase=phase,
                 movement_action=movement_action,
             )
+            if status is not None:
+                return status
+    return None
+
+
+def is_unit_move_completed_battle_shock_reroll_request(request: DecisionRequest) -> bool:
+    from warhammer40k_core.engine.battle_shock_resolution import is_battle_shock_reroll_request
+
+    return is_battle_shock_reroll_request(
+        request,
+        source_kind=UNIT_MOVE_COMPLETED_BATTLE_SHOCK_SOURCE_KIND,
+    )
+
+
+def apply_unit_move_completed_battle_shock_reroll_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    battle_shock_hooks: BattleShockHookRegistry,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.battle_shock_resolution import (
+        apply_battle_shock_reroll_resolution_decision,
+    )
+
+    apply_battle_shock_reroll_resolution_decision(
+        state=state,
+        decisions=decisions,
+        result=result,
+        battle_shock_hooks=battle_shock_hooks,
+        expected_source_kind=UNIT_MOVE_COMPLETED_BATTLE_SHOCK_SOURCE_KIND,
+    )
+    return None
 
 
 def apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
@@ -758,16 +791,14 @@ def _resolve_battle_shock_effect(
     effect: UnitMoveCompletedBattleShockEffect,
     completed_phase: BattlePhase,
     movement_action: str,
-) -> None:
+) -> LifecycleStatus | None:
     from warhammer40k_core.engine.battle_shock import (
-        BattleShockResult,
         BattleShockTestRequest,
         battle_shock_leadership_target_for_unit,
     )
-    from warhammer40k_core.engine.battle_shock_hooks import (
-        BattleShockDiceExpressionContext,
-        BattleShockModifierContext,
-        BattleShockOutcomeContext,
+    from warhammer40k_core.engine.battle_shock_hooks import BattleShockDiceExpressionContext
+    from warhammer40k_core.engine.battle_shock_resolution import (
+        resolve_battle_shock_test_with_optional_reroll,
     )
 
     target_unit, target_player_id = _unit_and_player_by_id(
@@ -851,58 +882,29 @@ def _resolve_battle_shock_effect(
     )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = manager.roll(request.spec)
-    result = BattleShockResult.from_roll_state(
-        result_id=f"{request.request_id}:result",
+    resolution = resolve_battle_shock_test_with_optional_reroll(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        battle_shock_hooks=battle_shock_hooks,
         request=request,
         roll_state=roll_state,
-        modifiers=battle_shock_hooks.modifiers_for(
-            BattleShockModifierContext(
-                state=state,
-                request=request,
-                active_player_id=_active_player_id(state),
-                phase=completed_phase,
-                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
-            )
+        active_player_id=_active_player_id(state),
+        phase=completed_phase,
+        phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+        source_kind=UNIT_MOVE_COMPLETED_BATTLE_SHOCK_SOURCE_KIND,
+        base_payload=base_payload,
+        resolved_event_types=(
+            "battle_shock_test_resolved",
+            UNIT_MOVE_COMPLETED_BATTLE_SHOCK_RESOLVED_EVENT,
         ),
+        pending_phase_body_status="unit_move_completed_battle_shock_reroll_pending",
     )
-    state_update = "not_required"
-    if not result.passed:
-        if effect.target_unit_instance_id in phase_start_battle_shocked_unit_ids:
-            state_update = "already_battle_shocked"
-        else:
-            state.record_battle_shock_result(result)
-            state_update = "recorded_battle_shocked"
-    result_payload = validate_json_value(result.to_payload())
-    decisions.event_log.append(
-        "battle_shock_test_resolved",
-        {
-            **base_payload,
-            "battle_shock_result": result_payload,
-            "auto_passed": False,
-            "state_update": state_update,
-        },
-    )
-    decisions.event_log.append(
-        UNIT_MOVE_COMPLETED_BATTLE_SHOCK_RESOLVED_EVENT,
-        {
-            **base_payload,
-            "battle_shock_result": result_payload,
-            "auto_passed": False,
-            "state_update": state_update,
-        },
-    )
-    battle_shock_hooks.resolve_outcomes(
-        BattleShockOutcomeContext(
-            state=state,
-            decisions=decisions,
-            dice_manager=manager,
-            result=result,
-            active_player_id=_active_player_id(state),
-            phase=completed_phase,
-            auto_passed=False,
-            phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
-        )
-    )
+    if resolution.pending_status is not None:
+        return resolution.pending_status
+    if resolution.resolved_payload is None:
+        raise GameLifecycleError("Unit move completed Battle-shock did not resolve.")
+    return None
 
 
 def _unprocessed_move_completion_events(

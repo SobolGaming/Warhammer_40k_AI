@@ -29,6 +29,7 @@ from warhammer40k_core.core.modifiers import (
 )
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
+    CoverEffect,
     LineOfSightPolicy,
     RulesetDescriptor,
     TerrainFeatureKind,
@@ -225,11 +226,14 @@ from warhammer40k_core.geometry.measurement import (
     objective_marker_controls_model,
 )
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
 from warhammer40k_core.geometry.visibility import (
     BenefitOfCoverResult,
     CoverSourceReason,
     CoverSourceRecord,
+    LineOfSightWitness,
     TerrainVisibilityContext,
+    VisibilityBlockerKind,
 )
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
@@ -257,6 +261,7 @@ __all__ = (
     "BenefitOfCoverResult",
     "Callable",
     "Characteristic",
+    "CoverEffect",
     "CoverSourceReason",
     "CoverSourceRecord",
     "DEVASTATING_WOUNDS_RULE_ID",
@@ -311,6 +316,7 @@ __all__ = (
     "JsonValue",
     "LANCE_RULE_ID",
     "LifecycleStatus",
+    "LineOfSightWitness",
     "LineOfSightPolicy",
     "MELTA_RULE_ID",
     "ModelRemovalRecord",
@@ -364,7 +370,9 @@ __all__ = (
     "StrEnum",
     "TWIN_LINKED_RULE_ID",
     "TYPE_CHECKING",
+    "TerrainFeatureDefinition",
     "TerrainFeatureKind",
+    "TerrainVolume",
     "TerrainVisibilityContext",
     "TimingTriggerKind",
     "TimingWindow",
@@ -376,6 +384,7 @@ __all__ = (
     "UnitCharacteristicModifierContext",
     "UnitInstance",
     "UnitPlacement",
+    "VisibilityBlockerKind",
     "WeaponKeyword",
     "WeaponProfile",
     "WoundRollModifierContext",

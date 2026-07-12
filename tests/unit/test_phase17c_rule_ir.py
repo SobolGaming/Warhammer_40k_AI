@@ -2773,6 +2773,14 @@ def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant(
         "weapon_ability": "Devastating Wounds",
         "weapon_name": "Juggernaut's bladed horns",
     }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:devastating-wounds",
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:devastating-wounds",
+    )
 
 
 def test_phase17c_lord_of_change_named_weapon_choice_compiles_to_semantic_ir() -> None:
@@ -3401,6 +3409,113 @@ def test_phase17c_post_shoot_hit_target_effect_compiles_to_selected_target_consu
     )
     assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID in (
         catalog_rule_ir_hook_ids_for_rule(rule_ir)
+    )
+
+
+def test_phase17c_post_shoot_hit_target_battle_shock_compiles_to_immediate_effect() -> None:
+    rule_ir = _compiled(
+        "In your Shooting phase, after this model has shot, select one enemy unit that was "
+        "hit by one or more of those attacks. That unit must take a Battle-shock test."
+    ).rule_ir
+    selection_clause = rule_ir.clauses[0]
+    battle_shock_clause = rule_ir.clauses[1]
+    battle_shock_effect = battle_shock_clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert selection_clause.trigger is not None
+    assert parameter_payload(selection_clause.trigger.parameters) == {
+        "edge": "after",
+        "owner": "active_player",
+        "phase": "shooting",
+        "subject": "this_model",
+        "target_relationship": "hit_by_those_attacks",
+        "timing_window": "just_after_friendly_unit_has_shot",
+    }
+    assert battle_shock_clause.duration is None
+    assert battle_shock_clause.target is not None
+    assert battle_shock_clause.target.kind is RuleTargetKind.SELECTED_UNIT
+    assert parameter_payload(battle_shock_effect.parameters) == {
+        "reason": "forced_by_ability",
+        "required": True,
+        "rules_context": "battle_shock",
+        "status": "force_battle_shock_test",
+        "target_scope": "selected_unit",
+    }
+    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID in (
+        catalog_rule_ir_consumers_for_rule(rule_ir)
+    )
+    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID in (
+        catalog_rule_ir_hook_ids_for_rule(rule_ir)
+    )
+
+
+def test_phase17c_rendmaster_blood_throne_compiles_to_visible_selected_target_effect() -> None:
+    rule_ir = _compiled(
+        'At the start of the Fight phase, select one enemy unit within 18" of and visible '
+        "to this model. Until the end of the phase, each time a friendly Khorne Legiones "
+        "Daemonica unit makes an attack that targets that unit, improve the Strength, "
+        "Armour Penetration and Damage characteristics of that attack by 1."
+    ).rule_ir
+    selection_clause = rule_ir.clauses[0]
+    modifier_clause = rule_ir.clauses[1]
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert selection_clause.trigger is not None
+    assert parameter_payload(selection_clause.trigger.parameters) == {
+        "edge": "start",
+        "owner": None,
+        "phase": "fight",
+    }
+    assert selection_clause.target is not None
+    assert selection_clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert _condition_payload(selection_clause, RuleConditionKind.DISTANCE_PREDICATE) == {
+        "distance_inches": 18.0,
+        "negated": False,
+        "object_kind": "model",
+        "object_reference": "this",
+        "predicate": "within",
+        "qualifier": None,
+        "range_kind": "numeric_range",
+    }
+    assert _condition_payload(selection_clause, RuleConditionKind.VISIBILITY_PREDICATE) == {
+        "observer": "this_model",
+        "predicate": "visible_to",
+        "target_reference": "selected_unit",
+    }
+    assert modifier_clause.target is not None
+    assert modifier_clause.target.kind is RuleTargetKind.FRIENDLY_UNIT
+    assert parameter_payload(modifier_clause.target.parameters) == {
+        "allegiance": "friendly",
+        "required_keyword_sequence": ("KHORNE", "LEGIONES_DAEMONICA"),
+    }
+    assert _condition_payload(modifier_clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "gate_subject": "attack_target",
+        "relationship": "attack_targets_selected_unit",
+        "target_reference": "selected_unit",
+    }
+    assert tuple(parameter_payload(effect.parameters) for effect in modifier_clause.effects) == (
+        {
+            "attack_role": "attacker",
+            "characteristic": "armor_penetration",
+            "delta": 1,
+        },
+        {
+            "attack_role": "attacker",
+            "characteristic": "damage",
+            "delta": 1,
+        },
+        {
+            "attack_role": "attacker",
+            "characteristic": "strength",
+            "delta": 1,
+        },
+    )
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_consumers_for_rule(
+        rule_ir
+    )
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(
+        rule_ir
     )
 
 

@@ -244,6 +244,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:ballistic-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:battle-shock-failed-heal` | Pall of Despair (Aura, Psychic) |
 | `catalog-ir:battle-shock-forced-test` | Pall of Despair (Aura, Psychic) |
+| `catalog-ir:battle-shock-reroll` | No current generated rows |
 | `catalog-ir:can-advance-and-charge` | No current generated rows |
 | `catalog-ir:can-advance-and-shoot-and-charge` | No current generated rows |
 | `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
@@ -267,6 +268,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:first-death-return` | No current generated rows |
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
 | `catalog-ir:force-desperate-escape` | Bane of Cowards |
+| `catalog-ir:fortification-cover` | No current generated rows |
+| `catalog-ir:fortification-desperate-escape` | No current generated rows |
+| `catalog-ir:fortification-target-permission` | No current generated rows |
 | `catalog-ir:hit-roll-modifier` | Revel in Desecration |
 | `catalog-ir:hit-roll-reroll` | Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |

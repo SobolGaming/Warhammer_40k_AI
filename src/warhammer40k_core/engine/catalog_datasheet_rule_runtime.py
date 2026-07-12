@@ -7,7 +7,10 @@ from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
-from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
+from warhammer40k_core.core.weapon_profiles import (
+    RangeProfileKind,
+    WeaponProfile,
+)
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -23,6 +26,7 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
     CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
+    clause_is_charge_end_leading_unit_weapon_ability_grant,
     clause_is_conditional_lone_operative,
     clause_is_consolidation_move_distance_modifier,
     clause_is_fight_selected_weapon_ability_choice,
@@ -45,6 +49,7 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityHookBinding,
     FightActivationAbilityOption,
 )
+from warhammer40k_core.engine.fight_order import CHARGE_FIGHTS_FIRST_EFFECT_KIND
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
@@ -58,6 +63,8 @@ from warhammer40k_core.engine.rule_execution import (
 )
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_modified_weapon_profile,
+    rule_ir_weapon_ability_granted_profile,
+    rule_ir_weapon_selector_applies,
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -84,6 +91,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
+    RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
     parameter_payload,
@@ -151,15 +159,25 @@ class CatalogDatasheetRuleRuntime:
         )
 
     def weapon_profile_modifier_bindings(self) -> tuple[WeaponProfileModifierBinding, ...]:
-        return tuple(
+        bindings: list[WeaponProfileModifierBinding] = []
+        bindings.extend(
             WeaponProfileModifierBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
-                handler=self._weapon_handler(source),
+                handler=self._weapon_characteristic_handler(source),
             )
             for source in self._sources(clause_is_passive_characteristic_modifier)
             if _source_characteristic(source) in {Characteristic.ATTACKS, Characteristic.STRENGTH}
         )
+        bindings.extend(
+            WeaponProfileModifierBinding(
+                modifier_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                handler=self._charge_end_weapon_ability_handler(source),
+            )
+            for source in self._sources(clause_is_charge_end_leading_unit_weapon_ability_grant)
+        )
+        return tuple(bindings)
 
     def hit_roll_modifier_bindings(self) -> tuple[HitRollModifierBinding, ...]:
         sources = self._sources(clause_is_stealth_aura)
@@ -293,7 +311,7 @@ class CatalogDatasheetRuleRuntime:
 
         return handler
 
-    def _weapon_handler(
+    def _weapon_characteristic_handler(
         self, source: _CatalogClauseSource
     ) -> Callable[[WeaponProfileModifierContext], WeaponProfile]:
         def handler(context: WeaponProfileModifierContext) -> WeaponProfile:
@@ -309,6 +327,44 @@ class CatalogDatasheetRuleRuntime:
                 return context.weapon_profile
             return rule_ir_modified_weapon_profile(
                 parameters=parameter_payload(source.clause.effects[0].parameters),
+                profile=context.weapon_profile,
+                source_id=source.rule_ir.source_id,
+            )
+
+        return handler
+
+    def _charge_end_weapon_ability_handler(
+        self, source: _CatalogClauseSource
+    ) -> Callable[[WeaponProfileModifierContext], WeaponProfile]:
+        def handler(context: WeaponProfileModifierContext) -> WeaponProfile:
+            if (
+                not _source_applies_to_rules_unit(
+                    source=source,
+                    context_unit_id=context.attacking_unit_instance_id,
+                    state=context.state,
+                )
+                or not _source_currently_leading_rules_unit(
+                    source=source,
+                    context_unit_id=context.attacking_unit_instance_id,
+                    state=context.state,
+                )
+                or not _source_keyword_gate_applies(source)
+                or not _rules_unit_charged_this_turn(
+                    state=context.state,
+                    unit_instance_id=context.attacking_unit_instance_id,
+                )
+            ):
+                return context.weapon_profile
+            effect = source.clause.effects[0]
+            if effect.kind is not RuleEffectKind.GRANT_WEAPON_ABILITY:
+                raise GameLifecycleError("Catalog datasheet weapon grant effect is malformed.")
+            parameters = parameter_payload(effect.parameters)
+            if not rule_ir_weapon_selector_applies(
+                parameters=parameters, profile=context.weapon_profile
+            ):
+                return context.weapon_profile
+            return rule_ir_weapon_ability_granted_profile(
+                parameters=parameters,
                 profile=context.weapon_profile,
                 source_id=source.rule_ir.source_id,
             )
@@ -563,6 +619,20 @@ def _source_currently_leading_rules_unit(
         and component.role in {"leader", "support"}
         for component in rules_unit.components
     )
+
+
+def _rules_unit_charged_this_turn(*, state: object, unit_instance_id: str) -> bool:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Catalog datasheet charge query requires GameState.")
+    for effect in state.persisting_effects_for_unit(unit_instance_id):
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("effect_kind") == CHARGE_FIGHTS_FIRST_EFFECT_KIND:
+            return True
+    return False
 
 
 def _source_is_alive(state: object, source: _CatalogClauseSource) -> bool:
