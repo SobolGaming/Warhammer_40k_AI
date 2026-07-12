@@ -8,8 +8,20 @@ from dataclasses import dataclass
 from datetime import date
 from functools import cache
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
+if TYPE_CHECKING or __package__:
+    from tools.aeldari_support_review import (
+        AELDARI_FACTION_ID,
+        aeldari_datasheet_review_markdown,
+        aeldari_datasheet_snapshot_markdown,
+    )
+else:
+    from aeldari_support_review import (
+        AELDARI_FACTION_ID,
+        aeldari_datasheet_review_markdown,
+        aeldari_datasheet_snapshot_markdown,
+    )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
 from warhammer40k_core.core.faction_aliases import (
@@ -2775,6 +2787,8 @@ def _faction_support_markdown(
     ]
     if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
         lines.extend(_chaos_daemons_semantic_snapshot_markdown())
+    if faction_row.faction_id == AELDARI_FACTION_ID:
+        lines.extend(_aeldari_semantic_snapshot_markdown())
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
     lines.extend(
         _faction_datasheet_support_markdown(
@@ -2784,7 +2798,7 @@ def _faction_support_markdown(
             leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
     )
-    if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
+    if faction_row.faction_id in (AELDARI_FACTION_ID, CHAOS_DAEMONS_FACTION_ID):
         lines.append("")
         return "\n".join(lines)
     lines.extend(_faction_detachment_rule_coverage_rows_markdown(detachment_rule_rows))
@@ -2895,6 +2909,66 @@ def _chaos_daemons_semantic_snapshot_markdown() -> list[str]:
     lines.extend(_chaos_daemons_exact_stratagem_snapshot_markdown())
     lines.extend(_chaos_daemons_datasheet_snapshot_markdown())
     return lines
+
+
+def _aeldari_semantic_snapshot_markdown() -> list[str]:
+    lines = [
+        "",
+        "## Semantic Support Snapshot",
+        "",
+        (
+            "This generated snapshot separates source review from semantic execution. "
+            "Detachment-rule support uses the semantic support table below. Exact "
+            "Enhancement and Stratagem support uses the shared Phase17F execution evidence. "
+            "Datasheet counts describe the reviewed current source scope; no datasheet-level "
+            "execution support is claimed while Aeldari catalog rows are absent."
+        ),
+    ]
+    lines.extend(_aeldari_detachment_snapshot_markdown())
+    lines.extend(_aeldari_exact_enhancement_snapshot_markdown())
+    lines.extend(_aeldari_exact_stratagem_snapshot_markdown())
+    lines.extend(aeldari_datasheet_snapshot_markdown())
+    return lines
+
+
+def _aeldari_detachment_snapshot_markdown() -> list[str]:
+    rows = _detachment_rule_support_rows_for_faction(AELDARI_FACTION_ID)
+    fully_supported = tuple(row.detachment for row in rows if _detachment_rule_is_supported(row))
+    needs_support = tuple(row.detachment for row in rows if not _detachment_rule_is_supported(row))
+    return [
+        "",
+        "### Detachments",
+        "",
+        "| Fully supported | Still needs semantic support |",
+        "| --- | --- |",
+        f"| {_markdown_line_list(fully_supported)} | {_markdown_line_list(needs_support)} |",
+    ]
+
+
+def _aeldari_exact_enhancement_snapshot_markdown() -> list[str]:
+    rows = tuple(
+        row
+        for row in faction_coverage_2026_27.coverage_rows()
+        if row.faction_id == AELDARI_FACTION_ID
+        and row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
+    )
+    return _chaos_daemons_exact_source_rows_snapshot_markdown(
+        title="Enhancements",
+        rows=rows,
+    )
+
+
+def _aeldari_exact_stratagem_snapshot_markdown() -> list[str]:
+    rows = tuple(
+        row
+        for row in faction_coverage_2026_27.coverage_rows()
+        if row.faction_id == AELDARI_FACTION_ID
+        and row.coverage_kind is Phase17ECoverageKind.DETACHMENT_STRATAGEM
+    )
+    return _chaos_daemons_exact_source_rows_snapshot_markdown(
+        title="Stratagems",
+        rows=rows,
+    )
 
 
 def _chaos_daemons_detachment_snapshot_markdown() -> list[str]:
@@ -3059,6 +3133,9 @@ def _faction_datasheet_support_markdown(
                 leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids)
             )
         )
+        return lines
+    if faction_row.faction_id == AELDARI_FACTION_ID:
+        lines.extend(aeldari_datasheet_review_markdown())
         return lines
     lines.extend(
         (
