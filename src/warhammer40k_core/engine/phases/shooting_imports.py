@@ -76,7 +76,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE,
     apply_catalog_post_shoot_hit_target_effect_result,
+    apply_catalog_selected_target_battle_shock_reroll_decision,
     invalid_catalog_post_shoot_hit_target_effect_status,
+    is_catalog_selected_target_battle_shock_reroll_request,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -295,6 +297,7 @@ __all__ = (
     "SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE",
     "invalid_catalog_post_shoot_hit_target_status_status",
     "invalid_catalog_post_shoot_hit_target_effect_status",
+    "is_catalog_selected_target_battle_shock_reroll_request",
     "SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE",
     "SELECT_DESTRUCTION_REACTION_DECISION_TYPE",
     "SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE",
@@ -343,6 +346,7 @@ __all__ = (
     "annotations",
     "apply_allocation_order_decision",
     "apply_attack_weapon_group_decision",
+    "apply_catalog_selected_target_battle_shock_reroll_decision",
     "apply_catalog_post_shoot_hit_target_status_result",
     "apply_catalog_post_shoot_hit_target_effect_result",
     "apply_damage_allocation_model_decision",

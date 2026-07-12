@@ -126,8 +126,6 @@ class CatalogBattleShockRerollRuntime:
     ) -> RerollPermission | None:
         if type(context) is not BattleShockRerollPermissionContext:
             raise GameLifecycleError("Catalog Battle-shock reroll requires context.")
-        if context.phase is not BattlePhase.COMMAND:
-            return None
         player_id = context.request.player_id
         army = _army_for_player(self.armies, player_id=player_id)
         target_unit = _unit_in_army(army, unit_instance_id=context.request.unit_instance_id)

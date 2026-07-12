@@ -19,9 +19,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
-from warhammer40k_core.engine import (
-    catalog_battle_shock_runtime as battle_shock_runtime,
-)
+from warhammer40k_core.engine import catalog_battle_shock_runtime as battle_shock_runtime
 from warhammer40k_core.engine import (
     catalog_command_point_runtime as command_point_runtime,
 )
@@ -585,7 +583,7 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
     assert permission is not None
     assert permission.eligible_roll_type == "battle_shock_roll"
     assert permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
-    assert runtime.reroll_permission(replace(context, phase=BattlePhase.MOVEMENT)) is None
+    assert runtime.reroll_permission(replace(context, phase=BattlePhase.MOVEMENT)) == permission
     with pytest.raises(GameLifecycleError, match="requires context"):
         runtime.reroll_permission(cast(Any, object()))
 

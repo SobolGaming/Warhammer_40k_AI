@@ -388,6 +388,8 @@ def _fortification_cover_for_allocated_model(
             state=state,
             model_instance_id=attacker_placement.model_instance_id,
         )
+        if not attacker_model.is_alive:
+            continue
         observer_geometry = geometry_model_for_placement(
             model=attacker_model,
             placement=attacker_placement,
@@ -475,7 +477,12 @@ def _model_owner_unit_has_keyword(
     canonical = _canonical_keyword(keyword)
     for army in state.army_definitions:
         for unit in army.units:
-            if not any(model.model_instance_id == model_instance_id for model in unit.own_models):
-                continue
-            return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
+            for model in unit.own_models:
+                if model.model_instance_id != model_instance_id:
+                    continue
+                if not model.is_alive:
+                    return False
+                return canonical in {
+                    _canonical_keyword(unit_keyword) for unit_keyword in unit.keywords
+                }
     raise GameLifecycleError("Fortification cover blocker model is unknown.")

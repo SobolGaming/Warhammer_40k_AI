@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battle_shock import (
-    BattleShockResult,
     BattleShockTestReason,
     BattleShockTestRequest,
     battle_shock_leadership_target_for_unit,
@@ -14,8 +13,10 @@ from warhammer40k_core.engine.battle_shock import (
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockDiceExpressionContext,
     BattleShockHookRegistry,
-    BattleShockModifierContext,
-    BattleShockOutcomeContext,
+)
+from warhammer40k_core.engine.battle_shock_resolution import (
+    BattleShockResolutionResult,
+    resolve_battle_shock_test_with_optional_reroll,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
@@ -64,7 +65,10 @@ def resolve_selected_target_battle_shock_effect(
     runtime_modifier_registry: RuntimeModifierRegistry,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     target_unit_ids: tuple[str, ...],
-) -> dict[str, JsonValue]:
+    recorded_effects_before_battle_shock: tuple[dict[str, JsonValue], ...] = (),
+    remaining_effect_records_after_battle_shock: tuple[dict[str, JsonValue], ...] = (),
+    remaining_effect_start_index: int = 0,
+) -> BattleShockResolutionResult:
     if len(target_unit_ids) != 1:
         raise GameLifecycleError("Catalog selected-target Battle-shock requires one target.")
     target_unit_id = target_unit_ids[0]
@@ -123,11 +127,15 @@ def resolve_selected_target_battle_shock_effect(
     )
     base_payload = _selected_target_battle_shock_base_payload(
         state=state,
+        result=result,
         payload=payload,
         record=record,
         effect_payload=effect_payload,
         target_unit_id=target_unit_id,
         target_player_id=target_player_id,
+        recorded_effects_before_battle_shock=recorded_effects_before_battle_shock,
+        remaining_effect_records_after_battle_shock=remaining_effect_records_after_battle_shock,
+        remaining_effect_start_index=remaining_effect_start_index,
     )
     decisions.event_log.append(
         "battle_shock_test_requested",
@@ -140,61 +148,38 @@ def resolve_selected_target_battle_shock_effect(
     )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = manager.roll(request.spec)
-    result_record = BattleShockResult.from_roll_state(
-        result_id=f"{request.request_id}:result",
+    return resolve_battle_shock_test_with_optional_reroll(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        battle_shock_hooks=battle_shock_hooks,
         request=request,
         roll_state=roll_state,
-        modifiers=battle_shock_hooks.modifiers_for(
-            BattleShockModifierContext(
-                state=state,
-                request=request,
-                active_player_id=active_player_id,
-                phase=BattlePhase.SHOOTING,
-                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
-            )
+        active_player_id=active_player_id,
+        phase=BattlePhase.SHOOTING,
+        phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+        source_kind="catalog_selected_target_effect",
+        base_payload=base_payload,
+        resolved_event_types=(
+            "battle_shock_test_resolved",
+            "catalog_selected_target_battle_shock_resolved",
         ),
+        pending_phase_body_status="catalog_selected_target_battle_shock_reroll_pending",
     )
-    state_update = "not_required"
-    if not result_record.passed:
-        if target_unit_id in phase_start_battle_shocked_unit_ids:
-            state_update = "already_battle_shocked"
-        else:
-            state.record_battle_shock_result(result_record)
-            state_update = "recorded_battle_shocked"
-    result_payload = validate_json_value(result_record.to_payload())
-    resolved_payload = validate_json_value(
-        {
-            **base_payload,
-            "battle_shock_result": result_payload,
-            "auto_passed": False,
-            "state_update": state_update,
-        }
-    )
-    decisions.event_log.append("battle_shock_test_resolved", resolved_payload)
-    decisions.event_log.append("catalog_selected_target_battle_shock_resolved", resolved_payload)
-    battle_shock_hooks.resolve_outcomes(
-        BattleShockOutcomeContext(
-            state=state,
-            decisions=decisions,
-            dice_manager=manager,
-            result=result_record,
-            active_player_id=active_player_id,
-            phase=BattlePhase.SHOOTING,
-            auto_passed=False,
-            phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
-        )
-    )
-    return cast(dict[str, JsonValue], resolved_payload)
 
 
 def _selected_target_battle_shock_base_payload(
     *,
     state: GameState,
+    result: DecisionResult,
     payload: Mapping[str, object],
     record: Mapping[str, object],
     effect_payload: Mapping[str, object],
     target_unit_id: str,
     target_player_id: str,
+    recorded_effects_before_battle_shock: tuple[dict[str, JsonValue], ...],
+    remaining_effect_records_after_battle_shock: tuple[dict[str, JsonValue], ...],
+    remaining_effect_start_index: int,
 ) -> dict[str, JsonValue]:
     return cast(
         dict[str, JsonValue],
@@ -222,6 +207,17 @@ def _selected_target_battle_shock_base_payload(
                 "target_unit_instance_id": target_unit_id,
                 "target_player_id": target_player_id,
                 "effect_payload": validate_json_value(effect_payload),
+                "selected_target_decision_result": validate_json_value(result.to_payload()),
+                "selected_target_payload": validate_json_value(dict(payload)),
+                "selected_target_recorded_effects_before_battle_shock": [
+                    validate_json_value(recorded_effect)
+                    for recorded_effect in recorded_effects_before_battle_shock
+                ],
+                "selected_target_remaining_effect_records_after_battle_shock": [
+                    validate_json_value(remaining_record)
+                    for remaining_record in remaining_effect_records_after_battle_shock
+                ],
+                "selected_target_remaining_effect_start_index": remaining_effect_start_index,
             }
         ),
     )

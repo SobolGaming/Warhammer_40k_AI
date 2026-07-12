@@ -17,6 +17,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     movement_mode_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import unit_move_completed_hooks as _umc
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.aircraft import AircraftMovementPolicy, HoverModeState
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
@@ -110,10 +111,6 @@ from warhammer40k_core.engine.unit_coherency import (
     resolve_unit_movement_endpoint_coherency,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.engine.unit_move_completed_hooks import (
-    UnitMoveCompletedBattleShockHookRegistry,
-    UnitMoveCompletedMortalWoundHookRegistry,
-)
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
     PathWitness,
@@ -831,11 +828,11 @@ class ChargePhaseHandler:
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry = field(
         default_factory=ChargeTargetRestrictionHookRegistry.empty
     )
-    unit_move_completed_mortal_wound_hooks: UnitMoveCompletedMortalWoundHookRegistry = field(
-        default_factory=UnitMoveCompletedMortalWoundHookRegistry.empty
+    unit_move_completed_mortal_wound_hooks: _umc.UnitMoveCompletedMortalWoundHookRegistry = field(
+        default_factory=_umc.UnitMoveCompletedMortalWoundHookRegistry.empty
     )
-    unit_move_completed_battle_shock_hooks: UnitMoveCompletedBattleShockHookRegistry = field(
-        default_factory=UnitMoveCompletedBattleShockHookRegistry.empty
+    unit_move_completed_battle_shock_hooks: _umc.UnitMoveCompletedBattleShockHookRegistry = field(
+        default_factory=_umc.UnitMoveCompletedBattleShockHookRegistry.empty
     )
     battle_shock_hooks: BattleShockHookRegistry = field(
         default_factory=BattleShockHookRegistry.empty
@@ -1026,6 +1023,14 @@ class ChargePhaseHandler:
                 charge_target_restriction_hooks=self.charge_target_restriction_hooks,
             )
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
+            reroll_record = decisions.record_for_result(result)
+            if _umc.is_unit_move_completed_battle_shock_reroll_request(reroll_record.request):
+                return _umc.apply_unit_move_completed_battle_shock_reroll_decision(
+                    state=state,
+                    result=result,
+                    decisions=decisions,
+                    battle_shock_hooks=self.battle_shock_hooks,
+                )
             return _apply_charge_roll_reroll_decision(
                 state=state,
                 result=result,

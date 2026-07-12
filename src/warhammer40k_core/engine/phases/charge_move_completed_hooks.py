@@ -65,7 +65,7 @@ def resolve_charge_move_completed_hooks(
     )
     if move_completed_status is not None:
         return move_completed_status
-    resolve_unit_move_completed_battle_shock_hooks(
+    battle_shock_status = resolve_unit_move_completed_battle_shock_hooks(
         state=state,
         decisions=decisions,
         registry=handler.unit_move_completed_battle_shock_hooks,
@@ -77,6 +77,8 @@ def resolve_charge_move_completed_hooks(
         movement_actions=(movement_action,),
         ability_indexes_by_player_id=handler.ability_indexes_by_player_id,
     )
+    if battle_shock_status is not None:
+        return battle_shock_status
     return None
 
 

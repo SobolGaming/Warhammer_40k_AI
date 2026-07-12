@@ -713,6 +713,16 @@ class ShootingPhaseHandler:
                 stratagem_index=self.stratagem_index,
             )
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
+            reroll_record = decisions.record_for_result(result)
+            if is_catalog_selected_target_battle_shock_reroll_request(reroll_record.request):
+                return apply_catalog_selected_target_battle_shock_reroll_decision(
+                    state=state,
+                    decisions=decisions,
+                    result=result,
+                    battle_shock_hooks=self.battle_shock_hooks,
+                    runtime_modifier_registry=self.runtime_modifier_registry,
+                    ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                )
             return _apply_shooting_dice_reroll_decision(
                 state=state,
                 result=result,
