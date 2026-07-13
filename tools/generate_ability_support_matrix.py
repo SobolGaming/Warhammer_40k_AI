@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING, TypedDict, cast
 
 if TYPE_CHECKING or __package__:
     from tools.aeldari_datasheet_semantic_snapshot import (
-        DatasheetSemanticSnapshotSupportRow,
         aeldari_datasheet_semantic_snapshot_markdown,
     )
     from tools.faction_pack_datasheet_review import (
@@ -22,7 +21,6 @@ if TYPE_CHECKING or __package__:
     )
 else:
     from aeldari_datasheet_semantic_snapshot import (
-        DatasheetSemanticSnapshotSupportRow,
         aeldari_datasheet_semantic_snapshot_markdown,
     )
     from faction_pack_datasheet_review import (
@@ -2797,12 +2795,7 @@ def _faction_support_markdown(
     if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
         lines.extend(_chaos_daemons_semantic_snapshot_markdown())
     if faction_row.faction_id == AELDARI_FACTION_ID:
-        lines.extend(
-            _aeldari_semantic_snapshot_markdown(
-                datasheet_support_rows=datasheet_support_rows,
-                ability_rows_by_id=ability_rows_by_id,
-            )
-        )
+        lines.extend(_aeldari_semantic_snapshot_markdown())
     elif faction_row.faction_id in reviewed_faction_ids():
         lines.extend(faction_pack_datasheet_snapshot_markdown(faction_row.faction_id))
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
@@ -2930,11 +2923,7 @@ def _chaos_daemons_semantic_snapshot_markdown() -> list[str]:
     return lines
 
 
-def _aeldari_semantic_snapshot_markdown(
-    *,
-    datasheet_support_rows: tuple[DatasheetSupportRow, ...],
-    ability_rows_by_id: Mapping[str, AbilityCoverageRow],
-) -> list[str]:
+def _aeldari_semantic_snapshot_markdown() -> list[str]:
     lines = [
         "",
         "## Semantic Support Snapshot",
@@ -2943,28 +2932,17 @@ def _aeldari_semantic_snapshot_markdown(
             "This generated snapshot separates source review from semantic execution. "
             "Detachment-rule support uses the semantic support table below. Exact "
             "Enhancement and Stratagem support uses the shared Phase17F execution evidence. "
-            "The Unit Datasheets table groups the reviewed Aeldari source scope by tradition "
-            "and derives each semantic bucket from generated catalog, RuleIR, diagnostic, and "
-            "runtime-consumer evidence."
+            "The Exact Ability Semantic Coverage table groups the reviewed Aeldari source scope "
+            "by tradition. It bridges every effective datasheet and derives each semantic bucket "
+            "from exact datasheet and wargear ability text, parser diagnostics, and runtime "
+            "consumers. It does not report catalog or playability support; the separate Datasheet "
+            "/ Unit Support table remains authoritative for those fields."
         ),
     ]
     lines.extend(_aeldari_detachment_snapshot_markdown())
     lines.extend(_aeldari_exact_enhancement_snapshot_markdown())
     lines.extend(_aeldari_exact_stratagem_snapshot_markdown())
-    lines.extend(
-        aeldari_datasheet_semantic_snapshot_markdown(
-            datasheet_support_rows=tuple(
-                DatasheetSemanticSnapshotSupportRow(
-                    datasheet_id=row.datasheet_id,
-                    datasheet_name=row.datasheet_name,
-                    catalog_blocked=row.catalog_status == DATASHEET_SUPPORT_BLOCKED,
-                    ability_coverage_row_ids=row.ability_coverage_row_ids,
-                )
-                for row in datasheet_support_rows
-            ),
-            ability_rows_by_id=ability_rows_by_id,
-        )
-    )
+    lines.extend(aeldari_datasheet_semantic_snapshot_markdown())
     return lines
 
 

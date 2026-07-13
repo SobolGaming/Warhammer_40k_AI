@@ -5953,6 +5953,17 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     return ()
 
 
+def catalog_rule_ir_consumer_ids_for_effect(
+    effect: RuleEffectSpec,
+) -> tuple[str, ...]:
+    """Return stable consumer identities capable of hosting one effect."""
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule effect consumption requires RuleEffectSpec.")
+    if effect.kind is RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION:
+        return (CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,)
+    return _catalog_ir_hook_ids_for_effect(effect)
+
+
 def _catalog_ir_roll_modifier_hook_ids(parameters: Mapping[str, object]) -> tuple[str, ...]:
     roll_type = _string_parameter(parameters, key="roll_type")
     consumer_id = _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))

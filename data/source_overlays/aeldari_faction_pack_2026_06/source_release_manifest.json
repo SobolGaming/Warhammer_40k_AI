@@ -1,0 +1,23 @@
+{
+  "base_source_edition": "warhammer-40000-10th",
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "catalog_version": {
+    "source_date": "2026-06-09",
+    "version_id": "warhammer-40000-11th-aeldari-faction-pack-2026-06"
+  },
+  "overlay_package_ids": [
+    {
+      "namespace": "gw",
+      "package_name": "aeldari-faction-pack-datasheet-overlay",
+      "version": "11th-2026-06-09"
+    }
+  ],
+  "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
+  "release_id": "aeldari-faction-pack-datasheet-release-2026-06",
+  "schema_version": "phase17-source-release-v1",
+  "target_edition": "warhammer-40000-11th"
+}

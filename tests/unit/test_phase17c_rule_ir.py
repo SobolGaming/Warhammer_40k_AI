@@ -61,6 +61,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+    CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,
     CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
     CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
@@ -1141,6 +1142,47 @@ def test_phase17c_champion_slayer_clause_coverage_rolls_up_partial_and_full() ->
     assert descriptor_rollup.to_payload() == full_rollup.to_payload()
 
 
+def test_phase17c_multi_effect_clause_requires_a_consumer_for_every_effect() -> None:
+    rule_ir = _compiled(
+        'While this unit is within 12" of one or more friendly Aeldari Psyker models, '
+        "models in this unit have a Leadership characteristic of 6+ and each time a model "
+        "in this unit makes an attack, add 1 to the Hit roll."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert tuple(effect.kind for effect in clause.effects) == (
+        RuleEffectKind.SET_CHARACTERISTIC,
+        RuleEffectKind.MODIFY_DICE_ROLL,
+    )
+    clause_rows = ability_clause_coverage_rows_for_rule_ir(
+        source_ability_id="source:psychic-guidance",
+        ability_name="Psychic Guidance",
+        rule_ir=rule_ir,
+        runtime_consumers_by_clause_id={
+            clause.clause_id: (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,),
+        },
+    )
+    rollup = ability_support_rollup_for_rule_ir(
+        source_ability_id="source:psychic-guidance",
+        ability_name="Psychic Guidance",
+        rule_ir=rule_ir,
+        runtime_consumers_by_clause_id={
+            clause.clause_id: (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,),
+        },
+    )
+
+    assert len(clause_rows) == 1
+    assert clause_rows[0].runtime_consumer_ids == (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,)
+    assert clause_rows[0].effect_runtime_consumer_ids == (
+        (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,),
+        (),
+    )
+    assert clause_rows[0].support_stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
+    assert rollup.consumed_clause_count == 0
+    assert rollup.overall_ability_support is AbilityOverallSupport.PARSED
+
+
 def test_phase17c_prey_selection_reselection_and_attack_gate_compile_to_semantic_ir() -> None:
     rule_ir = _compiled(PREY_TARGET_TEXT).rule_ir
     selection_clause = rule_ir.clauses[0]
@@ -1504,6 +1546,11 @@ def test_phase17c_move_over_permission_supports_single_move_mode_and_decimal_hei
 def test_phase17c_move_through_models_terrain_and_auto_pass_compiles_to_semantic_ir() -> None:
     rule_ir = _compiled(MOVE_THROUGH_MODELS_TERRAIN_AUTO_PASS_TEXT).rule_ir
     clause = rule_ir.clauses[0]
+    clause_rows = ability_clause_coverage_rows_for_rule_ir(
+        source_ability_id="source:scuttling-walker",
+        ability_name="Scuttling Walker",
+        rule_ir=rule_ir,
+    )
     assert clause.trigger is not None
     assert clause.target is not None
 
@@ -1542,6 +1589,11 @@ def test_phase17c_move_through_models_terrain_and_auto_pass_compiles_to_semantic
     assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     )
+    assert clause_rows[0].effect_runtime_consumer_ids == (
+        (CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,),
+        (CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,),
+    )
+    assert clause_rows[0].support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
 
 
 def test_phase17c_movement_transit_consumer_normalizes_mode_order() -> None:
@@ -2142,6 +2194,30 @@ def test_phase17c_ability_coverage_rows_and_validators_are_fail_fast() -> None:
             effect_kinds=(),
             runtime_consumer_ids=(),
             support_stage=cast(AbilityCoverageSupportStage, "bad"),
+        )
+    with pytest.raises(GameLifecycleError, match="consumers for every effect"):
+        AbilityClauseCoverageRow(
+            source_ability_id="source",
+            ability_name="Ability",
+            clause_id="clause",
+            source_span=span,
+            trigger_kind=None,
+            effect_kinds=("modify_dice_roll",),
+            runtime_consumer_ids=("consumer",),
+            support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
+            effect_runtime_consumer_ids=((),),
+        )
+    with pytest.raises(GameLifecycleError, match="effect consumers must be clause consumers"):
+        AbilityClauseCoverageRow(
+            source_ability_id="source",
+            ability_name="Ability",
+            clause_id="clause",
+            source_span=span,
+            trigger_kind=None,
+            effect_kinds=("modify_dice_roll",),
+            runtime_consumer_ids=("consumer",),
+            support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
+            effect_runtime_consumer_ids=(("different-consumer",),),
         )
     with pytest.raises(GameLifecycleError, match="total_clause_count must be non-negative"):
         AbilitySupportRollup(

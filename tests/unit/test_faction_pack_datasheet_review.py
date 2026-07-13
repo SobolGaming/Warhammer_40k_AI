@@ -1,13 +1,23 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
+from collections import Counter
 from pathlib import Path
 from typing import Any, cast
 
-from tools.aeldari_datasheet_semantic_snapshot import (
-    DatasheetSemanticSnapshotSupportRow,
-    datasheet_semantic_snapshot_bucket,
+import pytest
+from tools.aeldari_datasheet_semantic_coverage import (
+    COVERAGE_PATH,
+    OVERLAY_PACK_PATH,
+    RELEASE_MANIFEST_PATH,
+    SEMANTIC_BUCKET_ALL_CONSUMED,
+    SEMANTIC_BUCKET_BRIDGE_BLOCKED,
+    SEMANTIC_BUCKET_HOST_NEEDED,
+    SEMANTIC_BUCKET_UNSUPPORTED_IR,
+    SEMANTIC_BUCKETS,
+    SOURCE_ARTIFACT_TABLES,
+    aeldari_datasheet_semantic_coverage,
+    load_aeldari_datasheet_semantic_coverage,
 )
 from tools.faction_pack_datasheet_review import (
     SOURCE_DATASHEETS_PATH,
@@ -22,8 +32,14 @@ from tools.generate_ability_support_matrix import (
     datasheet_support_rows,
     faction_support_markdown_files,
 )
+from tools.generate_aeldari_datasheet_semantic_coverage import (
+    generated_aeldari_datasheet_semantic_coverage,
+)
 
-from warhammer40k_core.engine.ability_coverage import AbilityCoverageSupportStage
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
 )
@@ -209,78 +225,247 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     )
 
     aeldari_markdown = markdown_by_filename["aeldari.md"]
-    snapshot = aeldari_markdown.split("### Unit Datasheets", 1)[1].split(
+    snapshot = aeldari_markdown.split("### Exact Ability Semantic Coverage", 1)[1].split(
         "## Detachment Rule Support", 1
     )[0]
     assert "### Unit Datasheet Source Treatments" not in snapshot
-    aeldari_review = faction_pack_datasheet_review("aeldari")
-    for group_name in tuple(dict.fromkeys(row.group for row in aeldari_review.rows)):
+    semantic_coverage = aeldari_datasheet_semantic_coverage()
+    for group_name in tuple(dict.fromkeys(row.group for row in semantic_coverage.rows)):
         table_row = next(
             line for line in snapshot.splitlines() if line.startswith(f"| {group_name} |")
         )
         cells = [cell.strip() for cell in table_row.strip("|").split(" | ")]
-        assert cells[1:4] == ["None", "None", "None"]
-        expected_blocked_labels = {
-            f"{row.datasheet_name} (`{row.datasheet_id}`)"
-            for row in aeldari_review.rows
-            if row.group == group_name
-        }
-        assert set(cells[4].split("<br>")) == expected_blocked_labels
+        for bucket_index, bucket in enumerate(SEMANTIC_BUCKETS, start=1):
+            expected_labels = {
+                f"{row.datasheet_name} (`{row.datasheet_id}`)"
+                for row in semantic_coverage.rows
+                if row.group == group_name and row.semantic_bucket == bucket
+            }
+            actual_labels: set[str] = (
+                set() if cells[bucket_index] == "None" else set(cells[bucket_index].split("<br>"))
+            )
+            assert actual_labels == expected_labels
 
 
-def test_datasheet_semantic_snapshot_buckets_require_parse_and_runtime_evidence() -> None:
-    ability_rows = ability_support_matrix_rows()
-    ability_rows_by_id = {row.coverage_row_id: row for row in ability_rows}
-    thousand_sons_defiler = next(
-        row for row in datasheet_support_rows() if row.datasheet_id == "000001030"
+def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
+    artifact = aeldari_datasheet_semantic_coverage()
+    rows_by_id = {row.datasheet_id: row for row in artifact.rows}
+
+    assert len(rows_by_id) == 70
+    assert sum(len(row.abilities) for row in artifact.rows) == 145
+    assert Counter(row.semantic_bucket for row in artifact.rows) == {
+        SEMANTIC_BUCKET_HOST_NEEDED: 6,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 64,
+    }
+    assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
+    assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
+    assert rows_by_id["000000571"].semantic_bucket == SEMANTIC_BUCKET_UNSUPPORTED_IR
+    assert all(row.semantic_bucket != SEMANTIC_BUCKET_BRIDGE_BLOCKED for row in artifact.rows)
+    assert set(dict(artifact.source_artifact_hashes)) == set(SOURCE_ARTIFACT_TABLES)
+    for row in artifact.rows:
+        for ability in row.abilities:
+            if ability.support_stage.value == "engine_consumed":
+                assert ability.runtime_consumer_ids
+                assert not ability.diagnostic_reasons
+                assert ability.semantic_consumers
+                assert all(semantic.runtime_consumer_ids for semantic in ability.semantic_consumers)
+    psychic_guidance = next(
+        ability
+        for ability in rows_by_id["000000597"].abilities
+        if ability.ability_name == "Psychic Guidance"
     )
-    semantic_support_row = DatasheetSemanticSnapshotSupportRow(
-        datasheet_id=thousand_sons_defiler.datasheet_id,
-        datasheet_name=thousand_sons_defiler.datasheet_name,
-        catalog_blocked=False,
-        ability_coverage_row_ids=thousand_sons_defiler.ability_coverage_row_ids,
+    assert psychic_guidance.support_stage.value == "generic_ir_executable"
+    assert psychic_guidance.runtime_consumer_ids == (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,)
+    assert tuple(
+        (semantic.semantic_kind, semantic.runtime_consumer_ids)
+        for semantic in psychic_guidance.semantic_consumers
+    ) == (
+        ("set_characteristic", (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,)),
+        ("modify_dice_roll", ()),
+    )
+    assert CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID not in (
+        consumer_id
+        for semantic in psychic_guidance.semantic_consumers
+        for consumer_id in semantic.runtime_consumer_ids
+    )
+    inescapable_accuracy = next(
+        ability
+        for ability in rows_by_id["000000607"].abilities
+        if ability.ability_name == "Inescapable Accuracy"
+    )
+    assert inescapable_accuracy.support_stage.value == "generic_ir_executable"
+    assert not inescapable_accuracy.runtime_consumer_ids
+    rangers_text = next(
+        ability.raw_text
+        for ability in rows_by_id["000000592"].abilities
+        if ability.ability_name == "Path of the Outcast"
+    )
+    starweaver_text = next(
+        ability.raw_text
+        for ability in rows_by_id["000002541"].abilities
+        if ability.ability_name == "Rapid Embarkation"
+    )
+    aspect_token_text = next(
+        ability.raw_text
+        for ability in rows_by_id["000000593"].abilities
+        if ability.ability_name == "Aspect Shrine Token"
+    )
+    assert 'ends a move within 8"' in rangers_text
+    assert "in a turn it disembarked from this TRANSPORT" in starweaver_text
+    assert "Designer's Note" not in aspect_token_text
+
+
+def test_aeldari_semantic_coverage_artifacts_are_current() -> None:
+    overlay_pack, release_manifest, coverage_payload = (
+        generated_aeldari_datasheet_semantic_coverage()
     )
 
-    assert (
-        datasheet_semantic_snapshot_bucket(
-            support_row=semantic_support_row,
-            ability_rows_by_id=ability_rows_by_id,
-        )
-        == "All consumed"
+    assert json.loads(COVERAGE_PATH.read_text(encoding="utf-8")) == coverage_payload
+    assert json.loads(OVERLAY_PACK_PATH.read_text(encoding="utf-8")) == (overlay_pack.to_payload())
+    assert json.loads(RELEASE_MANIFEST_PATH.read_text(encoding="utf-8")) == (
+        release_manifest.to_payload()
     )
 
-    first_coverage_id = thousand_sons_defiler.ability_coverage_row_ids[0]
-    parsed_without_host_rows = dict(ability_rows_by_id)
-    parsed_without_host_rows[first_coverage_id] = replace(
-        ability_rows_by_id[first_coverage_id],
-        support_stage=AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
-        runtime_consumer_ids=(),
+
+@pytest.mark.parametrize(
+    ("support_stage", "field_name", "replacement", "message"),
+    [
+        (
+            "engine_consumed",
+            "runtime_consumer_ids",
+            [],
+            "semantic consumers must be present in runtime consumers",
+        ),
+        (
+            "engine_consumed",
+            "diagnostic_reasons",
+            ["unsupported_language"],
+            "must not contain diagnostics",
+        ),
+        (
+            "generic_ir_executable",
+            "diagnostic_reasons",
+            ["unsupported_language"],
+            "must not contain blocking diagnostics",
+        ),
+        (
+            "ir_compiled_unsupported",
+            "diagnostic_reasons",
+            [],
+            "requires explicit diagnostic evidence",
+        ),
+    ],
+)
+def test_aeldari_semantic_loader_rejects_inconsistent_runtime_evidence(
+    tmp_path: Path,
+    support_stage: str,
+    field_name: str,
+    replacement: object,
+    message: str,
+) -> None:
+    payload = _mutable_aeldari_coverage_payload()
+    ability = _first_ability_payload_for_stage(payload, support_stage)
+    ability[field_name] = replacement
+    coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match=message):
+        load_aeldari_datasheet_semantic_coverage(coverage_path=coverage_path)
+
+
+def test_aeldari_semantic_loader_rejects_partially_consumed_engine_ability(
+    tmp_path: Path,
+) -> None:
+    payload = _mutable_aeldari_coverage_payload()
+    ability = _first_ability_payload_for_stage(payload, "engine_consumed")
+    semantic_consumers = cast(list[dict[str, Any]], ability["semantic_consumers"])
+    semantic_consumers[0]["runtime_consumer_ids"] = []
+    coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match="requires every semantic"):
+        load_aeldari_datasheet_semantic_coverage(coverage_path=coverage_path)
+
+
+def test_aeldari_semantic_loader_rejects_omitted_effect_and_false_promotion(
+    tmp_path: Path,
+) -> None:
+    payload = _mutable_aeldari_coverage_payload()
+    datasheets = cast(list[dict[str, Any]], payload["datasheets"])
+    wraithguard = next(
+        datasheet for datasheet in datasheets if datasheet["datasheet_id"] == "000000597"
     )
-    assert (
-        datasheet_semantic_snapshot_bucket(
-            support_row=semantic_support_row,
-            ability_rows_by_id=parsed_without_host_rows,
-        )
-        == "IR parsed; host needed"
+    abilities = cast(list[dict[str, Any]], wraithguard["abilities"])
+    psychic_guidance = next(
+        ability for ability in abilities if ability["ability_name"] == "Psychic Guidance"
+    )
+    semantic_consumers = cast(list[dict[str, Any]], psychic_guidance["semantic_consumers"])
+    psychic_guidance["semantic_consumers"] = [
+        semantic
+        for semantic in semantic_consumers
+        if semantic["semantic_kind"] != "modify_dice_roll"
+    ]
+    psychic_guidance["support_stage"] = "engine_consumed"
+    wraithguard["semantic_bucket"] = SEMANTIC_BUCKET_ALL_CONSUMED
+    payload["semantic_bucket_counts"] = {
+        SEMANTIC_BUCKET_ALL_CONSUMED: 1,
+        SEMANTIC_BUCKET_HOST_NEEDED: 5,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 64,
+    }
+    coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match="effect inventory drifted"):
+        load_aeldari_datasheet_semantic_coverage(coverage_path=coverage_path)
+
+
+@pytest.mark.parametrize("table_name", SOURCE_ARTIFACT_TABLES)
+def test_aeldari_semantic_loader_rejects_each_source_artifact_hash_mutation(
+    tmp_path: Path,
+    table_name: str,
+) -> None:
+    payload = _mutable_aeldari_coverage_payload()
+    source_hashes = cast(dict[str, str], payload["source_artifact_hashes"])
+    source_hashes[table_name] = "0" * 64
+    coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match="source artifact hashes drifted"):
+        load_aeldari_datasheet_semantic_coverage(coverage_path=coverage_path)
+
+
+def test_aeldari_semantic_loader_rejects_unconsumed_evidence_fields(
+    tmp_path: Path,
+) -> None:
+    payload = _mutable_aeldari_coverage_payload()
+    ability = _first_ability_payload_for_stage(payload, "engine_consumed")
+    ability["rule_ir_payload_sha256"] = "0" * 64
+    coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match=r"unexpected=.*rule_ir_payload_sha256"):
+        load_aeldari_datasheet_semantic_coverage(coverage_path=coverage_path)
+
+
+def _mutable_aeldari_coverage_payload() -> dict[str, Any]:
+    return cast(
+        dict[str, Any],
+        json.loads(COVERAGE_PATH.read_text(encoding="utf-8")),
     )
 
-    unsupported_rows = dict(ability_rows_by_id)
-    unsupported_rows[first_coverage_id] = replace(
-        ability_rows_by_id[first_coverage_id],
-        support_stage=AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED,
-        runtime_consumer_ids=(),
-    )
-    assert (
-        datasheet_semantic_snapshot_bucket(
-            support_row=semantic_support_row,
-            ability_rows_by_id=unsupported_rows,
-        )
-        == "Unsupported IR"
-    )
-    assert (
-        datasheet_semantic_snapshot_bucket(
-            support_row=None,
-            ability_rows_by_id=ability_rows_by_id,
-        )
-        == "Bridge/catalog blocked"
-    )
+
+def _first_ability_payload_for_stage(
+    payload: dict[str, Any],
+    support_stage: str,
+) -> dict[str, Any]:
+    datasheets = cast(list[dict[str, Any]], payload["datasheets"])
+    for datasheet in datasheets:
+        abilities = cast(list[dict[str, Any]], datasheet["abilities"])
+        for ability in abilities:
+            if ability["support_stage"] == support_stage:
+                return ability
+    raise AssertionError(f"Missing exact ability support stage: {support_stage}.")
+
+
+def _write_aeldari_coverage_payload(
+    tmp_path: Path,
+    payload: dict[str, Any],
+) -> Path:
+    coverage_path = tmp_path / "aeldari-datasheet-semantic-coverage.json"
+    coverage_path.write_text(json.dumps(payload), encoding="utf-8")
+    return coverage_path
