@@ -7,6 +7,7 @@ from typing import TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
+    MUSTERING_WARLORD_FORBIDDEN,
     MUSTERING_WARLORD_REQUIRED,
     MUSTERING_WARLORD_RULE_KEY,
     CatalogAbilitySourceKind,
@@ -476,6 +477,37 @@ def ability_coverage_rows_from_catalog(
     )
 
 
+def ability_coverage_row_for_descriptor(
+    *,
+    catalog_id: str,
+    datasheet_id: str,
+    datasheet_name: str,
+    ability: DatasheetAbilityDescriptor,
+) -> AbilityCoverageRow:
+    if type(ability) is not DatasheetAbilityDescriptor:
+        raise GameLifecycleError("Ability coverage requires a DatasheetAbilityDescriptor.")
+    rule_ir = _rule_ir_for_ability(ability)
+    consumer_ids = _runtime_consumer_ids(ability=ability, rule_ir=rule_ir)
+    return AbilityCoverageRow(
+        catalog_id=_validate_string("catalog_id", catalog_id),
+        datasheet_id=_validate_string("datasheet_id", datasheet_id),
+        datasheet_name=_validate_string("datasheet_name", datasheet_name),
+        ability_id=ability.ability_id,
+        ability_name=ability.name,
+        source_kind=ability.source_kind,
+        source_wargear_id=ability.source_wargear_id,
+        catalog_support=ability.support,
+        support_stage=_support_stage(
+            ability=ability,
+            rule_ir=rule_ir,
+            consumer_ids=consumer_ids,
+        ),
+        semantic_categories=_semantic_categories(ability=ability, rule_ir=rule_ir),
+        runtime_consumer_ids=consumer_ids,
+        diagnostic_reasons=_diagnostic_reasons(ability),
+    )
+
+
 def ability_coverage_rows_payload(
     rows: tuple[AbilityCoverageRow, ...],
 ) -> list[AbilityCoverageRowPayload]:
@@ -664,26 +696,12 @@ def _ability_coverage_rows_for_datasheet(
         raise GameLifecycleError("Ability coverage requires DatasheetDefinition values.")
     rows: list[AbilityCoverageRow] = []
     for ability in datasheet.abilities:
-        rule_ir = _rule_ir_for_ability(ability)
-        consumer_ids = _runtime_consumer_ids(ability=ability, rule_ir=rule_ir)
         rows.append(
-            AbilityCoverageRow(
+            ability_coverage_row_for_descriptor(
                 catalog_id=catalog.catalog_id,
                 datasheet_id=datasheet.datasheet_id,
                 datasheet_name=datasheet.name,
-                ability_id=ability.ability_id,
-                ability_name=ability.name,
-                source_kind=ability.source_kind,
-                source_wargear_id=ability.source_wargear_id,
-                catalog_support=ability.support,
-                support_stage=_support_stage(
-                    ability=ability,
-                    rule_ir=rule_ir,
-                    consumer_ids=consumer_ids,
-                ),
-                semantic_categories=_semantic_categories(ability=ability, rule_ir=rule_ir),
-                runtime_consumer_ids=consumer_ids,
-                diagnostic_reasons=_diagnostic_reasons(ability),
+                ability=ability,
             )
         )
     return tuple(rows)
@@ -735,6 +753,8 @@ def _descriptor_runtime_consumer_ids(
         return (CORE_STEALTH_RUNTIME_CONSUMER_ID,)
     if _descriptor_is_supreme_commander(ability):
         return (SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,)
+    if _descriptor_is_warlord_restriction(ability):
+        return (WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID,)
     if _descriptor_is_shadow_of_chaos(ability):
         return (_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID,)
     return ()
@@ -959,6 +979,15 @@ def _descriptor_is_supreme_commander(ability: DatasheetAbilityDescriptor) -> boo
     )
 
 
+def _descriptor_is_warlord_restriction(ability: DatasheetAbilityDescriptor) -> bool:
+    payload = ability.rule_ir_payload
+    return (
+        ability.source_kind is CatalogAbilitySourceKind.DATASHEET
+        and type(payload) is dict
+        and payload.get(MUSTERING_WARLORD_RULE_KEY) == MUSTERING_WARLORD_FORBIDDEN
+    )
+
+
 def _coverage_row_sort_key(
     row: AbilityCoverageRow,
 ) -> tuple[str, str, str, str, str]:
@@ -1091,6 +1120,7 @@ _CATEGORY_NAMES: Mapping[str, str] = {
 
 CORE_STEALTH_RUNTIME_CONSUMER_ID = "core:stealth"
 SUPREME_COMMANDER_MUSTERING_CONSUMER_ID = "army-mustering:supreme-commander"
+WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID = "army-mustering:warlord-restriction"
 _SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID = (
     "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
 )

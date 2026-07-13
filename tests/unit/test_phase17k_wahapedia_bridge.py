@@ -87,12 +87,14 @@ from warhammer40k_core.engine.ability_catalog import (
 from warhammer40k_core.engine.ability_coverage import (
     CORE_STEALTH_RUNTIME_CONSUMER_ID,
     SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,
+    WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID,
     AbilityCoverageAbilityDatasheetPair,
     AbilityCoverageCategoryRow,
     AbilityCoverageRow,
     AbilityCoverageSupportStage,
     ability_coverage_category_rows,
     ability_coverage_category_rows_payload,
+    ability_coverage_row_for_descriptor,
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
@@ -420,6 +422,9 @@ from warhammer40k_core.rules.wahapedia_bridge import (
     ModelHeightOverride,
     WahapediaBridgeError,
     build_wahapedia_canonical_bridge_artifacts,
+)
+from warhammer40k_core.rules.wahapedia_datasheet_ability_bridge import (
+    bridge_datasheet_abilities,
 )
 from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
@@ -6693,10 +6698,21 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Aeldari tradition | Fully supported (`All consumed`) | "
         "IR parsed; host needed | Unsupported IR | Bridge/catalog blocked |"
     ) in aeldari_markdown
-    assert "| Craftworlds / Asuryani | None | None | None |" in aeldari_markdown
-    assert "| Anhrathe / Corsairs | None | None | None |" in aeldari_markdown
-    assert "| Harlequins | None | None | None |" in aeldari_markdown
-    assert "| Ynnari | None | None | None |" in aeldari_markdown
+    assert "| Craftworlds / Asuryani | Wraithguard (`000000597`) |" in aeldari_markdown
+    assert "Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)" in aeldari_markdown
+    assert "| Anhrathe / Corsairs | None | None | Corsair Skyreavers" in aeldari_markdown
+    assert "| Harlequins | None | Skyweavers (`000002539`) |" in aeldari_markdown
+    assert "| Ynnari | None | None | The Visarch" in aeldari_markdown
+    for group_name in (
+        "Craftworlds / Asuryani",
+        "Anhrathe / Corsairs",
+        "Harlequins",
+        "Ynnari",
+    ):
+        group_row = next(
+            line for line in aeldari_markdown.splitlines() if line.startswith(f"| {group_name} |")
+        )
+        assert group_row.endswith("| None |")
     assert "`generic_supported` / `engine_consumed`" not in aeldari_markdown
     assert "`named_handler_required` / `source_only`" not in aeldari_markdown
     assert (
@@ -7965,6 +7981,24 @@ def test_phase17k_bridge_tags_warlord_mustering_datasheet_abilities() -> None:
     assert not plain_rule_ir_payload or MUSTERING_WARLORD_RULE_KEY not in json.loads(
         plain_rule_ir_payload
     )
+    semantic_rows = bridge_datasheet_abilities(
+        source_artifacts=_warlord_mustering_source_artifacts(),
+        datasheet_ids=("test-supreme-commander", "test-warlord-forbidden"),
+    )
+    forbidden_descriptor = next(
+        row
+        for row in semantic_rows
+        if row.datasheet_id == "test-warlord-forbidden"
+        and row.descriptor.name == "ENSLAVED STAR GOD"
+    ).descriptor
+    forbidden_coverage = ability_coverage_row_for_descriptor(
+        catalog_id="test-warlord-semantic-bridge",
+        datasheet_id="test-warlord-forbidden",
+        datasheet_name="Forbidden Warlord",
+        ability=forbidden_descriptor,
+    )
+    assert forbidden_coverage.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    assert forbidden_coverage.runtime_consumer_ids == (WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID,)
 
 
 def test_phase17k_bridge_loads_belakor_datasheet_rule_ir_support() -> None:
