@@ -3456,7 +3456,7 @@ def test_phase17c_selected_unit_this_model_damage_bonus_compiles() -> None:
     )
 
 
-def test_phase17c_post_shoot_hit_target_effect_compiles_to_selected_target_consumer() -> None:
+def test_phase17c_post_shoot_selected_unit_actor_requires_attacker_runtime() -> None:
     rule_ir = _compiled(
         "In your Shooting phase, after this unit has shot, select one enemy unit hit by "
         "one or more of those attacks. Until the end of the phase, each time a friendly "
@@ -3479,11 +3479,17 @@ def test_phase17c_post_shoot_hit_target_effect_compiles_to_selected_target_consu
     }
     assert reroll_clause.target is not None
     assert reroll_clause.target.kind is RuleTargetKind.FRIENDLY_UNIT
+    assert reroll_clause.trigger is not None
+    assert parameter_payload(reroll_clause.trigger.parameters) == {
+        "actor": "selected_unit",
+        "target_reference": "selected_unit",
+        "timing_window": "attack_sequence.attack",
+    }
     assert parameter_payload(reroll_effect.parameters) == {"roll_type": "wound"}
-    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID in (
+    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in (
         catalog_rule_ir_consumers_for_rule(rule_ir)
     )
-    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID in (
+    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in (
         catalog_rule_ir_hook_ids_for_rule(rule_ir)
     )
 

@@ -201,11 +201,16 @@ def _effect_trigger_is_supported(clause: RuleClause) -> bool:
     if trigger.kind is not RuleTriggerKind.DICE_ROLL:
         return False
     parameters = parameter_payload(trigger.parameters)
+    actor = parameters.get("actor")
+    target_kind = None if clause.target is None else clause.target.kind
     return (
         frozenset(parameters) == frozenset({"actor", "target_reference", "timing_window"})
-        and parameters.get("actor") in {"selected_unit", "this_model", "this_unit"}
         and parameters.get("target_reference") == "selected_unit"
         and parameters.get("timing_window") == "attack_sequence.attack"
+        and (
+            (actor == "this_model" and target_kind is RuleTargetKind.THIS_MODEL)
+            or (actor == "this_unit" and target_kind is RuleTargetKind.THIS_UNIT)
+        )
     )
 
 

@@ -969,6 +969,17 @@ def test_catalog_selected_target_support_classifies_selection_and_effect_clauses
         (post_shoot_selection, skipped_effect, selected_effect, breaker),
         0,
     ) == (selected_effect,)
+    for actor, target_kind in (
+        ("this_model", RuleTargetKind.THIS_MODEL),
+        ("this_unit", RuleTargetKind.THIS_UNIT),
+    ):
+        assert post_shoot_selected_target_effect_clause_is_supported(
+            replace(
+                selected_effect,
+                trigger=_post_shoot_effect_trigger(actor=actor),
+                target=RuleTargetSpec(kind=target_kind, source_span=_span()),
+            )
+        )
 
     effect = _effect(
         RuleEffectKind.MODIFY_DICE_ROLL,
@@ -1061,6 +1072,36 @@ def test_catalog_post_shoot_selected_target_rejects_unsupported_effect_shapes() 
                 ),
             ),
         ),
+        (
+            "selected-unit-trigger-actor",
+            replace(
+                supported_effect,
+                trigger=_post_shoot_effect_trigger(actor="selected_unit"),
+                target=RuleTargetSpec(
+                    kind=RuleTargetKind.SELECTED_UNIT,
+                    source_span=_span(),
+                ),
+                effects=(
+                    _effect(
+                        RuleEffectKind.MODIFY_DICE_ROLL,
+                        ("roll_type", "attack_sequence.hit"),
+                        ("delta", -1),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "this-model-trigger-with-friendly-unit-target",
+            replace(
+                supported_effect,
+                trigger=_post_shoot_effect_trigger(actor="this_model"),
+                target=RuleTargetSpec(
+                    kind=RuleTargetKind.FRIENDLY_UNIT,
+                    source_span=_span(),
+                    parameters=_parameters(("allegiance", "friendly")),
+                ),
+            ),
+        ),
     )
     source_army, target_army = _mustered_core_armies()
     empty_index = AbilityCatalogIndex.from_records(())
@@ -1087,12 +1128,12 @@ def test_catalog_post_shoot_selected_target_rejects_unsupported_effect_shapes() 
             == ()
         ), shape_name
         assert post_shoot_hit_target_effect_clause_ids(rule_ir) == (), shape_name
-        assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in (
-            catalog_rule_ir_consumers_for_rule(rule_ir)
-        ), shape_name
-        assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in (
-            catalog_rule_ir_hook_ids_for_rule(rule_ir)
-        ), shape_name
+        consumer_ids = catalog_rule_ir_consumers_for_rule(rule_ir)
+        hook_ids = catalog_rule_ir_hook_ids_for_rule(rule_ir)
+        assert consumer_ids == (), shape_name
+        assert hook_ids == (), shape_name
+        assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in consumer_ids, shape_name
+        assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in hook_ids, shape_name
         assert not has_post_shoot_hit_target_effect_records({source_army.player_id: index}), (
             shape_name
         )
@@ -4192,6 +4233,18 @@ def _post_shoot_hit_selection_clause() -> RuleClause:
                 ("allegiance", "enemy"),
                 ("target_relationship", "hit_by_those_attacks"),
             ),
+        ),
+    )
+
+
+def _post_shoot_effect_trigger(*, actor: str) -> RuleTrigger:
+    return RuleTrigger(
+        kind=RuleTriggerKind.DICE_ROLL,
+        source_span=_span(),
+        parameters=_parameters(
+            ("actor", actor),
+            ("target_reference", "selected_unit"),
+            ("timing_window", "attack_sequence.attack"),
         ),
     )
 
