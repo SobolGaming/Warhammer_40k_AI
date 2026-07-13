@@ -10571,7 +10571,7 @@ def _post_shoot_selected_target_effect_source_artifacts() -> tuple[WahapediaJson
                     ),
                     (
                         "test-lord-of-change,2,Datasheet,,Warpflame Locus,"
-                        '"In your Shooting phase, after this unit has shot, select one '
+                        '"In your Shooting phase, after this model has shot, select one '
                         "enemy unit hit by one or more of those attacks. Until the end "
                         "of the phase, each time this model makes an attack that targets "
                         'that unit, add 1 to the Damage characteristic of that attack.",'

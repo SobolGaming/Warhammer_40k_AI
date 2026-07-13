@@ -11,6 +11,7 @@ from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
+    AbilitySourceKind,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
@@ -24,8 +25,11 @@ from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import 
     post_shoot_selected_target_effect_attack_role,
     post_shoot_selected_target_effect_clause_is_supported,
     post_shoot_selected_target_effect_clauses_after,
+    post_shoot_selected_target_pair_is_supported,
+    post_shoot_selection_clause_binds_source_model,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_unit_scoped_generic_records,
 )
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
@@ -61,6 +65,8 @@ __all__ = (
     "post_shoot_selected_target_effect_attack_role",
     "post_shoot_selected_target_effect_clause_is_supported",
     "post_shoot_selected_target_effect_clauses_after",
+    "post_shoot_selected_target_pair_is_supported",
+    "post_shoot_selection_clause_binds_source_model",
 )
 
 _ENGAGEMENT_RANGE_HORIZONTAL_INCHES = 1.0
@@ -439,23 +445,33 @@ def selection_source_model_ids(
     selection_clause: RuleClause,
     current_model_instance_ids: tuple[str, ...],
 ) -> tuple[str | None, ...]:
-    if selection_clause.trigger is not None:
-        trigger_parameters = parameter_payload(selection_clause.trigger.parameters)
-        if (
-            trigger_parameters.get("subject") == "this_model"
-            or trigger_parameters.get("attacker_model_reference") == "this_model"
-        ):
-            return current_model_instance_ids
-    for condition in selection_clause.conditions:
-        if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
-            continue
-        parameters = parameter_payload(condition.parameters)
-        if (
-            parameters.get("object_kind") == "model"
-            and parameters.get("object_reference") == "this"
-        ):
-            return current_model_instance_ids
+    if post_shoot_selection_clause_binds_source_model(selection_clause):
+        return current_model_instance_ids
     return (None,)
+
+
+def selection_source_model_ids_for_record(
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    selection_clause: RuleClause,
+    current_model_instance_ids: tuple[str, ...],
+) -> tuple[str | None, ...]:
+    source_model_ids = selection_source_model_ids(
+        selection_clause=selection_clause,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+    if record.source_kind is not AbilitySourceKind.WARGEAR or source_model_ids == (None,):
+        return source_model_ids
+    bearer_ids = frozenset(
+        catalog_rule_record_current_wargear_bearer_model_ids(
+            record=record,
+            unit=unit,
+            current_model_instance_ids=current_model_instance_ids,
+        )
+    )
+    return tuple(
+        model_id for model_id in source_model_ids if model_id is not None and model_id in bearer_ids
+    )
 
 
 def selection_weapon_names(selection_clause: RuleClause) -> tuple[str, ...]:
@@ -503,6 +519,47 @@ def has_post_shoot_hit_target_effect_records(
             TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
         )
     )
+
+
+def has_post_shoot_hit_target_effect_runtime_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> bool:
+    for army in armies:
+        index = ability_indexes_by_player_id.get(army.player_id)
+        if index is None:
+            raise GameLifecycleError("Catalog selected-target runtime missing ability index.")
+        for unit in army.units:
+            current_model_ids = tuple(
+                sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
+            )
+            for record in unit_scoped_generic_records_for_timing(
+                ability_index=index,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+                trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            ):
+                clauses = catalog_selected_target_clauses_from_record(record)
+                runtime_clause_id = runtime_clause_id_from_record(record)
+                for selection_index, selection_clause in enumerate(clauses):
+                    if (
+                        (
+                            runtime_clause_id is None
+                            or runtime_clause_id == selection_clause.clause_id
+                        )
+                        and clause_is_post_shoot_hit_target_selection(selection_clause)
+                        and post_shoot_selected_target_effect_clauses_after(
+                            clauses, selection_index
+                        )
+                        and selection_source_model_ids_for_record(
+                            record,
+                            unit,
+                            selection_clause,
+                            current_model_ids,
+                        )
+                    ):
+                        return True
+    return False
 
 
 def record_has_supported_post_shoot_selected_target_effect(

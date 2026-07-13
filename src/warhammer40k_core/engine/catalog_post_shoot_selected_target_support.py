@@ -116,13 +116,53 @@ def post_shoot_selected_target_effect_clauses_after(
         raise GameLifecycleError("Post-shoot selected-target discovery requires RuleClause values.")
     if type(selection_index) is not int or not 0 <= selection_index < len(clauses):
         raise GameLifecycleError("Post-shoot selected-target selection_index is invalid.")
+    selection_clause = clauses[selection_index]
     selected: list[RuleClause] = []
     for clause in clauses[selection_index + 1 :]:
         if clause.template_id == "phase17c:selected-target-constraint":
             break
-        if post_shoot_selected_target_effect_clause_is_supported(clause):
+        if post_shoot_selected_target_pair_is_supported(
+            selection_clause=selection_clause,
+            effect_clause=clause,
+        ):
             selected.append(clause)
     return tuple(selected)
+
+
+def post_shoot_selected_target_pair_is_supported(
+    *,
+    selection_clause: RuleClause,
+    effect_clause: RuleClause,
+) -> bool:
+    if type(selection_clause) is not RuleClause or type(effect_clause) is not RuleClause:
+        raise GameLifecycleError(
+            "Post-shoot selected-target pair support requires RuleClause values."
+        )
+    if not post_shoot_selected_target_effect_clause_is_supported(effect_clause):
+        return False
+    return (
+        effect_clause.target is None
+        or effect_clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or post_shoot_selection_clause_binds_source_model(selection_clause)
+    )
+
+
+def post_shoot_selection_clause_binds_source_model(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Post-shoot source-model binding requires RuleClause.")
+    if clause.trigger is not None:
+        trigger_parameters = parameter_payload(clause.trigger.parameters)
+        if (
+            trigger_parameters.get("subject") == "this_model"
+            or trigger_parameters.get("attacker_model_reference") == "this_model"
+        ):
+            return True
+    return any(
+        condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+        and parameter_payload(condition.parameters).get("object_kind") == "model"
+        and parameter_payload(condition.parameters).get("object_reference") == "this"
+        for condition in clause.conditions
+    )
 
 
 def post_shoot_selected_target_effect_clause_is_supported(clause: RuleClause) -> bool:
