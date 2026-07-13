@@ -21,6 +21,9 @@ from warhammer40k_core.engine.catalog_geometry import alive_geometry_models_for_
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_unit_scoped_generic_records,
 )
+from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    clause_is_post_shoot_hit_target_selection as clause_is_post_shoot_hit_target_selection,
+)
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
@@ -71,23 +74,6 @@ def clause_is_fight_start_selection(clause: RuleClause) -> bool:
     return (
         parameters.get("edge") == "start"
         and parameters.get("phase") == BattlePhase.FIGHT.value
-        and not clause.effects
-    )
-
-
-def clause_is_post_shoot_hit_target_selection(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog post-shoot matcher requires RuleClause.")
-    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
-        return False
-    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
-        return False
-    parameters = parameter_payload(clause.trigger.parameters)
-    target_parameters = parameter_payload(clause.target.parameters)
-    return (
-        parameters.get("timing_window") == "just_after_friendly_unit_has_shot"
-        and parameters.get("target_relationship") == "hit_by_those_attacks"
-        and target_parameters.get("target_relationship") == "hit_by_those_attacks"
         and not clause.effects
     )
 

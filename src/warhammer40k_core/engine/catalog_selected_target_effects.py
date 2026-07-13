@@ -661,7 +661,11 @@ def _post_shoot_hit_target_effect_groups(
     armies: tuple[ArmyDefinition, ...],
     context: AttackSequenceCompletedContext,
 ) -> tuple[_SelectedTargetGroup, ...]:
-    if context.source_phase is not BattlePhase.SHOOTING:
+    if (
+        context.source_phase is not BattlePhase.SHOOTING
+        or context.attack_sequence.source_phase is not BattlePhase.SHOOTING
+        or context.attack_sequence.attacker_player_id != context.state.active_player_id
+    ):
         return ()
     player_id = _validate_identifier("player_id", context.attack_sequence.attacker_player_id)
     army = _army_for_player(armies, player_id=player_id)

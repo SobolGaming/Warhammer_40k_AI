@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping
 from dataclasses import replace
 from typing import Any, cast
@@ -919,6 +920,36 @@ def test_catalog_selected_target_support_classifies_selection_and_effect_clauses
     assert not clause_is_fight_start_selection(post_shoot_selection)
     assert clause_is_post_shoot_hit_target_selection(post_shoot_selection)
     assert not clause_is_post_shoot_hit_target_selection(fight_selection)
+    assert post_shoot_selection.trigger is not None
+    unit_trigger_parameters = parameter_payload(post_shoot_selection.trigger.parameters)
+    unit_trigger_parameters.pop("attacker_model_reference")
+    unit_trigger_parameters.pop("weapon_names")
+    unit_trigger_parameters["subject"] = "this_unit"
+    unit_selection_clause = replace(
+        post_shoot_selection,
+        trigger=replace(
+            post_shoot_selection.trigger,
+            parameters=_parameters(*tuple(unit_trigger_parameters.items())),
+        ),
+    )
+    assert clause_is_post_shoot_hit_target_selection(unit_selection_clause)
+    for parameter_name, unsupported_value in (
+        ("owner", "opponent"),
+        ("phase", "fight"),
+        ("edge", "before"),
+        ("subject", "friendly_unit"),
+        ("attacker_model_reference", "attacking_model"),
+    ):
+        trigger_parameters = parameter_payload(post_shoot_selection.trigger.parameters)
+        trigger_parameters[parameter_name] = unsupported_value
+        unsupported_clause = replace(
+            post_shoot_selection,
+            trigger=replace(
+                post_shoot_selection.trigger,
+                parameters=_parameters(*tuple(trigger_parameters.items())),
+            ),
+        )
+        assert not clause_is_post_shoot_hit_target_selection(unsupported_clause)
     assert selected_effect_clauses_after(
         (fight_selection, skipped_effect, selected_effect, breaker),
         0,
@@ -1150,18 +1181,57 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         ReservePlacementViolationCode.RESERVE_ARRIVAL_ABILITY_RESTRICTION
     }
 
-    far_placement = _unit_placement_for_test(
+    source_radius = source_geometry.base.max_radius()
+    arriving_radius = near_geometry.base.max_radius()
+    exact_center_gap = 12.0 + source_radius + arriving_radius
+    exact_placement = _unit_placement_for_test(
         army=target_army,
         unit=target_unit,
-        model_xs=_model_xs_for_unit(unit=target_unit, start_x=24.0),
+        model_xs=_model_xs_for_unit(unit=target_unit, start_x=10.0 + exact_center_gap),
     )
-    far_geometry = geometry_model_for_placement(
+    exact_geometry = geometry_model_for_placement(
         model=arriving_model,
-        placement=far_placement.model_placements[0],
+        placement=exact_placement.model_placements[0],
     )
-    assert far_geometry.pose.distance_2d_to(source_geometry.pose) == 14.0
-    assert far_geometry.range_to(source_geometry) > 12.0
-    assert not registry.restrictions_for(replace(context, attempted_placement=far_placement))
+    assert exact_geometry.pose.distance_2d_to(source_geometry.pose) == exact_center_gap
+    assert math.isclose(exact_geometry.range_to(source_geometry), 12.0, abs_tol=1e-12)
+    exact_violations = reserve_arrival_restriction_violations(
+        state=state,
+        scenario=scenario,
+        reserve_state=reserve_state,
+        unit=target_unit,
+        attempted_placement=exact_placement,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        registry=registry,
+    )
+    assert {violation.violation_code for violation in exact_violations} == {
+        ReservePlacementViolationCode.RESERVE_ARRIVAL_ABILITY_RESTRICTION
+    }
+
+    epsilon = 1e-6
+    outside_placement = _unit_placement_for_test(
+        army=target_army,
+        unit=target_unit,
+        model_xs=_model_xs_for_unit(
+            unit=target_unit,
+            start_x=10.0 + exact_center_gap + epsilon,
+        ),
+    )
+    outside_geometry = geometry_model_for_placement(
+        model=arriving_model,
+        placement=outside_placement.model_placements[0],
+    )
+    assert outside_geometry.range_to(source_geometry) > 12.0
+    assert not registry.restrictions_for(replace(context, attempted_placement=outside_placement))
+    assert not reserve_arrival_restriction_violations(
+        state=state,
+        scenario=scenario,
+        reserve_state=reserve_state,
+        unit=target_unit,
+        attempted_placement=outside_placement,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        registry=registry,
+    )
 
 
 def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_effect() -> None:
@@ -1173,16 +1243,17 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
     )
     source_army = _army_with_unit(source_army, source_unit)
     target_unit = target_army.units[0]
+    battlefield = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=10.0,
+        target_army=target_army,
+        target_unit=target_unit,
+        target_x=20.0,
+    )
     state = _state_with_battlefield(
         armies=(source_army, target_army),
-        battlefield=_battlefield_for_units(
-            source_army=source_army,
-            source_unit=source_unit,
-            source_x=10.0,
-            target_army=target_army,
-            target_unit=target_unit,
-            target_x=20.0,
-        ),
+        battlefield=battlefield,
         active_player_id=source_army.player_id,
         phase=BattlePhase.SHOOTING,
     )
@@ -1261,6 +1332,40 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
         dread_profile,
         sequence_id="attack-sequence:kharseth:fury:dread",
     )
+    non_active_state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
+        active_player_id=target_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    non_active_decisions = DecisionController()
+    non_active_decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": dread_sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+    non_active_status = binding.handler(
+        AttackSequenceCompletedContext(
+            state=non_active_state,
+            decisions=non_active_decisions,
+            dice_manager=DiceRollManager(
+                non_active_state.game_id,
+                event_log=non_active_decisions.event_log,
+            ),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=dread_sequence,
+            attack_sequence_completed_event_id="event:kharseth:fury:non-active-attacker",
+        )
+    )
+    assert non_active_status is None
+    assert not non_active_decisions.queue.pending_requests
+    assert not non_active_state.persisting_effects
+
     decisions.event_log.append(
         "attack_sequence_step",
         {
@@ -3941,14 +4046,23 @@ def _post_shoot_hit_selection_clause() -> RuleClause:
             kind=RuleTriggerKind.TIMING_WINDOW,
             source_span=_span(),
             parameters=_parameters(
+                ("attacker_model_reference", "this_model"),
+                ("edge", "after"),
+                ("owner", "active_player"),
+                ("phase", "shooting"),
+                ("subject", "this_model"),
                 ("timing_window", "just_after_friendly_unit_has_shot"),
                 ("target_relationship", "hit_by_those_attacks"),
+                ("weapon_names", ("Dread of the Deep Void",)),
             ),
         ),
         target=RuleTargetSpec(
             kind=RuleTargetKind.ENEMY_UNIT,
             source_span=_span(),
-            parameters=_parameters(("target_relationship", "hit_by_those_attacks")),
+            parameters=_parameters(
+                ("allegiance", "enemy"),
+                ("target_relationship", "hit_by_those_attacks"),
+            ),
         ),
     )
 
