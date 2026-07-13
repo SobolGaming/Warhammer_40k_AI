@@ -12,12 +12,25 @@ if TYPE_CHECKING or __package__:
 else:
     from faction_pack_datasheet_review import faction_pack_datasheet_review
 
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+)
 from warhammer40k_core.engine.ability_coverage import AbilityCoverageSupportStage
 from warhammer40k_core.rules.source_overlay import (
     SourceOverlayPack,
     SourceOverlayPackPayload,
     SourceReleaseManifest,
     SourceReleaseManifestPayload,
+    apply_source_release_overlays,
+)
+from warhammer40k_core.rules.text_normalization import (
+    normalize_rule_text,
+    normalize_structured_source_text,
+)
+from warhammer40k_core.rules.wahapedia_schema import (
+    WahapediaJsonArtifact,
+    WahapediaJsonArtifactPayload,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -31,21 +44,29 @@ COVERAGE_PATH = (
 OVERLAY_DIR = REPO_ROOT / "data" / "source_overlays" / "aeldari_faction_pack_2026_06"
 OVERLAY_PACK_PATH = OVERLAY_DIR / "aeldari-faction-pack-datasheet-overlay.overlay-pack.json"
 RELEASE_MANIFEST_PATH = OVERLAY_DIR / "source_release_manifest.json"
-SOURCE_DATASHEETS_PATH = (
-    REPO_ROOT
-    / "data"
-    / "source_snapshots"
-    / "wahapedia"
-    / "10th-edition"
-    / "2026-06-14"
-    / "json"
-    / "Datasheets.json"
+SOURCE_SNAPSHOT_RELATIVE_PATH = (
+    Path("data") / "source_snapshots" / "wahapedia" / "10th-edition" / "2026-06-14" / "json"
 )
-SCHEMA_VERSION = "aeldari-datasheet-semantic-coverage-v1"
-SEMANTIC_BUCKET_ALL_CONSUMED = "All consumed"
-SEMANTIC_BUCKET_HOST_NEEDED = "IR parsed; host needed"
-SEMANTIC_BUCKET_UNSUPPORTED_IR = "Unsupported IR"
-SEMANTIC_BUCKET_BRIDGE_BLOCKED = "Bridge/catalog blocked"
+SOURCE_JSON_DIR = REPO_ROOT / SOURCE_SNAPSHOT_RELATIVE_PATH
+SOURCE_ARTIFACT_TABLES = (
+    "Abilities",
+    "Datasheets",
+    "Datasheets_abilities",
+    "Datasheets_keywords",
+    "Datasheets_leader",
+    "Datasheets_models",
+    "Datasheets_models_cost",
+    "Datasheets_options",
+    "Datasheets_unit_composition",
+    "Datasheets_wargear",
+    "Factions",
+)
+SCHEMA_VERSION = "aeldari-datasheet-semantic-coverage-v2"
+GENERATED_BY = "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py"
+SEMANTIC_BUCKET_ALL_CONSUMED = "All exact abilities consumed"
+SEMANTIC_BUCKET_HOST_NEEDED = "Exact IR parsed; host needed"
+SEMANTIC_BUCKET_UNSUPPORTED_IR = "Exact ability IR unsupported"
+SEMANTIC_BUCKET_BRIDGE_BLOCKED = "Exact ability bridge blocked"
 SEMANTIC_BUCKETS = (
     SEMANTIC_BUCKET_ALL_CONSUMED,
     SEMANTIC_BUCKET_HOST_NEEDED,
@@ -53,21 +74,106 @@ SEMANTIC_BUCKETS = (
     SEMANTIC_BUCKET_BRIDGE_BLOCKED,
 )
 
+_ROOT_KEYS = frozenset(
+    {
+        "schema_version",
+        "generated_by",
+        "faction_id",
+        "faction_name",
+        "pdf_filename",
+        "pdf_sha256",
+        "source_snapshot_path",
+        "source_artifact_hashes",
+        "overlay_pack_hash",
+        "release_hash",
+        "treatment_counts",
+        "semantic_bucket_counts",
+        "datasheet_count",
+        "exact_ability_count",
+        "datasheets",
+    }
+)
+_DATASHEET_KEYS = frozenset(
+    {
+        "datasheet_id",
+        "datasheet_name",
+        "group",
+        "treatment",
+        "pdf_page_reference",
+        "semantic_bucket",
+        "abilities",
+    }
+)
+_ABILITY_KEYS = frozenset(
+    {
+        "ability_id",
+        "ability_name",
+        "source_kind",
+        "source_row_id",
+        "source_ids",
+        "raw_text",
+        "raw_text_sha256",
+        "normalized_text_sha256",
+        "catalog_support",
+        "support_stage",
+        "runtime_consumer_ids",
+        "diagnostic_reasons",
+    }
+)
+
+
+@dataclass(frozen=True, slots=True)
+class ExactAbilitySemanticEvidence:
+    support_stage: AbilityCoverageSupportStage
+    runtime_consumer_ids: tuple[str, ...]
+    diagnostic_reasons: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if type(self.support_stage) is not AbilityCoverageSupportStage:
+            raise TypeError("Exact ability evidence requires an ability coverage support stage.")
+        consumers = _validated_unique_text_tuple("runtime_consumer_ids", self.runtime_consumer_ids)
+        diagnostics = _validated_unique_text_tuple("diagnostic_reasons", self.diagnostic_reasons)
+        object.__setattr__(self, "runtime_consumer_ids", consumers)
+        object.__setattr__(self, "diagnostic_reasons", diagnostics)
+        if self.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED:
+            if not consumers:
+                raise ValueError(
+                    "Engine-consumed exact ability evidence requires runtime consumers."
+                )
+            if diagnostics:
+                raise ValueError(
+                    "Engine-consumed exact ability evidence must not contain diagnostics."
+                )
+        if self.support_stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE and diagnostics:
+            raise ValueError("Executable exact ability IR must not contain blocking diagnostics.")
+        if (
+            self.support_stage is AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
+            and not diagnostics
+        ):
+            raise ValueError("Unsupported exact ability IR requires explicit diagnostic evidence.")
+
 
 @dataclass(frozen=True, slots=True)
 class AeldariDatasheetAbilitySemanticCoverage:
     ability_id: str
     ability_name: str
-    source_kind: str
+    source_kind: CatalogAbilitySourceKind
     source_row_id: str
     raw_text: str
     raw_text_sha256: str
     normalized_text_sha256: str
-    catalog_support: str
+    catalog_support: CatalogAbilitySupport
     support_stage: AbilityCoverageSupportStage
     runtime_consumer_ids: tuple[str, ...]
     diagnostic_reasons: tuple[str, ...]
     source_ids: tuple[str, ...]
+
+    def semantic_evidence(self) -> ExactAbilitySemanticEvidence:
+        return ExactAbilitySemanticEvidence(
+            support_stage=self.support_stage,
+            runtime_consumer_ids=self.runtime_consumer_ids,
+            diagnostic_reasons=self.diagnostic_reasons,
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,42 +191,52 @@ class AeldariDatasheetSemanticCoverage:
 class AeldariSemanticCoverageArtifact:
     overlay_pack_hash: str
     release_hash: str
+    source_artifact_hashes: tuple[tuple[str, str], ...]
     rows: tuple[AeldariDatasheetSemanticCoverage, ...]
 
 
 @cache
 def aeldari_datasheet_semantic_coverage() -> AeldariSemanticCoverageArtifact:
-    payload = _load_object(COVERAGE_PATH)
-    if payload.get("schema_version") != SCHEMA_VERSION:
+    return load_aeldari_datasheet_semantic_coverage(coverage_path=COVERAGE_PATH)
+
+
+def load_aeldari_datasheet_semantic_coverage(
+    *,
+    coverage_path: Path,
+) -> AeldariSemanticCoverageArtifact:
+    if not isinstance(coverage_path, Path):
+        raise TypeError("Aeldari semantic coverage path must be a Path.")
+    payload = _load_object(coverage_path)
+    _require_exact_keys(payload, _ROOT_KEYS, "Aeldari semantic coverage artifact")
+    if payload["schema_version"] != SCHEMA_VERSION:
         raise ValueError("Aeldari datasheet semantic coverage schema version is unsupported.")
+    if payload["generated_by"] != GENERATED_BY:
+        raise ValueError("Aeldari semantic coverage generator identity drifted.")
     review = faction_pack_datasheet_review("aeldari")
-    if payload.get("faction_id") != review.faction_id:
+    if payload["faction_id"] != review.faction_id:
         raise ValueError("Aeldari semantic coverage faction identity drifted.")
-    if payload.get("pdf_filename") != review.pdf_filename:
+    if payload["faction_name"] != review.faction_name:
+        raise ValueError("Aeldari semantic coverage faction name drifted.")
+    if payload["pdf_filename"] != review.pdf_filename:
         raise ValueError("Aeldari semantic coverage PDF filename drifted.")
-    if payload.get("pdf_sha256") != review.pdf_sha256:
+    if payload["pdf_sha256"] != review.pdf_sha256:
         raise ValueError("Aeldari semantic coverage PDF hash drifted.")
-    if payload.get("source_datasheets_sha256") != _sha256_file(SOURCE_DATASHEETS_PATH):
-        raise ValueError("Aeldari semantic coverage source snapshot hash drifted.")
-    overlay_pack = SourceOverlayPack.from_payload(
-        cast(SourceOverlayPackPayload, _load_object(OVERLAY_PACK_PATH))
-    )
-    release_manifest = SourceReleaseManifest.from_payload(
-        cast(SourceReleaseManifestPayload, _load_object(RELEASE_MANIFEST_PATH))
-    )
-    overlay_pack_hash = _required_sha256(payload, "overlay_pack_hash")
-    release_hash = _required_sha256(payload, "release_hash")
-    if overlay_pack_hash != overlay_pack.package_hash():
+    if payload["source_snapshot_path"] != SOURCE_SNAPSHOT_RELATIVE_PATH.as_posix():
+        raise ValueError("Aeldari semantic coverage source snapshot path drifted.")
+    overlay_pack_hash, release_hash, actual_source_hashes = _canonical_source_provenance()
+    recorded_source_hashes = _required_sha256_map(payload, "source_artifact_hashes")
+    if recorded_source_hashes != dict(actual_source_hashes):
+        raise ValueError("Aeldari semantic coverage source artifact hashes drifted.")
+    if _required_sha256(payload, "overlay_pack_hash") != overlay_pack_hash:
         raise ValueError("Aeldari semantic coverage overlay hash drifted.")
-    if release_hash != release_manifest.release_hash():
+    if _required_sha256(payload, "release_hash") != release_hash:
         raise ValueError("Aeldari semantic coverage release hash drifted.")
-    raw_rows = _required_list(payload, "datasheets")
-    rows = tuple(_parse_datasheet(row) for row in raw_rows)
+    rows = tuple(_parse_datasheet(row) for row in _required_list(payload, "datasheets"))
     _validate_rows(rows)
     expected_treatment_counts = {
         treatment.value: count for treatment, count in review.treatment_counts().items()
     }
-    if payload.get("treatment_counts") != expected_treatment_counts:
+    if payload["treatment_counts"] != expected_treatment_counts:
         raise ValueError("Aeldari semantic coverage treatment counts drifted.")
     actual_bucket_counts = dict(
         sorted(
@@ -129,30 +245,72 @@ def aeldari_datasheet_semantic_coverage() -> AeldariSemanticCoverageArtifact:
             if any(row.semantic_bucket == bucket for row in rows)
         )
     )
-    if payload.get("semantic_bucket_counts") != actual_bucket_counts:
+    if payload["semantic_bucket_counts"] != actual_bucket_counts:
         raise ValueError("Aeldari semantic coverage bucket counts drifted.")
-    if payload.get("datasheet_count") != len(rows):
+    if type(payload["datasheet_count"]) is not int or payload["datasheet_count"] != len(rows):
         raise ValueError("Aeldari semantic coverage datasheet count drifted.")
-    if payload.get("exact_ability_count") != sum(len(row.abilities) for row in rows):
+    exact_ability_count = sum(len(row.abilities) for row in rows)
+    if (
+        type(payload["exact_ability_count"]) is not int
+        or payload["exact_ability_count"] != exact_ability_count
+    ):
         raise ValueError("Aeldari semantic coverage ability count drifted.")
     return AeldariSemanticCoverageArtifact(
         overlay_pack_hash=overlay_pack_hash,
         release_hash=release_hash,
+        source_artifact_hashes=actual_source_hashes,
         rows=rows,
     )
 
 
+def exact_ability_semantic_bucket(
+    abilities: tuple[ExactAbilitySemanticEvidence, ...],
+) -> str:
+    if type(abilities) is not tuple:
+        raise TypeError("Exact ability semantic rollup requires a tuple.")
+    if not abilities:
+        return SEMANTIC_BUCKET_BRIDGE_BLOCKED
+    for ability in abilities:
+        if type(ability) is not ExactAbilitySemanticEvidence:
+            raise TypeError("Exact ability semantic rollup requires evidence values.")
+    if any(
+        ability.support_stage
+        in {
+            AbilityCoverageSupportStage.DESCRIPTOR_ONLY,
+            AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED,
+        }
+        for ability in abilities
+    ):
+        return SEMANTIC_BUCKET_UNSUPPORTED_IR
+    if any(
+        ability.support_stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
+        for ability in abilities
+    ):
+        return SEMANTIC_BUCKET_HOST_NEEDED
+    if all(
+        ability.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        and ability.runtime_consumer_ids
+        and not ability.diagnostic_reasons
+        for ability in abilities
+    ):
+        return SEMANTIC_BUCKET_ALL_CONSUMED
+    raise ValueError("Aeldari exact ability coverage encountered an unclassified datasheet.")
+
+
 def _parse_datasheet(raw: object) -> AeldariDatasheetSemanticCoverage:
     payload = _object(raw, "Aeldari datasheet semantic coverage row")
+    _require_exact_keys(payload, _DATASHEET_KEYS, "Aeldari datasheet semantic coverage row")
     abilities = tuple(
         _parse_ability(raw_ability) for raw_ability in _required_list(payload, "abilities")
     )
     if not abilities:
         raise ValueError("Aeldari semantic coverage datasheets require exact abilities.")
     bucket = _required_text(payload, "semantic_bucket")
-    if bucket != _semantic_bucket(abilities):
+    if bucket != exact_ability_semantic_bucket(
+        tuple(ability.semantic_evidence() for ability in abilities)
+    ):
         raise ValueError("Aeldari semantic coverage datasheet bucket is stale.")
-    page_value = payload.get("pdf_page_reference")
+    page_value = payload["pdf_page_reference"]
     page_reference = None if page_value is None else _text(page_value, "pdf_page_reference")
     return AeldariDatasheetSemanticCoverage(
         datasheet_id=_required_text(payload, "datasheet_id"),
@@ -167,27 +325,53 @@ def _parse_datasheet(raw: object) -> AeldariDatasheetSemanticCoverage:
 
 def _parse_ability(raw: object) -> AeldariDatasheetAbilitySemanticCoverage:
     payload = _object(raw, "Aeldari datasheet ability semantic coverage row")
+    _require_exact_keys(payload, _ABILITY_KEYS, "Aeldari datasheet ability coverage row")
     raw_text = _required_text(payload, "raw_text")
     raw_text_sha256 = _required_sha256(payload, "raw_text_sha256")
     if raw_text_sha256 != _sha256_text(raw_text):
         raise ValueError("Aeldari semantic coverage exact ability text hash drifted.")
+    normalized_text_sha256 = _required_sha256(payload, "normalized_text_sha256")
+    normalized_text = (
+        normalize_structured_source_text(raw_text)
+        if "\n" in raw_text
+        else normalize_rule_text(raw_text)
+    )
+    if normalized_text_sha256 != _sha256_text(normalized_text):
+        raise ValueError("Aeldari semantic coverage normalized ability text hash drifted.")
     try:
+        source_kind = CatalogAbilitySourceKind(_required_text(payload, "source_kind"))
+        catalog_support = CatalogAbilitySupport(_required_text(payload, "catalog_support"))
         support_stage = AbilityCoverageSupportStage(_required_text(payload, "support_stage"))
     except ValueError as exc:
-        raise ValueError("Aeldari semantic coverage support stage is invalid.") from exc
+        raise ValueError("Aeldari semantic coverage ability classification is invalid.") from exc
+    evidence = ExactAbilitySemanticEvidence(
+        support_stage=support_stage,
+        runtime_consumer_ids=_unique_text_tuple(payload, "runtime_consumer_ids"),
+        diagnostic_reasons=_unique_text_tuple(payload, "diagnostic_reasons"),
+    )
+    if (
+        support_stage is AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
+        and catalog_support is not CatalogAbilitySupport.UNSUPPORTED
+    ):
+        raise ValueError("Unsupported exact ability IR requires unsupported catalog evidence.")
+    if (
+        support_stage is AbilityCoverageSupportStage.DESCRIPTOR_ONLY
+        and catalog_support is not CatalogAbilitySupport.DESCRIPTOR_ONLY
+    ):
+        raise ValueError("Descriptor-only exact ability evidence has inconsistent catalog support.")
     return AeldariDatasheetAbilitySemanticCoverage(
         ability_id=_required_text(payload, "ability_id"),
         ability_name=_required_text(payload, "ability_name"),
-        source_kind=_required_text(payload, "source_kind"),
+        source_kind=source_kind,
         source_row_id=_required_text(payload, "source_row_id"),
         raw_text=raw_text,
         raw_text_sha256=raw_text_sha256,
-        normalized_text_sha256=_required_sha256(payload, "normalized_text_sha256"),
-        catalog_support=_required_text(payload, "catalog_support"),
-        support_stage=support_stage,
-        runtime_consumer_ids=_text_tuple(payload, "runtime_consumer_ids"),
-        diagnostic_reasons=_text_tuple(payload, "diagnostic_reasons"),
-        source_ids=_text_tuple(payload, "source_ids"),
+        normalized_text_sha256=normalized_text_sha256,
+        catalog_support=catalog_support,
+        support_stage=evidence.support_stage,
+        runtime_consumer_ids=evidence.runtime_consumer_ids,
+        diagnostic_reasons=evidence.diagnostic_reasons,
+        source_ids=_unique_text_tuple(payload, "source_ids", require_non_empty=True),
     )
 
 
@@ -216,28 +400,46 @@ def _validate_rows(rows: tuple[AeldariDatasheetSemanticCoverage, ...]) -> None:
             if source_key in seen_source_rows:
                 raise ValueError("Aeldari semantic coverage duplicates an exact ability row.")
             seen_source_rows.add(source_key)
-            if not ability.source_ids:
-                raise ValueError("Aeldari semantic coverage abilities require provenance IDs.")
 
 
-def _semantic_bucket(
-    abilities: tuple[AeldariDatasheetAbilitySemanticCoverage, ...],
-) -> str:
-    stages = tuple(ability.support_stage for ability in abilities)
-    if any(
-        stage
-        in {
-            AbilityCoverageSupportStage.DESCRIPTOR_ONLY,
-            AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED,
-        }
-        for stage in stages
+@cache
+def _canonical_source_provenance() -> tuple[
+    str,
+    str,
+    tuple[tuple[str, str], ...],
+]:
+    overlay_pack = SourceOverlayPack.from_payload(
+        cast(SourceOverlayPackPayload, _load_object(OVERLAY_PACK_PATH))
+    )
+    release_manifest = SourceReleaseManifest.from_payload(
+        cast(SourceReleaseManifestPayload, _load_object(RELEASE_MANIFEST_PATH))
+    )
+    source_artifacts = tuple(
+        _load_source_artifact(table_name) for table_name in SOURCE_ARTIFACT_TABLES
+    )
+    effective_artifacts = apply_source_release_overlays(
+        source_artifacts=source_artifacts,
+        release_manifest=release_manifest,
+        overlay_packs=(overlay_pack,),
+    )
+    source_hashes = tuple(
+        sorted(
+            (artifact.source_table, artifact.artifact_hash()) for artifact in effective_artifacts
+        )
+    )
+    if tuple(table_name for table_name, _ in source_hashes) != tuple(
+        sorted(SOURCE_ARTIFACT_TABLES)
     ):
-        return SEMANTIC_BUCKET_UNSUPPORTED_IR
-    if any(stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE for stage in stages):
-        return SEMANTIC_BUCKET_HOST_NEEDED
-    if all(stage is AbilityCoverageSupportStage.ENGINE_CONSUMED for stage in stages):
-        return SEMANTIC_BUCKET_ALL_CONSUMED
-    raise ValueError("Aeldari semantic coverage encountered an unclassified datasheet.")
+        raise ValueError("Aeldari semantic coverage source artifact scope drifted.")
+    return overlay_pack.package_hash(), release_manifest.release_hash(), source_hashes
+
+
+def _load_source_artifact(table_name: str) -> WahapediaJsonArtifact:
+    payload = _load_object(SOURCE_JSON_DIR / f"{table_name}.json")
+    artifact = WahapediaJsonArtifact.from_payload(cast(WahapediaJsonArtifactPayload, payload))
+    if artifact.source_table != table_name:
+        raise ValueError("Aeldari semantic coverage source artifact table drifted.")
+    return artifact
 
 
 def _load_object(path: Path) -> dict[str, Any]:
@@ -252,6 +454,15 @@ def _object(value: object, label: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise TypeError(f"{label} must be a JSON object.")
     return cast(dict[str, Any], value)
+
+
+def _require_exact_keys(payload: dict[str, Any], expected: frozenset[str], label: str) -> None:
+    actual = frozenset(payload)
+    if actual != expected:
+        raise ValueError(
+            f"{label} keys drifted; missing={sorted(expected - actual)!r}, "
+            f"unexpected={sorted(actual - expected)!r}."
+        )
 
 
 def _required_list(payload: dict[str, Any], key: str) -> list[object]:
@@ -273,8 +484,25 @@ def _text(value: object, label: str) -> str:
     return value
 
 
-def _text_tuple(payload: dict[str, Any], key: str) -> tuple[str, ...]:
-    return tuple(_text(value, key) for value in _required_list(payload, key))
+def _unique_text_tuple(
+    payload: dict[str, Any],
+    key: str,
+    *,
+    require_non_empty: bool = False,
+) -> tuple[str, ...]:
+    values = tuple(_text(value, key) for value in _required_list(payload, key))
+    if require_non_empty and not values:
+        raise ValueError(f"{key!r} must not be empty.")
+    return _validated_unique_text_tuple(key, values)
+
+
+def _validated_unique_text_tuple(key: str, values: tuple[str, ...]) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise TypeError(f"{key!r} must be a tuple.")
+    validated = tuple(_text(value, key) for value in values)
+    if len(validated) != len(set(validated)):
+        raise ValueError(f"{key!r} must not contain duplicate values.")
+    return validated
 
 
 def _required_sha256(payload: dict[str, Any], key: str) -> str:
@@ -284,13 +512,12 @@ def _required_sha256(payload: dict[str, Any], key: str) -> str:
     return value
 
 
+def _required_sha256_map(payload: dict[str, Any], key: str) -> dict[str, str]:
+    raw = _object(payload.get(key), key)
+    expected_keys = frozenset(SOURCE_ARTIFACT_TABLES)
+    _require_exact_keys(raw, expected_keys, key)
+    return {table_name: _required_sha256(raw, table_name) for table_name in sorted(raw)}
+
+
 def _sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
-
-
-def _sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()

@@ -6693,10 +6693,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "| Legion of Excess | `None` | Generated scaffold only |" in chaos_daemons_markdown
     assert "## Detachment Rule Coverage Rows" not in chaos_daemons_markdown
     assert "## Semantic Support Snapshot" in aeldari_markdown
-    assert "### Unit Datasheets" in aeldari_markdown
+    assert "### Exact Ability Semantic Coverage" in aeldari_markdown
     assert (
-        "| Aeldari tradition | Fully supported (`All consumed`) | "
-        "IR parsed; host needed | Unsupported IR | Bridge/catalog blocked |"
+        "| Aeldari tradition | All exact abilities consumed | "
+        "Exact IR parsed; host needed | Exact ability IR unsupported | "
+        "Exact ability bridge blocked |"
     ) in aeldari_markdown
     assert "| Craftworlds / Asuryani | Wraithguard (`000000597`) |" in aeldari_markdown
     assert "Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)" in aeldari_markdown

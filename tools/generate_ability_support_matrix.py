@@ -2932,9 +2932,11 @@ def _aeldari_semantic_snapshot_markdown() -> list[str]:
             "This generated snapshot separates source review from semantic execution. "
             "Detachment-rule support uses the semantic support table below. Exact "
             "Enhancement and Stratagem support uses the shared Phase17F execution evidence. "
-            "The Unit Datasheets table groups the reviewed Aeldari source scope by tradition. "
-            "It bridges every effective datasheet and derives each semantic bucket from the "
-            "exact datasheet and wargear ability text, parser diagnostics, and runtime consumers."
+            "The Exact Ability Semantic Coverage table groups the reviewed Aeldari source scope "
+            "by tradition. It bridges every effective datasheet and derives each semantic bucket "
+            "from exact datasheet and wargear ability text, parser diagnostics, and runtime "
+            "consumers. It does not report catalog or playability support; the separate Datasheet "
+            "/ Unit Support table remains authoritative for those fields."
         ),
     ]
     lines.extend(_aeldari_detachment_snapshot_markdown())

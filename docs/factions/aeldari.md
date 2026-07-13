@@ -12,7 +12,7 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr
 
 ## Semantic Support Snapshot
 
-This generated snapshot separates source review from semantic execution. Detachment-rule support uses the semantic support table below. Exact Enhancement and Stratagem support uses the shared Phase17F execution evidence. The Unit Datasheets table groups the reviewed Aeldari source scope by tradition. It bridges every effective datasheet and derives each semantic bucket from the exact datasheet and wargear ability text, parser diagnostics, and runtime consumers.
+This generated snapshot separates source review from semantic execution. Detachment-rule support uses the semantic support table below. Exact Enhancement and Stratagem support uses the shared Phase17F execution evidence. The Exact Ability Semantic Coverage table groups the reviewed Aeldari source scope by tradition. It bridges every effective datasheet and derives each semantic bucket from exact datasheet and wargear ability text, parser diagnostics, and runtime consumers. It does not report catalog or playability support; the separate Datasheet / Unit Support table remains authoritative for those fields.
 
 ### Detachments
 
@@ -56,9 +56,9 @@ This generated snapshot separates source review from semantic execution. Detachm
 | Warhost | None | BLITZING FIREPOWER<br>FEIGNED RETREAT<br>FIRE AND FADE<br>LIGHTNING-FAST REACTIONS<br>SKYBORNE SANCTUARY<br>WEBWAY TUNNEL |
 | Windrider Host | None | DARING RIDERS<br>DEATH FROM ON HIGH<br>FOCUSED FIREPOWER<br>OVERFLIGHT<br>SPIRALLING EVASION<br>WIND OF BLADES |
 
-### Unit Datasheets
+### Exact Ability Semantic Coverage
 
-| Aeldari tradition | Fully supported (`All consumed`) | IR parsed; host needed | Unsupported IR | Bridge/catalog blocked |
+| Aeldari tradition | All exact abilities consumed | Exact IR parsed; host needed | Exact ability IR unsupported | Exact ability bridge blocked |
 | --- | --- | --- | --- | --- |
 | Craftworlds / Asuryani | Wraithguard (`000000597`) | Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)<br>Falcon (`000000609`)<br>Wave Serpent (`000000599`) | Asurmen (`000000571`)<br>Autarch (`000000577`)<br>Autarch Wayleaper (`000002759`)<br>Avatar of Khaine (`000000581`)<br>Baharroth (`000000575`)<br>D-cannon Platform (`000003910`)<br>Dark Reapers (`000000607`)<br>Dire Avengers (`000000593`)<br>Farseer (`000000582`)<br>Farseer Skyrunner (`000000583`)<br>Fire Dragons (`000000596`)<br>Fire Prism (`000000610`)<br>Fuegan (`000000574`)<br>Guardian Defenders (`000000589`)<br>Hemlock Wraithfighter (`000000606`)<br>Howling Banshees (`000000594`)<br>Jain Zar (`000000572`)<br>Lhykhis (`000003909`)<br>Maugan Ra (`000000576`)<br>Night Spinner (`000000611`)<br>Rangers (`000000592`)<br>Shadow Weaver Platform (`000003911`)<br>Shining Spears (`000000602`)<br>Shroud Runners (`000002533`)<br>Spiritseer (`000000588`)<br>Storm Guardians (`000000590`)<br>Striking Scorpions (`000000595`)<br>Swooping Hawks (`000000600`)<br>Vibro Cannon Platform (`000003912`)<br>Vypers (`000000605`)<br>War Walkers (`000000612`)<br>Warlock (`000000585`)<br>Warlock Conclave (`000000584`)<br>Warlock Skyrunners (`000000587`)<br>Warp Spiders (`000000601`)<br>Windriders (`000000591`)<br>Wraithblades (`000000598`)<br>Wraithknight (`000000614`)<br>Wraithknight with Ghostglaive (`000003913`)<br>Wraithlord (`000000613`) | None |
 | Anhrathe / Corsairs | None | None | Corsair Skyreavers (`000004196`)<br>Corsair Voidreavers (`000002531`)<br>Corsair Voidscarred (`000002532`)<br>Kharseth (`000004194`)<br>Prince Yriel (`000004193`)<br>Starfangs (`000004195`) | None |

@@ -776,7 +776,7 @@ def _support_stage(
             ability_name=ability.name,
             rule_ir=rule_ir,
         )
-        if rollup.overall_ability_support is AbilityOverallSupport.FULL:
+        if rollup.overall_ability_support is AbilityOverallSupport.FULL and consumer_ids:
             return AbilityCoverageSupportStage.ENGINE_CONSUMED
         if rollup.overall_ability_support is AbilityOverallSupport.UNSUPPORTED:
             return AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED

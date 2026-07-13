@@ -26,11 +26,12 @@ def aeldari_datasheet_semantic_snapshot_markdown() -> list[str]:
     coverage = aeldari_datasheet_semantic_coverage()
     lines = [
         "",
-        "### Unit Datasheets",
+        "### Exact Ability Semantic Coverage",
         "",
         (
-            "| Aeldari tradition | Fully supported (`All consumed`) | "
-            "IR parsed; host needed | Unsupported IR | Bridge/catalog blocked |"
+            "| Aeldari tradition | All exact abilities consumed | "
+            "Exact IR parsed; host needed | Exact ability IR unsupported | "
+            "Exact ability bridge blocked |"
         ),
         "| --- | --- | --- | --- | --- |",
     ]

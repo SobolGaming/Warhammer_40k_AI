@@ -9,6 +9,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING or __package__:
+    from tools.aeldari_datasheet_semantic_coverage import (
+        GENERATED_BY,
+        SCHEMA_VERSION,
+        SOURCE_ARTIFACT_TABLES,
+        ExactAbilitySemanticEvidence,
+        exact_ability_semantic_bucket,
+    )
     from tools.faction_pack_datasheet_review import (
         DatasheetSourceTreatment,
         faction_pack_datasheet_review,
@@ -18,16 +25,20 @@ if TYPE_CHECKING or __package__:
         _load_source_artifacts,
     )
 else:
+    from aeldari_datasheet_semantic_coverage import (
+        GENERATED_BY,
+        SCHEMA_VERSION,
+        SOURCE_ARTIFACT_TABLES,
+        ExactAbilitySemanticEvidence,
+        exact_ability_semantic_bucket,
+    )
     from faction_pack_datasheet_review import (
         DatasheetSourceTreatment,
         faction_pack_datasheet_review,
     )
     from generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR, _load_source_artifacts
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
-from warhammer40k_core.engine.ability_coverage import (
-    AbilityCoverageSupportStage,
-    ability_coverage_row_for_descriptor,
-)
+from warhammer40k_core.engine.ability_coverage import ability_coverage_row_for_descriptor
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
@@ -57,8 +68,6 @@ OUTPUT_PATH = (
 OVERLAY_DIR = REPO_ROOT / "data" / "source_overlays" / "aeldari_faction_pack_2026_06"
 OVERLAY_PACK_PATH = OVERLAY_DIR / "aeldari-faction-pack-datasheet-overlay.overlay-pack.json"
 RELEASE_MANIFEST_PATH = OVERLAY_DIR / "source_release_manifest.json"
-SCHEMA_VERSION = "aeldari-datasheet-semantic-coverage-v1"
-GENERATED_BY = "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py"
 SOURCE_DATE = "2026-06-09"
 SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p23"
 TARGET_EDITION = "warhammer-40000-11th"
@@ -452,7 +461,7 @@ def _coverage_payload(
         if not ability_rows:
             raise ValueError("Aeldari effective coverage requires exact abilities per datasheet.")
         ability_payloads: list[dict[str, object]] = []
-        support_stages: list[AbilityCoverageSupportStage] = []
+        semantic_evidence: list[ExactAbilitySemanticEvidence] = []
         for ability_row in ability_rows:
             coverage = ability_coverage_row_for_descriptor(
                 catalog_id=CATALOG_ID,
@@ -460,12 +469,17 @@ def _coverage_payload(
                 datasheet_name=review_row.datasheet_name,
                 ability=ability_row.descriptor,
             )
-            support_stages.append(coverage.support_stage)
+            semantic_evidence.append(
+                ExactAbilitySemanticEvidence(
+                    support_stage=coverage.support_stage,
+                    runtime_consumer_ids=coverage.runtime_consumer_ids,
+                    diagnostic_reasons=coverage.diagnostic_reasons,
+                )
+            )
             ability_payloads.append(
                 {
                     "ability_id": ability_row.descriptor.ability_id,
                     "ability_name": ability_row.descriptor.name,
-                    "ability_type": ability_row.ability_type,
                     "source_kind": ability_row.descriptor.source_kind.value,
                     "source_row_id": ability_row.source_row_id,
                     "source_ids": list(ability_row.source_ids),
@@ -476,15 +490,9 @@ def _coverage_payload(
                     "support_stage": coverage.support_stage.value,
                     "runtime_consumer_ids": list(coverage.runtime_consumer_ids),
                     "diagnostic_reasons": list(coverage.diagnostic_reasons),
-                    "rule_ir_diagnostics": list(ability_row.descriptor.rule_ir_diagnostics),
-                    "rule_ir_payload_sha256": (
-                        None
-                        if ability_row.descriptor.rule_ir_payload is None
-                        else _sha256_payload(ability_row.descriptor.rule_ir_payload)
-                    ),
                 }
             )
-        bucket = _bucket(support_stages)
+        bucket = exact_ability_semantic_bucket(tuple(semantic_evidence))
         bucket_counts[bucket] += 1
         datasheet_payloads.append(
             {
@@ -498,6 +506,11 @@ def _coverage_payload(
             }
         )
     exact_ability_count = sum(len(rows) for rows in rows_by_datasheet.values())
+    source_artifact_hashes = {
+        artifact.source_table: artifact.artifact_hash() for artifact in effective_artifacts
+    }
+    if source_artifact_hashes.keys() != set(SOURCE_ARTIFACT_TABLES):
+        raise ValueError("Aeldari semantic coverage source artifact scope drifted.")
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_by": GENERATED_BY,
@@ -505,8 +518,8 @@ def _coverage_payload(
         "faction_name": review.faction_name,
         "pdf_filename": review.pdf_filename,
         "pdf_sha256": review.pdf_sha256,
-        "source_snapshot_path": str(DEFAULT_SOURCE_JSON_DIR),
-        "source_datasheets_sha256": _sha256_file(Path(DEFAULT_SOURCE_JSON_DIR) / "Datasheets.json"),
+        "source_snapshot_path": DEFAULT_SOURCE_JSON_DIR.as_posix(),
+        "source_artifact_hashes": dict(sorted(source_artifact_hashes.items())),
         "overlay_pack_hash": overlay_pack.package_hash(),
         "release_hash": release_manifest.release_hash(),
         "treatment_counts": {
@@ -518,25 +531,6 @@ def _coverage_payload(
         "exact_ability_count": exact_ability_count,
         "datasheets": datasheet_payloads,
     }
-
-
-def _bucket(stages: list[AbilityCoverageSupportStage]) -> str:
-    if not stages:
-        return "Bridge/catalog blocked"
-    if any(
-        stage
-        in {
-            AbilityCoverageSupportStage.DESCRIPTOR_ONLY,
-            AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED,
-        }
-        for stage in stages
-    ):
-        return "Unsupported IR"
-    if any(stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE for stage in stages):
-        return "IR parsed; host needed"
-    if all(stage is AbilityCoverageSupportStage.ENGINE_CONSUMED for stage in stages):
-        return "All consumed"
-    raise ValueError("Aeldari semantic coverage encountered an unclassified datasheet.")
 
 
 def _validate_effective_updates(
@@ -660,18 +654,6 @@ def _warlock_conclave_leader() -> str:
 
 def _sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
-
-
-def _sha256_payload(payload: object) -> str:
-    return _sha256_text(json.dumps(payload, sort_keys=True, separators=(",", ":")))
-
-
-def _sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def _write_json(path: Path, payload: object) -> None:
