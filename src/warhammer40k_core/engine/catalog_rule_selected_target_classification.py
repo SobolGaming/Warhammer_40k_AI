@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from typing import cast
 
+from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
+    post_shoot_selected_target_effect_clauses_after,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleEffectKind,
-    RuleEffectSpec,
     RuleIR,
     RuleParameterValue,
     RuleTargetKind,
@@ -57,7 +59,6 @@ def fight_start_selected_target_effect_clause_ids(rule_ir: RuleIR) -> tuple[str,
             for effect_clause in _selected_target_effect_clauses_after(
                 rule_ir.clauses,
                 index,
-                include_immediate_effects=False,
             )
         )
     return tuple(sorted(clause_ids))
@@ -74,10 +75,9 @@ def post_shoot_hit_target_effect_clause_ids(rule_ir: RuleIR) -> tuple[str, ...]:
             continue
         clause_ids.update(
             effect_clause.clause_id
-            for effect_clause in _selected_target_effect_clauses_after(
+            for effect_clause in post_shoot_selected_target_effect_clauses_after(
                 rule_ir.clauses,
                 index,
-                include_immediate_effects=True,
             )
         )
     return tuple(sorted(clause_ids))
@@ -164,8 +164,6 @@ def _valid_weapon_names(value: object) -> bool:
 def _selected_target_effect_clauses_after(
     clauses: tuple[RuleClause, ...],
     selection_index: int,
-    *,
-    include_immediate_effects: bool,
 ) -> tuple[RuleClause, ...]:
     selected: list[RuleClause] = []
     for clause in clauses[selection_index + 1 :]:
@@ -173,36 +171,8 @@ def _selected_target_effect_clauses_after(
             break
         if not clause.effects:
             continue
-        if clause.duration is None and not (
-            include_immediate_effects and _clause_has_immediate_selected_target_effect(clause)
-        ):
+        if clause.duration is None:
             continue
         if any(effect.kind in _SELECTED_TARGET_EFFECT_KINDS for effect in clause.effects):
             selected.append(clause)
     return tuple(selected)
-
-
-def _clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog selected-target classifier requires RuleClause.")
-    if clause.duration is not None or clause.target is None:
-        return False
-    if clause.target.kind not in {RuleTargetKind.SELECTED_UNIT, RuleTargetKind.SELECTED_TARGET}:
-        return False
-    return any(
-        _effect_is_immediate_selected_target_battle_shock(effect) for effect in clause.effects
-    )
-
-
-def _effect_is_immediate_selected_target_battle_shock(effect: RuleEffectSpec) -> bool:
-    if type(effect) is not RuleEffectSpec:
-        raise GameLifecycleError("Catalog selected-target classifier requires RuleEffectSpec.")
-    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
-        return False
-    parameters = parameter_payload(effect.parameters)
-    return (
-        parameters.get("rules_context") == "battle_shock"
-        and parameters.get("status") == "force_battle_shock_test"
-        and parameters.get("required") is True
-        and parameters.get("target_scope") == "selected_unit"
-    )

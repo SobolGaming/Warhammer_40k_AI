@@ -86,6 +86,12 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     payload_string_tuple as _payload_string_tuple,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    post_shoot_selected_target_effect_clauses_after as _post_shoot_effect_clauses_after,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    record_has_supported_post_shoot_selected_target_effect as _record_has_supported_post_shoot,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     runtime_clause_id_from_record as _runtime_clause_id_from_record,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
@@ -694,6 +700,8 @@ def _post_shoot_hit_target_effect_groups(
             current_model_instance_ids=current_model_ids,
             trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
         ):
+            if not _record_has_supported_post_shoot(record):
+                continue
             groups.extend(
                 _post_shoot_groups_for_record(
                     state=context.state,
@@ -792,11 +800,7 @@ def _post_shoot_groups_for_record(
             continue
         if not _clause_is_post_shoot_hit_target_selection(selection_clause):
             continue
-        effect_clauses = _selected_effect_clauses_after(
-            clauses,
-            index,
-            include_immediate_effects=True,
-        )
+        effect_clauses = _post_shoot_effect_clauses_after(clauses, index)
         if not effect_clauses:
             continue
         for source_model_id in _selection_source_model_ids(

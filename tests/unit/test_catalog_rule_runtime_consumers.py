@@ -85,12 +85,22 @@ from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CATALOG_ONCE_PER_BATTLE_ABILITY_DECLINED_EVENT,
     CatalogOncePerBattleRuntime,
 )
+from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
+    post_shoot_selected_target_effect_clause_is_supported,
+    post_shoot_selected_target_effect_clauses_after,
+)
 from warhammer40k_core.engine.catalog_reserve_arrival_restrictions import (
     CatalogReserveArrivalRestrictionRuntime,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
+    CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     catalog_rule_clauses_from_record,
+    catalog_rule_ir_consumers_for_rule,
+    catalog_rule_ir_hook_ids_for_rule,
+)
+from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    post_shoot_hit_target_effect_clause_ids,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
@@ -954,6 +964,11 @@ def test_catalog_selected_target_support_classifies_selection_and_effect_clauses
         (fight_selection, skipped_effect, selected_effect, breaker),
         0,
     ) == (selected_effect,)
+    assert post_shoot_selected_target_effect_clause_is_supported(selected_effect)
+    assert post_shoot_selected_target_effect_clauses_after(
+        (post_shoot_selection, skipped_effect, selected_effect, breaker),
+        0,
+    ) == (selected_effect,)
 
     effect = _effect(
         RuleEffectKind.MODIFY_DICE_ROLL,
@@ -975,6 +990,120 @@ def test_catalog_selected_target_support_classifies_selection_and_effect_clauses
         clause_is_fight_start_selection(cast(RuleClause, object()))
     with pytest.raises(GameLifecycleError, match="requires RuleClause"):
         clause_is_post_shoot_hit_target_selection(cast(RuleClause, object()))
+    with pytest.raises(GameLifecycleError, match="requires RuleClause"):
+        post_shoot_selected_target_effect_clause_is_supported(cast(RuleClause, object()))
+
+
+def test_catalog_post_shoot_selected_target_rejects_unsupported_effect_shapes() -> None:
+    selection = _post_shoot_hit_selection_clause()
+    supported_effect = _effect_clause(
+        clause_id="test:selected-target:selection:post-shoot:supported-effect",
+        duration=_duration("phase"),
+        effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+        roll_type="attack_sequence.hit",
+        delta=1,
+    )
+    invalid_shapes = (
+        (
+            "unsupported-target",
+            replace(
+                supported_effect,
+                target=RuleTargetSpec(kind=RuleTargetKind.PLAYER, source_span=_span()),
+            ),
+        ),
+        (
+            "unsupported-duration-kind",
+            replace(
+                supported_effect,
+                duration=RuleDuration(
+                    kind=RuleDurationKind.WHILE_CONDITION_TRUE,
+                    source_span=_span(),
+                ),
+            ),
+        ),
+        (
+            "unsupported-duration-endpoint",
+            replace(supported_effect, duration=_duration("next_shooting_phase")),
+        ),
+        (
+            "unsupported-condition-relationship",
+            replace(
+                supported_effect,
+                conditions=(
+                    _condition(
+                        RuleConditionKind.TARGET_CONSTRAINT,
+                        ("relationship", "source_unit_can_see_selected_unit"),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "mixed-supported-and-unsupported-effects",
+            replace(
+                supported_effect,
+                effects=(
+                    *supported_effect.effects,
+                    _effect(RuleEffectKind.ADD_VICTORY_POINTS, ("amount", 1)),
+                ),
+            ),
+        ),
+        (
+            "unsupported-effect-parameters",
+            replace(
+                supported_effect,
+                effects=(
+                    _effect(
+                        RuleEffectKind.MODIFY_DICE_ROLL,
+                        ("roll_type", "attack_sequence.hit"),
+                        ("delta", 1),
+                        ("unsupported_mode", "always"),
+                    ),
+                ),
+            ),
+        ),
+    )
+    source_army, target_army = _mustered_core_armies()
+    empty_index = AbilityCatalogIndex.from_records(())
+
+    for shape_name, invalid_effect in invalid_shapes:
+        rule_ir = _rule_ir(
+            source_id=f"test:selected-target:post-shoot:{shape_name}",
+            clauses=(selection, invalid_effect),
+        )
+        record = _ability_record(
+            record_id=f"record:selected-target:post-shoot:{shape_name}",
+            rule_ir=rule_ir,
+            trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            runtime_clause_id=selection.clause_id,
+        )
+        index = AbilityCatalogIndex.from_records((record,))
+
+        assert not post_shoot_selected_target_effect_clause_is_supported(invalid_effect), shape_name
+        assert (
+            post_shoot_selected_target_effect_clauses_after(
+                rule_ir.clauses,
+                0,
+            )
+            == ()
+        ), shape_name
+        assert post_shoot_hit_target_effect_clause_ids(rule_ir) == (), shape_name
+        assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in (
+            catalog_rule_ir_consumers_for_rule(rule_ir)
+        ), shape_name
+        assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in (
+            catalog_rule_ir_hook_ids_for_rule(rule_ir)
+        ), shape_name
+        assert not has_post_shoot_hit_target_effect_records({source_army.player_id: index}), (
+            shape_name
+        )
+        runtime = CatalogSelectedTargetEffectRuntime(
+            ability_indexes_by_player_id={
+                source_army.player_id: index,
+                target_army.player_id: empty_index,
+            },
+            armies=(source_army, target_army),
+        )
+        assert runtime.attack_sequence_completed_bindings() == (), shape_name
 
 
 def test_catalog_selected_target_support_filters_generic_records_by_timing() -> None:
@@ -1016,9 +1145,9 @@ def test_catalog_selected_target_support_filters_generic_records_by_timing() -> 
             _effect_clause(
                 clause_id="test:selected-target:selection:post-shoot:effect",
                 duration=_duration("phase"),
-                effect_kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
-                status="benefit_of_cover",
-                operation="deny",
+                effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+                roll_type="attack_sequence.hit",
+                delta=1,
             ),
         ),
     )

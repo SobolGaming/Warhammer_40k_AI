@@ -1779,14 +1779,10 @@
           "normalized_text_sha256": "3e36b949094a56050a1e2e063a452be5f7ca0d7647105501eb58d1e5651c0bb8",
           "raw_text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks. Until the end of the turn, each time a friendly model that disembarked from this TRANSPORT this turn makes an attack that targets that enemy unit, you can re-roll the Wound roll.",
           "raw_text_sha256": "3e36b949094a56050a1e2e063a452be5f7ca0d7647105501eb58d1e5651c0bb8",
-          "runtime_consumer_ids": [
-            "catalog-ir:post-shoot-hit-target-effect"
-          ],
+          "runtime_consumer_ids": [],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [
-                "catalog-ir:post-shoot-hit-target-effect"
-              ],
+              "runtime_consumer_ids": [],
               "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000609:4:description:clause:002:effect:0",
               "semantic_kind": "reroll_permission"
             }
@@ -1796,14 +1792,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000609:4",
-          "support_stage": "engine_consumed"
+          "support_stage": "generic_ir_executable"
         }
       ],
       "datasheet_id": "000000609",
       "datasheet_name": "Falcon",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "All exact abilities consumed",
+      "semantic_bucket": "Exact IR parsed; host needed",
       "treatment": "rules_update"
     },
     {
@@ -3121,14 +3117,12 @@
           "raw_text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks. Until the end of the turn, each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll of 5+ scores a Critical Hit.",
           "raw_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
           "runtime_consumer_ids": [
-            "catalog-ir:minimum-unmodified-hit-success",
-            "catalog-ir:post-shoot-hit-target-effect"
+            "catalog-ir:minimum-unmodified-hit-success"
           ],
           "semantic_consumers": [
             {
               "runtime_consumer_ids": [
-                "catalog-ir:minimum-unmodified-hit-success",
-                "catalog-ir:post-shoot-hit-target-effect"
+                "catalog-ir:minimum-unmodified-hit-success"
               ],
               "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003909:5:description:clause:002:effect:0",
               "semantic_kind": "set_contextual_status"
@@ -4025,8 +4019,8 @@
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 2,
-    "Exact IR parsed; host needed": 5,
+    "All exact abilities consumed": 1,
+    "Exact IR parsed; host needed": 6,
     "Exact ability IR unsupported": 63
   },
   "source_artifact_hashes": {

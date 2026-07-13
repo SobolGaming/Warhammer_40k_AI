@@ -18,6 +18,12 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.catalog_geometry import alive_geometry_models_for_placement
+from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
+    clause_has_immediate_selected_target_effect,
+    effect_is_immediate_selected_target_battle_shock,
+    post_shoot_selected_target_effect_clause_is_supported,
+    post_shoot_selected_target_effect_clauses_after,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_unit_scoped_generic_records,
 )
@@ -47,6 +53,13 @@ from warhammer40k_core.rules.rule_ir import (
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+
+__all__ = (
+    "clause_has_immediate_selected_target_effect",
+    "effect_is_immediate_selected_target_battle_shock",
+    "post_shoot_selected_target_effect_clause_is_supported",
+    "post_shoot_selected_target_effect_clauses_after",
+)
 
 _ENGAGEMENT_RANGE_HORIZONTAL_INCHES = 1.0
 _ENGAGEMENT_RANGE_VERTICAL_INCHES = 5.0
@@ -97,32 +110,6 @@ def selected_effect_clauses_after(
         if any(effect.kind in SUPPORTED_SELECTED_EFFECT_KINDS for effect in clause.effects):
             selected.append(clause)
     return tuple(selected)
-
-
-def clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog selected-target matcher requires RuleClause.")
-    if clause.duration is not None or clause.target is None:
-        return False
-    if clause.target.kind not in {RuleTargetKind.SELECTED_UNIT, RuleTargetKind.SELECTED_TARGET}:
-        return False
-    return any(
-        effect_is_immediate_selected_target_battle_shock(effect) for effect in clause.effects
-    )
-
-
-def effect_is_immediate_selected_target_battle_shock(effect: RuleEffectSpec) -> bool:
-    if type(effect) is not RuleEffectSpec:
-        raise GameLifecycleError("Catalog selected-target matcher requires RuleEffectSpec.")
-    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
-        return False
-    parameters = parameter_payload(effect.parameters)
-    return (
-        parameters.get("rules_context") == "battle_shock"
-        and parameters.get("status") == "force_battle_shock_test"
-        and parameters.get("required") is True
-        and parameters.get("target_scope") == "selected_unit"
-    )
 
 
 def eligible_selection_target_unit_ids(
@@ -491,15 +478,25 @@ def has_post_shoot_hit_target_effect_records(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> bool:
     return any(
-        any(
-            clause_is_post_shoot_hit_target_selection(clause)
-            for clause in catalog_selected_target_clauses_from_record(record)
-        )
+        record_has_supported_post_shoot_selected_target_effect(record)
         for index in ability_indexes_by_player_id.values()
         for record in records_for_timing(
             index,
             TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
         )
+    )
+
+
+def record_has_supported_post_shoot_selected_target_effect(
+    record: AbilityCatalogRecord,
+) -> bool:
+    clauses = catalog_selected_target_clauses_from_record(record)
+    runtime_clause_id = runtime_clause_id_from_record(record)
+    return any(
+        (runtime_clause_id is None or runtime_clause_id == clause.clause_id)
+        and clause_is_post_shoot_hit_target_selection(clause)
+        and bool(post_shoot_selected_target_effect_clauses_after(clauses, index))
+        for index, clause in enumerate(clauses)
     )
 
 

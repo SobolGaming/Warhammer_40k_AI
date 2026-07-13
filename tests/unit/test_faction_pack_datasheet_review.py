@@ -301,8 +301,8 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 2,
-        SEMANTIC_BUCKET_HOST_NEEDED: 5,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 1,
+        SEMANTIC_BUCKET_HOST_NEEDED: 6,
         SEMANTIC_BUCKET_UNSUPPORTED_IR: 63,
     }
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
