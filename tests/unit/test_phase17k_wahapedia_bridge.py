@@ -6687,10 +6687,12 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in chaos_daemons_markdown
     assert "| Legion of Excess | `None` | Generated scaffold only |" in chaos_daemons_markdown
     assert "## Detachment Rule Coverage Rows" not in chaos_daemons_markdown
-    assert "| Corsair Coterie | Pirates' Due |" in aeldari_markdown
-    assert "| Corsair Coterie | Archraider |" in aeldari_markdown
-    assert "`generic_supported` / `engine_consumed`" in aeldari_markdown
-    assert "`named_handler_required` / `source_only`" in aeldari_markdown
+    assert "## Semantic Support Snapshot" in aeldari_markdown
+    assert "| Complete Faction Pack datasheets | 5 |" in aeldari_markdown
+    assert "| Faction Pack datasheet updates | 24 |" in aeldari_markdown
+    assert "| Unchanged predecessor datasheets | 41 |" in aeldari_markdown
+    assert "`generic_supported` / `engine_consumed`" not in aeldari_markdown
+    assert "`named_handler_required` / `source_only`" not in aeldari_markdown
     assert (
         "| Detachment | Rule | Rule ID | Timing | Category | Source support | "
         "Execution status | Handler / block | Runtime consumers | Source IDs |"

@@ -10,6 +10,15 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_orks-agh9kwrtno-0xarrl5fjj.pd
 | ---: | ---: | ---: | ---: | ---: |
 | 12 | 1 | 44 | 66 | 13 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 7 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 26 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 24 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **57** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -29,9 +38,83 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Taktikal Brigade | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | War Horde | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_09-06_warhammer40000_faction_pack_orks-agh9kwrtno-0xarrl5fjj.pdf` (SHA-256 `2c15bcd7dde77ad2e3656175410516135f52d6874577e27769d76394f763f7d1`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Bannernob (PDF-only) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-22 | PDF-only complete datasheet; no matching row exists in the pinned predecessor snapshot. |
+| Battlewagon (`000000039`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Beast Snagga Boyz (`000002494`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Beastboss (`000002489`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Beastboss On Squigosaur (`000002490`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Big Mek (`000003707`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Big Mek Dakkarig (PDF-only) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-22 | PDF-only complete datasheet; no matching row exists in the pinned predecessor snapshot. |
+| Big Mek In Mega Armour (`000000006`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Big Mek With Shokk Attack Gun (`000001536`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Big'ed Bossbunka (`000002499`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Bigboss (PDF-only) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-22 | PDF-only complete datasheet; no matching row exists in the pinned predecessor snapshot. |
+| Blitza-bommer (`000000031`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Boomdakka Snazzwagon (`000001540`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Boss Snikrot (`000000011`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Boyz (`000000016`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Breaka Boyz (`000003861`) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-22 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Burna Boyz (`000000019`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Burna-bommer (`000000030`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Dakkajet (`000000029`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Deff Dread (`000000040`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Deffkilla Wartrike (`000001537`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Deffkoptas (`000000028`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Flash Gitz (`000000045`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Ghazghkull Thraka (`000000008`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Gorkanaut (`000000043`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Gretchin (`000000017`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hunta Rig (`000002498`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kill Rig (`000002497`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Killa Kans (`000000041`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kommandos (`000000025`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kustom Boosta-blasta (`000001538`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lootas (`000000044`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Meganobz (`000000024`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Megatrakk Scrapjet (`000001541`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Mek (`000000012`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Mek Gunz (`000000038`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Morkanaut (`000000042`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Mozrog Skragbad (`000002493`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Nobz (`000000021`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Painboss (`000002491`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Painboy (`000000013`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Rukkatrukk Squigbuggy (`000001542`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Shokkjump Dragsta (`000001539`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Squighog Boyz (`000002496`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stompa (`000000046`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormboyz (`000000027`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tankbustas (`000000020`) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-22 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Trukk (`000000026`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Warbikers (`000000033`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Warboss (`000000001`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Warboss In Mega Armour (`000000002`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Wartrakks (`000000034`) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-22 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Wazbom Blastajet (`000000032`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Wazdakka Gutsmek (`000004221`) | `complete_pdf` | Complete Datasheets, physical PDF pages 9-22 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Weirdboy (`000000004`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Wurrboy (`000002492`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Zodgrod Wortsnagga (`000002488`) | `rules_update` | Rules Updates, physical PDF pages 23-25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -39,24 +122,26 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Blitz Brigade | Blitz Brigade detachment rule | `phase17e:orks:blitz-brigade:rule` | `named_handler_required` | `phase17e:detachment:blitz-brigade:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:blitz-brigade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Bully Boyz | Bully Boyz detachment rule | `phase17e:orks:bully-boyz:rule` | `named_handler_required` | `phase17e:detachment:bully-boyz:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Da Big Hunt | Da Big Hunt detachment rule | `phase17e:orks:da-big-hunt:rule` | `named_handler_required` | `phase17e:detachment:da-big-hunt:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:da-big-hunt`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Dread Mob | Dread Mob detachment rule | `phase17e:orks:dread-mob:rule` | `named_handler_required` | `phase17e:detachment:dread-mob:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:dread-mob`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Freebooter Krew | Freebooter Krew detachment rule | `phase17e:orks:freebooter-krew:rule` | `named_handler_required` | `phase17e:detachment:freebooter-krew:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:freebooter-krew`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Green Tide | Green Tide detachment rule | `phase17e:orks:green-tide:rule` | `named_handler_required` | `phase17e:detachment:green-tide:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:green-tide`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Kult of Speed | Kult of Speed detachment rule | `phase17e:orks:kult-of-speed:rule` | `named_handler_required` | `phase17e:detachment:kult-of-speed:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:kult-of-speed`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| More Dakka! | More Dakka! detachment rule | `phase17e:orks:more-dakka:rule` | `generic_supported` |  | `gw-11e-faction-detachments-2026-27:detachment:orks:more-dakka`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Rollin' Deff | Rollin' Deff detachment rule | `phase17e:orks:rollin-deff:rule` | `named_handler_required` | `phase17e:detachment:rollin-deff:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:rollin-deff`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Speedwaaagh! | Speedwaaagh! detachment rule | `phase17e:orks:speedwaaagh:rule` | `named_handler_required` | `phase17e:detachment:speedwaaagh:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:speedwaaagh`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| Taktikal Brigade | Taktikal Brigade detachment rule | `phase17e:orks:taktikal-brigade:rule` | `named_handler_required` | `phase17e:detachment:taktikal-brigade:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:taktikal-brigade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
-| War Horde | War Horde detachment rule | `phase17e:orks:war-horde:rule` | `named_handler_required` | `phase17e:detachment:war-horde:rule` | `gw-11e-faction-detachments-2026-27:detachment:orks:war-horde`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Blitz Brigade | Blitz Brigade detachment rule | `phase17e:orks:blitz-brigade:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:blitz-brigade:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:blitz-brigade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Bully Boyz | Bully Boyz detachment rule | `phase17e:orks:bully-boyz:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:bully-boyz:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Da Big Hunt | Da Big Hunt detachment rule | `phase17e:orks:da-big-hunt:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:da-big-hunt:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:da-big-hunt`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Dread Mob | Dread Mob detachment rule | `phase17e:orks:dread-mob:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:dread-mob:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:dread-mob`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Freebooter Krew | Freebooter Krew detachment rule | `phase17e:orks:freebooter-krew:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:freebooter-krew:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:freebooter-krew`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Green Tide | Green Tide detachment rule | `phase17e:orks:green-tide:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:green-tide:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:green-tide`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Kult of Speed | Kult of Speed detachment rule | `phase17e:orks:kult-of-speed:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:kult-of-speed:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:kult-of-speed`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| More Dakka! | More Dakka! detachment rule | `phase17e:orks:more-dakka:rule` | `generic_supported` | `executable_generic_ir` |  | None | `gw-11e-faction-detachments-2026-27:detachment:orks:more-dakka`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Rollin' Deff | Rollin' Deff detachment rule | `phase17e:orks:rollin-deff:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:rollin-deff:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:rollin-deff`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Speedwaaagh! | Speedwaaagh! detachment rule | `phase17e:orks:speedwaaagh:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:speedwaaagh:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:speedwaaagh`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| Taktikal Brigade | Taktikal Brigade detachment rule | `phase17e:orks:taktikal-brigade:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:taktikal-brigade:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:taktikal-brigade`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
+| War Horde | War Horde detachment rule | `phase17e:orks:war-horde:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:war-horde:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:war-horde`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -106,6 +191,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | War Horde | Supa-Cybork Body | `000008367005` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:orks:war-horde:enhancement:000008367005` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:war-horde`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008367005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:orks:war-horde:000008367005`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:orks` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

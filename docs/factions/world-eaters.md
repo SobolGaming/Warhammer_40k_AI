@@ -10,6 +10,15 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_world_eaters-az7rivdn6x-d9rvb
 | ---: | ---: | ---: | ---: | ---: |
 | 8 | 0 | 24 | 36 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 1 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 14 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 15 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **30** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -25,9 +34,56 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Possessed Slaughterband | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Vessels of Wrath | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_10-06_warhammer40000_faction_pack_world_eaters-az7rivdn6x-d9rvbncqvt.pdf` (SHA-256 `c773ef3a9c73ab354a18bd9b0c1e9a190ee89c9155a1e2bba52286fa6e39be30`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Angron (`000002621`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Bloodcrushers (`000004107`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Bloodletters (`000004106`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Bloodthirster (`000004105`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Land Raider (`000002634`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Annihilator (`000002637`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Destructor (`000002636`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Rhino (`000002640`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Spawn (`000002633`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Terminators (`000002629`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Daemon Prince of Khorne (`000002624`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemon Prince of Khorne with Wings (`000002757`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Defiler (`000004207`) | `complete_pdf` | Complete Datasheet, physical PDF pages 5-6 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Eightbound (`000002630`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Exalted Eightbound (`000002631`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Flesh Hounds (`000004108`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Forgefiend (`000002638`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Goremongers (`000004076`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Helbrute (`000002632`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Heldrake (`000002641`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Jakhals (`000002628`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Khorne Berzerkers (`000002627`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Khorne Lord of Skulls (`000002642`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Khârn The Betrayer (`000002622`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord Invocatus (`000002623`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord on Juggernaut (`000002625`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Master of Executions (`000002626`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Maulerfiend (`000002639`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Skarbrand (`000004104`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Slaughterbound (`000004103`) | `rules_update` | Rules Updates, physical PDF pages 7-8 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -44,20 +100,22 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Berzerker Warband | Berzerker Warband detachment rule | `phase17e:world-eaters:berzerker-warband:rule` | `named_handler_required` | `phase17e:detachment:berzerker-warband:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:berzerker-warband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Brazen Engines | Brazen Engines detachment rule | `phase17e:world-eaters:brazen-engines:rule` | `named_handler_required` | `phase17e:detachment:brazen-engines:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:brazen-engines`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Butchers of Khorne | Butchers of Khorne detachment rule | `phase17e:world-eaters:butchers-of-khorne:rule` | `named_handler_required` | `phase17e:detachment:butchers-of-khorne:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:butchers-of-khorne`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Cult of Blood | Cult of Blood detachment rule | `phase17e:world-eaters:cult-of-blood:rule` | `named_handler_required` | `phase17e:detachment:cult-of-blood:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:cult-of-blood`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Goretrack Onslaught | Goretrack Onslaught detachment rule | `phase17e:world-eaters:goretrack-onslaught:rule` | `named_handler_required` | `phase17e:detachment:goretrack-onslaught:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:goretrack-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Khorne Daemonkin | Khorne Daemonkin detachment rule | `phase17e:world-eaters:khorne-daemonkin:rule` | `named_handler_required` | `phase17e:detachment:khorne-daemonkin:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:khorne-daemonkin`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Possessed Slaughterband | Possessed Slaughterband detachment rule | `phase17e:world-eaters:possessed-slaughterband:rule` | `named_handler_required` | `phase17e:detachment:possessed-slaughterband:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:possessed-slaughterband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
-| Vessels of Wrath | Vessels of Wrath detachment rule | `phase17e:world-eaters:vessels-of-wrath:rule` | `named_handler_required` | `phase17e:detachment:vessels-of-wrath:rule` | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:vessels-of-wrath`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Berzerker Warband | Berzerker Warband detachment rule | `phase17e:world-eaters:berzerker-warband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:berzerker-warband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:berzerker-warband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Brazen Engines | Brazen Engines detachment rule | `phase17e:world-eaters:brazen-engines:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:brazen-engines:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:brazen-engines`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Butchers of Khorne | Butchers of Khorne detachment rule | `phase17e:world-eaters:butchers-of-khorne:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:butchers-of-khorne:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:butchers-of-khorne`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Cult of Blood | Cult of Blood detachment rule | `phase17e:world-eaters:cult-of-blood:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:cult-of-blood:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:cult-of-blood`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Goretrack Onslaught | Goretrack Onslaught detachment rule | `phase17e:world-eaters:goretrack-onslaught:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:goretrack-onslaught:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:goretrack-onslaught`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Khorne Daemonkin | Khorne Daemonkin detachment rule | `phase17e:world-eaters:khorne-daemonkin:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:khorne-daemonkin:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:khorne-daemonkin`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Possessed Slaughterband | Possessed Slaughterband detachment rule | `phase17e:world-eaters:possessed-slaughterband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:possessed-slaughterband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:possessed-slaughterband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
+| Vessels of Wrath | Vessels of Wrath detachment rule | `phase17e:world-eaters:vessels-of-wrath:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:vessels-of-wrath:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:vessels-of-wrath`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -87,6 +145,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Vessels of Wrath | Vox-diabolus | `000009847003` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:world-eaters:vessels-of-wrath:enhancement:000009847003` | None | `gw-11e-faction-detachments-2026-27:detachment:world-eaters:vessels-of-wrath`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009847003`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:world-eaters:vessels-of-wrath:000009847003`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:world-eaters` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

@@ -10,6 +10,15 @@ Source PDF: [eng_11-06_warhammer40000_faction_pack_astra_militarum-etf9ihpodv-mb
 | ---: | ---: | ---: | ---: | ---: |
 | 11 | 0 | 36 | 54 | 2 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 8 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 42 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 20 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **70** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -28,9 +37,96 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Siege Regiment | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Steel Hammer | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_11-06_warhammer40000_faction_pack_astra_militarum-etf9ihpodv-mbqdsa1bfv.pdf` (SHA-256 `ca0686dedc7c921970a5efbf779d9d85a7d427cdce252e64c3576899809acecd`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Aegis Defence Line (`000002619`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Armoured Sentinels (`000000691`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Artillery Team (`000003896`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Attilan Rough Riders (`000002616`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Baneblade (`000000702`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Banehammer (`000000703`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Banesword (`000000704`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Basilisk (`000000695`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Bullgryn Squad (`000000723`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cadian Castellan (`000002607`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cadian Command Squad (`000002609`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Cadian Heavy Weapons Squad (`000000686`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cadian Recon Squad (`000004224`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Cadian Shock Troops (`000002612`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Catachan Command Squad (`000003891`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Catachan Heavy Weapons Squad (`000003894`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Catachan Jungle Fighters (`000002614`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Centaur RSV (`000004220`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Chimera (`000000692`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Commissar (`000000716`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Commissar Graves (`000004217`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Commissar Graves on Foot (`000004218`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Commissar Yarrick (`000004216`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Death Korps Of Krieg (`000002613`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Death Riders (`000003898`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Deathstrike (`000000699`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Doomhammer (`000000705`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Field Ordnance Battery (`000003897`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Gaunt's Ghosts (`000002485`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hellhammer (`000000706`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hellhound (`000000694`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hippogriff AFV (`000004219`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Hydra (`000000696`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kasrkin (`000002615`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Krieg Combat Engineers (`000003893`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Krieg Command Squad (`000003889`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Krieg Heavy Weapons Squad (`000003895`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Battle Tank (`000000700`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Commander (`000000680`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Demolisher (`000000701`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Eradicator (`000002741`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Executioner (`000002742`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Exterminator (`000002743`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Punisher (`000002744`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Leman Russ Vanquisher (`000002745`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Lord Marshal Dreir (`000003890`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord Solar Leontus (`000002605`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Manticore (`000000698`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Militarum Tempestus Command Squad (`000000719`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ministorum Priest (`000001394`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Nork Deddog (`000000725`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Ogryn Bodyguard (`000001398`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ogryn Squad (`000000722`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Primaris Psyker (`000000889`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Ratlings (`000000724`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Rogal Dorn Battle Tank (`000002617`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Rogal Dorn Commander (`000003892`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Scout Sentinels (`000000690`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Shadowsword (`000000707`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sly Marbo (`000001406`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Stormlord (`000000708`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormsword (`000000709`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Taurox (`000000693`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Taurox Prime (`000000721`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tech-Priest Enginseer (`000001396`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tempestus Aquilons (`000003834`) | `complete_pdf` | Complete Datasheets, physical PDF pages 11-26 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Tempestus Scions (`000002746`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ursula Creed (`000002606`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Valkyrie (`000000727`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Wyvern (`000000697`) | `rules_update` | Rules Updates, physical PDF pages 27-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -38,23 +134,25 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Abhuman Auxiliaries | Abhuman Auxiliaries detachment rule | `phase17e:astra-militarum:abhuman-auxiliaries:rule` | `named_handler_required` | `phase17e:detachment:abhuman-auxiliaries:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:abhuman-auxiliaries`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Armoured Infantry | Armoured Infantry detachment rule | `phase17e:astra-militarum:armoured-infantry:rule` | `named_handler_required` | `phase17e:detachment:armoured-infantry:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:armoured-infantry`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Bridgehead Strike | Bridgehead Strike detachment rule | `phase17e:astra-militarum:bridgehead-strike:rule` | `named_handler_required` | `phase17e:detachment:bridgehead-strike:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:bridgehead-strike`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Combined Arms | Combined Arms detachment rule | `phase17e:astra-militarum:combined-arms:rule` | `named_handler_required` | `phase17e:detachment:combined-arms:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:combined-arms`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Designation Force | Designation Force detachment rule | `phase17e:astra-militarum:designation-force:rule` | `named_handler_required` | `phase17e:detachment:designation-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:designation-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Grizzled Company | Grizzled Company detachment rule | `phase17e:astra-militarum:grizzled-company:rule` | `named_handler_required` | `phase17e:detachment:grizzled-company:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:grizzled-company`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Hammer of the Emperor | Hammer of the Emperor detachment rule | `phase17e:astra-militarum:hammer-of-the-emperor:rule` | `named_handler_required` | `phase17e:detachment:hammer-of-the-emperor:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:hammer-of-the-emperor`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Mechanised Assault | Mechanised Assault detachment rule | `phase17e:astra-militarum:mechanised-assault:rule` | `named_handler_required` | `phase17e:detachment:mechanised-assault:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:mechanised-assault`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Recon Element | Recon Element detachment rule | `phase17e:astra-militarum:recon-element:rule` | `named_handler_required` | `phase17e:detachment:recon-element:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:recon-element`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Siege Regiment | Siege Regiment detachment rule | `phase17e:astra-militarum:siege-regiment:rule` | `named_handler_required` | `phase17e:detachment:siege-regiment:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:siege-regiment`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
-| Steel Hammer | Steel Hammer detachment rule | `phase17e:astra-militarum:steel-hammer:rule` | `named_handler_required` | `phase17e:detachment:steel-hammer:rule` | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:steel-hammer`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Abhuman Auxiliaries | Abhuman Auxiliaries detachment rule | `phase17e:astra-militarum:abhuman-auxiliaries:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:abhuman-auxiliaries:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:abhuman-auxiliaries`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Armoured Infantry | Armoured Infantry detachment rule | `phase17e:astra-militarum:armoured-infantry:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:armoured-infantry:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:armoured-infantry`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Bridgehead Strike | Bridgehead Strike detachment rule | `phase17e:astra-militarum:bridgehead-strike:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:bridgehead-strike:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:bridgehead-strike`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Combined Arms | Combined Arms detachment rule | `phase17e:astra-militarum:combined-arms:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:combined-arms:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:combined-arms`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Designation Force | Designation Force detachment rule | `phase17e:astra-militarum:designation-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:designation-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:designation-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Grizzled Company | Grizzled Company detachment rule | `phase17e:astra-militarum:grizzled-company:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:grizzled-company:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:grizzled-company`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Hammer of the Emperor | Hammer of the Emperor detachment rule | `phase17e:astra-militarum:hammer-of-the-emperor:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hammer-of-the-emperor:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:hammer-of-the-emperor`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Mechanised Assault | Mechanised Assault detachment rule | `phase17e:astra-militarum:mechanised-assault:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:mechanised-assault:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:mechanised-assault`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Recon Element | Recon Element detachment rule | `phase17e:astra-militarum:recon-element:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:recon-element:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:recon-element`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Siege Regiment | Siege Regiment detachment rule | `phase17e:astra-militarum:siege-regiment:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:siege-regiment:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:siege-regiment`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
+| Steel Hammer | Steel Hammer detachment rule | `phase17e:astra-militarum:steel-hammer:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:steel-hammer:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:steel-hammer`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -96,6 +194,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Steel Hammer | Titan Killer | `000010787003` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:astra-militarum:steel-hammer:enhancement:000010787003` | None | `gw-11e-faction-detachments-2026-27:detachment:astra-militarum:steel-hammer`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010787003`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:astra-militarum:steel-hammer:000010787003`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:astra-militarum` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

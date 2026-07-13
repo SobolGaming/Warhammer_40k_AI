@@ -10,6 +10,15 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_emperor_s_children-fffbpc3gn0
 | ---: | ---: | ---: | ---: | ---: |
 | 10 | 1 | 30 | 45 | 18 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 1 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 9 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 13 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **23** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -27,9 +36,49 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Slaanesh's Chosen | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Spectacle of Slaughter | `Full` | Static RuleIR runtime bundle for the detachment rule, two enhancement bindings, and three Stratagem records | Lifecycle bundle, enhancement hook, Stratagem lifecycle, and runtime boundary tests | Covers Entitled to Victory Fights First grants, Beguiling Grotesquerie Snap Shooting target restriction, Eager Patrons Move modifier, Honour Is for Fools Precision, Single-minded Strike charge transit permission, and Intoxicated by Triumph triggered movement. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_10-06_warhammer40000_faction_pack_emperor_s_children-fffbpc3gn0-mesp5k6khu.pdf` (SHA-256 `2b59fff06a1e5f3164155d3ceea0f773d565eaf85e6c5807b36b7d497d0307a3`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Chaos Land Raider (`000004082`) | `rules_update` | Rules Updates, physical PDF pages 9-10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Rhino (`000004093`) | `rules_update` | Rules Updates, physical PDF pages 9-10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Spawn (`000004090`) | `rules_update` | Rules Updates, physical PDF pages 9-10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Terminators (`000004081`) | `rules_update` | Rules Updates, physical PDF pages 9-10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Daemon Prince of Slaanesh (`000004086`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemon Prince of Slaanesh with Wings (`000004087`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemonettes (`000004095`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Defiler (`000004208`) | `complete_pdf` | Complete Datasheet, physical PDF pages 7-8 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Fiends (`000004096`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Flawless Blades (`000004089`) | `rules_update` | Rules Updates, physical PDF pages 9-10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Fulgrim (`000004077`) | `rules_update` | Rules Updates, physical PDF pages 9-10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Heldrake (`000004092`) | `rules_update` | Rules Updates, physical PDF pages 9-10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Infractors (`000004080`) | `rules_update` | Rules Updates, physical PDF pages 9-10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Keeper of Secrets (`000004097`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord Exultant (`000004078`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord Kakophonist (`000004084`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lucius the Eternal (`000004083`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Maulerfiend (`000004091`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Noise Marines (`000004088`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Seekers (`000004098`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Shalaxi Helbane (`000004094`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sorcerer (`000004085`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tormentors (`000004079`) | `rules_update` | Rules Updates, physical PDF pages 9-10 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -46,22 +95,24 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Carnival of Excess | Carnival of Excess detachment rule | `phase17e:emperors-children:carnival-of-excess:rule` | `named_handler_required` | `phase17e:detachment:carnival-of-excess:rule` | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:carnival-of-excess`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
-| Coterie of the Conceited | Coterie of the Conceited detachment rule | `phase17e:emperors-children:coterie-of-the-conceited:rule` | `named_handler_required` | `phase17e:detachment:coterie-of-the-conceited:rule` | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:coterie-of-the-conceited`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
-| Court of the Phoenician | Court of the Phoenician detachment rule | `phase17e:emperors-children:court-of-the-phoenician:rule` | `generic_supported` |  | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:court-of-the-phoenician`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
-| Elegant Brutes | Elegant Brutes detachment rule | `phase17e:emperors-children:elegant-brutes:rule` | `named_handler_required` | `phase17e:detachment:elegant-brutes:rule` | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:elegant-brutes`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
-| Frenzied Host | Frenzied Host detachment rule | `phase17e:emperors-children:frenzied-host:rule` | `named_handler_required` | `phase17e:detachment:frenzied-host:rule` | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:frenzied-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
-| Mercurial Host | Mercurial Host detachment rule | `phase17e:emperors-children:mercurial-host:rule` | `named_handler_required` | `phase17e:detachment:mercurial-host:rule` | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:mercurial-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
-| Peerless Bladesmen | Peerless Bladesmen detachment rule | `phase17e:emperors-children:peerless-bladesmen:rule` | `named_handler_required` | `phase17e:detachment:peerless-bladesmen:rule` | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:peerless-bladesmen`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
-| Rapid Evisceration | Rapid Evisceration detachment rule | `phase17e:emperors-children:rapid-evisceration:rule` | `named_handler_required` | `phase17e:detachment:rapid-evisceration:rule` | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:rapid-evisceration`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
-| Slaanesh's Chosen | Slaanesh's Chosen detachment rule | `phase17e:emperors-children:slaaneshs-chosen:rule` | `named_handler_required` | `phase17e:detachment:slaaneshs-chosen:rule` | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:slaaneshs-chosen`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
-| Spectacle of Slaughter | Spectacle of Slaughter detachment rule | `phase17e:emperors-children:spectacle-of-slaughter:rule` | `generic_supported` |  | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:spectacle-of-slaughter`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Carnival of Excess | Carnival of Excess detachment rule | `phase17e:emperors-children:carnival-of-excess:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:carnival-of-excess:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:carnival-of-excess`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Coterie of the Conceited | Coterie of the Conceited detachment rule | `phase17e:emperors-children:coterie-of-the-conceited:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:coterie-of-the-conceited:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:coterie-of-the-conceited`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Court of the Phoenician | Court of the Phoenician detachment rule | `phase17e:emperors-children:court-of-the-phoenician:rule` | `generic_supported` | `executable_generic_ir` |  | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:court-of-the-phoenician`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Elegant Brutes | Elegant Brutes detachment rule | `phase17e:emperors-children:elegant-brutes:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:elegant-brutes:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:elegant-brutes`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Frenzied Host | Frenzied Host detachment rule | `phase17e:emperors-children:frenzied-host:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:frenzied-host:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:frenzied-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Mercurial Host | Mercurial Host detachment rule | `phase17e:emperors-children:mercurial-host:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:mercurial-host:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:mercurial-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Peerless Bladesmen | Peerless Bladesmen detachment rule | `phase17e:emperors-children:peerless-bladesmen:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:peerless-bladesmen:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:peerless-bladesmen`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Rapid Evisceration | Rapid Evisceration detachment rule | `phase17e:emperors-children:rapid-evisceration:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:rapid-evisceration:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:rapid-evisceration`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Slaanesh's Chosen | Slaanesh's Chosen detachment rule | `phase17e:emperors-children:slaaneshs-chosen:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:slaaneshs-chosen:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:slaaneshs-chosen`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
+| Spectacle of Slaughter | Spectacle of Slaughter detachment rule | `phase17e:emperors-children:spectacle-of-slaughter:rule` | `generic_supported` | `executable_generic_ir` |  | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:spectacle-of-slaughter`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -97,6 +148,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Spectacle of Slaughter | Eager Patrons Upgrade | `000010900003` | army_construction | enhancement | `generic_supported` / `source_only` | `executable_generic_ir` |  | None | `gw-11e-faction-detachments-2026-27:detachment:emperors-children:spectacle-of-slaughter`, `gw-11e-mfm-2026-06:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:eager-patrons`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:emperors-children:spectacle-of-slaughter:000010900003`, `gw-11e-phase17e-exact-faction-subrules-2026-27:pdf-page:emperors-children:spectacle-of-slaughter:page-4:eager-patrons`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:emperors-children` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

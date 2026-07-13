@@ -10,6 +10,15 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_knights-nd97dcwfqa-6prd
 | ---: | ---: | ---: | ---: | ---: |
 | 8 | 0 | 26 | 36 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 0 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 1 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 10 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **11** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -25,9 +34,37 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Lords of Dread | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Traitoris Lance | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_10-06_warhammer40000_faction_pack_chaos_knights-nd97dcwfqa-6prdhhde6p.pdf` (SHA-256 `08f011a00fc6af66134c100e075376c9b01453b1f14226111a0eed8af4f92b1e`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Knight Abominant (`000002567`) | `rules_update` | Rules Updates, physical PDF page 25 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Knight Desecrator (`000001660`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Knight Despoiler (`000001658`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Knight Rampager (`000001661`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Knight Ruinator (`000004134`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Knight Tyrant (`000001659`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| War Dog Brigand (`000002565`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| War Dog Executioner (`000002562`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| War Dog Huntsman (`000002566`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| War Dog Karnivore (`000002564`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| War Dog Stalker (`000002563`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -35,20 +72,22 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Bastions of Tyranny | Bastions of Tyranny detachment rule | `phase17e:chaos-knights:bastions-of-tyranny:rule` | `named_handler_required` | `phase17e:detachment:bastions-of-tyranny:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:bastions-of-tyranny`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
-| Helhunt Lance | Helhunt Lance detachment rule | `phase17e:chaos-knights:helhunt-lance:rule` | `named_handler_required` | `phase17e:detachment:helhunt-lance:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:helhunt-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
-| Houndpack Lance | Houndpack Lance detachment rule | `phase17e:chaos-knights:houndpack-lance:rule` | `named_handler_required` | `phase17e:detachment:houndpack-lance:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:houndpack-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
-| Hunting Warpack | Hunting Warpack detachment rule | `phase17e:chaos-knights:hunting-warpack:rule` | `named_handler_required` | `phase17e:detachment:hunting-warpack:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:hunting-warpack`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
-| Iconoclast Fiefdom | Iconoclast Fiefdom detachment rule | `phase17e:chaos-knights:iconoclast-fiefdom:rule` | `named_handler_required` | `phase17e:detachment:iconoclast-fiefdom:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:iconoclast-fiefdom`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
-| Infernal Lance | Infernal Lance detachment rule | `phase17e:chaos-knights:infernal-lance:rule` | `named_handler_required` | `phase17e:detachment:infernal-lance:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:infernal-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
-| Lords of Dread | Lords of Dread detachment rule | `phase17e:chaos-knights:lords-of-dread:rule` | `named_handler_required` | `phase17e:detachment:lords-of-dread:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:lords-of-dread`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
-| Traitoris Lance | Traitoris Lance detachment rule | `phase17e:chaos-knights:traitoris-lance:rule` | `named_handler_required` | `phase17e:detachment:traitoris-lance:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:traitoris-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Bastions of Tyranny | Bastions of Tyranny detachment rule | `phase17e:chaos-knights:bastions-of-tyranny:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:bastions-of-tyranny:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:bastions-of-tyranny`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
+| Helhunt Lance | Helhunt Lance detachment rule | `phase17e:chaos-knights:helhunt-lance:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:helhunt-lance:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:helhunt-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
+| Houndpack Lance | Houndpack Lance detachment rule | `phase17e:chaos-knights:houndpack-lance:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:houndpack-lance:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:houndpack-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
+| Hunting Warpack | Hunting Warpack detachment rule | `phase17e:chaos-knights:hunting-warpack:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hunting-warpack:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:hunting-warpack`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
+| Iconoclast Fiefdom | Iconoclast Fiefdom detachment rule | `phase17e:chaos-knights:iconoclast-fiefdom:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:iconoclast-fiefdom:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:iconoclast-fiefdom`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
+| Infernal Lance | Infernal Lance detachment rule | `phase17e:chaos-knights:infernal-lance:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:infernal-lance:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:infernal-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
+| Lords of Dread | Lords of Dread detachment rule | `phase17e:chaos-knights:lords-of-dread:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:lords-of-dread:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:lords-of-dread`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
+| Traitoris Lance | Traitoris Lance detachment rule | `phase17e:chaos-knights:traitoris-lance:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:traitoris-lance:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:traitoris-lance`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -80,6 +119,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Traitoris Lance | Veil of Medrengard | `000008516005` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:chaos-knights:traitoris-lance:enhancement:000008516005` | None | `gw-11e-faction-detachments-2026-27:detachment:chaos-knights:traitoris-lance`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008516005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-knights:traitoris-lance:000008516005`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-knights` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

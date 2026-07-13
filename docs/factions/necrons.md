@@ -10,6 +10,15 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_necrons-qodfthk7tt-bzeqy07okc
 | ---: | ---: | ---: | ---: | ---: |
 | 12 | 0 | 36 | 54 | 4 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 8 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 17 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 26 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **51** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -29,9 +38,77 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Starshatter Arsenal | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | The Phaeron's Armoury | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_09-06_warhammer40000_faction_pack_necrons-qodfthk7tt-bzeqy07okc.pdf` (SHA-256 `34c6c6ddaecdfd027986c3856bd924f04eaeecd937b0d91ec0f2893ab9c9f240`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Annihilation Barge (`000000553`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| C'tan Shard of the Deceiver (`000000542`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-28 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| C'tan Shard of the Nightbringer (`000000541`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-28 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| C'tan Shard of the Void Dragon (`000002357`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-28 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Canoptek Doomstalker (`000002115`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Canoptek Macrocytes (`000004176`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-28 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Canoptek Reanimator (`000002112`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Canoptek Scarab Swarms (`000002114`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Canoptek Spyders (`000000551`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Canoptek Tomb Crawlers (`000004177`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-28 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Canoptek Wraiths (`000000546`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Catacomb Command Barge (`000000533`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chronomancer (`000002354`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Convergence Of Dominion (`000002361`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Cryptothralls (`000002111`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Deathmarks (`000000537`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Doom Scythe (`000000545`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Doomsday Ark (`000000554`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Flayed Ones (`000000538`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Geomancer (`000004178`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-28 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Ghost Ark (`000000543`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hexmark Destroyer (`000002355`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Illuminor Szeras (`000002092`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Immortals (`000000535`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Imotekh The Stormlord (`000000522`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lokhust Destroyers (`000002359`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lokhust Heavy Destroyers (`000002116`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lokhust Lord (`000002351`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lychguard (`000000536`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Monolith (`000000552`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Necron Warriors (`000000534`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Nekrosor Ammentar (`000004186`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-28 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Night Scythe (`000000544`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Obelisk (`000000557`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ophydian Destroyers (`000002358`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Orikan The Diviner (`000000530`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Overlord (`000000523`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Overlord with translocation shroud (`000003693`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plasmancer (`000002108`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Psychomancer (`000002353`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Royal Warden (`000002350`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Skorpekh Destroyers (`000002110`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Skorpekh Lord (`000002109`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Technomancer (`000002352`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tesseract Vault (`000000556`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| The Silent King (`000002360`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tomb Blades (`000000548`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Transcendent C'tan (`000000555`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-28 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Trazyn The Infinite (`000000532`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Triarch Praetorians (`000000539`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Triarch Stalker (`000000540`) | `rules_update` | Rules Updates, physical PDF pages 29-32 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -39,24 +116,26 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Annihilation Legion | Annihilation Legion detachment rule | `phase17e:necrons:annihilation-legion:rule` | `named_handler_required` | `phase17e:detachment:annihilation-legion:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:annihilation-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Awakened Dynasty | Awakened Dynasty detachment rule | `phase17e:necrons:awakened-dynasty:rule` | `named_handler_required` | `phase17e:detachment:awakened-dynasty:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:awakened-dynasty`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Canoptek Court | Canoptek Court detachment rule | `phase17e:necrons:canoptek-court:rule` | `named_handler_required` | `phase17e:detachment:canoptek-court:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:canoptek-court`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Cryptek Conclave | Cryptek Conclave detachment rule | `phase17e:necrons:cryptek-conclave:rule` | `named_handler_required` | `phase17e:detachment:cryptek-conclave:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:cryptek-conclave`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Cursed Legion | Cursed Legion detachment rule | `phase17e:necrons:cursed-legion:rule` | `named_handler_required` | `phase17e:detachment:cursed-legion:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:cursed-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Hand of the Dynasty | Hand of the Dynasty detachment rule | `phase17e:necrons:hand-of-the-dynasty:rule` | `named_handler_required` | `phase17e:detachment:hand-of-the-dynasty:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:hand-of-the-dynasty`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Hypercrypt Legion | Hypercrypt Legion detachment rule | `phase17e:necrons:hypercrypt-legion:rule` | `named_handler_required` | `phase17e:detachment:hypercrypt-legion:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:hypercrypt-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Obeisance Phalanx | Obeisance Phalanx detachment rule | `phase17e:necrons:obeisance-phalanx:rule` | `named_handler_required` | `phase17e:detachment:obeisance-phalanx:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:obeisance-phalanx`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Pantheon of Woe | Pantheon of Woe detachment rule | `phase17e:necrons:pantheon-of-woe:rule` | `named_handler_required` | `phase17e:detachment:pantheon-of-woe:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:pantheon-of-woe`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Skyshroud Spearhead | Skyshroud Spearhead detachment rule | `phase17e:necrons:skyshroud-spearhead:rule` | `named_handler_required` | `phase17e:detachment:skyshroud-spearhead:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:skyshroud-spearhead`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| Starshatter Arsenal | Starshatter Arsenal detachment rule | `phase17e:necrons:starshatter-arsenal:rule` | `named_handler_required` | `phase17e:detachment:starshatter-arsenal:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:starshatter-arsenal`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
-| The Phaeron's Armoury | The Phaeron's Armoury detachment rule | `phase17e:necrons:the-phaerons-armoury:rule` | `named_handler_required` | `phase17e:detachment:the-phaerons-armoury:rule` | `gw-11e-faction-detachments-2026-27:detachment:necrons:the-phaerons-armoury`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Annihilation Legion | Annihilation Legion detachment rule | `phase17e:necrons:annihilation-legion:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:annihilation-legion:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:annihilation-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Awakened Dynasty | Awakened Dynasty detachment rule | `phase17e:necrons:awakened-dynasty:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:awakened-dynasty:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:awakened-dynasty`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Canoptek Court | Canoptek Court detachment rule | `phase17e:necrons:canoptek-court:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:canoptek-court:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:canoptek-court`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Cryptek Conclave | Cryptek Conclave detachment rule | `phase17e:necrons:cryptek-conclave:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:cryptek-conclave:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:cryptek-conclave`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Cursed Legion | Cursed Legion detachment rule | `phase17e:necrons:cursed-legion:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:cursed-legion:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:cursed-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Hand of the Dynasty | Hand of the Dynasty detachment rule | `phase17e:necrons:hand-of-the-dynasty:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hand-of-the-dynasty:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:hand-of-the-dynasty`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Hypercrypt Legion | Hypercrypt Legion detachment rule | `phase17e:necrons:hypercrypt-legion:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hypercrypt-legion:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:hypercrypt-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Obeisance Phalanx | Obeisance Phalanx detachment rule | `phase17e:necrons:obeisance-phalanx:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:obeisance-phalanx:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:obeisance-phalanx`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Pantheon of Woe | Pantheon of Woe detachment rule | `phase17e:necrons:pantheon-of-woe:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:pantheon-of-woe:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:pantheon-of-woe`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Skyshroud Spearhead | Skyshroud Spearhead detachment rule | `phase17e:necrons:skyshroud-spearhead:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:skyshroud-spearhead:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:skyshroud-spearhead`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| Starshatter Arsenal | Starshatter Arsenal detachment rule | `phase17e:necrons:starshatter-arsenal:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:starshatter-arsenal:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:starshatter-arsenal`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
+| The Phaeron's Armoury | The Phaeron's Armoury detachment rule | `phase17e:necrons:the-phaerons-armoury:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:the-phaerons-armoury:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:the-phaerons-armoury`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -98,6 +177,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Starshatter Arsenal | Miniaturised Nebuloscope | `000009749003` | army_construction | enhancement | `generic_supported` / `source_only` | `executable_generic_ir` |  | None | `gw-11e-faction-detachments-2026-27:detachment:necrons:starshatter-arsenal`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009749003`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:necrons:starshatter-arsenal:000009749003`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:necrons` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

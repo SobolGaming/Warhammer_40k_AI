@@ -8,8 +8,20 @@ from dataclasses import dataclass
 from datetime import date
 from functools import cache
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
+if TYPE_CHECKING or __package__:
+    from tools.faction_pack_datasheet_review import (
+        faction_pack_datasheet_review_markdown,
+        faction_pack_datasheet_snapshot_markdown,
+        reviewed_faction_ids,
+    )
+else:
+    from faction_pack_datasheet_review import (
+        faction_pack_datasheet_review_markdown,
+        faction_pack_datasheet_snapshot_markdown,
+        reviewed_faction_ids,
+    )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
 from warhammer40k_core.core.faction_aliases import (
@@ -159,6 +171,7 @@ DEFAULT_DOCS_PATH = Path("docs") / "ABILITY_SUPPORT_MATRIX_V2.md"
 DEFAULT_FACTION_DOCS_DIR = Path("docs") / "factions"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
 RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-coverage-v1"
+AELDARI_FACTION_ID = "aeldari"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
@@ -2775,7 +2788,14 @@ def _faction_support_markdown(
     ]
     if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
         lines.extend(_chaos_daemons_semantic_snapshot_markdown())
+    if faction_row.faction_id == AELDARI_FACTION_ID:
+        lines.extend(_aeldari_semantic_snapshot_markdown())
+    elif faction_row.faction_id in reviewed_faction_ids():
+        lines.extend(faction_pack_datasheet_snapshot_markdown(faction_row.faction_id))
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
+    if faction_row.faction_id in reviewed_faction_ids():
+        lines.extend(("", "## Datasheet Source Review", ""))
+        lines.extend(faction_pack_datasheet_review_markdown(faction_row.faction_id))
     lines.extend(
         _faction_datasheet_support_markdown(
             faction_row=faction_row,
@@ -2784,7 +2804,7 @@ def _faction_support_markdown(
             leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
     )
-    if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
+    if faction_row.faction_id in (AELDARI_FACTION_ID, CHAOS_DAEMONS_FACTION_ID):
         lines.append("")
         return "\n".join(lines)
     lines.extend(_faction_detachment_rule_coverage_rows_markdown(detachment_rule_rows))
@@ -2895,6 +2915,66 @@ def _chaos_daemons_semantic_snapshot_markdown() -> list[str]:
     lines.extend(_chaos_daemons_exact_stratagem_snapshot_markdown())
     lines.extend(_chaos_daemons_datasheet_snapshot_markdown())
     return lines
+
+
+def _aeldari_semantic_snapshot_markdown() -> list[str]:
+    lines = [
+        "",
+        "## Semantic Support Snapshot",
+        "",
+        (
+            "This generated snapshot separates source review from semantic execution. "
+            "Detachment-rule support uses the semantic support table below. Exact "
+            "Enhancement and Stratagem support uses the shared Phase17F execution evidence. "
+            "Datasheet counts describe the reviewed current source scope; no datasheet-level "
+            "execution support is claimed while Aeldari catalog rows are absent."
+        ),
+    ]
+    lines.extend(_aeldari_detachment_snapshot_markdown())
+    lines.extend(_aeldari_exact_enhancement_snapshot_markdown())
+    lines.extend(_aeldari_exact_stratagem_snapshot_markdown())
+    lines.extend(faction_pack_datasheet_snapshot_markdown(AELDARI_FACTION_ID))
+    return lines
+
+
+def _aeldari_detachment_snapshot_markdown() -> list[str]:
+    rows = _detachment_rule_support_rows_for_faction(AELDARI_FACTION_ID)
+    fully_supported = tuple(row.detachment for row in rows if _detachment_rule_is_supported(row))
+    needs_support = tuple(row.detachment for row in rows if not _detachment_rule_is_supported(row))
+    return [
+        "",
+        "### Detachments",
+        "",
+        "| Fully supported | Still needs semantic support |",
+        "| --- | --- |",
+        f"| {_markdown_line_list(fully_supported)} | {_markdown_line_list(needs_support)} |",
+    ]
+
+
+def _aeldari_exact_enhancement_snapshot_markdown() -> list[str]:
+    rows = tuple(
+        row
+        for row in faction_coverage_2026_27.coverage_rows()
+        if row.faction_id == AELDARI_FACTION_ID
+        and row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
+    )
+    return _chaos_daemons_exact_source_rows_snapshot_markdown(
+        title="Enhancements",
+        rows=rows,
+    )
+
+
+def _aeldari_exact_stratagem_snapshot_markdown() -> list[str]:
+    rows = tuple(
+        row
+        for row in faction_coverage_2026_27.coverage_rows()
+        if row.faction_id == AELDARI_FACTION_ID
+        and row.coverage_kind is Phase17ECoverageKind.DETACHMENT_STRATAGEM
+    )
+    return _chaos_daemons_exact_source_rows_snapshot_markdown(
+        title="Stratagems",
+        rows=rows,
+    )
 
 
 def _chaos_daemons_detachment_snapshot_markdown() -> list[str]:
@@ -3040,16 +3120,18 @@ def _faction_datasheet_support_markdown(
         "## Datasheet / Unit Support",
         "",
         (
-            "This table reports datasheet-level playability evidence. `Full` means "
-            "catalog/model/wargear/geometry data is present and every known datasheet/"
-            "wargear ability row is engine-consumed by named runtime consumers, with no "
-            "unsupported diagnostics. `Playable` means core unit operation is available but "
-            "one or more non-blocking generic IR, ability-detail, faction, or detachment "
-            "proofs are incomplete. `Partial` means at least one known ability or interaction is "
-            "descriptor-only or unsupported. `Catalog-only` means the unit is present but no "
+            "This table reports datasheet-level playability evidence generated from the exact "
+            "source text and structured catalog rows. `Full` (fully complete) requires complete "
+            "catalog/model/wargear/geometry data, every known datasheet and wargear ability to "
+            "parse into supported descriptors or RuleIR without diagnostics, and every parsed "
+            "semantic to have an engine runtime consumer. `Playable` means the exact text parses "
+            "into supported structured semantics and core unit operation is available, but one "
+            "or more runtime-consumption, faction, or detachment proofs remain incomplete. "
+            "`Partial` means at least one known ability or interaction is descriptor-only, only "
+            "partly parsed, or unsupported. `Catalog-only` means the unit is present but no "
             "semantic ability/runtime support is proven. `Blocked` means a known unsupported "
-            "rule, missing geometry, missing wargear, or missing required source data "
-            "prevents safe play."
+            "rule, missing geometry, missing wargear, or missing required source data prevents "
+            "safe play."
         ),
         "",
     ]
@@ -4119,11 +4201,18 @@ def _faction_detachment_rule_coverage_rows_markdown(
         "",
         (
             "These rows expose the underlying Phase17E source coverage and handler IDs. "
-            "Use the support table above for semantic support status."
+            "`generic_supported` is emitted only when the generator can build supported "
+            "RuleIR from the exact rule text without unsupported diagnostics. Parsing and "
+            "runtime execution remain separate: a row is fully complete only when its "
+            "execution status is executable and it records runtime consumers. Use the support "
+            "table above for the gameplay-support summary."
         ),
         "",
-        "| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |",
-        "| --- | --- | --- | --- | --- | --- |",
+        (
+            "| Detachment | Rule | Coverage row | Source support | Execution status | "
+            "Handler / block | Runtime consumers | Source IDs |"
+        ),
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for row in rows:
         lines.append(
@@ -4134,7 +4223,9 @@ def _faction_detachment_rule_coverage_rows_markdown(
                     _markdown_text(row.rule_name),
                     f"`{_markdown_text(row.descriptor_id)}`",
                     _coverage_status_text(row),
+                    _coverage_execution_status_text(row),
                     _handler_or_block_text(row),
+                    _inline_code_list(row.runtime_consumer_ids),
                     _inline_code_list(row.source_ids),
                 )
             )
@@ -4157,6 +4248,13 @@ def _faction_exact_rule_rows_markdown(
     lines = [
         "",
         f"## {title}",
+        "",
+        (
+            "`generic_supported` means the generator parsed the exact source text into "
+            "supported RuleIR without unsupported diagnostics. That is IR coverage, not by "
+            "itself complete gameplay support. A row is fully complete only when the separate "
+            "execution status is executable and runtime consumers are recorded."
+        ),
         "",
         (
             "| Detachment | Rule | Rule ID | Timing | Category | Source support | "

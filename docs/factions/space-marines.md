@@ -10,6 +10,15 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_space-marines-nd2ezs5yzn-wxe2
 | ---: | ---: | ---: | ---: | ---: |
 | 22 | 0 | 80 | 119 | 2 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 14 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 54 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 32 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **100** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -39,9 +48,126 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Subversion Assets | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Vanguard Spearhead | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_08-06_warhammer40000_faction_pack_space-marines-nd2ezs5yzn-wxe2nf2ckk.pdf` (SHA-256 `82b2e28b0950c53b12bc83681a3bee3fd6a58cd6d2acd7a9d67d37f2dcbe6f2f`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Adrax Agatone (`000002100`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Aethon Shaan (`000004148`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Aggressor Squad (`000002099`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Ancient (`000002775`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ancient In Terminator Armour (`000002677`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Apothecary (`000002773`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Apothecary Biologis (`000000060`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Assault Intercessor Squad (`000001606`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Assault Intercessors With Jump Packs (`000002776`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Ballistus Dreadnought (`000000091`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Bladeguard Ancient (`000001165`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Bladeguard Veteran Squad (`000000071`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Brutalis Dreadnought (`000000136`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Caanok Var (`000004166`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Captain (`000000073`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Captain In Gravis Armour (`000001172`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Captain In Phobos Armour (`000002701`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Captain In Terminator Armour (`000000135`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Captain Titus (`000004187`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Captain With Jump Pack (`000000083`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Cato Sicarius (`000004184`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Centurion Assault Squad (`000002703`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Centurion Devastator Squad (`000001193`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaplain (`000001174`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaplain In Terminator Armour (`000000115`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaplain On Bike (`000000094`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaplain With Jump Pack (`000000112`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chief Librarian Tigurius (`000001611`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Company Heroes (`000002772`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Darnath Lysander (`000002105`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Desolation Squad (`000002270`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Devastator Squad (`000002202`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Dreadnought (`000000117`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Drop Pod (`000000087`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Eliminator Squad (`000001668`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Eradicator Squad (`000000103`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Firestrike Servo-turrets (`000000086`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Gladiator Lancer (`000002705`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Gladiator Reaper (`000001667`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Gladiator Valiant (`000001825`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hammerfall Bunker (`000000097`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Heavy Intercessor Squad (`000001177`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hellblaster Squad (`000002098`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Impulsor (`000002568`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Inceptor Squad (`000000125`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Incursor Squad (`000001159`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Infernus Squad (`000000126`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Infiltrator Squad (`000000128`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Intercessor Squad (`000001157`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Invader ATV (`000001158`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Invictor Tactical Warsuit (`000001156`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Iron Father Feirros (`000000127`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Judiciar (`000002707`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kayvaan Shrike (`000002708`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kor'sarro Khan (`000002709`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Land Raider (`000000065`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Land Raider Crusader (`000000066`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Land Raider Redeemer (`000002173`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Land Speeder (`000002711`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Librarian (`000002266`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Librarian In Phobos Armour (`000000119`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Librarian In Terminator Armour (`000000079`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lieutenant (`000001346`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Lieutenant In Phobos Armour (`000002530`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Lieutenant In Reiver Armour (`000001345`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Lieutenant With Combi-weapon (`000000076`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Marneus Calgar in Armour of Antilochus (`000004183`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Outrider Squad (`000002712`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Pedro Kantor (`000002713`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Predator Annihilator (`000002714`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Predator Destructor (`000002715`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Razorback (`000000129`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Redemptor Dreadnought (`000002717`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Reiver Squad (`000002718`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Repulsor (`000002721`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Repulsor Executioner (`000002722`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Rhino (`000002723`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Roboute Guilliman (`000000138`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Scout Squad (`000001160`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sternguard Veteran Squad (`000002255`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Storm Speeder Hailstrike (`000000124`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Storm Speeder Hammerstrike (`000000114`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Storm Speeder Thunderstrike (`000001610`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormhawk Interceptor (`000000084`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormraven Gunship (`000001191`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormtalon Gunship (`000001190`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Suboden Khan (`000004167`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Suppressor Squad (`000000068`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tactical Squad (`000000070`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Techmarine (`000000140`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Terminator Assault Squad (`000000118`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Terminator Squad (`000001183`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tor Garadon (`000002473`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Uriel Ventris (`000000121`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Vanguard Veteran Squad With Jump Packs (`000000147`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Victrix Honour Guard (`000004185`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Vindicator (`000001188`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Vulkan He'stan (`000002726`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Wardens of Ultramar (`000004188`) | `complete_pdf` | Complete Datasheets, physical PDF pages 31-58 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Whirlwind (`000002727`) | `rules_update` | Rules Updates, physical PDF pages 59-62 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -49,34 +175,36 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| 1st Company Task Force | 1st Company Task Force detachment rule | `phase17e:space-marines:1st-company-task-force:rule` | `named_handler_required` | `phase17e:detachment:1st-company-task-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:1st-company-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Anvil Siege Force | Anvil Siege Force detachment rule | `phase17e:space-marines:anvil-siege-force:rule` | `named_handler_required` | `phase17e:detachment:anvil-siege-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:anvil-siege-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Armoured Speartip | Armoured Speartip detachment rule | `phase17e:space-marines:armoured-speartip:rule` | `named_handler_required` | `phase17e:detachment:armoured-speartip:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:armoured-speartip`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Bastion Task Force | Bastion Task Force detachment rule | `phase17e:space-marines:bastion-task-force:rule` | `named_handler_required` | `phase17e:detachment:bastion-task-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:bastion-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Blade of Ultramar | Blade of Ultramar detachment rule | `phase17e:space-marines:blade-of-ultramar:rule` | `named_handler_required` | `phase17e:detachment:blade-of-ultramar:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:blade-of-ultramar`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Ceramite Sentinels | Ceramite Sentinels detachment rule | `phase17e:space-marines:ceramite-sentinels:rule` | `named_handler_required` | `phase17e:detachment:ceramite-sentinels:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:ceramite-sentinels`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Emperor's Shield | Emperor's Shield detachment rule | `phase17e:space-marines:emperors-shield:rule` | `named_handler_required` | `phase17e:detachment:emperors-shield:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:emperors-shield`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Firestorm Assault Force | Firestorm Assault Force detachment rule | `phase17e:space-marines:firestorm-assault-force:rule` | `named_handler_required` | `phase17e:detachment:firestorm-assault-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:firestorm-assault-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Forgefather's Seekers | Forgefather's Seekers detachment rule | `phase17e:space-marines:forgefathers-seekers:rule` | `named_handler_required` | `phase17e:detachment:forgefathers-seekers:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:forgefathers-seekers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Fulguris Task Force | Fulguris Task Force detachment rule | `phase17e:space-marines:fulguris-task-force:rule` | `named_handler_required` | `phase17e:detachment:fulguris-task-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:fulguris-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Gladius Task Force | Gladius Task Force detachment rule | `phase17e:space-marines:gladius-task-force:rule` | `named_handler_required` | `phase17e:detachment:gladius-task-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:gladius-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Hammer of Avernii | Hammer of Avernii detachment rule | `phase17e:space-marines:hammer-of-avernii:rule` | `named_handler_required` | `phase17e:detachment:hammer-of-avernii:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:hammer-of-avernii`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Headhunter Task Force | Headhunter Task Force detachment rule | `phase17e:space-marines:headhunter-task-force:rule` | `named_handler_required` | `phase17e:detachment:headhunter-task-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:headhunter-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Ironstorm Spearhead | Ironstorm Spearhead detachment rule | `phase17e:space-marines:ironstorm-spearhead:rule` | `named_handler_required` | `phase17e:detachment:ironstorm-spearhead:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:ironstorm-spearhead`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Librarius Conclave | Librarius Conclave detachment rule | `phase17e:space-marines:librarius-conclave:rule` | `named_handler_required` | `phase17e:detachment:librarius-conclave:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:librarius-conclave`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Orbital Assault Force | Orbital Assault Force detachment rule | `phase17e:space-marines:orbital-assault-force:rule` | `named_handler_required` | `phase17e:detachment:orbital-assault-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:orbital-assault-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Reclamation Force | Reclamation Force detachment rule | `phase17e:space-marines:reclamation-force:rule` | `named_handler_required` | `phase17e:detachment:reclamation-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:reclamation-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Shadowmark Talon | Shadowmark Talon detachment rule | `phase17e:space-marines:shadowmark-talon:rule` | `named_handler_required` | `phase17e:detachment:shadowmark-talon:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:shadowmark-talon`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Spearpoint Task Force | Spearpoint Task Force detachment rule | `phase17e:space-marines:spearpoint-task-force:rule` | `named_handler_required` | `phase17e:detachment:spearpoint-task-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:spearpoint-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Stormlance Task Force | Stormlance Task Force detachment rule | `phase17e:space-marines:stormlance-task-force:rule` | `named_handler_required` | `phase17e:detachment:stormlance-task-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:stormlance-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Subversion Assets | Subversion Assets detachment rule | `phase17e:space-marines:subversion-assets:rule` | `named_handler_required` | `phase17e:detachment:subversion-assets:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:subversion-assets`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
-| Vanguard Spearhead | Vanguard Spearhead detachment rule | `phase17e:space-marines:vanguard-spearhead:rule` | `named_handler_required` | `phase17e:detachment:vanguard-spearhead:rule` | `gw-11e-faction-detachments-2026-27:detachment:space-marines:vanguard-spearhead`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1st Company Task Force | 1st Company Task Force detachment rule | `phase17e:space-marines:1st-company-task-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:1st-company-task-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:1st-company-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Anvil Siege Force | Anvil Siege Force detachment rule | `phase17e:space-marines:anvil-siege-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:anvil-siege-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:anvil-siege-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Armoured Speartip | Armoured Speartip detachment rule | `phase17e:space-marines:armoured-speartip:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:armoured-speartip:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:armoured-speartip`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Bastion Task Force | Bastion Task Force detachment rule | `phase17e:space-marines:bastion-task-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:bastion-task-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:bastion-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Blade of Ultramar | Blade of Ultramar detachment rule | `phase17e:space-marines:blade-of-ultramar:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:blade-of-ultramar:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:blade-of-ultramar`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Ceramite Sentinels | Ceramite Sentinels detachment rule | `phase17e:space-marines:ceramite-sentinels:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:ceramite-sentinels:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:ceramite-sentinels`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Emperor's Shield | Emperor's Shield detachment rule | `phase17e:space-marines:emperors-shield:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:emperors-shield:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:emperors-shield`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Firestorm Assault Force | Firestorm Assault Force detachment rule | `phase17e:space-marines:firestorm-assault-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:firestorm-assault-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:firestorm-assault-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Forgefather's Seekers | Forgefather's Seekers detachment rule | `phase17e:space-marines:forgefathers-seekers:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:forgefathers-seekers:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:forgefathers-seekers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Fulguris Task Force | Fulguris Task Force detachment rule | `phase17e:space-marines:fulguris-task-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:fulguris-task-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:fulguris-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Gladius Task Force | Gladius Task Force detachment rule | `phase17e:space-marines:gladius-task-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:gladius-task-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:gladius-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Hammer of Avernii | Hammer of Avernii detachment rule | `phase17e:space-marines:hammer-of-avernii:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hammer-of-avernii:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:hammer-of-avernii`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Headhunter Task Force | Headhunter Task Force detachment rule | `phase17e:space-marines:headhunter-task-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:headhunter-task-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:headhunter-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Ironstorm Spearhead | Ironstorm Spearhead detachment rule | `phase17e:space-marines:ironstorm-spearhead:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:ironstorm-spearhead:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:ironstorm-spearhead`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Librarius Conclave | Librarius Conclave detachment rule | `phase17e:space-marines:librarius-conclave:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:librarius-conclave:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:librarius-conclave`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Orbital Assault Force | Orbital Assault Force detachment rule | `phase17e:space-marines:orbital-assault-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:orbital-assault-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:orbital-assault-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Reclamation Force | Reclamation Force detachment rule | `phase17e:space-marines:reclamation-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:reclamation-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:reclamation-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Shadowmark Talon | Shadowmark Talon detachment rule | `phase17e:space-marines:shadowmark-talon:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:shadowmark-talon:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:shadowmark-talon`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Spearpoint Task Force | Spearpoint Task Force detachment rule | `phase17e:space-marines:spearpoint-task-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:spearpoint-task-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:spearpoint-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Stormlance Task Force | Stormlance Task Force detachment rule | `phase17e:space-marines:stormlance-task-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:stormlance-task-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:stormlance-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Subversion Assets | Subversion Assets detachment rule | `phase17e:space-marines:subversion-assets:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:subversion-assets:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:subversion-assets`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
+| Vanguard Spearhead | Vanguard Spearhead detachment rule | `phase17e:space-marines:vanguard-spearhead:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:vanguard-spearhead:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:vanguard-spearhead`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -162,6 +290,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Vanguard Spearhead | The Blade Driven Deep | `000008490002` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:space-marines:vanguard-spearhead:enhancement:000008490002` | None | `gw-11e-faction-detachments-2026-27:detachment:space-marines:vanguard-spearhead`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008490002`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:space-marines:vanguard-spearhead:000008490002`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:space-marines` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

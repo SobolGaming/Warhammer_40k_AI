@@ -10,6 +10,15 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_grey_knights-geqfqwt3wh-g2fik
 | ---: | ---: | ---: | ---: | ---: |
 | 9 | 0 | 24 | 36 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 0 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 10 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 15 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **25** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -26,9 +35,51 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Sanctic Spearhead | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Warpbane Task Force | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_08-06_warhammer40000_faction_pack_grey_knights-geqfqwt3wh-g2fikyrqup.pdf` (SHA-256 `3f5436dd0507ab03bf568b505da509dd4096250ebc60466f95618561a344e923`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Brother-captain (`000000376`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Brotherhood Champion (`000000379`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Brotherhood Chaplain (`000001362`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Brotherhood Librarian (`000001361`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Brotherhood Techmarine (`000000399`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Brotherhood Terminator Squad (`000000382`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Castellan Crowe (`000000380`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Grand Master (`000000375`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Grand Master In Nemesis Dreadknight (`000001360`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Grand Master Voldus (`000000374`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Interceptor Squad (`000000387`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Land Raider (`000000391`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Land Raider Crusader (`000000392`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Land Raider Redeemer (`000000393`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Nemesis Dreadknight (`000000389`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Paladin Squad (`000000384`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Purgation Squad (`000000388`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Purifier Squad (`000000383`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Razorback (`000000395`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Rhino (`000000396`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormhawk Interceptor (`000001363`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormraven Gunship (`000000398`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stormtalon Gunship (`000001364`) | `rules_update` | Rules Updates, physical PDF page 9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Strike Squad (`000000381`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Venerable Dreadnought (`000000400`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -36,21 +87,23 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Argent Assault | Argent Assault detachment rule | `phase17e:grey-knights:argent-assault:rule` | `named_handler_required` | `phase17e:detachment:argent-assault:rule` | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:argent-assault`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
-| Augurium Task Force | Augurium Task Force detachment rule | `phase17e:grey-knights:augurium-task-force:rule` | `named_handler_required` | `phase17e:detachment:augurium-task-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:augurium-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
-| Banishers | Banishers detachment rule | `phase17e:grey-knights:banishers:rule` | `named_handler_required` | `phase17e:detachment:banishers:rule` | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:banishers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
-| Brotherhood Strike | Brotherhood Strike detachment rule | `phase17e:grey-knights:brotherhood-strike:rule` | `named_handler_required` | `phase17e:detachment:brotherhood-strike:rule` | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:brotherhood-strike`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
-| Fires of Purgation | Fires of Purgation detachment rule | `phase17e:grey-knights:fires-of-purgation:rule` | `named_handler_required` | `phase17e:detachment:fires-of-purgation:rule` | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:fires-of-purgation`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
-| Hallowed Conclave | Hallowed Conclave detachment rule | `phase17e:grey-knights:hallowed-conclave:rule` | `named_handler_required` | `phase17e:detachment:hallowed-conclave:rule` | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:hallowed-conclave`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
-| Immaterial Interdiction | Immaterial Interdiction detachment rule | `phase17e:grey-knights:immaterial-interdiction:rule` | `named_handler_required` | `phase17e:detachment:immaterial-interdiction:rule` | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:immaterial-interdiction`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
-| Sanctic Spearhead | Sanctic Spearhead detachment rule | `phase17e:grey-knights:sanctic-spearhead:rule` | `named_handler_required` | `phase17e:detachment:sanctic-spearhead:rule` | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:sanctic-spearhead`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
-| Warpbane Task Force | Warpbane Task Force detachment rule | `phase17e:grey-knights:warpbane-task-force:rule` | `named_handler_required` | `phase17e:detachment:warpbane-task-force:rule` | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:warpbane-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Argent Assault | Argent Assault detachment rule | `phase17e:grey-knights:argent-assault:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:argent-assault:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:argent-assault`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
+| Augurium Task Force | Augurium Task Force detachment rule | `phase17e:grey-knights:augurium-task-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:augurium-task-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:augurium-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
+| Banishers | Banishers detachment rule | `phase17e:grey-knights:banishers:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:banishers:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:banishers`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
+| Brotherhood Strike | Brotherhood Strike detachment rule | `phase17e:grey-knights:brotherhood-strike:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:brotherhood-strike:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:brotherhood-strike`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
+| Fires of Purgation | Fires of Purgation detachment rule | `phase17e:grey-knights:fires-of-purgation:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:fires-of-purgation:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:fires-of-purgation`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
+| Hallowed Conclave | Hallowed Conclave detachment rule | `phase17e:grey-knights:hallowed-conclave:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hallowed-conclave:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:hallowed-conclave`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
+| Immaterial Interdiction | Immaterial Interdiction detachment rule | `phase17e:grey-knights:immaterial-interdiction:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:immaterial-interdiction:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:immaterial-interdiction`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
+| Sanctic Spearhead | Sanctic Spearhead detachment rule | `phase17e:grey-knights:sanctic-spearhead:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:sanctic-spearhead:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:sanctic-spearhead`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
+| Warpbane Task Force | Warpbane Task Force detachment rule | `phase17e:grey-knights:warpbane-task-force:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:warpbane-task-force:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:warpbane-task-force`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -80,6 +133,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Warpbane Task Force | Radiant Champion | `000009777003` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:grey-knights:warpbane-task-force:enhancement:000009777003` | None | `gw-11e-faction-detachments-2026-27:detachment:grey-knights:warpbane-task-force`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009777003`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:grey-knights:warpbane-task-force:000009777003`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:grey-knights` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

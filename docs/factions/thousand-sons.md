@@ -10,6 +10,15 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_thousand_sons-qxnr1lbasx-i6ee
 | ---: | ---: | ---: | ---: | ---: |
 | 9 | 0 | 24 | 36 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 1 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 17 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 16 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **34** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -26,9 +35,60 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Warpforged Cabal | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Warpmeld Pact | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_10-06_warhammer40000_faction_pack_thousand_sons-qxnr1lbasx-i6ee7zitrl.pdf` (SHA-256 `b6d2f04a1fda50200f779ee56ff9b977284f9945beceefa2910084b321da7984`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Ahriman (`000001032`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Blue Horrors (`000004128`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Land Raider (`000001025`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Annihilator (`000002501`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Destructor (`000001026`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Rhino (`000001022`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Spawn (`000001023`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Vindicator (`000001027`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Daemon Prince of Tzeentch (`000001036`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemon Prince of Tzeentch with Wings (`000004120`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Defiler (`000001030`) | `complete_pdf` | Complete Datasheet, physical PDF pages 7-8 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Exalted Sorcerer (`000001033`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Exalted Sorcerer on Disc of Tzeentch (`000002755`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Flamers (`000004125`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Forgefiend (`000001028`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Helbrute (`000001021`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Heldrake (`000001024`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Infernal Master (`000002500`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kairos Fateweaver (`000004123`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Lord of Change (`000004124`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Magnus The Red (`000001031`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Maulerfiend (`000001029`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Mutalith Vortex Beast (`000001476`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Pink Horrors (`000004127`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Rubric Marines (`000001020`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Scarab Occult Terminators (`000001035`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Screamers (`000004126`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sekhetar Robots (`000004121`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sorcerer (`000001016`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sorcerer In Terminator Armour (`000001017`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tzaangor Enlightened (`000001474`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tzaangor Enlightened with Fatecaster Greatbows (`000004122`) | `rules_update` | Rules Updates, physical PDF pages 9-11 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tzaangor Shaman (`000001472`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tzaangors (`000001034`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -45,21 +105,23 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Changehost of Deceit | Changehost of Deceit detachment rule | `phase17e:thousand-sons:changehost-of-deceit:rule` | `named_handler_required` | `phase17e:detachment:changehost-of-deceit:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:changehost-of-deceit`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Grand Coven | Grand Coven detachment rule | `phase17e:thousand-sons:grand-coven:rule` | `named_handler_required` | `phase17e:detachment:grand-coven:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:grand-coven`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Hexwarp Thrallband | Hexwarp Thrallband detachment rule | `phase17e:thousand-sons:hexwarp-thrallband:rule` | `named_handler_required` | `phase17e:detachment:hexwarp-thrallband:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:hexwarp-thrallband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Ritual of Regeneration | Ritual of Regeneration detachment rule | `phase17e:thousand-sons:ritual-of-regeneration:rule` | `named_handler_required` | `phase17e:detachment:ritual-of-regeneration:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:ritual-of-regeneration`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Rubricae Phalanx | Rubricae Phalanx detachment rule | `phase17e:thousand-sons:rubricae-phalanx:rule` | `named_handler_required` | `phase17e:detachment:rubricae-phalanx:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:rubricae-phalanx`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Sekhetar Cohort | Sekhetar Cohort detachment rule | `phase17e:thousand-sons:sekhetar-cohort:rule` | `named_handler_required` | `phase17e:detachment:sekhetar-cohort:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:sekhetar-cohort`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Servants of Change | Servants of Change detachment rule | `phase17e:thousand-sons:servants-of-change:rule` | `named_handler_required` | `phase17e:detachment:servants-of-change:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:servants-of-change`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Warpforged Cabal | Warpforged Cabal detachment rule | `phase17e:thousand-sons:warpforged-cabal:rule` | `named_handler_required` | `phase17e:detachment:warpforged-cabal:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpforged-cabal`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
-| Warpmeld Pact | Warpmeld Pact detachment rule | `phase17e:thousand-sons:warpmeld-pact:rule` | `named_handler_required` | `phase17e:detachment:warpmeld-pact:rule` | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpmeld-pact`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Changehost of Deceit | Changehost of Deceit detachment rule | `phase17e:thousand-sons:changehost-of-deceit:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:changehost-of-deceit:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:changehost-of-deceit`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Grand Coven | Grand Coven detachment rule | `phase17e:thousand-sons:grand-coven:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:grand-coven:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:grand-coven`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Hexwarp Thrallband | Hexwarp Thrallband detachment rule | `phase17e:thousand-sons:hexwarp-thrallband:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hexwarp-thrallband:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:hexwarp-thrallband`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Ritual of Regeneration | Ritual of Regeneration detachment rule | `phase17e:thousand-sons:ritual-of-regeneration:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:ritual-of-regeneration:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:ritual-of-regeneration`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Rubricae Phalanx | Rubricae Phalanx detachment rule | `phase17e:thousand-sons:rubricae-phalanx:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:rubricae-phalanx:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:rubricae-phalanx`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Sekhetar Cohort | Sekhetar Cohort detachment rule | `phase17e:thousand-sons:sekhetar-cohort:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:sekhetar-cohort:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:sekhetar-cohort`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Servants of Change | Servants of Change detachment rule | `phase17e:thousand-sons:servants-of-change:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:servants-of-change:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:servants-of-change`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Warpforged Cabal | Warpforged Cabal detachment rule | `phase17e:thousand-sons:warpforged-cabal:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:warpforged-cabal:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpforged-cabal`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
+| Warpmeld Pact | Warpmeld Pact detachment rule | `phase17e:thousand-sons:warpmeld-pact:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:warpmeld-pact:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpmeld-pact`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -89,6 +151,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Warpmeld Pact | Warpmeld Dagger | `000010201002` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:thousand-sons:warpmeld-pact:enhancement:000010201002` | None | `gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpmeld-pact`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010201002`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:thousand-sons:warpmeld-pact:000010201002`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:thousand-sons` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

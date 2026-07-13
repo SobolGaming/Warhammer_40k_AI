@@ -10,6 +10,15 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_death_guard-dgm6djcpoa-iiqvms
 | ---: | ---: | ---: | ---: | ---: |
 | 9 | 0 | 28 | 42 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 1 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 8 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 27 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **36** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -26,9 +35,62 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Tallyband Summoners | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Virulent Vectorium | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_10-06_warhammer40000_faction_pack_death_guard-dgm6djcpoa-iiqvmsh0op.pdf` (SHA-256 `5430fe8d89047644aab0102d0265783db725655c4535ad6600c3925f2cf32885`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Beasts of Nurgle (`000004115`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Biologus Putrifier (`000001368`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Blightlord Terminators (`000001372`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Chaos Land Raider (`000001049`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Annihilator (`000001050`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Predator Destructor (`000002461`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Rhino (`000001047`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Chaos Spawn (`000001048`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemon Prince of Nurgle (`000001052`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemon Prince of Nurgle with Wings (`000002749`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Deathshroud Terminators (`000001371`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Defiler (`000004209`) | `complete_pdf` | Complete Datasheet, physical PDF pages 5-6 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Foetid Bloat-drone (`000001057`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Foetid Bloat-drone with Heavy Blight Launcher (`000004110`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Foul Blightspawn (`000001367`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Great Unclean One (`000004112`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Helbrute (`000001046`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Icon Bearer (`000002750`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord of Contagion (`000001054`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord of Poxes (`000004109`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Lord of Virulence (`000002460`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Malignant Plaguecaster (`000001055`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Miasmic Malignifier (`000002462`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Mortarion (`000001377`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Myphitic Blight-hauler (`000001374`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Noxious Blightbringer (`000001058`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Nurglings (`000004116`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plague Drones (`000004114`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plague Marines (`000001044`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plague Surgeon (`000001369`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plaguebearers (`000004113`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Plagueburst Crawler (`000001376`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Poxwalkers (`000001056`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Rotigus (`000004111`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Tallyman (`000001370`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Typhus (`000001053`) | `rules_update` | Rules Updates, physical PDF page 7 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -45,21 +107,23 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Champions of Contagion | Champions of Contagion detachment rule | `phase17e:death-guard:champions-of-contagion:rule` | `named_handler_required` | `phase17e:detachment:champions-of-contagion:rule` | `gw-11e-faction-detachments-2026-27:detachment:death-guard:champions-of-contagion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
-| Contagion Engines | Contagion Engines detachment rule | `phase17e:death-guard:contagion-engines:rule` | `named_handler_required` | `phase17e:detachment:contagion-engines:rule` | `gw-11e-faction-detachments-2026-27:detachment:death-guard:contagion-engines`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
-| Death Lord's Chosen | Death Lord's Chosen detachment rule | `phase17e:death-guard:death-lords-chosen:rule` | `named_handler_required` | `phase17e:detachment:death-lords-chosen:rule` | `gw-11e-faction-detachments-2026-27:detachment:death-guard:death-lords-chosen`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
-| Flyblown Host | Flyblown Host detachment rule | `phase17e:death-guard:flyblown-host:rule` | `named_handler_required` | `phase17e:detachment:flyblown-host:rule` | `gw-11e-faction-detachments-2026-27:detachment:death-guard:flyblown-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
-| Mortarion's Hammer | Mortarion's Hammer detachment rule | `phase17e:death-guard:mortarions-hammer:rule` | `named_handler_required` | `phase17e:detachment:mortarions-hammer:rule` | `gw-11e-faction-detachments-2026-27:detachment:death-guard:mortarions-hammer`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
-| Paragons of Putrescence | Paragons of Putrescence detachment rule | `phase17e:death-guard:paragons-of-putrescence:rule` | `named_handler_required` | `phase17e:detachment:paragons-of-putrescence:rule` | `gw-11e-faction-detachments-2026-27:detachment:death-guard:paragons-of-putrescence`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
-| Shamblerot Vectorium | Shamblerot Vectorium detachment rule | `phase17e:death-guard:shamblerot-vectorium:rule` | `named_handler_required` | `phase17e:detachment:shamblerot-vectorium:rule` | `gw-11e-faction-detachments-2026-27:detachment:death-guard:shamblerot-vectorium`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
-| Tallyband Summoners | Tallyband Summoners detachment rule | `phase17e:death-guard:tallyband-summoners:rule` | `named_handler_required` | `phase17e:detachment:tallyband-summoners:rule` | `gw-11e-faction-detachments-2026-27:detachment:death-guard:tallyband-summoners`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
-| Virulent Vectorium | Virulent Vectorium detachment rule | `phase17e:death-guard:virulent-vectorium:rule` | `named_handler_required` | `phase17e:detachment:virulent-vectorium:rule` | `gw-11e-faction-detachments-2026-27:detachment:death-guard:virulent-vectorium`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Champions of Contagion | Champions of Contagion detachment rule | `phase17e:death-guard:champions-of-contagion:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:champions-of-contagion:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:champions-of-contagion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
+| Contagion Engines | Contagion Engines detachment rule | `phase17e:death-guard:contagion-engines:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:contagion-engines:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:contagion-engines`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
+| Death Lord's Chosen | Death Lord's Chosen detachment rule | `phase17e:death-guard:death-lords-chosen:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:death-lords-chosen:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:death-lords-chosen`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
+| Flyblown Host | Flyblown Host detachment rule | `phase17e:death-guard:flyblown-host:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:flyblown-host:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:flyblown-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
+| Mortarion's Hammer | Mortarion's Hammer detachment rule | `phase17e:death-guard:mortarions-hammer:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:mortarions-hammer:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:mortarions-hammer`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
+| Paragons of Putrescence | Paragons of Putrescence detachment rule | `phase17e:death-guard:paragons-of-putrescence:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:paragons-of-putrescence:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:paragons-of-putrescence`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
+| Shamblerot Vectorium | Shamblerot Vectorium detachment rule | `phase17e:death-guard:shamblerot-vectorium:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:shamblerot-vectorium:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:shamblerot-vectorium`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
+| Tallyband Summoners | Tallyband Summoners detachment rule | `phase17e:death-guard:tallyband-summoners:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:tallyband-summoners:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:tallyband-summoners`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
+| Virulent Vectorium | Virulent Vectorium detachment rule | `phase17e:death-guard:virulent-vectorium:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:virulent-vectorium:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:virulent-vectorium`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -93,6 +157,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Virulent Vectorium | Revolting Regeneration | `000010123005` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:death-guard:virulent-vectorium:enhancement:000010123005` | None | `gw-11e-faction-detachments-2026-27:detachment:death-guard:virulent-vectorium`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010123005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:death-guard:virulent-vectorium:000010123005`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:death-guard` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

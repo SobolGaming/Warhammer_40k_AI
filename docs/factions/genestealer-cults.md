@@ -10,6 +10,15 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_genestealer_cults-ee2tg004ty-
 | ---: | ---: | ---: | ---: | ---: |
 | 9 | 0 | 20 | 30 | 3 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 0 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 13 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 11 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **24** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -26,9 +35,50 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Xenocreed Congregation | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Xenocult Masses | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_09-06_warhammer40000_faction_pack_genestealer_cults-ee2tg004ty-lfbh6g1gr7.pdf` (SHA-256 `3a6060942f8862409d4f2d0d422b8f25c29ccd900a4b79ce3964c20a8fc40637`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Aberrants (`000000514`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Abominant (`000001546`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Achilles Ridgerunners (`000001573`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Acolyte Hybrids With Autopistols (`000000511`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Acolyte Hybrids With Hand Flamers (`000003716`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Acolyte Iconward (`000000510`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Atalan Jackals (`000001574`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Benefictus (`000003715`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Biophagus (`000001572`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Clamavus (`000001567`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Goliath Rockgrinder (`000000521`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Goliath Truck (`000000516`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hybrid Metamorphs (`000000513`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Jackal Alphus (`000001565`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kelermorph (`000001570`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Locus (`000001568`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Magus (`000000508`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Neophyte Hybrids (`000000512`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Nexos (`000001571`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Patriarch (`000000507`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Primus (`000000509`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Purestrain Genestealers (`000000515`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Reductus Saboteur (`000002525`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sanctus (`000001569`) | `rules_update` | Rules Updates, physical PDF pages 7-9 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -36,21 +86,23 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Biosanctic Broodsurge | Biosanctic Broodsurge detachment rule | `phase17e:genestealer-cults:biosanctic-broodsurge:rule` | `named_handler_required` | `phase17e:detachment:biosanctic-broodsurge:rule` | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:biosanctic-broodsurge`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
-| Brood Brothers Auxillia | Brood Brothers Auxillia detachment rule | `phase17e:genestealer-cults:brood-brothers-auxillia:rule` | `named_handler_required` | `phase17e:detachment:brood-brothers-auxillia:rule` | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:brood-brothers-auxillia`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
-| Final Day | Final Day detachment rule | `phase17e:genestealer-cults:final-day:rule` | `named_handler_required` | `phase17e:detachment:final-day:rule` | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:final-day`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
-| Heroes of the Uprising | Heroes of the Uprising detachment rule | `phase17e:genestealer-cults:heroes-of-the-uprising:rule` | `named_handler_required` | `phase17e:detachment:heroes-of-the-uprising:rule` | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:heroes-of-the-uprising`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
-| Host of Ascension | Host of Ascension detachment rule | `phase17e:genestealer-cults:host-of-ascension:rule` | `named_handler_required` | `phase17e:detachment:host-of-ascension:rule` | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:host-of-ascension`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
-| Outlander Claw | Outlander Claw detachment rule | `phase17e:genestealer-cults:outlander-claw:rule` | `named_handler_required` | `phase17e:detachment:outlander-claw:rule` | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:outlander-claw`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
-| Purestrain Broodswarm | Purestrain Broodswarm detachment rule | `phase17e:genestealer-cults:purestrain-broodswarm:rule` | `named_handler_required` | `phase17e:detachment:purestrain-broodswarm:rule` | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:purestrain-broodswarm`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
-| Xenocreed Congregation | Xenocreed Congregation detachment rule | `phase17e:genestealer-cults:xenocreed-congregation:rule` | `named_handler_required` | `phase17e:detachment:xenocreed-congregation:rule` | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:xenocreed-congregation`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
-| Xenocult Masses | Xenocult Masses detachment rule | `phase17e:genestealer-cults:xenocult-masses:rule` | `named_handler_required` | `phase17e:detachment:xenocult-masses:rule` | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:xenocult-masses`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Biosanctic Broodsurge | Biosanctic Broodsurge detachment rule | `phase17e:genestealer-cults:biosanctic-broodsurge:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:biosanctic-broodsurge:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:biosanctic-broodsurge`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
+| Brood Brothers Auxillia | Brood Brothers Auxillia detachment rule | `phase17e:genestealer-cults:brood-brothers-auxillia:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:brood-brothers-auxillia:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:brood-brothers-auxillia`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
+| Final Day | Final Day detachment rule | `phase17e:genestealer-cults:final-day:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:final-day:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:final-day`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
+| Heroes of the Uprising | Heroes of the Uprising detachment rule | `phase17e:genestealer-cults:heroes-of-the-uprising:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:heroes-of-the-uprising:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:heroes-of-the-uprising`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
+| Host of Ascension | Host of Ascension detachment rule | `phase17e:genestealer-cults:host-of-ascension:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:host-of-ascension:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:host-of-ascension`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
+| Outlander Claw | Outlander Claw detachment rule | `phase17e:genestealer-cults:outlander-claw:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:outlander-claw:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:outlander-claw`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
+| Purestrain Broodswarm | Purestrain Broodswarm detachment rule | `phase17e:genestealer-cults:purestrain-broodswarm:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:purestrain-broodswarm:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:purestrain-broodswarm`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
+| Xenocreed Congregation | Xenocreed Congregation detachment rule | `phase17e:genestealer-cults:xenocreed-congregation:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:xenocreed-congregation:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:xenocreed-congregation`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
+| Xenocult Masses | Xenocult Masses detachment rule | `phase17e:genestealer-cults:xenocult-masses:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:xenocult-masses:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:xenocult-masses`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -76,6 +128,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Xenocreed Congregation | Incendiary Inspiration | `000009071005` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:genestealer-cults:xenocreed-congregation:enhancement:000009071005` | None | `gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:xenocreed-congregation`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009071005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:genestealer-cults:xenocreed-congregation:000009071005`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:genestealer-cults` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

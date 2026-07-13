@@ -10,6 +10,15 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_tau_empire-avmkx2gg8i-jezqgeb
 | ---: | ---: | ---: | ---: | ---: |
 | 7 | 0 | 20 | 30 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 3 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 15 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 21 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **39** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -24,9 +33,65 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Mont'ka | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Retaliation Cadre | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_09-06_warhammer40000_faction_pack_tau_empire-avmkx2gg8i-jezqgeb55k.pdf` (SHA-256 `da70143aea942aa016f760287bb389f66d10f9e3de3449a2263a0c04f009a6f0`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Breacher Team (`000000412`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Broadside Battlesuits (`000000433`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Cadre Fireblade (`000000405`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Commander Farsight (`000000406`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Commander In Coldstar Battlesuit (`000000402`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Commander In Enforcer Battlesuit (`000001478`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Commander Shadowsun (`000000407`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Crisis Fireknife Battlesuits (`000003700`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Crisis Starscythe Battlesuits (`000003701`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Crisis Sunforge Battlesuits (`000003699`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Darkstrider (`000000410`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Devilfish (`000000424`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ethereal (`000000404`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Firesight Team (`000000428`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Ghostkeel Battlesuit (`000000420`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Hammerhead Gunship (`000000432`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kroot Carnivores (`000000413`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kroot Farstalkers (`000002588`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kroot Flesh Shaper (`000003704`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kroot Hounds (`000000415`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kroot Lone-Spear (`000003705`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Kroot Trail Shaper (`000003702`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Kroot War Shaper (`000003703`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Krootox Rampagers (`000003706`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Krootox Riders (`000000414`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Pathfinder Team (`000000422`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Piranhas (`000000423`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Razorshark Strike Fighter (`000000425`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Riptide Battlesuit (`000000421`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Sky Ray Gunship (`000000430`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Stealth Battlesuits (`000000417`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-18 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Stormsurge (`000000434`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Strike Team (`000000411`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sun Shark Bomber (`000000426`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| The Twin Lance (`000004203`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-18 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Tidewall Droneport (`000000435`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tidewall Gunrig (`000000437`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Tidewall Shieldline (`000000436`) | `rules_update` | Rules Updates, physical PDF pages 19-20 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Vespid Stingwings (`000000427`) | `complete_pdf` | Complete Datasheets, physical PDF pages 13-18 | The Faction Pack reprints this complete datasheet and is authoritative. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -34,19 +99,21 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Advanced Acquisition Cadre | Advanced Acquisition Cadre detachment rule | `phase17e:tau-empire:advanced-acquisition-cadre:rule` | `named_handler_required` | `phase17e:detachment:advanced-acquisition-cadre:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:advanced-acquisition-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Auxillary Cadre | Auxillary Cadre detachment rule | `phase17e:tau-empire:auxillary-cadre:rule` | `named_handler_required` | `phase17e:detachment:auxillary-cadre:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:auxillary-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Experimental Prototype Cadre | Experimental Prototype Cadre detachment rule | `phase17e:tau-empire:experimental-prototype-cadre:rule` | `named_handler_required` | `phase17e:detachment:experimental-prototype-cadre:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:experimental-prototype-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Kauyon | Kauyon detachment rule | `phase17e:tau-empire:kauyon:rule` | `named_handler_required` | `phase17e:detachment:kauyon:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:kauyon`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Kroot Hunting Pack | Kroot Hunting Pack detachment rule | `phase17e:tau-empire:kroot-hunting-pack:rule` | `named_handler_required` | `phase17e:detachment:kroot-hunting-pack:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:kroot-hunting-pack`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Mont'ka | Mont'ka detachment rule | `phase17e:tau-empire:montka:rule` | `named_handler_required` | `phase17e:detachment:montka:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:montka`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
-| Retaliation Cadre | Retaliation Cadre detachment rule | `phase17e:tau-empire:retaliation-cadre:rule` | `named_handler_required` | `phase17e:detachment:retaliation-cadre:rule` | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:retaliation-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Advanced Acquisition Cadre | Advanced Acquisition Cadre detachment rule | `phase17e:tau-empire:advanced-acquisition-cadre:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:advanced-acquisition-cadre:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:advanced-acquisition-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Auxillary Cadre | Auxillary Cadre detachment rule | `phase17e:tau-empire:auxillary-cadre:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:auxillary-cadre:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:auxillary-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Experimental Prototype Cadre | Experimental Prototype Cadre detachment rule | `phase17e:tau-empire:experimental-prototype-cadre:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:experimental-prototype-cadre:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:experimental-prototype-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Kauyon | Kauyon detachment rule | `phase17e:tau-empire:kauyon:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:kauyon:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:kauyon`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Kroot Hunting Pack | Kroot Hunting Pack detachment rule | `phase17e:tau-empire:kroot-hunting-pack:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:kroot-hunting-pack:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:kroot-hunting-pack`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Mont'ka | Mont'ka detachment rule | `phase17e:tau-empire:montka:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:montka:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:montka`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
+| Retaliation Cadre | Retaliation Cadre detachment rule | `phase17e:tau-empire:retaliation-cadre:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:retaliation-cadre:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:retaliation-cadre`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -72,6 +139,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Retaliation Cadre | Starflare Ignition System | `000008815005` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:tau-empire:retaliation-cadre:enhancement:000008815005` | None | `gw-11e-faction-detachments-2026-27:detachment:tau-empire:retaliation-cadre`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008815005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:tau-empire:retaliation-cadre:000008815005`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:tau-empire` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

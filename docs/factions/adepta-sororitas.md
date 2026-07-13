@@ -10,6 +10,15 @@ Source PDF: [eng_11-06_warhammer40000_faction_pack_adepta_sororitas-ktlklgb0t5-k
 | ---: | ---: | ---: | ---: | ---: |
 | 8 | 0 | 20 | 30 | 1 |
 
+### Unit Datasheet Source Treatments
+
+| Review bucket | Count | Source treatment |
+| --- | ---: | --- |
+| Complete Faction Pack datasheets | 3 | The complete Faction Pack datasheet is authoritative. |
+| Faction Pack datasheet updates | 13 | The pinned predecessor row is retained with the cited Rules Update applied. |
+| Unchanged predecessor datasheets | 17 | The pinned predecessor row is retained after explicit PDF review. |
+| **Datasheets reviewed** | **33** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+
 ## Detachment Rule Support
 
 This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
@@ -25,9 +34,59 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Sacred Champions | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Sanctified Orators | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 
+## Datasheet Source Review
+
+### Source scope, provenance, and exclusions
+
+The review explicitly classifies every current, non-virtual datasheet row owned by this faction's pinned predecessor source, plus only the listed current Faction Pack additions or replacements.
+
+Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content.
+
+The review is pinned to `eng_11-06_warhammer40000_faction_pack_adepta_sororitas-ktlklgb0t5-knvswx9kyw.pdf` (SHA-256 `7cbcc25461d0ac00b0ae1ad33923845abf6ed3d86637b4833c150ad11df77c67`) and the versioned predecessor source snapshot recorded in the review manifest. Every in-scope source ID occurs exactly once, every source-backed name is checked against that snapshot, and treatment counts are derived from the validated rows below.
+
+This source-review subsection alone makes no catalog-load or semantic-execution claim. The separate Datasheet / Unit Support section below preserves the generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every datasheet that currently has it.
+
+### Current datasheets
+
+| Datasheet | Explicit treatment | PDF reference | Review note |
+| --- | --- | --- | --- |
+| Aestred Thurga And Agathae Dolan (`000002480`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Arco-flagellants (`000000896`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Battle Sisters Squad (`000000903`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Canoness (`000000899`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Canoness with Jump Pack (`000003714`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Castigator (`000002484`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Celestian Insidiants (`000004189`) | `complete_pdf` | Complete Datasheets, physical PDF pages 7-12 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Celestian Sacresants (`000002481`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Daemonifuge (`000002771`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Dialogus (`000000902`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Dogmata (`000002482`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Dominion Squad (`000000909`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Exorcist (`000000912`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Hospitaller (`000000901`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Imagifier (`000000900`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Immolator (`000000911`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Intranzia Fraye (`000004215`) | `complete_pdf` | Complete Datasheets, physical PDF pages 7-12 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Junith Eruita (`000002064`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Ministorum Priest (`000001553`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Mortifiers (`000002067`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Morvenn Vahl (`000002479`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Palatine (`000002472`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Paragon Warsuits (`000002483`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Penitent Engines (`000000897`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Repentia Squad (`000000907`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Retributor Squad (`000000908`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Saint Celestine (`000000898`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sanctifiers (`000004075`) | `complete_pdf` | Complete Datasheets, physical PDF pages 7-12 | The Faction Pack reprints this complete datasheet and is authoritative. |
+| Seraphim Squad (`000000904`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sisters Novitiate Squad (`000002507`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Sororitas Rhino (`000000910`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Triumph Of Saint Katherine (`000002063`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+| Zephyrim Squad (`000002066`) | `rules_update` | Rules Updates, physical PDF pages 13-14 | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
 ## Datasheet / Unit Support
 
-This table reports datasheet-level playability evidence. `Full` means catalog/model/wargear/geometry data is present and every known datasheet/wargear ability row is engine-consumed by named runtime consumers, with no unsupported diagnostics. `Playable` means core unit operation is available but one or more non-blocking generic IR, ability-detail, faction, or detachment proofs are incomplete. `Partial` means at least one known ability or interaction is descriptor-only or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
+This table reports datasheet-level playability evidence generated from the exact source text and structured catalog rows. `Full` (fully complete) requires complete catalog/model/wargear/geometry data, every known datasheet and wargear ability to parse into supported descriptors or RuleIR without diagnostics, and every parsed semantic to have an engine runtime consumer. `Playable` means the exact text parses into supported structured semantics and core unit operation is available, but one or more runtime-consumption, faction, or detachment proofs remain incomplete. `Partial` means at least one known ability or interaction is descriptor-only, only partly parsed, or unsupported. `Catalog-only` means the unit is present but no semantic ability/runtime support is proven. `Blocked` means a known unsupported rule, missing geometry, missing wargear, or missing required source data prevents safe play.
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -35,20 +94,22 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 ## Detachment Rule Coverage Rows
 
-These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
+These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.
 
-| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
-| --- | --- | --- | --- | --- | --- |
-| Army of Faith | Army of Faith detachment rule | `phase17e:adepta-sororitas:army-of-faith:rule` | `named_handler_required` | `phase17e:detachment:army-of-faith:rule` | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:army-of-faith`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
-| Bringers of Flame | Bringers of Flame detachment rule | `phase17e:adepta-sororitas:bringers-of-flame:rule` | `named_handler_required` | `phase17e:detachment:bringers-of-flame:rule` | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:bringers-of-flame`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
-| Champions of Faith | Champions of Faith detachment rule | `phase17e:adepta-sororitas:champions-of-faith:rule` | `named_handler_required` | `phase17e:detachment:champions-of-faith:rule` | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:champions-of-faith`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
-| Chorus of Condemnation | Chorus of Condemnation detachment rule | `phase17e:adepta-sororitas:chorus-of-condemnation:rule` | `named_handler_required` | `phase17e:detachment:chorus-of-condemnation:rule` | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:chorus-of-condemnation`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
-| Hallowed Martyrs | Hallowed Martyrs detachment rule | `phase17e:adepta-sororitas:hallowed-martyrs:rule` | `named_handler_required` | `phase17e:detachment:hallowed-martyrs:rule` | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:hallowed-martyrs`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
-| Penitent Host | Penitent Host detachment rule | `phase17e:adepta-sororitas:penitent-host:rule` | `named_handler_required` | `phase17e:detachment:penitent-host:rule` | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:penitent-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
-| Sacred Champions | Sacred Champions detachment rule | `phase17e:adepta-sororitas:sacred-champions:rule` | `named_handler_required` | `phase17e:detachment:sacred-champions:rule` | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:sacred-champions`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
-| Sanctified Orators | Sanctified Orators detachment rule | `phase17e:adepta-sororitas:sanctified-orators:rule` | `named_handler_required` | `phase17e:detachment:sanctified-orators:rule` | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:sanctified-orators`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
+| Detachment | Rule | Coverage row | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Army of Faith | Army of Faith detachment rule | `phase17e:adepta-sororitas:army-of-faith:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:army-of-faith:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:army-of-faith`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
+| Bringers of Flame | Bringers of Flame detachment rule | `phase17e:adepta-sororitas:bringers-of-flame:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:bringers-of-flame:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:bringers-of-flame`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
+| Champions of Faith | Champions of Faith detachment rule | `phase17e:adepta-sororitas:champions-of-faith:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:champions-of-faith:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:champions-of-faith`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
+| Chorus of Condemnation | Chorus of Condemnation detachment rule | `phase17e:adepta-sororitas:chorus-of-condemnation:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:chorus-of-condemnation:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:chorus-of-condemnation`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
+| Hallowed Martyrs | Hallowed Martyrs detachment rule | `phase17e:adepta-sororitas:hallowed-martyrs:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:hallowed-martyrs:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:hallowed-martyrs`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
+| Penitent Host | Penitent Host detachment rule | `phase17e:adepta-sororitas:penitent-host:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:penitent-host:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:penitent-host`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
+| Sacred Champions | Sacred Champions detachment rule | `phase17e:adepta-sororitas:sacred-champions:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:sacred-champions:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:sacred-champions`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
+| Sanctified Orators | Sanctified Orators detachment rule | `phase17e:adepta-sororitas:sanctified-orators:rule` | `named_handler_required` | `blocked_structured_semantics_required` | `phase17e:detachment:sanctified-orators:rule` | None | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:sanctified-orators`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
 
 ## Enhancements
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -74,6 +135,8 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Penitent Host | Verse of Holy Piety | `000009029003` | army_construction | enhancement | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:adepta-sororitas:penitent-host:enhancement:000009029003` | None | `gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:penitent-host`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009029003`, `gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:adepta-sororitas:penitent-host:000009029003`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:adepta-sororitas` |
 
 ## Stratagems
+
+`generic_supported` means the generator parsed the exact source text into supported RuleIR without unsupported diagnostics. That is IR coverage, not by itself complete gameplay support. A row is fully complete only when the separate execution status is executable and runtime consumers are recorded.
 
 | Detachment | Rule | Rule ID | Timing | Category | Source support | Execution status | Handler / block | Runtime consumers | Source IDs |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
