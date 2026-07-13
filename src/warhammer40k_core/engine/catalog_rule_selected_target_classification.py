@@ -26,29 +26,60 @@ _SELECTED_TARGET_EFFECT_KINDS = frozenset(
 
 
 def rule_has_fight_start_selected_target_effect(rule_ir: RuleIR) -> bool:
+    return bool(fight_start_selected_target_effect_clause_ids(rule_ir))
+
+
+def fight_start_selected_target_effect_clause_ids(rule_ir: RuleIR) -> tuple[str, ...]:
+    clause_ids: set[str] = set()
     for index, clause in enumerate(rule_ir.clauses):
         if not _clause_is_fight_start_selected_target_selection(clause):
             continue
-        if _selected_target_effect_clauses_after(
-            rule_ir.clauses,
-            index,
-            include_immediate_effects=False,
-        ):
-            return True
-    return False
+        clause_ids.update(
+            effect_clause.clause_id
+            for effect_clause in _selected_target_effect_clauses_after(
+                rule_ir.clauses,
+                index,
+                include_immediate_effects=False,
+            )
+        )
+    return tuple(sorted(clause_ids))
 
 
 def rule_has_post_shoot_hit_target_effect(rule_ir: RuleIR) -> bool:
+    return bool(post_shoot_hit_target_effect_clause_ids(rule_ir))
+
+
+def post_shoot_hit_target_effect_clause_ids(rule_ir: RuleIR) -> tuple[str, ...]:
+    clause_ids: set[str] = set()
     for index, clause in enumerate(rule_ir.clauses):
         if not _clause_is_post_shoot_hit_target_effect_selection(clause):
             continue
-        if _selected_target_effect_clauses_after(
-            rule_ir.clauses,
-            index,
-            include_immediate_effects=True,
-        ):
-            return True
-    return False
+        clause_ids.update(
+            effect_clause.clause_id
+            for effect_clause in _selected_target_effect_clauses_after(
+                rule_ir.clauses,
+                index,
+                include_immediate_effects=True,
+            )
+        )
+    return tuple(sorted(clause_ids))
+
+
+def contextual_consumers_for_clause(
+    *,
+    rule_ir: RuleIR,
+    clause: RuleClause,
+) -> tuple[str, ...]:
+    if type(rule_ir) is not RuleIR or type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog contextual consumer classification requires RuleIR.")
+    if clause not in rule_ir.clauses:
+        raise GameLifecycleError("Catalog contextual consumer clause is not in RuleIR.")
+    consumer_ids: set[str] = set()
+    if clause.clause_id in fight_start_selected_target_effect_clause_ids(rule_ir):
+        consumer_ids.add(CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID)
+    if clause.clause_id in post_shoot_hit_target_effect_clause_ids(rule_ir):
+        consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
+    return tuple(sorted(consumer_ids))
 
 
 def _clause_is_fight_start_selected_target_selection(clause: RuleClause) -> bool:

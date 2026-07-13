@@ -155,6 +155,7 @@ def _apply_placement_proposal_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     reserve_arrival_distance_hooks: ReserveArrivalDistanceHookRegistry,
+    reserve_arrival_restriction_hooks: ReserveArrivalRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -192,6 +193,7 @@ def _apply_placement_proposal_decision(
             decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
             reserve_arrival_distance_hooks=reserve_arrival_distance_hooks,
+            reserve_arrival_restriction_hooks=reserve_arrival_restriction_hooks,
             unit_instance_id=submission.unit_instance_id,
             placement_kind=submission.placement_kind,
             attempted_placement=submission.attempted_placement,

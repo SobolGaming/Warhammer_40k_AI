@@ -14,6 +14,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     FightEligibilityKind,
     FightOrderingBandKind,
     FightTypeKind,
+    ReserveDestructionTimingKind,
     RulesetDescriptor,
     TerrainFeatureKind,
 )
@@ -50,11 +51,13 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockRerollPermissionContext,
 )
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
     BattlefieldRuntimeState,
     BattlefieldScenario,
     ModelPlacement,
     PlacedArmy,
     UnitPlacement,
+    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.catalog_battle_shock_runtime import (
     CatalogBattleShockRerollRuntime,
@@ -80,6 +83,9 @@ from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CATALOG_ONCE_PER_BATTLE_ABILITY_ACTIVATED_EVENT,
     CATALOG_ONCE_PER_BATTLE_ABILITY_DECLINED_EVENT,
     CatalogOncePerBattleRuntime,
+)
+from warhammer40k_core.engine.catalog_reserve_arrival_restrictions import (
+    CatalogReserveArrivalRestrictionRuntime,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
@@ -167,6 +173,20 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalRestrictionContext,
+    ReserveArrivalRestrictionHookRegistry,
+)
+from warhammer40k_core.engine.reserve_arrival_restriction_resolution import (
+    reserve_arrival_restriction_violations,
+)
+from warhammer40k_core.engine.reserves import (
+    ReserveDestructionTimingPolicy,
+    ReserveKind,
+    ReserveOrigin,
+    ReservePlacementViolationCode,
+    ReserveState,
+)
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
@@ -228,6 +248,9 @@ from warhammer40k_core.rules.rule_ir import (
     parameters_from_pairs,
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_kharseth_2026_06 as kharseth_package,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
@@ -989,6 +1012,328 @@ def test_catalog_selected_target_support_filters_generic_records_by_timing() -> 
         catalog_selected_target_clauses_from_record(cast(AbilityCatalogRecord, object()))
     with pytest.raises(GameLifecycleError, match="requires AbilityCatalogRecord"):
         runtime_clause_id_from_record(cast(AbilityCatalogRecord, object()))
+
+
+def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_ir() -> None:
+    source_army, target_army = _mustered_core_armies()
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    target_request = _muster_request(
+        catalog=catalog,
+        player_id=target_army.player_id,
+        army_id=target_army.army_id,
+    )
+    target_selection = target_request.unit_selections[0]
+    target_army = muster_army(
+        catalog=catalog,
+        request=replace(
+            target_request,
+            unit_selections=(
+                target_selection,
+                replace(target_selection, unit_selection_id="army-beta-reserve-unit"),
+            ),
+        ),
+    )
+    source_unit = replace(
+        source_army.units[0],
+        own_models=(source_army.units[0].own_models[0],),
+    )
+    source_army = _army_with_unit(source_army, source_unit)
+    placed_target_unit, target_unit = target_army.units
+    battlefield = BattlefieldRuntimeState(
+        battlefield_id="catalog-aethersense-battlefield",
+        battlefield_width_inches=60.0,
+        battlefield_depth_inches=44.0,
+        placed_armies=(
+            _placed_army(
+                army=source_army,
+                unit=source_unit,
+                model_xs=_model_xs_for_unit(unit=source_unit, start_x=10.0),
+            ),
+            _placed_army(
+                army=target_army,
+                unit=placed_target_unit,
+                model_xs=_model_xs_for_unit(unit=placed_target_unit, start_x=45.0),
+            ),
+        ),
+    )
+    scenario = BattlefieldScenario(
+        armies=(source_army, target_army),
+        battlefield_state=battlefield,
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
+        active_player_id=target_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+    reserve_state = ReserveState(
+        player_id=target_army.player_id,
+        unit_instance_id=target_unit.unit_instance_id,
+        reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+        declared_during_step="declare_battle_formations",
+        entered_reserves_battle_round=None,
+        entered_reserves_phase=None,
+        destruction_deadline_policy=ReserveDestructionTimingPolicy(
+            timing_kind=ReserveDestructionTimingKind.END_OF_BATTLE,
+        ),
+    )
+    rule_ir_payload = kharseth_package.datasheet_rule_ir_payload_by_source_row_id("000004194:4")
+    assert rule_ir_payload is not None
+    record = _ability_record(
+        record_id="record:aeldari:kharseth:aethersense",
+        rule_ir=RuleIR.from_payload(rule_ir_payload),
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+        datasheet_id=source_unit.datasheet_id,
+    )
+    runtime = CatalogReserveArrivalRestrictionRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    registry = ReserveArrivalRestrictionHookRegistry.from_bindings(runtime.bindings())
+
+    near_placement = _unit_placement_for_test(
+        army=target_army,
+        unit=target_unit,
+        model_xs=_model_xs_for_unit(unit=target_unit, start_x=23.0),
+    )
+    source_model = source_unit.own_models[0]
+    arriving_model = target_unit.own_models[0]
+    source_geometry = geometry_model_for_placement(
+        model=source_model,
+        placement=battlefield.model_placement_by_id(source_model.model_instance_id),
+    )
+    near_geometry = geometry_model_for_placement(
+        model=arriving_model,
+        placement=near_placement.model_placements[0],
+    )
+    assert near_geometry.pose.distance_2d_to(source_geometry.pose) == 13.0
+    assert near_geometry.range_to(source_geometry) < 12.0
+    context = ReserveArrivalRestrictionContext(
+        state=state,
+        scenario=scenario,
+        reserve_state=reserve_state,
+        unit=target_unit,
+        attempted_placement=near_placement,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+    )
+    restrictions = registry.restrictions_for(context)
+
+    assert restrictions
+    assert {restriction.minimum_distance_inches for restriction in restrictions} == {12.0}
+    assert {restriction.catalog_record_id for restriction in restrictions} == {record.record_id}
+    assert all(
+        restriction.replay_payload
+        == {
+            "ability_id": record.definition.ability_id,
+            "catalog_record_id": record.record_id,
+            "catalog_source_rule_id": record.definition.source_id,
+            "clause_id": "phase17k:aeldari:kharseth:000004194:4:clause:001",
+            "source_unit_instance_id": source_unit.unit_instance_id,
+        }
+        for restriction in restrictions
+    )
+    violations = reserve_arrival_restriction_violations(
+        state=state,
+        scenario=scenario,
+        reserve_state=reserve_state,
+        unit=target_unit,
+        attempted_placement=near_placement,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        registry=registry,
+    )
+    assert violations
+    assert {violation.violation_code for violation in violations} == {
+        ReservePlacementViolationCode.RESERVE_ARRIVAL_ABILITY_RESTRICTION
+    }
+
+    far_placement = _unit_placement_for_test(
+        army=target_army,
+        unit=target_unit,
+        model_xs=_model_xs_for_unit(unit=target_unit, start_x=24.0),
+    )
+    far_geometry = geometry_model_for_placement(
+        model=arriving_model,
+        placement=far_placement.model_placements[0],
+    )
+    assert far_geometry.pose.distance_2d_to(source_geometry.pose) == 14.0
+    assert far_geometry.range_to(source_geometry) > 12.0
+    assert not registry.restrictions_for(replace(context, attempted_placement=far_placement))
+
+
+def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_effect() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = replace(
+        source_army.units[0],
+        own_models=(source_army.units[0].own_models[0],),
+        keywords=(*source_army.units[0].keywords, "AELDARI"),
+    )
+    source_army = _army_with_unit(source_army, source_unit)
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    rule_ir_payload = kharseth_package.datasheet_rule_ir_payload_by_source_row_id("000004194:5")
+    assert rule_ir_payload is not None
+    record = _ability_record(
+        record_id="record:aeldari:kharseth:fury-of-the-void",
+        rule_ir=RuleIR.from_payload(rule_ir_payload),
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        datasheet_id=source_unit.datasheet_id,
+    )
+    ability_indexes_by_player_id = {
+        source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+        target_army.player_id: AbilityCatalogIndex.from_records(()),
+    }
+    runtime = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=(source_army, target_army),
+    )
+    base_profile = _first_catalog_weapon_profile()
+    dread_profile = replace(base_profile, name="Dread of the Deep Void")
+    other_profile = replace(base_profile, profile_id="test:other-profile", name="Other Weapon")
+    source_model_id = source_unit.own_models[0].model_instance_id
+
+    def sequence_for(profile: WeaponProfile, *, sequence_id: str) -> AttackSequence:
+        return AttackSequence(
+            sequence_id=sequence_id,
+            attacker_player_id=source_army.player_id,
+            attacking_unit_instance_id=source_unit.unit_instance_id,
+            source_phase=BattlePhase.SHOOTING,
+            attack_pools=(
+                RangedAttackPool(
+                    attacker_model_instance_id=source_model_id,
+                    wargear_id=f"wargear:{sequence_id}",
+                    weapon_profile_id=profile.profile_id,
+                    weapon_profile=profile,
+                    target_unit_instance_id=target_unit.unit_instance_id,
+                    shooting_type=ShootingType.NORMAL,
+                    attacks=1,
+                    target_visible_model_ids=target_unit.own_model_ids(),
+                    target_in_range_model_ids=target_unit.own_model_ids(),
+                ),
+            ),
+        )
+
+    decisions = DecisionController()
+    binding = runtime.attack_sequence_completed_bindings()[0]
+    wrong_weapon_sequence = sequence_for(
+        other_profile,
+        sequence_id="attack-sequence:kharseth:fury:wrong-weapon",
+    )
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": wrong_weapon_sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+    wrong_status = binding.handler(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=wrong_weapon_sequence,
+            attack_sequence_completed_event_id="event:kharseth:fury:wrong-weapon",
+        )
+    )
+    assert wrong_status is None
+    assert not decisions.queue.pending_requests
+
+    dread_sequence = sequence_for(
+        dread_profile,
+        sequence_id="attack-sequence:kharseth:fury:dread",
+    )
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": dread_sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+    status = binding.handler(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=dread_sequence,
+            attack_sequence_completed_event_id="event:kharseth:fury:dread",
+        )
+    )
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = decisions.queue.peek_next()
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["available_target_unit_instance_ids"] == [target_unit.unit_instance_id]
+    result = DecisionResult.for_request(
+        result_id="result:kharseth:fury",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    decisions.submit_result(result)
+    assert (
+        apply_catalog_post_shoot_hit_target_effect_result(
+            state=state,
+            decisions=decisions,
+            result=result,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+        )
+        is None
+    )
+
+    assert len(state.persisting_effects) == 1
+    effect = state.persisting_effects[0]
+    assert effect.target_unit_instance_ids == (source_unit.unit_instance_id,)
+    assert effect.expiration == EffectExpiration.end_turn(
+        battle_round=state.battle_round,
+        player_id=source_army.player_id,
+    )
+    modifier_context = WeaponProfileModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=source_unit.unit_instance_id,
+        attacker_model_instance_id=source_model_id,
+        target_unit_instance_id=target_unit.unit_instance_id,
+        weapon_profile=base_profile,
+    )
+    modified = RuntimeModifierRegistry.empty().modified_weapon_profile(modifier_context)
+    assert modified.strength.final == base_profile.strength.final + 1
+    assert modified.source_ids == (
+        f"{record.definition.source_id}:"
+        "phase17k:aeldari:kharseth:000004194:5:clause:002:modify_characteristic",
+    )
+    assert (
+        RuntimeModifierRegistry.empty().modified_weapon_profile(
+            replace(
+                modifier_context,
+                target_unit_instance_id=source_unit.unit_instance_id,
+            )
+        )
+        == base_profile
+    )
 
 
 def test_catalog_selected_target_fight_start_runtime_records_selected_effect() -> None:

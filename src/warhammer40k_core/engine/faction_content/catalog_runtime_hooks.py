@@ -15,6 +15,9 @@ from warhammer40k_core.engine.catalog_battle_shock_runtime import (
 from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CatalogOncePerBattleRuntime,
 )
+from warhammer40k_core.engine.catalog_reserve_arrival_restrictions import (
+    CatalogReserveArrivalRestrictionRuntime,
+)
 from warhammer40k_core.engine.catalog_return_on_death_runtime import (
     catalog_return_on_death_phase_end_hook_bindings,
     catalog_return_on_death_unit_destroyed_hook_bindings,
@@ -37,6 +40,9 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
     FightPhaseStartResultContext,
 )
 from warhammer40k_core.engine.phase import LifecycleStatus
+from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalRestrictionHookRegistry,
+)
 from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlHookBinding,
 )
@@ -148,3 +154,15 @@ def attack_sequence_completed_hook_bindings(
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         armies=armies,
     )
+
+
+def reserve_arrival_restriction_hook_registry(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> ReserveArrivalRestrictionHookRegistry:
+    runtime = CatalogReserveArrivalRestrictionRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    )
+    return ReserveArrivalRestrictionHookRegistry.from_bindings(runtime.bindings())

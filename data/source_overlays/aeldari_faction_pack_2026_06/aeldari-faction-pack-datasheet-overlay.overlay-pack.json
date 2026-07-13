@@ -374,6 +374,34 @@
     },
     {
       "effective_date": "2026-06-09",
+      "expected_preimage_hash": "de300d7998ee045e25d0eb50688757e7fb6a8b3557553acafb4dbbf2c2a7b39f",
+      "fields": {
+        "name": "Kharseth"
+      },
+      "op_id": "aeldari-correct-kharseth-model-name",
+      "operation_kind": "update_row",
+      "order_index": 25,
+      "reason": "Correct the mirrored Kharseth model name from the reviewed datasheet.",
+      "source_reference": "pdf:aeldari-faction-pack:2026-06-09:p14-15",
+      "source_row_id": "000004194:1",
+      "source_table": "Datasheets_models",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-06-09",
+      "expected_preimage_hash": "81429597a2b6126103c58e6962059de8ffef1b74a37f1d01e69012e988bd5988",
+      "fields": {},
+      "op_id": "aeldari-supersede-kharseth-blank-faction-keyword",
+      "operation_kind": "supersede_row",
+      "order_index": 26,
+      "reason": "Supersede the mirrored blank faction-keyword row before the strict Kharseth catalog bridge.",
+      "source_reference": "pdf:aeldari-faction-pack:2026-06-09:p14-15",
+      "source_row_id": "000004194:blank-keyword:global:true:15622",
+      "source_table": "Datasheets_keywords",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-06-09",
       "expected_preimage_hash": null,
       "fields": {
         "description": "This model has the Support ability.",
@@ -383,7 +411,7 @@
       },
       "op_id": "aeldari-add-support-core-ability",
       "operation_kind": "add_row",
-      "order_index": 25,
+      "order_index": 27,
       "reason": "Add the 11th Edition Support core ability referenced by the Warlock update.",
       "source_reference": "pdf:aeldari-faction-pack:2026-06-09:p23",
       "source_row_id": "core-v2-11e-support:global",
@@ -401,10 +429,10 @@
       },
       "op_id": "aeldari-add-frame-keyword-000000603",
       "operation_kind": "add_row",
-      "order_index": 26,
+      "order_index": 28,
       "reason": "Add the Faction Pack FRAME keyword.",
       "source_reference": "pdf:aeldari-faction-pack:2026-06-09:p23",
-      "source_row_id": "000000603:FRAME:global:false:28",
+      "source_row_id": "000000603:FRAME:global:false:30",
       "source_table": "Datasheets_keywords",
       "target_edition": "warhammer-40000-11th"
     },
@@ -419,15 +447,15 @@
       },
       "op_id": "aeldari-add-frame-keyword-000000606",
       "operation_kind": "add_row",
-      "order_index": 27,
+      "order_index": 29,
       "reason": "Add the Faction Pack FRAME keyword.",
       "source_reference": "pdf:aeldari-faction-pack:2026-06-09:p23",
-      "source_row_id": "000000606:FRAME:global:false:29",
+      "source_row_id": "000000606:FRAME:global:false:31",
       "source_table": "Datasheets_keywords",
       "target_edition": "warhammer-40000-11th"
     }
   ],
-  "package_hash": "a29b14b2d7f87b0e20de65d1842c311143e684323a2aa5ef7e9cd66b982e9110",
+  "package_hash": "42fef216e9605aba38565b2ca562caa6163b415b8581b0eae7d2aad26e28590f",
   "package_id": {
     "namespace": "gw",
     "package_name": "aeldari-faction-pack-datasheet-overlay",

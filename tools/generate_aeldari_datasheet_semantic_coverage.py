@@ -75,6 +75,7 @@ OVERLAY_PACK_PATH = OVERLAY_DIR / "aeldari-faction-pack-datasheet-overlay.overla
 RELEASE_MANIFEST_PATH = OVERLAY_DIR / "source_release_manifest.json"
 SOURCE_DATE = "2026-06-09"
 SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p23"
+KHARSETH_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p14-15"
 TARGET_EDITION = "warhammer-40000-11th"
 BASE_SOURCE_PACKAGE_ID = DataPackageId(
     namespace="wahapedia",
@@ -186,6 +187,49 @@ def _overlay_pack(
                 fields=spec.fields,
             )
         )
+    kharseth_model_row = _required_row(
+        rows_by_table,
+        "Datasheets_models",
+        "000004194:1",
+    )
+    operations.append(
+        SourceOverlayOperation(
+            op_id="aeldari-correct-kharseth-model-name",
+            order_index=len(operations) + 1,
+            operation_kind=SourceOverlayOperationKind.UPDATE_ROW,
+            target_edition=TARGET_EDITION,
+            source_table="Datasheets_models",
+            source_row_id="000004194:1",
+            source_reference=KHARSETH_SOURCE_REFERENCE,
+            effective_date=SOURCE_DATE,
+            reason="Correct the mirrored Kharseth model name from the reviewed datasheet.",
+            expected_preimage_hash=source_row_hash(kharseth_model_row),
+            fields=(("name", "Kharseth"),),
+        )
+    )
+    kharseth_blank_keyword_row = _required_row(
+        rows_by_table,
+        "Datasheets_keywords",
+        "000004194:blank-keyword:global:true:15622",
+    )
+    operations.append(
+        SourceOverlayOperation(
+            op_id="aeldari-supersede-kharseth-blank-faction-keyword",
+            order_index=len(operations) + 1,
+            operation_kind=SourceOverlayOperationKind.SUPERSEDE_ROW,
+            target_edition=TARGET_EDITION,
+            source_table="Datasheets_keywords",
+            source_row_id=kharseth_blank_keyword_row.source_row_id,
+            source_reference=KHARSETH_SOURCE_REFERENCE,
+            effective_date=SOURCE_DATE,
+            reason=(
+                "Supersede the mirrored blank faction-keyword row before the strict "
+                "Kharseth catalog bridge."
+            ),
+            expected_preimage_hash=source_row_hash(kharseth_blank_keyword_row),
+            fields=(),
+        )
+    )
     add_index = len(operations) + 1
     operations.append(
         SourceOverlayOperation(
@@ -544,6 +588,10 @@ def _validate_effective_updates(
     warlock_ability = _required_row(rows, "Datasheets_abilities", "000000585:1")
     if warlock_ability.runtime_fields_payload()["ability_id"] != SUPPORT_ABILITY_ID:
         raise ValueError("Aeldari Warlock Support update did not apply.")
+    kharseth_model = _required_row(rows, "Datasheets_models", "000004194:1")
+    if kharseth_model.runtime_fields_payload()["name"] != "Kharseth":
+        raise ValueError("Aeldari Kharseth model-name correction did not apply.")
+    _assert_keyword(rows, "000004194", "", present=False)
 
 
 def _assert_keyword(

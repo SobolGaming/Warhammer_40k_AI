@@ -1288,6 +1288,9 @@ class GameLifecycle:
             result=result,
             decisions=self.decision_controller,
             ruleset_descriptor=self._require_config().ruleset_descriptor,
+            reserve_arrival_restriction_hooks=(
+                self._require_runtime_content_bundle().reserve_arrival_restriction_hook_registry
+            ),
         )
         if placement_status is not None:
             if resolves_reaction_frame:
@@ -2451,6 +2454,7 @@ class GameLifecycle:
             fall_back_hooks=bundle.fall_back_hook_registry,
             movement_end_surge_hooks=bundle.movement_end_surge_hook_registry,
             reserve_arrival_distance_hooks=bundle.reserve_arrival_distance_hook_registry,
+            reserve_arrival_restriction_hooks=(bundle.reserve_arrival_restriction_hook_registry),
             unit_move_completed_mortal_wound_hooks=(
                 bundle.unit_move_completed_mortal_wound_hook_registry
             ),

@@ -15,10 +15,16 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
 )
+from warhammer40k_core.engine.catalog_descriptor_consumption import (
+    catalog_descriptor_consumption_for,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_consumer_ids_for_effect,
     catalog_rule_ir_consumers_for_clause,
     catalog_rule_ir_consumers_for_rule,
+)
+from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    contextual_consumers_for_clause,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_abilities import (
@@ -579,7 +585,17 @@ def ability_clause_coverage_rows_for_rule_ir(
             ability_name=name,
             clause=clause,
             runtime_consumer_ids=(
-                catalog_rule_ir_consumers_for_clause(clause)
+                tuple(
+                    sorted(
+                        {
+                            *catalog_rule_ir_consumers_for_clause(clause),
+                            *contextual_consumers_for_clause(
+                                rule_ir=rule_ir,
+                                clause=clause,
+                            ),
+                        }
+                    )
+                )
                 if consumer_override is None
                 else consumer_override.get(clause.clause_id, ())
             ),
@@ -781,12 +797,13 @@ def _descriptor_runtime_consumer_ids(
         )
     if descriptor_is_stealth(ability):
         return (CORE_STEALTH_RUNTIME_CONSUMER_ID,)
+    descriptor_consumption = catalog_descriptor_consumption_for(ability)
+    if descriptor_consumption is not None:
+        return descriptor_consumption.runtime_consumer_ids
     if _descriptor_is_supreme_commander(ability):
         return (SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,)
     if _descriptor_is_warlord_restriction(ability):
         return (WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID,)
-    if _descriptor_is_shadow_of_chaos(ability):
-        return (_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID,)
     return ()
 
 
@@ -984,10 +1001,11 @@ def _descriptor_semantic_categories(
         return ("core.feel_no_pain",)
     if descriptor_is_stealth(ability):
         return ("core.stealth",)
+    descriptor_consumption = catalog_descriptor_consumption_for(ability)
+    if descriptor_consumption is not None:
+        return descriptor_consumption.semantic_categories
     if _descriptor_is_supreme_commander(ability):
         return ("datasheet.mustering.supreme_commander",)
-    if _descriptor_is_shadow_of_chaos(ability):
-        return ("faction.army_rule.shadow_of_chaos",)
     return ("unknown.ability_text",)
 
 
@@ -1008,15 +1026,6 @@ def _diagnostic_reasons(ability: DatasheetAbilityDescriptor) -> tuple[str, ...]:
             raise GameLifecycleError("Ability coverage diagnostic reason must be a string.")
         reasons.add(reason)
     return tuple(sorted(reasons))
-
-
-def _descriptor_is_shadow_of_chaos(ability: DatasheetAbilityDescriptor) -> bool:
-    if type(ability) is not DatasheetAbilityDescriptor:
-        raise GameLifecycleError("Shadow of Chaos descriptor matching requires a descriptor.")
-    return (
-        ability.source_kind is CatalogAbilitySourceKind.FACTION
-        and ability.ability_id == _SHADOW_OF_CHAOS_CATALOG_ABILITY_ID
-    )
 
 
 def _descriptor_is_supreme_commander(ability: DatasheetAbilityDescriptor) -> bool:
@@ -1151,10 +1160,13 @@ _SUPPORT_STAGE_ORDER: Mapping[AbilityCoverageSupportStage, int] = {
 
 _CATEGORY_NAMES: Mapping[str, str] = {
     "core.descriptor": "Core Ability Descriptor",
+    "core.leader": "Leader",
+    "core.scouts": "Scouts",
     "core.stealth": "Stealth",
     "core.reserve.deep_strike": "Deep Strike Reserve Arrival",
     "datasheet.mustering.supreme_commander": "Supreme Commander",
     "faction.army_rule.blessings_of_khorne": "World Eaters Army Rule",
+    "faction.army_rule.battle_focus": "Aeldari Army Rule",
     "faction.army_rule.templar_vows": "Black Templars Army Rule",
     "faction.army_rule.dark_pacts": "Chaos Space Marines Army Rule",
     "faction.army_rule.corsairs_and_travelling_players": "Drukhari Army Rule",
@@ -1172,10 +1184,6 @@ _CATEGORY_NAMES: Mapping[str, str] = {
 CORE_STEALTH_RUNTIME_CONSUMER_ID = "core:stealth"
 SUPREME_COMMANDER_MUSTERING_CONSUMER_ID = "army-mustering:supreme-commander"
 WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID = "army-mustering:warlord-restriction"
-_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID = (
-    "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
-)
-_SHADOW_OF_CHAOS_CATALOG_ABILITY_ID = "000008433"
 
 
 def _category_name(category_id: str) -> str:

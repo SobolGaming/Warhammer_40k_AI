@@ -122,6 +122,12 @@ from warhammer40k_core.engine.phases.shooting import (
     shooting_unit_can_select_to_shoot,
     shooting_unit_has_legal_declaration_against_targets,
 )
+from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalRestrictionHookRegistry,
+)
+from warhammer40k_core.engine.reserve_arrival_restriction_resolution import (
+    reserve_arrival_restriction_violations,
+)
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveState,
@@ -226,6 +232,7 @@ __all__ = (
     "RerollComponentSelectionPolicy",
     "RerollPermission",
     "ReserveKind",
+    "ReserveArrivalRestrictionHookRegistry",
     "ReserveState",
     "ReserveStatus",
     "RulesetDescriptor",
@@ -270,6 +277,7 @@ __all__ = (
     "replace",
     "request_out_of_phase_shooting_declaration",
     "reserve_state_is_cult_ambush",
+    "reserve_arrival_restriction_violations",
     "resolve_charge_move",
     "resolve_mortal_wound_feel_no_pain_decision",
     "resolve_objective_control",

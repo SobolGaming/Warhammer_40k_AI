@@ -21,8 +21,10 @@ from warhammer40k_core.engine.catalog_geometry import alive_geometry_models_for_
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_unit_scoped_generic_records,
 )
+from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -30,6 +32,7 @@ from warhammer40k_core.geometry.volume import Model
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
+    RuleDurationKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleParameterValue,
@@ -372,9 +375,11 @@ def effect_target_unit_ids(
     for placed_army in state.battlefield_state.placed_armies:
         if placed_army.player_id != source_player_id:
             continue
-        army = army_for_player(tuple(state.army_definitions), player_id=placed_army.player_id)
         for placement in placed_army.unit_placements:
-            unit = unit_in_army_by_id(army, unit_instance_id=placement.unit_instance_id)
+            unit = rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=placement.unit_instance_id,
+            )
             if required_keywords and not unit_has_required_keywords(
                 unit_keywords=unit.keywords,
                 faction_keywords=unit.faction_keywords,
@@ -443,6 +448,13 @@ def selection_source_model_ids(
     selection_clause: RuleClause,
     current_model_instance_ids: tuple[str, ...],
 ) -> tuple[str | None, ...]:
+    if selection_clause.trigger is not None:
+        trigger_parameters = parameter_payload(selection_clause.trigger.parameters)
+        if (
+            trigger_parameters.get("subject") == "this_model"
+            or trigger_parameters.get("attacker_model_reference") == "this_model"
+        ):
+            return current_model_instance_ids
     for condition in selection_clause.conditions:
         if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
             continue
@@ -453,6 +465,27 @@ def selection_source_model_ids(
         ):
             return current_model_instance_ids
     return (None,)
+
+
+def selection_weapon_names(selection_clause: RuleClause) -> tuple[str, ...]:
+    if selection_clause.trigger is None:
+        return ()
+    parameters = parameter_payload(selection_clause.trigger.parameters)
+    single_name = parameters.get("weapon_name")
+    raw_names = parameters.get("weapon_names")
+    if single_name is not None and raw_names is not None:
+        raise GameLifecycleError("Catalog selected-target weapon selector is ambiguous.")
+    if single_name is not None:
+        if type(single_name) is not str or not single_name.strip():
+            raise GameLifecycleError("Catalog selected-target weapon_name is invalid.")
+        return (single_name,)
+    if raw_names is None:
+        return ()
+    if type(raw_names) is not tuple or not raw_names:
+        raise GameLifecycleError("Catalog selected-target weapon_names are invalid.")
+    if any(type(name) is not str or not name.strip() for name in raw_names):
+        raise GameLifecycleError("Catalog selected-target weapon_names are invalid.")
+    return tuple(sorted(raw_names))
 
 
 def has_fight_start_selected_target_records(
@@ -678,6 +711,42 @@ def battle_phase_kind(phase: BattlePhase) -> BattlePhaseKind:
     if phase is BattlePhase.SHOOTING:
         return BattlePhaseKind.SHOOTING
     raise GameLifecycleError("Catalog selected-target phase is unsupported.")
+
+
+def selected_target_effect_expiration(
+    *,
+    state: GameState,
+    phase: BattlePhase,
+    clause: RuleClause,
+) -> EffectExpiration:
+    duration = clause.duration
+    if duration is None:
+        return EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=battle_phase_kind(phase),
+            player_id=active_player_id(state),
+        )
+    if duration.kind is RuleDurationKind.PERMANENT:
+        return EffectExpiration.end_of_battle()
+    if duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT:
+        raise GameLifecycleError("Catalog selected-target effect duration is unsupported.")
+    endpoint = parameter_payload(duration.parameters).get("endpoint")
+    if endpoint == "phase":
+        return EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=battle_phase_kind(phase),
+            player_id=active_player_id(state),
+        )
+    if endpoint == "turn":
+        return EffectExpiration.end_turn(
+            battle_round=state.battle_round,
+            player_id=active_player_id(state),
+        )
+    if endpoint == "battle_round":
+        return EffectExpiration.end_battle_round(battle_round=state.battle_round)
+    if endpoint == "battle":
+        return EffectExpiration.end_of_battle()
+    raise GameLifecycleError("Catalog selected-target timing endpoint is unsupported.")
 
 
 def timing_window_id(phase: BattlePhase) -> str:

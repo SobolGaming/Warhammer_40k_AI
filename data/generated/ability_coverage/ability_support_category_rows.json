@@ -2,6 +2,44 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
+        "datasheet_id": "000004194",
+        "datasheet_name": "Kharseth",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Battle Focus"
+    ],
+    "category_id": "faction.army_rule.battle_focus",
+    "category_name": "Aeldari Army Rule",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004194/faction/000009894/none"
+    ],
+    "datasheet_names": [
+      "Kharseth"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:black_templars:army_rule:templar_vows",
         "ability_name": "Templar Vows",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/black-templars/faction/warhammer_40000_11th:black_templars:army_rule:templar_vows/none",
@@ -621,6 +659,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004194:fury-of-the-void-psychic",
+        "ability_name": "Fury of the Void (Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/datasheet/000004194:fury-of-the-void-psychic/none",
+        "datasheet_id": "000004194",
+        "datasheet_name": "Kharseth",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Fury of the Void (Psychic)"
+    ],
+    "category_id": "datasheet.rule_ir.modify_characteristic.friendly_unit",
+    "category_name": "Datasheet Rule Ir Modify Characteristic Friendly Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004194/datasheet/000004194:fury-of-the-void-psychic/none"
+    ],
+    "datasheet_names": [
+      "Kharseth"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-effect"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000002758:daemon-prince-of-khorne",
         "ability_name": "Daemon Prince of Khorne",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemon-prince-of-khorne/none",
@@ -936,6 +1007,39 @@
     ],
     "runtime_consumer_ids": [
       "catalog-ir:can-be-placed-in-reserves"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000004194:aethersense-psychic",
+        "ability_name": "Aethersense (Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/datasheet/000004194:aethersense-psychic/none",
+        "datasheet_id": "000004194",
+        "datasheet_name": "Kharseth",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Aethersense (Psychic)"
+    ],
+    "category_id": "datasheet.rule_ir.placement_restriction.enemy_unit",
+    "category_name": "Datasheet Rule Ir Placement Restriction Enemy Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004194/datasheet/000004194:aethersense-psychic/none"
+    ],
+    "datasheet_names": [
+      "Kharseth"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:reserve-arrival-restriction"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -1920,6 +2024,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
+        "datasheet_id": "000004194",
+        "datasheet_name": "Kharseth",
+        "source_kind": "core"
+      }
+    ],
+    "ability_names": [
+      "Leader"
+    ],
+    "category_id": "core.leader",
+    "category_name": "Leader",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004194/core/000008346/none"
+    ],
+    "datasheet_names": [
+      "Kharseth"
+    ],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "source_kind_counts": {
+      "core": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001115:daemonic-icon",
         "ability_name": "Daemonic Icon",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/wargear/000001115:daemonic-icon/000001115:daemonic-icon",
@@ -1955,6 +2092,39 @@
     ],
     "source_kind_counts": {
       "wargear": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000008344",
+        "ability_name": "Scouts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/core/000008344/none",
+        "datasheet_id": "000004194",
+        "datasheet_name": "Kharseth",
+        "source_kind": "core"
+      }
+    ],
+    "ability_names": [
+      "Scouts"
+    ],
+    "category_id": "core.scouts",
+    "category_name": "Scouts",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004194/core/000008344/none"
+    ],
+    "datasheet_names": [
+      "Kharseth"
+    ],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:scouts"
+    ],
+    "source_kind_counts": {
+      "core": 1
     },
     "support_stages": [
       "engine_consumed"

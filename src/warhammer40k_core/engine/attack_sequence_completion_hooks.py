@@ -11,6 +11,7 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.rule_ir_weapon_modifiers import rule_ir_weapon_selector_applies
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 if TYPE_CHECKING:
@@ -135,6 +136,7 @@ def successful_hit_target_unit_ids_for_sequence(
     attacker_model_instance_id: str | None = None,
     wargear_ids: tuple[str, ...] = (),
     weapon_profile_ids: tuple[str, ...] = (),
+    weapon_names: tuple[str, ...] = (),
 ) -> tuple[str, ...]:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Attack sequence hit target lookup requires decisions.")
@@ -150,6 +152,7 @@ def successful_hit_target_unit_ids_for_sequence(
         "weapon_profile_ids",
         weapon_profile_ids,
     )
+    requested_weapon_names = _validate_optional_identifier_tuple("weapon_names", weapon_names)
     target_ids: set[str] = set()
     for record in decisions.event_log.records:
         if record.event_type != "attack_sequence_step":
@@ -179,6 +182,11 @@ def successful_hit_target_unit_ids_for_sequence(
         if (
             requested_weapon_profile_ids
             and pool.weapon_profile_id not in requested_weapon_profile_ids
+        ):
+            continue
+        if requested_weapon_names and not rule_ir_weapon_selector_applies(
+            parameters={"weapon_names": requested_weapon_names},
+            profile=pool.weapon_profile,
         ):
             continue
         target_ids.add(pool.target_unit_instance_id)

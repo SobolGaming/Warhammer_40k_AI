@@ -95,16 +95,19 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     selected_payload as _selected_payload,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    selected_target_effect_expiration as _selected_target_effect_expiration,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     selected_target_status_gate_allows as _selected_target_status_gate_allows,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     selection_source_model_ids as _selection_source_model_ids,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    timing_window_id as _timing_window_id,
+    selection_weapon_names as _selection_weapon_names,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    unit_in_army_by_id as _unit_in_army_by_id,
+    timing_window_id as _timing_window_id,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     unit_scoped_generic_records_for_timing as _unit_scoped_generic_records_for_timing,
@@ -146,6 +149,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -661,44 +665,43 @@ def _post_shoot_hit_target_effect_groups(
         return ()
     player_id = _validate_identifier("player_id", context.attack_sequence.attacker_player_id)
     army = _army_for_player(armies, player_id=player_id)
-    unit = _unit_in_army_by_id(
-        army,
+    rules_unit = rules_unit_view_by_id(
+        state=context.state,
         unit_instance_id=context.attack_sequence.attacking_unit_instance_id,
     )
     index = ability_indexes_by_player_id.get(player_id)
     if index is None:
         raise GameLifecycleError("Catalog post-shoot target effect missing ability index.")
-    current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
-        state=context.state,
-        unit=unit,
-    )
-    if not current_model_ids:
-        return ()
-    hit_target_ids = successful_hit_target_unit_ids_for_sequence(
-        decisions=context.decisions,
-        sequence=context.attack_sequence,
-    )
-    if not hit_target_ids:
-        return ()
     groups: list[_SelectedTargetGroup] = []
-    for record in _unit_scoped_generic_records_for_timing(
-        ability_index=index,
-        unit=unit,
-        current_model_instance_ids=current_model_ids,
-        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+    for component in sorted(
+        rules_unit.components,
+        key=lambda value: value.unit.unit_instance_id,
     ):
-        groups.extend(
-            _post_shoot_groups_for_record(
-                state=context.state,
-                army=army,
-                unit=unit,
-                current_model_instance_ids=current_model_ids,
-                record=record,
-                hit_target_unit_ids=hit_target_ids,
-                attack_sequence=context.attack_sequence,
-                attack_sequence_completed_event_id=context.attack_sequence_completed_event_id,
-            )
+        unit = component.unit
+        current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+            state=context.state,
+            unit=unit,
         )
+        if not current_model_ids:
+            continue
+        for record in _unit_scoped_generic_records_for_timing(
+            ability_index=index,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        ):
+            groups.extend(
+                _post_shoot_groups_for_record(
+                    state=context.state,
+                    decisions=context.decisions,
+                    army=army,
+                    unit=unit,
+                    current_model_instance_ids=current_model_ids,
+                    record=record,
+                    attack_sequence=context.attack_sequence,
+                    attack_sequence_completed_event_id=(context.attack_sequence_completed_event_id),
+                )
+            )
     return tuple(sorted(groups, key=lambda group: group.sort_key))
 
 
@@ -769,11 +772,11 @@ def _fight_start_groups_for_record(
 def _post_shoot_groups_for_record(
     *,
     state: GameState,
+    decisions: DecisionController,
     army: ArmyDefinition,
     unit: UnitInstance,
     current_model_instance_ids: tuple[str, ...],
     record: AbilityCatalogRecord,
-    hit_target_unit_ids: tuple[str, ...],
     attack_sequence: AttackSequence,
     attack_sequence_completed_event_id: str,
 ) -> tuple[_SelectedTargetGroup, ...]:
@@ -792,46 +795,60 @@ def _post_shoot_groups_for_record(
         )
         if not effect_clauses:
             continue
-        target_ids = _eligible_selection_target_unit_ids(
-            state=state,
-            source_player_id=army.player_id,
-            source_unit_instance_id=unit.unit_instance_id,
-            source_model_instance_id=None,
+        for source_model_id in _selection_source_model_ids(
             selection_clause=selection_clause,
-            explicit_target_unit_ids=hit_target_unit_ids,
-        )
-        options = _options_for_targets(
-            state=state,
-            record=record,
-            player_id=army.player_id,
-            unit=unit,
-            source_model_instance_id=None,
-            selection_clause=selection_clause,
-            effect_clauses=effect_clauses,
-            selected_target_unit_ids=target_ids,
-            phase=BattlePhase.SHOOTING,
-            hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
-            submission_kind=SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SUBMISSION_KIND,
-            attack_sequence=attack_sequence,
-            attack_sequence_completed_event_id=attack_sequence_completed_event_id,
-        )
-        if options:
-            groups.append(
-                _SelectedTargetGroup(
-                    record=record,
-                    player_id=army.player_id,
-                    unit=unit,
-                    source_model_instance_id=None,
-                    selection_clause=selection_clause,
-                    effect_clauses=effect_clauses,
-                    options=options,
-                    phase=BattlePhase.SHOOTING,
-                    hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
-                    submission_kind=SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SUBMISSION_KIND,
-                    attack_sequence=attack_sequence,
-                    attack_sequence_completed_event_id=attack_sequence_completed_event_id,
-                )
+            current_model_instance_ids=current_model_instance_ids,
+        ):
+            hit_target_ids = successful_hit_target_unit_ids_for_sequence(
+                decisions=decisions,
+                sequence=attack_sequence,
+                attacker_model_instance_id=source_model_id,
+                weapon_names=_selection_weapon_names(selection_clause),
             )
+            if not hit_target_ids:
+                continue
+            target_ids = _eligible_selection_target_unit_ids(
+                state=state,
+                source_player_id=army.player_id,
+                source_unit_instance_id=unit.unit_instance_id,
+                source_model_instance_id=source_model_id,
+                selection_clause=selection_clause,
+                explicit_target_unit_ids=hit_target_ids,
+            )
+            options = _options_for_targets(
+                state=state,
+                record=record,
+                player_id=army.player_id,
+                unit=unit,
+                source_model_instance_id=source_model_id,
+                selection_clause=selection_clause,
+                effect_clauses=effect_clauses,
+                selected_target_unit_ids=target_ids,
+                phase=BattlePhase.SHOOTING,
+                hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+                submission_kind=SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SUBMISSION_KIND,
+                attack_sequence=attack_sequence,
+                attack_sequence_completed_event_id=attack_sequence_completed_event_id,
+            )
+            if options:
+                groups.append(
+                    _SelectedTargetGroup(
+                        record=record,
+                        player_id=army.player_id,
+                        unit=unit,
+                        source_model_instance_id=source_model_id,
+                        selection_clause=selection_clause,
+                        effect_clauses=effect_clauses,
+                        options=options,
+                        phase=BattlePhase.SHOOTING,
+                        hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+                        submission_kind=(
+                            SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SUBMISSION_KIND
+                        ),
+                        attack_sequence=attack_sequence,
+                        attack_sequence_completed_event_id=(attack_sequence_completed_event_id),
+                    )
+                )
     return tuple(groups)
 
 
@@ -973,10 +990,10 @@ def _effect_records_for_selected_target(
                 "target_unit_instance_ids": list(target_unit_ids),
                 "started_battle_round": state.battle_round,
                 "started_phase": _battle_phase_kind(phase).value,
-                "expiration": EffectExpiration.end_phase(
-                    battle_round=state.battle_round,
-                    phase=_battle_phase_kind(phase),
-                    player_id=_active_player_id(state),
+                "expiration": _selected_target_effect_expiration(
+                    state=state,
+                    phase=phase,
+                    clause=clause,
                 ).to_payload(),
                 "effect_payload": {
                     "effect_kind": GENERIC_RULE_EFFECT_KIND,

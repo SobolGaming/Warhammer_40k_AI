@@ -136,6 +136,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalDistanceHookBinding,
     ReserveArrivalDistanceHookRegistry,
+    ReserveArrivalRestrictionHookRegistry,
 )
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionRegistry,
@@ -211,6 +212,7 @@ _validate_contribution_tuple = _bundle_validation.validate_contribution_tuple
 _validate_identifier = _bundle_validation.validate_identifier
 _validate_identifier_tuple = _bundle_validation.validate_identifier_tuple
 _validate_index_mapping = _bundle_validation.validate_index_mapping
+_validate_runtime_contributions = _bundle_validation.validate_runtime_content_contributions
 _validate_tuple = _bundle_validation.validate_tuple
 _merge_records = _bundle_validation.merge_records
 _contribution_values = _bundle_validation.contribution_values
@@ -1035,6 +1037,7 @@ class RuntimeContentBundle:
     fall_back_hook_registry: FallBackEligibilityHookRegistry
     movement_end_surge_hook_registry: MovementEndSurgeHookRegistry
     reserve_arrival_distance_hook_registry: ReserveArrivalDistanceHookRegistry
+    reserve_arrival_restriction_hook_registry: ReserveArrivalRestrictionHookRegistry
     unit_move_completed_mortal_wound_hook_registry: UnitMoveCompletedMortalWoundHookRegistry
     unit_move_completed_battle_shock_hook_registry: UnitMoveCompletedBattleShockHookRegistry
     mortal_wound_feel_no_pain_hook_registry: MortalWoundFeelNoPainContinuationHookRegistry
@@ -1119,13 +1122,10 @@ class RuntimeContentBundle:
             )
         if type(self.movement_end_surge_hook_registry) is not MovementEndSurgeHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires MovementEndSurgeHookRegistry.")
-        if (
-            type(self.reserve_arrival_distance_hook_registry)
-            is not ReserveArrivalDistanceHookRegistry
-        ):
-            raise GameLifecycleError(
-                "RuntimeContentBundle requires ReserveArrivalDistanceHookRegistry."
-            )
+        _bundle_validation.validate_reserve_arrival_hook_registries(
+            self.reserve_arrival_distance_hook_registry,
+            self.reserve_arrival_restriction_hook_registry,
+        )
         if (
             type(self.unit_move_completed_mortal_wound_hook_registry)
             is not UnitMoveCompletedMortalWoundHookRegistry
@@ -1515,6 +1515,12 @@ class RuntimeContentBundle:
                 ),
             )
         )
+        reserve_arrival_restriction_hook_registry = (
+            catalog_runtime_hooks.reserve_arrival_restriction_hook_registry(
+                ability_indexes_by_player_id=ability_indexes_by_player_id,
+                armies=validated_armies,
+            )
+        )
         unit_move_completed_mortal_wound_hook_registry = (
             _unit_move_completed.unit_move_completed_mortal_wound_hook_registry(
                 ability_indexes_by_player_id=ability_indexes_by_player_id,
@@ -1804,6 +1810,7 @@ class RuntimeContentBundle:
             fall_back_hook_registry=fall_back_hook_registry,
             movement_end_surge_hook_registry=movement_end_surge_hook_registry,
             reserve_arrival_distance_hook_registry=reserve_arrival_distance_hook_registry,
+            reserve_arrival_restriction_hook_registry=reserve_arrival_restriction_hook_registry,
             unit_move_completed_mortal_wound_hook_registry=(
                 unit_move_completed_mortal_wound_hook_registry
             ),
@@ -1841,16 +1848,7 @@ class RuntimeContentBundle:
 
 
 def _validate_contributions(contributions: object) -> tuple[RuntimeContentContribution, ...]:
-    if type(contributions) is not tuple:
-        raise GameLifecycleError("Runtime content contributions must be a tuple.")
-    validated: list[RuntimeContentContribution] = []
-    for contribution in cast(tuple[object, ...], contributions):
-        if type(contribution) is not RuntimeContentContribution:
-            raise GameLifecycleError(
-                "Runtime content contributions must contain RuntimeContentContribution values."
-            )
-        validated.append(contribution)
-    return tuple(validated)
+    return _validate_runtime_contributions(contributions, RuntimeContentContribution)
 
 
 def _validate_armies(armies: object) -> tuple[ArmyDefinition, ...]:

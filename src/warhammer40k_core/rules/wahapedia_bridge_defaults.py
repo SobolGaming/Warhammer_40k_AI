@@ -130,6 +130,20 @@ CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_KHARSETH_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000004194",
+        model_name="Kharseth - EPIC HERO",
+        height=2.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:kharseth:height",
+        height_document_reference=(
+            "Warhammer Community Kharseth assembled and sprue imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (32mm base)"
+        ),
+    ),
+)
+
 DEATH_GUARD_DEFILER_PDF_CORRECTION = PdfDatasheetCorrection(
     datasheet_id="000004209",
     source_id="pdf:death-guard-faction-pack:2026-06-10:p5-p6",
@@ -192,6 +206,7 @@ DEFAULT_PDF_CORRECTIONS = (
     *CHAOS_DEFILER_PDF_CORRECTIONS,
 )
 DEFAULT_HEIGHT_OVERRIDES = (
+    *AELDARI_KHARSETH_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES,
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,

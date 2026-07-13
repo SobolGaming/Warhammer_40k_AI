@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict, cast
 
 if TYPE_CHECKING or __package__:
+    from tools import aeldari_datasheet_semantic_coverage
     from tools.aeldari_datasheet_semantic_snapshot import (
         aeldari_datasheet_semantic_snapshot_markdown,
     )
@@ -20,6 +21,7 @@ if TYPE_CHECKING or __package__:
         reviewed_faction_ids,
     )
 else:
+    import aeldari_datasheet_semantic_coverage
     from aeldari_datasheet_semantic_snapshot import (
         aeldari_datasheet_semantic_snapshot_markdown,
     )
@@ -138,7 +140,13 @@ from warhammer40k_core.engine.stratagem_catalog import (
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
-from warhammer40k_core.rules.source_overlay import apply_source_release_overlays
+from warhammer40k_core.rules.source_overlay import (
+    SourceOverlayPack,
+    SourceOverlayPackPayload,
+    SourceReleaseManifest,
+    SourceReleaseManifestPayload,
+    apply_source_release_overlays,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_defiler_datasheet_overlay_2026_06 as chaos_defiler_overlay,
 )
@@ -156,6 +164,7 @@ from warhammer40k_core.rules.wahapedia_bridge import (
     build_wahapedia_canonical_bridge_artifacts,
 )
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
+    AELDARI_KHARSETH_HEIGHT_OVERRIDES,
     CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     CHAOS_DEFILER_HEIGHT_OVERRIDES,
 )
@@ -178,12 +187,14 @@ DEFAULT_FACTION_DOCS_DIR = Path("docs") / "factions"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
 RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-coverage-v1"
 AELDARI_FACTION_ID = "aeldari"
+AELDARI_KHARSETH_DATASHEET_IDS = ("000004194",)
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 UNDIVIDED_DAEMON_DATASHEET_IDS = ("000001149", "000002758", "000001151")
 CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.DEFILER_DATASHEET_IDS
 ABILITY_SUPPORT_DATASHEET_IDS = (
+    *AELDARI_KHARSETH_DATASHEET_IDS,
     *BELAKOR_DATASHEET_IDS,
     *DAEMON_WARGEAR_DATASHEET_IDS,
     *UNDIVIDED_DAEMON_DATASHEET_IDS,
@@ -1386,17 +1397,41 @@ def _ability_support_catalog_package(
 ) -> CanonicalCatalogPackage:
     source_json_dir = _resolve_repo_path(source_json_dir)
     artifacts = _load_source_artifacts(source_json_dir)
-    overlaid_artifacts = apply_source_release_overlays(
+    chaos_overlaid_artifacts = apply_source_release_overlays(
         source_artifacts=artifacts,
         release_manifest=chaos_defiler_overlay.source_release_manifest(),
         overlay_packs=(chaos_defiler_overlay.overlay_pack(),),
+    )
+    aeldari_overlay_pack = SourceOverlayPack.from_payload(
+        cast(
+            SourceOverlayPackPayload,
+            json.loads(
+                aeldari_datasheet_semantic_coverage.OVERLAY_PACK_PATH.read_text(encoding="utf-8")
+            ),
+        )
+    )
+    aeldari_release_manifest = SourceReleaseManifest.from_payload(
+        cast(
+            SourceReleaseManifestPayload,
+            json.loads(
+                aeldari_datasheet_semantic_coverage.RELEASE_MANIFEST_PATH.read_text(
+                    encoding="utf-8"
+                )
+            ),
+        )
+    )
+    overlaid_artifacts = apply_source_release_overlays(
+        source_artifacts=chaos_overlaid_artifacts,
+        release_manifest=aeldari_release_manifest,
+        overlay_packs=(aeldari_overlay_pack,),
     )
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=overlaid_artifacts,
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
         height_overrides=(
-            BELAKOR_HEIGHT_OVERRIDES
+            AELDARI_KHARSETH_HEIGHT_OVERRIDES
+            + BELAKOR_HEIGHT_OVERRIDES
             + UNDIVIDED_DAEMON_HEIGHT_OVERRIDES
             + CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
             + BLOODLETTERS_HEIGHT_OVERRIDES
