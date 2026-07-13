@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from collections import Counter
 from dataclasses import dataclass
@@ -16,6 +15,10 @@ if TYPE_CHECKING or __package__:
         ExactAbilitySemanticEvidence,
         ExactSemanticConsumerEvidence,
         exact_ability_semantic_bucket,
+    )
+    from tools.aeldari_datasheet_semantic_evidence import (
+        SourceDerivedAeldariAbilityEvidence,
+        source_derived_aeldari_exact_ability_evidence,
     )
     from tools.faction_pack_datasheet_review import (
         DatasheetSourceTreatment,
@@ -34,16 +37,15 @@ else:
         ExactSemanticConsumerEvidence,
         exact_ability_semantic_bucket,
     )
+    from aeldari_datasheet_semantic_evidence import (
+        SourceDerivedAeldariAbilityEvidence,
+        source_derived_aeldari_exact_ability_evidence,
+    )
     from faction_pack_datasheet_review import (
         DatasheetSourceTreatment,
         faction_pack_datasheet_review,
     )
     from generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR, _load_source_artifacts
-from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
-from warhammer40k_core.engine.ability_coverage import (
-    ability_clause_coverage_rows_for_ability,
-    ability_coverage_row_for_descriptor,
-)
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
@@ -56,9 +58,7 @@ from warhammer40k_core.rules.source_overlay import (
 from warhammer40k_core.rules.source_patch import source_row_hash
 from warhammer40k_core.rules.wahapedia_bridge_rows import bridge_rows_by_table
 from warhammer40k_core.rules.wahapedia_datasheet_ability_bridge import (
-    BridgedDatasheetAbility,
     WahapediaDatasheetAbilityBridgeError,
-    bridge_datasheet_abilities,
 )
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
 
@@ -90,7 +90,6 @@ CATALOG_VERSION = CatalogVersion.dated(
     version_id="warhammer-40000-11th-aeldari-faction-pack-2026-06",
     source_date=date.fromisoformat(SOURCE_DATE),
 )
-CATALOG_ID = "aeldari-effective-datasheet-abilities-2026-06"
 SUPPORT_ABILITY_ID = "core-v2-11e-support"
 
 ASPECT_SHRINE_TOKEN_DESCRIPTION = (
@@ -441,21 +440,19 @@ def _coverage_payload(
     release_manifest: SourceReleaseManifest,
 ) -> dict[str, object]:
     review = faction_pack_datasheet_review("aeldari")
-    datasheet_ids = tuple(row.datasheet_id for row in review.rows if row.datasheet_id is not None)
-    bridged_rows = bridge_datasheet_abilities(
-        source_artifacts=effective_artifacts,
-        datasheet_ids=datasheet_ids,
+    datasheet_id_names = tuple(
+        (row.datasheet_id, row.datasheet_name)
+        for row in review.rows
+        if row.datasheet_id is not None
     )
-    exact_rows = tuple(
-        row
-        for row in bridged_rows
-        if row.descriptor.source_kind
-        in {CatalogAbilitySourceKind.DATASHEET, CatalogAbilitySourceKind.WARGEAR}
+    source_evidence = source_derived_aeldari_exact_ability_evidence(
+        effective_artifacts=effective_artifacts,
+        datasheet_id_names=datasheet_id_names,
     )
-    rows_by_datasheet: dict[str, list[BridgedDatasheetAbility]] = {
-        datasheet_id: [] for datasheet_id in datasheet_ids
+    rows_by_datasheet: dict[str, list[SourceDerivedAeldariAbilityEvidence]] = {
+        datasheet_id: [] for datasheet_id, _ in datasheet_id_names
     }
-    for row in exact_rows:
+    for row in source_evidence:
         rows_by_datasheet[row.datasheet_id].append(row)
     datasheet_payloads: list[dict[str, object]] = []
     bucket_counts: Counter[str] = Counter()
@@ -468,43 +465,23 @@ def _coverage_payload(
         ability_payloads: list[dict[str, object]] = []
         semantic_evidence: list[ExactAbilitySemanticEvidence] = []
         for ability_row in ability_rows:
-            coverage = ability_coverage_row_for_descriptor(
-                catalog_id=CATALOG_ID,
-                datasheet_id=review_row.datasheet_id,
-                datasheet_name=review_row.datasheet_name,
-                ability=ability_row.descriptor,
-            )
-            semantic_consumers = _exact_semantic_consumers(
-                ability_row=ability_row,
-                runtime_consumer_ids=coverage.runtime_consumer_ids,
+            semantic_consumers = tuple(
+                ExactSemanticConsumerEvidence(
+                    semantic_id=semantic.semantic_id,
+                    semantic_kind=semantic.semantic_kind,
+                    runtime_consumer_ids=semantic.runtime_consumer_ids,
+                )
+                for semantic in ability_row.semantic_consumers
             )
             semantic_evidence.append(
                 ExactAbilitySemanticEvidence(
-                    support_stage=coverage.support_stage,
+                    support_stage=ability_row.support_stage,
                     semantic_consumers=semantic_consumers,
-                    runtime_consumer_ids=coverage.runtime_consumer_ids,
-                    diagnostic_reasons=coverage.diagnostic_reasons,
+                    runtime_consumer_ids=ability_row.runtime_consumer_ids,
+                    diagnostic_reasons=ability_row.diagnostic_reasons,
                 )
             )
-            ability_payloads.append(
-                {
-                    "ability_id": ability_row.descriptor.ability_id,
-                    "ability_name": ability_row.descriptor.name,
-                    "source_kind": ability_row.descriptor.source_kind.value,
-                    "source_row_id": ability_row.source_row_id,
-                    "source_ids": list(ability_row.source_ids),
-                    "raw_text": ability_row.raw_description,
-                    "raw_text_sha256": _sha256_text(ability_row.raw_description),
-                    "normalized_text_sha256": _sha256_text(ability_row.normalized_description),
-                    "catalog_support": ability_row.descriptor.support.value,
-                    "support_stage": coverage.support_stage.value,
-                    "semantic_consumers": [
-                        semantic.to_payload() for semantic in semantic_consumers
-                    ],
-                    "runtime_consumer_ids": list(coverage.runtime_consumer_ids),
-                    "diagnostic_reasons": list(coverage.diagnostic_reasons),
-                }
-            )
+            ability_payloads.append(ability_row.to_ability_payload())
         bucket = exact_ability_semantic_bucket(tuple(semantic_evidence))
         bucket_counts[bucket] += 1
         datasheet_payloads.append(
@@ -518,7 +495,7 @@ def _coverage_payload(
                 "abilities": ability_payloads,
             }
         )
-    exact_ability_count = sum(len(rows) for rows in rows_by_datasheet.values())
+    exact_ability_count = len(source_evidence)
     source_artifact_hashes = {
         artifact.source_table: artifact.artifact_hash() for artifact in effective_artifacts
     }
@@ -544,41 +521,6 @@ def _coverage_payload(
         "exact_ability_count": exact_ability_count,
         "datasheets": datasheet_payloads,
     }
-
-
-def _exact_semantic_consumers(
-    *,
-    ability_row: BridgedDatasheetAbility,
-    runtime_consumer_ids: tuple[str, ...],
-) -> tuple[ExactSemanticConsumerEvidence, ...]:
-    clause_rows = ability_clause_coverage_rows_for_ability(ability_row.descriptor)
-    if not clause_rows:
-        return (
-            ExactSemanticConsumerEvidence(
-                semantic_id=f"descriptor:{ability_row.descriptor.ability_id}",
-                semantic_kind="descriptor",
-                runtime_consumer_ids=runtime_consumer_ids,
-            ),
-        )
-    evidence: list[ExactSemanticConsumerEvidence] = []
-    for clause_row in clause_rows:
-        if len(clause_row.effect_kinds) != len(clause_row.effect_runtime_consumer_ids):
-            raise ValueError("Exact ability clause effect evidence is incomplete.")
-        evidence.extend(
-            ExactSemanticConsumerEvidence(
-                semantic_id=f"{clause_row.clause_id}:effect:{index}",
-                semantic_kind=effect_kind,
-                runtime_consumer_ids=effect_consumer_ids,
-            )
-            for index, (effect_kind, effect_consumer_ids) in enumerate(
-                zip(
-                    clause_row.effect_kinds,
-                    clause_row.effect_runtime_consumer_ids,
-                    strict=True,
-                )
-            )
-        )
-    return tuple(evidence)
 
 
 def _validate_effective_updates(
@@ -698,10 +640,6 @@ def _warlock_conclave_leader() -> str:
         "does, until the end of the battle, every model in this unit counts as being part of "
         "that Bodyguard unit, and that Bodyguard unit's Starting Strength is increased accordingly."
     )
-
-
-def _sha256_text(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 def _write_json(path: Path, payload: object) -> None:

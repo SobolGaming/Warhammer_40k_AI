@@ -10,6 +10,7 @@ from tools.aeldari_datasheet_semantic_coverage import (
     COVERAGE_PATH,
     OVERLAY_PACK_PATH,
     RELEASE_MANIFEST_PATH,
+    SEMANTIC_BUCKET_ALL_CONSUMED,
     SEMANTIC_BUCKET_BRIDGE_BLOCKED,
     SEMANTIC_BUCKET_HOST_NEEDED,
     SEMANTIC_BUCKET_UNSUPPORTED_IR,
@@ -381,6 +382,37 @@ def test_aeldari_semantic_loader_rejects_partially_consumed_engine_ability(
     coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
 
     with pytest.raises(ValueError, match="requires every semantic"):
+        load_aeldari_datasheet_semantic_coverage(coverage_path=coverage_path)
+
+
+def test_aeldari_semantic_loader_rejects_omitted_effect_and_false_promotion(
+    tmp_path: Path,
+) -> None:
+    payload = _mutable_aeldari_coverage_payload()
+    datasheets = cast(list[dict[str, Any]], payload["datasheets"])
+    wraithguard = next(
+        datasheet for datasheet in datasheets if datasheet["datasheet_id"] == "000000597"
+    )
+    abilities = cast(list[dict[str, Any]], wraithguard["abilities"])
+    psychic_guidance = next(
+        ability for ability in abilities if ability["ability_name"] == "Psychic Guidance"
+    )
+    semantic_consumers = cast(list[dict[str, Any]], psychic_guidance["semantic_consumers"])
+    psychic_guidance["semantic_consumers"] = [
+        semantic
+        for semantic in semantic_consumers
+        if semantic["semantic_kind"] != "modify_dice_roll"
+    ]
+    psychic_guidance["support_stage"] = "engine_consumed"
+    wraithguard["semantic_bucket"] = SEMANTIC_BUCKET_ALL_CONSUMED
+    payload["semantic_bucket_counts"] = {
+        SEMANTIC_BUCKET_ALL_CONSUMED: 1,
+        SEMANTIC_BUCKET_HOST_NEEDED: 5,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 64,
+    }
+    coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match="effect inventory drifted"):
         load_aeldari_datasheet_semantic_coverage(coverage_path=coverage_path)
 
 

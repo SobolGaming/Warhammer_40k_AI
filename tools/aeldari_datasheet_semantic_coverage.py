@@ -8,8 +8,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING or __package__:
+    from tools.aeldari_datasheet_semantic_evidence import (
+        SourceDerivedAeldariAbilityEvidence,
+        source_derived_aeldari_exact_ability_evidence,
+    )
     from tools.faction_pack_datasheet_review import faction_pack_datasheet_review
 else:
+    from aeldari_datasheet_semantic_evidence import (
+        SourceDerivedAeldariAbilityEvidence,
+        source_derived_aeldari_exact_ability_evidence,
+    )
     from faction_pack_datasheet_review import faction_pack_datasheet_review
 
 from warhammer40k_core.core.datasheet import (
@@ -281,7 +289,12 @@ def load_aeldari_datasheet_semantic_coverage(
         raise ValueError("Aeldari semantic coverage PDF hash drifted.")
     if payload["source_snapshot_path"] != SOURCE_SNAPSHOT_RELATIVE_PATH.as_posix():
         raise ValueError("Aeldari semantic coverage source snapshot path drifted.")
-    overlay_pack_hash, release_hash, actual_source_hashes = _canonical_source_provenance()
+    (
+        overlay_pack_hash,
+        release_hash,
+        actual_source_hashes,
+        expected_ability_evidence,
+    ) = _canonical_source_provenance()
     recorded_source_hashes = _required_sha256_map(payload, "source_artifact_hashes")
     if recorded_source_hashes != dict(actual_source_hashes):
         raise ValueError("Aeldari semantic coverage source artifact hashes drifted.")
@@ -291,6 +304,10 @@ def load_aeldari_datasheet_semantic_coverage(
         raise ValueError("Aeldari semantic coverage release hash drifted.")
     rows = tuple(_parse_datasheet(row) for row in _required_list(payload, "datasheets"))
     _validate_rows(rows)
+    _validate_source_derived_ability_evidence(
+        rows=rows,
+        expected=expected_ability_evidence,
+    )
     expected_treatment_counts = {
         treatment.value: count for treatment, count in review.treatment_counts().items()
     }
@@ -481,11 +498,73 @@ def _validate_rows(rows: tuple[AeldariDatasheetSemanticCoverage, ...]) -> None:
             seen_source_rows.add(source_key)
 
 
+def _validate_source_derived_ability_evidence(
+    *,
+    rows: tuple[AeldariDatasheetSemanticCoverage, ...],
+    expected: tuple[SourceDerivedAeldariAbilityEvidence, ...],
+) -> None:
+    actual_by_identity = {
+        (row.datasheet_id, ability.source_row_id, ability.ability_id): (
+            row.datasheet_name,
+            ability,
+        )
+        for row in rows
+        for ability in row.abilities
+    }
+    expected_by_identity = {ability.source_identity: ability for ability in expected}
+    if actual_by_identity.keys() != expected_by_identity.keys():
+        raise ValueError("Aeldari semantic coverage source-derived ability identity drifted.")
+    for identity, expected_ability in expected_by_identity.items():
+        datasheet_name, actual_ability = actual_by_identity[identity]
+        actual_inventory = tuple(
+            (semantic.semantic_id, semantic.semantic_kind)
+            for semantic in actual_ability.semantic_consumers
+        )
+        if actual_inventory != expected_ability.semantic_inventory:
+            raise ValueError("Aeldari semantic coverage effect inventory drifted.")
+        actual_semantic_consumers = tuple(
+            (
+                semantic.semantic_id,
+                semantic.semantic_kind,
+                semantic.runtime_consumer_ids,
+            )
+            for semantic in actual_ability.semantic_consumers
+        )
+        expected_semantic_consumers = tuple(
+            (
+                semantic.semantic_id,
+                semantic.semantic_kind,
+                semantic.runtime_consumer_ids,
+            )
+            for semantic in expected_ability.semantic_consumers
+        )
+        if actual_semantic_consumers != expected_semantic_consumers:
+            raise ValueError("Aeldari semantic coverage per-effect consumers drifted.")
+        if (
+            actual_ability.runtime_consumer_ids != expected_ability.runtime_consumer_ids
+            or actual_ability.support_stage is not expected_ability.support_stage
+            or actual_ability.diagnostic_reasons != expected_ability.diagnostic_reasons
+        ):
+            raise ValueError("Aeldari semantic coverage ability execution evidence drifted.")
+        if (
+            datasheet_name != expected_ability.datasheet_name
+            or actual_ability.ability_name != expected_ability.ability_name
+            or actual_ability.source_kind is not expected_ability.source_kind
+            or actual_ability.source_ids != expected_ability.source_ids
+            or actual_ability.raw_text != expected_ability.raw_text
+            or actual_ability.raw_text_sha256 != expected_ability.raw_text_sha256
+            or actual_ability.normalized_text_sha256 != expected_ability.normalized_text_sha256
+            or actual_ability.catalog_support is not expected_ability.catalog_support
+        ):
+            raise ValueError("Aeldari semantic coverage source-derived ability evidence drifted.")
+
+
 @cache
 def _canonical_source_provenance() -> tuple[
     str,
     str,
     tuple[tuple[str, str], ...],
+    tuple[SourceDerivedAeldariAbilityEvidence, ...],
 ]:
     overlay_pack = SourceOverlayPack.from_payload(
         cast(SourceOverlayPackPayload, _load_object(OVERLAY_PACK_PATH))
@@ -510,7 +589,22 @@ def _canonical_source_provenance() -> tuple[
         sorted(SOURCE_ARTIFACT_TABLES)
     ):
         raise ValueError("Aeldari semantic coverage source artifact scope drifted.")
-    return overlay_pack.package_hash(), release_manifest.release_hash(), source_hashes
+    review = faction_pack_datasheet_review("aeldari")
+    datasheet_id_names = tuple(
+        (row.datasheet_id, row.datasheet_name)
+        for row in review.rows
+        if row.datasheet_id is not None
+    )
+    expected_ability_evidence = source_derived_aeldari_exact_ability_evidence(
+        effective_artifacts=effective_artifacts,
+        datasheet_id_names=datasheet_id_names,
+    )
+    return (
+        overlay_pack.package_hash(),
+        release_manifest.release_hash(),
+        source_hashes,
+        expected_ability_evidence,
+    )
 
 
 def _load_source_artifact(table_name: str) -> WahapediaJsonArtifact:
