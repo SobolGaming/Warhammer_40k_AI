@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, cast
 
+from tools.aeldari_datasheet_semantic_snapshot import (
+    DatasheetSemanticSnapshotSupportRow,
+    datasheet_semantic_snapshot_bucket,
+)
 from tools.faction_pack_datasheet_review import (
     SOURCE_DATASHEETS_PATH,
     DatasheetSourceTreatment,
@@ -18,6 +23,7 @@ from tools.generate_ability_support_matrix import (
     faction_support_markdown_files,
 )
 
+from warhammer40k_core.engine.ability_coverage import AbilityCoverageSupportStage
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
 )
@@ -200,4 +206,81 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     assert "`catalog-ir:setup-reactive-shoot-charge`" in world_eaters_markdown
     assert "Blessings of Khorne (`000008428`) | `faction` | `descriptor_only`" in (
         world_eaters_markdown
+    )
+
+    aeldari_markdown = markdown_by_filename["aeldari.md"]
+    snapshot = aeldari_markdown.split("### Unit Datasheets", 1)[1].split(
+        "## Detachment Rule Support", 1
+    )[0]
+    assert "### Unit Datasheet Source Treatments" not in snapshot
+    aeldari_review = faction_pack_datasheet_review("aeldari")
+    for group_name in tuple(dict.fromkeys(row.group for row in aeldari_review.rows)):
+        table_row = next(
+            line for line in snapshot.splitlines() if line.startswith(f"| {group_name} |")
+        )
+        cells = [cell.strip() for cell in table_row.strip("|").split(" | ")]
+        assert cells[1:4] == ["None", "None", "None"]
+        expected_blocked_labels = {
+            f"{row.datasheet_name} (`{row.datasheet_id}`)"
+            for row in aeldari_review.rows
+            if row.group == group_name
+        }
+        assert set(cells[4].split("<br>")) == expected_blocked_labels
+
+
+def test_datasheet_semantic_snapshot_buckets_require_parse_and_runtime_evidence() -> None:
+    ability_rows = ability_support_matrix_rows()
+    ability_rows_by_id = {row.coverage_row_id: row for row in ability_rows}
+    thousand_sons_defiler = next(
+        row for row in datasheet_support_rows() if row.datasheet_id == "000001030"
+    )
+    semantic_support_row = DatasheetSemanticSnapshotSupportRow(
+        datasheet_id=thousand_sons_defiler.datasheet_id,
+        datasheet_name=thousand_sons_defiler.datasheet_name,
+        catalog_blocked=False,
+        ability_coverage_row_ids=thousand_sons_defiler.ability_coverage_row_ids,
+    )
+
+    assert (
+        datasheet_semantic_snapshot_bucket(
+            support_row=semantic_support_row,
+            ability_rows_by_id=ability_rows_by_id,
+        )
+        == "All consumed"
+    )
+
+    first_coverage_id = thousand_sons_defiler.ability_coverage_row_ids[0]
+    parsed_without_host_rows = dict(ability_rows_by_id)
+    parsed_without_host_rows[first_coverage_id] = replace(
+        ability_rows_by_id[first_coverage_id],
+        support_stage=AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
+        runtime_consumer_ids=(),
+    )
+    assert (
+        datasheet_semantic_snapshot_bucket(
+            support_row=semantic_support_row,
+            ability_rows_by_id=parsed_without_host_rows,
+        )
+        == "IR parsed; host needed"
+    )
+
+    unsupported_rows = dict(ability_rows_by_id)
+    unsupported_rows[first_coverage_id] = replace(
+        ability_rows_by_id[first_coverage_id],
+        support_stage=AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED,
+        runtime_consumer_ids=(),
+    )
+    assert (
+        datasheet_semantic_snapshot_bucket(
+            support_row=semantic_support_row,
+            ability_rows_by_id=unsupported_rows,
+        )
+        == "Unsupported IR"
+    )
+    assert (
+        datasheet_semantic_snapshot_bucket(
+            support_row=None,
+            ability_rows_by_id=ability_rows_by_id,
+        )
+        == "Bridge/catalog blocked"
     )

@@ -11,12 +11,20 @@ from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict, cast
 
 if TYPE_CHECKING or __package__:
+    from tools.aeldari_datasheet_semantic_snapshot import (
+        DatasheetSemanticSnapshotSupportRow,
+        aeldari_datasheet_semantic_snapshot_markdown,
+    )
     from tools.faction_pack_datasheet_review import (
         faction_pack_datasheet_review_markdown,
         faction_pack_datasheet_snapshot_markdown,
         reviewed_faction_ids,
     )
 else:
+    from aeldari_datasheet_semantic_snapshot import (
+        DatasheetSemanticSnapshotSupportRow,
+        aeldari_datasheet_semantic_snapshot_markdown,
+    )
     from faction_pack_datasheet_review import (
         faction_pack_datasheet_review_markdown,
         faction_pack_datasheet_snapshot_markdown,
@@ -2789,7 +2797,12 @@ def _faction_support_markdown(
     if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
         lines.extend(_chaos_daemons_semantic_snapshot_markdown())
     if faction_row.faction_id == AELDARI_FACTION_ID:
-        lines.extend(_aeldari_semantic_snapshot_markdown())
+        lines.extend(
+            _aeldari_semantic_snapshot_markdown(
+                datasheet_support_rows=datasheet_support_rows,
+                ability_rows_by_id=ability_rows_by_id,
+            )
+        )
     elif faction_row.faction_id in reviewed_faction_ids():
         lines.extend(faction_pack_datasheet_snapshot_markdown(faction_row.faction_id))
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
@@ -2917,7 +2930,11 @@ def _chaos_daemons_semantic_snapshot_markdown() -> list[str]:
     return lines
 
 
-def _aeldari_semantic_snapshot_markdown() -> list[str]:
+def _aeldari_semantic_snapshot_markdown(
+    *,
+    datasheet_support_rows: tuple[DatasheetSupportRow, ...],
+    ability_rows_by_id: Mapping[str, AbilityCoverageRow],
+) -> list[str]:
     lines = [
         "",
         "## Semantic Support Snapshot",
@@ -2926,14 +2943,28 @@ def _aeldari_semantic_snapshot_markdown() -> list[str]:
             "This generated snapshot separates source review from semantic execution. "
             "Detachment-rule support uses the semantic support table below. Exact "
             "Enhancement and Stratagem support uses the shared Phase17F execution evidence. "
-            "Datasheet counts describe the reviewed current source scope; no datasheet-level "
-            "execution support is claimed while Aeldari catalog rows are absent."
+            "The Unit Datasheets table groups the reviewed Aeldari source scope by tradition "
+            "and derives each semantic bucket from generated catalog, RuleIR, diagnostic, and "
+            "runtime-consumer evidence."
         ),
     ]
     lines.extend(_aeldari_detachment_snapshot_markdown())
     lines.extend(_aeldari_exact_enhancement_snapshot_markdown())
     lines.extend(_aeldari_exact_stratagem_snapshot_markdown())
-    lines.extend(faction_pack_datasheet_snapshot_markdown(AELDARI_FACTION_ID))
+    lines.extend(
+        aeldari_datasheet_semantic_snapshot_markdown(
+            datasheet_support_rows=tuple(
+                DatasheetSemanticSnapshotSupportRow(
+                    datasheet_id=row.datasheet_id,
+                    datasheet_name=row.datasheet_name,
+                    catalog_blocked=row.catalog_status == DATASHEET_SUPPORT_BLOCKED,
+                    ability_coverage_row_ids=row.ability_coverage_row_ids,
+                )
+                for row in datasheet_support_rows
+            ),
+            ability_rows_by_id=ability_rows_by_id,
+        )
+    )
     return lines
 
 

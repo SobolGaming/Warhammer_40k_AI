@@ -6688,9 +6688,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "| Legion of Excess | `None` | Generated scaffold only |" in chaos_daemons_markdown
     assert "## Detachment Rule Coverage Rows" not in chaos_daemons_markdown
     assert "## Semantic Support Snapshot" in aeldari_markdown
-    assert "| Complete Faction Pack datasheets | 5 |" in aeldari_markdown
-    assert "| Faction Pack datasheet updates | 24 |" in aeldari_markdown
-    assert "| Unchanged predecessor datasheets | 41 |" in aeldari_markdown
+    assert "### Unit Datasheets" in aeldari_markdown
+    assert (
+        "| Aeldari tradition | Fully supported (`All consumed`) | "
+        "IR parsed; host needed | Unsupported IR | Bridge/catalog blocked |"
+    ) in aeldari_markdown
+    assert "| Craftworlds / Asuryani | None | None | None |" in aeldari_markdown
+    assert "| Anhrathe / Corsairs | None | None | None |" in aeldari_markdown
+    assert "| Harlequins | None | None | None |" in aeldari_markdown
+    assert "| Ynnari | None | None | None |" in aeldari_markdown
     assert "`generic_supported` / `engine_consumed`" not in aeldari_markdown
     assert "`named_handler_required` / `source_only`" not in aeldari_markdown
     assert (

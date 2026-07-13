@@ -12,7 +12,7 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr
 
 ## Semantic Support Snapshot
 
-This generated snapshot separates source review from semantic execution. Detachment-rule support uses the semantic support table below. Exact Enhancement and Stratagem support uses the shared Phase17F execution evidence. Datasheet counts describe the reviewed current source scope; no datasheet-level execution support is claimed while Aeldari catalog rows are absent.
+This generated snapshot separates source review from semantic execution. Detachment-rule support uses the semantic support table below. Exact Enhancement and Stratagem support uses the shared Phase17F execution evidence. The Unit Datasheets table groups the reviewed Aeldari source scope by tradition and derives each semantic bucket from generated catalog, RuleIR, diagnostic, and runtime-consumer evidence.
 
 ### Detachments
 
@@ -56,14 +56,14 @@ This generated snapshot separates source review from semantic execution. Detachm
 | Warhost | None | BLITZING FIREPOWER<br>FEIGNED RETREAT<br>FIRE AND FADE<br>LIGHTNING-FAST REACTIONS<br>SKYBORNE SANCTUARY<br>WEBWAY TUNNEL |
 | Windrider Host | None | DARING RIDERS<br>DEATH FROM ON HIGH<br>FOCUSED FIREPOWER<br>OVERFLIGHT<br>SPIRALLING EVASION<br>WIND OF BLADES |
 
-### Unit Datasheet Source Treatments
+### Unit Datasheets
 
-| Review bucket | Count | Source treatment |
-| --- | ---: | --- |
-| Complete Faction Pack datasheets | 5 | The complete Faction Pack datasheet is authoritative. |
-| Faction Pack datasheet updates | 24 | The pinned predecessor row is retained with the cited Rules Update applied. |
-| Unchanged predecessor datasheets | 41 | The pinned predecessor row is retained after explicit PDF review. |
-| **Datasheets reviewed** | **70** | Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded unless a complete current Faction Pack datasheet explicitly replaces one; excluded rows are not presented as supported content. |
+| Aeldari tradition | Fully supported (`All consumed`) | IR parsed; host needed | Unsupported IR | Bridge/catalog blocked |
+| --- | --- | --- | --- | --- |
+| Craftworlds / Asuryani | None | None | None | Asurmen (`000000571`)<br>Autarch (`000000577`)<br>Autarch Wayleaper (`000002759`)<br>Avatar of Khaine (`000000581`)<br>Baharroth (`000000575`)<br>Crimson Hunter (`000000603`)<br>D-cannon Platform (`000003910`)<br>Dark Reapers (`000000607`)<br>Dire Avengers (`000000593`)<br>Eldrad Ulthran (`000000568`)<br>Falcon (`000000609`)<br>Farseer (`000000582`)<br>Farseer Skyrunner (`000000583`)<br>Fire Dragons (`000000596`)<br>Fire Prism (`000000610`)<br>Fuegan (`000000574`)<br>Guardian Defenders (`000000589`)<br>Hemlock Wraithfighter (`000000606`)<br>Howling Banshees (`000000594`)<br>Jain Zar (`000000572`)<br>Lhykhis (`000003909`)<br>Maugan Ra (`000000576`)<br>Night Spinner (`000000611`)<br>Rangers (`000000592`)<br>Shadow Weaver Platform (`000003911`)<br>Shining Spears (`000000602`)<br>Shroud Runners (`000002533`)<br>Spiritseer (`000000588`)<br>Storm Guardians (`000000590`)<br>Striking Scorpions (`000000595`)<br>Swooping Hawks (`000000600`)<br>Vibro Cannon Platform (`000003912`)<br>Vypers (`000000605`)<br>War Walkers (`000000612`)<br>Warlock (`000000585`)<br>Warlock Conclave (`000000584`)<br>Warlock Skyrunners (`000000587`)<br>Warp Spiders (`000000601`)<br>Wave Serpent (`000000599`)<br>Windriders (`000000591`)<br>Wraithblades (`000000598`)<br>Wraithguard (`000000597`)<br>Wraithknight (`000000614`)<br>Wraithknight with Ghostglaive (`000003913`)<br>Wraithlord (`000000613`) |
+| Anhrathe / Corsairs | None | None | None | Corsair Skyreavers (`000004196`)<br>Corsair Voidreavers (`000002531`)<br>Corsair Voidscarred (`000002532`)<br>Kharseth (`000004194`)<br>Prince Yriel (`000004193`)<br>Starfangs (`000004195`) |
+| Harlequins | None | None | None | Death Jester (`000002537`)<br>Shadowseer (`000002535`)<br>Skyweavers (`000002539`)<br>Solitaire (`000002538`)<br>Starweaver (`000002541`)<br>Troupe (`000002536`)<br>Troupe Master (`000002534`)<br>Voidweaver (`000002540`) |
+| Ynnari | None | None | None | The Visarch (`000002543`)<br>The Yncarne (`000002544`)<br>Ynnari Archon (`000003914`)<br>Ynnari Incubi (`000003918`)<br>Ynnari Kabalite Warriors (`000003916`)<br>Ynnari Raider (`000003920`)<br>Ynnari Reavers (`000003919`)<br>Ynnari Succubus (`000003915`)<br>Ynnari Venom (`000003921`)<br>Ynnari Wyches (`000003917`)<br>Yvraine (`000002542`) |
 
 ## Detachment Rule Support
 
