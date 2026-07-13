@@ -4,6 +4,9 @@ from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, canonical_weapon_keyword_tokens
+from warhammer40k_core.engine.catalog_selected_target_pair_support import (
+    selected_target_selection_clause_binds_source_model,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -148,21 +151,7 @@ def post_shoot_selected_target_pair_is_supported(
 
 
 def post_shoot_selection_clause_binds_source_model(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Post-shoot source-model binding requires RuleClause.")
-    if clause.trigger is not None:
-        trigger_parameters = parameter_payload(clause.trigger.parameters)
-        if (
-            trigger_parameters.get("subject") == "this_model"
-            or trigger_parameters.get("attacker_model_reference") == "this_model"
-        ):
-            return True
-    return any(
-        condition.kind is RuleConditionKind.DISTANCE_PREDICATE
-        and parameter_payload(condition.parameters).get("object_kind") == "model"
-        and parameter_payload(condition.parameters).get("object_reference") == "this"
-        for condition in clause.conditions
-    )
+    return selected_target_selection_clause_binds_source_model(clause)
 
 
 def post_shoot_selected_target_effect_clause_is_supported(clause: RuleClause) -> bool:

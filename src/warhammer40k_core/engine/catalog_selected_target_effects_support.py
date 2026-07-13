@@ -35,6 +35,12 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
     clause_is_post_shoot_hit_target_selection as clause_is_post_shoot_hit_target_selection,
 )
+from warhammer40k_core.engine.catalog_selected_target_pair_support import (
+    clause_is_fight_start_selected_target_selection,
+    fight_start_selected_target_effect_clauses_after,
+    selected_target_pair_requires_source_model,
+    selected_target_selection_clause_binds_source_model,
+)
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
@@ -51,7 +57,6 @@ from warhammer40k_core.rules.rule_ir import (
     RuleEffectSpec,
     RuleParameterValue,
     RuleTargetKind,
-    RuleTriggerKind,
     parameter_payload,
     parameters_from_pairs,
 )
@@ -85,18 +90,7 @@ _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def clause_is_fight_start_selection(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog selected-target matcher requires RuleClause.")
-    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
-        return False
-    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
-        return False
-    parameters = parameter_payload(clause.trigger.parameters)
-    return (
-        parameters.get("edge") == "start"
-        and parameters.get("phase") == BattlePhase.FIGHT.value
-        and not clause.effects
-    )
+    return clause_is_fight_start_selected_target_selection(clause)
 
 
 def selected_effect_clauses_after(
@@ -105,6 +99,8 @@ def selected_effect_clauses_after(
     *,
     include_immediate_effects: bool = False,
 ) -> tuple[RuleClause, ...]:
+    if not include_immediate_effects:
+        return fight_start_selected_target_effect_clauses_after(clauses, selection_index)
     selected: list[RuleClause] = []
     for clause in clauses[selection_index + 1 :]:
         if clause.template_id == "phase17c:selected-target-constraint":
@@ -445,7 +441,7 @@ def selection_source_model_ids(
     selection_clause: RuleClause,
     current_model_instance_ids: tuple[str, ...],
 ) -> tuple[str | None, ...]:
-    if post_shoot_selection_clause_binds_source_model(selection_clause):
+    if selected_target_selection_clause_binds_source_model(selection_clause):
         return current_model_instance_ids
     return (None,)
 
@@ -454,13 +450,16 @@ def selection_source_model_ids_for_record(
     record: AbilityCatalogRecord,
     unit: UnitInstance,
     selection_clause: RuleClause,
+    effect_clauses: tuple[RuleClause, ...],
     current_model_instance_ids: tuple[str, ...],
 ) -> tuple[str | None, ...]:
-    source_model_ids = selection_source_model_ids(
+    if not selected_target_pair_requires_source_model(
         selection_clause=selection_clause,
-        current_model_instance_ids=current_model_instance_ids,
-    )
-    if record.source_kind is not AbilitySourceKind.WARGEAR or source_model_ids == (None,):
+        effect_clauses=effect_clauses,
+    ):
+        return (None,)
+    source_model_ids = current_model_instance_ids
+    if record.source_kind is not AbilitySourceKind.WARGEAR:
         return source_model_ids
     bearer_ids = frozenset(
         catalog_rule_record_current_wargear_bearer_model_ids(
@@ -469,9 +468,7 @@ def selection_source_model_ids_for_record(
             current_model_instance_ids=current_model_instance_ids,
         )
     )
-    return tuple(
-        model_id for model_id in source_model_ids if model_id is not None and model_id in bearer_ids
-    )
+    return tuple(model_id for model_id in source_model_ids if model_id in bearer_ids)
 
 
 def selection_weapon_names(selection_clause: RuleClause) -> tuple[str, ...]:
@@ -499,13 +496,54 @@ def has_fight_start_selected_target_records(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> bool:
     return any(
-        any(
-            clause_is_fight_start_selection(clause)
-            for clause in catalog_selected_target_clauses_from_record(record)
-        )
+        record_has_supported_fight_start_selected_target_effect(record)
         for index in ability_indexes_by_player_id.values()
         for record in records_for_timing(index, TimingTriggerKind.START_PHASE)
     )
+
+
+def has_fight_start_selected_target_runtime_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> bool:
+    for army in armies:
+        index = ability_indexes_by_player_id.get(army.player_id)
+        if index is None:
+            raise GameLifecycleError("Catalog selected-target runtime missing ability index.")
+        for unit in army.units:
+            current_model_ids = tuple(
+                sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
+            )
+            for record in unit_scoped_generic_records_for_timing(
+                ability_index=index,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+                trigger_kind=TimingTriggerKind.START_PHASE,
+            ):
+                clauses = catalog_selected_target_clauses_from_record(record)
+                runtime_clause_id = runtime_clause_id_from_record(record)
+                for selection_index, selection_clause in enumerate(clauses):
+                    effect_clauses = fight_start_selected_target_effect_clauses_after(
+                        clauses,
+                        selection_index,
+                    )
+                    if (
+                        (
+                            runtime_clause_id is None
+                            or runtime_clause_id == selection_clause.clause_id
+                        )
+                        and clause_is_fight_start_selection(selection_clause)
+                        and effect_clauses
+                        and selection_source_model_ids_for_record(
+                            record,
+                            unit,
+                            selection_clause,
+                            effect_clauses,
+                            current_model_ids,
+                        )
+                    ):
+                        return True
+    return False
 
 
 def has_post_shoot_hit_target_effect_records(
@@ -542,24 +580,40 @@ def has_post_shoot_hit_target_effect_runtime_records(
                 clauses = catalog_selected_target_clauses_from_record(record)
                 runtime_clause_id = runtime_clause_id_from_record(record)
                 for selection_index, selection_clause in enumerate(clauses):
+                    effect_clauses = post_shoot_selected_target_effect_clauses_after(
+                        clauses,
+                        selection_index,
+                    )
                     if (
                         (
                             runtime_clause_id is None
                             or runtime_clause_id == selection_clause.clause_id
                         )
                         and clause_is_post_shoot_hit_target_selection(selection_clause)
-                        and post_shoot_selected_target_effect_clauses_after(
-                            clauses, selection_index
-                        )
+                        and effect_clauses
                         and selection_source_model_ids_for_record(
                             record,
                             unit,
                             selection_clause,
+                            effect_clauses,
                             current_model_ids,
                         )
                     ):
                         return True
     return False
+
+
+def record_has_supported_fight_start_selected_target_effect(
+    record: AbilityCatalogRecord,
+) -> bool:
+    clauses = catalog_selected_target_clauses_from_record(record)
+    runtime_clause_id = runtime_clause_id_from_record(record)
+    return any(
+        (runtime_clause_id is None or runtime_clause_id == clause.clause_id)
+        and clause_is_fight_start_selection(clause)
+        and bool(fight_start_selected_target_effect_clauses_after(clauses, index))
+        for index, clause in enumerate(clauses)
+    )
 
 
 def record_has_supported_post_shoot_selected_target_effect(

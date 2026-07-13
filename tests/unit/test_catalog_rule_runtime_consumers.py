@@ -97,11 +97,13 @@ from warhammer40k_core.engine.catalog_reserve_arrival_restrictions import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     catalog_rule_clauses_from_record,
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
 )
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    fight_start_selected_target_effect_clause_ids,
     post_shoot_hit_target_effect_clause_ids,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects import (
@@ -208,6 +210,9 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WoundRollModifierContext,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
+from warhammer40k_core.engine.source_backed_rerolls import (
+    source_backed_reroll_permission_context_for_unit,
+)
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     StratagemCostChoiceRequestContext,
     StratagemCostChoiceResultContext,
@@ -1198,7 +1203,7 @@ def test_catalog_post_shoot_selected_target_rejects_unsupported_effect_shapes() 
 
 @pytest.mark.parametrize(
     "include_model_condition",
-    [(False,), (True,)],
+    [pytest.param(False), pytest.param(True)],
     ids=("without-model-condition", "with-model-condition"),
 )
 def test_catalog_post_shoot_rejects_unit_selection_for_model_scoped_effect(
@@ -1277,6 +1282,52 @@ def test_catalog_post_shoot_rejects_unit_selection_for_model_scoped_effect(
         armies=(source_army, target_army),
     )
     assert runtime.attack_sequence_completed_bindings() == ()
+
+
+def test_catalog_fight_start_rejects_mixed_supported_and_unsupported_effects() -> None:
+    selection_clause = _fight_start_selection_clause()
+    supported_effect_clause = _effect_clause(
+        clause_id="test:selected-target:selection:fight:mixed-effect",
+        duration=_duration("phase"),
+        effect_kind=RuleEffectKind.REROLL_PERMISSION,
+        roll_type="attack_sequence.hit",
+    )
+    mixed_effect_clause = replace(
+        supported_effect_clause,
+        effects=(
+            *supported_effect_clause.effects,
+            _effect(RuleEffectKind.ADD_VICTORY_POINTS, ("amount", 1)),
+        ),
+    )
+    rule_ir = _rule_ir(
+        source_id="test:selected-target:fight:mixed-effect",
+        clauses=(selection_clause, mixed_effect_clause),
+    )
+    record = _ability_record(
+        record_id="record:selected-target:fight:mixed-effect",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        runtime_clause_id=selection_clause.clause_id,
+    )
+    source_army, target_army = _mustered_core_armies()
+    index = AbilityCatalogIndex.from_records((record,))
+    runtime = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: index,
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+
+    assert fight_start_selected_target_effect_clause_ids(rule_ir) == ()
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID not in (
+        catalog_rule_ir_consumers_for_rule(rule_ir)
+    )
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID not in (
+        catalog_rule_ir_hook_ids_for_rule(rule_ir)
+    )
+    assert not has_fight_start_selected_target_records({source_army.player_id: index})
+    assert runtime.fight_phase_start_bindings() == ()
 
 
 def test_catalog_selected_target_support_filters_generic_records_by_timing() -> None:
@@ -2201,6 +2252,185 @@ def test_catalog_selected_target_fight_start_runtime_records_selected_effect() -
     ] == target_unit.unit_instance_id
     assert (
         decisions.event_log.records[-1].event_type == CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT
+    )
+
+
+@pytest.mark.parametrize(
+    "include_model_condition",
+    [pytest.param(False), pytest.param(True)],
+    ids=("without-model-condition", "with-model-condition"),
+)
+def test_catalog_fight_start_wargear_model_effect_binds_only_current_bearer(
+    include_model_condition: bool,
+) -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit_template = source_army.units[0]
+    wargear_id = "wargear:fight-start:model-ability"
+    bearer_model = replace(
+        source_unit_template.own_models[0],
+        wargear_ids=(*source_unit_template.own_models[0].wargear_ids, wargear_id),
+    )
+    source_unit_without_bearer = replace(
+        source_unit_template,
+        own_models=(
+            replace(bearer_model, wounds_remaining=0),
+            *source_unit_template.own_models[1:],
+        ),
+    )
+    source_army_without_bearer = _army_with_unit(source_army, source_unit_without_bearer)
+    source_unit = replace(
+        source_unit_template,
+        own_models=(bearer_model, *source_unit_template.own_models[1:]),
+    )
+    source_army = _army_with_unit(source_army, source_unit)
+    target_unit = target_army.units[0]
+    selection_clause = _fight_start_selection_clause()
+    effect_clause = RuleClause(
+        clause_id="test:selected-target:selection:fight:wargear-model-effect",
+        source_span=_span(),
+        trigger=_post_shoot_effect_trigger(actor="this_model"),
+        conditions=(
+            (
+                _condition(
+                    RuleConditionKind.TARGET_CONSTRAINT,
+                    ("gate_subject", "attack_target"),
+                    ("relationship", "this_model_makes_attack"),
+                    ("target_reference", "selected_unit"),
+                ),
+            )
+            if include_model_condition
+            else ()
+        ),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=_span()),
+        effects=(
+            _effect(
+                RuleEffectKind.REROLL_PERMISSION,
+                ("roll_type", "attack_sequence.hit"),
+            ),
+        ),
+        duration=_duration("phase"),
+    )
+    rule_ir = _rule_ir(
+        source_id="test:selected-target:fight:wargear-model-effect",
+        clauses=(selection_clause, effect_clause),
+    )
+    record = _ability_record(
+        record_id="record:selected-target:fight:wargear-model-effect",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        runtime_clause_id=selection_clause.clause_id,
+        source_kind=AbilitySourceKind.WARGEAR,
+        datasheet_id=source_unit.datasheet_id,
+        wargear_id=wargear_id,
+    )
+    ability_indexes_by_player_id = {
+        source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+        target_army.player_id: AbilityCatalogIndex.from_records(()),
+    }
+
+    assert fight_start_selected_target_effect_clause_ids(rule_ir) == (effect_clause.clause_id,)
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_consumers_for_rule(
+        rule_ir
+    )
+    no_bearer_runtime = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=(source_army_without_bearer, target_army),
+    )
+    no_bearer_state = _state_with_battlefield(
+        armies=(source_army_without_bearer, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army_without_bearer,
+            source_unit=source_unit_without_bearer,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=10.4,
+        ),
+        active_player_id=source_army_without_bearer.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    assert no_bearer_runtime.fight_phase_start_bindings() == ()
+    assert (
+        no_bearer_runtime.fight_phase_start_request(
+            FightPhaseStartRequestContext(
+                state=no_bearer_state,
+                decisions=DecisionController(),
+            )
+        )
+        is None
+    )
+
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=10.4,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    runtime = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=(source_army, target_army),
+    )
+    assert len(runtime.fight_phase_start_bindings()) == 1
+    decisions = DecisionController()
+    request = runtime.fight_phase_start_request(
+        FightPhaseStartRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    assert len(request.options) == 1
+    queued = decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="result:selected-target:fight:wargear-model-effect",
+        request=queued,
+        selected_option_id=queued.options[0].option_id,
+    )
+    decisions.submit_result(result)
+    assert (
+        runtime.apply_fight_phase_start_result(
+            FightPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=queued,
+                result=result,
+            )
+        )
+        is True
+    )
+    assert len(state.persisting_effects) == 1
+    effect_payload = cast(dict[str, JsonValue], state.persisting_effects[0].effect_payload)
+    selected_metadata = cast(dict[str, JsonValue], effect_payload["catalog_selected_target"])
+    bearer_model_id = bearer_model.model_instance_id
+    non_bearer_model_id = source_unit.own_models[1].model_instance_id
+    assert selected_metadata["source_model_instance_id"] == bearer_model_id
+    bearer_permission = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id=source_army.player_id,
+        unit_instance_id=source_unit.unit_instance_id,
+        model_instance_id=bearer_model_id,
+        roll_type="attack_sequence.hit",
+        timing_window="attack_sequence.hit",
+        attack_kind="melee",
+        target_unit_instance_id=target_unit.unit_instance_id,
+    )
+    assert bearer_permission is not None
+    assert (
+        source_backed_reroll_permission_context_for_unit(
+            state=state,
+            player_id=source_army.player_id,
+            unit_instance_id=source_unit.unit_instance_id,
+            model_instance_id=non_bearer_model_id,
+            roll_type="attack_sequence.hit",
+            timing_window="attack_sequence.hit",
+            attack_kind="melee",
+            target_unit_instance_id=target_unit.unit_instance_id,
+        )
+        is None
     )
 
 

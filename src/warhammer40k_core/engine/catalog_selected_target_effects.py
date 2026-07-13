@@ -65,7 +65,7 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     eligible_selection_target_unit_ids as _eligible_selection_target_unit_ids,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    has_fight_start_selected_target_records as _has_fight_start_selected_target_records,
+    has_fight_start_selected_target_runtime_records as _has_runtime_fight_start_records,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     has_post_shoot_hit_target_effect_runtime_records as _has_runtime_post_shoot_records,
@@ -110,7 +110,7 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     selected_target_status_gate_allows as _selected_target_status_gate_allows,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    selection_source_model_ids_for_record as _source_model_ids,
+    selection_source_model_ids_for_record as _source_ids,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     selection_weapon_names as _selection_weapon_names,
@@ -302,7 +302,7 @@ class CatalogSelectedTargetEffectRuntime:
         object.__setattr__(self, "armies", armies)
 
     def fight_phase_start_bindings(self) -> tuple[FightPhaseStartHookBinding, ...]:
-        if not _has_fight_start_selected_target_records(self.ability_indexes_by_player_id):
+        if not _has_runtime_fight_start_records(self.ability_indexes_by_player_id, self.armies):
             return ()
         return (
             FightPhaseStartHookBinding(
@@ -737,8 +737,8 @@ def _fight_start_groups_for_record(
         effect_clauses = _selected_effect_clauses_after(clauses, index)
         if not effect_clauses:
             continue
-        for source_model_id in _source_model_ids(
-            record, unit, selection_clause, current_model_instance_ids
+        for source_model_id in _source_ids(
+            record, unit, selection_clause, effect_clauses, current_model_instance_ids
         ):
             target_ids = _eligible_selection_target_unit_ids(
                 state=state,
@@ -803,8 +803,8 @@ def _post_shoot_groups_for_record(
         effect_clauses = _post_shoot_effect_clauses_after(clauses, index)
         if not effect_clauses:
             continue
-        for source_model_id in _source_model_ids(
-            record, unit, selection_clause, current_model_instance_ids
+        for source_model_id in _source_ids(
+            record, unit, selection_clause, effect_clauses, current_model_instance_ids
         ):
             hit_target_ids = successful_hit_target_unit_ids_for_sequence(
                 decisions=decisions,

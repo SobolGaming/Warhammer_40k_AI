@@ -5,10 +5,13 @@ from typing import cast
 from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
     post_shoot_selected_target_effect_clauses_after,
 )
+from warhammer40k_core.engine.catalog_selected_target_pair_support import (
+    clause_is_fight_start_selected_target_selection,
+    fight_start_selected_target_effect_clauses_after,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
-    RuleEffectKind,
     RuleIR,
     RuleParameterValue,
     RuleTargetKind,
@@ -34,16 +37,6 @@ _POST_SHOOT_FILTERED_TRIGGER_KEYS = _POST_SHOOT_TRIGGER_KEYS | {
     "weapon_names",
 }
 
-_SELECTED_TARGET_EFFECT_KINDS = frozenset(
-    (
-        RuleEffectKind.GRANT_WEAPON_ABILITY,
-        RuleEffectKind.MODIFY_CHARACTERISTIC,
-        RuleEffectKind.MODIFY_DICE_ROLL,
-        RuleEffectKind.REROLL_PERMISSION,
-        RuleEffectKind.SET_CONTEXTUAL_STATUS,
-    )
-)
-
 
 def rule_has_fight_start_selected_target_effect(rule_ir: RuleIR) -> bool:
     return bool(fight_start_selected_target_effect_clause_ids(rule_ir))
@@ -52,11 +45,11 @@ def rule_has_fight_start_selected_target_effect(rule_ir: RuleIR) -> bool:
 def fight_start_selected_target_effect_clause_ids(rule_ir: RuleIR) -> tuple[str, ...]:
     clause_ids: set[str] = set()
     for index, clause in enumerate(rule_ir.clauses):
-        if not _clause_is_fight_start_selected_target_selection(clause):
+        if not clause_is_fight_start_selected_target_selection(clause):
             continue
         clause_ids.update(
             effect_clause.clause_id
-            for effect_clause in _selected_target_effect_clauses_after(
+            for effect_clause in fight_start_selected_target_effect_clauses_after(
                 rule_ir.clauses,
                 index,
             )
@@ -98,21 +91,6 @@ def contextual_consumers_for_clause(
     if clause.clause_id in post_shoot_hit_target_effect_clause_ids(rule_ir):
         consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
     return tuple(sorted(consumer_ids))
-
-
-def _clause_is_fight_start_selected_target_selection(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog selected-target classifier requires RuleClause.")
-    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
-        return False
-    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
-        return False
-    parameters = parameter_payload(clause.trigger.parameters)
-    return (
-        parameters.get("edge") == "start"
-        and parameters.get("phase") == BattlePhase.FIGHT.value
-        and not clause.effects
-    )
 
 
 def clause_is_post_shoot_hit_target_selection(clause: RuleClause) -> bool:
@@ -159,20 +137,3 @@ def _valid_weapon_names(value: object) -> bool:
     if type(value) is not tuple or not value:
         return False
     return all(type(name) is str and bool(name.strip()) for name in cast(tuple[object, ...], value))
-
-
-def _selected_target_effect_clauses_after(
-    clauses: tuple[RuleClause, ...],
-    selection_index: int,
-) -> tuple[RuleClause, ...]:
-    selected: list[RuleClause] = []
-    for clause in clauses[selection_index + 1 :]:
-        if clause.template_id == "phase17c:selected-target-constraint":
-            break
-        if not clause.effects:
-            continue
-        if clause.duration is None:
-            continue
-        if any(effect.kind in _SELECTED_TARGET_EFFECT_KINDS for effect in clause.effects):
-            selected.append(clause)
-    return tuple(selected)
