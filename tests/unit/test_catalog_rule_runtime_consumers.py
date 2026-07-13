@@ -86,6 +86,7 @@ from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CatalogOncePerBattleRuntime,
 )
 from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
+    post_shoot_selected_target_effect_attack_role,
     post_shoot_selected_target_effect_clause_is_supported,
     post_shoot_selected_target_effect_clauses_after,
 )
@@ -200,6 +201,7 @@ from warhammer40k_core.engine.reserves import (
 )
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
 from warhammer40k_core.engine.runtime_modifiers import (
+    HitRollModifierContext,
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
     WoundRollModifierContext,
@@ -965,6 +967,13 @@ def test_catalog_selected_target_support_classifies_selection_and_effect_clauses
         0,
     ) == (selected_effect,)
     assert post_shoot_selected_target_effect_clause_is_supported(selected_effect)
+    assert (
+        post_shoot_selected_target_effect_attack_role(
+            clause=selected_effect,
+            effect=selected_effect.effects[0],
+        )
+        == "target"
+    )
     assert post_shoot_selected_target_effect_clauses_after(
         (post_shoot_selection, skipped_effect, selected_effect, breaker),
         0,
@@ -973,12 +982,18 @@ def test_catalog_selected_target_support_classifies_selection_and_effect_clauses
         ("this_model", RuleTargetKind.THIS_MODEL),
         ("this_unit", RuleTargetKind.THIS_UNIT),
     ):
-        assert post_shoot_selected_target_effect_clause_is_supported(
-            replace(
-                selected_effect,
-                trigger=_post_shoot_effect_trigger(actor=actor),
-                target=RuleTargetSpec(kind=target_kind, source_span=_span()),
+        actor_scoped_effect = replace(
+            selected_effect,
+            trigger=_post_shoot_effect_trigger(actor=actor),
+            target=RuleTargetSpec(kind=target_kind, source_span=_span()),
+        )
+        assert post_shoot_selected_target_effect_clause_is_supported(actor_scoped_effect)
+        assert (
+            post_shoot_selected_target_effect_attack_role(
+                clause=actor_scoped_effect,
+                effect=actor_scoped_effect.effects[0],
             )
+            == "attacker"
         )
 
     effect = _effect(
@@ -1099,6 +1114,39 @@ def test_catalog_post_shoot_selected_target_rejects_unsupported_effect_shapes() 
                     kind=RuleTargetKind.FRIENDLY_UNIT,
                     source_span=_span(),
                     parameters=_parameters(("allegiance", "friendly")),
+                ),
+            ),
+        ),
+        (
+            "this-model-trigger-with-target-attack-role",
+            replace(
+                supported_effect,
+                trigger=_post_shoot_effect_trigger(actor="this_model"),
+                target=RuleTargetSpec(
+                    kind=RuleTargetKind.THIS_MODEL,
+                    source_span=_span(),
+                ),
+                effects=(
+                    _effect(
+                        RuleEffectKind.MODIFY_DICE_ROLL,
+                        ("roll_type", "attack_sequence.hit"),
+                        ("delta", -1),
+                        ("attack_role", "target"),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "selected-enemy-target-with-attacker-role",
+            replace(
+                supported_effect,
+                effects=(
+                    _effect(
+                        RuleEffectKind.MODIFY_DICE_ROLL,
+                        ("roll_type", "attack_sequence.hit"),
+                        ("delta", 1),
+                        ("attack_role", "attacker"),
+                    ),
                 ),
             ),
         ),
@@ -1608,6 +1656,179 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
             )
         )
         == base_profile
+    )
+
+
+def test_catalog_post_shoot_roleless_negative_modifier_is_normalized_to_attacker() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = replace(
+        source_army.units[0],
+        own_models=(source_army.units[0].own_models[0],),
+    )
+    source_army = _army_with_unit(source_army, source_unit)
+    target_unit = target_army.units[0]
+    battlefield = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=10.0,
+        target_army=target_army,
+        target_unit=target_unit,
+        target_x=20.0,
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    selection_clause = _post_shoot_hit_selection_clause()
+    effect_clause = RuleClause(
+        clause_id="test:selected-target:selection:post-shoot:negative-hit-effect",
+        source_span=_span(),
+        trigger=_post_shoot_effect_trigger(actor="this_model"),
+        conditions=(
+            _condition(
+                RuleConditionKind.TARGET_CONSTRAINT,
+                ("gate_subject", "attack_target"),
+                ("relationship", "this_model_makes_attack"),
+                ("target_reference", "selected_unit"),
+            ),
+        ),
+        target=RuleTargetSpec(
+            kind=RuleTargetKind.THIS_MODEL,
+            source_span=_span(),
+        ),
+        effects=(
+            _effect(
+                RuleEffectKind.MODIFY_DICE_ROLL,
+                ("roll_type", "attack_sequence.hit"),
+                ("delta", -1),
+            ),
+        ),
+        duration=_duration("phase"),
+    )
+    rule_ir = _rule_ir(
+        source_id="test:selected-target:post-shoot:negative-hit",
+        clauses=(selection_clause, effect_clause),
+    )
+    record = _ability_record(
+        record_id="record:selected-target:post-shoot:negative-hit",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        runtime_clause_id=selection_clause.clause_id,
+    )
+    ability_indexes_by_player_id = {
+        source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+        target_army.player_id: AbilityCatalogIndex.from_records(()),
+    }
+    runtime = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=(source_army, target_army),
+    )
+
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    )
+    assert post_shoot_hit_target_effect_clause_ids(rule_ir) == (effect_clause.clause_id,)
+    assert has_post_shoot_hit_target_effect_records(ability_indexes_by_player_id)
+    bindings = runtime.attack_sequence_completed_bindings()
+    assert len(bindings) == 1
+
+    profile = replace(_first_catalog_weapon_profile(), name="Dread of the Deep Void")
+    source_model_id = source_unit.own_models[0].model_instance_id
+    sequence = AttackSequence(
+        sequence_id="attack-sequence:post-shoot:negative-hit",
+        attacker_player_id=source_army.player_id,
+        attacking_unit_instance_id=source_unit.unit_instance_id,
+        source_phase=BattlePhase.SHOOTING,
+        attack_pools=(
+            RangedAttackPool(
+                attacker_model_instance_id=source_model_id,
+                wargear_id="wargear:post-shoot:negative-hit",
+                weapon_profile_id=profile.profile_id,
+                weapon_profile=profile,
+                target_unit_instance_id=target_unit.unit_instance_id,
+                shooting_type=ShootingType.NORMAL,
+                attacks=1,
+                target_visible_model_ids=target_unit.own_model_ids(),
+                target_in_range_model_ids=target_unit.own_model_ids(),
+            ),
+        ),
+    )
+    decisions = DecisionController()
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+    status = bindings[0].handler(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=sequence,
+            attack_sequence_completed_event_id="event:post-shoot:negative-hit",
+        )
+    )
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = decisions.queue.peek_next()
+    result = DecisionResult.for_request(
+        result_id="result:post-shoot:negative-hit",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    decisions.submit_result(result)
+    assert (
+        apply_catalog_post_shoot_hit_target_effect_result(
+            state=state,
+            decisions=decisions,
+            result=result,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+        )
+        is None
+    )
+
+    assert len(state.persisting_effects) == 1
+    effect = state.persisting_effects[0]
+    assert effect.target_unit_instance_ids == (source_unit.unit_instance_id,)
+    effect_payload = cast(dict[str, JsonValue], effect.effect_payload)
+    effect_spec_payload = cast(dict[str, JsonValue], effect_payload["effect"])
+    effect_parameters = {
+        cast(str, item["key"]): item["value"]
+        for item in cast(list[dict[str, JsonValue]], effect_spec_payload["parameters"])
+    }
+    assert effect_parameters["attack_role"] == "attacker"
+    assert effect_parameters["delta"] == -1
+    assert effect_parameters["selected_target_unit_instance_id"] == target_unit.unit_instance_id
+
+    modifier_context = HitRollModifierContext(
+        state=state,
+        attacking_unit_instance_id=source_unit.unit_instance_id,
+        attacker_model_instance_id=source_model_id,
+        target_unit_instance_id=target_unit.unit_instance_id,
+        weapon_profile=profile,
+        source_phase=BattlePhase.SHOOTING,
+    )
+    assert RuntimeModifierRegistry.empty().hit_roll_modifier(modifier_context) == -1
+    assert (
+        RuntimeModifierRegistry.empty().hit_roll_modifier(
+            replace(
+                modifier_context,
+                attacking_unit_instance_id=target_unit.unit_instance_id,
+                attacker_model_instance_id=target_unit.own_models[0].model_instance_id,
+                target_unit_instance_id=source_unit.unit_instance_id,
+            )
+        )
+        == 0
     )
 
 

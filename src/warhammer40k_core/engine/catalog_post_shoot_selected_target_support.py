@@ -31,6 +31,20 @@ _SUPPORTED_EFFECT_TARGET_KINDS = frozenset(
         RuleTargetKind.THIS_UNIT,
     }
 )
+_ATTACKER_EFFECT_TARGET_KINDS = frozenset(
+    {
+        RuleTargetKind.FRIENDLY_UNIT,
+        RuleTargetKind.THIS_MODEL,
+        RuleTargetKind.THIS_UNIT,
+    }
+)
+_TARGET_EFFECT_TARGET_KINDS = frozenset(
+    {
+        RuleTargetKind.ENEMY_UNIT,
+        RuleTargetKind.SELECTED_TARGET,
+        RuleTargetKind.SELECTED_UNIT,
+    }
+)
 _SUPPORTED_WEAPON_CHARACTERISTICS = frozenset(
     {
         Characteristic.ARMOR_PENETRATION.value,
@@ -130,6 +144,25 @@ def post_shoot_selected_target_effect_clause_is_supported(clause: RuleClause) ->
             _selected_target_effect_is_supported(effect, clause=clause) for effect in clause.effects
         )
     )
+
+
+def post_shoot_selected_target_effect_attack_role(
+    *,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+) -> str:
+    if type(clause) is not RuleClause or type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError(
+            "Post-shoot selected-target attack-role resolution requires RuleIR values."
+        )
+    if effect not in clause.effects:
+        raise GameLifecycleError(
+            "Post-shoot selected-target attack-role effect is not owned by the clause."
+        )
+    attack_role = _resolved_effect_attack_role(clause=clause, effect=effect)
+    if attack_role is None:
+        raise GameLifecycleError("Post-shoot selected-target attack-role shape is unsupported.")
+    return attack_role
 
 
 def clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
@@ -268,16 +301,50 @@ def _selected_target_effect_is_supported(
 ) -> bool:
     parameters = parameter_payload(effect.parameters)
     if effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:
-        return _characteristic_modifier_is_supported(parameters)
-    if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
-        return _dice_roll_modifier_is_supported(parameters)
-    if effect.kind is RuleEffectKind.REROLL_PERMISSION:
-        return _reroll_permission_is_supported(parameters)
-    if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
-        return _weapon_ability_grant_is_supported(parameters)
-    if effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        effect_is_supported = _characteristic_modifier_is_supported(parameters)
+    elif effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
+        effect_is_supported = _dice_roll_modifier_is_supported(parameters)
+    elif effect.kind is RuleEffectKind.REROLL_PERMISSION:
+        effect_is_supported = _reroll_permission_is_supported(parameters)
+    elif effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
+        effect_is_supported = _weapon_ability_grant_is_supported(parameters)
+    elif effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS:
         return clause.duration is None and effect_is_immediate_selected_target_battle_shock(effect)
-    return False
+    else:
+        return False
+    return (
+        effect_is_supported
+        and _resolved_effect_attack_role(clause=clause, effect=effect) is not None
+    )
+
+
+def _resolved_effect_attack_role(
+    *,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+) -> str | None:
+    if clause.target is None:
+        return None
+    target_kind = clause.target.kind
+    if target_kind in _ATTACKER_EFFECT_TARGET_KINDS:
+        target_role = "attacker"
+    elif target_kind in _TARGET_EFFECT_TARGET_KINDS:
+        target_role = "target"
+    else:
+        return None
+
+    trigger_role: str | None = None
+    if clause.trigger is not None:
+        actor = parameter_payload(clause.trigger.parameters).get("actor")
+        if actor in {"this_model", "this_unit"}:
+            trigger_role = "attacker"
+    if trigger_role is not None and trigger_role != target_role:
+        return None
+
+    explicit_role = parameter_payload(effect.parameters).get("attack_role")
+    if explicit_role is not None and explicit_role != target_role:
+        return None
+    return target_role
 
 
 def _characteristic_modifier_is_supported(

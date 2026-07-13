@@ -21,6 +21,7 @@ from warhammer40k_core.engine.catalog_geometry import alive_geometry_models_for_
 from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
     clause_has_immediate_selected_target_effect,
     effect_is_immediate_selected_target_battle_shock,
+    post_shoot_selected_target_effect_attack_role,
     post_shoot_selected_target_effect_clause_is_supported,
     post_shoot_selected_target_effect_clauses_after,
 )
@@ -57,6 +58,7 @@ if TYPE_CHECKING:
 __all__ = (
     "clause_has_immediate_selected_target_effect",
     "effect_is_immediate_selected_target_battle_shock",
+    "post_shoot_selected_target_effect_attack_role",
     "post_shoot_selected_target_effect_clause_is_supported",
     "post_shoot_selected_target_effect_clauses_after",
 )
@@ -406,12 +408,28 @@ def effect_with_selected_target(
     effect: RuleEffectSpec,
     *,
     selected_target_unit_instance_id: str,
+    normalized_attack_role: str | None = None,
 ) -> RuleEffectSpec:
+    if normalized_attack_role is not None and normalized_attack_role not in {
+        "attacker",
+        "target",
+    }:
+        raise GameLifecycleError("Catalog selected-target normalized attack role is unsupported.")
+    existing_attack_role = parameter_payload(effect.parameters).get("attack_role")
+    if (
+        normalized_attack_role is not None
+        and existing_attack_role is not None
+        and existing_attack_role != normalized_attack_role
+    ):
+        raise GameLifecycleError("Catalog selected-target attack role conflicts with its clause.")
     pairs: list[tuple[str, RuleParameterValue]] = [
         (parameter.key, parameter.value)
         for parameter in effect.parameters
         if parameter.key != "selected_target_unit_instance_id"
+        and not (normalized_attack_role is not None and parameter.key == "attack_role")
     ]
+    if normalized_attack_role is not None:
+        pairs.append(("attack_role", normalized_attack_role))
     pairs.append(("selected_target_unit_instance_id", selected_target_unit_instance_id))
     return replace(effect, parameters=parameters_from_pairs(tuple(pairs)))
 
