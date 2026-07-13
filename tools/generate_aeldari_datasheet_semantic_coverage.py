@@ -14,6 +14,7 @@ if TYPE_CHECKING or __package__:
         SCHEMA_VERSION,
         SOURCE_ARTIFACT_TABLES,
         ExactAbilitySemanticEvidence,
+        ExactSemanticConsumerEvidence,
         exact_ability_semantic_bucket,
     )
     from tools.faction_pack_datasheet_review import (
@@ -30,6 +31,7 @@ else:
         SCHEMA_VERSION,
         SOURCE_ARTIFACT_TABLES,
         ExactAbilitySemanticEvidence,
+        ExactSemanticConsumerEvidence,
         exact_ability_semantic_bucket,
     )
     from faction_pack_datasheet_review import (
@@ -38,7 +40,10 @@ else:
     )
     from generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR, _load_source_artifacts
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
-from warhammer40k_core.engine.ability_coverage import ability_coverage_row_for_descriptor
+from warhammer40k_core.engine.ability_coverage import (
+    ability_clause_coverage_rows_for_ability,
+    ability_coverage_row_for_descriptor,
+)
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
@@ -469,9 +474,14 @@ def _coverage_payload(
                 datasheet_name=review_row.datasheet_name,
                 ability=ability_row.descriptor,
             )
+            semantic_consumers = _exact_semantic_consumers(
+                ability_row=ability_row,
+                runtime_consumer_ids=coverage.runtime_consumer_ids,
+            )
             semantic_evidence.append(
                 ExactAbilitySemanticEvidence(
                     support_stage=coverage.support_stage,
+                    semantic_consumers=semantic_consumers,
                     runtime_consumer_ids=coverage.runtime_consumer_ids,
                     diagnostic_reasons=coverage.diagnostic_reasons,
                 )
@@ -488,6 +498,9 @@ def _coverage_payload(
                     "normalized_text_sha256": _sha256_text(ability_row.normalized_description),
                     "catalog_support": ability_row.descriptor.support.value,
                     "support_stage": coverage.support_stage.value,
+                    "semantic_consumers": [
+                        semantic.to_payload() for semantic in semantic_consumers
+                    ],
                     "runtime_consumer_ids": list(coverage.runtime_consumer_ids),
                     "diagnostic_reasons": list(coverage.diagnostic_reasons),
                 }
@@ -531,6 +544,41 @@ def _coverage_payload(
         "exact_ability_count": exact_ability_count,
         "datasheets": datasheet_payloads,
     }
+
+
+def _exact_semantic_consumers(
+    *,
+    ability_row: BridgedDatasheetAbility,
+    runtime_consumer_ids: tuple[str, ...],
+) -> tuple[ExactSemanticConsumerEvidence, ...]:
+    clause_rows = ability_clause_coverage_rows_for_ability(ability_row.descriptor)
+    if not clause_rows:
+        return (
+            ExactSemanticConsumerEvidence(
+                semantic_id=f"descriptor:{ability_row.descriptor.ability_id}",
+                semantic_kind="descriptor",
+                runtime_consumer_ids=runtime_consumer_ids,
+            ),
+        )
+    evidence: list[ExactSemanticConsumerEvidence] = []
+    for clause_row in clause_rows:
+        if len(clause_row.effect_kinds) != len(clause_row.effect_runtime_consumer_ids):
+            raise ValueError("Exact ability clause effect evidence is incomplete.")
+        evidence.extend(
+            ExactSemanticConsumerEvidence(
+                semantic_id=f"{clause_row.clause_id}:effect:{index}",
+                semantic_kind=effect_kind,
+                runtime_consumer_ids=effect_consumer_ids,
+            )
+            for index, (effect_kind, effect_consumer_ids) in enumerate(
+                zip(
+                    clause_row.effect_kinds,
+                    clause_row.effect_runtime_consumer_ids,
+                    strict=True,
+                )
+            )
+        )
+    return tuple(evidence)
 
 
 def _validate_effective_updates(

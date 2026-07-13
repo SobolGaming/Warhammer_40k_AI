@@ -61,7 +61,7 @@ SOURCE_ARTIFACT_TABLES = (
     "Datasheets_wargear",
     "Factions",
 )
-SCHEMA_VERSION = "aeldari-datasheet-semantic-coverage-v2"
+SCHEMA_VERSION = "aeldari-datasheet-semantic-coverage-v3"
 GENERATED_BY = "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py"
 SEMANTIC_BUCKET_ALL_CONSUMED = "All exact abilities consumed"
 SEMANTIC_BUCKET_HOST_NEEDED = "Exact IR parsed; host needed"
@@ -116,15 +116,47 @@ _ABILITY_KEYS = frozenset(
         "normalized_text_sha256",
         "catalog_support",
         "support_stage",
+        "semantic_consumers",
         "runtime_consumer_ids",
         "diagnostic_reasons",
+    }
+)
+_SEMANTIC_CONSUMER_KEYS = frozenset(
+    {
+        "semantic_id",
+        "semantic_kind",
+        "runtime_consumer_ids",
     }
 )
 
 
 @dataclass(frozen=True, slots=True)
+class ExactSemanticConsumerEvidence:
+    semantic_id: str
+    semantic_kind: str
+    runtime_consumer_ids: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "semantic_id", _text(self.semantic_id, "semantic_id"))
+        object.__setattr__(self, "semantic_kind", _text(self.semantic_kind, "semantic_kind"))
+        object.__setattr__(
+            self,
+            "runtime_consumer_ids",
+            _validated_unique_text_tuple("runtime_consumer_ids", self.runtime_consumer_ids),
+        )
+
+    def to_payload(self) -> dict[str, object]:
+        return {
+            "semantic_id": self.semantic_id,
+            "semantic_kind": self.semantic_kind,
+            "runtime_consumer_ids": list(self.runtime_consumer_ids),
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class ExactAbilitySemanticEvidence:
     support_stage: AbilityCoverageSupportStage
+    semantic_consumers: tuple[ExactSemanticConsumerEvidence, ...]
     runtime_consumer_ids: tuple[str, ...]
     diagnostic_reasons: tuple[str, ...]
 
@@ -133,12 +165,36 @@ class ExactAbilitySemanticEvidence:
             raise TypeError("Exact ability evidence requires an ability coverage support stage.")
         consumers = _validated_unique_text_tuple("runtime_consumer_ids", self.runtime_consumer_ids)
         diagnostics = _validated_unique_text_tuple("diagnostic_reasons", self.diagnostic_reasons)
+        if type(self.semantic_consumers) is not tuple or any(
+            type(semantic) is not ExactSemanticConsumerEvidence
+            for semantic in self.semantic_consumers
+        ):
+            raise TypeError("Exact ability semantic consumers must be an evidence tuple.")
+        semantic_ids = tuple(semantic.semantic_id for semantic in self.semantic_consumers)
+        if len(set(semantic_ids)) != len(semantic_ids):
+            raise ValueError("Exact ability semantic consumer IDs must be unique.")
+        represented_consumer_ids = {
+            consumer_id
+            for semantic in self.semantic_consumers
+            for consumer_id in semantic.runtime_consumer_ids
+        }
+        if not represented_consumer_ids.issubset(consumers):
+            raise ValueError(
+                "Exact ability semantic consumers must be present in runtime consumers."
+            )
         object.__setattr__(self, "runtime_consumer_ids", consumers)
         object.__setattr__(self, "diagnostic_reasons", diagnostics)
         if self.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED:
             if not consumers:
                 raise ValueError(
                     "Engine-consumed exact ability evidence requires runtime consumers."
+                )
+            if not self.semantic_consumers or any(
+                not semantic.runtime_consumer_ids for semantic in self.semantic_consumers
+            ):
+                raise ValueError(
+                    "Engine-consumed exact ability evidence requires every semantic to have "
+                    "runtime consumers."
                 )
             if diagnostics:
                 raise ValueError(
@@ -164,6 +220,7 @@ class AeldariDatasheetAbilitySemanticCoverage:
     normalized_text_sha256: str
     catalog_support: CatalogAbilitySupport
     support_stage: AbilityCoverageSupportStage
+    semantic_consumers: tuple[ExactSemanticConsumerEvidence, ...]
     runtime_consumer_ids: tuple[str, ...]
     diagnostic_reasons: tuple[str, ...]
     source_ids: tuple[str, ...]
@@ -171,6 +228,7 @@ class AeldariDatasheetAbilitySemanticCoverage:
     def semantic_evidence(self) -> ExactAbilitySemanticEvidence:
         return ExactAbilitySemanticEvidence(
             support_stage=self.support_stage,
+            semantic_consumers=self.semantic_consumers,
             runtime_consumer_ids=self.runtime_consumer_ids,
             diagnostic_reasons=self.diagnostic_reasons,
         )
@@ -289,6 +347,8 @@ def exact_ability_semantic_bucket(
         return SEMANTIC_BUCKET_HOST_NEEDED
     if all(
         ability.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        and ability.semantic_consumers
+        and all(semantic.runtime_consumer_ids for semantic in ability.semantic_consumers)
         and ability.runtime_consumer_ids
         and not ability.diagnostic_reasons
         for ability in abilities
@@ -346,6 +406,10 @@ def _parse_ability(raw: object) -> AeldariDatasheetAbilitySemanticCoverage:
         raise ValueError("Aeldari semantic coverage ability classification is invalid.") from exc
     evidence = ExactAbilitySemanticEvidence(
         support_stage=support_stage,
+        semantic_consumers=tuple(
+            _parse_semantic_consumer(raw_semantic)
+            for raw_semantic in _required_list(payload, "semantic_consumers")
+        ),
         runtime_consumer_ids=_unique_text_tuple(payload, "runtime_consumer_ids"),
         diagnostic_reasons=_unique_text_tuple(payload, "diagnostic_reasons"),
     )
@@ -369,9 +433,24 @@ def _parse_ability(raw: object) -> AeldariDatasheetAbilitySemanticCoverage:
         normalized_text_sha256=normalized_text_sha256,
         catalog_support=catalog_support,
         support_stage=evidence.support_stage,
+        semantic_consumers=evidence.semantic_consumers,
         runtime_consumer_ids=evidence.runtime_consumer_ids,
         diagnostic_reasons=evidence.diagnostic_reasons,
         source_ids=_unique_text_tuple(payload, "source_ids", require_non_empty=True),
+    )
+
+
+def _parse_semantic_consumer(raw: object) -> ExactSemanticConsumerEvidence:
+    payload = _object(raw, "Aeldari exact ability semantic consumer evidence")
+    _require_exact_keys(
+        payload,
+        _SEMANTIC_CONSUMER_KEYS,
+        "Aeldari exact ability semantic consumer evidence",
+    )
+    return ExactSemanticConsumerEvidence(
+        semantic_id=_required_text(payload, "semantic_id"),
+        semantic_kind=_required_text(payload, "semantic_kind"),
+        runtime_consumer_ids=_unique_text_tuple(payload, "runtime_consumer_ids"),
     )
 
 

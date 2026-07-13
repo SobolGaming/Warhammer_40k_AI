@@ -10,7 +10,6 @@ from tools.aeldari_datasheet_semantic_coverage import (
     COVERAGE_PATH,
     OVERLAY_PACK_PATH,
     RELEASE_MANIFEST_PATH,
-    SEMANTIC_BUCKET_ALL_CONSUMED,
     SEMANTIC_BUCKET_BRIDGE_BLOCKED,
     SEMANTIC_BUCKET_HOST_NEEDED,
     SEMANTIC_BUCKET_UNSUPPORTED_IR,
@@ -36,6 +35,10 @@ from tools.generate_aeldari_datasheet_semantic_coverage import (
     generated_aeldari_datasheet_semantic_coverage,
 )
 
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
 )
@@ -250,11 +253,10 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 1,
-        SEMANTIC_BUCKET_HOST_NEEDED: 5,
+        SEMANTIC_BUCKET_HOST_NEEDED: 6,
         SEMANTIC_BUCKET_UNSUPPORTED_IR: 64,
     }
-    assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000571"].semantic_bucket == SEMANTIC_BUCKET_UNSUPPORTED_IR
     assert all(row.semantic_bucket != SEMANTIC_BUCKET_BRIDGE_BLOCKED for row in artifact.rows)
@@ -264,6 +266,27 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
             if ability.support_stage.value == "engine_consumed":
                 assert ability.runtime_consumer_ids
                 assert not ability.diagnostic_reasons
+                assert ability.semantic_consumers
+                assert all(semantic.runtime_consumer_ids for semantic in ability.semantic_consumers)
+    psychic_guidance = next(
+        ability
+        for ability in rows_by_id["000000597"].abilities
+        if ability.ability_name == "Psychic Guidance"
+    )
+    assert psychic_guidance.support_stage.value == "generic_ir_executable"
+    assert psychic_guidance.runtime_consumer_ids == (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,)
+    assert tuple(
+        (semantic.semantic_kind, semantic.runtime_consumer_ids)
+        for semantic in psychic_guidance.semantic_consumers
+    ) == (
+        ("set_characteristic", (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,)),
+        ("modify_dice_roll", ()),
+    )
+    assert CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID not in (
+        consumer_id
+        for semantic in psychic_guidance.semantic_consumers
+        for consumer_id in semantic.runtime_consumer_ids
+    )
     inescapable_accuracy = next(
         ability
         for ability in rows_by_id["000000607"].abilities
@@ -310,7 +333,7 @@ def test_aeldari_semantic_coverage_artifacts_are_current() -> None:
             "engine_consumed",
             "runtime_consumer_ids",
             [],
-            "requires runtime consumers",
+            "semantic consumers must be present in runtime consumers",
         ),
         (
             "engine_consumed",
@@ -345,6 +368,19 @@ def test_aeldari_semantic_loader_rejects_inconsistent_runtime_evidence(
     coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
 
     with pytest.raises(ValueError, match=message):
+        load_aeldari_datasheet_semantic_coverage(coverage_path=coverage_path)
+
+
+def test_aeldari_semantic_loader_rejects_partially_consumed_engine_ability(
+    tmp_path: Path,
+) -> None:
+    payload = _mutable_aeldari_coverage_payload()
+    ability = _first_ability_payload_for_stage(payload, "engine_consumed")
+    semantic_consumers = cast(list[dict[str, Any]], ability["semantic_consumers"])
+    semantic_consumers[0]["runtime_consumer_ids"] = []
+    coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match="requires every semantic"):
         load_aeldari_datasheet_semantic_coverage(coverage_path=coverage_path)
 
 

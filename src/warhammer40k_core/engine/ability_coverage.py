@@ -16,6 +16,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_rule_ir_consumer_ids_for_effect,
     catalog_rule_ir_consumers_for_clause,
     catalog_rule_ir_consumers_for_rule,
 )
@@ -74,6 +75,7 @@ class AbilityClauseCoverageRowPayload(TypedDict):
     source_span: TextSpanPayload
     trigger_kind: str | None
     effect_kinds: list[str]
+    effect_runtime_consumer_ids: list[list[str]]
     runtime_consumer_ids: list[str]
     support_stage: str
     diagnostics: list[str]
@@ -204,6 +206,7 @@ class AbilityClauseCoverageRow:
     effect_kinds: tuple[str, ...]
     runtime_consumer_ids: tuple[str, ...]
     support_stage: AbilityCoverageSupportStage
+    effect_runtime_consumer_ids: tuple[tuple[str, ...], ...] = ()
     diagnostics: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -231,14 +234,38 @@ class AbilityClauseCoverageRow:
             "effect_kinds",
             _validate_string_tuple("effect_kinds", self.effect_kinds),
         )
-        object.__setattr__(
-            self,
-            "runtime_consumer_ids",
-            _validate_string_tuple("runtime_consumer_ids", self.runtime_consumer_ids),
+        runtime_consumers = _validate_string_tuple(
+            "runtime_consumer_ids", self.runtime_consumer_ids
         )
+        object.__setattr__(self, "runtime_consumer_ids", runtime_consumers)
+        if type(self.effect_runtime_consumer_ids) is not tuple:
+            raise GameLifecycleError(
+                "AbilityClauseCoverageRow effect_runtime_consumer_ids must be a tuple."
+            )
+        effect_consumers = tuple(
+            _validate_string_tuple("effect_runtime_consumer_ids", consumer_ids)
+            for consumer_ids in self.effect_runtime_consumer_ids
+        )
+        if len(effect_consumers) != len(self.effect_kinds):
+            raise GameLifecycleError(
+                "AbilityClauseCoverageRow effect consumer evidence must match effect_kinds."
+            )
+        if not {
+            consumer_id for consumer_ids in effect_consumers for consumer_id in consumer_ids
+        }.issubset(runtime_consumers):
+            raise GameLifecycleError(
+                "AbilityClauseCoverageRow effect consumers must be clause consumers."
+            )
+        object.__setattr__(self, "effect_runtime_consumer_ids", effect_consumers)
         if type(self.support_stage) is not AbilityCoverageSupportStage:
             raise GameLifecycleError(
                 "AbilityClauseCoverageRow support_stage must be AbilityCoverageSupportStage."
+            )
+        if self.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED and (
+            not effect_consumers or any(not consumer_ids for consumer_ids in effect_consumers)
+        ):
+            raise GameLifecycleError(
+                "Engine-consumed ability clauses require consumers for every effect."
             )
         object.__setattr__(
             self,
@@ -254,6 +281,9 @@ class AbilityClauseCoverageRow:
             "source_span": self.source_span.to_payload(),
             "trigger_kind": self.trigger_kind,
             "effect_kinds": list(self.effect_kinds),
+            "effect_runtime_consumer_ids": [
+                list(consumer_ids) for consumer_ids in self.effect_runtime_consumer_ids
+            ],
             "runtime_consumer_ids": list(self.runtime_consumer_ids),
             "support_stage": self.support_stage.value,
             "diagnostics": list(self.diagnostics),
@@ -841,6 +871,9 @@ def _clause_coverage_row(
         raise GameLifecycleError("Ability clause coverage requires RuleClause values.")
     if type(runtime_consumer_ids) is not tuple:
         raise GameLifecycleError("Ability clause coverage consumers must be a tuple.")
+    effect_runtime_consumer_ids = _effect_runtime_consumer_ids(
+        clause=clause, runtime_consumer_ids=runtime_consumer_ids
+    )
     return AbilityClauseCoverageRow(
         source_ability_id=source_ability_id,
         ability_name=ability_name,
@@ -848,10 +881,11 @@ def _clause_coverage_row(
         source_span=clause.source_span,
         trigger_kind=None if clause.trigger is None else clause.trigger.kind.value,
         effect_kinds=tuple(effect.kind.value for effect in clause.effects),
+        effect_runtime_consumer_ids=effect_runtime_consumer_ids,
         runtime_consumer_ids=tuple(sorted(runtime_consumer_ids)),
         support_stage=_clause_support_stage(
             clause=clause,
-            runtime_consumer_ids=runtime_consumer_ids,
+            effect_runtime_consumer_ids=effect_runtime_consumer_ids,
         ),
         diagnostics=tuple(
             f"{diagnostic.reason.value}:{diagnostic.source_span.start}-"
@@ -861,14 +895,31 @@ def _clause_coverage_row(
     )
 
 
-def _clause_support_stage(
+def _effect_runtime_consumer_ids(
     *,
     clause: RuleClause,
     runtime_consumer_ids: tuple[str, ...],
+) -> tuple[tuple[str, ...], ...]:
+    """Partition trigger- and condition-aware clause consumers by represented effect."""
+    if not clause.effects:
+        return ()
+    if len(clause.effects) == 1:
+        return (tuple(sorted(runtime_consumer_ids)),)
+    consumers = frozenset(runtime_consumer_ids)
+    return tuple(
+        tuple(sorted(consumers.intersection(catalog_rule_ir_consumer_ids_for_effect(effect))))
+        for effect in clause.effects
+    )
+
+
+def _clause_support_stage(
+    *,
+    clause: RuleClause,
+    effect_runtime_consumer_ids: tuple[tuple[str, ...], ...],
 ) -> AbilityCoverageSupportStage:
     if not clause.is_supported:
         return AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
-    if runtime_consumer_ids:
+    if effect_runtime_consumer_ids and all(effect_runtime_consumer_ids):
         return AbilityCoverageSupportStage.ENGINE_CONSUMED
     return AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
 
