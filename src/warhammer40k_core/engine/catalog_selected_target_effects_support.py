@@ -204,11 +204,6 @@ def selection_distance_conditions_apply(
     )
     if not distance_conditions:
         return True
-    source_models = geometry_models_for_placement(
-        scenario=scenario,
-        unit_placement=source_placement,
-        source_model_instance_id=source_model_instance_id,
-    )
     target_models = geometry_models_for_placement(
         scenario=scenario,
         unit_placement=target_placement,
@@ -222,6 +217,22 @@ def selection_distance_conditions_apply(
             parameters.get("range_kind") != "numeric_range"
         ):
             raise GameLifecycleError("Catalog selected-target distance predicate is unsupported.")
+        object_kind = parameters.get("object_kind")
+        if object_kind == "model":
+            if source_model_instance_id is None:
+                raise GameLifecycleError(
+                    "Model-scoped selected-target distance requires a source model."
+                )
+            condition_source_model_id = source_model_instance_id
+        elif object_kind == "unit":
+            condition_source_model_id = None
+        else:
+            raise GameLifecycleError("Catalog selected-target distance object kind is unsupported.")
+        source_models = geometry_models_for_placement(
+            scenario=scenario,
+            unit_placement=source_placement,
+            source_model_instance_id=condition_source_model_id,
+        )
         if not any_models_satisfy_distance(
             source_models=source_models,
             target_models=target_models,

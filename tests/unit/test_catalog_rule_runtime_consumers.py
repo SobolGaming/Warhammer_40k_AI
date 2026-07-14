@@ -2688,11 +2688,14 @@ def test_catalog_selected_target_fight_start_runtime_records_selected_effect() -
     [pytest.param(False), pytest.param(True)],
     ids=("without-model-condition", "with-model-condition"),
 )
-def test_catalog_fight_start_wargear_model_effect_binds_only_current_bearer(
+def test_catalog_fight_start_wargear_model_effect_uses_unit_geometry_and_binds_bearer(
     include_model_condition: bool,
 ) -> None:
     source_army, target_army = _mustered_core_armies()
-    source_unit_template = source_army.units[0]
+    source_unit_template = replace(
+        source_army.units[0],
+        own_models=source_army.units[0].own_models[:2],
+    )
     wargear_id = "wargear:fight-start:model-ability"
     bearer_model = replace(
         source_unit_template.own_models[0],
@@ -2712,7 +2715,10 @@ def test_catalog_fight_start_wargear_model_effect_binds_only_current_bearer(
     )
     source_army = _army_with_unit(source_army, source_unit)
     target_unit = target_army.units[0]
-    selection_clause = _fight_start_selection_clause()
+    selection_clause = replace(
+        _fight_start_selection_clause(),
+        conditions=(_selection_engagement_range_condition(object_kind="unit"),),
+    )
     effect_clause = RuleClause(
         clause_id="test:selected-target:selection:fight:wargear-model-effect",
         source_span=_span(),
@@ -2766,13 +2772,13 @@ def test_catalog_fight_start_wargear_model_effect_binds_only_current_bearer(
     )
     no_bearer_state = _state_with_battlefield(
         armies=(source_army_without_bearer, target_army),
-        battlefield=_battlefield_for_units(
+        battlefield=_battlefield_for_units_with_model_xs(
             source_army=source_army_without_bearer,
             source_unit=source_unit_without_bearer,
-            source_x=10.0,
+            source_model_xs=(30.0, 10.0),
             target_army=target_army,
             target_unit=target_unit,
-            target_x=10.4,
+            target_model_xs=_model_xs_for_unit(unit=target_unit, start_x=10.4),
         ),
         active_player_id=source_army_without_bearer.player_id,
         phase=BattlePhase.FIGHT,
@@ -2790,13 +2796,13 @@ def test_catalog_fight_start_wargear_model_effect_binds_only_current_bearer(
 
     state = _state_with_battlefield(
         armies=(source_army, target_army),
-        battlefield=_battlefield_for_units(
+        battlefield=_battlefield_for_units_with_model_xs(
             source_army=source_army,
             source_unit=source_unit,
-            source_x=10.0,
+            source_model_xs=(30.0, 10.0),
             target_army=target_army,
             target_unit=target_unit,
-            target_x=10.4,
+            target_model_xs=_model_xs_for_unit(unit=target_unit, start_x=10.4),
         ),
         active_player_id=source_army.player_id,
         phase=BattlePhase.FIGHT,
@@ -3872,16 +3878,28 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
         state=state,
         source_player_id=source_army.player_id,
         source_unit_instance_id=source_unit.unit_instance_id,
-        source_model_instance_id=None,
+        source_model_instance_id=source_model_ids[0],
         selection_clause=distance_selection,
         explicit_target_unit_ids=None,
     ) == (target_unit.unit_instance_id,)
-    assert (
+    with pytest.raises(
+        GameLifecycleError,
+        match="Model-scoped selected-target distance requires a source model",
+    ):
         eligible_selection_target_unit_ids(
             state=state,
             source_player_id=source_army.player_id,
             source_unit_instance_id=source_unit.unit_instance_id,
             source_model_instance_id=None,
+            selection_clause=distance_selection,
+            explicit_target_unit_ids=None,
+        )
+    assert (
+        eligible_selection_target_unit_ids(
+            state=state,
+            source_player_id=source_army.player_id,
+            source_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=source_model_ids[0],
             selection_clause=distance_selection,
             explicit_target_unit_ids=("other-target",),
         )
@@ -4029,6 +4047,52 @@ def test_catalog_selected_target_visibility_gate_uses_real_line_of_sight() -> No
     )
 
 
+def test_catalog_selected_target_conditions_resolve_their_declared_geometry_scope() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = replace(
+        source_army.units[0],
+        own_models=source_army.units[0].own_models[:2],
+    )
+    source_army = _army_with_unit(source_army, source_unit)
+    target_unit = target_army.units[0]
+    source_model_id = source_unit.own_models[0].model_instance_id
+    selection_clause = replace(
+        _fight_start_selection_clause(),
+        conditions=(
+            _selection_engagement_range_condition(object_kind="unit"),
+            _condition(
+                RuleConditionKind.VISIBILITY_PREDICATE,
+                ("observer", "this_model"),
+                ("predicate", "visible_to"),
+                ("target_reference", "selected_unit"),
+            ),
+        ),
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units_with_model_xs(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_model_xs=(30.0, 10.0),
+            target_army=target_army,
+            target_unit=target_unit,
+            target_model_xs=_model_xs_for_unit(unit=target_unit, start_x=10.4),
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+
+    assert fight_start_selected_target_selection_is_supported(selection_clause)
+    assert eligible_selection_target_unit_ids(
+        state=state,
+        source_player_id=source_army.player_id,
+        source_unit_instance_id=source_unit.unit_instance_id,
+        source_model_instance_id=source_model_id,
+        selection_clause=selection_clause,
+        explicit_target_unit_ids=None,
+    ) == (target_unit.unit_instance_id,)
+
+
 def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None:
     source_army, target_army = _mustered_core_armies()
     source_unit = source_army.units[0]
@@ -4070,7 +4134,7 @@ def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None
             state=dead_source_state,
             source_player_id=dead_source_army.player_id,
             source_unit_instance_id=dead_source_unit.unit_instance_id,
-            source_model_instance_id=None,
+            source_model_instance_id=dead_source_unit.own_models[0].model_instance_id,
             selection_clause=distance_selection,
             explicit_target_unit_ids=None,
         )
@@ -4098,7 +4162,7 @@ def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None
             state=dead_target_state,
             source_player_id=source_army.player_id,
             source_unit_instance_id=source_unit.unit_instance_id,
-            source_model_instance_id=None,
+            source_model_instance_id=source_unit.own_models[0].model_instance_id,
             selection_clause=distance_selection,
             explicit_target_unit_ids=None,
         )
@@ -5452,6 +5516,19 @@ def _condition(
         kind=kind,
         source_span=_span(),
         parameters=_parameters(*parameters),
+    )
+
+
+def _selection_engagement_range_condition(*, object_kind: str) -> RuleCondition:
+    return _condition(
+        RuleConditionKind.DISTANCE_PREDICATE,
+        ("distance_inches", None),
+        ("negated", False),
+        ("object_kind", object_kind),
+        ("object_reference", "this"),
+        ("predicate", "within_engagement_range"),
+        ("qualifier", None),
+        ("range_kind", "engagement_range"),
     )
 
 
