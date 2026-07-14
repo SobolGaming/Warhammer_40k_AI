@@ -164,6 +164,7 @@ from warhammer40k_core.rules.wahapedia_bridge import (
     build_wahapedia_canonical_bridge_artifacts,
 )
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
+    AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES,
     AELDARI_KHARSETH_HEIGHT_OVERRIDES,
     CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     CHAOS_DEFILER_HEIGHT_OVERRIDES,
@@ -188,12 +189,14 @@ GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
 RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-coverage-v1"
 AELDARI_FACTION_ID = "aeldari"
 AELDARI_KHARSETH_DATASHEET_IDS = ("000004194",)
+AELDARI_CORSAIR_SKYREAVERS_DATASHEET_IDS = ("000004196",)
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 UNDIVIDED_DAEMON_DATASHEET_IDS = ("000001149", "000002758", "000001151")
 CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.DEFILER_DATASHEET_IDS
 ABILITY_SUPPORT_DATASHEET_IDS = (
+    *AELDARI_CORSAIR_SKYREAVERS_DATASHEET_IDS,
     *AELDARI_KHARSETH_DATASHEET_IDS,
     *BELAKOR_DATASHEET_IDS,
     *DAEMON_WARGEAR_DATASHEET_IDS,
@@ -1430,7 +1433,8 @@ def _ability_support_catalog_package(
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
         height_overrides=(
-            AELDARI_KHARSETH_HEIGHT_OVERRIDES
+            AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES
+            + AELDARI_KHARSETH_HEIGHT_OVERRIDES
             + BELAKOR_HEIGHT_OVERRIDES
             + UNDIVIDED_DAEMON_HEIGHT_OVERRIDES
             + CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
@@ -1962,9 +1966,13 @@ def _datasheet_tests_evidence(ability_rows: tuple[AbilityCoverageRow, ...]) -> s
         )
     )
     if runtime_consumer_ids:
-        return (
-            f"Runtime consumers: {_inline_code_list(runtime_consumer_ids)}; coverage artifact only"
-        )
+        notes = ["coverage artifact only"]
+        if "catalog-ir:fight-end-triggered-movement" in runtime_consumer_ids:
+            notes.append(
+                "host limitation: Fight-end triggered movement is exposed only for "
+                "non-attached physical rules units until grouped triggered movement is supported"
+            )
+        return f"Runtime consumers: {_inline_code_list(runtime_consumer_ids)}; {'; '.join(notes)}"
     return "coverage artifact only"
 
 

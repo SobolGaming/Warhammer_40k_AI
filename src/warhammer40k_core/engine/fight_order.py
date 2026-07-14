@@ -17,10 +17,10 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequencePayload
-from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
@@ -1367,7 +1367,7 @@ def eligible_fight_contexts_for_player(
     for unit_id in _unit_ids_for_player(state=state, player_id=requested_player_id):
         if unit_id in fight_state.fight_order_state.selected_to_fight_unit_ids:
             continue
-        reasons = _eligibility_reasons_for_unit(
+        reasons = fight_eligibility_reasons_for_unit(
             state=state,
             fight_state=fight_state,
             unit_instance_id=unit_id,
@@ -1397,6 +1397,20 @@ def eligible_fight_contexts_for_player(
             )
         )
     return tuple(sorted(contexts, key=lambda context: context.unit_instance_id))
+
+
+def unit_is_currently_engaged(*, state: GameState, unit_instance_id: str) -> bool:
+    """Return current Engagement Range state for the whole attached rules unit."""
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    owner = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=requested_unit_id,
+    ).owner_player_id
+    return _unit_is_engaged(
+        state=state,
+        player_id=owner,
+        unit_instance_id=requested_unit_id,
+    )
 
 
 def eligible_pass_is_available(contexts: tuple[FightEligibilityContext, ...]) -> bool:
@@ -1595,7 +1609,7 @@ def fight_interrupt_request_from_payload(result_payload: JsonValue) -> FightInte
     return FightInterruptRequest.from_payload(cast(FightInterruptRequestPayload, interrupt_payload))
 
 
-def _eligibility_reasons_for_unit(
+def fight_eligibility_reasons_for_unit(
     *,
     state: GameState,
     fight_state: FightPhaseState,
@@ -1627,11 +1641,14 @@ def _unit_is_engaged(
     player_id: str,
     unit_instance_id: str,
 ) -> bool:
-    unit_models = _geometry_models_for_unit(state=state, unit_instance_id=unit_instance_id)
+    unit_models = geometry_models_for_rules_unit(state=state, unit_instance_id=unit_instance_id)
     if not unit_models:
         return False
     for enemy_unit_id in _enemy_unit_ids_for_player(state=state, player_id=player_id):
-        enemy_models = _geometry_models_for_unit(state=state, unit_instance_id=enemy_unit_id)
+        enemy_models = geometry_models_for_rules_unit(
+            state=state,
+            unit_instance_id=enemy_unit_id,
+        )
         if _any_models_within_engagement_range(
             first_models=unit_models,
             second_models=enemy_models,
@@ -1647,13 +1664,13 @@ def _closest_enemy_distance_inches(
     player_id: str,
     unit_instance_id: str,
 ) -> float | None:
-    unit_models = _geometry_models_for_unit(state=state, unit_instance_id=unit_instance_id)
+    unit_models = geometry_models_for_rules_unit(state=state, unit_instance_id=unit_instance_id)
     if not unit_models:
         return None
     distances: list[float] = []
     for enemy_unit_id in _enemy_unit_ids_for_player(state=state, player_id=player_id):
         for first_model in unit_models:
-            for second_model in _geometry_models_for_unit(
+            for second_model in geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=enemy_unit_id,
             ):
@@ -1679,31 +1696,6 @@ def _any_models_within_engagement_range(
             ):
                 return True
     return False
-
-
-def _geometry_models_for_unit(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-) -> tuple[GeometryModel, ...]:
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Fight eligibility requires battlefield_state.")
-    unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
-    try:
-        unit_placement = battlefield_state.unit_placement_by_id(unit_instance_id)
-    except ValueError as exc:
-        raise GameLifecycleError("Fight eligibility requires placed units.") from exc
-    model_by_id = {model.model_instance_id: model for model in unit.own_models}
-    models: list[GeometryModel] = []
-    for placement in unit_placement.model_placements:
-        model = model_by_id.get(placement.model_instance_id)
-        if model is None:
-            raise GameLifecycleError("UnitPlacement references an unknown model.")
-        if not model.is_alive:
-            continue
-        models.append(geometry_model_for_placement(model=model, placement=placement))
-    return tuple(models)
 
 
 def _unit_ids_for_player(*, state: GameState, player_id: str) -> tuple[str, ...]:
@@ -1734,15 +1726,6 @@ def _owner_for_unit(*, state: GameState, unit_instance_id: str) -> str:
             if unit.unit_instance_id == requested_unit_id:
                 return army.player_id
     raise GameLifecycleError("Fight unit owner was not found.")
-
-
-def _unit_by_id(*, state: GameState, unit_instance_id: str) -> UnitInstance:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit
-    raise GameLifecycleError("Fight unit was not found.")
 
 
 def _placed_unit_ids(state: GameState) -> set[str]:

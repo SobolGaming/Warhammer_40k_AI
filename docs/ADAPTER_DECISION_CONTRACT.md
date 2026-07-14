@@ -361,6 +361,17 @@ options for the reacting player. The engine owns the hit-unit filtering,
 distance roll, source spend recording, and physical movement proposal; adapters
 must not infer hit eligibility or move models from the finite option payload.
 
+Fight-end generic RuleIR movement uses that same existing finite/proposal
+contract. At the end of the Fight phase, Corsair Skyreavers' Raid and Run emits
+`select_triggered_movement` only when the engine's Fight eligibility history
+accepts the rules unit. The engine selects Normal Move or Fall Back from the
+unit's current Engagement Range state, rolls D3 and adds 3, and carries the
+source RuleIR record, clause, selected effect, roll, and movement mode in
+replay-safe context. The accepted unit then emits the existing `surge_move`
+`submit_movement_proposal`, so every physical move still requires a
+`PathWitness`. Adapters must not infer prior Fight eligibility, choose the move
+mode, roll the distance, or move models from the finite option payload.
+
 Catalog setup-reactive shoot/charge rules use the finite decision type
 `select_catalog_setup_reactive_shoot_charge` at the end of the opponent's
 Movement phase after an enemy unit is set up on the battlefield within the

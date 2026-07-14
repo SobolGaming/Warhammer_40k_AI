@@ -207,6 +207,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     non_daemons_rows = tuple(row for row in support_rows if row.faction_id != "chaos-daemons")
     assert {(row.faction_id, row.datasheet_id, row.overall) for row in non_daemons_rows} == {
         ("aeldari", "000004194", "Playable"),
+        ("aeldari", "000004196", "Playable"),
         ("death-guard", "000004209", "Partial"),
         ("emperors-children", "000004208", "Partial"),
         ("thousand-sons", "000001030", "Playable"),
@@ -301,9 +302,9 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 1,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 2,
         SEMANTIC_BUCKET_HOST_NEEDED: 6,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 63,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 62,
     }
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
@@ -321,6 +322,17 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
         "Fury of the Void (Psychic)": (
             "engine_consumed",
             (CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,),
+        ),
+    }
+    skyreavers = rows_by_id["000004196"]
+    assert skyreavers.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    assert {
+        ability.ability_name: (ability.support_stage.value, ability.runtime_consumer_ids)
+        for ability in skyreavers.abilities
+    } == {
+        "Raid and Run": (
+            "engine_consumed",
+            ("catalog-ir:fight-end-triggered-movement",),
         ),
     }
     assert all(row.semantic_bucket != SEMANTIC_BUCKET_BRIDGE_BLOCKED for row in artifact.rows)

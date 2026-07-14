@@ -76,6 +76,7 @@ RELEASE_MANIFEST_PATH = OVERLAY_DIR / "source_release_manifest.json"
 SOURCE_DATE = "2026-06-09"
 SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p23"
 KHARSETH_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p14-15"
+CORSAIR_SKYREAVERS_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p20-21"
 TARGET_EDITION = "warhammer-40000-11th"
 BASE_SOURCE_PACKAGE_ID = DataPackageId(
     namespace="wahapedia",
@@ -227,6 +228,29 @@ def _overlay_pack(
                 "Kharseth catalog bridge."
             ),
             expected_preimage_hash=source_row_hash(kharseth_blank_keyword_row),
+            fields=(),
+        )
+    )
+    skyreavers_blank_keyword_row = _required_row(
+        rows_by_table,
+        "Datasheets_keywords",
+        "000004196:blank-keyword:global:true:15640",
+    )
+    operations.append(
+        SourceOverlayOperation(
+            op_id="aeldari-supersede-corsair-skyreavers-blank-faction-keyword",
+            order_index=len(operations) + 1,
+            operation_kind=SourceOverlayOperationKind.SUPERSEDE_ROW,
+            target_edition=TARGET_EDITION,
+            source_table="Datasheets_keywords",
+            source_row_id=skyreavers_blank_keyword_row.source_row_id,
+            source_reference=CORSAIR_SKYREAVERS_SOURCE_REFERENCE,
+            effective_date=SOURCE_DATE,
+            reason=(
+                "Supersede the mirrored blank faction-keyword row before the strict "
+                "Corsair Skyreavers catalog bridge."
+            ),
+            expected_preimage_hash=source_row_hash(skyreavers_blank_keyword_row),
             fields=(),
         )
     )
@@ -592,6 +616,7 @@ def _validate_effective_updates(
     if kharseth_model.runtime_fields_payload()["name"] != "Kharseth":
         raise ValueError("Aeldari Kharseth model-name correction did not apply.")
     _assert_keyword(rows, "000004194", "", present=False)
+    _assert_keyword(rows, "000004196", "", present=False)
 
 
 def _assert_keyword(

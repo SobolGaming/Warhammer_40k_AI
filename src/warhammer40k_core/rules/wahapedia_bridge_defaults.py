@@ -144,6 +144,31 @@ AELDARI_KHARSETH_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000004196",
+        model_name="Skyreaver Felarch",
+        height=3.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:corsair-skyreavers:felarch:height",
+        height_document_reference=(
+            "Warhammer Community Eldritch Raiders assembled promotional imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000004196",
+        model_name="Skyreavers",
+        height=3.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:corsair-skyreavers:skyreavers:height",
+        height_document_reference=(
+            "Warhammer Community Eldritch Raiders assembled promotional imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+)
+
 DEATH_GUARD_DEFILER_PDF_CORRECTION = PdfDatasheetCorrection(
     datasheet_id="000004209",
     source_id="pdf:death-guard-faction-pack:2026-06-10:p5-p6",
@@ -206,6 +231,7 @@ DEFAULT_PDF_CORRECTIONS = (
     *CHAOS_DEFILER_PDF_CORRECTIONS,
 )
 DEFAULT_HEIGHT_OVERRIDES = (
+    *AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES,
     *AELDARI_KHARSETH_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES,

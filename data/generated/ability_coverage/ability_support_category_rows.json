@@ -4,6 +4,14 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
+        "datasheet_id": "000004196",
+        "datasheet_name": "Corsair Skyreavers",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
@@ -15,11 +23,13 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004194/faction/000009894/none"
     ],
     "datasheet_names": [
+      "Corsair Skyreavers",
       "Kharseth"
     ],
     "runtime_consumer_ids": [
@@ -31,7 +41,7 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 1
+      "faction": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -985,6 +995,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004196:raid-and-run",
+        "ability_name": "Raid and Run",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004196/datasheet/000004196:raid-and-run/none",
+        "datasheet_id": "000004196",
+        "datasheet_name": "Corsair Skyreavers",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Raid and Run"
+    ],
+    "category_id": "datasheet.rule_ir.out_of_phase_action.this_unit",
+    "category_name": "Datasheet Rule Ir Out Of Phase Action This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004196/datasheet/000004196:raid-and-run/none"
+    ],
+    "datasheet_names": [
+      "Corsair Skyreavers"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:fight-end-triggered-movement"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001112:hunters-from-the-warp",
         "ability_name": "Hunters from the Warp",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/datasheet/000001112:hunters-from-the-warp/none",
@@ -1317,6 +1360,14 @@
       {
         "ability_id": "000008343",
         "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004196/core/000008343/none",
+        "datasheet_id": "000004196",
+        "datasheet_name": "Corsair Skyreavers",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/core/000008343/none",
         "datasheet_id": "000002758",
         "datasheet_name": "Daemon Prince Of Chaos With Wings",
@@ -1352,11 +1403,12 @@
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
-    "coverage_row_count": 7,
+    "coverage_row_count": 8,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001114/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000004196/core/000008343/none",
       "chaos-daemons-bridge-catalog/000002758/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001149/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001112/core/000008343/none",
@@ -1366,6 +1418,7 @@
       "Be'lakor",
       "Bloodcrushers",
       "Bloodletters",
+      "Corsair Skyreavers",
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Flesh Hounds",
@@ -1376,7 +1429,7 @@
       "descriptor:reserve-declaration:deep-strike"
     ],
     "source_kind_counts": {
-      "core": 7
+      "core": 8
     },
     "support_stages": [
       "engine_consumed"
@@ -2102,6 +2155,14 @@
       {
         "ability_id": "000008344",
         "ability_name": "Scouts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004196/core/000008344/none",
+        "datasheet_id": "000004196",
+        "datasheet_name": "Corsair Skyreavers",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008344",
+        "ability_name": "Scouts",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/core/000008344/none",
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
@@ -2113,18 +2174,20 @@
     ],
     "category_id": "core.scouts",
     "category_name": "Scouts",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004196/core/000008344/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008344/none"
     ],
     "datasheet_names": [
+      "Corsair Skyreavers",
       "Kharseth"
     ],
     "runtime_consumer_ids": [
       "descriptor:prebattle:scouts"
     ],
     "source_kind_counts": {
-      "core": 1
+      "core": 2
     },
     "support_stages": [
       "engine_consumed"

@@ -402,6 +402,19 @@
     },
     {
       "effective_date": "2026-06-09",
+      "expected_preimage_hash": "bfcf714684758eca80bae7c0055f9852a2154512168a97b5f5602fdb736cf76c",
+      "fields": {},
+      "op_id": "aeldari-supersede-corsair-skyreavers-blank-faction-keyword",
+      "operation_kind": "supersede_row",
+      "order_index": 27,
+      "reason": "Supersede the mirrored blank faction-keyword row before the strict Corsair Skyreavers catalog bridge.",
+      "source_reference": "pdf:aeldari-faction-pack:2026-06-09:p20-21",
+      "source_row_id": "000004196:blank-keyword:global:true:15640",
+      "source_table": "Datasheets_keywords",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-06-09",
       "expected_preimage_hash": null,
       "fields": {
         "description": "This model has the Support ability.",
@@ -411,7 +424,7 @@
       },
       "op_id": "aeldari-add-support-core-ability",
       "operation_kind": "add_row",
-      "order_index": 27,
+      "order_index": 28,
       "reason": "Add the 11th Edition Support core ability referenced by the Warlock update.",
       "source_reference": "pdf:aeldari-faction-pack:2026-06-09:p23",
       "source_row_id": "core-v2-11e-support:global",
@@ -429,10 +442,10 @@
       },
       "op_id": "aeldari-add-frame-keyword-000000603",
       "operation_kind": "add_row",
-      "order_index": 28,
+      "order_index": 29,
       "reason": "Add the Faction Pack FRAME keyword.",
       "source_reference": "pdf:aeldari-faction-pack:2026-06-09:p23",
-      "source_row_id": "000000603:FRAME:global:false:30",
+      "source_row_id": "000000603:FRAME:global:false:31",
       "source_table": "Datasheets_keywords",
       "target_edition": "warhammer-40000-11th"
     },
@@ -447,15 +460,15 @@
       },
       "op_id": "aeldari-add-frame-keyword-000000606",
       "operation_kind": "add_row",
-      "order_index": 29,
+      "order_index": 30,
       "reason": "Add the Faction Pack FRAME keyword.",
       "source_reference": "pdf:aeldari-faction-pack:2026-06-09:p23",
-      "source_row_id": "000000606:FRAME:global:false:31",
+      "source_row_id": "000000606:FRAME:global:false:32",
       "source_table": "Datasheets_keywords",
       "target_edition": "warhammer-40000-11th"
     }
   ],
-  "package_hash": "42fef216e9605aba38565b2ca562caa6163b415b8581b0eae7d2aad26e28590f",
+  "package_hash": "2581eb6272313d4ba76ebcce5bdd68dd98e76f32303d870acb36e4f2fc02d8c6",
   "package_id": {
     "namespace": "gw",
     "package_name": "aeldari-faction-pack-datasheet-overlay",

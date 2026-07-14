@@ -63,6 +63,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
 )
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.wargear import Wargear
+from warhammer40k_core.core.wargear_selection_limits import DatasheetWargearSelectionLimit
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityDescriptorPayload,
@@ -437,6 +438,7 @@ def _structured_wargear_option_from_rows(
         ),
         conditions=conditions,
         effects=effects,
+        selection_limit=_wargear_selection_limit_from_row(row),
     )
 
 
@@ -567,6 +569,10 @@ def _validate_grouped_option_rows(rows: tuple[NormalizedSourceRow, ...]) -> None
         "max_selections",
         "condition_kind",
         "condition_wargear_ids",
+        "selection_group_id",
+        "selection_models_per_increment",
+        "selection_group_max_per_increment",
+        "selection_option_max_per_increment",
     )
     expected = {
         column_name: _optional_field(row=first, column_name=column_name)
@@ -633,6 +639,34 @@ def _wargear_option_conditions_from_row(
         DatasheetWargearOptionCondition(
             kind=parsed_kind,
             wargear_ids=_required_split_field(row=row, column_name="condition_wargear_ids"),
+        ),
+    )
+
+
+def _wargear_selection_limit_from_row(
+    row: NormalizedSourceRow,
+) -> DatasheetWargearSelectionLimit | None:
+    selection_group_id = _optional_field(row=row, column_name="selection_group_id")
+    limit_columns = (
+        "selection_models_per_increment",
+        "selection_group_max_per_increment",
+        "selection_option_max_per_increment",
+    )
+    raw_limits = tuple(_optional_field(row=row, column_name=name) for name in limit_columns)
+    if selection_group_id is None:
+        if any(value is not None for value in raw_limits):
+            raise CatalogGenerationError("Wargear limits require selection_group_id.")
+        return None
+    if any(value is None for value in raw_limits):
+        raise CatalogGenerationError("Wargear selection limit is incomplete.")
+    return DatasheetWargearSelectionLimit(
+        selection_group_id=selection_group_id,
+        models_per_increment=_required_positive_int(row, "selection_models_per_increment"),
+        max_group_selections_per_increment=_required_positive_int(
+            row, "selection_group_max_per_increment"
+        ),
+        max_option_selections_per_increment=_required_positive_int(
+            row, "selection_option_max_per_increment"
         ),
     )
 

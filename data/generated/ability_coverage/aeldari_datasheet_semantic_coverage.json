@@ -3980,28 +3980,43 @@
         {
           "ability_id": "000004196:raid-and-run",
           "ability_name": "Raid and Run",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "415adedbde9aeee5438c705dcb48a9639edbe27c4acfa31f570af3f5782a3db9",
           "raw_text": "At the end of the Fight phase, if this unit was eligible to fight this phase, and is not within Engagement Range of one or more enemy units, it can make a Normal move of up to D3+3\". Otherwise, if this unit was eligible to fight this phase, this unit can make a Fall Back move of up to D3+3\".",
           "raw_text_sha256": "415adedbde9aeee5438c705dcb48a9639edbe27c4acfa31f570af3f5782a3db9",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:fight-end-triggered-movement"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:fight-end-triggered-movement"
+              ],
+              "semantic_id": "phase17k:aeldari:corsair-skyreavers:000004196:4:clause:001:effect:0",
+              "semantic_kind": "out_of_phase_action"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:fight-end-triggered-movement"
+              ],
+              "semantic_id": "phase17k:aeldari:corsair-skyreavers:000004196:4:clause:001:effect:1",
+              "semantic_kind": "out_of_phase_action"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004196:4"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000004196:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000004196",
       "datasheet_name": "Corsair Skyreavers",
       "group": "Anhrathe / Corsairs",
       "pdf_page_reference": "Complete Datasheets, physical PDF pages 12-21",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "complete_pdf"
     }
   ],
@@ -4009,28 +4024,28 @@
   "faction_id": "aeldari",
   "faction_name": "Aeldari",
   "generated_by": "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py",
-  "overlay_pack_hash": "42fef216e9605aba38565b2ca562caa6163b415b8581b0eae7d2aad26e28590f",
+  "overlay_pack_hash": "2581eb6272313d4ba76ebcce5bdd68dd98e76f32303d870acb36e4f2fc02d8c6",
   "pdf_filename": "eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
   "pdf_sha256": "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9",
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 1,
+    "All exact abilities consumed": 2,
     "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 63
+    "Exact ability IR unsupported": 62
   },
   "source_artifact_hashes": {
-    "Abilities": "dc330b726472a301027fb36652eb8a4e0a1ffdc0fc529df72d5977cf31ccc09e",
-    "Datasheets": "8e7c7170e1ffd73fd0ad92dd7f5ad7cbaffe7ea3a784941ed9f4f2d5ef380a5e",
-    "Datasheets_abilities": "adba6373b277930f4d26b9481d0e3653d0e5dd1eeb45d18e129fc0087bc3bef6",
-    "Datasheets_keywords": "391eae1bfcbd729e9b9ba1e04f30eada56b5fbcadacc2af92132e91c50555b7b",
-    "Datasheets_leader": "cb4f8556bc3ecf40e269fcd0e9672d55eac3ba72a97f8d4605848eb3c7b52690",
-    "Datasheets_models": "30aedf5c608f7b9069bb91f86b10cce216f7128d23f2678de8239486313b774d",
-    "Datasheets_models_cost": "210b677d8d7235f75af0d121e371bfc0eaa09587ab99f4d380f3165e9ada1db7",
-    "Datasheets_options": "3e89bbb95e74d7d47e04becc682fc02d3e8cd6154e7fc8ab5b31b637d797c20e",
-    "Datasheets_unit_composition": "72678fd019e06a7e5120aa77ed9d2a6f21f1317de3f89dde562c0e5c027a5371",
-    "Datasheets_wargear": "de59a065f32f996c0a99d7338926a3d53972606dcd2153b4f3b298dca50e118f",
-    "Factions": "16d33bc9684d31e2eda2a149a4e990a893b28800a98d8e1485ad5a5d8f3d5027"
+    "Abilities": "c5c6fa2d632d5f5b446394eaca989d616d8e133c3038c24c50a127645f2dc273",
+    "Datasheets": "1c96f6122c7d9269ac5854066122e96cc2e8a519dc096d8852966137d36c5ee8",
+    "Datasheets_abilities": "f5fa0bc0f7dee62dbea601aaffe09ed8b521861fcbf023fcd2fd4c58637d6bff",
+    "Datasheets_keywords": "93189be4918929552de56cfd4906751a5818609e588ff828d86f1acddcc5c637",
+    "Datasheets_leader": "beae31d3ce17e022313428fbf7c565cc7202db1fa0e51559f68b8ce566530835",
+    "Datasheets_models": "41033c3600d5dee90a44eca1b614596a408badf18cf97377e56e35a0e8b19bf9",
+    "Datasheets_models_cost": "4fd78481d091902f3277a8321f09ac2d2b5b388d043d810337d3bafd65519a09",
+    "Datasheets_options": "5fc381bb40ea096dcda2fa1ecff3fac7d5e00c75d772b22081617a500cefdb98",
+    "Datasheets_unit_composition": "bdf3100cef8918011cd2a65a646beaf8616b87f8cfa56ecb82820759617d02a5",
+    "Datasheets_wargear": "e8e1ceec662fd516829078cba838c9e57c950af4be115ce94d2973b0709069dd",
+    "Factions": "bdc6f0d65d1eb27bba9802329d6c90f5d2f6a453f2aa6f31cfe8436cf17d6524"
   },
   "source_snapshot_path": "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json",
   "treatment_counts": {

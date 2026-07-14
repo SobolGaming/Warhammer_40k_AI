@@ -6703,9 +6703,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)" in aeldari_markdown
     assert "Eldrad Ulthran (`000000568`)<br>Falcon (`000000609`)" in aeldari_markdown
     assert "Wraithguard (`000000597`)" in aeldari_markdown
-    assert "| Anhrathe / Corsairs | Kharseth (`000004194`) | None | Corsair Skyreavers" in (
-        aeldari_markdown
-    )
+    assert (
+        "| Anhrathe / Corsairs | Corsair Skyreavers (`000004196`)<br>"
+        "Kharseth (`000004194`) | None | Corsair Voidreavers"
+    ) in aeldari_markdown
     assert "| Harlequins | None | Skyweavers (`000002539`) |" in aeldari_markdown
     assert "| Ynnari | None | None | The Visarch" in aeldari_markdown
     for group_name in (
@@ -6874,6 +6875,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Daemon Prince of Chaos",
         "Soul Grinder",
         "Daemon Prince Of Chaos With Wings",
+        "Corsair Skyreavers",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Collar of Khorne"]) == (
         "Flesh Hounds",

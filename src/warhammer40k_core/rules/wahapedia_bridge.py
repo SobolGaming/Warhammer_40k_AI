@@ -63,12 +63,9 @@ from warhammer40k_core.rules.wahapedia_bridge_patterns import (
     DAMAGED_OC_RE,
     DAMAGED_RANGE_RE,
     DAMAGED_SHOOTING_WEAPON_SELECTION_LIMIT_RE,
-    DUPLICATE_EQUIPMENT_RESTRICTION_RE,
     FACTION_ARMY_RULE_ABILITY_IDS_BY_FACTION_ID,
     LOADOUT_ITEM_COUNT_RE,
     LOADOUT_RE,
-    OPTION_CHOICE_RE,
-    OPTION_CHOICE_RESTRICTION_RE,
     OPTION_RE,
     REPLACEMENT_WITH_CHOICES_RE,
     REPLACEMENT_WITH_REQUIRED_CHOICES_RE,
@@ -82,6 +79,10 @@ from warhammer40k_core.rules.wahapedia_bridge_rows import (
     resolve_bridge_ability_source_row,
 )
 from warhammer40k_core.rules.wahapedia_equipment_choice_bridge import append_choice_rows
+from warhammer40k_core.rules.wahapedia_replacement_option_bridge import (
+    append_extended_replacement_rows,
+    replacement_choices,
+)
 from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
     WahapediaCsvTable,
@@ -195,12 +196,6 @@ class _BaseSizeEvidence:
 class _WeaponKeywordEntry:
     keyword: WeaponKeyword | None
     ability: AbilityDescriptor | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class _ReplacementChoice:
-    name: str
-    duplicate_limited_name: str | None = None
 
 
 EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID = (
@@ -855,14 +850,25 @@ def _bridge_options(
 ) -> None:
     model_profile_by_name = _model_profiles_by_name(composition_entries)
     profile_ids = tuple(entry.model_profile_id for entry in composition_entries)
-    for row in _rows_matching(
+    option_rows = _rows_matching(
         context.rows_by_table, "Datasheets_options", "datasheet_id", datasheet_id
-    ):
+    )
+    for row in option_rows:
         description = _required_field(row, "description")
         if description == "None":
             continue
         if append_choice_rows(
             row, datasheet_id, profile_ids, wargear_ids_by_name, bridged_rows, WahapediaBridgeError
+        ):
+            continue
+        if append_extended_replacement_rows(
+            row=row,
+            option_rows=option_rows,
+            datasheet_id=datasheet_id,
+            model_profile_by_name=model_profile_by_name,
+            wargear_ids_by_name=wargear_ids_by_name,
+            bridged_rows=bridged_rows,
+            error_type=WahapediaBridgeError,
         ):
             continue
         replacement_match = REPLACEMENT_WITH_REQUIRED_CHOICES_RE.fullmatch(description)
@@ -1057,7 +1063,7 @@ def _bridge_replacement_with_required_choices_option(
 ) -> None:
     replaced_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replaced"))
     required_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("required"))
-    choices = _replacement_choices(match.group("choices"))
+    choices = replacement_choices(match.group("choices"), error_type=WahapediaBridgeError)
     choice_wargear_ids = tuple(
         _required_wargear_id(wargear_ids_by_name, choice.name) for choice in choices
     )
@@ -1120,7 +1126,7 @@ def _bridge_replacement_with_choices_option(
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> None:
     replaced_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replaced"))
-    choices = _replacement_choices(match.group("choices"))
+    choices = replacement_choices(match.group("choices"), error_type=WahapediaBridgeError)
     source_line = _required_field(row, "line")
     for choice_index, choice in enumerate(choices, start=1):
         choice_wargear_id = _required_wargear_id(wargear_ids_by_name, choice.name)
@@ -1195,34 +1201,6 @@ def _bridge_single_replacement_option(
             "source_ids": _joined(_source_ids(row)),
         }
     )
-
-
-def _replacement_choices(choices_text: str) -> tuple[_ReplacementChoice, ...]:
-    choices: list[_ReplacementChoice] = []
-    for line in choices_text.splitlines():
-        match = OPTION_CHOICE_RE.fullmatch(line.strip())
-        if match is None:
-            raise WahapediaBridgeError("Unsupported replacement wargear choice row shape.")
-        choices.append(_replacement_choice(match.group("name")))
-    if not choices:
-        raise WahapediaBridgeError("Replacement wargear option has no choices.")
-    return tuple(choices)
-
-
-def _replacement_choice(choice_text: str) -> _ReplacementChoice:
-    restriction_match = OPTION_CHOICE_RESTRICTION_RE.fullmatch(choice_text)
-    if restriction_match is None:
-        return _ReplacementChoice(name=choice_text)
-    name = restriction_match.group("name")
-    duplicate_match = DUPLICATE_EQUIPMENT_RESTRICTION_RE.fullmatch(
-        restriction_match.group("restriction")
-    )
-    if duplicate_match is None:
-        raise WahapediaBridgeError("Unsupported replacement wargear choice restriction.")
-    duplicate_name = duplicate_match.group("name")
-    if _name_key(duplicate_name) != _name_key(name):
-        raise WahapediaBridgeError("Replacement wargear duplicate restriction target drift.")
-    return _ReplacementChoice(name=name, duplicate_limited_name=duplicate_name)
 
 
 def _bridge_leader_links(
@@ -1607,6 +1585,10 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "max_selections",
             "condition_kind",
             "condition_wargear_ids",
+            "selection_group_id",
+            "selection_models_per_increment",
+            "selection_group_max_per_increment",
+            "selection_option_max_per_increment",
             "effect_kind",
             "effect_wargear_id",
             "effect_replaced_wargear_id",

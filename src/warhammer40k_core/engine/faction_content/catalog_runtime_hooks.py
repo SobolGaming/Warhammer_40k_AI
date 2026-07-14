@@ -12,6 +12,9 @@ from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookBinding
 from warhammer40k_core.engine.catalog_battle_shock_runtime import (
     catalog_battle_shock_hook_bindings,
 )
+from warhammer40k_core.engine.catalog_fight_end_triggered_movement_runtime import (
+    catalog_fight_end_triggered_movement_hook_bindings,
+)
 from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CatalogOncePerBattleRuntime,
 )
@@ -34,6 +37,7 @@ from warhammer40k_core.engine.catalog_tracked_target_runtime import (
     catalog_tracked_target_unit_destroyed_hook_bindings,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.fight_phase_end_hooks import FightPhaseEndHookBinding
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     FightPhaseStartHookBinding,
     FightPhaseStartRequestContext,
@@ -142,6 +146,16 @@ def fight_phase_start_hook_bindings(
             request_handler=request_handler,
             result_handler=result_handler,
         ),
+    )
+
+
+def fight_end_hooks(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[FightPhaseEndHookBinding, ...]:
+    return catalog_fight_end_triggered_movement_hook_bindings(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
     )
 
 

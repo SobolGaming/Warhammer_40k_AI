@@ -72,6 +72,13 @@ engine decision type.
 | Healing model selection, `select_healing_model`. | One engine-enumerated legal model ID for the next one-wound healing step when multiple wounded models can be healed or multiple destroyed removed models can be revived. The opposing player chooses by default; source-backed effects can set `selection_actor_player_id` when that rule assigns the choice elsewhere, such as Necrons Reanimation Protocols assigning the choice to the owning Necrons player. Single-candidate heal/revival steps and no-effect steps auto-resolve. | Any source-backed Healing Wounds effect. | `tests/unit/test_phase14h_healing.py::test_attached_unit_multiple_wounded_models_use_opposing_healing_decision`; `tests/unit/test_phase14h_healing.py::test_healing_selection_drift_rejects_before_queue_pop`; `tests/unit/test_phase14h_healing.py::test_multiple_missing_models_use_opposing_revival_decision`; `tests/unit/test_phase17g_necrons_army_rule.py::test_reanimation_revive_choice_uses_necron_player_and_json_safe_records`. |
 | Destroyed-model reaction selection, `select_destruction_reaction`. | `decline_destruction_reaction` for optional reactions, or one eligible source ID option for reactions such as Shoot on Death, Fight on Death, or Deadly Demise. Mandatory reactions omit decline. | Attack sequence model destruction and destruction-chain handling. | `tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection`; `tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice`; `tests/unit/test_phase13b_shooting_declarations.py::test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue`. |
 
+Fight-end generic RuleIR movement, including Corsair Skyreavers' Raid and Run,
+is covered by the existing `select_triggered_movement` row and its `surge_move`
+proposal. The engine derives Fight eligibility, Engagement Range branch, and
+D3+3 limit; accepted physical movement still requires a submitted `PathWitness`.
+Regression coverage lives in
+`tests/unit/test_catalog_rule_runtime_consumers.py::test_catalog_fight_end_triggered_movement_runtime_uses_raid_and_run_rule_ir`.
+
 ## Parameterized
 
 | Decision Description | Decision Options | Phase (or Phases the Decision can be made in) | List of Tests that verify implementation |
