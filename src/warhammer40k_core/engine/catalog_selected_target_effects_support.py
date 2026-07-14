@@ -38,6 +38,9 @@ from warhammer40k_core.engine.catalog_rule_selected_target_classification import
 from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     clause_is_fight_start_selected_target_selection,
     fight_start_selected_target_effect_clauses_after,
+    selected_target_effect_attack_role,
+    selected_target_effect_clause_is_supported,
+    selected_target_effect_weapon_scope,
     selected_target_pair_requires_source_model,
     selected_target_selection_clause_binds_source_model,
 )
@@ -53,7 +56,6 @@ from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
     RuleDurationKind,
-    RuleEffectKind,
     RuleEffectSpec,
     RuleParameterValue,
     RuleTargetKind,
@@ -72,19 +74,13 @@ __all__ = (
     "post_shoot_selected_target_effect_clauses_after",
     "post_shoot_selected_target_pair_is_supported",
     "post_shoot_selection_clause_binds_source_model",
+    "selected_target_effect_attack_role",
+    "selected_target_effect_clause_is_supported",
+    "selected_target_effect_weapon_scope",
 )
 
 _ENGAGEMENT_RANGE_HORIZONTAL_INCHES = 1.0
 _ENGAGEMENT_RANGE_VERTICAL_INCHES = 5.0
-SUPPORTED_SELECTED_EFFECT_KINDS = frozenset(
-    (
-        RuleEffectKind.GRANT_WEAPON_ABILITY,
-        RuleEffectKind.MODIFY_CHARACTERISTIC,
-        RuleEffectKind.MODIFY_DICE_ROLL,
-        RuleEffectKind.REROLL_PERMISSION,
-        RuleEffectKind.SET_CONTEXTUAL_STATUS,
-    )
-)
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
@@ -105,13 +101,7 @@ def selected_effect_clauses_after(
     for clause in clauses[selection_index + 1 :]:
         if clause.template_id == "phase17c:selected-target-constraint":
             break
-        if not clause.effects:
-            continue
-        if clause.duration is None and not (
-            include_immediate_effects and clause_has_immediate_selected_target_effect(clause)
-        ):
-            continue
-        if any(effect.kind in SUPPORTED_SELECTED_EFFECT_KINDS for effect in clause.effects):
+        if selected_target_effect_clause_is_supported(clause):
             selected.append(clause)
     return tuple(selected)
 
@@ -410,13 +400,39 @@ def effect_with_selected_target(
     effect: RuleEffectSpec,
     *,
     selected_target_unit_instance_id: str,
+    clause: RuleClause | None = None,
     normalized_attack_role: str | None = None,
+    normalized_weapon_scope: str | None = None,
 ) -> RuleEffectSpec:
+    if clause is not None:
+        if type(clause) is not RuleClause or effect not in clause.effects:
+            raise GameLifecycleError("Catalog selected-target effect clause is invalid.")
+        if not selected_target_effect_clause_is_supported(clause):
+            raise GameLifecycleError("Catalog selected-target effect clause is unsupported.")
+        if normalized_attack_role is not None or normalized_weapon_scope is not None:
+            raise GameLifecycleError(
+                "Catalog selected-target effect normalization is already clause-derived."
+            )
+        if not clause_has_immediate_selected_target_effect(clause):
+            normalized_attack_role = selected_target_effect_attack_role(
+                clause=clause,
+                effect=effect,
+            )
+            normalized_weapon_scope = selected_target_effect_weapon_scope(
+                clause=clause,
+                effect=effect,
+            )
     if normalized_attack_role is not None and normalized_attack_role not in {
         "attacker",
         "target",
     }:
         raise GameLifecycleError("Catalog selected-target normalized attack role is unsupported.")
+    if normalized_weapon_scope is not None and normalized_weapon_scope not in {
+        "all",
+        "melee",
+        "ranged",
+    }:
+        raise GameLifecycleError("Catalog selected-target normalized weapon scope is unsupported.")
     existing_attack_role = parameter_payload(effect.parameters).get("attack_role")
     if (
         normalized_attack_role is not None
@@ -424,14 +440,24 @@ def effect_with_selected_target(
         and existing_attack_role != normalized_attack_role
     ):
         raise GameLifecycleError("Catalog selected-target attack role conflicts with its clause.")
+    existing_weapon_scope = parameter_payload(effect.parameters).get("weapon_scope")
+    if (
+        normalized_weapon_scope is not None
+        and existing_weapon_scope is not None
+        and existing_weapon_scope != normalized_weapon_scope
+    ):
+        raise GameLifecycleError("Catalog selected-target weapon scope conflicts with its clause.")
     pairs: list[tuple[str, RuleParameterValue]] = [
         (parameter.key, parameter.value)
         for parameter in effect.parameters
         if parameter.key != "selected_target_unit_instance_id"
         and not (normalized_attack_role is not None and parameter.key == "attack_role")
+        and not (normalized_weapon_scope is not None and parameter.key == "weapon_scope")
     ]
     if normalized_attack_role is not None:
         pairs.append(("attack_role", normalized_attack_role))
+    if normalized_weapon_scope is not None:
+        pairs.append(("weapon_scope", normalized_weapon_scope))
     pairs.append(("selected_target_unit_instance_id", selected_target_unit_instance_id))
     return replace(effect, parameters=parameters_from_pairs(tuple(pairs)))
 

@@ -32,9 +32,6 @@ from warhammer40k_core.engine.catalog_selected_target_battle_shock import (
     resolve_selected_target_battle_shock_effect as _resolve_selected_target_battle_shock_effect,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    SUPPORTED_SELECTED_EFFECT_KINDS as _SUPPORTED_SELECTED_EFFECT_KINDS,
-)
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     active_player_id as _active_player_id,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
@@ -84,9 +81,6 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     payload_string_tuple as _payload_string_tuple,
-)
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    post_shoot_selected_target_effect_attack_role as _post_shoot_effect_attack_role,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     post_shoot_selected_target_effect_clauses_after as _post_shoot_effect_clauses_after,
@@ -955,8 +949,6 @@ def _effect_records_for_selected_target(
         if not target_unit_ids:
             continue
         for effect_index, effect in enumerate(clause.effects):
-            if effect.kind not in _SUPPORTED_SELECTED_EFFECT_KINDS:
-                raise GameLifecycleError("Catalog selected-target effect kind is unsupported.")
             immediate_effect_kind = (
                 "force_battle_shock_test"
                 if (clause.duration is None and _is_immediate_battle_shock(effect))
@@ -965,12 +957,7 @@ def _effect_records_for_selected_target(
             transformed_effect = _effect_with_selected_target(
                 effect,
                 selected_target_unit_instance_id=selected_target_id,
-                normalized_attack_role=(
-                    _post_shoot_effect_attack_role(clause=clause, effect=effect)
-                    if hook_id == CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID
-                    and immediate_effect_kind is None
-                    else None
-                ),
+                clause=clause,
             )
             context = RuleExecutionContext(
                 game_id=state.game_id,

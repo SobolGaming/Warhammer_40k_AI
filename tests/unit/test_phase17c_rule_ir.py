@@ -3531,7 +3531,7 @@ def test_phase17c_post_shoot_hit_target_battle_shock_compiles_to_immediate_effec
     )
 
 
-def test_phase17c_rendmaster_blood_throne_compiles_to_visible_selected_target_effect() -> None:
+def test_phase17c_rendmaster_blood_throne_requires_selected_attacker_runtime() -> None:
     rule_ir = _compiled(
         'At the start of the Fight phase, select one enemy unit within 18" of and visible '
         "to this model. Until the end of the phase, each time a friendly Khorne Legiones "
@@ -3593,11 +3593,11 @@ def test_phase17c_rendmaster_blood_throne_compiles_to_visible_selected_target_ef
             "delta": 1,
         },
     )
-    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_consumers_for_rule(
-        rule_ir
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID not in (
+        catalog_rule_ir_consumers_for_rule(rule_ir)
     )
-    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(
-        rule_ir
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID not in (
+        catalog_rule_ir_hook_ids_for_rule(rule_ir)
     )
 
 
@@ -3643,8 +3643,8 @@ def test_phase17c_selected_enemy_attack_wound_debuff_marks_attacker_role() -> No
         "roll_type": "wound",
     }
     assert CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(rule_ir)
-    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(
-        rule_ir
+    assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID not in (
+        catalog_rule_ir_hook_ids_for_rule(rule_ir)
     )
 
 

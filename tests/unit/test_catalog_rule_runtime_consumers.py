@@ -140,6 +140,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     validate_effect_record_tuple,
     validate_identifier_tuple,
 )
+from warhammer40k_core.engine.catalog_selected_target_pair_support import (
+    selected_target_persisting_effect_clause_is_supported,
+)
 from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_runtime import (
     catalog_unit_move_completed_battle_shock_hook_bindings,
 )
@@ -1002,6 +1005,33 @@ def test_catalog_selected_target_support_classifies_selection_and_effect_clauses
             == "attacker"
         )
 
+    this_model_effect = replace(
+        selected_effect,
+        trigger=RuleTrigger(
+            kind=RuleTriggerKind.DICE_ROLL,
+            source_span=_span(),
+            parameters=_parameters(
+                ("actor", "this_model"),
+                ("attack_kind", "melee"),
+                ("target_reference", "selected_unit"),
+                ("timing_window", "attack_sequence.attack"),
+            ),
+        ),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=_span()),
+    )
+    transformed_this_model_effect = effect_with_selected_target(
+        this_model_effect.effects[0],
+        selected_target_unit_instance_id="selected-target",
+        clause=this_model_effect,
+    )
+    assert parameter_payload(transformed_this_model_effect.parameters) == {
+        "attack_role": "attacker",
+        "delta": 1,
+        "roll_type": "attack_sequence.hit",
+        "selected_target_unit_instance_id": "selected-target",
+        "weapon_scope": "melee",
+    }
+
     effect = _effect(
         RuleEffectKind.MODIFY_DICE_ROLL,
         ("roll_type", "attack_sequence.hit"),
@@ -1328,6 +1358,135 @@ def test_catalog_fight_start_rejects_mixed_supported_and_unsupported_effects() -
     )
     assert not has_fight_start_selected_target_records({source_army.player_id: index})
     assert runtime.fight_phase_start_bindings() == ()
+
+
+def test_catalog_fight_start_rejects_malformed_recognized_effect_shapes() -> None:
+    selection_clause = _fight_start_selection_clause()
+    supported_effect_clause = _effect_clause(
+        clause_id="test:selected-target:selection:fight:malformed-effect",
+        duration=_duration("phase"),
+        effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+        roll_type="attack_sequence.hit",
+        delta=1,
+    )
+    invalid_shapes = (
+        (
+            "unexpected-effect-parameter",
+            replace(
+                supported_effect_clause,
+                effects=(
+                    _effect(
+                        RuleEffectKind.MODIFY_DICE_ROLL,
+                        ("roll_type", "attack_sequence.hit"),
+                        ("delta", 1),
+                        ("unsupported_mode", "always"),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "malformed-delta",
+            replace(
+                supported_effect_clause,
+                effects=(
+                    _effect(
+                        RuleEffectKind.MODIFY_DICE_ROLL,
+                        ("roll_type", "attack_sequence.hit"),
+                        ("delta", "1"),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "unsupported-trigger",
+            replace(
+                supported_effect_clause,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.DICE_ROLL,
+                    source_span=_span(),
+                    parameters=_parameters(
+                        ("actor", "this_unit"),
+                        ("target_reference", "selected_unit"),
+                        ("timing_window", "attack_sequence.attack"),
+                        ("unsupported_mode", "always"),
+                    ),
+                ),
+                target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=_span()),
+            ),
+        ),
+        (
+            "unsupported-condition-relationship",
+            replace(
+                supported_effect_clause,
+                conditions=(
+                    _condition(
+                        RuleConditionKind.TARGET_CONSTRAINT,
+                        ("relationship", "source_unit_can_see_selected_unit"),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "unsupported-target-parameters",
+            replace(
+                supported_effect_clause,
+                target=RuleTargetSpec(
+                    kind=RuleTargetKind.SELECTED_TARGET,
+                    source_span=_span(),
+                    parameters=_parameters(("unsupported_scope", "all")),
+                ),
+            ),
+        ),
+        (
+            "incompatible-attack-role",
+            replace(
+                supported_effect_clause,
+                effects=(
+                    _effect(
+                        RuleEffectKind.MODIFY_DICE_ROLL,
+                        ("roll_type", "attack_sequence.hit"),
+                        ("delta", 1),
+                        ("attack_role", "attacker"),
+                    ),
+                ),
+            ),
+        ),
+    )
+    source_army, target_army = _mustered_core_armies()
+    empty_index = AbilityCatalogIndex.from_records(())
+
+    for shape_name, invalid_effect_clause in invalid_shapes:
+        rule_ir = _rule_ir(
+            source_id=f"test:selected-target:fight:{shape_name}",
+            clauses=(selection_clause, invalid_effect_clause),
+        )
+        record = _ability_record(
+            record_id=f"record:selected-target:fight:{shape_name}",
+            rule_ir=rule_ir,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+            runtime_clause_id=selection_clause.clause_id,
+        )
+        index = AbilityCatalogIndex.from_records((record,))
+        runtime = CatalogSelectedTargetEffectRuntime(
+            ability_indexes_by_player_id={
+                source_army.player_id: index,
+                target_army.player_id: empty_index,
+            },
+            armies=(source_army, target_army),
+        )
+
+        assert not selected_target_persisting_effect_clause_is_supported(invalid_effect_clause), (
+            shape_name
+        )
+        assert fight_start_selected_target_effect_clause_ids(rule_ir) == (), shape_name
+        consumer_ids = catalog_rule_ir_consumers_for_rule(rule_ir)
+        hook_ids = catalog_rule_ir_hook_ids_for_rule(rule_ir)
+        assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID not in consumer_ids, shape_name
+        assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID not in hook_ids, shape_name
+        assert not has_fight_start_selected_target_records({source_army.player_id: index}), (
+            shape_name
+        )
+        assert runtime.fight_phase_start_bindings() == (), shape_name
 
 
 def test_catalog_selected_target_support_filters_generic_records_by_timing() -> None:
