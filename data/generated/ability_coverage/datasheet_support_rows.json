@@ -36,7 +36,7 @@
       "corsair-coterie",
       "path-of-the-outcast"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:fight-end-triggered-movement`, `descriptor:movement:deep-strike-placement`, `descriptor:prebattle:scouts`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:fight-end-triggered-movement`, `descriptor:movement:deep-strike-placement`, `descriptor:prebattle:scouts`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only; host limitation: Fight-end triggered movement is exposed only for non-attached physical rules units until grouped triggered movement is supported",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

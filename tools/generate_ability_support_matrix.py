@@ -1966,9 +1966,13 @@ def _datasheet_tests_evidence(ability_rows: tuple[AbilityCoverageRow, ...]) -> s
         )
     )
     if runtime_consumer_ids:
-        return (
-            f"Runtime consumers: {_inline_code_list(runtime_consumer_ids)}; coverage artifact only"
-        )
+        notes = ["coverage artifact only"]
+        if "catalog-ir:fight-end-triggered-movement" in runtime_consumer_ids:
+            notes.append(
+                "host limitation: Fight-end triggered movement is exposed only for "
+                "non-attached physical rules units until grouped triggered movement is supported"
+            )
+        return f"Runtime consumers: {_inline_code_list(runtime_consumer_ids)}; {'; '.join(notes)}"
     return "coverage artifact only"
 
 

@@ -5754,6 +5754,62 @@ def test_catalog_fight_end_triggered_movement_runtime_fails_fast_on_invalid_host
         runtime.next_request(cast(Any, None))
 
 
+def test_catalog_fight_end_triggered_movement_runtime_does_not_expose_attached_units() -> None:
+    source_army, target_army = _mustered_attached_once_per_battle_armies()
+    leader_unit = next(
+        unit for unit in source_army.units if unit.datasheet_id == "core-character-leader"
+    )
+    attached_unit_id = source_army.attached_units[0].attached_unit_instance_id
+    battlefield = create_deterministic_battlefield_scenario(
+        battlefield_id="catalog-fight-end-movement-attached",
+        armies=(source_army, target_army),
+    ).battlefield_state
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    policy = state.runtime_ruleset_descriptor().fight_policy
+    fight_state = FightPhaseState.start(
+        battle_round=state.battle_round,
+        active_player_id=source_army.player_id,
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(attached_unit_id,),
+        fights_first_registry=FightsFirstRegistry(),
+    )
+    state.fight_phase_state = replace(
+        fight_state,
+        fight_order_state=replace(
+            fight_state.fight_order_state,
+            selected_to_fight_unit_ids=(attached_unit_id,),
+        ),
+    ).with_current_step(current_step=FightPhaseStepKind.END, policy=policy)
+    rule_ir_payload = skyreavers_package.datasheet_rule_ir_payload_by_source_row_id("000004196:4")
+    assert rule_ir_payload is not None
+    record = _ability_record(
+        record_id="record:aeldari:skyreavers:raid-and-run:attached",
+        rule_ir=RuleIR.from_payload(rule_ir_payload),
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        datasheet_id=leader_unit.datasheet_id,
+        phase=BattlePhaseKind.FIGHT,
+    )
+    runtime = CatalogFightEndTriggeredMovementRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    decisions = DecisionController()
+
+    assert runtime.bindings() == ()
+    assert (
+        runtime.next_request(FightPhaseEndRequestContext(state=state, decisions=decisions)) is None
+    )
+    assert not decisions.event_log.records
+
+
 def _mustered_core_armies() -> tuple[ArmyDefinition, ArmyDefinition]:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return (

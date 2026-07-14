@@ -71,7 +71,10 @@ class CatalogFightEndTriggeredMovementRuntime:
         object.__setattr__(self, "armies", _validate_armies(self.armies))
 
     def bindings(self) -> tuple[FightPhaseEndHookBinding, ...]:
-        if not _has_supported_records(self.ability_indexes_by_player_id):
+        if not _has_supported_records_for_unattached_units(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+        ):
             return ()
         return (
             FightPhaseEndHookBinding(
@@ -183,6 +186,8 @@ class CatalogFightEndTriggeredMovementRuntime:
                         state=state,
                         unit_instance_id=source_unit.unit_instance_id,
                     )
+                    if rules_unit.is_attached_rules_unit:
+                        continue
                     for clause in catalog_rule_clauses_from_record(record):
                         if not clause_is_fight_end_triggered_movement(clause):
                             continue
@@ -244,13 +249,50 @@ def catalog_fight_end_triggered_movement_hook_bindings(
     ).bindings()
 
 
-def _has_supported_records(indexes: Mapping[str, AbilityCatalogIndex]) -> bool:
-    return any(
-        clause_is_fight_end_triggered_movement(clause)
-        for index in indexes.values()
-        for record in index.records_for(TimingTriggerKind.END_PHASE)
-        if record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID
-        for clause in catalog_rule_clauses_from_record(record)
+def _has_supported_records_for_unattached_units(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> bool:
+    for army in armies:
+        index = ability_indexes_by_player_id.get(army.player_id)
+        if index is None:
+            continue
+        attached_component_unit_ids = _attached_component_unit_ids(army)
+        for source_unit in army.units:
+            if source_unit.unit_instance_id in attached_component_unit_ids:
+                continue
+            current_model_ids = tuple(
+                sorted(
+                    model.model_instance_id for model in source_unit.own_models if model.is_alive
+                )
+            )
+            if not current_model_ids:
+                continue
+            for record in index.records_for(TimingTriggerKind.END_PHASE):
+                if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+                    continue
+                if record.definition.timing.phase is not BattlePhaseKind.FIGHT:
+                    continue
+                if not catalog_rule_record_source_matches_unit(
+                    record=record,
+                    unit=source_unit,
+                    current_model_instance_ids=current_model_ids,
+                ):
+                    continue
+                if any(
+                    clause_is_fight_end_triggered_movement(clause)
+                    for clause in catalog_rule_clauses_from_record(record)
+                ):
+                    return True
+    return False
+
+
+def _attached_component_unit_ids(army: ArmyDefinition) -> frozenset[str]:
+    return frozenset(
+        unit_id
+        for attached_unit in army.attached_units
+        for unit_id in attached_unit.component_unit_instance_ids
     )
 
 
