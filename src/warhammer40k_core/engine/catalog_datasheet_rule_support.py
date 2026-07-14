@@ -4,6 +4,19 @@ from collections.abc import Mapping
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import WeaponProfileError, weapon_keyword_from_token
+from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
+    clause_uses_exact_datasheet_runtime_template,
+    exact_datasheet_runtime_descriptor_for_clause,
+    first_failed_save_damage_replacement_descriptor_for_clause,
+    invulnerable_save_descriptor_for_clause,
+    passive_hit_reroll_descriptor_for_clause,
+)
+from warhammer40k_core.engine.catalog_tracked_target_selection_descriptors import (
+    clause_has_invalid_exact_tracked_target_selection_shape,
+)
+from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
+    clause_has_invalid_exact_tracked_target_weapon_grant_shape,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -33,6 +46,17 @@ CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID = "catalog-ir:passive-hit-reroll"
 CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID = (
     "catalog-ir:first-failed-save-damage-replacement"
 )
+
+
+def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool:
+    return (
+        (
+            clause_uses_exact_datasheet_runtime_template(clause)
+            and exact_datasheet_runtime_descriptor_for_clause(clause) is None
+        )
+        or clause_has_invalid_exact_tracked_target_weapon_grant_shape(clause)
+        or clause_has_invalid_exact_tracked_target_selection_shape(clause)
+    )
 
 
 def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
@@ -157,91 +181,15 @@ def clause_is_passive_characteristic_modifier(clause: RuleClause) -> bool:
 
 
 def clause_is_passive_invulnerable_save_set(clause: RuleClause) -> bool:
-    if (
-        not clause.is_supported
-        or clause.trigger is not None
-        or clause.target is None
-        or clause.target.kind is not RuleTargetKind.THIS_MODEL
-        or clause.duration is not None
-        or clause.conditions
-        or len(clause.effects) != 1
-    ):
-        return False
-    effect = clause.effects[0]
-    if effect.kind is not RuleEffectKind.SET_CHARACTERISTIC:
-        return False
-    parameters = parameter_payload(effect.parameters)
-    value = parameters.get("value")
-    return (
-        parameters.get("characteristic") == Characteristic.INVULNERABLE_SAVE.value
-        and type(value) is int
-        and 2 <= value <= 6
-    )
+    return invulnerable_save_descriptor_for_clause(clause) is not None
 
 
 def clause_is_passive_hit_reroll(clause: RuleClause) -> bool:
-    if (
-        not clause.is_supported
-        or clause.trigger is not None
-        or clause.target is None
-        or clause.target.kind is not RuleTargetKind.THIS_UNIT
-        or clause.duration is not None
-        or clause.conditions
-        or len(clause.effects) != 1
-    ):
-        return False
-    effect = clause.effects[0]
-    if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
-        return False
-    parameters = parameter_payload(effect.parameters)
-    reroll_value = parameters.get("reroll_unmodified_value")
-    objective_upgrade = parameters.get("full_reroll_if_target_within_objective_range")
-    return (
-        parameters.get("roll_type") == "hit"
-        and type(reroll_value) is int
-        and 1 <= reroll_value <= 6
-        and (objective_upgrade is None or type(objective_upgrade) is bool)
-    )
+    return passive_hit_reroll_descriptor_for_clause(clause) is not None
 
 
 def clause_is_first_failed_save_damage_replacement(clause: RuleClause) -> bool:
-    if (
-        not clause.is_supported
-        or clause.trigger is None
-        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
-        or clause.target is None
-        or clause.target.kind is not RuleTargetKind.THIS_UNIT
-        or clause.duration is not None
-        or len(clause.effects) != 1
-        or len(clause.conditions) != 1
-    ):
-        return False
-    trigger = parameter_payload(clause.trigger.parameters)
-    if (
-        trigger.get("roll_type") != "attack_sequence.save"
-        or trigger.get("outcome") != "failed"
-        or trigger.get("timing_window") != "after_failed_saving_throw"
-    ):
-        return False
-    condition = clause.conditions[0]
-    if condition.kind is not RuleConditionKind.FREQUENCY_LIMIT:
-        return False
-    frequency = parameter_payload(condition.parameters)
-    if (
-        frequency.get("scope") != "turn"
-        or frequency.get("max_uses") != 1
-        or frequency.get("activation_kind") != "automatic_first_occurrence"
-        or frequency.get("usage_subject") != "bearers_unit"
-    ):
-        return False
-    effect = clause.effects[0]
-    parameters = parameter_payload(effect.parameters)
-    return (
-        effect.kind is RuleEffectKind.SET_CHARACTERISTIC
-        and parameters.get("characteristic") == Characteristic.DAMAGE.value
-        and parameters.get("attack_role") == "defender"
-        and parameters.get("value") == 0
-    )
+    return first_failed_save_damage_replacement_descriptor_for_clause(clause) is not None
 
 
 def clause_is_conditional_lone_operative(clause: RuleClause) -> bool:

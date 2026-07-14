@@ -29,8 +29,13 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_tracked_target_supported_attack_roll_pairs_for_clause,
     catalog_rule_unit_scoped_generic_records,
 )
+from warhammer40k_core.engine.catalog_tracked_target_selection_descriptors import (
+    START_BATTLE_TRACKED_TARGET_SELECTION_TEMPLATE_ID,
+    tracked_target_selection_descriptor_for_clause,
+)
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id, rules_unit_view_from_armies
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.tracked_targets import (
     TRACKED_TARGET_EXPIRED_EVENT_TYPE,
@@ -307,41 +312,49 @@ def _tracked_target_reselection_request(
     context: UnitDestroyedContext,
     expired_record: TrackedTargetRecord,
 ) -> DecisionRequest | None:
-    army, unit = _army_and_unit_for_unit_id(
+    rules_unit = rules_unit_view_from_armies(
         armies=armies,
         unit_instance_id=expired_record.source_unit_instance_id,
     )
+    army = next(
+        (candidate for candidate in armies if candidate.player_id == rules_unit.owner_player_id),
+        None,
+    )
+    if army is None:
+        raise GameLifecycleError("Tracked-target reselection source army is unknown.")
+    if army.player_id != expired_record.owner_player_id:
+        raise GameLifecycleError("Tracked-target reselection owner drift.")
     index = ability_indexes_by_player_id.get(expired_record.owner_player_id)
     if index is None:
         raise GameLifecycleError("Tracked-target reselection missing player ability index.")
-    current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
-        state=context.state,
-        unit=unit,
-    )
-    if not current_model_ids:
-        return None
-    for record in index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED):
-        if not catalog_rule_record_source_matches_unit(
-            record=record,
+    for component in rules_unit.components:
+        unit = component.unit
+        current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+            state=context.state,
             unit=unit,
-            current_model_instance_ids=current_model_ids,
-        ):
+        )
+        if not current_model_ids:
             continue
-        for clause in catalog_rule_clauses_from_record(record):
-            if not catalog_rule_clause_is_supported_tracked_target_destroyed_reselect(clause):
-                continue
-            request = _reselection_request_for_clause(
-                context=context,
-                expired_record=expired_record,
+        for record in index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED):
+            if not catalog_rule_record_source_matches_unit(
                 record=record,
-                clause=clause,
                 unit=unit,
-                related_records=index.all_records(),
-            )
-            if request is not None:
-                return request
-    if army.player_id != expired_record.owner_player_id:
-        raise GameLifecycleError("Tracked-target reselection owner drift.")
+                current_model_instance_ids=current_model_ids,
+            ):
+                continue
+            for clause in catalog_rule_clauses_from_record(record):
+                if not catalog_rule_clause_is_supported_tracked_target_destroyed_reselect(clause):
+                    continue
+                request = _reselection_request_for_clause(
+                    context=context,
+                    expired_record=expired_record,
+                    record=record,
+                    clause=clause,
+                    unit=unit,
+                    related_records=index.all_records(),
+                )
+                if request is not None:
+                    return request
     return None
 
 
@@ -354,7 +367,11 @@ def _reselection_request_for_clause(
     unit: UnitInstance,
     related_records: tuple[AbilityCatalogRecord, ...],
 ) -> DecisionRequest | None:
-    if unit.unit_instance_id != expired_record.source_unit_instance_id:
+    source_rules_unit_instance_id = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=unit.unit_instance_id,
+    ).unit_instance_id
+    if source_rules_unit_instance_id != expired_record.source_unit_instance_id:
         raise GameLifecycleError("Tracked-target reselection source unit drift.")
     for effect_index, effect in enumerate(clause.effects):
         if effect.kind is not RuleEffectKind.SELECT_TRACKED_TARGET:
@@ -393,6 +410,12 @@ def _build_request_from_effect(
     related_records: tuple[AbilityCatalogRecord, ...],
 ) -> DecisionRequest | None:
     parameters = parameter_payload(effect.parameters)
+    descriptor = tracked_target_selection_descriptor_for_clause(clause)
+    if (
+        clause.template_id == START_BATTLE_TRACKED_TARGET_SELECTION_TEMPLATE_ID
+        and descriptor is None
+    ):
+        raise GameLifecycleError("Tracked-target selection descriptor classification drift.")
     supported_attack_roll_pairs = _supported_attack_roll_pairs_for_selection_effect(
         record=record,
         effect=effect,
@@ -409,12 +432,28 @@ def _build_request_from_effect(
         source_effect_index=effect_index,
         source_unit_instance_id=unit.unit_instance_id,
         source_model_instance_id=source_model_instance_id,
-        owner_scope=TrackedTargetOwnerScope(str(parameters["tracked_target_owner"])),
-        role=TrackedTargetRole(str(parameters["tracked_target_role"])),
+        owner_scope=(
+            descriptor.owner_scope
+            if descriptor is not None
+            else TrackedTargetOwnerScope(str(parameters["tracked_target_owner"]))
+        ),
+        role=(
+            descriptor.role
+            if descriptor is not None
+            else TrackedTargetRole(str(parameters["tracked_target_role"]))
+        ),
         supported_attack_roll_pairs=supported_attack_roll_pairs,
-        target_allegiance=str(parameters["target_allegiance"]),
-        target_scope=str(parameters["target_scope"]),
-        replacement=bool(parameters["replacement"]),
+        target_allegiance=(
+            descriptor.target_allegiance
+            if descriptor is not None
+            else str(parameters["target_allegiance"])
+        ),
+        target_scope=(
+            descriptor.target_scope if descriptor is not None else str(parameters["target_scope"])
+        ),
+        replacement=(
+            descriptor.replacement if descriptor is not None else bool(parameters["replacement"])
+        ),
     )
 
 
@@ -518,18 +557,6 @@ def _tracked_target_source_model_ids(
     if wargear_bearer_ids:
         return wargear_bearer_ids
     return current_model_instance_ids
-
-
-def _army_and_unit_for_unit_id(
-    *,
-    armies: tuple[ArmyDefinition, ...],
-    unit_instance_id: str,
-) -> tuple[ArmyDefinition, UnitInstance]:
-    for army in armies:
-        for unit in army.units:
-            if unit.unit_instance_id == unit_instance_id:
-                return army, unit
-    raise GameLifecycleError("Tracked-target runtime could not find source unit.")
 
 
 def _has_tracked_target_selection_records(

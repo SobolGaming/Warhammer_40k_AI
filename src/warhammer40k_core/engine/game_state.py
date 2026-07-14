@@ -175,6 +175,18 @@ from warhammer40k_core.engine.sticky_objective_control import (
     sticky_objective_control_state_is_expired,
 )
 from warhammer40k_core.engine.stratagems import StratagemUseRecord
+from warhammer40k_core.engine.tracked_target_state import (
+    active_tracked_target_for as _active_tracked_target_for,
+)
+from warhammer40k_core.engine.tracked_target_state import (
+    attached_rules_unit_ids,
+    attached_rules_unit_owner_ids,
+    destroyed_attached_rules_unit_ids,
+    validate_canonical_tracked_target_record,
+)
+from warhammer40k_core.engine.tracked_target_state import (
+    tracked_targets_for_destroyed_unit as _tracked_targets_for_destroyed_unit,
+)
 from warhammer40k_core.engine.tracked_targets import (
     TrackedTargetOwnerScope,
     TrackedTargetRecord,
@@ -2981,6 +2993,10 @@ class GameState:
         )
         if record.owner_player_id not in self.player_ids:
             raise GameLifecycleError("Tracked target owner_player_id is not in this game.")
+        validate_canonical_tracked_target_record(
+            armies=tuple(self.army_definitions),
+            record=record,
+        )
         if record.source_unit_instance_id not in owner_by_unit_id:
             raise GameLifecycleError("Tracked target source unit is unknown.")
         if owner_by_unit_id[record.source_unit_instance_id] != record.owner_player_id:
@@ -3030,29 +3046,15 @@ class GameState:
         owner_scope: TrackedTargetOwnerScope,
         role: TrackedTargetRole,
     ) -> TrackedTargetRecord | None:
-        requested_rule = _validate_identifier("source_rule_id", source_rule_id)
-        requested_unit = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
-        requested_model = _validate_optional_identifier(
-            "source_model_instance_id",
-            source_model_instance_id,
+        return _active_tracked_target_for(
+            armies=tuple(self.army_definitions),
+            records=self.tracked_target_records,
+            source_rule_id=source_rule_id,
+            source_unit_instance_id=source_unit_instance_id,
+            source_model_instance_id=source_model_instance_id,
+            owner_scope=owner_scope,
+            role=role,
         )
-        if type(owner_scope) is not TrackedTargetOwnerScope:
-            raise GameLifecycleError("Tracked target owner_scope must be TrackedTargetOwnerScope.")
-        if type(role) is not TrackedTargetRole:
-            raise GameLifecycleError("Tracked target role must be TrackedTargetRole.")
-        matches = tuple(
-            record
-            for record in self.tracked_target_records
-            if record.active
-            and record.source_rule_id == requested_rule
-            and record.source_unit_instance_id == requested_unit
-            and record.source_model_instance_id == requested_model
-            and record.owner_scope is owner_scope
-            and record.role is role
-        )
-        if len(matches) > 1:
-            raise GameLifecycleError("Tracked target active source key is duplicated.")
-        return matches[0] if matches else None
 
     def expire_tracked_target(self, record_id: str) -> TrackedTargetRecord:
         requested_id = _validate_identifier("record_id", record_id)
@@ -3079,19 +3081,10 @@ class GameState:
         *,
         destroyed_unit_instance_id: str,
     ) -> tuple[TrackedTargetRecord, ...]:
-        requested_unit = _validate_identifier(
-            "destroyed_unit_instance_id",
-            destroyed_unit_instance_id,
-        )
-        return tuple(
-            sorted(
-                (
-                    record
-                    for record in self.tracked_target_records
-                    if record.active and record.target_unit_instance_id == requested_unit
-                ),
-                key=lambda record: record.record_id,
-            )
+        return _tracked_targets_for_destroyed_unit(
+            armies=tuple(self.army_definitions),
+            records=self.tracked_target_records,
+            destroyed_unit_instance_id=destroyed_unit_instance_id,
         )
 
     def record_pending_return_on_death(self, pending: PendingReturnOnDeath) -> None:
@@ -3169,6 +3162,12 @@ class GameState:
                 model_ids = {model.model_instance_id for model in unit.own_models}
                 if model_ids and model_ids <= removed_model_ids:
                     destroyed.add(unit.unit_instance_id)
+        destroyed.update(
+            destroyed_attached_rules_unit_ids(
+                armies=tuple(self.army_definitions),
+                removed_model_ids=removed_model_ids,
+            )
+        )
         return destroyed
 
     def remove_persisting_effects_by_id(
@@ -7072,6 +7071,10 @@ def _validate_tracked_target_records(
             raise GameLifecycleError("TrackedTargetRecord source unit is unknown.")
         if record.target_unit_instance_id not in owner_by_unit_id:
             raise GameLifecycleError("TrackedTargetRecord target unit is unknown.")
+        validate_canonical_tracked_target_record(
+            armies=tuple(army_definitions),
+            record=record,
+        )
         if record.owner_scope is TrackedTargetOwnerScope.THIS_MODEL:
             source_model_ids = _model_ids_for_unit(
                 army_definitions=army_definitions,
@@ -7132,9 +7135,11 @@ def _known_rules_unit_ids(
     army_definitions: list[ArmyDefinition],
     starting_strength_records: list[StartingStrengthRecord],
 ) -> set[str]:
-    return {unit.unit_instance_id for army in army_definitions for unit in army.units} | {
-        record.unit_instance_id for record in starting_strength_records
-    }
+    return (
+        {unit.unit_instance_id for army in army_definitions for unit in army.units}
+        | attached_rules_unit_ids(tuple(army_definitions))
+        | {record.unit_instance_id for record in starting_strength_records}
+    )
 
 
 def _model_ids_for_unit(
@@ -7158,6 +7163,7 @@ def _known_rules_unit_owner_ids(
     owner_ids = {
         unit.unit_instance_id: army.player_id for army in army_definitions for unit in army.units
     }
+    owner_ids.update(attached_rules_unit_owner_ids(tuple(army_definitions)))
     for record in starting_strength_records:
         owner_ids[record.unit_instance_id] = record.player_id
     return owner_ids
@@ -7315,12 +7321,6 @@ def _validate_identifier_tuple(
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
-    if value is None:
-        return None
-    return _validate_identifier(field_name, value)
 
 
 def _validate_descriptor_hash(field_name: str, value: object) -> str:

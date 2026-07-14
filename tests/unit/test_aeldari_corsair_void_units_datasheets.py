@@ -24,6 +24,12 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionEffectKind,
 )
 from warhammer40k_core.core.datasheet_composition import validate_unit_composition_counts
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollResult,
+    DiceRollSpec,
+    DiceRollState,
+)
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.ability_catalog import (
@@ -31,6 +37,10 @@ from warhammer40k_core.engine.ability_catalog import (
     catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.attack_sequence import (
+    _source_backed_hit_permission_for_attack,
+)
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
@@ -49,6 +59,7 @@ from warhammer40k_core.engine.list_validation import (
     WargearSelection,
     resolve_model_profile_selections,
 )
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, SetupStep
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -58,14 +69,20 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
-from warhammer40k_core.engine.tracked_targets import apply_select_tracked_target_decision
+from warhammer40k_core.engine.tracked_targets import (
+    TrackedTargetOwnerScope,
+    TrackedTargetRole,
+    apply_select_tracked_target_decision,
+)
 from warhammer40k_core.engine.unit_factory import UnitFactory
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation_composition import (
     allows_zero_models_from_row,
     composition_min_models_from_row,
 )
 from warhammer40k_core.rules.catalog_generation_errors import CatalogGenerationError
 from warhammer40k_core.rules.data_package import DataPackageId
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_ir import (
     RuleConditionKind,
     RuleEffectKind,
@@ -897,6 +914,288 @@ def test_piratical_raiders_uses_setup_decision_and_target_gated_weapon_grants() 
     assert unchanged == profile
 
 
+def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> None:
+    package = _ability_support_catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    source_selection = _voidscarred_selection(regular_count=4, optional_count=0)
+    source = factory.instantiate_unit(
+        army_id="army-a",
+        datasheet=catalog.datasheet_by_id(VOIDSCARRED_ID),
+        selection=source_selection,
+    )
+    target_selection = _voidreavers_selection(unit_selection_id="target-bodyguard")
+    target = factory.instantiate_unit(
+        army_id="army-b",
+        datasheet=catalog.datasheet_by_id(VOIDREAVERS_ID),
+        selection=target_selection,
+    )
+    unrelated = factory.instantiate_unit(
+        army_id="army-b",
+        datasheet=catalog.datasheet_by_id(VOIDREAVERS_ID),
+        selection=_voidreavers_selection(unit_selection_id="unrelated"),
+    )
+    kharseth = catalog.datasheet_by_id("000004194")
+    kharseth_profile_id = kharseth.model_profiles[0].model_profile_id
+
+    def leader(*, army_id: str, selection_id: str) -> Any:
+        return factory.instantiate_unit(
+            army_id=army_id,
+            datasheet=kharseth,
+            selection=UnitMusterSelection(
+                unit_selection_id=selection_id,
+                datasheet_id=kharseth.datasheet_id,
+                model_profile_selections=(ModelProfileSelection(kharseth_profile_id, 1),),
+            ),
+        )
+
+    source_leader = leader(army_id="army-a", selection_id="source-leader")
+    target_leader = leader(army_id="army-b", selection_id="target-leader")
+    source_attached_id = "attached-unit:army-a:voidscarred-source"
+    target_attached_id = "attached-unit:army-b:voidreavers-target"
+    source_formation = _attached_formation(
+        attached_unit_instance_id=source_attached_id,
+        bodyguard_unit_instance_id=source.unit_instance_id,
+        leader_unit_instance_id=source_leader.unit_instance_id,
+    )
+    target_formation = _attached_formation(
+        attached_unit_instance_id=target_attached_id,
+        bodyguard_unit_instance_id=target.unit_instance_id,
+        leader_unit_instance_id=target_leader.unit_instance_id,
+    )
+    armies = (
+        _army_with_units(
+            catalog=catalog,
+            army_id="army-a",
+            player_id="player-a",
+            units=(source, source_leader),
+            attached_units=(source_formation,),
+        ),
+        _army_with_units(
+            catalog=catalog,
+            army_id="army-b",
+            player_id="player-b",
+            units=(target, target_leader, unrelated),
+            attached_units=(target_formation,),
+        ),
+    )
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    setup_sequence = tuple(descriptor.setup_sequence.steps)
+    setup_state = GameState(
+        game_id="corsair-attached-tracked-target",
+        ruleset_descriptor_hash=descriptor.descriptor_hash,
+        stage=GameLifecycleStage.SETUP,
+        setup_sequence=setup_sequence,
+        battle_phase_sequence=tuple(descriptor.battle_phase_sequence.phases),
+        setup_step_index=setup_sequence.index(SetupStep.DECLARE_BATTLE_FORMATIONS),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        tactical_secondary_draw_count=2,
+    )
+    for army in armies:
+        setup_state.record_army_definition(army)
+    config = GameConfig(
+        game_id=setup_state.game_id,
+        ruleset_descriptor=descriptor,
+        army_catalog=catalog,
+        army_muster_requests=(
+            _muster_request(army=armies[0], selection=source_selection),
+            _muster_request(army=armies[1], selection=target_selection),
+        ),
+        player_ids=setup_state.player_ids,
+        turn_order=setup_state.turn_order,
+        fixed_secondary_mission_ids=("assassination", "bring-it-down"),
+        allow_legacy_non_strict_rosters=True,
+    )
+    decisions = DecisionController()
+    request = CatalogTrackedTargetRuntime(indexes, armies).battle_formation_request(
+        BattleFormationRequestContext(state=setup_state, decisions=decisions, config=config)
+    )
+
+    assert request is not None
+    assert cast(dict[str, Any], request.payload)["source_unit_instance_id"] == source_attached_id
+    assert cast(dict[str, Any], request.payload)["legal_target_unit_ids"] == [
+        unrelated.unit_instance_id,
+        target_attached_id,
+    ]
+    assert tuple(option.option_id for option in request.options) == (
+        unrelated.unit_instance_id,
+        target_attached_id,
+    )
+    tracked_target = apply_select_tracked_target_decision(
+        state=setup_state,
+        request=request,
+        result=DecisionResult.for_request(
+            result_id="attached-piratical-raiders-result",
+            request=request,
+            selected_option_id=target_attached_id,
+        ),
+        decisions_event_log=decisions.event_log,
+    )
+    assert tracked_target.source_unit_instance_id == source_attached_id
+    assert tracked_target.target_unit_instance_id == target_attached_id
+    assert (
+        setup_state.active_tracked_target_for(
+            source_rule_id=tracked_target.source_rule_id,
+            source_unit_instance_id=source.unit_instance_id,
+            source_model_instance_id=None,
+            owner_scope=TrackedTargetOwnerScope.THIS_UNIT,
+            role=TrackedTargetRole.PREY,
+        )
+        == tracked_target
+    )
+    assert setup_state.tracked_targets_for_destroyed_unit(
+        destroyed_unit_instance_id=target_leader.unit_instance_id
+    ) == (tracked_target,)
+
+    battle_state = _battle_state(armies)
+    battle_state.record_tracked_target(tracked_target)
+    profile = next(
+        wargear.weapon_profiles[0]
+        for wargear in catalog.wargear
+        if wargear.wargear_id == f"{VOIDSCARRED_ID}:shuriken-pistol"
+    )
+    attacker = next(
+        model for model in source.own_models if model.model_profile_id == VOIDSCARRED_PROFILE_ID
+    )
+    runtime = CatalogWeaponKeywordGrantRuntime(indexes, armies)
+    context = WeaponProfileModifierContext(
+        state=battle_state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=source_attached_id,
+        attacker_model_instance_id=attacker.model_instance_id,
+        target_unit_instance_id=target_attached_id,
+        weapon_profile=profile,
+    )
+    modified = runtime.weapon_profile_modifier(context)
+
+    assert WeaponKeyword.LETHAL_HITS in modified.keywords
+    assert WeaponKeyword.PRECISION in modified.keywords
+    assert (
+        runtime.weapon_profile_modifier(
+            replace(context, target_unit_instance_id=unrelated.unit_instance_id)
+        )
+        == profile
+    )
+
+
+def test_reavers_of_the_void_full_reroll_checks_all_attached_target_models() -> None:
+    package = _ability_support_catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    source = factory.instantiate_unit(
+        army_id="army-a",
+        datasheet=catalog.datasheet_by_id(VOIDREAVERS_ID),
+        selection=_voidreavers_selection(unit_selection_id="source-reavers"),
+    )
+    target = factory.instantiate_unit(
+        army_id="army-b",
+        datasheet=catalog.datasheet_by_id(VOIDSCARRED_ID),
+        selection=replace(
+            _voidscarred_selection(regular_count=4, optional_count=0),
+            unit_selection_id="target-voidscarred",
+        ),
+    )
+    kharseth = catalog.datasheet_by_id("000004194")
+    target_leader = factory.instantiate_unit(
+        army_id="army-b",
+        datasheet=kharseth,
+        selection=UnitMusterSelection(
+            unit_selection_id="target-leader",
+            datasheet_id=kharseth.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(kharseth.model_profiles[0].model_profile_id, 1),
+            ),
+        ),
+    )
+    target_attached_id = "attached-unit:army-b:objective-target"
+    armies = (
+        _army(catalog=catalog, army_id="army-a", player_id="player-a", unit=source),
+        _army_with_units(
+            catalog=catalog,
+            army_id="army-b",
+            player_id="player-b",
+            units=(target, target_leader),
+            attached_units=(
+                _attached_formation(
+                    attached_unit_instance_id=target_attached_id,
+                    bodyguard_unit_instance_id=target.unit_instance_id,
+                    leader_unit_instance_id=target_leader.unit_instance_id,
+                ),
+            ),
+        ),
+    )
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    state = _battle_state(armies)
+    state.mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    marker = state.mission_setup.objective_markers[0]
+    assert state.battlefield_state is not None
+    leader_placement = state.battlefield_state.unit_placement_by_id(target_leader.unit_instance_id)
+    moved_model = leader_placement.model_placements[0].with_pose(
+        Pose.at(marker.x_inches, marker.y_inches, marker.z_inches)
+    )
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        leader_placement.with_model_placements(
+            (moved_model, *leader_placement.model_placements[1:])
+        )
+    )
+    permission_context = (
+        CatalogDatasheetRuleRuntime(indexes, armies)
+        .attack_reroll_permission_bindings()[0]
+        .handler(
+            AttackRerollPermissionContext(
+                state=state,
+                player_id="player-a",
+                attacking_unit_instance_id=source.unit_instance_id,
+                attacker_model_instance_id=source.own_models[0].model_instance_id,
+                target_unit_instance_id=target_attached_id,
+                source_phase=BattlePhase.SHOOTING,
+                roll_type="attack_sequence.hit",
+                timing_window="attack_sequence.hit",
+            )
+        )
+    )
+    assert permission_context is not None
+    roll_state = DiceRollState.from_result(
+        DiceRollResult.from_values(
+            roll_id="attached-objective-hit-roll",
+            spec=DiceRollSpec(
+                expression=DiceExpression(quantity=1, sides=6),
+                reason="attached objective hit",
+                roll_type="attack_sequence.hit",
+                actor_id="player-a",
+            ),
+            values=(2,),
+            source="fixed",
+        )
+    )
+
+    assert (
+        _source_backed_hit_permission_for_attack(
+            permission_context=permission_context,
+            roll_state=roll_state,
+            state=state,
+            target_unit_instance_id=target_attached_id,
+        )
+        == permission_context.permission
+    )
+
+
 def _rule_ir(source_row_id: str) -> RuleIR:
     payload = void_units_package.datasheet_rule_ir_payload_by_source_row_id(source_row_id)
     assert payload is not None
@@ -996,7 +1295,34 @@ def _voidscarred_selection(
     )
 
 
+def _voidreavers_selection(*, unit_selection_id: str) -> UnitMusterSelection:
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id=VOIDREAVERS_ID,
+        model_profile_selections=(
+            ModelProfileSelection(VOIDREAVER_PROFILE_ID, 4),
+            ModelProfileSelection(VOIDREAVER_FELARCH_PROFILE_ID, 1),
+        ),
+    )
+
+
 def _army(*, catalog: Any, army_id: str, player_id: str, unit: Any) -> ArmyDefinition:
+    return _army_with_units(
+        catalog=catalog,
+        army_id=army_id,
+        player_id=player_id,
+        units=(unit,),
+    )
+
+
+def _army_with_units(
+    *,
+    catalog: Any,
+    army_id: str,
+    player_id: str,
+    units: tuple[Any, ...],
+    attached_units: tuple[AttachedUnitFormation, ...] = (),
+) -> ArmyDefinition:
     return ArmyDefinition(
         army_id=army_id,
         player_id=player_id,
@@ -1007,7 +1333,26 @@ def _army(*, catalog: Any, army_id: str, player_id: str, unit: Any) -> ArmyDefin
             faction_id=catalog.factions[0].faction_id,
             detachment_ids=("void-unit-test-detachment",),
         ),
-        units=(unit,),
+        units=units,
+        attached_units=attached_units,
+    )
+
+
+def _attached_formation(
+    *,
+    attached_unit_instance_id: str,
+    bodyguard_unit_instance_id: str,
+    leader_unit_instance_id: str,
+) -> AttachedUnitFormation:
+    return AttachedUnitFormation(
+        attached_unit_instance_id=attached_unit_instance_id,
+        bodyguard_unit_instance_id=bodyguard_unit_instance_id,
+        leader_unit_instance_ids=(leader_unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard_unit_instance_id, leader_unit_instance_id))
+        ),
+        source_id=f"{attached_unit_instance_id}:source",
+        attachment_source_ids=(f"{attached_unit_instance_id}:eligibility",),
     )
 
 

@@ -63,9 +63,10 @@ from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
     CatalogWeaponKeywordGrant as CatalogWeaponKeywordGrant,
 )
 from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
+    catalog_weapon_grant_source_army_and_unit,
     clause_is_tracked_target_weapon_grant,
     tracked_target_weapon_grant_applies,
-    tracked_target_weapon_grant_from_parameters,
+    tracked_target_weapon_grant_from_clause,
 )
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
@@ -846,9 +847,9 @@ class CatalogWeaponKeywordGrantRuntime:
     def weapon_profile_modifier(self, context: WeaponProfileModifierContext) -> WeaponProfile:
         if type(context) is not WeaponProfileModifierContext:
             raise GameLifecycleError("Catalog weapon keyword grant requires context.")
-        army, unit = _army_and_unit_for_unit_id(
+        army, unit = catalog_weapon_grant_source_army_and_unit(
             armies=self.armies,
-            unit_instance_id=context.attacking_unit_instance_id,
+            context=context,
         )
         index = self.ability_indexes_by_player_id.get(army.player_id)
         if index is None:
@@ -3828,6 +3829,8 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         raise GameLifecycleError("Catalog rule consumer classification requires RuleClause.")
     if _frequency.clause_has_unconsumed_once_per_battle_activation(clause):
         return ()
+    if _datasheet.clause_has_invalid_exact_datasheet_runtime_shape(clause):
+        return ()
     consumer_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
     consumer_ids.update(_datasheet.consumer_ids_for_clause(clause))
     if _frequency.clause_is_runtime_once_per_battle_activation(clause):
@@ -3916,6 +3919,8 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
     hook_ids: set[str] = set()
     for clause in rule_ir.clauses:
         if _frequency.clause_has_unconsumed_once_per_battle_activation(clause):
+            continue
+        if _datasheet.clause_has_invalid_exact_datasheet_runtime_shape(clause):
             continue
         hook_ids.update(_catalog_ir_hook_ids_for_clause(clause))
         for effect in clause.effects:
@@ -4086,6 +4091,8 @@ def catalog_rule_clause_is_supported_first_death_return(clause: RuleClause) -> b
 def _clause_is_supported_tracked_target_selection(clause: RuleClause) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Tracked-target consumer classification requires RuleClause.")
+    if _datasheet.clause_has_invalid_exact_datasheet_runtime_shape(clause):
+        return False
     if not clause.is_supported:
         return False
     if clause.target is None or clause.target.kind not in {
@@ -4979,7 +4986,9 @@ def _keywords_match_any(
 def _clause_targets_weapon_keyword_grant_unit(clause: RuleClause) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
-    if clause.trigger is not None:
+    if clause.trigger is not None or _datasheet.clause_has_invalid_exact_datasheet_runtime_shape(
+        clause
+    ):
         return False
     return _clause_targets_this_unit(clause) or (
         clause.target is not None
@@ -5394,8 +5403,8 @@ def _catalog_weapon_keyword_grant_from_effect(
         keyword=keyword,
         weapon_scope=_weapon_scope_parameter(parameters),
         ability=_weapon_ability_descriptor_for_grant(parameters=parameters, keyword=keyword),
-        tracked_target=tracked_target_weapon_grant_from_parameters(
-            parameters=parameters,
+        tracked_target=tracked_target_weapon_grant_from_clause(
+            clause=clause,
             source_rule_id=record.definition.source_id,
         ),
     )
@@ -6336,19 +6345,6 @@ def _army_for_player(armies: tuple[ArmyDefinition, ...], *, player_id: str) -> A
         if army.player_id == requested_player_id:
             return army
     raise GameLifecycleError("Catalog advance eligibility player army is unknown.")
-
-
-def _army_and_unit_for_unit_id(
-    *,
-    armies: tuple[ArmyDefinition, ...],
-    unit_instance_id: str,
-) -> tuple[ArmyDefinition, UnitInstance]:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in armies:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return army, unit
-    raise GameLifecycleError("Catalog weapon keyword grant unit is unknown.")
 
 
 def _unit_in_army_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance:

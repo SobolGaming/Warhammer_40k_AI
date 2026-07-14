@@ -292,6 +292,15 @@ def build_select_tracked_target_request(
     )
     scope = _owner_scope_from_token(owner_scope)
     tracked_role = _role_from_token(role)
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit)
+    if scope is TrackedTargetOwnerScope.THIS_UNIT:
+        source_unit = source_rules_unit.unit_instance_id
+    else:
+        if source_model is None:
+            raise GameLifecycleError("THIS_MODEL tracked target requires a source model.")
+        source_unit = source_rules_unit.component_unit_id_for_model(source_model)
     attack_roll_pairs = _validate_supported_attack_roll_pairs(supported_attack_roll_pairs)
     attack_kinds = _supported_attack_kinds_for_pairs(attack_roll_pairs)
     roll_types = _supported_roll_types_for_pairs(attack_roll_pairs)
@@ -654,7 +663,9 @@ def _legal_target_unit_ids(
     removed_model_ids = set(
         () if state.battlefield_state is None else state.battlefield_state.removed_model_ids
     )
-    legal: list[str] = []
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    legal: set[str] = set()
     for army in state.army_definitions:
         owner_matches = army.player_id == owner
         if allegiance == "enemy" and owner_matches:
@@ -662,12 +673,13 @@ def _legal_target_unit_ids(
         if allegiance == "friendly" and not owner_matches:
             continue
         for unit in army.units:
-            model_ids = {model.model_instance_id for model in unit.own_models}
-            if model_ids and model_ids <= removed_model_ids:
+            rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id)
+            if not any(
+                model.is_alive and model.model_instance_id not in removed_model_ids
+                for model in rules_unit.own_models
+            ):
                 continue
-            if not any(model.is_alive for model in unit.own_models):
-                continue
-            legal.append(unit.unit_instance_id)
+            legal.add(rules_unit.unit_instance_id)
     return tuple(sorted(legal))
 
 

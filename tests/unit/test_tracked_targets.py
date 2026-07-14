@@ -1594,11 +1594,6 @@ def test_tracked_target_runtime_reselection_defensive_paths() -> None:
         )
         is None
     )
-    with pytest.raises(GameLifecycleError, match="could not find source unit"):
-        catalog_tracked_target_runtime_module._army_and_unit_for_unit_id(  # pyright: ignore[reportPrivateUsage]
-            armies=tuple(state.army_definitions),
-            unit_instance_id="unit:missing",
-        )
 
 
 def test_tracked_target_destroyed_target_expires_and_requests_reselection() -> None:

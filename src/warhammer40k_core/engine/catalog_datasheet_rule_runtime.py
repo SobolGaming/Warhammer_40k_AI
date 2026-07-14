@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import cast
+from typing import TypeVar, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
@@ -26,6 +26,14 @@ from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     CatalogAnyPhaseOncePerBattleRuntime,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
+    CatalogFirstFailedSaveDamageReplacementDescriptor,
+    CatalogInvulnerableSaveDescriptor,
+    CatalogPassiveHitRerollDescriptor,
+    first_failed_save_damage_replacement_descriptor_for_clause,
+    invulnerable_save_descriptor_for_clause,
+    passive_hit_reroll_descriptor_for_clause,
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
     CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
@@ -35,11 +43,8 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     clause_is_conditional_lone_operative,
     clause_is_consolidation_move_distance_modifier,
     clause_is_fight_selected_weapon_ability_choice,
-    clause_is_first_failed_save_damage_replacement,
     clause_is_leading_unit_wound_roll_modifier,
     clause_is_passive_characteristic_modifier,
-    clause_is_passive_hit_reroll,
-    clause_is_passive_invulnerable_save_set,
     clause_is_stealth_aura,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
@@ -131,6 +136,9 @@ class _CatalogClauseSource:
         return f"catalog-ir:datasheet:{self.unit.unit_instance_id}:{self.clause.clause_id}"
 
 
+_DescriptorT = TypeVar("_DescriptorT")
+
+
 @dataclass(frozen=True, slots=True)
 class CatalogDatasheetRuleRuntime:
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
@@ -183,9 +191,11 @@ class CatalogDatasheetRuleRuntime:
             SaveOptionModifierBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
-                handler=self._save_option_handler(source),
+                handler=self._save_option_handler(source, descriptor),
             )
-            for source in self._sources(clause_is_passive_invulnerable_save_set)
+            for source, descriptor in self._described_sources(
+                invulnerable_save_descriptor_for_clause
+            )
         )
 
     def attack_reroll_permission_bindings(
@@ -195,9 +205,11 @@ class CatalogDatasheetRuleRuntime:
             AttackRerollPermissionBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
-                handler=self._attack_reroll_permission_handler(source),
+                handler=self._attack_reroll_permission_handler(source, descriptor),
             )
-            for source in self._sources(clause_is_passive_hit_reroll)
+            for source, descriptor in self._described_sources(
+                passive_hit_reroll_descriptor_for_clause
+            )
         )
 
     def failed_save_damage_replacement_bindings(
@@ -207,9 +219,11 @@ class CatalogDatasheetRuleRuntime:
             FailedSaveDamageReplacementBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
-                handler=self._failed_save_damage_replacement_handler(source),
+                handler=self._failed_save_damage_replacement_handler(source, descriptor),
             )
-            for source in self._sources(clause_is_first_failed_save_damage_replacement)
+            for source, descriptor in self._described_sources(
+                first_failed_save_damage_replacement_descriptor_for_clause
+            )
         )
 
     def weapon_profile_modifier_bindings(self) -> tuple[WeaponProfileModifierBinding, ...]:
@@ -332,6 +346,18 @@ class CatalogDatasheetRuleRuntime:
                     )
         return tuple(sorted(sources, key=lambda source: source.binding_id))
 
+    def _described_sources(
+        self,
+        parser: Callable[[RuleClause], _DescriptorT | None],
+    ) -> tuple[tuple[_CatalogClauseSource, _DescriptorT], ...]:
+        described: list[tuple[_CatalogClauseSource, _DescriptorT]] = []
+        for source in self._sources(lambda clause: parser(clause) is not None):
+            descriptor = parser(source.clause)
+            if descriptor is None:
+                raise GameLifecycleError("Catalog datasheet descriptor classification drift.")
+            described.append((source, descriptor))
+        return tuple(described)
+
     def _unit_characteristic_handler(
         self, source: _CatalogClauseSource
     ) -> Callable[[UnitCharacteristicModifierContext], int]:
@@ -366,7 +392,9 @@ class CatalogDatasheetRuleRuntime:
         return handler
 
     def _save_option_handler(
-        self, source: _CatalogClauseSource
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogInvulnerableSaveDescriptor,
     ) -> Callable[[SaveOptionModifierContext], tuple[SaveOption, ...]]:
         def handler(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
             allocated_model_id = context.allocated_model_instance_id
@@ -381,14 +409,10 @@ class CatalogDatasheetRuleRuntime:
                 source=source,
             ):
                 return context.save_options
-            parameters = parameter_payload(source.clause.effects[0].parameters)
-            value = parameters.get("value")
-            if type(value) is not int or not 2 <= value <= 6:
-                raise GameLifecycleError("Catalog invulnerable save target is invalid.")
             replacement = SaveOption(
                 save_kind=SaveKind.INVULNERABLE,
-                target_number=value,
-                characteristic_target_number=value,
+                target_number=descriptor.target_number,
+                characteristic_target_number=descriptor.target_number,
                 armor_penetration=0,
                 source_rule_ids=(source.rule_ir.source_id,),
             )
@@ -406,6 +430,7 @@ class CatalogDatasheetRuleRuntime:
     def _attack_reroll_permission_handler(
         self,
         source: _CatalogClauseSource,
+        descriptor: CatalogPassiveHitRerollDescriptor,
     ) -> Callable[[AttackRerollPermissionContext], SourceBackedRerollPermissionContext | None]:
         def handler(
             context: AttackRerollPermissionContext,
@@ -421,13 +446,6 @@ class CatalogDatasheetRuleRuntime:
                 )
             ):
                 return None
-            parameters = parameter_payload(source.clause.effects[0].parameters)
-            reroll_value = parameters.get("reroll_unmodified_value")
-            if type(reroll_value) is not int or not 1 <= reroll_value <= 6:
-                raise GameLifecycleError("Catalog passive hit reroll value is invalid.")
-            objective_upgrade = parameters.get("full_reroll_if_target_within_objective_range")
-            if objective_upgrade is not None and type(objective_upgrade) is not bool:
-                raise GameLifecycleError("Catalog passive hit reroll objective gate is invalid.")
             return SourceBackedRerollPermissionContext(
                 permission=RerollPermission(
                     source_id=source.binding_id,
@@ -441,8 +459,10 @@ class CatalogDatasheetRuleRuntime:
                     "source_rule_id": source.rule_ir.source_id,
                     "source_unit_instance_id": source.unit.unit_instance_id,
                     "conditional_hit_reroll": {
-                        "reroll_unmodified_values": [reroll_value],
-                        "full_reroll_if_target_within_objective_range": (objective_upgrade is True),
+                        "reroll_unmodified_values": [descriptor.reroll_unmodified_value],
+                        "full_reroll_if_target_within_objective_range": (
+                            descriptor.full_reroll_if_target_within_objective_range
+                        ),
                     },
                 },
             )
@@ -452,6 +472,7 @@ class CatalogDatasheetRuleRuntime:
     def _failed_save_damage_replacement_handler(
         self,
         source: _CatalogClauseSource,
+        descriptor: CatalogFirstFailedSaveDamageReplacementDescriptor,
     ) -> Callable[[FailedSaveDamageReplacementContext], FailedSaveDamageReplacement | None]:
         def handler(
             context: FailedSaveDamageReplacementContext,
@@ -462,16 +483,10 @@ class CatalogDatasheetRuleRuntime:
                 state=context.state,
             ):
                 return None
-            parameters = parameter_payload(source.clause.effects[0].parameters)
-            replacement_damage = parameters.get("value")
-            if type(replacement_damage) is not int or replacement_damage != 0:
-                raise GameLifecycleError(
-                    "Catalog first-failed-save damage replacement must set damage to zero."
-                )
             return FailedSaveDamageReplacement(
                 source_id=source.binding_id,
                 source_unit_instance_id=source.unit.unit_instance_id,
-                replacement_damage=replacement_damage,
+                replacement_damage=descriptor.replacement_damage,
             )
 
         return handler
