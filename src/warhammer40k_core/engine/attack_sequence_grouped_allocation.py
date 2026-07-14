@@ -39,6 +39,8 @@ __all__ = (
     "_roll_grouped_saves",
 )
 
+FAILED_SAVE_DAMAGE_REPLACED_EVENT_TYPE = "failed_save_damage_replaced"
+
 
 def _continue_grouped_allocation_for_wound_contexts(
     *,
@@ -430,6 +432,48 @@ def _resolve_grouped_damage_from(
             )
             current_pending = pending_for_die.advanced_after_current_die()
             continue
+        if saving_throw is not None:
+            replacement = _unused_failed_save_damage_replacement(
+                state=state,
+                decisions=decisions,
+                runtime_modifiers=runtime_modifiers,
+                attack_sequence=save_attack_sequence,
+                allocated_model_instance_id=current_model_id,
+            )
+            if replacement is not None:
+                if replacement.replacement_damage != 0:
+                    raise GameLifecycleError(
+                        "Failed-save damage replacement must set attack damage to zero."
+                    )
+                decisions.event_log.append(
+                    FAILED_SAVE_DAMAGE_REPLACED_EVENT_TYPE,
+                    {
+                        "game_id": state.game_id,
+                        "battle_round": state.battle_round,
+                        "active_player_id": state.active_player_id,
+                        "phase": save_attack_sequence.source_phase.value,
+                        "source_id": replacement.source_id,
+                        "source_unit_instance_id": replacement.source_unit_instance_id,
+                        "target_unit_instance_id": pool.target_unit_instance_id,
+                        "allocated_model_instance_id": current_model_id,
+                        "attacking_unit_instance_id": (
+                            save_attack_sequence.attacking_unit_instance_id
+                        ),
+                        "attacker_model_instance_id": pool.attacker_model_instance_id,
+                        "attack_context_id": damage_attack_context["attack_context_id"],
+                        "replacement_damage": replacement.replacement_damage,
+                    },
+                )
+                _emit_damage_event(
+                    state=state,
+                    decisions=decisions,
+                    hooks=hooks,
+                    attack_sequence=save_attack_sequence,
+                    damage=None,
+                    saving_throw=saving_throw,
+                )
+                current_pending = pending_for_die.advanced_after_current_die()
+                continue
         damage_value, status = _damage_value(
             state=state,
             decisions=decisions,
@@ -500,6 +544,43 @@ def _resolve_grouped_damage_from(
         current_pending.allocated_model_ids,
         None,
     )
+
+
+def _unused_failed_save_damage_replacement(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    runtime_modifiers: RuntimeModifierRegistry,
+    attack_sequence: AttackSequence,
+    allocated_model_instance_id: str,
+) -> FailedSaveDamageReplacement | None:
+    pool = attack_sequence.current_pool()
+    replacement = runtime_modifiers.failed_save_damage_replacement(
+        FailedSaveDamageReplacementContext(
+            state=state,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            allocated_model_instance_id=allocated_model_instance_id,
+            source_phase=attack_sequence.source_phase,
+        )
+    )
+    if replacement is None:
+        return None
+    for event in decisions.event_log.records:
+        if event.event_type != FAILED_SAVE_DAMAGE_REPLACED_EVENT_TYPE:
+            continue
+        payload = event.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Failed-save damage replacement event must be an object.")
+        if (
+            payload.get("battle_round") == state.battle_round
+            and payload.get("active_player_id") == state.active_player_id
+            and payload.get("source_id") == replacement.source_id
+            and payload.get("source_unit_instance_id") == replacement.source_unit_instance_id
+        ):
+            return None
+    return replacement
 
 
 def _alive_allocated_model_ids(

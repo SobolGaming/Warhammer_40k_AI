@@ -268,14 +268,15 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:fight-selected-weapon-ability-choice` | Harbinger of Death |
 | `catalog-ir:first-death-return` | No current generated rows |
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
+| `catalog-ir:first-failed-save-damage-replacement` | Channeller Stones |
 | `catalog-ir:force-desperate-escape` | Bane of Cowards |
 | `catalog-ir:fortification-cover` | No current generated rows |
 | `catalog-ir:fortification-desperate-escape` | No current generated rows |
 | `catalog-ir:fortification-target-permission` | No current generated rows |
 | `catalog-ir:hit-roll-modifier` | Revel in Desecration |
-| `catalog-ir:hit-roll-reroll` | Shadow Lord (Aura, Psychic) |
+| `catalog-ir:hit-roll-reroll` | Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
-| `catalog-ir:invulnerable-save-characteristic-query` | No current generated rows |
+| `catalog-ir:invulnerable-save-characteristic-query` | Mistshield |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon |
@@ -287,6 +288,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
 | `catalog-ir:once-per-battle-ability` | Malefic Destruction<br>Unholy Vigour |
+| `catalog-ir:passive-hit-reroll` | Reavers of the Void |
 | `catalog-ir:post-shoot-hit-target-effect` | Fury of the Void (Psychic) |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
@@ -306,10 +308,10 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:toughness-characteristic-query` | No current generated rows |
 | `catalog-ir:tracked-target-destroyed-reselect` | No current generated rows |
 | `catalog-ir:tracked-target-reroll` | No current generated rows |
-| `catalog-ir:tracked-target-selection` | No current generated rows |
+| `catalog-ir:tracked-target-selection` | Piratical Raiders |
 | `catalog-ir:unit-move-completed-battle-shock` | No current generated rows |
 | `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede |
-| `catalog-ir:weapon-keyword-grant` | Harbinger of Death |
+| `catalog-ir:weapon-keyword-grant` | Faolchú<br>Harbinger of Death<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:c'tan-power` | No current generated rows |
@@ -320,14 +322,14 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-keyword-grant:hazardous` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:heavy` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:hunter` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:ignores-cover` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:ignores-cover` | Faolchú |
 | `catalog-ir:weapon-keyword-grant:indirect-fire` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:lance` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:lethal-hits` | Harbinger of Death |
+| `catalog-ir:weapon-keyword-grant:lethal-hits` | Harbinger of Death<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:melta` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:one-shot` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:pistol` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:precision` | Harbinger of Death |
+| `catalog-ir:weapon-keyword-grant:precision` | Harbinger of Death<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:psychic` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:rapid-fire` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:sustained-hits` | Harbinger of Death |

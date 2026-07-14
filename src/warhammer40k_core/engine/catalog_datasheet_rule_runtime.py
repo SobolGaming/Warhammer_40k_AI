@@ -6,6 +6,10 @@ from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.dice import (
+    RerollComponentSelectionPolicy,
+    RerollPermission,
+)
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
@@ -15,6 +19,7 @@ from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
+    AbilitySourceKind,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
@@ -30,13 +35,17 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     clause_is_conditional_lone_operative,
     clause_is_consolidation_move_distance_modifier,
     clause_is_fight_selected_weapon_ability_choice,
+    clause_is_first_failed_save_damage_replacement,
     clause_is_leading_unit_wound_roll_modifier,
     clause_is_passive_characteristic_modifier,
+    clause_is_passive_hit_reroll,
+    clause_is_passive_invulnerable_save_set,
     clause_is_stealth_aura,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
+    catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_record_source_matches_unit,
 )
 from warhammer40k_core.engine.faction_content.events import (
@@ -68,10 +77,17 @@ from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
+    AttackRerollPermissionBinding,
+    AttackRerollPermissionContext,
+    FailedSaveDamageReplacement,
+    FailedSaveDamageReplacementBinding,
+    FailedSaveDamageReplacementContext,
     HitRollModifierBinding,
     HitRollModifierContext,
     MovementBudgetModifierBinding,
     MovementBudgetModifierContext,
+    SaveOptionModifierBinding,
+    SaveOptionModifierContext,
     UnitCharacteristicModifierBinding,
     UnitCharacteristicModifierContext,
     WeaponProfileModifierBinding,
@@ -79,8 +95,12 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WoundRollModifierBinding,
     WoundRollModifierContext,
 )
+from warhammer40k_core.engine.saves import SaveKind, SaveOption
 from warhammer40k_core.engine.shooting_selection_range import (
     target_within_shooting_selection_range,
+)
+from warhammer40k_core.engine.source_backed_rerolls import (
+    SourceBackedRerollPermissionContext,
 )
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
@@ -156,6 +176,40 @@ class CatalogDatasheetRuleRuntime:
             )
             for source in self._sources(clause_is_passive_characteristic_modifier)
             if _source_characteristic(source) is Characteristic.MOVEMENT
+        )
+
+    def save_option_modifier_bindings(self) -> tuple[SaveOptionModifierBinding, ...]:
+        return tuple(
+            SaveOptionModifierBinding(
+                modifier_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                handler=self._save_option_handler(source),
+            )
+            for source in self._sources(clause_is_passive_invulnerable_save_set)
+        )
+
+    def attack_reroll_permission_bindings(
+        self,
+    ) -> tuple[AttackRerollPermissionBinding, ...]:
+        return tuple(
+            AttackRerollPermissionBinding(
+                modifier_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                handler=self._attack_reroll_permission_handler(source),
+            )
+            for source in self._sources(clause_is_passive_hit_reroll)
+        )
+
+    def failed_save_damage_replacement_bindings(
+        self,
+    ) -> tuple[FailedSaveDamageReplacementBinding, ...]:
+        return tuple(
+            FailedSaveDamageReplacementBinding(
+                modifier_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                handler=self._failed_save_damage_replacement_handler(source),
+            )
+            for source in self._sources(clause_is_first_failed_save_damage_replacement)
         )
 
     def weapon_profile_modifier_bindings(self) -> tuple[WeaponProfileModifierBinding, ...]:
@@ -308,6 +362,117 @@ class CatalogDatasheetRuleRuntime:
             ) or not _source_keyword_gate_applies(source):
                 return context.current_movement_inches
             return context.current_movement_inches + float(_source_characteristic_delta(source)[1])
+
+        return handler
+
+    def _save_option_handler(
+        self, source: _CatalogClauseSource
+    ) -> Callable[[SaveOptionModifierContext], tuple[SaveOption, ...]]:
+        def handler(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
+            allocated_model_id = context.allocated_model_instance_id
+            if allocated_model_id is None or not _source_applies_to_rules_unit(
+                source=source,
+                context_unit_id=context.target_unit_instance_id,
+                state=context.state,
+            ):
+                return context.save_options
+            if allocated_model_id not in _current_source_model_ids(
+                state=context.state,
+                source=source,
+            ):
+                return context.save_options
+            parameters = parameter_payload(source.clause.effects[0].parameters)
+            value = parameters.get("value")
+            if type(value) is not int or not 2 <= value <= 6:
+                raise GameLifecycleError("Catalog invulnerable save target is invalid.")
+            replacement = SaveOption(
+                save_kind=SaveKind.INVULNERABLE,
+                target_number=value,
+                characteristic_target_number=value,
+                armor_penetration=0,
+                source_rule_ids=(source.rule_ir.source_id,),
+            )
+            return (
+                *tuple(
+                    option
+                    for option in context.save_options
+                    if option.save_kind is not SaveKind.INVULNERABLE
+                ),
+                replacement,
+            )
+
+        return handler
+
+    def _attack_reroll_permission_handler(
+        self,
+        source: _CatalogClauseSource,
+    ) -> Callable[[AttackRerollPermissionContext], SourceBackedRerollPermissionContext | None]:
+        def handler(
+            context: AttackRerollPermissionContext,
+        ) -> SourceBackedRerollPermissionContext | None:
+            if (
+                context.player_id != source.player_id
+                or context.roll_type != "attack_sequence.hit"
+                or context.timing_window != "attack_sequence.hit"
+                or not _source_applies_to_rules_unit(
+                    source=source,
+                    context_unit_id=context.attacking_unit_instance_id,
+                    state=context.state,
+                )
+            ):
+                return None
+            parameters = parameter_payload(source.clause.effects[0].parameters)
+            reroll_value = parameters.get("reroll_unmodified_value")
+            if type(reroll_value) is not int or not 1 <= reroll_value <= 6:
+                raise GameLifecycleError("Catalog passive hit reroll value is invalid.")
+            objective_upgrade = parameters.get("full_reroll_if_target_within_objective_range")
+            if objective_upgrade is not None and type(objective_upgrade) is not bool:
+                raise GameLifecycleError("Catalog passive hit reroll objective gate is invalid.")
+            return SourceBackedRerollPermissionContext(
+                permission=RerollPermission(
+                    source_id=source.binding_id,
+                    timing_window=context.timing_window,
+                    owning_player_id=context.player_id,
+                    eligible_roll_type=context.roll_type,
+                    component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+                ),
+                source_payload={
+                    "catalog_record_id": source.record.record_id,
+                    "source_rule_id": source.rule_ir.source_id,
+                    "source_unit_instance_id": source.unit.unit_instance_id,
+                    "conditional_hit_reroll": {
+                        "reroll_unmodified_values": [reroll_value],
+                        "full_reroll_if_target_within_objective_range": (objective_upgrade is True),
+                    },
+                },
+            )
+
+        return handler
+
+    def _failed_save_damage_replacement_handler(
+        self,
+        source: _CatalogClauseSource,
+    ) -> Callable[[FailedSaveDamageReplacementContext], FailedSaveDamageReplacement | None]:
+        def handler(
+            context: FailedSaveDamageReplacementContext,
+        ) -> FailedSaveDamageReplacement | None:
+            if not _source_applies_to_rules_unit(
+                source=source,
+                context_unit_id=context.target_unit_instance_id,
+                state=context.state,
+            ):
+                return None
+            parameters = parameter_payload(source.clause.effects[0].parameters)
+            replacement_damage = parameters.get("value")
+            if type(replacement_damage) is not int or replacement_damage != 0:
+                raise GameLifecycleError(
+                    "Catalog first-failed-save damage replacement must set damage to zero."
+                )
+            return FailedSaveDamageReplacement(
+                source_id=source.binding_id,
+                source_unit_instance_id=source.unit.unit_instance_id,
+                replacement_damage=replacement_damage,
+            )
 
         return handler
 
@@ -651,9 +816,16 @@ def _current_source_model_ids(*, state: object, source: _CatalogClauseSource) ->
 
     if type(state) is not GameState:
         raise GameLifecycleError("Catalog datasheet source query requires GameState.")
-    return catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+    current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
         state=state,
         unit=source.unit,
+    )
+    if source.record.source_kind is not AbilitySourceKind.WARGEAR:
+        return current_model_ids
+    return catalog_rule_record_current_wargear_bearer_model_ids(
+        record=source.record,
+        unit=source.unit,
+        current_model_instance_ids=current_model_ids,
     )
 
 

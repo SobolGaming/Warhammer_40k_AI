@@ -59,6 +59,14 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
+    CatalogWeaponKeywordGrant as CatalogWeaponKeywordGrant,
+)
+from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
+    clause_is_tracked_target_weapon_grant,
+    tracked_target_weapon_grant_applies,
+    tracked_target_weapon_grant_from_parameters,
+)
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
@@ -502,25 +510,6 @@ class CatalogFallBackEligibilityRuntime:
 
 
 @dataclass(frozen=True, slots=True)
-class CatalogWeaponKeywordGrant:
-    source_id: str
-    keyword: WeaponKeyword
-    weapon_scope: str
-    ability: AbilityDescriptor | None = None
-
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
-        object.__setattr__(self, "keyword", _weapon_keyword_from_value(self.keyword))
-        object.__setattr__(
-            self,
-            "weapon_scope",
-            _weapon_scope_from_token(self.weapon_scope),
-        )
-        if self.ability is not None and type(self.ability) is not AbilityDescriptor:
-            raise GameLifecycleError("Catalog weapon keyword grant ability must be a descriptor.")
-
-
-@dataclass(frozen=True, slots=True)
 class CatalogNamedWeaponAbilityChoiceOption:
     option_id: str
     selection_option_id: str
@@ -872,6 +861,8 @@ class CatalogWeaponKeywordGrantRuntime:
         )
         profile = context.weapon_profile
         for grant in grants:
+            if not tracked_target_weapon_grant_applies(context=context, grant=grant):
+                continue
             if not _weapon_scope_matches_profile(
                 weapon_scope=grant.weapon_scope,
                 profile=profile,
@@ -4226,6 +4217,13 @@ def _tracked_target_supported_attack_roll_pairs_for_clause(
 ) -> tuple[tuple[str, str], ...]:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Tracked-target attack-roll pair derivation requires RuleClause.")
+    if clause_is_tracked_target_weapon_grant(clause):
+        weapon_scope = _weapon_scope_parameter(parameter_payload(clause.effects[0].parameters))
+        return tuple(
+            (attack_kind, "attack_sequence.hit")
+            for attack_kind in ("melee", "ranged")
+            if weapon_scope in {"all", attack_kind}
+        )
     if not _clause_is_supported_tracked_target_reroll(clause):
         return ()
     trigger = clause.trigger
@@ -5396,6 +5394,10 @@ def _catalog_weapon_keyword_grant_from_effect(
         keyword=keyword,
         weapon_scope=_weapon_scope_parameter(parameters),
         ability=_weapon_ability_descriptor_for_grant(parameters=parameters, keyword=keyword),
+        tracked_target=tracked_target_weapon_grant_from_parameters(
+            parameters=parameters,
+            source_rule_id=record.definition.source_id,
+        ),
     )
 
 

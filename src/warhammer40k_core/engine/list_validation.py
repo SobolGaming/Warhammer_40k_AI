@@ -914,14 +914,22 @@ def resolve_model_profile_selections(
     _validate_unique_model_profile_selections(selections)
     composition_by_profile = {part.model_profile_id: part for part in datasheet.composition}
     selection_by_profile = {selection.model_profile_id: selection for selection in selections}
-    if set(selection_by_profile) != set(composition_by_profile):
+    if not set(selection_by_profile).issubset(composition_by_profile) or any(
+        part.min_models > 0 and part.model_profile_id not in selection_by_profile
+        for part in datasheet.composition
+    ):
         raise ListValidationError(
-            "UnitMusterSelection model_profile_selections must match datasheet composition."
+            "UnitMusterSelection model_profile_selections must match required composition."
         )
     for model_profile_id, selection in selection_by_profile.items():
         composition = composition_by_profile[model_profile_id]
         _validate_model_count_against_composition(selection, composition)
         datasheet.model_profile_by_id(model_profile_id)
+    total_models = sum(selection.model_count for selection in selections)
+    if total_models < 1:
+        raise ListValidationError("UnitMusterSelection must include at least one model.")
+    if datasheet.max_unit_models is not None and total_models > datasheet.max_unit_models:
+        raise ListValidationError("UnitMusterSelection exceeds the datasheet unit-size maximum.")
     return tuple(sorted(selections, key=lambda selection: selection.model_profile_id))
 
 
@@ -1197,6 +1205,12 @@ def _validate_wargear_option_semantics(
                 raise ListValidationError(
                     "WargearSelection violates a structured wargear option condition."
                 )
+            if condition.kind is WargearOptionConditionKind.MODEL_EQUIPPED_WITH and not set(
+                condition.wargear_ids
+            ).issubset(other_selected_for_profile):
+                raise ListValidationError(
+                    "WargearSelection violates a structured wargear option condition."
+                )
         for effect in option.effects:
             if effect.kind is WargearOptionEffectKind.ADD_WARGEAR:
                 _validate_add_wargear_effect_count(selection=selection, effect=effect)
@@ -1205,7 +1219,10 @@ def _validate_wargear_option_semantics(
                     selection=selection,
                     effect=effect,
                 )
-            elif effect.kind is WargearOptionEffectKind.REPLACE_WARGEAR:
+            elif effect.kind in {
+                WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED,
+                WargearOptionEffectKind.REPLACE_WARGEAR,
+            }:
                 validate_replace_wargear_effect_count(
                     selection_wargear_ids=selection.wargear_ids,
                     effect=effect,

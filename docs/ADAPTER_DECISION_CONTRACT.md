@@ -1582,9 +1582,11 @@ Required Phase 16E adapter-contract tests:
 
 Catalog tracked-target RuleIR uses the finite decision type `select_tracked_target`.
 The engine emits this request for supported prey/quarry target-selection clauses
-at battle-round start and for supported destroyed-target replacement clauses
-when the active tracked target is destroyed. Adapters answer only by selecting
-one pending option ID; the option ID is exactly the target unit instance ID.
+at the `DECLARE_BATTLE_FORMATIONS` setup step for start-of-battle clauses, at
+battle-round start for round-start clauses, and for supported destroyed-target
+replacement clauses when the active tracked target is destroyed. Adapters answer
+only by selecting one pending option ID; the option ID is exactly the target unit
+instance ID.
 
 The request and option payloads include `submission_kind: "select_tracked_target"`,
 source rule/ability/clause/effect identity, `owner_scope` (`this_model` or

@@ -74,6 +74,8 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
     WeaponProfileError,
 )
+from warhammer40k_core.rules import catalog_generation_composition
+from warhammer40k_core.rules.catalog_generation_errors import CatalogGenerationError
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRError, RuleIRPayload
@@ -83,11 +85,7 @@ from warhammer40k_core.rules.source_patch import PatchedSourceArtifact
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow, WahapediaJsonArtifact
 from warhammer40k_core.rules.weapon_profile_names import WEAPON_PROFILE_SUFFIX_RE
 
-
-class CatalogGenerationError(ValueError):
-    """Raised when Phase 17B catalog generation violates strict source invariants."""
-
-
+__all__ = ["CatalogGenerationError"]
 SourceArtifact = WahapediaJsonArtifact | PatchedSourceArtifact | OverlaySourceArtifact
 
 _BASE_SIZE_BLOCKERS = frozenset(
@@ -290,6 +288,7 @@ def _datasheet_from_row(
         ),
         model_profiles=model_profiles,
         composition=composition,
+        max_unit_models=_optional_positive_int(row=row, column_name="max_unit_models"),
         wargear_options=(
             *tuple(
                 option
@@ -361,8 +360,9 @@ def _model_profile_from_row(
 def _composition_from_model_row(row: NormalizedSourceRow) -> UnitCompositionDefinition:
     return UnitCompositionDefinition(
         model_profile_id=_required_field(row=row, column_name="model_profile_id"),
-        min_models=_required_positive_int(row=row, column_name="min_models"),
+        min_models=catalog_generation_composition.composition_min_models_from_row(row),
         max_models=_required_positive_int(row=row, column_name="max_models"),
+        allows_zero_models=catalog_generation_composition.allows_zero_models_from_row(row),
     )
 
 
@@ -686,7 +686,11 @@ def _wargear_option_effects_from_row(
             kind=parsed_kind,
             wargear_id=_required_field(row=row, column_name="effect_wargear_id"),
             model_count=_required_positive_int(row=row, column_name="effect_model_count"),
-            wargear_count=_required_positive_int(row=row, column_name="effect_wargear_count"),
+            wargear_count=(
+                _required_non_negative_int
+                if parsed_kind is WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED
+                else _required_positive_int
+            )(row=row, column_name="effect_wargear_count"),
             replaced_wargear_id=_optional_field(row=row, column_name="effect_replaced_wargear_id"),
         ),
     )

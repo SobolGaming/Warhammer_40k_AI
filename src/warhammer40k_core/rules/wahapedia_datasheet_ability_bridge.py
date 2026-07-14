@@ -154,11 +154,7 @@ def _bridge_ability(
         if mustering_value is not None:
             rule_ir_payload = {MUSTERING_WARLORD_RULE_KEY: mustering_value}
         else:
-            static_payload = (
-                payload_by_source_row_id(resolved_row.source_row_id)
-                if source_kind is CatalogAbilitySourceKind.DATASHEET
-                else None
-            )
+            static_payload = payload_by_source_row_id(resolved_row.source_row_id)
             if static_payload is not None:
                 rule_ir_payload = cast(CatalogJsonObject, static_payload)
                 support = CatalogAbilitySupport.GENERIC_RULE_IR

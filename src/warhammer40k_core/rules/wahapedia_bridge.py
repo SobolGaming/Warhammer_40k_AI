@@ -64,12 +64,11 @@ from warhammer40k_core.rules.wahapedia_bridge_patterns import (
     DAMAGED_RANGE_RE,
     DAMAGED_SHOOTING_WEAPON_SELECTION_LIMIT_RE,
     FACTION_ARMY_RULE_ABILITY_IDS_BY_FACTION_ID,
-    LOADOUT_ITEM_COUNT_RE,
-    LOADOUT_RE,
     OPTION_RE,
     REPLACEMENT_WITH_CHOICES_RE,
     REPLACEMENT_WITH_REQUIRED_CHOICES_RE,
     SINGLE_REPLACEMENT_RE,
+    UNIT_COMPOSITION_MAX_MODELS_RE,
     UNIT_COMPOSITION_PART_RE,
     UNIT_COMPOSITION_SEPARATOR_RE,
 )
@@ -79,6 +78,10 @@ from warhammer40k_core.rules.wahapedia_bridge_rows import (
     resolve_bridge_ability_source_row,
 )
 from warhammer40k_core.rules.wahapedia_equipment_choice_bridge import append_choice_rows
+from warhammer40k_core.rules.wahapedia_loadout_bridge import (
+    LoadoutAssignments,
+    parse_loadout_assignments,
+)
 from warhammer40k_core.rules.wahapedia_replacement_option_bridge import (
     append_extended_replacement_rows,
     replacement_choices,
@@ -89,6 +92,14 @@ from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaJsonArtifact,
 )
 from warhammer40k_core.rules.wahapedia_static_rule_ir import compact_json, payload_by_source_row_id
+from warhammer40k_core.rules.wahapedia_unit_composition_bridge import (
+    composition_count_range,
+    composition_max_unit_models,
+    optional_int_text,
+)
+from warhammer40k_core.rules.wahapedia_unit_wargear_option_bridge import (
+    append_unit_wargear_option_rows,
+)
 from warhammer40k_core.rules.weapon_profile_names import WEAPON_PROFILE_SUFFIX_RE
 
 
@@ -224,6 +235,12 @@ def _bridge_datasheet(
         )
     model_source_row = model_source_rows[0]
     composition_entries = _composition_entries(context=context, datasheet_id=datasheet_id)
+    loadout_assignments = parse_loadout_assignments(
+        loadout=_normalized_or_field(datasheet_row, "loadout"),
+        model_profile_by_name=_model_profiles_by_name(composition_entries),
+        all_model_profile_ids=tuple(entry.model_profile_id for entry in composition_entries),
+        error_type=WahapediaBridgeError,
+    )
     cost_rows = _rows_matching(
         context.rows_by_table, "Datasheets_models_cost", "datasheet_id", datasheet_id
     )
@@ -274,6 +291,9 @@ def _bridge_datasheet(
                 composition_entries=composition_entries,
                 source_id=datasheet_row.stable_source_id(),
             ),
+            "max_unit_models": optional_int_text(
+                _composition_max_unit_models(context=context, datasheet_id=datasheet_id)
+            ),
             "source_ids": _joined(_source_ids(datasheet_row, *keyword_source_ids)),
         }
     )
@@ -308,6 +328,7 @@ def _bridge_datasheet(
                 "bs": "-",
                 "min_models": str(entry.min_models),
                 "max_models": str(entry.max_models),
+                "allows_zero_models": "true" if entry.min_models == 0 else "",
                 "base_size": base_size.base_size_text,
                 "base_size_source_id": base_size.source_id,
                 "base_size_document_reference": base_size.document_reference,
@@ -339,14 +360,14 @@ def _bridge_datasheet(
         context=context,
         datasheet_id=datasheet_id,
         composition_entries=composition_entries,
-        default_wargear_name_keys=_loadout_wargear_name_keys(
-            _normalized_or_field(datasheet_row, "loadout")
-        ),
+        loadout_assignments=loadout_assignments,
         bridged_rows=bridged_rows,
     )
     _bridge_abilities(
         context=context,
         datasheet_id=datasheet_id,
+        composition_entries=composition_entries,
+        loadout_assignments=loadout_assignments,
         wargear_ids_by_name=wargear_ids_by_name,
         bridged_rows=bridged_rows,
     )
@@ -416,13 +437,18 @@ def _composition_parts_from_row(row: NormalizedSourceRow) -> tuple[_CompositionP
     description = _required_field(row, "description").strip()
     if description.casefold() == "or:":
         return ()
+    if UNIT_COMPOSITION_MAX_MODELS_RE.fullmatch(description) is not None:
+        return ()
     parts: list[_CompositionPart] = []
     position = 0
     for match in UNIT_COMPOSITION_PART_RE.finditer(description):
         separator = description[position : match.start()]
         if separator and UNIT_COMPOSITION_SEPARATOR_RE.fullmatch(separator) is None:
             raise WahapediaBridgeError("Unsupported unit composition row shape.")
-        minimum, maximum = _composition_count_range(match.group("count"))
+        minimum, maximum = composition_count_range(
+            match.group("count"),
+            error_type=WahapediaBridgeError,
+        )
         parts.append(
             _CompositionPart(
                 model_name=match.group("name").strip(),
@@ -437,16 +463,16 @@ def _composition_parts_from_row(row: NormalizedSourceRow) -> tuple[_CompositionP
     return tuple(parts)
 
 
-def _composition_count_range(count_text: str) -> tuple[int, int]:
-    if "-" not in count_text:
-        count = _int_from_text(count_text)
-        return count, count
-    minimum_text, maximum_text = count_text.split("-", maxsplit=1)
-    minimum = _int_from_text(minimum_text)
-    maximum = _int_from_text(maximum_text)
-    if maximum < minimum:
-        raise WahapediaBridgeError("Unit composition maximum must be at least its minimum.")
-    return minimum, maximum
+def _composition_max_unit_models(*, context: _BridgeContext, datasheet_id: str) -> int | None:
+    return composition_max_unit_models(
+        rows=_rows_matching(
+            context.rows_by_table,
+            "Datasheets_unit_composition",
+            "datasheet_id",
+            datasheet_id,
+        ),
+        error_type=WahapediaBridgeError,
+    )
 
 
 def _base_size_evidence(
@@ -643,7 +669,7 @@ def _bridge_wargear(
     context: _BridgeContext,
     datasheet_id: str,
     composition_entries: tuple[_CompositionEntry, ...],
-    default_wargear_name_keys: frozenset[str] | None,
+    loadout_assignments: LoadoutAssignments | None,
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> dict[str, str]:
     wargear_ids_by_name: dict[str, str] = {}
@@ -656,7 +682,12 @@ def _bridge_wargear(
     for row in _rows_matching(
         context.rows_by_table, "Datasheets_wargear", "datasheet_id", datasheet_id
     ):
-        name = _required_wargear_name(row=row, default_wargear_name_keys=default_wargear_name_keys)
+        name = _required_wargear_name(
+            row=row,
+            default_wargear_name_keys=(
+                None if loadout_assignments is None else loadout_assignments.wargear_name_keys()
+            ),
+        )
         if name is None:
             continue
         base_name = _base_wargear_name(name)
@@ -664,12 +695,13 @@ def _bridge_wargear(
         wargear_id = f"{datasheet_id}:{_slug(base_name)}"
         wargear_ids_by_name[_name_key(base_name)] = wargear_id
         wargear_ids_by_name[_name_key(name)] = wargear_id
-        is_default_loadout = (
-            _is_default_loadout_wargear(
-                base_name=base_name,
-                default_wargear_name_keys=default_wargear_name_keys,
-            )
-            and wargear_id not in emitted_default_wargear_ids
+        default_model_profile_ids = (
+            model_profile_ids
+            if loadout_assignments is None
+            else loadout_assignments.profile_ids_for(base_name)
+        )
+        is_default_loadout = bool(default_model_profile_ids) and (
+            wargear_id not in emitted_default_wargear_ids
         )
         if is_default_loadout:
             emitted_default_wargear_ids.add(wargear_id)
@@ -686,7 +718,9 @@ def _bridge_wargear(
                     if profile_name is None
                     else f"{wargear_id}:{_slug(profile_name)}"
                 ),
-                "model_profile_ids": _joined(model_profile_ids),
+                "model_profile_ids": _joined(
+                    default_model_profile_ids if is_default_loadout else model_profile_ids
+                ),
                 "range": _required_field(row, "range"),
                 "a": _required_field(row, "A"),
                 "skill_characteristic": _skill_characteristic(row),
@@ -715,6 +749,8 @@ def _bridge_abilities(
     *,
     context: _BridgeContext,
     datasheet_id: str,
+    composition_entries: tuple[_CompositionEntry, ...],
+    loadout_assignments: LoadoutAssignments | None,
     wargear_ids_by_name: dict[str, str],
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> None:
@@ -770,7 +806,10 @@ def _bridge_abilities(
                 )
             else:
                 static_rule_ir_payload = None
-                if source_kind is CatalogAbilitySourceKind.DATASHEET:
+                if source_kind in {
+                    CatalogAbilitySourceKind.DATASHEET,
+                    CatalogAbilitySourceKind.WARGEAR,
+                }:
                     static_rule_ir_payload = payload_by_source_row_id(
                         description_source_row.source_row_id
                     )
@@ -816,6 +855,10 @@ def _bridge_abilities(
         ):
             wargear_id = source_wargear_id
             wargear_ids_by_name[_name_key(name)] = wargear_id
+            model_profile_ids = tuple(entry.model_profile_id for entry in composition_entries)
+            default_model_profile_ids = (
+                () if loadout_assignments is None else loadout_assignments.profile_ids_for(name)
+            )
             bridged_rows["Datasheets_wargear"].append(
                 {
                     "datasheet_id": datasheet_id,
@@ -824,7 +867,11 @@ def _bridge_abilities(
                     "name": name,
                     "wargear_id": wargear_id,
                     "weapon_profile_id": "",
-                    "model_profile_ids": "",
+                    "model_profile_ids": _joined(
+                        default_model_profile_ids
+                        if default_model_profile_ids
+                        else model_profile_ids
+                    ),
                     "range": "",
                     "a": "",
                     "skill_characteristic": "",
@@ -834,7 +881,7 @@ def _bridge_abilities(
                     "d": "",
                     "weapon_keywords": "",
                     "weapon_abilities": "",
-                    "default_loadout": "false",
+                    "default_loadout": "true" if default_model_profile_ids else "false",
                     "source_ids": _joined(_source_ids(row)),
                 }
             )
@@ -853,9 +900,26 @@ def _bridge_options(
     option_rows = _rows_matching(
         context.rows_by_table, "Datasheets_options", "datasheet_id", datasheet_id
     )
+    max_models_by_profile_id = {
+        entry.model_profile_id: entry.max_models for entry in composition_entries
+    }
+    maximum_unit_models = _composition_max_unit_models(
+        context=context, datasheet_id=datasheet_id
+    ) or sum(entry.max_models for entry in composition_entries)
     for row in option_rows:
         description = _required_field(row, "description")
         if description == "None":
+            continue
+        if append_unit_wargear_option_rows(
+            row=row,
+            datasheet_id=datasheet_id,
+            model_profile_by_name=model_profile_by_name,
+            max_models_by_profile_id=max_models_by_profile_id,
+            maximum_unit_models=maximum_unit_models,
+            wargear_ids_by_name=wargear_ids_by_name,
+            bridged_rows=bridged_rows,
+            error_type=WahapediaBridgeError,
+        ):
             continue
         if append_choice_rows(
             row, datasheet_id, profile_ids, wargear_ids_by_name, bridged_rows, WahapediaBridgeError
@@ -906,7 +970,9 @@ def _bridge_options(
             continue
         match = OPTION_RE.fullmatch(description)
         if match is None:
-            raise WahapediaBridgeError("Unsupported wargear option row shape.")
+            raise WahapediaBridgeError(
+                f"Unsupported wargear option row shape: {row.source_row_id}."
+            )
         model_profile_id = _required_model_profile_id(model_profile_by_name, match.group("model"))
         forbidden_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("forbidden"))
         granted_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("granted"))
@@ -1523,6 +1589,7 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "leader_footer",
             "damaged_description",
             "damaged_effects",
+            "max_unit_models",
             "source_ids",
         ),
         "Datasheets_models": (
@@ -1542,6 +1609,7 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "bs",
             "min_models",
             "max_models",
+            "allows_zero_models",
             "base_size",
             "base_size_source_id",
             "base_size_document_reference",
@@ -2256,54 +2324,6 @@ def _single_model_profile_id(composition_entries: tuple[_CompositionEntry, ...])
     if len(composition_entries) != 1:
         raise WahapediaBridgeError("This-model wargear replacement requires one model profile.")
     return composition_entries[0].model_profile_id
-
-
-def _loadout_wargear_name_keys(loadout: str) -> frozenset[str] | None:
-    stripped = " ".join(loadout.strip().split())
-    if not stripped:
-        return None
-    matches = tuple(LOADOUT_RE.finditer(stripped))
-    if not matches:
-        raise WahapediaBridgeError("Unsupported datasheet loadout row shape.")
-    item_names = tuple(
-        _loadout_wargear_name(item) for match in matches for item in match.group("items").split(";")
-    )
-    if not item_names or any(not item_name for item_name in item_names):
-        raise WahapediaBridgeError("Datasheet loadout contains an empty wargear item.")
-    item_keys = tuple(_name_key(item_name) for item_name in item_names)
-    nothing_key = _name_key("nothing")
-    if item_keys == (nothing_key,):
-        return frozenset()
-    if nothing_key in item_keys:
-        raise WahapediaBridgeError("Datasheet loadout mixes nothing with wargear items.")
-    return frozenset(item_keys)
-
-
-def _loadout_wargear_name(item_name: str) -> str:
-    stripped = item_name.strip()
-    match = LOADOUT_ITEM_COUNT_RE.fullmatch(stripped)
-    if match is None:
-        return stripped
-    _positive_int_from_text("loadout wargear count", match.group("count"))
-    name = match.group("name").strip()
-    if not name:
-        raise WahapediaBridgeError("Datasheet loadout contains an empty counted wargear item.")
-    return name
-
-
-def _is_default_loadout_wargear(
-    *,
-    base_name: str,
-    default_wargear_name_keys: frozenset[str] | None,
-) -> bool:
-    if default_wargear_name_keys is None:
-        return True
-    key = _name_key(base_name)
-    if key in default_wargear_name_keys:
-        return True
-    if f"{key}s" in default_wargear_name_keys:
-        return True
-    return key.endswith("s") and key[:-1] in default_wargear_name_keys
 
 
 def _weapon_description_item_name_keys(description: str) -> frozenset[str]:

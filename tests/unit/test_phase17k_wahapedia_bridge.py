@@ -6705,7 +6705,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "Wraithguard (`000000597`)" in aeldari_markdown
     assert (
         "| Anhrathe / Corsairs | Corsair Skyreavers (`000004196`)<br>"
-        "Kharseth (`000004194`) | None | Corsair Voidreavers"
+        "Corsair Voidreavers (`000002531`)<br>Corsair Voidscarred (`000002532`)<br>"
+        "Kharseth (`000004194`) | None | Prince Yriel"
     ) in aeldari_markdown
     assert "| Harlequins | None | Skyweavers (`000002539`) |" in aeldari_markdown
     assert "| Ynnari | None | None | The Visarch" in aeldari_markdown
@@ -6755,10 +6756,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |"
     ) in generated_markdown
     assert "| `catalog-ir:feel-no-pain-source` | Collar of Khorne |" in generated_markdown
-    for harbinger_consumer in ("lethal-hits", "precision", "sustained-hits"):
+    for shared_consumer in ("lethal-hits", "precision"):
         assert (
-            f"| `catalog-ir:weapon-keyword-grant:{harbinger_consumer}` | Harbinger of Death |"
+            f"| `catalog-ir:weapon-keyword-grant:{shared_consumer}` | "
+            "Harbinger of Death<br>Piratical Raiders |"
         ) in generated_markdown
+    assert (
+        "| `catalog-ir:weapon-keyword-grant:sustained-hits` | Harbinger of Death |"
+    ) in generated_markdown
     assert (
         "| `catalog-ir:can-advance-and-charge` | No current generated rows |"
     ) in generated_markdown

@@ -9,7 +9,12 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    SetupStep,
+)
 from warhammer40k_core.engine.source_backed_rerolls import SourceBackedRerollPermissionContext
 
 if TYPE_CHECKING:
@@ -455,7 +460,7 @@ def apply_select_tracked_target_decision(
         target_unit_instance_id=target_unit_id,
         target_allegiance=_payload_string(request_payload, key="target_allegiance"),
         target_lifecycle="until_destroyed",
-        selected_battle_round=state.battle_round,
+        selected_battle_round=_tracked_target_selection_battle_round(state),
         selection_request_id=request.request_id,
         selection_result_id=result.result_id,
         active=True,
@@ -477,6 +482,17 @@ def apply_select_tracked_target_decision(
         },
     )
     return record
+
+
+def _tracked_target_selection_battle_round(state: GameState) -> int:
+    if state.battle_round >= 1:
+        return state.battle_round
+    if (
+        state.stage is GameLifecycleStage.SETUP
+        and state.current_setup_step is SetupStep.DECLARE_BATTLE_FORMATIONS
+    ):
+        return 1
+    raise GameLifecycleError("Tracked target selection requires battle round context.")
 
 
 def invalid_select_tracked_target_status(

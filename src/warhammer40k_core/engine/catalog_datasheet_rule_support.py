@@ -26,6 +26,13 @@ CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:wound-roll
 CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID = (
     "catalog-ir:fight-activation-movement-distance"
 )
+CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID = (
+    "catalog-ir:invulnerable-save-characteristic-query"
+)
+CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID = "catalog-ir:passive-hit-reroll"
+CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID = (
+    "catalog-ir:first-failed-save-damage-replacement"
+)
 
 
 def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
@@ -43,6 +50,12 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
             _required_string(parameter_payload(clause.effects[0].parameters), "characteristic")
         )
         consumer_ids.add(f"catalog-ir:{characteristic.value}-characteristic-modifier")
+    if clause_is_passive_invulnerable_save_set(clause):
+        consumer_ids.add(CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID)
+    if clause_is_passive_hit_reroll(clause):
+        consumer_ids.add(CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID)
+    if clause_is_first_failed_save_damage_replacement(clause):
+        consumer_ids.add(CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID)
     if clause_is_fight_selected_weapon_ability_choice(clause):
         consumer_ids.add(CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID)
         consumer_ids.add(CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID)
@@ -78,6 +91,9 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
                 CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID,
                 CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
+                CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,
+                CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID,
+                CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID,
             }
         )
     )
@@ -137,6 +153,94 @@ def clause_is_passive_characteristic_modifier(clause: RuleClause) -> bool:
         condition.kind is RuleConditionKind.KEYWORD_GATE
         and type(parameter_payload(condition.parameters).get("required_keyword")) is str
         for condition in clause.conditions
+    )
+
+
+def clause_is_passive_invulnerable_save_set(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.trigger is not None
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or clause.duration is not None
+        or clause.conditions
+        or len(clause.effects) != 1
+    ):
+        return False
+    effect = clause.effects[0]
+    if effect.kind is not RuleEffectKind.SET_CHARACTERISTIC:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    value = parameters.get("value")
+    return (
+        parameters.get("characteristic") == Characteristic.INVULNERABLE_SAVE.value
+        and type(value) is int
+        and 2 <= value <= 6
+    )
+
+
+def clause_is_passive_hit_reroll(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.trigger is not None
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.duration is not None
+        or clause.conditions
+        or len(clause.effects) != 1
+    ):
+        return False
+    effect = clause.effects[0]
+    if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    reroll_value = parameters.get("reroll_unmodified_value")
+    objective_upgrade = parameters.get("full_reroll_if_target_within_objective_range")
+    return (
+        parameters.get("roll_type") == "hit"
+        and type(reroll_value) is int
+        and 1 <= reroll_value <= 6
+        and (objective_upgrade is None or type(objective_upgrade) is bool)
+    )
+
+
+def clause_is_first_failed_save_damage_replacement(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.duration is not None
+        or len(clause.effects) != 1
+        or len(clause.conditions) != 1
+    ):
+        return False
+    trigger = parameter_payload(clause.trigger.parameters)
+    if (
+        trigger.get("roll_type") != "attack_sequence.save"
+        or trigger.get("outcome") != "failed"
+        or trigger.get("timing_window") != "after_failed_saving_throw"
+    ):
+        return False
+    condition = clause.conditions[0]
+    if condition.kind is not RuleConditionKind.FREQUENCY_LIMIT:
+        return False
+    frequency = parameter_payload(condition.parameters)
+    if (
+        frequency.get("scope") != "turn"
+        or frequency.get("max_uses") != 1
+        or frequency.get("activation_kind") != "automatic_first_occurrence"
+        or frequency.get("usage_subject") != "bearers_unit"
+    ):
+        return False
+    effect = clause.effects[0]
+    parameters = parameter_payload(effect.parameters)
+    return (
+        effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+        and parameters.get("characteristic") == Characteristic.DAMAGE.value
+        and parameters.get("attack_role") == "defender"
+        and parameters.get("value") == 0
     )
 
 

@@ -77,6 +77,9 @@ SOURCE_DATE = "2026-06-09"
 SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p23"
 KHARSETH_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p14-15"
 CORSAIR_SKYREAVERS_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p20-21"
+CORSAIR_VOID_UNITS_KEYWORD_SOURCE_REFERENCE = (
+    "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords"
+)
 TARGET_EDITION = "warhammer-40000-11th"
 BASE_SOURCE_PACKAGE_ID = DataPackageId(
     namespace="wahapedia",
@@ -231,6 +234,41 @@ def _overlay_pack(
             fields=(),
         )
     )
+    for datasheet_id, datasheet_name, source_row_id in (
+        (
+            "000002531",
+            "Corsair Voidreavers",
+            "000002531:blank-keyword:global:true:6675",
+        ),
+        (
+            "000002532",
+            "Corsair Voidscarred",
+            "000002532:blank-keyword:global:true:6682",
+        ),
+    ):
+        blank_keyword_row = _required_row(
+            rows_by_table,
+            "Datasheets_keywords",
+            source_row_id,
+        )
+        operations.append(
+            SourceOverlayOperation(
+                op_id=f"aeldari-supersede-{datasheet_id}-blank-faction-keyword",
+                order_index=len(operations) + 1,
+                operation_kind=SourceOverlayOperationKind.SUPERSEDE_ROW,
+                target_edition=TARGET_EDITION,
+                source_table="Datasheets_keywords",
+                source_row_id=blank_keyword_row.source_row_id,
+                source_reference=CORSAIR_VOID_UNITS_KEYWORD_SOURCE_REFERENCE,
+                effective_date=SOURCE_DATE,
+                reason=(
+                    "Supersede the mirrored blank faction-keyword row before the strict "
+                    f"{datasheet_name} catalog bridge."
+                ),
+                expected_preimage_hash=source_row_hash(blank_keyword_row),
+                fields=(),
+            )
+        )
     skyreavers_blank_keyword_row = _required_row(
         rows_by_table,
         "Datasheets_keywords",
@@ -617,6 +655,8 @@ def _validate_effective_updates(
         raise ValueError("Aeldari Kharseth model-name correction did not apply.")
     _assert_keyword(rows, "000004194", "", present=False)
     _assert_keyword(rows, "000004196", "", present=False)
+    _assert_keyword(rows, "000002531", "", present=False)
+    _assert_keyword(rows, "000002532", "", present=False)
 
 
 def _assert_keyword(

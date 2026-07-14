@@ -169,6 +169,29 @@ AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES = tuple(
+    ModelHeightOverride(
+        datasheet_id=datasheet_id,
+        model_name=model_name,
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id=f"geometry-review:aeldari:corsair-void-units:{source_key}:height",
+        height_document_reference=(
+            "Aeldari Corsair Voidscarred assembled kit imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    )
+    for datasheet_id, model_name, source_key in (
+        ("000002531", "Voidreaver Felarch", "voidreaver-felarch"),
+        ("000002531", "Corsair Voidreavers", "corsair-voidreavers"),
+        ("000002532", "Voidscarred Felarch", "voidscarred-felarch"),
+        ("000002532", "Corsair Voidscarred", "corsair-voidscarred"),
+        ("000002532", "Shade Runner", "shade-runner"),
+        ("000002532", "Soul Weaver", "soul-weaver"),
+        ("000002532", "Way Seeker", "way-seeker"),
+    )
+)
+
 DEATH_GUARD_DEFILER_PDF_CORRECTION = PdfDatasheetCorrection(
     datasheet_id="000004209",
     source_id="pdf:death-guard-faction-pack:2026-06-10:p5-p6",
@@ -232,6 +255,7 @@ DEFAULT_PDF_CORRECTIONS = (
 )
 DEFAULT_HEIGHT_OVERRIDES = (
     *AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES,
+    *AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES,
     *AELDARI_KHARSETH_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES,

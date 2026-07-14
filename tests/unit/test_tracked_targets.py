@@ -1581,6 +1581,7 @@ def test_tracked_target_runtime_reselection_defensive_paths() -> None:
             record=record,
             clause=clause,
             unit=source_unit,
+            related_records=(record,),
         )
     assert (
         catalog_tracked_target_runtime_module._reselection_request_for_clause(  # pyright: ignore[reportPrivateUsage]
@@ -1589,6 +1590,7 @@ def test_tracked_target_runtime_reselection_defensive_paths() -> None:
             record=record,
             clause=clause,
             unit=source_unit,
+            related_records=(record,),
         )
         is None
     )

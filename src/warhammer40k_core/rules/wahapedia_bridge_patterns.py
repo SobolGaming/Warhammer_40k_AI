@@ -8,6 +8,10 @@ UNIT_COMPOSITION_PART_RE = re.compile(
     re.IGNORECASE,
 )
 UNIT_COMPOSITION_SEPARATOR_RE = re.compile(r"(?:,\s+|\s+and\s+)", re.IGNORECASE)
+UNIT_COMPOSITION_MAX_MODELS_RE = re.compile(
+    r"^This unit can contain a maximum of (?P<maximum>\d+) models\.$",
+    re.IGNORECASE,
+)
 OPTION_RE = re.compile(
     r"^1 (?P<model>.+?) that is not equipped with (?:a|an|1) "
     r"(?P<forbidden>.+?) can be equipped with 1 (?P<granted>.+?)\.$",

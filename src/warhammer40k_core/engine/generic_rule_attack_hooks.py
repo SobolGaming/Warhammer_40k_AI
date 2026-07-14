@@ -242,11 +242,14 @@ def generic_rule_modified_save_options(
     ):
         if _characteristic_parameter(effect.parameters) is not Characteristic.INVULNERABLE_SAVE:
             continue
-        if not _generic_this_model_effect_targets_only_alive_model(
-            state=context.state,
-            effect=effect,
-            unit_instance_id=context.target_unit_instance_id,
-        ):
+        if context.allocated_model_instance_id is None:
+            if not _generic_this_model_effect_targets_only_alive_model(
+                state=context.state,
+                effect=effect,
+                unit_instance_id=context.target_unit_instance_id,
+            ):
+                continue
+        elif effect.source_model_instance_id != context.allocated_model_instance_id:
             continue
         current = _save_options_with_invulnerable_save(
             current,

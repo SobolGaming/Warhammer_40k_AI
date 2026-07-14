@@ -152,7 +152,10 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
+    AttackRerollPermissionContext,
     DamageRollModifierContext,
+    FailedSaveDamageReplacement,
+    FailedSaveDamageReplacementContext,
     HitRollMinimumUnmodifiedSuccessContext,
     HitRollModifierContext,
     RuntimeModifierRegistry,
@@ -252,6 +255,7 @@ __all__ = (
     "AttackAllocationPayload",
     "AttackAllocationRuleContext",
     "AttackAllocationRuleContextPayload",
+    "AttackRerollPermissionContext",
     "BENEFIT_OF_COVER_RULE_ID",
     "BattlePhase",
     "BattlefieldPlacementKind",
@@ -271,6 +275,8 @@ __all__ = (
     "DamageApplicationPayload",
     "DamageKind",
     "DamageRollModifierContext",
+    "FailedSaveDamageReplacement",
+    "FailedSaveDamageReplacementContext",
     "DamageProfile",
     "DamageProfilePayload",
     "DecisionController",
