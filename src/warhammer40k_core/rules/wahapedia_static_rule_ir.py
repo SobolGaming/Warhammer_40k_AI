@@ -4,6 +4,9 @@ import json
 
 from warhammer40k_core.rules.rule_ir import RuleIRPayload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_corsair_skyreavers_2026_06 as aeldari_corsair_skyreavers_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_kharseth_2026_06 as aeldari_kharseth_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -19,6 +22,9 @@ def datasheet_rule_ir_payload_by_source_row_id(source_row_id: str) -> RuleIRPayl
     payloads = tuple(
         payload
         for payload in (
+            aeldari_corsair_skyreavers_source.datasheet_rule_ir_payload_by_source_row_id(
+                source_row_id
+            ),
             aeldari_kharseth_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
             chaos_daemons_datasheet_ir_source.datasheet_rule_ir_payload_by_source_row_id(
                 source_row_id

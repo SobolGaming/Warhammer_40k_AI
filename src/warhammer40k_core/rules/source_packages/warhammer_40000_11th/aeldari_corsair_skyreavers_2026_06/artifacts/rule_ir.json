@@ -1,0 +1,195 @@
+{
+  "artifact_schema": "core-v2-corsair-skyreavers-datasheet-rule-ir-v1",
+  "datasheet_id": "000004196",
+  "datasheet_name": "Corsair Skyreavers",
+  "package_hash": "0b101ecff4e275e775cdd18168907924362dde91fa23234048e80fa809234bd8",
+  "records": {
+    "000004196:4": {
+      "ability_name": "Raid and Run",
+      "normalized_text_sha256": "415adedbde9aeee5438c705dcb48a9639edbe27c4acfa31f570af3f5782a3db9",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:corsair-skyreavers:000004196:4:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "this_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "eligible_to_fight_this_phase"
+                  }
+                ],
+                "source_span": {
+                  "end": 76,
+                  "start": 34,
+                  "text": "this unit was eligible to fight this phase"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "out_of_phase_action",
+                "parameters": [
+                  {
+                    "key": "action",
+                    "value": "move"
+                  },
+                  {
+                    "key": "action_group",
+                    "value": "fight_end_conditional_move"
+                  },
+                  {
+                    "key": "distance_bonus",
+                    "value": 3
+                  },
+                  {
+                    "key": "distance_dice_quantity",
+                    "value": 1
+                  },
+                  {
+                    "key": "distance_dice_sides",
+                    "value": 3
+                  },
+                  {
+                    "key": "engagement_state",
+                    "value": "not_within"
+                  },
+                  {
+                    "key": "movement_kind",
+                    "value": "triggered"
+                  },
+                  {
+                    "key": "movement_mode",
+                    "value": "normal"
+                  },
+                  {
+                    "key": "optional",
+                    "value": true
+                  }
+                ],
+                "source_span": {
+                  "end": 181,
+                  "start": 148,
+                  "text": "make a Normal move of up to D3+3\""
+                }
+              },
+              {
+                "kind": "out_of_phase_action",
+                "parameters": [
+                  {
+                    "key": "action",
+                    "value": "move"
+                  },
+                  {
+                    "key": "action_group",
+                    "value": "fight_end_conditional_move"
+                  },
+                  {
+                    "key": "distance_bonus",
+                    "value": 3
+                  },
+                  {
+                    "key": "distance_dice_quantity",
+                    "value": 1
+                  },
+                  {
+                    "key": "distance_dice_sides",
+                    "value": 3
+                  },
+                  {
+                    "key": "engagement_state",
+                    "value": "within"
+                  },
+                  {
+                    "key": "movement_kind",
+                    "value": "triggered"
+                  },
+                  {
+                    "key": "movement_mode",
+                    "value": "fall_back"
+                  },
+                  {
+                    "key": "optional",
+                    "value": true
+                  }
+                ],
+                "source_span": {
+                  "end": 291,
+                  "start": 255,
+                  "text": "make a Fall Back move of up to D3+3\""
+                }
+              }
+            ],
+            "source_span": {
+              "end": 292,
+              "start": 0,
+              "text": "At the end of the Fight phase, if this unit was eligible to fight this phase, and is not within Engagement Range of one or more enemy units, it can make a Normal move of up to D3+3\". Otherwise, if this unit was eligible to fight this phase, this unit can make a Fall Back move of up to D3+3\"."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 43,
+                "start": 34,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17c:fight-end-conditional-triggered-movement",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "end"
+                },
+                {
+                  "key": "owner",
+                  "value": "either_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "fight"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "end_fight_phase"
+                }
+              ],
+              "source_span": {
+                "end": 29,
+                "start": 0,
+                "text": "At the end of the Fight phase"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "e517153603f8a6a5df4486299868bb5816cf7aa4222d5bec425ce0482bb4eb9d",
+        "normalized_text": "At the end of the Fight phase, if this unit was eligible to fight this phase, and is not within Engagement Range of one or more enemy units, it can make a Normal move of up to D3+3\". Otherwise, if this unit was eligible to fight this phase, this unit can make a Fall Back move of up to D3+3\".",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:corsair-skyreavers:datasheet:000004196:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-corsair-skyreavers-datasheet-2026-06-09:datasheet:000004196:4"
+      }
+    }
+  },
+  "source_package_id": "gw-11e-aeldari-corsair-skyreavers-datasheet-2026-06-09",
+  "source_page_numbers": [
+    20,
+    21
+  ],
+  "source_pdf_filename": "eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
+  "source_pdf_sha256": "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9"
+}

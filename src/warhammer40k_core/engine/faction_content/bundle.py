@@ -1410,7 +1410,8 @@ class RuntimeContentBundle:
             )
         )
         fight_phase_end_hook_registry = FightPhaseEndHookRegistry.from_bindings(
-            _contribution_values(
+            catalog_runtime_hooks.fight_end_hooks(ability_indexes_by_player_id, validated_armies)
+            + _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.fight_phase_end_hook_bindings,
             )

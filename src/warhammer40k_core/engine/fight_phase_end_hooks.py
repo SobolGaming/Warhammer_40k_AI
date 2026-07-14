@@ -120,7 +120,6 @@ class FightPhaseEndHookRegistry:
     ) -> DecisionRequest | None:
         if type(context) is not FightPhaseEndRequestContext:
             raise GameLifecycleError("Fight-phase end request hooks require context.")
-        requests: list[DecisionRequest] = []
         for binding in self.bindings:
             if binding.request_handler is None:
                 continue
@@ -131,14 +130,8 @@ class FightPhaseEndHookRegistry:
                 raise GameLifecycleError(
                     "Fight-phase end request handlers must return DecisionRequest or None."
                 )
-            requests.append(request)
-        if len(requests) > 1:
-            raise GameLifecycleError(
-                "Fight-phase end hooks produced multiple simultaneous requests."
-            )
-        if not requests:
-            return None
-        return requests[0]
+            return request
+        return None
 
     def apply_result(self, context: FightPhaseEndResultContext) -> bool | LifecycleStatus:
         if type(context) is not FightPhaseEndResultContext:

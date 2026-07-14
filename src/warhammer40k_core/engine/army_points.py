@@ -767,6 +767,10 @@ def _resolved_wargear_selections(
             catalog=catalog,
             datasheet=datasheet,
             requested_selections=selection.wargear_selections,
+            model_profile_selections=_resolved_model_profile_selections(
+                datasheet=datasheet,
+                selection=selection,
+            ),
         )
     except ListValidationError as exc:
         raise ArmyPointsError("MFM points received invalid wargear selections.") from exc

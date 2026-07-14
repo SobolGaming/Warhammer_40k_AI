@@ -1504,7 +1504,7 @@ def test_fight_phase_end_hook_registry_guardrails() -> None:
         registry.apply_result(cast(FightPhaseEndResultContext, object()))
 
 
-def test_fight_phase_end_hook_registry_rejects_multiple_requests_and_results() -> None:
+def test_fight_phase_end_hook_registry_sequences_requests_and_rejects_multiple_results() -> None:
     state = _generic_fight_end_state("phase17g-fight-end-multiple-hooks")
     decisions = DecisionController()
     request = _generic_fight_end_request(state)
@@ -1524,8 +1524,7 @@ def test_fight_phase_end_hook_registry_rejects_multiple_requests_and_results() -
             ),
         )
     )
-    with pytest.raises(GameLifecycleError, match="multiple simultaneous requests"):
-        multiple_request_registry.next_request_for(context)
+    assert multiple_request_registry.next_request_for(context) == request
 
     result = DecisionResult.for_request(
         result_id="phase17g-fight-end-multiple-result",

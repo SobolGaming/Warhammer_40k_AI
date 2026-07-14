@@ -28,6 +28,28 @@ REPLACEMENT_WITH_CHOICES_RE = re.compile(
     r"(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
     re.IGNORECASE,
 )
+NAMED_MODEL_REPLACEMENT_WITH_CHOICES_RE = re.compile(
+    r"^The (?P<model>.+?) can replace (?:its|their) (?P<replaced>.+?) "
+    r"with one of the following:\n(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
+    re.IGNORECASE,
+)
+SCALED_MODEL_REPLACEMENT_WITH_PAIRED_CHOICES_RE = re.compile(
+    r"^For every (?P<models_per_increment>\d+) models in the unit, up to "
+    r"(?P<max_per_increment>\d+) (?P<model>.+?) models can each have their "
+    r"(?P<replaced_first>.+?) and (?P<replaced_second>.+?) replaced with one of "
+    r"the following\*:\n(?P<choices>(?:- 1 .+? and 1 .+?(?:\n|$))+)$",
+    re.IGNORECASE,
+)
+PAIRED_OPTION_CHOICE_RE = re.compile(
+    r"^- 1 (?P<first>.+?) and 1 (?P<second>.+?)$",
+    re.IGNORECASE,
+)
+SCALED_OPTION_DUPLICATE_RESTRICTION_RE = re.compile(
+    r"^\* You cannot select the same option more than once per unit unless it contains "
+    r"(?P<threshold>\d+) models, in which case you cannot select the same weapon more than "
+    r"(?P<max_duplicates>\w+) per unit\.$",
+    re.IGNORECASE,
+)
 SINGLE_REPLACEMENT_RE = re.compile(
     r"^This model's (?P<replaced>.+?) can be replaced with "
     r"(?P<replacement_count>\d+) (?P<replacement>.+?)\.?$",
@@ -102,7 +124,9 @@ DAMAGED_ABILITY_SELECTION_LIMIT_RE = re.compile(
 )
 DAMAGED_IGNORABLE_REMAINDER_RE = re.compile(r"[\s,.;:]+|(?:\band\b)|(?:\bwhile\b)", re.IGNORECASE)
 COUNT_WORDS = {
+    "once": 1,
     "one": 1,
+    "twice": 2,
     "two": 2,
     "three": 3,
     "four": 4,

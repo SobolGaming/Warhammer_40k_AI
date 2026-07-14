@@ -81,6 +81,9 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     fight_activation_ability_use_from_result,
     is_fight_activation_ability_decline_payload,
 )
+from warhammer40k_core.engine.fight_eligibility_queries import (
+    unit_was_eligible_to_fight_this_phase,
+)
 from warhammer40k_core.engine.fight_order import (
     DECLINE_FIGHT_INTERRUPT_OPTION_ID,
     ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
@@ -1789,17 +1792,11 @@ def _eligible_fight_movement_unit_ids(
             eligible.append(unit_id)
             continue
         if step is FightPhaseStepKind.CONSOLIDATE:
-            was_eligible = (
-                unit_id in fight_state.fight_order_state.selected_to_fight_unit_ids
-                or unit_id in fight_state.fight_order_state.fights_first_registry.charged_unit_ids()
-                or unit_id in fight_state.fight_order_state.engaged_at_fight_step_start_unit_ids
-                or bool(
-                    melee_target_unit_ids(
-                        scenario=scenario,
-                        ruleset_descriptor=state.runtime_ruleset_descriptor(),
-                        unit_instance_id=unit_id,
-                    )
-                )
+            was_eligible = unit_was_eligible_to_fight_this_phase(
+                state=state,
+                fight_state=fight_state,
+                unit_instance_id=unit_id,
+                policy=state.runtime_ruleset_descriptor().fight_policy,
             )
             if not was_eligible:
                 continue

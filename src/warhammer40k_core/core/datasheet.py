@@ -23,6 +23,10 @@ from warhammer40k_core.core.content_scope import (
     catalog_content_scope_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
+from warhammer40k_core.core.wargear_selection_limits import (
+    DatasheetWargearSelectionLimit,
+    DatasheetWargearSelectionLimitPayload,
+)
 
 
 class DatasheetCatalogError(ValueError):
@@ -148,6 +152,7 @@ class DatasheetWargearOptionPayload(TypedDict):
     source_ids: list[str]
     conditions: NotRequired[list[DatasheetWargearOptionConditionPayload]]
     effects: NotRequired[list[DatasheetWargearOptionEffectPayload]]
+    selection_limit: NotRequired[DatasheetWargearSelectionLimitPayload]
 
 
 class DatasheetMusteringOptionEffectPayload(TypedDict):
@@ -531,6 +536,7 @@ class DatasheetWargearOption:
     source_ids: tuple[str, ...] = ()
     conditions: tuple[DatasheetWargearOptionCondition, ...] = ()
     effects: tuple[DatasheetWargearOptionEffect, ...] = ()
+    selection_limit: DatasheetWargearSelectionLimit | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -605,9 +611,15 @@ class DatasheetWargearOption:
                 )
         object.__setattr__(self, "conditions", conditions)
         object.__setattr__(self, "effects", effects)
+        if self.selection_limit is not None and type(self.selection_limit) is not (
+            DatasheetWargearSelectionLimit
+        ):
+            raise DatasheetCatalogError(
+                "DatasheetWargearOption selection_limit must be a selection limit."
+            )
 
     def to_payload(self) -> DatasheetWargearOptionPayload:
-        return {
+        payload: DatasheetWargearOptionPayload = {
             "option_id": self.option_id,
             "model_profile_id": self.model_profile_id,
             "default_wargear_ids": list(self.default_wargear_ids),
@@ -618,6 +630,9 @@ class DatasheetWargearOption:
             "conditions": [condition.to_payload() for condition in self.conditions],
             "effects": [effect.to_payload() for effect in self.effects],
         }
+        if self.selection_limit is not None:
+            payload["selection_limit"] = self.selection_limit.to_payload()
+        return payload
 
     @classmethod
     def from_payload(cls, payload: DatasheetWargearOptionPayload) -> Self:
@@ -636,6 +651,11 @@ class DatasheetWargearOption:
             effects=tuple(
                 DatasheetWargearOptionEffect.from_payload(effect)
                 for effect in payload.get("effects", [])
+            ),
+            selection_limit=(
+                None
+                if "selection_limit" not in payload
+                else DatasheetWargearSelectionLimit.from_payload(payload["selection_limit"])
             ),
         )
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
 from warhammer40k_core.core.datasheet import (
@@ -18,6 +18,13 @@ from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
+from warhammer40k_core.engine.scaled_wargear_limits import (
+    ScaledWargearSelection,
+    validate_scaled_wargear_selections,
+)
+from warhammer40k_core.engine.structured_wargear_validation import (
+    validate_replace_wargear_effect_count,
+)
 
 
 class ListValidationError(ValueError):
@@ -98,6 +105,7 @@ class WargearSelectionPayload(TypedDict):
     option_id: str
     model_profile_id: str
     wargear_ids: list[str]
+    selection_count: NotRequired[int]
 
 
 class MusteringOptionSelectionPayload(TypedDict):
@@ -280,6 +288,7 @@ class WargearSelection:
     option_id: str
     model_profile_id: str
     wargear_ids: tuple[str, ...]
+    selection_count: int | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -305,13 +314,35 @@ class WargearSelection:
                 min_length=0,
             ),
         )
+        if self.selection_count is not None:
+            if type(self.selection_count) is not int or self.selection_count < 0:
+                raise ListValidationError(
+                    "WargearSelection selection_count must be a non-negative integer."
+                )
+            if self.wargear_ids and self.selection_count == 0:
+                raise ListValidationError(
+                    "WargearSelection selection_count must be positive when wargear is selected."
+                )
+            if not self.wargear_ids and self.selection_count != 0:
+                raise ListValidationError(
+                    "WargearSelection selection_count must be zero when no wargear is selected."
+                )
+
+    @property
+    def resolved_selection_count(self) -> int:
+        if self.selection_count is not None:
+            return self.selection_count
+        return 1 if self.wargear_ids else 0
 
     def to_payload(self) -> WargearSelectionPayload:
-        return {
+        payload: WargearSelectionPayload = {
             "option_id": self.option_id,
             "model_profile_id": self.model_profile_id,
             "wargear_ids": list(self.wargear_ids),
         }
+        if self.selection_count is not None:
+            payload["selection_count"] = self.selection_count
+        return payload
 
     @classmethod
     def from_payload(cls, payload: WargearSelectionPayload) -> Self:
@@ -319,6 +350,7 @@ class WargearSelection:
             option_id=payload["option_id"],
             model_profile_id=payload["model_profile_id"],
             wargear_ids=tuple(payload["wargear_ids"]),
+            selection_count=payload.get("selection_count"),
         )
 
 
@@ -898,6 +930,7 @@ def resolve_wargear_selections(
     catalog: ArmyCatalog,
     datasheet: DatasheetDefinition,
     requested_selections: tuple[WargearSelection, ...],
+    model_profile_selections: tuple[ModelProfileSelection, ...] | None = None,
 ) -> tuple[WargearSelection, ...]:
     if type(catalog) is not ArmyCatalog:
         raise ListValidationError("catalog must be an ArmyCatalog.")
@@ -928,7 +961,11 @@ def resolve_wargear_selections(
             _catalog_wargear_by_id(catalog, wargear_id)
         resolved.append(selection)
     resolved_tuple = tuple(sorted(resolved, key=lambda selection: selection.option_id))
-    _validate_wargear_option_semantics(selections=resolved_tuple, datasheet=datasheet)
+    _validate_wargear_option_semantics(
+        selections=resolved_tuple,
+        datasheet=datasheet,
+        model_profile_selections=model_profile_selections,
+    )
     return resolved_tuple
 
 
@@ -1119,6 +1156,10 @@ def _validate_wargear_selection_against_option(
         raise ListValidationError("WargearSelection does not satisfy minimum selections.")
     if selected_count > option.max_selections:
         raise ListValidationError("WargearSelection exceeds maximum selections.")
+    if selection.resolved_selection_count > 1 and option.selection_limit is None:
+        raise ListValidationError(
+            "WargearSelection selection_count exceeds an unscaled option limit."
+        )
     allowed = set(option.allowed_wargear_ids)
     for wargear_id in selection.wargear_ids:
         if wargear_id not in allowed:
@@ -1129,6 +1170,7 @@ def _validate_wargear_option_semantics(
     *,
     selections: tuple[WargearSelection, ...],
     datasheet: DatasheetDefinition,
+    model_profile_selections: tuple[ModelProfileSelection, ...] | None,
 ) -> None:
     options_by_id = {option.option_id: option for option in datasheet.wargear_options}
     selected_by_profile: dict[str, set[str]] = {}
@@ -1164,13 +1206,64 @@ def _validate_wargear_option_semantics(
                     effect=effect,
                 )
             elif effect.kind is WargearOptionEffectKind.REPLACE_WARGEAR:
-                _validate_replace_wargear_effect_count(
-                    selection=selection,
+                validate_replace_wargear_effect_count(
+                    selection_wargear_ids=selection.wargear_ids,
                     effect=effect,
+                    option_effects=option.effects,
                     selected_for_profile=selected_for_profile,
+                    error_type=ListValidationError,
                 )
             else:
                 raise ListValidationError("Unsupported structured wargear option effect.")
+    _validate_scaled_wargear_selection_limits(
+        selections=selections,
+        options_by_id=options_by_id,
+        datasheet=datasheet,
+        model_profile_selections=model_profile_selections,
+    )
+
+
+def _validate_scaled_wargear_selection_limits(
+    *,
+    selections: tuple[WargearSelection, ...],
+    options_by_id: dict[str, DatasheetWargearOption],
+    datasheet: DatasheetDefinition,
+    model_profile_selections: tuple[ModelProfileSelection, ...] | None,
+) -> None:
+    limited_options = tuple(
+        option for option in options_by_id.values() if option.selection_limit is not None
+    )
+    if not limited_options:
+        return
+    if model_profile_selections is None:
+        raise ListValidationError(
+            "Scaled WargearSelection validation requires model profile selections."
+        )
+    validated_model_selections = resolve_model_profile_selections(
+        datasheet=datasheet,
+        selections=model_profile_selections,
+    )
+    selections_by_option_id = {selection.option_id: selection for selection in selections}
+    scaled_selections: list[ScaledWargearSelection] = []
+    for option in limited_options:
+        limit = option.selection_limit
+        if limit is None:
+            raise ListValidationError("Scaled wargear option selection limit is missing.")
+        scaled_selections.append(
+            ScaledWargearSelection(
+                option_id=option.option_id,
+                selection_group_id=limit.selection_group_id,
+                models_per_increment=limit.models_per_increment,
+                max_group_selections_per_increment=limit.max_group_selections_per_increment,
+                max_option_selections_per_increment=limit.max_option_selections_per_increment,
+                selected_count=selections_by_option_id[option.option_id].resolved_selection_count,
+            )
+        )
+    validate_scaled_wargear_selections(
+        unit_model_count=sum(selection.model_count for selection in validated_model_selections),
+        selections=tuple(scaled_selections),
+        error_type=ListValidationError,
+    )
 
 
 def _validate_add_wargear_effect_count(
@@ -1206,33 +1299,6 @@ def _validate_conditional_add_wargear_effect_count(
     if selected_wargear_count not in {0, effect.wargear_count}:
         raise ListValidationError(
             "WargearSelection does not satisfy a structured wargear option effect count."
-        )
-
-
-def _validate_replace_wargear_effect_count(
-    *,
-    selection: WargearSelection,
-    effect: DatasheetWargearOptionEffect,
-    selected_for_profile: set[str],
-) -> None:
-    if effect.model_count != 1:
-        raise ListValidationError(
-            "WargearSelection structured wargear option replacement model count is unsupported."
-        )
-    if effect.replaced_wargear_id is None:
-        raise ListValidationError(
-            "WargearSelection structured wargear option replacement target is missing."
-        )
-    if effect.replaced_wargear_id not in selected_for_profile:
-        raise ListValidationError(
-            "WargearSelection structured wargear option replacement target is not selected."
-        )
-    selected_wargear_count = sum(
-        1 for wargear_id in selection.wargear_ids if wargear_id == effect.wargear_id
-    )
-    if selected_wargear_count != effect.wargear_count:
-        raise ListValidationError(
-            "WargearSelection does not satisfy a structured wargear option replacement count."
         )
 
 

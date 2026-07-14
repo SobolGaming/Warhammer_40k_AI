@@ -410,6 +410,7 @@ class UnitFactory:
                 catalog=self.catalog,
                 datasheet=datasheet,
                 requested_selections=selection.wargear_selections,
+                model_profile_selections=model_profile_selections,
             )
         except ListValidationError as exc:
             raise UnitFactoryError("UnitMusterSelection is invalid.") from exc
@@ -583,6 +584,7 @@ def _apply_structured_wargear_selection_to_models(
     wargear_by_model_id: dict[str, list[str]],
 ) -> None:
     selected_wargear = list(selection.wargear_ids)
+    selection_count = selection.resolved_selection_count
     for effect in option.effects:
         if effect.kind in {
             WargearOptionEffectKind.ADD_WARGEAR,
@@ -592,6 +594,7 @@ def _apply_structured_wargear_selection_to_models(
                 option=option,
                 effect=effect,
                 selected_wargear=tuple(selected_wargear),
+                selection_count=selection_count,
                 models=models,
                 wargear_by_model_id=wargear_by_model_id,
             )
@@ -601,6 +604,7 @@ def _apply_structured_wargear_selection_to_models(
                 option=option,
                 effect=effect,
                 selected_wargear=tuple(selected_wargear),
+                selection_count=selection_count,
                 models=models,
                 wargear_by_model_id=wargear_by_model_id,
             )
@@ -613,6 +617,7 @@ def _apply_add_wargear_effect_to_models(
     option: DatasheetWargearOption,
     effect: DatasheetWargearOptionEffect,
     selected_wargear: tuple[str, ...],
+    selection_count: int,
     models: tuple[ModelInstance, ...],
     wargear_by_model_id: dict[str, list[str]],
 ) -> None:
@@ -623,11 +628,12 @@ def _apply_add_wargear_effect_to_models(
         models=models,
         wargear_by_model_id=wargear_by_model_id,
     )
-    if len(candidates) < effect.model_count:
+    affected_model_count = effect.model_count * selection_count
+    if len(candidates) < affected_model_count:
         raise UnitFactoryError(
             "Structured wargear option has fewer eligible model bearers than required."
         )
-    for model in candidates[: effect.model_count]:
+    for model in candidates[:affected_model_count]:
         wargear_by_model_id[model.model_instance_id].extend(
             effect.wargear_id for _index in range(effect.wargear_count)
         )
@@ -638,6 +644,7 @@ def _apply_replace_wargear_effect_to_models(
     option: DatasheetWargearOption,
     effect: DatasheetWargearOptionEffect,
     selected_wargear: tuple[str, ...],
+    selection_count: int,
     models: tuple[ModelInstance, ...],
     wargear_by_model_id: dict[str, list[str]],
 ) -> None:
@@ -654,11 +661,12 @@ def _apply_replace_wargear_effect_to_models(
         )
         if effect.replaced_wargear_id in wargear_by_model_id[model.model_instance_id]
     )
-    if len(candidates) < effect.model_count:
+    affected_model_count = effect.model_count * selection_count
+    if len(candidates) < affected_model_count:
         raise UnitFactoryError(
             "Structured wargear replacement has fewer eligible model bearers than required."
         )
-    for model in candidates[: effect.model_count]:
+    for model in candidates[:affected_model_count]:
         model_wargear = wargear_by_model_id[model.model_instance_id]
         model_wargear.remove(effect.replaced_wargear_id)
         model_wargear.extend(effect.wargear_id for _index in range(effect.wargear_count))
