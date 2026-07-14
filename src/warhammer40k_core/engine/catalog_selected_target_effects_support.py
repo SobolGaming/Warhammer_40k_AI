@@ -43,6 +43,7 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     selected_target_effect_weapon_scope,
     selected_target_pair_requires_source_model,
     selected_target_selection_clause_binds_source_model,
+    selected_target_selection_condition_is_supported,
 )
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -164,6 +165,11 @@ def selection_target_conditions_apply(
     target_placement: UnitPlacement,
     selection_clause: RuleClause,
 ) -> bool:
+    if not all(
+        selected_target_selection_condition_is_supported(condition)
+        for condition in selection_clause.conditions
+    ):
+        raise GameLifecycleError("Catalog selected-target selection condition is unsupported.")
     if not selection_distance_conditions_apply(
         scenario=scenario,
         source_placement=source_placement,

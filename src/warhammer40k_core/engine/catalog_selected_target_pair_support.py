@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from math import isfinite
 from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
@@ -110,23 +111,60 @@ _IMMEDIATE_BATTLE_SHOCK_PARAMETER_KEYS = frozenset(
         "target_scope",
     }
 )
+_FIGHT_START_TRIGGER_PARAMETER_KEYS = frozenset({"edge", "owner", "phase"})
+_FIGHT_START_TARGET_PARAMETER_KEYS = frozenset({"allegiance"})
+_SELECTION_DISTANCE_PARAMETER_KEYS = frozenset(
+    {
+        "distance_inches",
+        "negated",
+        "object_kind",
+        "object_reference",
+        "predicate",
+        "qualifier",
+        "range_kind",
+    }
+)
+_SELECTION_VISIBILITY_PARAMETER_KEYS = frozenset(
+    {
+        "observer",
+        "predicate",
+        "target_reference",
+    }
+)
 
 
 def clause_is_fight_start_selected_target_selection(clause: RuleClause) -> bool:
+    return fight_start_selected_target_selection_is_supported(clause)
+
+
+def fight_start_selected_target_selection_is_supported(clause: RuleClause) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog selected-target classifier requires RuleClause.")
-    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
-        return False
-    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
-        return False
-    parameters = parameter_payload(clause.trigger.parameters)
     return (
-        clause.template_id == "phase17c:selected-target-constraint"
-        and parameters.get("edge") == "start"
-        and parameters.get("phase") == BattlePhase.FIGHT.value
+        clause.is_supported
+        and clause.template_id == "phase17c:selected-target-constraint"
+        and _fight_start_selection_trigger_is_supported(clause)
+        and _fight_start_selection_target_is_supported(clause.target)
+        and all(
+            selected_target_selection_condition_is_supported(condition)
+            for condition in clause.conditions
+        )
         and not clause.effects
         and clause.duration is None
     )
+
+
+def selected_target_selection_condition_is_supported(condition: RuleCondition) -> bool:
+    if type(condition) is not RuleCondition:
+        raise GameLifecycleError(
+            "Selected-target selection condition support requires RuleCondition."
+        )
+    parameters = parameter_payload(condition.parameters)
+    if condition.kind is RuleConditionKind.DISTANCE_PREDICATE:
+        return _selection_distance_condition_is_supported(parameters)
+    if condition.kind is RuleConditionKind.VISIBILITY_PREDICATE:
+        return _selection_visibility_condition_is_supported(parameters)
+    return False
 
 
 def fight_start_selected_target_effect_clauses_after(
@@ -290,10 +328,74 @@ def selected_target_selection_clause_binds_source_model(clause: RuleClause) -> b
         ):
             return True
     return any(
-        condition.kind is RuleConditionKind.DISTANCE_PREDICATE
-        and parameter_payload(condition.parameters).get("object_kind") == "model"
-        and parameter_payload(condition.parameters).get("object_reference") == "this"
+        (
+            condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+            and parameter_payload(condition.parameters).get("object_kind") == "model"
+            and parameter_payload(condition.parameters).get("object_reference") == "this"
+        )
+        or (
+            condition.kind is RuleConditionKind.VISIBILITY_PREDICATE
+            and parameter_payload(condition.parameters).get("observer") == "this_model"
+        )
         for condition in clause.conditions
+    )
+
+
+def _fight_start_selection_trigger_is_supported(clause: RuleClause) -> bool:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return False
+    parameters = parameter_payload(trigger.parameters)
+    parameter_keys = frozenset(parameters)
+    return (
+        parameter_keys == _FIGHT_START_TRIGGER_PARAMETER_KEYS
+        and parameters.get("edge") == "start"
+        and parameters.get("owner") is None
+        and parameters.get("phase") == BattlePhase.FIGHT.value
+    )
+
+
+def _fight_start_selection_target_is_supported(target: RuleTargetSpec | None) -> bool:
+    if target is None or target.kind is not RuleTargetKind.ENEMY_UNIT:
+        return False
+    parameters = parameter_payload(target.parameters)
+    return (
+        frozenset(parameters) == _FIGHT_START_TARGET_PARAMETER_KEYS
+        and parameters.get("allegiance") == "enemy"
+    )
+
+
+def _selection_distance_condition_is_supported(
+    parameters: dict[str, RuleParameterValue],
+) -> bool:
+    if (
+        frozenset(parameters) != _SELECTION_DISTANCE_PARAMETER_KEYS
+        or parameters.get("negated") is not False
+        or parameters.get("object_kind") not in {"model", "unit"}
+        or parameters.get("object_reference") != "this"
+        or parameters.get("qualifier") is not None
+    ):
+        return False
+    range_kind = parameters.get("range_kind")
+    distance_inches = parameters.get("distance_inches")
+    if range_kind == "engagement_range":
+        return parameters.get("predicate") == "within_engagement_range" and distance_inches is None
+    if range_kind != "numeric_range" or parameters.get("predicate") != "within":
+        return False
+    if not isinstance(distance_inches, (int, float)) or type(distance_inches) is bool:
+        return False
+    numeric_distance = float(distance_inches)
+    return isfinite(numeric_distance) and numeric_distance > 0.0
+
+
+def _selection_visibility_condition_is_supported(
+    parameters: dict[str, RuleParameterValue],
+) -> bool:
+    return (
+        frozenset(parameters) == _SELECTION_VISIBILITY_PARAMETER_KEYS
+        and parameters.get("observer") in {"this_model", "this_unit"}
+        and parameters.get("predicate") == "visible_to"
+        and parameters.get("target_reference") == "selected_unit"
     )
 
 

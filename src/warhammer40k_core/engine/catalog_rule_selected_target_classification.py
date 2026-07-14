@@ -103,7 +103,8 @@ def clause_is_post_shoot_hit_target_selection(clause: RuleClause) -> bool:
     parameters = parameter_payload(clause.trigger.parameters)
     target_parameters = parameter_payload(clause.target.parameters)
     return (
-        clause.template_id == "phase17c:selected-target-constraint"
+        clause.is_supported
+        and clause.template_id == "phase17c:selected-target-constraint"
         and not clause.conditions
         and not clause.effects
         and clause.duration is None

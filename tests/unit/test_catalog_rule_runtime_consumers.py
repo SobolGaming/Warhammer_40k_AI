@@ -129,6 +129,7 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     payload_object,
     payload_string,
     payload_string_tuple,
+    record_has_supported_fight_start_selected_target_effect,
     records_for_timing,
     required_keywords_for_clause,
     runtime_clause_id_from_record,
@@ -141,6 +142,7 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     validate_identifier_tuple,
 )
 from warhammer40k_core.engine.catalog_selected_target_pair_support import (
+    fight_start_selected_target_selection_is_supported,
     selected_target_persisting_effect_clause_is_supported,
 )
 from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_runtime import (
@@ -262,10 +264,12 @@ from warhammer40k_core.rules.rule_ir import (
     RuleIR,
     RuleParameter,
     RuleParameterValue,
+    RuleParseDiagnostic,
     RuleTargetKind,
     RuleTargetSpec,
     RuleTrigger,
     RuleTriggerKind,
+    RuleUnsupportedReason,
     parameter_payload,
     parameters_from_pairs,
 )
@@ -1487,6 +1491,271 @@ def test_catalog_fight_start_rejects_malformed_recognized_effect_shapes() -> Non
             shape_name
         )
         assert runtime.fight_phase_start_bindings() == (), shape_name
+
+
+def test_catalog_fight_start_rejects_malformed_selection_shapes() -> None:
+    selection_clause = _fight_start_selection_clause()
+    supported_effect_clause = _effect_clause(
+        clause_id="test:selected-target:selection:fight:selection-shape-effect",
+        duration=_duration("phase"),
+        effect_kind=RuleEffectKind.REROLL_PERMISSION,
+        roll_type="attack_sequence.hit",
+    )
+    distance_parameter_pairs = (
+        ("distance_inches", None),
+        ("negated", False),
+        ("object_kind", "model"),
+        ("object_reference", "this"),
+        ("predicate", "within_engagement_range"),
+        ("qualifier", None),
+        ("range_kind", "engagement_range"),
+    )
+    invalid_shapes = (
+        (
+            "unsupported-clause",
+            replace(
+                selection_clause,
+                diagnostics=(
+                    RuleParseDiagnostic(
+                        reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+                        message="unsupported-selection",
+                        source_span=_span(),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "unsupported-condition-kind",
+            replace(
+                selection_clause,
+                conditions=(
+                    _condition(RuleConditionKind.KEYWORD_GATE, ("required_keyword", "PSYKER")),
+                ),
+            ),
+        ),
+        (
+            "unknown-target-parameter",
+            replace(
+                selection_clause,
+                target=RuleTargetSpec(
+                    kind=RuleTargetKind.ENEMY_UNIT,
+                    source_span=_span(),
+                    parameters=_parameters(
+                        ("allegiance", "enemy"),
+                        ("unsupported_scope", "all"),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "contradictory-target-allegiance",
+            replace(
+                selection_clause,
+                target=RuleTargetSpec(
+                    kind=RuleTargetKind.ENEMY_UNIT,
+                    source_span=_span(),
+                    parameters=_parameters(("allegiance", "friendly")),
+                ),
+            ),
+        ),
+        (
+            "extra-trigger-parameter",
+            replace(
+                selection_clause,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.TIMING_WINDOW,
+                    source_span=_span(),
+                    parameters=_parameters(
+                        ("edge", "start"),
+                        ("owner", None),
+                        ("phase", BattlePhase.FIGHT.value),
+                        ("unsupported_mode", "always"),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "unsupported-trigger-owner",
+            replace(
+                selection_clause,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.TIMING_WINDOW,
+                    source_span=_span(),
+                    parameters=_parameters(
+                        ("edge", "start"),
+                        ("owner", "opponent"),
+                        ("phase", BattlePhase.FIGHT.value),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "malformed-engagement-range",
+            replace(
+                selection_clause,
+                conditions=(
+                    _condition(
+                        RuleConditionKind.DISTANCE_PREDICATE,
+                        *tuple(
+                            (key, 1.0) if key == "distance_inches" else (key, value)
+                            for key, value in distance_parameter_pairs
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "malformed-numeric-distance",
+            replace(
+                selection_clause,
+                conditions=(
+                    _condition(
+                        RuleConditionKind.DISTANCE_PREDICATE,
+                        ("distance_inches", "6"),
+                        ("negated", False),
+                        ("object_kind", "model"),
+                        ("object_reference", "this"),
+                        ("predicate", "within"),
+                        ("qualifier", None),
+                        ("range_kind", "numeric_range"),
+                    ),
+                ),
+            ),
+        ),
+        (
+            "malformed-visibility",
+            replace(
+                selection_clause,
+                conditions=(
+                    _condition(
+                        RuleConditionKind.VISIBILITY_PREDICATE,
+                        ("observer", "this_model"),
+                        ("predicate", "visible_to"),
+                        ("target_reference", "selected_unit"),
+                        ("unsupported_mode", "always"),
+                    ),
+                ),
+            ),
+        ),
+    )
+    source_army, target_army = _mustered_core_armies()
+    empty_index = AbilityCatalogIndex.from_records(())
+    battlefield = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_army.units[0],
+        source_x=10.0,
+        target_army=target_army,
+        target_unit=target_army.units[0],
+        target_x=10.4,
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+
+    for shape_name, invalid_selection_clause in invalid_shapes:
+        rule_ir = _rule_ir(
+            source_id=f"test:selected-target:fight:selection:{shape_name}",
+            clauses=(invalid_selection_clause, supported_effect_clause),
+        )
+        record = _ability_record(
+            record_id=f"record:selected-target:fight:selection:{shape_name}",
+            rule_ir=rule_ir,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+            runtime_clause_id=invalid_selection_clause.clause_id,
+        )
+        index = AbilityCatalogIndex.from_records((record,))
+        runtime = CatalogSelectedTargetEffectRuntime(
+            ability_indexes_by_player_id={
+                source_army.player_id: index,
+                target_army.player_id: empty_index,
+            },
+            armies=(source_army, target_army),
+        )
+
+        assert not fight_start_selected_target_selection_is_supported(invalid_selection_clause), (
+            shape_name
+        )
+        assert fight_start_selected_target_effect_clause_ids(rule_ir) == (), shape_name
+        consumer_ids = catalog_rule_ir_consumers_for_rule(rule_ir)
+        hook_ids = catalog_rule_ir_hook_ids_for_rule(rule_ir)
+        assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID not in consumer_ids, shape_name
+        assert CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID not in hook_ids, shape_name
+        assert not record_has_supported_fight_start_selected_target_effect(record), shape_name
+        assert not has_fight_start_selected_target_records({source_army.player_id: index}), (
+            shape_name
+        )
+        assert runtime.fight_phase_start_bindings() == (), shape_name
+        assert (
+            runtime.fight_phase_start_request(
+                FightPhaseStartRequestContext(state=state, decisions=DecisionController())
+            )
+            is None
+        ), shape_name
+
+    with pytest.raises(GameLifecycleError, match="selection condition is unsupported"):
+        eligible_selection_target_unit_ids(
+            state=state,
+            source_player_id=source_army.player_id,
+            source_unit_instance_id=source_army.units[0].unit_instance_id,
+            source_model_instance_id=None,
+            selection_clause=invalid_shapes[1][1],
+            explicit_target_unit_ids=None,
+        )
+
+
+def test_catalog_post_shoot_rejects_unsupported_selection_clause() -> None:
+    selection_clause = replace(
+        _post_shoot_hit_selection_clause(),
+        diagnostics=(
+            RuleParseDiagnostic(
+                reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+                message="unsupported-selection",
+                source_span=_span(),
+            ),
+        ),
+    )
+    rule_ir = _rule_ir(
+        source_id="test:selected-target:post-shoot:unsupported-selection",
+        clauses=(
+            selection_clause,
+            _effect_clause(
+                clause_id="test:selected-target:selection:post-shoot:unsupported-selection:effect",
+                duration=_duration("phase"),
+                effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+                roll_type="attack_sequence.hit",
+                delta=1,
+            ),
+        ),
+    )
+    record = _ability_record(
+        record_id="record:selected-target:post-shoot:unsupported-selection",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        runtime_clause_id=selection_clause.clause_id,
+    )
+    source_army, target_army = _mustered_core_armies()
+    index = AbilityCatalogIndex.from_records((record,))
+    runtime = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: index,
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+
+    assert not clause_is_post_shoot_hit_target_selection(selection_clause)
+    assert post_shoot_hit_target_effect_clause_ids(rule_ir) == ()
+    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in (
+        catalog_rule_ir_consumers_for_rule(rule_ir)
+    )
+    assert CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID not in (
+        catalog_rule_ir_hook_ids_for_rule(rule_ir)
+    )
+    assert not has_post_shoot_hit_target_effect_records({source_army.player_id: index})
+    assert runtime.attack_sequence_completed_bindings() == ()
 
 
 def test_catalog_selected_target_support_filters_generic_records_by_timing() -> None:
@@ -3587,9 +3856,12 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
         conditions=(
             _condition(
                 RuleConditionKind.DISTANCE_PREDICATE,
+                ("distance_inches", None),
+                ("negated", False),
                 ("object_kind", "model"),
                 ("object_reference", "this"),
                 ("predicate", "within_engagement_range"),
+                ("qualifier", None),
                 ("range_kind", "engagement_range"),
             ),
         ),
@@ -3766,9 +4038,12 @@ def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None
         conditions=(
             _condition(
                 RuleConditionKind.DISTANCE_PREDICATE,
+                ("distance_inches", None),
+                ("negated", False),
                 ("object_kind", "model"),
                 ("object_reference", "this"),
                 ("predicate", "within_engagement_range"),
+                ("qualifier", None),
                 ("range_kind", "engagement_range"),
             ),
         ),
@@ -5086,10 +5361,15 @@ def _fight_start_selection_clause(
             source_span=_span(),
             parameters=_parameters(
                 ("edge", "start"),
+                ("owner", None),
                 ("phase", BattlePhase.FIGHT.value),
             ),
         ),
-        target=RuleTargetSpec(kind=RuleTargetKind.ENEMY_UNIT, source_span=_span()),
+        target=RuleTargetSpec(
+            kind=RuleTargetKind.ENEMY_UNIT,
+            source_span=_span(),
+            parameters=_parameters(("allegiance", "enemy")),
+        ),
     )
 
 
