@@ -39,7 +39,14 @@ from tools.generate_aeldari_datasheet_semantic_coverage import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,
+    CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID,
 )
+from warhammer40k_core.engine.core_descriptor_consumption import (
+    CORE_LEADER_ATTACHMENT_CONSUMER_ID,
+    CORE_SCOUTS_PREBATTLE_CONSUMER_ID,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
 )
@@ -199,6 +206,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
 
     non_daemons_rows = tuple(row for row in support_rows if row.faction_id != "chaos-daemons")
     assert {(row.faction_id, row.datasheet_id, row.overall) for row in non_daemons_rows} == {
+        ("aeldari", "000004194", "Playable"),
         ("death-guard", "000004209", "Partial"),
         ("emperors-children", "000004208", "Partial"),
         ("thousand-sons", "000001030", "Playable"),
@@ -216,6 +224,45 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
                 f"| {row.datasheet_name} (`{row.datasheet_id}`) | "
                 f"{coverage_row.ability_name} (`{coverage_row.ability_id}`) |"
             ) in markdown
+
+    kharseth_support = next(row for row in non_daemons_rows if row.datasheet_id == "000004194")
+    assert (
+        kharseth_support.catalog_status,
+        kharseth_support.model_geometry_status,
+        kharseth_support.wargear_status,
+        kharseth_support.weapon_keyword_status,
+        kharseth_support.datasheet_ability_status,
+    ) == ("Full", "Full", "Full", "Full", "Full")
+    assert kharseth_support.faction_interaction_status == "Partial"
+    assert "detachment support 2/15" in kharseth_support.notes
+    kharseth_ability_rows = {
+        ability_rows_by_id[row_id].ability_name: ability_rows_by_id[row_id]
+        for row_id in kharseth_support.ability_coverage_row_ids
+    }
+    assert set(kharseth_ability_rows) == {
+        "Leader",
+        "Scouts",
+        "Aethersense (Psychic)",
+        "Fury of the Void (Psychic)",
+        "Battle Focus",
+    }
+    assert all(
+        row.support_stage.value == "engine_consumed" for row in kharseth_ability_rows.values()
+    )
+    assert kharseth_ability_rows["Leader"].runtime_consumer_ids == (
+        CORE_LEADER_ATTACHMENT_CONSUMER_ID,
+    )
+    assert kharseth_ability_rows["Scouts"].runtime_consumer_ids == (
+        CORE_SCOUTS_PREBATTLE_CONSUMER_ID,
+    )
+    assert kharseth_ability_rows["Battle Focus"].runtime_consumer_ids == (
+        army_rule.FADE_BACK_HOOK_ID,
+        army_rule.FLITTING_SHADOWS_HOOK_ID,
+        army_rule.OPPORTUNITY_SEIZED_HOOK_ID,
+        army_rule.STAR_ENGINES_HOOK_ID,
+        army_rule.SUDDEN_STRIKE_HOOK_ID,
+        army_rule.SWIFT_AS_THE_WIND_HOOK_ID,
+    )
 
     world_eaters_markdown = markdown_by_filename["world-eaters.md"]
     assert "`catalog-ir:movement-transit-permission`" in world_eaters_markdown
@@ -254,12 +301,28 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
+        SEMANTIC_BUCKET_ALL_CONSUMED: 1,
         SEMANTIC_BUCKET_HOST_NEEDED: 6,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 64,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 63,
     }
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000571"].semantic_bucket == SEMANTIC_BUCKET_UNSUPPORTED_IR
+    kharseth = rows_by_id["000004194"]
+    assert kharseth.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    assert {
+        ability.ability_name: (ability.support_stage.value, ability.runtime_consumer_ids)
+        for ability in kharseth.abilities
+    } == {
+        "Aethersense (Psychic)": (
+            "engine_consumed",
+            (CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID,),
+        ),
+        "Fury of the Void (Psychic)": (
+            "engine_consumed",
+            (CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,),
+        ),
+    }
     assert all(row.semantic_bucket != SEMANTIC_BUCKET_BRIDGE_BLOCKED for row in artifact.rows)
     assert set(dict(artifact.source_artifact_hashes)) == set(SOURCE_ARTIFACT_TABLES)
     for row in artifact.rows:
@@ -406,9 +469,9 @@ def test_aeldari_semantic_loader_rejects_omitted_effect_and_false_promotion(
     psychic_guidance["support_stage"] = "engine_consumed"
     wraithguard["semantic_bucket"] = SEMANTIC_BUCKET_ALL_CONSUMED
     payload["semantic_bucket_counts"] = {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 1,
-        SEMANTIC_BUCKET_HOST_NEEDED: 5,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 64,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 3,
+        SEMANTIC_BUCKET_HOST_NEEDED: 4,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 63,
     }
     coverage_path = _write_aeldari_coverage_payload(tmp_path, payload)
 

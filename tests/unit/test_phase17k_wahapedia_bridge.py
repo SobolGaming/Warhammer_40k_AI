@@ -6699,10 +6699,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Exact IR parsed; host needed | Exact ability IR unsupported | "
         "Exact ability bridge blocked |"
     ) in aeldari_markdown
-    assert "| Craftworlds / Asuryani | None | Crimson Hunter (`000000603`)" in aeldari_markdown
+    assert "| Craftworlds / Asuryani | None | Crimson Hunter" in aeldari_markdown
+    assert "Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)" in aeldari_markdown
     assert "Eldrad Ulthran (`000000568`)<br>Falcon (`000000609`)" in aeldari_markdown
     assert "Wraithguard (`000000597`)" in aeldari_markdown
-    assert "| Anhrathe / Corsairs | None | None | Corsair Skyreavers" in aeldari_markdown
+    assert "| Anhrathe / Corsairs | Kharseth (`000004194`) | None | Corsair Skyreavers" in (
+        aeldari_markdown
+    )
     assert "| Harlequins | None | Skyweavers (`000002539`) |" in aeldari_markdown
     assert "| Ynnari | None | None | The Visarch" in aeldari_markdown
     for group_name in (
@@ -10568,7 +10571,7 @@ def _post_shoot_selected_target_effect_source_artifacts() -> tuple[WahapediaJson
                     ),
                     (
                         "test-lord-of-change,2,Datasheet,,Warpflame Locus,"
-                        '"In your Shooting phase, after this unit has shot, select one '
+                        '"In your Shooting phase, after this model has shot, select one '
                         "enemy unit hit by one or more of those attacks. Until the end "
                         "of the phase, each time this model makes an attack that targets "
                         'that unit, add 1 to the Damage characteristic of that attack.",'

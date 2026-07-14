@@ -7,6 +7,10 @@ from typing import cast
 
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalDistanceHookRegistry,
+    ReserveArrivalRestrictionHookRegistry,
+)
 
 
 def contribution_values[TContribution, TValue](
@@ -57,6 +61,22 @@ def validate_contribution_tuple[T](
         value,
         expected_type,
     )
+
+
+def validate_runtime_content_contributions[T](
+    value: object,
+    expected_type: type[T],
+) -> tuple[T, ...]:
+    if type(value) is not tuple:
+        raise GameLifecycleError("Runtime content contributions must be a tuple.")
+    validated: list[T] = []
+    for item in cast(tuple[object, ...], value):
+        if type(item) is not expected_type:
+            raise GameLifecycleError(
+                "Runtime content contributions must contain RuntimeContentContribution values."
+            )
+        validated.append(item)
+    return tuple(validated)
 
 
 def validate_index_mapping[T](
@@ -113,3 +133,17 @@ def validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...
 def summary_hash(payload: Mapping[str, JsonValue]) -> str:
     serialized = canonical_json(validate_json_value(dict(payload)))
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+
+def validate_reserve_arrival_hook_registries(
+    distance_registry: object,
+    restriction_registry: object,
+) -> None:
+    if type(distance_registry) is not ReserveArrivalDistanceHookRegistry:
+        raise GameLifecycleError(
+            "RuntimeContentBundle requires ReserveArrivalDistanceHookRegistry."
+        )
+    if type(restriction_registry) is not ReserveArrivalRestrictionHookRegistry:
+        raise GameLifecycleError(
+            "RuntimeContentBundle requires ReserveArrivalRestrictionHookRegistry."
+        )

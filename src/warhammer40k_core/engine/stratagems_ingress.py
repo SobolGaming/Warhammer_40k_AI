@@ -47,6 +47,7 @@ def _apply_rapid_ingress_placement(
     proposal_request: MovementProposalRequest,
     submitted: PlacementProposalPayload,
     ruleset_descriptor: RulesetDescriptor,
+    reserve_arrival_restriction_hooks: ReserveArrivalRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
     reserve_state = state.reserve_state_for_unit(submitted.unit_instance_id)
     if reserve_state is None:
@@ -58,6 +59,15 @@ def _apply_rapid_ingress_placement(
         raise GameLifecycleError("Rapid Ingress placement requires MissionSetup.")
     scenario = _battlefield_scenario(state)
     manifested_battlefield = scenario.battlefield_state
+    restriction_violations = reserve_arrival_restriction_violations(
+        state=state,
+        scenario=scenario,
+        reserve_state=reserve_state,
+        unit=_unit_for_reserve_state(state=state, reserve_state=reserve_state),
+        attempted_placement=submitted.attempted_placement,
+        placement_kind=submitted.placement_kind,
+        registry=reserve_arrival_restriction_hooks,
+    )
     placement = resolve_reserve_arrival(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -76,6 +86,7 @@ def _apply_rapid_ingress_placement(
         ),
         large_model_exceptions=submitted.large_model_exceptions,
         strategic_reserve_rule=_strategic_reserve_rule_for_ingress_request(proposal_request),
+        additional_violations=restriction_violations,
     )
     if not placement.is_valid:
         invalid_payload = {

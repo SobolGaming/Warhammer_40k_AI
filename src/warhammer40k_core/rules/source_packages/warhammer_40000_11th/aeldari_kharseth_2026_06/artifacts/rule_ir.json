@@ -1,0 +1,313 @@
+{
+  "artifact_schema": "core-v2-kharseth-datasheet-rule-ir-v1",
+  "datasheet_id": "000004194",
+  "datasheet_name": "Kharseth",
+  "package_hash": "dfc876685dbb22509fa6bc5b9943566502ab0be41b0d6c4318501a6a31cdcdd7",
+  "records": {
+    "000004194:4": {
+      "ability_name": "Aethersense (Psychic)",
+      "normalized_text_sha256": "325e0851686fcd845d6b4e7ba59aa7a8a601770534aa40376df9e8a82059088b",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:kharseth:000004194:4:clause:001",
+            "conditions": [
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": 12.0
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "model"
+                  },
+                  {
+                    "key": "object_reference",
+                    "value": "this_model"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within"
+                  },
+                  {
+                    "key": "range_kind",
+                    "value": "numeric_range"
+                  }
+                ],
+                "source_span": {
+                  "end": 102,
+                  "start": 78,
+                  "text": "within 12\" of this model"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "placement_restriction",
+                "parameters": [
+                  {
+                    "key": "allowed",
+                    "value": false
+                  },
+                  {
+                    "key": "placement_source",
+                    "value": "reserves"
+                  }
+                ],
+                "source_span": {
+                  "end": 77,
+                  "start": 61,
+                  "text": "cannot be set up"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 103,
+              "start": 0,
+              "text": "Enemy units that are set up on the battlefield from Reserves cannot be set up within 12\" of this model."
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "setup_source",
+                  "value": "reserves"
+                }
+              ],
+              "source_span": {
+                "end": 11,
+                "start": 0,
+                "text": "Enemy units"
+              }
+            },
+            "template_id": "phase17c:placement-permission-restriction",
+            "trigger": {
+              "kind": "setup",
+              "parameters": [
+                {
+                  "key": "setup_source",
+                  "value": "reserves"
+                },
+                {
+                  "key": "subject",
+                  "value": "enemy_unit"
+                }
+              ],
+              "source_span": {
+                "end": 60,
+                "start": 21,
+                "text": "set up on the battlefield from Reserves"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "447381c9892ccc0fd9099519253e705fd5829c327f504b5308a7db720285d43c",
+        "normalized_text": "Enemy units that are set up on the battlefield from Reserves cannot be set up within 12\" of this model.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:kharseth:datasheet:000004194:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-kharseth-datasheet-2026-06-09:datasheet:000004194:4"
+      }
+    },
+    "000004194:5": {
+      "ability_name": "Fury of the Void (Psychic)",
+      "normalized_text_sha256": "7651b8d389eef31ad5d08ffe743e3ced3ff6752a4eabb5b1ab9eb5a051fa9b85",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:kharseth:000004194:5:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [],
+            "source_span": {
+              "end": 153,
+              "start": 0,
+              "text": "In your Shooting phase, after this model's unit has shot, select one enemy unit hit by one or more attacks made with this model's Dread of the Deep Void."
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 79,
+                "start": 65,
+                "text": "one enemy unit"
+              }
+            },
+            "template_id": "phase17c:selected-target-constraint",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "attacker_model_reference",
+                  "value": "this_model"
+                },
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "just_after_friendly_unit_has_shot"
+                },
+                {
+                  "key": "weapon_names",
+                  "value": [
+                    "Dread of the Deep Void"
+                  ]
+                }
+              ],
+              "source_span": {
+                "end": 56,
+                "start": 24,
+                "text": "after this model's unit has shot"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:aeldari:kharseth:000004194:5:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "attack_target"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "attack_targets_selected_unit"
+                  },
+                  {
+                    "key": "target_reference",
+                    "value": "selected_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 284,
+                  "start": 264,
+                  "text": "targets a riven unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "endpoint",
+                  "value": "turn"
+                }
+              ],
+              "source_span": {
+                "end": 179,
+                "start": 154,
+                "text": "Until the end of the turn"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_characteristic",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "characteristic",
+                    "value": "strength"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 1
+                  }
+                ],
+                "source_span": {
+                  "end": 337,
+                  "start": 286,
+                  "text": "add 1 to the Strength characteristic of that attack"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 338,
+              "start": 154,
+              "text": "Until the end of the turn, that unit is riven. Each time an AELDARI model from your army makes an attack that targets a riven unit, add 1 to the Strength characteristic of that attack."
+            },
+            "target": {
+              "kind": "friendly_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "friendly"
+                },
+                {
+                  "key": "required_keyword",
+                  "value": "AELDARI"
+                }
+              ],
+              "source_span": {
+                "end": 242,
+                "start": 211,
+                "text": "an AELDARI model from your army"
+              }
+            },
+            "template_id": "phase17c:characteristic-modifier",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "73a3e8e185390e7de72906b45e9e9c5e976f6c590661583adcb4d88bad482df3",
+        "normalized_text": "In your Shooting phase, after this model's unit has shot, select one enemy unit hit by one or more attacks made with this model's Dread of the Deep Void. Until the end of the turn, that unit is riven. Each time an AELDARI model from your army makes an attack that targets a riven unit, add 1 to the Strength characteristic of that attack.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:kharseth:datasheet:000004194:5",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-kharseth-datasheet-2026-06-09:datasheet:000004194:5"
+      }
+    }
+  },
+  "source_package_id": "gw-11e-aeldari-kharseth-datasheet-2026-06-09",
+  "source_page_numbers": [
+    14,
+    15
+  ],
+  "source_pdf_filename": "eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
+  "source_pdf_sha256": "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9"
+}

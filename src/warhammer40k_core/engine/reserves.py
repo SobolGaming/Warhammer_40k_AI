@@ -94,6 +94,7 @@ class ReservePlacementViolationCode(StrEnum):
     STRATEGIC_RESERVES_EDGE_DISTANCE = "strategic_reserves_edge_distance"
     STRATEGIC_RESERVES_ENEMY_DEPLOYMENT_ZONE = "strategic_reserves_enemy_deployment_zone"
     DEEP_STRIKE_KEYWORD_REQUIRED = "deep_strike_keyword_required"
+    RESERVE_ARRIVAL_ABILITY_RESTRICTION = "reserve_arrival_ability_restriction"
     RESERVE_ENEMY_DISTANCE = "reserve_enemy_distance"
     RESERVE_ENEMY_ENGAGEMENT_RANGE = "reserve_enemy_engagement_range"
     BATTLEFIELD_EDGE_CROSSED = "battlefield_edge_crossed"
@@ -1644,6 +1645,7 @@ def resolve_reserve_arrival(
     large_model_exceptions: tuple[LargeModelReservePlacementException, ...] = (),
     strategic_reserve_rule: StrategicReserveRule | None = None,
     deep_strike_enemy_horizontal_distance_inches: float | None = None,
+    additional_violations: tuple[ReservePlacementViolation, ...] = (),
 ) -> ReinforcementPlacement:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("resolve_reserve_arrival scenario must be a scenario.")
@@ -1668,6 +1670,10 @@ def resolve_reserve_arrival(
     exceptions = _validate_large_model_exception_tuple(
         "large_model_exceptions",
         large_model_exceptions,
+    )
+    supplied_violations = _validate_reserve_placement_violation_tuple(
+        "additional_violations",
+        additional_violations,
     )
     strategic_rule = strategic_reserve_rule or StrategicReserveRule()
     if type(strategic_rule) is not StrategicReserveRule:
@@ -1698,7 +1704,7 @@ def resolve_reserve_arrival(
         qualifying_edges=qualifying_edges,
         large_model_exceptions=exceptions,
     )
-    violations: list[ReservePlacementViolation] = []
+    violations: list[ReservePlacementViolation] = list(supplied_violations)
     _append_reserve_state_violations(
         violations=violations,
         reserve_state=reserve_state,

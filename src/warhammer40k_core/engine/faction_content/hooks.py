@@ -36,7 +36,10 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
 )
 from warhammer40k_core.engine.movement_end_surge_hooks import MovementEndSurgeHookBinding
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.reserve_arrival_hooks import ReserveArrivalDistanceHookBinding
+from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalDistanceHookBinding,
+    ReserveArrivalRestrictionHookBinding,
+)
 from warhammer40k_core.engine.shooting_end_surge_hooks import ShootingEndSurgeHookBinding
 from warhammer40k_core.engine.shooting_phase_start_hooks import ShootingPhaseStartHookBinding
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
@@ -118,6 +121,7 @@ _HOOK_EVENT_BY_BINDING_TYPE: Mapping[type[object], LifecycleHookEvent] = Mapping
         FallBackEligibilityHookBinding: LifecycleHookEvent.FALL_BACK_ELIGIBILITY,
         MovementEndSurgeHookBinding: LifecycleHookEvent.MOVEMENT_END_SURGE,
         ReserveArrivalDistanceHookBinding: LifecycleHookEvent.RESERVE_ARRIVAL_DISTANCE,
+        ReserveArrivalRestrictionHookBinding: LifecycleHookEvent.RESERVE_ARRIVAL_RESTRICTION,
         UnitMoveCompletedMortalWoundHookBinding: (
             LifecycleHookEvent.UNIT_MOVE_COMPLETED_MORTAL_WOUND
         ),
@@ -158,6 +162,9 @@ HOOK_BINDING_COMBINE_NAME_BY_EVENT: Mapping[LifecycleHookEvent, str] = MappingPr
         LifecycleHookEvent.FALL_BACK_ELIGIBILITY: "Fall Back eligibility hook binding",
         LifecycleHookEvent.MOVEMENT_END_SURGE: "movement-end surge hook binding",
         LifecycleHookEvent.RESERVE_ARRIVAL_DISTANCE: "reserve arrival distance hook binding",
+        LifecycleHookEvent.RESERVE_ARRIVAL_RESTRICTION: (
+            "reserve arrival restriction hook binding"
+        ),
         LifecycleHookEvent.UNIT_MOVE_COMPLETED_MORTAL_WOUND: (
             "unit move completed mortal wound hook binding"
         ),

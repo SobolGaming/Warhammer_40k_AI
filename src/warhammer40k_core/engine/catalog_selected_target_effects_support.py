@@ -11,6 +11,7 @@ from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
+    AbilitySourceKind,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
@@ -18,11 +19,36 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.catalog_geometry import alive_geometry_models_for_placement
+from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
+    clause_has_immediate_selected_target_effect,
+    effect_is_immediate_selected_target_battle_shock,
+    post_shoot_selected_target_effect_attack_role,
+    post_shoot_selected_target_effect_clause_is_supported,
+    post_shoot_selected_target_effect_clauses_after,
+    post_shoot_selected_target_pair_is_supported,
+    post_shoot_selection_clause_binds_source_model,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_unit_scoped_generic_records,
 )
+from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    clause_is_post_shoot_hit_target_selection as clause_is_post_shoot_hit_target_selection,
+)
+from warhammer40k_core.engine.catalog_selected_target_pair_support import (
+    clause_is_fight_start_selected_target_selection,
+    fight_start_selected_target_effect_clauses_after,
+    selected_target_effect_attack_role,
+    selected_target_effect_clause_is_supported,
+    selected_target_effect_weapon_scope,
+    selected_target_pair_requires_source_model,
+    selected_target_selection_clause_binds_source_model,
+    selected_target_selection_condition_is_supported,
+)
+from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -30,11 +56,10 @@ from warhammer40k_core.geometry.volume import Model
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
-    RuleEffectKind,
+    RuleDurationKind,
     RuleEffectSpec,
     RuleParameterValue,
     RuleTargetKind,
-    RuleTriggerKind,
     parameter_payload,
     parameters_from_pairs,
 )
@@ -42,51 +67,27 @@ from warhammer40k_core.rules.rule_ir import (
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
+__all__ = (
+    "clause_has_immediate_selected_target_effect",
+    "effect_is_immediate_selected_target_battle_shock",
+    "post_shoot_selected_target_effect_attack_role",
+    "post_shoot_selected_target_effect_clause_is_supported",
+    "post_shoot_selected_target_effect_clauses_after",
+    "post_shoot_selected_target_pair_is_supported",
+    "post_shoot_selection_clause_binds_source_model",
+    "selected_target_effect_attack_role",
+    "selected_target_effect_clause_is_supported",
+    "selected_target_effect_weapon_scope",
+)
+
 _ENGAGEMENT_RANGE_HORIZONTAL_INCHES = 1.0
 _ENGAGEMENT_RANGE_VERTICAL_INCHES = 5.0
-SUPPORTED_SELECTED_EFFECT_KINDS = frozenset(
-    (
-        RuleEffectKind.GRANT_WEAPON_ABILITY,
-        RuleEffectKind.MODIFY_CHARACTERISTIC,
-        RuleEffectKind.MODIFY_DICE_ROLL,
-        RuleEffectKind.REROLL_PERMISSION,
-        RuleEffectKind.SET_CONTEXTUAL_STATUS,
-    )
-)
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def clause_is_fight_start_selection(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog selected-target matcher requires RuleClause.")
-    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
-        return False
-    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
-        return False
-    parameters = parameter_payload(clause.trigger.parameters)
-    return (
-        parameters.get("edge") == "start"
-        and parameters.get("phase") == BattlePhase.FIGHT.value
-        and not clause.effects
-    )
-
-
-def clause_is_post_shoot_hit_target_selection(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog post-shoot matcher requires RuleClause.")
-    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
-        return False
-    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
-        return False
-    parameters = parameter_payload(clause.trigger.parameters)
-    target_parameters = parameter_payload(clause.target.parameters)
-    return (
-        parameters.get("timing_window") == "just_after_friendly_unit_has_shot"
-        and parameters.get("target_relationship") == "hit_by_those_attacks"
-        and target_parameters.get("target_relationship") == "hit_by_those_attacks"
-        and not clause.effects
-    )
+    return clause_is_fight_start_selected_target_selection(clause)
 
 
 def selected_effect_clauses_after(
@@ -95,45 +96,15 @@ def selected_effect_clauses_after(
     *,
     include_immediate_effects: bool = False,
 ) -> tuple[RuleClause, ...]:
+    if not include_immediate_effects:
+        return fight_start_selected_target_effect_clauses_after(clauses, selection_index)
     selected: list[RuleClause] = []
     for clause in clauses[selection_index + 1 :]:
         if clause.template_id == "phase17c:selected-target-constraint":
             break
-        if not clause.effects:
-            continue
-        if clause.duration is None and not (
-            include_immediate_effects and clause_has_immediate_selected_target_effect(clause)
-        ):
-            continue
-        if any(effect.kind in SUPPORTED_SELECTED_EFFECT_KINDS for effect in clause.effects):
+        if selected_target_effect_clause_is_supported(clause):
             selected.append(clause)
     return tuple(selected)
-
-
-def clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog selected-target matcher requires RuleClause.")
-    if clause.duration is not None or clause.target is None:
-        return False
-    if clause.target.kind not in {RuleTargetKind.SELECTED_UNIT, RuleTargetKind.SELECTED_TARGET}:
-        return False
-    return any(
-        effect_is_immediate_selected_target_battle_shock(effect) for effect in clause.effects
-    )
-
-
-def effect_is_immediate_selected_target_battle_shock(effect: RuleEffectSpec) -> bool:
-    if type(effect) is not RuleEffectSpec:
-        raise GameLifecycleError("Catalog selected-target matcher requires RuleEffectSpec.")
-    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
-        return False
-    parameters = parameter_payload(effect.parameters)
-    return (
-        parameters.get("rules_context") == "battle_shock"
-        and parameters.get("status") == "force_battle_shock_test"
-        and parameters.get("required") is True
-        and parameters.get("target_scope") == "selected_unit"
-    )
 
 
 def eligible_selection_target_unit_ids(
@@ -194,6 +165,11 @@ def selection_target_conditions_apply(
     target_placement: UnitPlacement,
     selection_clause: RuleClause,
 ) -> bool:
+    if not all(
+        selected_target_selection_condition_is_supported(condition)
+        for condition in selection_clause.conditions
+    ):
+        raise GameLifecycleError("Catalog selected-target selection condition is unsupported.")
     if not selection_distance_conditions_apply(
         scenario=scenario,
         source_placement=source_placement,
@@ -228,11 +204,6 @@ def selection_distance_conditions_apply(
     )
     if not distance_conditions:
         return True
-    source_models = geometry_models_for_placement(
-        scenario=scenario,
-        unit_placement=source_placement,
-        source_model_instance_id=source_model_instance_id,
-    )
     target_models = geometry_models_for_placement(
         scenario=scenario,
         unit_placement=target_placement,
@@ -246,6 +217,22 @@ def selection_distance_conditions_apply(
             parameters.get("range_kind") != "numeric_range"
         ):
             raise GameLifecycleError("Catalog selected-target distance predicate is unsupported.")
+        object_kind = parameters.get("object_kind")
+        if object_kind == "model":
+            if source_model_instance_id is None:
+                raise GameLifecycleError(
+                    "Model-scoped selected-target distance requires a source model."
+                )
+            condition_source_model_id = source_model_instance_id
+        elif object_kind == "unit":
+            condition_source_model_id = None
+        else:
+            raise GameLifecycleError("Catalog selected-target distance object kind is unsupported.")
+        source_models = geometry_models_for_placement(
+            scenario=scenario,
+            unit_placement=source_placement,
+            source_model_instance_id=condition_source_model_id,
+        )
         if not any_models_satisfy_distance(
             source_models=source_models,
             target_models=target_models,
@@ -372,9 +359,11 @@ def effect_target_unit_ids(
     for placed_army in state.battlefield_state.placed_armies:
         if placed_army.player_id != source_player_id:
             continue
-        army = army_for_player(tuple(state.army_definitions), player_id=placed_army.player_id)
         for placement in placed_army.unit_placements:
-            unit = unit_in_army_by_id(army, unit_instance_id=placement.unit_instance_id)
+            unit = rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=placement.unit_instance_id,
+            )
             if required_keywords and not unit_has_required_keywords(
                 unit_keywords=unit.keywords,
                 faction_keywords=unit.faction_keywords,
@@ -428,12 +417,64 @@ def effect_with_selected_target(
     effect: RuleEffectSpec,
     *,
     selected_target_unit_instance_id: str,
+    clause: RuleClause | None = None,
+    normalized_attack_role: str | None = None,
+    normalized_weapon_scope: str | None = None,
 ) -> RuleEffectSpec:
+    if clause is not None:
+        if type(clause) is not RuleClause or effect not in clause.effects:
+            raise GameLifecycleError("Catalog selected-target effect clause is invalid.")
+        if not selected_target_effect_clause_is_supported(clause):
+            raise GameLifecycleError("Catalog selected-target effect clause is unsupported.")
+        if normalized_attack_role is not None or normalized_weapon_scope is not None:
+            raise GameLifecycleError(
+                "Catalog selected-target effect normalization is already clause-derived."
+            )
+        if not clause_has_immediate_selected_target_effect(clause):
+            normalized_attack_role = selected_target_effect_attack_role(
+                clause=clause,
+                effect=effect,
+            )
+            normalized_weapon_scope = selected_target_effect_weapon_scope(
+                clause=clause,
+                effect=effect,
+            )
+    if normalized_attack_role is not None and normalized_attack_role not in {
+        "attacker",
+        "target",
+    }:
+        raise GameLifecycleError("Catalog selected-target normalized attack role is unsupported.")
+    if normalized_weapon_scope is not None and normalized_weapon_scope not in {
+        "all",
+        "melee",
+        "ranged",
+    }:
+        raise GameLifecycleError("Catalog selected-target normalized weapon scope is unsupported.")
+    existing_attack_role = parameter_payload(effect.parameters).get("attack_role")
+    if (
+        normalized_attack_role is not None
+        and existing_attack_role is not None
+        and existing_attack_role != normalized_attack_role
+    ):
+        raise GameLifecycleError("Catalog selected-target attack role conflicts with its clause.")
+    existing_weapon_scope = parameter_payload(effect.parameters).get("weapon_scope")
+    if (
+        normalized_weapon_scope is not None
+        and existing_weapon_scope is not None
+        and existing_weapon_scope != normalized_weapon_scope
+    ):
+        raise GameLifecycleError("Catalog selected-target weapon scope conflicts with its clause.")
     pairs: list[tuple[str, RuleParameterValue]] = [
         (parameter.key, parameter.value)
         for parameter in effect.parameters
         if parameter.key != "selected_target_unit_instance_id"
+        and not (normalized_attack_role is not None and parameter.key == "attack_role")
+        and not (normalized_weapon_scope is not None and parameter.key == "weapon_scope")
     ]
+    if normalized_attack_role is not None:
+        pairs.append(("attack_role", normalized_attack_role))
+    if normalized_weapon_scope is not None:
+        pairs.append(("weapon_scope", normalized_weapon_scope))
     pairs.append(("selected_target_unit_instance_id", selected_target_unit_instance_id))
     return replace(effect, parameters=parameters_from_pairs(tuple(pairs)))
 
@@ -443,44 +484,191 @@ def selection_source_model_ids(
     selection_clause: RuleClause,
     current_model_instance_ids: tuple[str, ...],
 ) -> tuple[str | None, ...]:
-    for condition in selection_clause.conditions:
-        if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
-            continue
-        parameters = parameter_payload(condition.parameters)
-        if (
-            parameters.get("object_kind") == "model"
-            and parameters.get("object_reference") == "this"
-        ):
-            return current_model_instance_ids
+    if selected_target_selection_clause_binds_source_model(selection_clause):
+        return current_model_instance_ids
     return (None,)
+
+
+def selection_source_model_ids_for_record(
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    selection_clause: RuleClause,
+    effect_clauses: tuple[RuleClause, ...],
+    current_model_instance_ids: tuple[str, ...],
+) -> tuple[str | None, ...]:
+    if not selected_target_pair_requires_source_model(
+        selection_clause=selection_clause,
+        effect_clauses=effect_clauses,
+    ):
+        return (None,)
+    source_model_ids = current_model_instance_ids
+    if record.source_kind is not AbilitySourceKind.WARGEAR:
+        return source_model_ids
+    bearer_ids = frozenset(
+        catalog_rule_record_current_wargear_bearer_model_ids(
+            record=record,
+            unit=unit,
+            current_model_instance_ids=current_model_instance_ids,
+        )
+    )
+    return tuple(model_id for model_id in source_model_ids if model_id in bearer_ids)
+
+
+def selection_weapon_names(selection_clause: RuleClause) -> tuple[str, ...]:
+    if selection_clause.trigger is None:
+        return ()
+    parameters = parameter_payload(selection_clause.trigger.parameters)
+    single_name = parameters.get("weapon_name")
+    raw_names = parameters.get("weapon_names")
+    if single_name is not None and raw_names is not None:
+        raise GameLifecycleError("Catalog selected-target weapon selector is ambiguous.")
+    if single_name is not None:
+        if type(single_name) is not str or not single_name.strip():
+            raise GameLifecycleError("Catalog selected-target weapon_name is invalid.")
+        return (single_name,)
+    if raw_names is None:
+        return ()
+    if type(raw_names) is not tuple or not raw_names:
+        raise GameLifecycleError("Catalog selected-target weapon_names are invalid.")
+    if any(type(name) is not str or not name.strip() for name in raw_names):
+        raise GameLifecycleError("Catalog selected-target weapon_names are invalid.")
+    return tuple(sorted(raw_names))
 
 
 def has_fight_start_selected_target_records(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> bool:
     return any(
-        any(
-            clause_is_fight_start_selection(clause)
-            for clause in catalog_selected_target_clauses_from_record(record)
-        )
+        record_has_supported_fight_start_selected_target_effect(record)
         for index in ability_indexes_by_player_id.values()
         for record in records_for_timing(index, TimingTriggerKind.START_PHASE)
     )
+
+
+def has_fight_start_selected_target_runtime_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> bool:
+    for army in armies:
+        index = ability_indexes_by_player_id.get(army.player_id)
+        if index is None:
+            raise GameLifecycleError("Catalog selected-target runtime missing ability index.")
+        for unit in army.units:
+            current_model_ids = tuple(
+                sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
+            )
+            for record in unit_scoped_generic_records_for_timing(
+                ability_index=index,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+                trigger_kind=TimingTriggerKind.START_PHASE,
+            ):
+                clauses = catalog_selected_target_clauses_from_record(record)
+                runtime_clause_id = runtime_clause_id_from_record(record)
+                for selection_index, selection_clause in enumerate(clauses):
+                    effect_clauses = fight_start_selected_target_effect_clauses_after(
+                        clauses,
+                        selection_index,
+                    )
+                    if (
+                        (
+                            runtime_clause_id is None
+                            or runtime_clause_id == selection_clause.clause_id
+                        )
+                        and clause_is_fight_start_selection(selection_clause)
+                        and effect_clauses
+                        and selection_source_model_ids_for_record(
+                            record,
+                            unit,
+                            selection_clause,
+                            effect_clauses,
+                            current_model_ids,
+                        )
+                    ):
+                        return True
+    return False
 
 
 def has_post_shoot_hit_target_effect_records(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> bool:
     return any(
-        any(
-            clause_is_post_shoot_hit_target_selection(clause)
-            for clause in catalog_selected_target_clauses_from_record(record)
-        )
+        record_has_supported_post_shoot_selected_target_effect(record)
         for index in ability_indexes_by_player_id.values()
         for record in records_for_timing(
             index,
             TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
         )
+    )
+
+
+def has_post_shoot_hit_target_effect_runtime_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> bool:
+    for army in armies:
+        index = ability_indexes_by_player_id.get(army.player_id)
+        if index is None:
+            raise GameLifecycleError("Catalog selected-target runtime missing ability index.")
+        for unit in army.units:
+            current_model_ids = tuple(
+                sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
+            )
+            for record in unit_scoped_generic_records_for_timing(
+                ability_index=index,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+                trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            ):
+                clauses = catalog_selected_target_clauses_from_record(record)
+                runtime_clause_id = runtime_clause_id_from_record(record)
+                for selection_index, selection_clause in enumerate(clauses):
+                    effect_clauses = post_shoot_selected_target_effect_clauses_after(
+                        clauses,
+                        selection_index,
+                    )
+                    if (
+                        (
+                            runtime_clause_id is None
+                            or runtime_clause_id == selection_clause.clause_id
+                        )
+                        and clause_is_post_shoot_hit_target_selection(selection_clause)
+                        and effect_clauses
+                        and selection_source_model_ids_for_record(
+                            record,
+                            unit,
+                            selection_clause,
+                            effect_clauses,
+                            current_model_ids,
+                        )
+                    ):
+                        return True
+    return False
+
+
+def record_has_supported_fight_start_selected_target_effect(
+    record: AbilityCatalogRecord,
+) -> bool:
+    clauses = catalog_selected_target_clauses_from_record(record)
+    runtime_clause_id = runtime_clause_id_from_record(record)
+    return any(
+        (runtime_clause_id is None or runtime_clause_id == clause.clause_id)
+        and clause_is_fight_start_selection(clause)
+        and bool(fight_start_selected_target_effect_clauses_after(clauses, index))
+        for index, clause in enumerate(clauses)
+    )
+
+
+def record_has_supported_post_shoot_selected_target_effect(
+    record: AbilityCatalogRecord,
+) -> bool:
+    clauses = catalog_selected_target_clauses_from_record(record)
+    runtime_clause_id = runtime_clause_id_from_record(record)
+    return any(
+        (runtime_clause_id is None or runtime_clause_id == clause.clause_id)
+        and clause_is_post_shoot_hit_target_selection(clause)
+        and bool(post_shoot_selected_target_effect_clauses_after(clauses, index))
+        for index, clause in enumerate(clauses)
     )
 
 
@@ -678,6 +866,42 @@ def battle_phase_kind(phase: BattlePhase) -> BattlePhaseKind:
     if phase is BattlePhase.SHOOTING:
         return BattlePhaseKind.SHOOTING
     raise GameLifecycleError("Catalog selected-target phase is unsupported.")
+
+
+def selected_target_effect_expiration(
+    *,
+    state: GameState,
+    phase: BattlePhase,
+    clause: RuleClause,
+) -> EffectExpiration:
+    duration = clause.duration
+    if duration is None:
+        return EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=battle_phase_kind(phase),
+            player_id=active_player_id(state),
+        )
+    if duration.kind is RuleDurationKind.PERMANENT:
+        return EffectExpiration.end_of_battle()
+    if duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT:
+        raise GameLifecycleError("Catalog selected-target effect duration is unsupported.")
+    endpoint = parameter_payload(duration.parameters).get("endpoint")
+    if endpoint == "phase":
+        return EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=battle_phase_kind(phase),
+            player_id=active_player_id(state),
+        )
+    if endpoint == "turn":
+        return EffectExpiration.end_turn(
+            battle_round=state.battle_round,
+            player_id=active_player_id(state),
+        )
+    if endpoint == "battle_round":
+        return EffectExpiration.end_battle_round(battle_round=state.battle_round)
+    if endpoint == "battle":
+        return EffectExpiration.end_of_battle()
+    raise GameLifecycleError("Catalog selected-target timing endpoint is unsupported.")
 
 
 def timing_window_id(phase: BattlePhase) -> str:

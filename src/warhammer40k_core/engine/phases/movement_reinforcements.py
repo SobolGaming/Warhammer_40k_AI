@@ -354,6 +354,7 @@ def _resolve_reinforcement_placement_submission(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     reserve_arrival_distance_hooks: ReserveArrivalDistanceHookRegistry,
+    reserve_arrival_restriction_hooks: ReserveArrivalRestrictionHookRegistry,
     unit_instance_id: str,
     placement_kind: BattlefieldPlacementKind,
     attempted_placement: UnitPlacement,
@@ -398,6 +399,15 @@ def _resolve_reinforcement_placement_submission(
         enemy_deployment_zones=enemy_deployment_zones,
         reserve_arrival_distance_hooks=reserve_arrival_distance_hooks,
     )
+    restriction_violations = reserve_arrival_restriction_violations(
+        state=state,
+        scenario=scenario,
+        reserve_state=reserve_state,
+        unit=_unit_for_reserve_state(scenario=scenario, reserve_state=reserve_state),
+        attempted_placement=attempted_placement,
+        placement_kind=placement_kind,
+        registry=reserve_arrival_restriction_hooks,
+    )
     placement = resolve_reserve_arrival(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -412,6 +422,7 @@ def _resolve_reinforcement_placement_submission(
         enemy_deployment_zones=enemy_deployment_zones,
         large_model_exceptions=large_model_exceptions,
         deep_strike_enemy_horizontal_distance_inches=deep_strike_enemy_distance,
+        additional_violations=restriction_violations,
     )
     if not placement.is_valid:
         invalid_payload = {

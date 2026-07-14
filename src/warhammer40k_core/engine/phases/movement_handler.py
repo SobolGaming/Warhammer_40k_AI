@@ -55,6 +55,9 @@ class MovementPhaseHandler:
     reserve_arrival_distance_hooks: ReserveArrivalDistanceHookRegistry = field(
         default_factory=ReserveArrivalDistanceHookRegistry.empty
     )
+    reserve_arrival_restriction_hooks: ReserveArrivalRestrictionHookRegistry = field(
+        default_factory=ReserveArrivalRestrictionHookRegistry.empty
+    )
     unit_move_completed_mortal_wound_hooks: UnitMoveCompletedMortalWoundHookRegistry = field(
         default_factory=UnitMoveCompletedMortalWoundHookRegistry.empty
     )
@@ -102,6 +105,13 @@ class MovementPhaseHandler:
         if type(self.reserve_arrival_distance_hooks) is not ReserveArrivalDistanceHookRegistry:
             raise GameLifecycleError(
                 "MovementPhaseHandler reserve_arrival_distance_hooks must be a registry."
+            )
+        if (
+            type(self.reserve_arrival_restriction_hooks)
+            is not ReserveArrivalRestrictionHookRegistry
+        ):
+            raise GameLifecycleError(
+                "MovementPhaseHandler reserve_arrival_restriction_hooks must be a registry."
             )
         if (
             type(self.unit_move_completed_mortal_wound_hooks)
@@ -415,6 +425,7 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 reserve_arrival_distance_hooks=self.reserve_arrival_distance_hooks,
+                reserve_arrival_restriction_hooks=self.reserve_arrival_restriction_hooks,
             )
         if result.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE:
             return _apply_disembark_unit_selection_decision(

@@ -378,6 +378,7 @@ def apply_stratagem_placement_proposal(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    reserve_arrival_restriction_hooks: ReserveArrivalRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
     proposal_request = _movement_proposal_request_from_payload(request.payload)
     if proposal_request is None or not _proposal_request_is_rapid_ingress(proposal_request):
@@ -392,6 +393,7 @@ def apply_stratagem_placement_proposal(
         proposal_request=proposal_request,
         submitted=submitted,
         ruleset_descriptor=ruleset_descriptor,
+        reserve_arrival_restriction_hooks=reserve_arrival_restriction_hooks,
     )
 
 

@@ -1779,9 +1779,7 @@
           "normalized_text_sha256": "3e36b949094a56050a1e2e063a452be5f7ca0d7647105501eb58d1e5651c0bb8",
           "raw_text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks. Until the end of the turn, each time a friendly model that disembarked from this TRANSPORT this turn makes an attack that targets that enemy unit, you can re-roll the Wound roll.",
           "raw_text_sha256": "3e36b949094a56050a1e2e063a452be5f7ca0d7647105501eb58d1e5651c0bb8",
-          "runtime_consumer_ids": [
-            "catalog-ir:post-shoot-hit-target-effect"
-          ],
+          "runtime_consumer_ids": [],
           "semantic_consumers": [
             {
               "runtime_consumer_ids": [],
@@ -2828,9 +2826,7 @@
           "normalized_text_sha256": "a22b789adde654c5c26df7f43ecf53a398f568cf0b3b0698c528ca2db21c1e26",
           "raw_text": "At the start of the Fight phase, select one enemy unit within Engagement Range of this model. Until the end of the phase, each time a friendly AELDARI model makes an attack that targets that unit, you can re-roll a Wound roll of 1.",
           "raw_text_sha256": "a22b789adde654c5c26df7f43ecf53a398f568cf0b3b0698c528ca2db21c1e26",
-          "runtime_consumer_ids": [
-            "catalog-ir:selected-target-effect"
-          ],
+          "runtime_consumer_ids": [],
           "semantic_consumers": [
             {
               "runtime_consumer_ids": [],
@@ -3117,8 +3113,7 @@
           "raw_text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks. Until the end of the turn, each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll of 5+ scores a Critical Hit.",
           "raw_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
           "runtime_consumer_ids": [
-            "catalog-ir:minimum-unmodified-hit-success",
-            "catalog-ir:post-shoot-hit-target-effect"
+            "catalog-ir:minimum-unmodified-hit-success"
           ],
           "semantic_consumers": [
             {
@@ -3892,18 +3887,20 @@
         {
           "ability_id": "000004194:aethersense-psychic",
           "ability_name": "Aethersense (Psychic)",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "325e0851686fcd845d6b4e7ba59aa7a8a601770534aa40376df9e8a82059088b",
           "raw_text": "Enemy units that are set up on the battlefield from Reserves cannot be set up within 12\" of this model.",
           "raw_text_sha256": "325e0851686fcd845d6b4e7ba59aa7a8a601770534aa40376df9e8a82059088b",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:reserve-arrival-restriction"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004194:4:description:clause:001:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:reserve-arrival-restriction"
+              ],
+              "semantic_id": "phase17k:aeldari:kharseth:000004194:4:clause:001:effect:0",
               "semantic_kind": "placement_restriction"
             }
           ],
@@ -3912,23 +3909,25 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000004194:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000004194:fury-of-the-void-psychic",
           "ability_name": "Fury of the Void (Psychic)",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "7651b8d389eef31ad5d08ffe743e3ced3ff6752a4eabb5b1ab9eb5a051fa9b85",
           "raw_text": "In your Shooting phase, after this model's unit has shot, select one enemy unit hit by one or more attacks made with this model's Dread of the Deep Void. Until the end of the turn, that unit is riven. Each time an AELDARI model from your army makes an attack that targets a riven unit, add 1 to the Strength characteristic of that attack.",
           "raw_text_sha256": "7651b8d389eef31ad5d08ffe743e3ced3ff6752a4eabb5b1ab9eb5a051fa9b85",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-effect"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004194:5:description:clause:003:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:post-shoot-hit-target-effect"
+              ],
+              "semantic_id": "phase17k:aeldari:kharseth:000004194:5:clause:002:effect:0",
               "semantic_kind": "modify_characteristic"
             }
           ],
@@ -3937,14 +3936,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000004194:5",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000004194",
       "datasheet_name": "Kharseth",
       "group": "Anhrathe / Corsairs",
       "pdf_page_reference": "Complete Datasheets, physical PDF pages 12-21",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "complete_pdf"
     },
     {
@@ -4010,27 +4009,28 @@
   "faction_id": "aeldari",
   "faction_name": "Aeldari",
   "generated_by": "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py",
-  "overlay_pack_hash": "a29b14b2d7f87b0e20de65d1842c311143e684323a2aa5ef7e9cd66b982e9110",
+  "overlay_pack_hash": "42fef216e9605aba38565b2ca562caa6163b415b8581b0eae7d2aad26e28590f",
   "pdf_filename": "eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
   "pdf_sha256": "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9",
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
+    "All exact abilities consumed": 1,
     "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 64
+    "Exact ability IR unsupported": 63
   },
   "source_artifact_hashes": {
-    "Abilities": "3dea7238ec65575549b6fbe42a86218e63f94ea886e9ff5c6f04fb70ca990d14",
-    "Datasheets": "086cc0f01ec5120eadf81004ce7997d5b26b4a3f6e1c35e9b3f74749ff518a6c",
-    "Datasheets_abilities": "66ab4de347628feaaede370c64fa62b85ae81e9c9edd2cdf01931b18dde8a9a8",
-    "Datasheets_keywords": "42be2843ebc06c4442798587ff25bb6a39e4aff6d334f8fa417e34acb531b2c9",
-    "Datasheets_leader": "0c5976593ed65d5b76f7b87c00c425740eb6816a34eeb4b620efee6af68f090e",
-    "Datasheets_models": "ee663db67f9b6e0de9f5dd18bb5c0f2bc46c314c8a52fece43ec20f1bff156fc",
-    "Datasheets_models_cost": "526716d509e04b9eade6fb1589db16e48fc04f20204ee602f987879530729c53",
-    "Datasheets_options": "21b760a790b14cea5fbae77fc99807a08338c6643082739e4d99b80deb527310",
-    "Datasheets_unit_composition": "97b8633c336f63b9c9485443b4337c43878a6f8da349a5d6015c2a05f09e80b6",
-    "Datasheets_wargear": "d70f3fb4865cd800d07827b0dca2c851b189734a0760c702fa58b6606410547c",
-    "Factions": "a0281f7ad2653ce0a923a90f8ebb5a47916e07f644843a0aeb250e519fe6845e"
+    "Abilities": "dc330b726472a301027fb36652eb8a4e0a1ffdc0fc529df72d5977cf31ccc09e",
+    "Datasheets": "8e7c7170e1ffd73fd0ad92dd7f5ad7cbaffe7ea3a784941ed9f4f2d5ef380a5e",
+    "Datasheets_abilities": "adba6373b277930f4d26b9481d0e3653d0e5dd1eeb45d18e129fc0087bc3bef6",
+    "Datasheets_keywords": "391eae1bfcbd729e9b9ba1e04f30eada56b5fbcadacc2af92132e91c50555b7b",
+    "Datasheets_leader": "cb4f8556bc3ecf40e269fcd0e9672d55eac3ba72a97f8d4605848eb3c7b52690",
+    "Datasheets_models": "30aedf5c608f7b9069bb91f86b10cce216f7128d23f2678de8239486313b774d",
+    "Datasheets_models_cost": "210b677d8d7235f75af0d121e371bfc0eaa09587ab99f4d380f3165e9ada1db7",
+    "Datasheets_options": "3e89bbb95e74d7d47e04becc682fc02d3e8cd6154e7fc8ab5b31b637d797c20e",
+    "Datasheets_unit_composition": "72678fd019e06a7e5120aa77ed9d2a6f21f1317de3f89dde562c0e5c027a5371",
+    "Datasheets_wargear": "de59a065f32f996c0a99d7338926a3d53972606dcd2153b4f3b298dca50e118f",
+    "Factions": "16d33bc9684d31e2eda2a149a4e990a893b28800a98d8e1485ad5a5d8f3d5027"
   },
   "source_snapshot_path": "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json",
   "treatment_counts": {

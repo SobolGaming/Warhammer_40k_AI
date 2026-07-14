@@ -151,6 +151,10 @@ from warhammer40k_core.engine.reaction_windows import (
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalDistanceContext,
     ReserveArrivalDistanceHookRegistry,
+    ReserveArrivalRestrictionHookRegistry,
+)
+from warhammer40k_core.engine.reserve_arrival_restriction_resolution import (
+    reserve_arrival_restriction_violations,
 )
 from warhammer40k_core.engine.reserves import (
     DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES,
@@ -384,6 +388,7 @@ __all__ = (
     "RerollPermissionPayload",
     "ReserveArrivalDistanceContext",
     "ReserveArrivalDistanceHookRegistry",
+    "ReserveArrivalRestrictionHookRegistry",
     "ReserveKind",
     "ReserveState",
     "RollModifier",
@@ -463,6 +468,7 @@ __all__ = (
     "resolve_disembark",
     "resolve_embark",
     "resolve_reserve_arrival",
+    "reserve_arrival_restriction_violations",
     "resolve_unit_move_completed_mortal_wound_hooks",
     "resolve_unit_movement_endpoint_coherency",
     "source_backed_reroll_permission_for_unit",

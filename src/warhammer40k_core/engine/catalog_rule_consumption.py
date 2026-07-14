@@ -29,6 +29,9 @@ from warhammer40k_core.engine import catalog_contextual_status_consumption as _c
 from warhammer40k_core.engine import catalog_datasheet_rule_support as _datasheet
 from warhammer40k_core.engine import catalog_movement_transit as _t
 from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
+from warhammer40k_core.engine import (
+    catalog_reserve_arrival_restriction_classification as _reserve_restriction,
+)
 from warhammer40k_core.engine import catalog_rule_selected_target_classification as _st
 from warhammer40k_core.engine import catalog_unit_move_completed_battle_shock_support as _ucbs
 from warhammer40k_core.engine import rules_units as _rules_units
@@ -177,6 +180,9 @@ CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
     "catalog-ir:can-advance-and-shoot-and-charge"
 )
 CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
+CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID = (
+    _reserve_restriction.CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID
+)
 CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID = (
     _contextual.CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID
 )
@@ -3859,6 +3865,8 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID)
     if _clause_is_supported_setup_reactive_shoot_charge(clause):
         consumer_ids.add(CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID)
+    if _reserve_restriction.clause_is_reserve_arrival_restriction(clause):
+        consumer_ids.add(CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID)
     if _clause_is_structured_wound_reroll_clause(clause):
         consumer_ids.add(CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID)
     if _clause_is_structured_destroyed_unit_restore_clause(clause):
@@ -3950,6 +3958,8 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     hook_ids.update(_ucbs.consumer_ids_for_clause(clause))
     if _clause_is_supported_setup_reactive_shoot_charge(clause):
         hook_ids.add(CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID)
+    if _reserve_restriction.clause_is_reserve_arrival_restriction(clause):
+        hook_ids.add(CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID)
     hook_ids.update(_contextual.consumer_ids_for_clause(clause))
     return tuple(sorted(hook_ids))
 
