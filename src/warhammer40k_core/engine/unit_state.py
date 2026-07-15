@@ -5,7 +5,8 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.rules_units import RulesUnitView
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
 
 class StartingStrengthRecordPayload(TypedDict):
@@ -223,17 +224,64 @@ class BelowHalfStrengthContext:
             raise GameLifecycleError("BelowHalfStrengthContext player_id drift.")
         if starting_strength.unit_instance_id != unit.unit_instance_id:
             raise GameLifecycleError("BelowHalfStrengthContext unit drift.")
+        return cls._from_models(
+            player_id=player_id,
+            unit_instance_id=unit.unit_instance_id,
+            models=unit.own_models,
+            starting_strength=starting_strength,
+            current_model_ids=current_model_ids,
+        )
+
+    @classmethod
+    def from_rules_unit(
+        cls,
+        *,
+        rules_unit: RulesUnitView,
+        starting_strength: StartingStrengthRecord,
+        current_model_ids: tuple[str, ...],
+    ) -> Self:
+        if type(rules_unit) is not RulesUnitView:
+            raise GameLifecycleError("BelowHalfStrengthContext requires a RulesUnitView.")
+        if starting_strength.player_id != rules_unit.owner_player_id:
+            raise GameLifecycleError("BelowHalfStrengthContext player_id drift.")
+        if starting_strength.unit_instance_id != rules_unit.unit_instance_id:
+            raise GameLifecycleError("BelowHalfStrengthContext rules-unit drift.")
+        return cls._from_models(
+            player_id=rules_unit.owner_player_id,
+            unit_instance_id=rules_unit.unit_instance_id,
+            models=rules_unit.own_models,
+            starting_strength=starting_strength,
+            current_model_ids=current_model_ids,
+        )
+
+    @classmethod
+    def _from_models(
+        cls,
+        *,
+        player_id: str,
+        unit_instance_id: str,
+        models: tuple[ModelInstance, ...],
+        starting_strength: StartingStrengthRecord,
+        current_model_ids: tuple[str, ...],
+    ) -> Self:
         model_ids = _validate_identifier_tuple("current_model_ids", current_model_ids)
-        unit_model_ids = {model.model_instance_id for model in unit.own_models}
+        if type(models) is not tuple or any(type(model) is not ModelInstance for model in models):
+            raise GameLifecycleError(
+                "BelowHalfStrengthContext models must contain ModelInstance values."
+            )
+        unit_model_ids = {model.model_instance_id for model in models}
         if not set(model_ids) <= unit_model_ids:
             raise GameLifecycleError("BelowHalfStrengthContext current model is not in unit.")
         single_model_wounds_remaining = None
         if starting_strength.starting_model_count == 1:
-            model = unit.own_models[0]
-            single_model_wounds_remaining = model.wounds_remaining if model_ids else 0
+            if len(models) != 1:
+                raise GameLifecycleError(
+                    "Single-model BelowHalfStrengthContext requires exactly one current model."
+                )
+            single_model_wounds_remaining = models[0].wounds_remaining if model_ids else 0
         return cls(
             player_id=player_id,
-            unit_instance_id=unit.unit_instance_id,
+            unit_instance_id=unit_instance_id,
             starting_model_count=starting_strength.starting_model_count,
             current_model_count=len(model_ids),
             single_model_starting_wounds=starting_strength.single_model_starting_wounds,

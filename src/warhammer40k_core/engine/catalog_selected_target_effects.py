@@ -23,6 +23,7 @@ from warhammer40k_core.engine.battle_shock_resolution import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+    CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
 )
 from warhammer40k_core.engine.catalog_selected_target_battle_shock import (
@@ -31,8 +32,29 @@ from warhammer40k_core.engine.catalog_selected_target_battle_shock import (
 from warhammer40k_core.engine.catalog_selected_target_battle_shock import (
     resolve_selected_target_battle_shock_effect as _resolve_selected_target_battle_shock_effect,
 )
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    active_player_id as _active_player_id,
+from warhammer40k_core.engine.catalog_selected_target_decisions import (
+    SelectedTargetGroup as _SelectedTargetGroup,
+)
+from warhammer40k_core.engine.catalog_selected_target_decisions import (
+    SelectedTargetOption as _SelectedTargetOption,
+)
+from warhammer40k_core.engine.catalog_selected_target_decisions import (
+    invalid_selected_target_effect_status as _invalid_selected_target_effect_status,
+)
+from warhammer40k_core.engine.catalog_selected_target_decisions import (
+    post_shoot_group_key as _post_shoot_group_key,
+)
+from warhammer40k_core.engine.catalog_selected_target_decisions import (
+    resolved_post_shoot_target_effect_group_keys as _resolved_post_shoot_target_effect_group_keys,
+)
+from warhammer40k_core.engine.catalog_selected_target_decisions import (
+    resolved_shooting_start_group_keys as _resolved_shooting_start_group_keys,
+)
+from warhammer40k_core.engine.catalog_selected_target_decisions import (
+    selected_target_option_id as _selected_target_option_id,
+)
+from warhammer40k_core.engine.catalog_selected_target_decisions import (
+    selected_target_request as _selected_target_request,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     army_for_player as _army_for_player,
@@ -48,6 +70,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     clause_is_post_shoot_hit_target_selection as _clause_is_post_shoot_hit_target_selection,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    clause_is_shooting_start_selection as _clause_is_shooting_start_selection,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     effect_is_immediate_selected_target_battle_shock as _is_immediate_battle_shock,
@@ -66,6 +91,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     has_post_shoot_hit_target_effect_runtime_records as _has_runtime_post_shoot_records,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    has_shooting_start_selected_target_runtime_records as _has_runtime_shooting_start_records,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     payload_effect_records as _payload_effect_records,
@@ -110,6 +138,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     selection_weapon_names as _selection_weapon_names,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    shooting_start_effect_clauses_after as _shooting_start_effect_clauses_after,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     timing_window_id as _timing_window_id,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
@@ -127,11 +158,8 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     validate_effect_record_tuple as _validate_effect_record_tuple,
 )
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    validate_unit as _validate_unit,
-)
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
@@ -154,6 +182,12 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.shooting_phase_start_hooks import (
+    SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+    ShootingPhaseStartHookBinding,
+    ShootingPhaseStartRequestContext,
+    ShootingPhaseStartResultContext,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause
@@ -171,103 +205,15 @@ CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT = "catalog_selected_target_effect_
 CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT = (
     "catalog_post_shoot_hit_target_effect_selected"
 )
+CATALOG_SHOOTING_START_SELECTED_TARGET_EFFECT_SELECTED_EVENT = (
+    "catalog_shooting_start_selected_target_effect_selected"
+)
 CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND = "catalog_selected_target_effect"
 
 _FIGHT_START_SUBMISSION_KIND = "catalog_selected_target_fight_start_effect"
+_SHOOTING_START_SUBMISSION_KIND = "catalog_selected_target_shooting_start_effect"
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-@dataclass(frozen=True, slots=True)
-class _SelectedTargetOption:
-    option_id: str
-    target_unit_instance_id: str
-    effect_records: tuple[dict[str, JsonValue], ...]
-
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "option_id", _validate_identifier("option_id", self.option_id))
-        object.__setattr__(
-            self,
-            "target_unit_instance_id",
-            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
-        )
-        object.__setattr__(
-            self,
-            "effect_records",
-            _validate_effect_record_tuple(self.effect_records),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class _SelectedTargetGroup:
-    record: AbilityCatalogRecord
-    player_id: str
-    unit: UnitInstance
-    source_model_instance_id: str | None
-    selection_clause: RuleClause
-    effect_clauses: tuple[RuleClause, ...]
-    options: tuple[_SelectedTargetOption, ...]
-    phase: BattlePhase
-    hook_id: str
-    submission_kind: str
-    attack_sequence: AttackSequence | None = None
-    attack_sequence_completed_event_id: str | None = None
-
-    def __post_init__(self) -> None:
-        if type(self.record) is not AbilityCatalogRecord:
-            raise GameLifecycleError("Catalog selected-target group requires ability record.")
-        object.__setattr__(self, "player_id", _validate_identifier("player_id", self.player_id))
-        _validate_unit(self.unit)
-        if self.source_model_instance_id is not None:
-            object.__setattr__(
-                self,
-                "source_model_instance_id",
-                _validate_identifier("source_model_instance_id", self.source_model_instance_id),
-            )
-        if type(self.selection_clause) is not RuleClause:
-            raise GameLifecycleError("Catalog selected-target group requires selection clause.")
-        if type(self.effect_clauses) is not tuple or not self.effect_clauses:
-            raise GameLifecycleError("Catalog selected-target group requires effect clauses.")
-        for clause in self.effect_clauses:
-            if type(clause) is not RuleClause:
-                raise GameLifecycleError("Catalog selected-target effect clauses are invalid.")
-        if type(self.options) is not tuple or not self.options:
-            raise GameLifecycleError("Catalog selected-target group requires options.")
-        options = tuple(_validate_option(option) for option in self.options)
-        if len({option.option_id for option in options}) != len(options):
-            raise GameLifecycleError("Catalog selected-target options must not duplicate IDs.")
-        object.__setattr__(self, "options", tuple(sorted(options, key=lambda item: item.option_id)))
-        if type(self.phase) is not BattlePhase:
-            raise GameLifecycleError("Catalog selected-target group requires BattlePhase.")
-        object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
-        object.__setattr__(
-            self,
-            "submission_kind",
-            _validate_identifier("submission_kind", self.submission_kind),
-        )
-        if self.attack_sequence is not None and type(self.attack_sequence) is not AttackSequence:
-            raise GameLifecycleError("Catalog selected-target group attack_sequence is invalid.")
-        if self.attack_sequence_completed_event_id is not None:
-            object.__setattr__(
-                self,
-                "attack_sequence_completed_event_id",
-                _validate_identifier(
-                    "attack_sequence_completed_event_id",
-                    self.attack_sequence_completed_event_id,
-                ),
-            )
-
-    @property
-    def sort_key(self) -> tuple[str, str, str, str, str]:
-        return (
-            self.unit.unit_instance_id,
-            self.record.record_id,
-            self.selection_clause.clause_id,
-            "" if self.source_model_instance_id is None else self.source_model_instance_id,
-            ""
-            if self.attack_sequence_completed_event_id is None
-            else (self.attack_sequence_completed_event_id),
-        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -319,6 +265,88 @@ class CatalogSelectedTargetEffectRuntime:
                 handler=self.post_shoot_hit_target_request,
             ),
         )
+
+    def shooting_phase_start_bindings(self) -> tuple[ShootingPhaseStartHookBinding, ...]:
+        if not _has_runtime_shooting_start_records(
+            self.ability_indexes_by_player_id,
+            self.armies,
+        ):
+            return ()
+        return (
+            ShootingPhaseStartHookBinding(
+                hook_id=CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+                source_id=CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+                request_handler=self.shooting_phase_start_request,
+                result_handler=self.apply_shooting_phase_start_result,
+            ),
+        )
+
+    def shooting_phase_start_request(
+        self,
+        context: ShootingPhaseStartRequestContext,
+    ) -> DecisionRequest | None:
+        groups = _shooting_start_selected_target_groups(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=context,
+        )
+        resolved = _resolved_shooting_start_group_keys(
+            context.decisions,
+            event_type=CATALOG_SHOOTING_START_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
+        )
+        unresolved = tuple(group for group in groups if group.sort_key not in resolved)
+        if not unresolved:
+            return None
+        return _selected_target_request(
+            state=context.state,
+            group=unresolved[0],
+            decision_type=SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+        )
+
+    def apply_shooting_phase_start_result(
+        self,
+        context: ShootingPhaseStartResultContext,
+    ) -> bool | LifecycleStatus:
+        if type(context) is not ShootingPhaseStartResultContext:
+            raise GameLifecycleError("Catalog selected-target Shooting-start requires context.")
+        request_payload = _payload_object(context.request.payload)
+        if (
+            request_payload.get("hook_id")
+            != CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID
+        ):
+            return False
+        invalid_status = _invalid_selected_target_effect_status(
+            state=context.state,
+            request=context.request,
+            result=context.result,
+            expected_decision_type=SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+            expected_submission_kind=_SHOOTING_START_SUBMISSION_KIND,
+            expected_phase=BattlePhase.SHOOTING,
+            invalid_reason="invalid_catalog_selected_target_shooting_start_result",
+        )
+        if invalid_status is not None:
+            return invalid_status
+        payload = _payload_object(context.result.payload)
+        recording = _record_selected_target_effects_from_payload(
+            state=context.state,
+            decisions=context.decisions,
+            result=context.result,
+            payload=payload,
+            phase=BattlePhase.SHOOTING,
+            event_type=CATALOG_SHOOTING_START_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
+        )
+        if recording.pending_status is not None:
+            return recording.pending_status
+        _append_selected_target_event(
+            state=context.state,
+            decisions=context.decisions,
+            result=context.result,
+            payload=payload,
+            effects=recording.effects,
+            event_type=CATALOG_SHOOTING_START_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
+            phase=BattlePhase.SHOOTING,
+        )
+        return True
 
     def fight_phase_start_request(
         self,
@@ -392,7 +420,10 @@ class CatalogSelectedTargetEffectRuntime:
         )
         if not groups:
             return None
-        resolved = _resolved_post_shoot_target_effect_group_keys(context.decisions)
+        resolved = _resolved_post_shoot_target_effect_group_keys(
+            context.decisions,
+            event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+        )
         unresolved = tuple(
             group for group in groups if _post_shoot_group_key(group) not in resolved
         )
@@ -656,6 +687,48 @@ def _fight_start_selected_target_groups(
     return tuple(sorted(groups, key=lambda group: group.sort_key))
 
 
+def _shooting_start_selected_target_groups(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+    context: ShootingPhaseStartRequestContext,
+) -> tuple[_SelectedTargetGroup, ...]:
+    if context.state.current_battle_phase is not BattlePhase.SHOOTING:
+        return ()
+    if context.state.battlefield_state is None:
+        return ()
+    groups: list[_SelectedTargetGroup] = []
+    for army in sorted(armies, key=lambda item: item.player_id):
+        if army.player_id == context.state.active_player_id:
+            continue
+        index = ability_indexes_by_player_id.get(army.player_id)
+        if index is None:
+            raise GameLifecycleError("Catalog selected-target missing ability index.")
+        for unit in sorted(army.units, key=lambda item: item.unit_instance_id):
+            current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+                state=context.state,
+                unit=unit,
+            )
+            if not current_model_ids:
+                continue
+            for record in _unit_scoped_generic_records_for_timing(
+                ability_index=index,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+                trigger_kind=TimingTriggerKind.START_PHASE,
+            ):
+                groups.extend(
+                    _shooting_start_groups_for_record(
+                        state=context.state,
+                        army=army,
+                        unit=unit,
+                        current_model_instance_ids=current_model_ids,
+                        record=record,
+                    )
+                )
+    return tuple(sorted(groups, key=lambda group: group.sort_key))
+
+
 def _post_shoot_hit_target_effect_groups(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
@@ -770,6 +843,70 @@ def _fight_start_groups_for_record(
                         phase=BattlePhase.FIGHT,
                         hook_id=CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
                         submission_kind=_FIGHT_START_SUBMISSION_KIND,
+                    )
+                )
+    return tuple(groups)
+
+
+def _shooting_start_groups_for_record(
+    *,
+    state: GameState,
+    army: ArmyDefinition,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    record: AbilityCatalogRecord,
+) -> tuple[_SelectedTargetGroup, ...]:
+    clauses = _catalog_selected_target_clauses_from_record(record)
+    runtime_clause_id = _runtime_clause_id_from_record(record)
+    groups: list[_SelectedTargetGroup] = []
+    for index, selection_clause in enumerate(clauses):
+        if runtime_clause_id is not None and runtime_clause_id != selection_clause.clause_id:
+            continue
+        if not _clause_is_shooting_start_selection(selection_clause):
+            continue
+        effect_clauses = _shooting_start_effect_clauses_after(clauses, index)
+        if not effect_clauses:
+            continue
+        for source_model_id in _source_ids(
+            record, unit, selection_clause, effect_clauses, current_model_instance_ids
+        ):
+            target_ids = _eligible_selection_target_unit_ids(
+                state=state,
+                source_player_id=army.player_id,
+                source_unit_instance_id=unit.unit_instance_id,
+                source_model_instance_id=source_model_id,
+                selection_clause=selection_clause,
+                explicit_target_unit_ids=None,
+            )
+            options = _options_for_targets(
+                state=state,
+                record=record,
+                player_id=army.player_id,
+                unit=unit,
+                source_model_instance_id=source_model_id,
+                selection_clause=selection_clause,
+                effect_clauses=effect_clauses,
+                selected_target_unit_ids=target_ids,
+                phase=BattlePhase.SHOOTING,
+                hook_id=CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+                submission_kind=_SHOOTING_START_SUBMISSION_KIND,
+                attack_sequence=None,
+                attack_sequence_completed_event_id=None,
+            )
+            if options:
+                groups.append(
+                    _SelectedTargetGroup(
+                        record=record,
+                        player_id=army.player_id,
+                        unit=unit,
+                        source_model_instance_id=source_model_id,
+                        selection_clause=selection_clause,
+                        effect_clauses=effect_clauses,
+                        options=options,
+                        phase=BattlePhase.SHOOTING,
+                        hook_id=CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+                        submission_kind=_SHOOTING_START_SUBMISSION_KIND,
+                        optional=True,
                     )
                 )
     return tuple(groups)
@@ -965,7 +1102,11 @@ def _effect_records_for_selected_target(
                 battle_round=state.battle_round,
                 phase=_battle_phase_kind(phase),
                 active_player_id=state.active_player_id,
-                timing_window_id=_timing_window_id(phase),
+                timing_window_id=(
+                    "shooting_phase_start"
+                    if submission_kind == _SHOOTING_START_SUBMISSION_KIND
+                    else _timing_window_id(phase)
+                ),
                 source_unit_instance_id=unit.unit_instance_id,
                 source_model_instance_id=source_model_instance_id,
                 target_unit_instance_ids=target_unit_ids,
@@ -1038,81 +1179,6 @@ def _effect_records_for_selected_target(
                 effect_record["immediate_effect_kind"] = immediate_effect_kind
             records.append(cast(dict[str, JsonValue], validate_json_value(effect_record)))
     return tuple(records)
-
-
-def _selected_target_request(
-    *,
-    state: GameState,
-    group: _SelectedTargetGroup,
-    decision_type: str,
-) -> DecisionRequest:
-    common_payload = _selected_target_base_payload(state=state, group=group)
-    return DecisionRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type=decision_type,
-        actor_id=group.player_id,
-        payload=validate_json_value(
-            {
-                **common_payload,
-                "available_target_unit_instance_ids": [
-                    option.target_unit_instance_id for option in group.options
-                ],
-                "available_catalog_selected_target_options": [
-                    _selected_target_option_selection_payload(option) for option in group.options
-                ],
-            }
-        ),
-        options=tuple(
-            DecisionOption(
-                option_id=option.option_id,
-                label=f"Select {option.target_unit_instance_id}",
-                payload=validate_json_value(
-                    {
-                        **common_payload,
-                        "selected_catalog_target_effect": (
-                            _selected_target_option_selection_payload(option)
-                        ),
-                        "generic_rule_effect_records": list(option.effect_records),
-                    }
-                ),
-            )
-            for option in group.options
-        ),
-    )
-
-
-def _selected_target_base_payload(
-    *,
-    state: GameState,
-    group: _SelectedTargetGroup,
-) -> dict[str, JsonValue]:
-    from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
-
-    rule_ir = rule_ir_from_execution_payload(group.record.definition.replay_payload)
-    payload: dict[str, JsonValue] = {
-        "submission_kind": group.submission_kind,
-        "hook_id": group.hook_id,
-        "game_id": state.game_id,
-        "battle_round": state.battle_round,
-        "phase": group.phase.value,
-        "active_player_id": _active_player_id(state),
-        "player_id": group.player_id,
-        "catalog_record_id": group.record.record_id,
-        "ability_id": group.record.definition.ability_id,
-        "ability_name": group.record.definition.name,
-        "source_rule_id": group.record.definition.source_id,
-        "rule_ir_hash": rule_ir.ir_hash(),
-        "source_unit_instance_id": group.unit.unit_instance_id,
-        "source_model_instance_id": group.source_model_instance_id,
-        "selection_clause_id": group.selection_clause.clause_id,
-        "effect_clause_ids": [clause.clause_id for clause in group.effect_clauses],
-    }
-    if group.attack_sequence is not None:
-        payload["attack_sequence_id"] = group.attack_sequence.sequence_id
-        payload["attack_sequence"] = validate_json_value(group.attack_sequence.to_payload())
-    if group.attack_sequence_completed_event_id is not None:
-        payload["attack_sequence_completed_event_id"] = group.attack_sequence_completed_event_id
-    return payload
 
 
 def _record_selected_target_effects_from_payload(
@@ -1233,7 +1299,15 @@ def _append_selected_target_event(
     event_type: str,
     phase: BattlePhase,
 ) -> None:
-    selected_payload = _selected_payload(payload)
+    use_ability = payload.get("use_ability", True)
+    if type(use_ability) is not bool:
+        raise GameLifecycleError("Catalog selected-target use_ability must be bool.")
+    selected_target_id: str | None = None
+    if use_ability:
+        selected_target_id = _payload_string(
+            _selected_payload(payload),
+            key="target_unit_instance_id",
+        )
     decisions.event_log.append(
         event_type,
         validate_json_value(
@@ -1255,10 +1329,8 @@ def _append_selected_target_event(
                 ),
                 "source_model_instance_id": payload.get("source_model_instance_id"),
                 "selection_clause_id": _payload_string(payload, key="selection_clause_id"),
-                "target_unit_instance_id": _payload_string(
-                    selected_payload,
-                    key="target_unit_instance_id",
-                ),
+                "use_ability": use_ability,
+                "target_unit_instance_id": selected_target_id,
                 "attack_sequence_id": payload.get("attack_sequence_id"),
                 "attack_sequence_completed_event_id": (
                     payload.get("attack_sequence_completed_event_id")
@@ -1283,202 +1355,3 @@ def _payload_json_object_tuple(
             raise GameLifecycleError(f"Catalog selected-target payload {key} must be objects.")
         records.append(cast(dict[str, JsonValue], validate_json_value(item)))
     return tuple(records)
-
-
-def _invalid_selected_target_effect_status(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-    expected_decision_type: str,
-    expected_submission_kind: str,
-    expected_phase: BattlePhase,
-    invalid_reason: str,
-) -> LifecycleStatus | None:
-    invalid_status = _invalid_finite_decision_status(
-        state=state,
-        request=request,
-        result=result,
-        invalid_reason=invalid_reason,
-    )
-    if invalid_status is not None:
-        return invalid_status
-    payload = _payload_object(result.payload)
-    request_payload = _payload_object(request.payload)
-    drift_field = _selected_target_drift_field(
-        state=state,
-        request=request,
-        payload=payload,
-        request_payload=request_payload,
-        expected_decision_type=expected_decision_type,
-        expected_submission_kind=expected_submission_kind,
-        expected_phase=expected_phase,
-    )
-    if drift_field is None:
-        return None
-    return LifecycleStatus.invalid(
-        stage=state.stage,
-        message="Catalog selected-target result drifted.",
-        payload=validate_json_value({"invalid_reason": invalid_reason, "field": drift_field}),
-    )
-
-
-def _selected_target_drift_field(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    payload: Mapping[str, object],
-    request_payload: Mapping[str, object],
-    expected_decision_type: str,
-    expected_submission_kind: str,
-    expected_phase: BattlePhase,
-) -> str | None:
-    if request.decision_type != expected_decision_type:
-        return "request_decision_type"
-    if state.current_battle_phase is not expected_phase:
-        return "state_phase"
-    if _payload_string(payload, key="submission_kind") != expected_submission_kind:
-        return "submission_kind"
-    for key in (
-        "hook_id",
-        "game_id",
-        "battle_round",
-        "phase",
-        "active_player_id",
-        "player_id",
-        "catalog_record_id",
-        "source_rule_id",
-        "source_unit_instance_id",
-        "selection_clause_id",
-    ):
-        if payload.get(key) != request_payload.get(key):
-            return key
-    if payload.get("game_id") != state.game_id:
-        return "game_id"
-    if payload.get("battle_round") != state.battle_round:
-        return "battle_round"
-    if payload.get("phase") != expected_phase.value:
-        return "phase"
-    if payload.get("active_player_id") != state.active_player_id:
-        return "active_player_id"
-    selected = _selected_payload(payload)
-    selected_target_id = _payload_string(selected, key="target_unit_instance_id")
-    available_target_ids = _payload_string_tuple(
-        request_payload,
-        key="available_target_unit_instance_ids",
-    )
-    if selected_target_id not in available_target_ids:
-        return "target_unit_instance_id"
-    if state.battlefield_state is None:
-        return "battlefield_state"
-    if state.battlefield_state.unit_placement_or_none(selected_target_id) is None:
-        return "target_unit_instance_id"
-    return None
-
-
-def _invalid_finite_decision_status(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-    invalid_reason: str,
-) -> LifecycleStatus | None:
-    if result.request_id != request.request_id:
-        return _invalid_status(state=state, invalid_reason=invalid_reason, field="request_id")
-    if result.decision_type != request.decision_type:
-        return _invalid_status(state=state, invalid_reason=invalid_reason, field="decision_type")
-    if result.actor_id != request.actor_id:
-        return _invalid_status(state=state, invalid_reason=invalid_reason, field="actor_id")
-    option_payload_by_id = {option.option_id: option.payload for option in request.options}
-    selected_payload = option_payload_by_id.get(result.selected_option_id)
-    if selected_payload is None:
-        return _invalid_status(
-            state=state,
-            invalid_reason=invalid_reason,
-            field="selected_option_id",
-        )
-    if result.payload != selected_payload:
-        return _invalid_status(state=state, invalid_reason=invalid_reason, field="payload")
-    return None
-
-
-def _invalid_status(*, state: GameState, invalid_reason: str, field: str) -> LifecycleStatus:
-    return LifecycleStatus.invalid(
-        stage=state.stage,
-        message="Catalog selected-target result is invalid.",
-        payload=validate_json_value({"invalid_reason": invalid_reason, "field": field}),
-    )
-
-
-def _selected_target_option_id(
-    *,
-    record: AbilityCatalogRecord,
-    unit: UnitInstance,
-    source_model_instance_id: str | None,
-    selection_clause: RuleClause,
-    target_unit_instance_id: str,
-    attack_sequence_completed_event_id: str | None,
-) -> str:
-    parts = [
-        "catalog-ir",
-        "selected-target",
-        record.record_id,
-        unit.unit_instance_id,
-        "model",
-        "unit" if source_model_instance_id is None else source_model_instance_id,
-        selection_clause.clause_id,
-    ]
-    if attack_sequence_completed_event_id is not None:
-        parts.append(attack_sequence_completed_event_id)
-    parts.extend(("target", target_unit_instance_id))
-    return ":".join(parts)
-
-
-def _selected_target_option_selection_payload(
-    option: _SelectedTargetOption,
-) -> dict[str, JsonValue]:
-    return {
-        "option_id": option.option_id,
-        "target_unit_instance_id": option.target_unit_instance_id,
-    }
-
-
-def _post_shoot_group_key(group: _SelectedTargetGroup) -> tuple[str, str, str, str, str]:
-    if group.attack_sequence is None or group.attack_sequence_completed_event_id is None:
-        raise GameLifecycleError("Catalog post-shoot group missing attack sequence.")
-    return (
-        group.attack_sequence_completed_event_id,
-        group.attack_sequence.sequence_id,
-        group.record.record_id,
-        group.unit.unit_instance_id,
-        group.selection_clause.clause_id,
-    )
-
-
-def _resolved_post_shoot_target_effect_group_keys(
-    decisions: DecisionController,
-) -> frozenset[tuple[str, str, str, str, str]]:
-    keys: set[tuple[str, str, str, str, str]] = set()
-    for event in decisions.event_log.records:
-        if event.event_type != CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT:
-            continue
-        payload = event.payload
-        if not isinstance(payload, dict):
-            raise GameLifecycleError("Catalog post-shoot selected event payload is malformed.")
-        payload_object = cast(dict[str, object], payload)
-        keys.add(
-            (
-                _payload_string(payload_object, key="attack_sequence_completed_event_id"),
-                _payload_string(payload_object, key="attack_sequence_id"),
-                _payload_string(payload_object, key="catalog_record_id"),
-                _payload_string(payload_object, key="source_unit_instance_id"),
-                _payload_string(payload_object, key="selection_clause_id"),
-            )
-        )
-    return frozenset(keys)
-
-
-def _validate_option(value: object) -> _SelectedTargetOption:
-    if type(value) is not _SelectedTargetOption:
-        raise GameLifecycleError("Catalog selected-target option is invalid.")
-    return value

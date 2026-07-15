@@ -15,7 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusteringError
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRemovalKind,
@@ -24,9 +24,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
     ModelPlacementRecord,
     ModelRemovalRecord,
-    PlacementError,
     UnitPlacement,
-    UnitPlacementPayload,
     battlefield_placement_kind_from_token,
     geometry_model_for_placement,
 )
@@ -35,11 +33,16 @@ from warhammer40k_core.engine.endpoint_placement import (
     terrain_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.rules_unit_placement import (
+    RulesUnitPlacement,
+    RulesUnitPlacementPayload,
+)
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_from_armies
 from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.engine.unit_coherency import (
+    UnitCoherencyContext,
     UnitCoherencyResult,
     UnitCoherencyResultPayload,
-    unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
@@ -217,7 +220,7 @@ class ReserveArrivalCandidatePayload(TypedDict):
     reserve_state: ReserveStatePayload
     battle_round: int
     placement_kind: str
-    attempted_placement: UnitPlacementPayload
+    attempted_rules_unit_placement: RulesUnitPlacementPayload
     qualifying_edges: list[str]
     large_model_exceptions: list[LargeModelReservePlacementExceptionPayload]
 
@@ -1406,7 +1409,7 @@ class ReserveArrivalCandidate:
     reserve_state: ReserveState
     battle_round: int
     placement_kind: BattlefieldPlacementKind
-    attempted_placement: UnitPlacement
+    attempted_rules_unit_placement: RulesUnitPlacement
     qualifying_edges: tuple[BattlefieldEdge, ...]
     large_model_exceptions: tuple[LargeModelReservePlacementException, ...] = ()
 
@@ -1423,13 +1426,16 @@ class ReserveArrivalCandidate:
             "placement_kind",
             battlefield_placement_kind_from_token(self.placement_kind),
         )
-        if type(self.attempted_placement) is not UnitPlacement:
+        if type(self.attempted_rules_unit_placement) is not RulesUnitPlacement:
             raise GameLifecycleError(
-                "ReserveArrivalCandidate attempted_placement must be UnitPlacement."
+                "ReserveArrivalCandidate attempted_rules_unit_placement must be RulesUnitPlacement."
             )
-        if self.attempted_placement.unit_instance_id != self.reserve_state.unit_instance_id:
+        if (
+            self.attempted_rules_unit_placement.rules_unit_instance_id
+            != self.reserve_state.unit_instance_id
+        ):
             raise GameLifecycleError("ReserveArrivalCandidate placement unit drift.")
-        if self.attempted_placement.player_id != self.reserve_state.player_id:
+        if self.attempted_rules_unit_placement.player_id != self.reserve_state.player_id:
             raise GameLifecycleError("ReserveArrivalCandidate placement player drift.")
         object.__setattr__(
             self,
@@ -1453,7 +1459,7 @@ class ReserveArrivalCandidate:
             "reserve_state": self.reserve_state.to_payload(),
             "battle_round": self.battle_round,
             "placement_kind": self.placement_kind.value,
-            "attempted_placement": self.attempted_placement.to_payload(),
+            "attempted_rules_unit_placement": (self.attempted_rules_unit_placement.to_payload()),
             "qualifying_edges": [edge.value for edge in self.qualifying_edges],
             "large_model_exceptions": [
                 exception.to_payload() for exception in self.large_model_exceptions
@@ -1466,7 +1472,9 @@ class ReserveArrivalCandidate:
             reserve_state=ReserveState.from_payload(payload["reserve_state"]),
             battle_round=payload["battle_round"],
             placement_kind=battlefield_placement_kind_from_token(payload["placement_kind"]),
-            attempted_placement=UnitPlacement.from_payload(payload["attempted_placement"]),
+            attempted_rules_unit_placement=RulesUnitPlacement.from_payload(
+                payload["attempted_rules_unit_placement"]
+            ),
             qualifying_edges=tuple(
                 battlefield_edge_from_token(edge) for edge in payload["qualifying_edges"]
             ),
@@ -1634,7 +1642,7 @@ def resolve_reserve_arrival(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     reserve_state: ReserveState,
-    attempted_placement: UnitPlacement,
+    attempted_placement: UnitPlacement | RulesUnitPlacement,
     battle_round: int,
     placement_kind: BattlefieldPlacementKind,
     battlefield_width_inches: float = _DEFAULT_BATTLEFIELD_WIDTH_INCHES,
@@ -1653,9 +1661,14 @@ def resolve_reserve_arrival(
         raise GameLifecycleError("resolve_reserve_arrival requires a RulesetDescriptor.")
     if type(reserve_state) is not ReserveState:
         raise GameLifecycleError("resolve_reserve_arrival reserve_state must be ReserveState.")
-    if type(attempted_placement) is not UnitPlacement:
+    if type(attempted_placement) is UnitPlacement:
+        rules_unit_placement = RulesUnitPlacement.single(attempted_placement)
+    elif type(attempted_placement) is RulesUnitPlacement:
+        rules_unit_placement = attempted_placement
+    else:
         raise GameLifecycleError(
-            "resolve_reserve_arrival attempted_placement must be UnitPlacement."
+            "resolve_reserve_arrival attempted_placement must be UnitPlacement or "
+            "RulesUnitPlacement."
         )
     placement_kind = battlefield_placement_kind_from_token(placement_kind)
     requested_round = _validate_positive_int("battle_round", battle_round)
@@ -1694,13 +1707,16 @@ def resolve_reserve_arrival(
             "deep_strike_enemy_horizontal_distance_inches only applies to Deep Strike placement."
         )
 
-    unit = _unit_for_reserve_state(scenario=scenario, reserve_state=reserve_state)
+    view = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=reserve_state.unit_instance_id,
+    )
     qualifying_edges = strategic_rule.qualifying_edges_for_battle_round(requested_round)
     candidate = ReserveArrivalCandidate(
         reserve_state=reserve_state,
         battle_round=requested_round,
         placement_kind=placement_kind,
-        attempted_placement=attempted_placement,
+        attempted_rules_unit_placement=rules_unit_placement,
         qualifying_edges=qualifying_edges,
         large_model_exceptions=exceptions,
     )
@@ -1708,7 +1724,7 @@ def resolve_reserve_arrival(
     _append_reserve_state_violations(
         violations=violations,
         reserve_state=reserve_state,
-        unit=unit,
+        view=view,
         placement_kind=placement_kind,
         battle_round=requested_round,
         mission_policy=ruleset_descriptor.mission_policy,
@@ -1716,14 +1732,11 @@ def resolve_reserve_arrival(
     )
     _append_unit_placement_drift_violations(
         violations=violations,
-        unit=unit,
-        attempted_placement=attempted_placement,
+        view=view,
+        attempted_rules_unit_placement=rules_unit_placement,
     )
 
-    models = _geometry_models_for_unit_placement(
-        scenario=scenario,
-        unit_placement=attempted_placement,
-    )
+    models = rules_unit_placement.geometry_models(scenario)
     if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES:
         _append_strategic_reserves_edge_violations(
             violations=violations,
@@ -1745,8 +1758,8 @@ def resolve_reserve_arrival(
         violations=violations,
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        unit=unit,
-        attempted_placement=attempted_placement,
+        view=view,
+        attempted_rules_unit_placement=rules_unit_placement,
         models=models,
         battlefield_width_inches=width,
         battlefield_depth_inches=depth,
@@ -1760,11 +1773,10 @@ def resolve_reserve_arrival(
             else _RESERVE_ENEMY_DISTANCE_INCHES
         ),
     )
-    coherency_result = unit_placement_coherency_result(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        unit_placement=attempted_placement,
-    )
+    coherency_result = UnitCoherencyContext.from_ruleset_descriptor(
+        ruleset_descriptor,
+        unit_instance_id=view.unit_instance_id,
+    ).validate_models(models)
     if not coherency_result.is_coherent:
         violations.append(
             ReservePlacementViolation(
@@ -1779,7 +1791,7 @@ def resolve_reserve_arrival(
     transition_batch = None
     if not violations:
         transition_batch = _reserve_arrival_transition_batch(
-            attempted_placement=attempted_placement,
+            attempted_rules_unit_placement=rules_unit_placement,
             placement_kind=placement_kind,
             source_rule_id=_source_rule_id_for_placement_kind(placement_kind),
         )
@@ -1804,7 +1816,7 @@ def apply_reinforcement_placement_to_battlefield(
         raise GameLifecycleError("placement must be a ReinforcementPlacement.")
     if not placement.is_valid:
         raise GameLifecycleError("Invalid reserve placement cannot mutate battlefield_state.")
-    return battlefield_state.with_added_unit_placement(placement.candidate.attempted_placement)
+    return placement.candidate.attempted_rules_unit_placement.add_to_battlefield(battlefield_state)
 
 
 def resolve_unarrived_reserve_destruction(
@@ -1843,11 +1855,16 @@ def resolve_unarrived_reserve_destruction(
         if not policy.applies_to_reserve_state(reserve_state):
             updated_states.append(reserve_state)
             continue
-        impacted_unit_ids = (
-            reserve_state.unit_instance_id,
-            *reserve_state.embarked_unit_instance_ids,
-        )
-        for unit_id in impacted_unit_ids:
+        try:
+            reserve_view = rules_unit_view_from_armies(
+                armies=army_tuple,
+                unit_instance_id=reserve_state.unit_instance_id,
+            )
+        except GameLifecycleError as exc:
+            raise GameLifecycleError("ReserveState references an unknown unit.") from exc
+        destroyed_unit_ids.add(reserve_view.unit_instance_id)
+        destroyed_model_ids.update(model.model_instance_id for model in reserve_view.own_models)
+        for unit_id in reserve_state.embarked_unit_instance_ids:
             unit = unit_by_id.get(unit_id)
             if unit is None:
                 raise GameLifecycleError("ReserveState references an unknown unit.")
@@ -1996,7 +2013,7 @@ def _append_reserve_state_violations(
     *,
     violations: list[ReservePlacementViolation],
     reserve_state: ReserveState,
-    unit: UnitInstance,
+    view: RulesUnitView,
     placement_kind: BattlefieldPlacementKind,
     battle_round: int,
     mission_policy: MissionPolicyDescriptor,
@@ -2061,7 +2078,9 @@ def _append_reserve_state_violations(
                     message="Strategic Reserves cannot arrive in battle round 1.",
                 )
             )
-    if placement_kind is BattlefieldPlacementKind.DEEP_STRIKE and not _unit_has_deep_strike(unit):
+    if placement_kind is BattlefieldPlacementKind.DEEP_STRIKE and not all(
+        unit_has_deep_strike(component.unit) for component in view.components
+    ):
         violations.append(
             ReservePlacementViolation(
                 violation_code=ReservePlacementViolationCode.DEEP_STRIKE_KEYWORD_REQUIRED,
@@ -2090,26 +2109,40 @@ def _reserve_arrival_block_exemption_applies(
 def _append_unit_placement_drift_violations(
     *,
     violations: list[ReservePlacementViolation],
-    unit: UnitInstance,
-    attempted_placement: UnitPlacement,
+    view: RulesUnitView,
+    attempted_rules_unit_placement: RulesUnitPlacement,
 ) -> None:
-    if attempted_placement.unit_instance_id != unit.unit_instance_id:
+    if attempted_rules_unit_placement.rules_unit_instance_id != view.unit_instance_id:
         violations.append(
             ReservePlacementViolation(
                 violation_code=ReservePlacementViolationCode.UNIT_PLACEMENT_DRIFT,
-                message="Reserve placement unit_instance_id does not match unit.",
+                message="Reserve placement rules-unit identity does not match unit.",
+            )
+        )
+        return
+    if (
+        attempted_rules_unit_placement.component_unit_instance_ids
+        != view.component_unit_instance_ids
+    ):
+        violations.append(
+            ReservePlacementViolation(
+                violation_code=ReservePlacementViolationCode.UNIT_PLACEMENT_DRIFT,
+                message="Reserve placement must include every component in the rules unit.",
             )
         )
         return
     attempted_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in attempted_placement.model_placements)
+        sorted(
+            placement.model_instance_id
+            for placement in attempted_rules_unit_placement.model_placements
+        )
     )
-    expected_model_ids = tuple(sorted(model.model_instance_id for model in unit.own_models))
+    expected_model_ids = tuple(sorted(model.model_instance_id for model in view.alive_models()))
     if attempted_model_ids != expected_model_ids:
         violations.append(
             ReservePlacementViolation(
                 violation_code=ReservePlacementViolationCode.UNIT_PLACEMENT_DRIFT,
-                message="Reserve placement must include every model in the unit.",
+                message="Reserve placement must include every alive model in the rules unit.",
             )
         )
 
@@ -2258,8 +2291,8 @@ def _append_common_reserve_placement_violations(
     violations: list[ReservePlacementViolation],
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
-    unit: UnitInstance,
-    attempted_placement: UnitPlacement,
+    view: RulesUnitView,
+    attempted_rules_unit_placement: RulesUnitPlacement,
     models: tuple[Model, ...],
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
@@ -2274,7 +2307,7 @@ def _append_common_reserve_placement_violations(
         blocker
         for blocker in blockers
         if _model_owner_player_id(scenario=scenario, model_instance_id=blocker.model_id)
-        != attempted_placement.player_id
+        != attempted_rules_unit_placement.player_id
     )
     for model in models:
         if not _model_is_within_battlefield(
@@ -2329,7 +2362,7 @@ def _append_common_reserve_placement_violations(
                 )
         terrain_violation = _terrain_endpoint_violation(
             model=model,
-            unit=unit,
+            unit=view.component_unit_for_model(model.model_id),
             ruleset_descriptor=ruleset_descriptor,
             terrain_features=terrain_features,
         )
@@ -2367,7 +2400,7 @@ def _append_common_reserve_placement_violations(
 
 def _reserve_arrival_transition_batch(
     *,
-    attempted_placement: UnitPlacement,
+    attempted_rules_unit_placement: RulesUnitPlacement,
     placement_kind: BattlefieldPlacementKind,
     source_rule_id: str,
 ) -> BattlefieldTransitionBatch:
@@ -2382,7 +2415,7 @@ def _reserve_arrival_transition_batch(
                 source_rule_id=source_rule_id,
                 source_event_id=None,
             )
-            for model_placement in attempted_placement.model_placements
+            for model_placement in attempted_rules_unit_placement.model_placements
         )
     )
 
@@ -2536,20 +2569,6 @@ def _model_pair_can_overlap_horizontally(first: Model, second: Model) -> bool:
     )
 
 
-def _geometry_models_for_unit_placement(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-) -> tuple[Model, ...]:
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(placement),
-            placement=placement,
-        )
-        for placement in unit_placement.model_placements
-    )
-
-
 def _placed_geometry_models(scenario: BattlefieldScenario) -> tuple[Model, ...]:
     models: list[Model] = []
     for placed_army in scenario.battlefield_state.placed_armies:
@@ -2572,19 +2591,6 @@ def _model_owner_player_id(*, scenario: BattlefieldScenario, model_instance_id: 
                 if model_placement.model_instance_id == requested_model_id:
                     return model_placement.player_id
     raise GameLifecycleError("model_instance_id is not placed.")
-
-
-def _unit_for_reserve_state(
-    *,
-    scenario: BattlefieldScenario,
-    reserve_state: ReserveState,
-) -> UnitInstance:
-    try:
-        return scenario.army_by_id(
-            reserve_state.unit_instance_id.split(":", maxsplit=1)[0]
-        ).unit_by_id(reserve_state.unit_instance_id)
-    except (PlacementError, ArmyMusteringError) as exc:
-        raise GameLifecycleError("ReserveState references an unknown unit.") from exc
 
 
 def _unit_by_id(armies: tuple[ArmyDefinition, ...]) -> dict[str, UnitInstance]:

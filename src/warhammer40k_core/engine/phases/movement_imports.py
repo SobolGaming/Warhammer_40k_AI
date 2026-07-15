@@ -165,6 +165,8 @@ from warhammer40k_core.engine.reserves import (
     apply_reinforcement_placement_to_battlefield,
     resolve_reserve_arrival,
 )
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import (
     AdvanceRollModifierContext,
     MovementBudgetModifierContext,
@@ -391,6 +393,9 @@ __all__ = (
     "ReserveArrivalRestrictionHookRegistry",
     "ReserveKind",
     "ReserveState",
+    "RulesUnitPlacement",
+    "RulesUnitView",
+    "rules_unit_view_from_armies",
     "RollModifier",
     "RollModifierPayload",
     "RulesetDescriptor",

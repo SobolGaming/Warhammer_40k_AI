@@ -12,6 +12,9 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationResultContext,
 )
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+from warhammer40k_core.engine.catalog_prebattle_redeploy import (
+    apply_redeploy_to_strategic_reserves,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -68,6 +71,7 @@ from warhammer40k_core.engine.reserve_declarations import (
     reserve_declaration_request_for_next_player,
     reserve_declaration_state_for_state,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
@@ -760,6 +764,21 @@ class SetupFlow:
                 decisions=decisions,
             )
             return
+        if action_kind is PreBattleActionKind.REDEPLOY_TO_STRATEGIC_RESERVES:
+            unit_instance_id = _payload_string(result.payload, key="unit_instance_id")
+            apply_redeploy_to_strategic_reserves(
+                state=state,
+                request=selection_record.request,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=config.ruleset_descriptor,
+                points_contribution=_redeploy_points_contribution(
+                    state=state,
+                    config=config,
+                    unit_instance_id=unit_instance_id,
+                ),
+            )
+            return
         placement_request = redeploy_placement_request_from_selection(
             state=state,
             ruleset_descriptor=config.ruleset_descriptor,
@@ -926,6 +945,29 @@ def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Decision payload must be an object.")
     return payload
+
+
+def _redeploy_points_contribution(
+    *,
+    state: GameState,
+    config: GameConfig,
+    unit_instance_id: str,
+) -> int:
+    view = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=unit_instance_id,
+    )
+    unit_ids = set(view.component_unit_instance_ids)
+    cargo_state = state.transport_cargo_state_for_transport(unit_instance_id)
+    if cargo_state is not None:
+        unit_ids.update(cargo_state.embarked_unit_instance_ids)
+    points_by_unit_id = {
+        entry.unit_instance_id: entry.points for entry in config.reserve_unit_points
+    }
+    missing = unit_ids - set(points_by_unit_id)
+    if missing:
+        raise GameLifecycleError("Redeploy Strategic Reserves units require point values.")
+    return sum(points_by_unit_id[unit_id] for unit_id in unit_ids)
 
 
 def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:

@@ -30,6 +30,10 @@ from warhammer40k_core.engine.battlefield_state import (
     battlefield_placement_kind_from_token,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_prebattle_redeploy import (
+    catalog_redeploy_permission_for_view,
+    catalog_redeploy_selection_options,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     DecisionOption,
@@ -58,7 +62,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.prebattle_records import (
     PreBattleActionKind,
-    PreBattleActionRecord,
+    record_prebattle_action,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState, ReserveStatus
 from warhammer40k_core.engine.rules_units import (
@@ -1062,24 +1066,19 @@ def redeploy_unit_selection_request(
     requested_player_id = _validate_identifier("player_id", player_id)
     mission_setup = _require_mission_setup(state)
     candidates = redeploy_unit_views_for_player(state=state, player_id=requested_player_id)
-    options = [
-        DecisionOption(
-            option_id=f"redeploy:{view.unit_instance_id}",
-            label=f"Redeploy {view.unit_instance_id}",
-            payload=_prebattle_selection_payload(
-                state=state,
-                ruleset_descriptor=ruleset_descriptor,
-                army_catalog=army_catalog,
-                mission_setup=mission_setup,
-                view=view,
-                setup_step=SetupStep.REDEPLOY_UNITS,
-                action_kind=PreBattleActionKind.REDEPLOY,
-                source_rule_id=CORE_REDEPLOY_SOURCE_RULE_ID,
-                proposal_kind=REDEPLOY_PROPOSAL_KIND,
-            ),
+    options = list(
+        catalog_redeploy_selection_options(
+            state=state,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            mission_setup=mission_setup,
+            player_id=requested_player_id,
+            candidates=candidates,
+            core_source_rule_id=CORE_REDEPLOY_SOURCE_RULE_ID,
+            proposal_kind=REDEPLOY_PROPOSAL_KIND,
+            payload_factory=_prebattle_selection_payload,
         )
-        for view in candidates
-    ]
+    )
     options.append(
         DecisionOption(
             option_id="complete_redeploys",
@@ -1375,7 +1374,7 @@ def apply_redeploy_placement(
     for unit_placement in proposal.grouped_unit_placements():
         battlefield = battlefield.with_added_unit_placement(unit_placement)
     state.replace_battlefield_state(battlefield)
-    _record_prebattle_action(
+    record_prebattle_action(
         state=state,
         result=result,
         request=request,
@@ -1438,7 +1437,7 @@ def apply_scout_reserve_setup(
             restriction_battle_round=None,
         )
     )
-    _record_prebattle_action(
+    record_prebattle_action(
         state=state,
         result=result,
         request=request,
@@ -1492,7 +1491,7 @@ def apply_scout_move(
     state.replace_battlefield_state(
         battlefield.with_unit_placement(current.with_model_placements(moved_placements))
     )
-    _record_prebattle_action(
+    record_prebattle_action(
         state=state,
         result=result,
         request=request,
@@ -1556,7 +1555,7 @@ def apply_redeploy_completion(
     request: DecisionRequest,
     decisions: DecisionController,
 ) -> None:
-    _record_prebattle_action(
+    record_prebattle_action(
         state=state,
         result=result,
         request=request,
@@ -1586,7 +1585,7 @@ def apply_prebattle_completion(
     request: DecisionRequest,
     decisions: DecisionController,
 ) -> None:
-    _record_prebattle_action(
+    record_prebattle_action(
         state=state,
         result=result,
         request=request,
@@ -1625,7 +1624,12 @@ def redeploy_unit_views_for_player(
     battlefield = _require_battlefield_state(state)
     available: list[RulesUnitView] = []
     for view in _rules_unit_views_for_player(state=state, player_id=requested_player_id):
-        if not _rules_unit_all_components_have_keyword(view, "REDEPLOY"):
+        permission = catalog_redeploy_permission_for_view(
+            state=state,
+            player_id=requested_player_id,
+            view=view,
+        )
+        if permission is None and not _rules_unit_all_components_have_keyword(view, "REDEPLOY"):
             continue
         if _unit_action_record_exists(
             state=state,
@@ -2216,12 +2220,25 @@ def _append_action_eligibility_violations(
                 field="unit_instance_id",
             )
         )
-    if request.action_kind is PreBattleActionKind.REDEPLOY:
-        if not _rules_unit_all_components_have_keyword(view, "REDEPLOY"):
+    if request.action_kind in {
+        PreBattleActionKind.REDEPLOY,
+        PreBattleActionKind.REDEPLOY_TO_STRATEGIC_RESERVES,
+    }:
+        permission = catalog_redeploy_permission_for_view(
+            state=state,
+            player_id=request.player_id,
+            view=view,
+        )
+        source_is_catalog_permission = (
+            permission is not None and permission.source_rule_id == request.source_rule_id
+        )
+        if not source_is_catalog_permission and not _rules_unit_all_components_have_keyword(
+            view, "REDEPLOY"
+        ):
             violations.append(
                 PreBattleViolation(
                     violation_code=PreBattleViolationCode.UNIT_NOT_ELIGIBLE,
-                    message="Redeploy requires every component unit to have REDEPLOY.",
+                    message="Redeploy requires a current source-backed permission.",
                     field="unit_instance_id",
                 )
             )
@@ -2915,42 +2932,6 @@ def _invalid_prebattle_status(
             "resolution": cast(JsonValue, None if resolution is None else resolution.to_payload()),
         },
     )
-
-
-def _record_prebattle_action(
-    *,
-    state: GameState,
-    result: DecisionResult,
-    request: DecisionRequest,
-    action_kind: PreBattleActionKind,
-    unit_instance_id: str | None,
-    source_rule_id: str,
-    payload: JsonValue,
-) -> None:
-    if result.actor_id is None:
-        raise GameLifecycleError("Pre-battle action records require actor_id.")
-    state.record_prebattle_action(
-        PreBattleActionRecord(
-            action_id=f"prebattle-action-{len(state.prebattle_action_records) + 1:06d}",
-            game_id=state.game_id,
-            player_id=result.actor_id,
-            setup_step=state.current_setup_step
-            if state.current_setup_step is not None
-            else _setup_step_for_action_kind(action_kind),
-            action_kind=action_kind,
-            unit_instance_id=unit_instance_id,
-            source_rule_id=source_rule_id,
-            request_id=request.request_id,
-            result_id=result.result_id,
-            payload=payload,
-        )
-    )
-
-
-def _setup_step_for_action_kind(action_kind: PreBattleActionKind) -> SetupStep:
-    if action_kind in {PreBattleActionKind.COMPLETE_REDEPLOYS, PreBattleActionKind.REDEPLOY}:
-        return SetupStep.REDEPLOY_UNITS
-    return SetupStep.RESOLVE_PREBATTLE_ACTIONS
 
 
 def _completed_kind_for_step_player(

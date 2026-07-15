@@ -25,9 +25,12 @@ from warhammer40k_core.rules.source_data import (
     SourceDataError,
 )
 from warhammer40k_core.rules.text_normalization import (
+    OFFICIAL_STRATAGEM_REFERENCE_ALIAS_SOURCE_ID,
     NormalizedRuleText,
     NormalizedRuleTextPayload,
     TextNormalizationError,
+    canonical_stratagem_reference_id,
+    canonical_stratagem_reference_name,
     normalize_rule_text,
     normalize_source_characters,
     normalize_structured_source_text,
@@ -105,6 +108,32 @@ def test_normalization_rejects_invalid_raw_text() -> None:
         normalize_rule_text("bad\u0000text")
     with pytest.raises(TextNormalizationError):
         NormalizedRuleText(raw_text="D6", normalized_text="d6")
+
+
+@pytest.mark.parametrize(
+    ("reference", "expected_id", "expected_name"),
+    [
+        ("Explosives Stratagem", "explosives", "Explosives Stratagem"),
+        ("  GRENADE\u00a0STRATAGEM  ", "explosives", "Explosives Stratagem"),
+        ("Crushing Impact Stratagem", "crushing-impact", "Crushing Impact Stratagem"),
+        ("tank shock stratagem", "crushing-impact", "Crushing Impact Stratagem"),
+    ],
+)
+def test_official_stratagem_name_equivalences_are_canonical_at_the_data_boundary(
+    reference: str,
+    expected_id: str,
+    expected_name: str,
+) -> None:
+    assert OFFICIAL_STRATAGEM_REFERENCE_ALIAS_SOURCE_ID == (
+        "gw-11e-official-faq:stratagem-name-equivalence:grenade-tank-shock"
+    )
+    assert canonical_stratagem_reference_id(reference) == expected_id
+    assert canonical_stratagem_reference_name(reference) == expected_name
+
+
+def test_unapproved_stratagem_reference_alias_fails_fast() -> None:
+    with pytest.raises(TextNormalizationError, match="approved alias"):
+        canonical_stratagem_reference_id("Unknown Stratagem")
 
 
 def test_parsed_tokens_are_structured_and_deterministic() -> None:

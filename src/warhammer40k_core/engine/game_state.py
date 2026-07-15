@@ -131,6 +131,11 @@ from warhammer40k_core.engine.phases.shooting import (
 from warhammer40k_core.engine.prebattle_records import (
     PreBattleActionRecord,
 )
+from warhammer40k_core.engine.reserve_state_queries import (
+    reserve_state_for_rules_unit,
+    unarrived_reserve_model_ids,
+    validate_reserve_state_rules_unit,
+)
 from warhammer40k_core.engine.reserves import (
     ReserveDestructionTimingPolicy,
     ReserveKind,
@@ -146,6 +151,8 @@ from warhammer40k_core.engine.reserves import (
 from warhammer40k_core.engine.return_on_death import (
     PendingReturnOnDeath,
 )
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     FinalScoringResult,
@@ -2096,7 +2103,6 @@ class GameState:
                 "strategic reserve destruction_deadline_policy must be "
                 "ReserveDestructionTimingPolicy."
             )
-        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
         existing_reserved_ids = {
             state.unit_instance_id
             for state in self.reserve_states
@@ -2117,10 +2123,15 @@ class GameState:
                 declaration.player_id,
                 player_ids=self.player_ids,
             )
-            owner = unit_owner_by_id.get(declaration.unit_instance_id)
-            if owner is None:
-                raise GameLifecycleError("Strategic Reserve declaration unit is unknown.")
-            if owner != requested_player_id:
+            declaration_view = rules_unit_view_from_armies(
+                armies=tuple(self.army_definitions),
+                unit_instance_id=declaration.unit_instance_id,
+            )
+            if declaration_view.unit_instance_id != declaration.unit_instance_id:
+                raise GameLifecycleError(
+                    "Strategic Reserve declaration must use canonical rules-unit identity."
+                )
+            if declaration_view.owner_player_id != requested_player_id:
                 raise GameLifecycleError("Strategic Reserve declaration player_id drift.")
             if declaration.unit_instance_id in existing_reserved_ids:
                 raise GameLifecycleError("Strategic Reserve declaration unit is already reserved.")
@@ -2128,12 +2139,11 @@ class GameState:
                 raise GameLifecycleError("Strategic Reserve declarations must not duplicate units.")
             declared_unit_ids.add(declaration.unit_instance_id)
             for embarked_unit_id in declaration.embarked_unit_instance_ids:
-                embarked_owner = unit_owner_by_id.get(embarked_unit_id)
-                if embarked_owner is None:
-                    raise GameLifecycleError(
-                        "Strategic Reserve declaration embarked unit is unknown."
-                    )
-                if embarked_owner != requested_player_id:
+                embarked_view = rules_unit_view_from_armies(
+                    armies=tuple(self.army_definitions),
+                    unit_instance_id=embarked_unit_id,
+                )
+                if embarked_view.owner_player_id != requested_player_id:
                     raise GameLifecycleError(
                         "Strategic Reserve declaration embarked unit player_id drift."
                     )
@@ -3965,21 +3975,29 @@ class GameState:
             raise GameLifecycleError("reserve_state must be a ReserveState.")
         if reserve_state.player_id not in self.player_ids:
             raise GameLifecycleError("ReserveState player_id is not in this game.")
+        validate_reserve_state_rules_unit(
+            armies=tuple(self.army_definitions),
+            reserve_state=reserve_state,
+        )
         if self.reserve_state_for_unit(reserve_state.unit_instance_id) is not None:
             raise GameLifecycleError("ReserveState already exists for unit.")
         self.reserve_states.append(reserve_state)
         self.reserve_states.sort(key=lambda state: state.unit_instance_id)
 
     def reserve_state_for_unit(self, unit_instance_id: str) -> ReserveState | None:
-        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-        for reserve_state in self.reserve_states:
-            if reserve_state.unit_instance_id == requested_unit_id:
-                return reserve_state
-        return None
+        return reserve_state_for_rules_unit(
+            armies=tuple(self.army_definitions),
+            reserve_states=tuple(self.reserve_states),
+            unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
+        )
 
     def replace_reserve_state(self, reserve_state: ReserveState) -> None:
         if type(reserve_state) is not ReserveState:
             raise GameLifecycleError("reserve_state must be a ReserveState.")
+        validate_reserve_state_rules_unit(
+            armies=tuple(self.army_definitions),
+            reserve_state=reserve_state,
+        )
         for index, stored in enumerate(self.reserve_states):
             if stored.unit_instance_id == reserve_state.unit_instance_id:
                 self.reserve_states[index] = reserve_state
@@ -4045,6 +4063,11 @@ class GameState:
             raise GameLifecycleError("Repositioned units require battlefield_state.")
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        rules_unit_view = rules_unit_view_from_armies(
+            armies=tuple(self.army_definitions),
+            unit_instance_id=requested_unit_id,
+        )
+        rules_unit_id = rules_unit_view.unit_instance_id
         origin = reserve_origin_from_token(reserve_origin)
         if origin not in {
             ReserveOrigin.DURING_BATTLE_ABILITY,
@@ -4052,48 +4075,39 @@ class GameState:
             ReserveOrigin.DURING_BATTLE_OTHER,
         }:
             raise GameLifecycleError("Repositioned units require a during-battle reserve origin.")
-        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
-        owner = unit_owner_by_id.get(requested_unit_id)
-        if owner is None:
-            raise GameLifecycleError("Repositioned unit is unknown.")
-        if owner != requested_player_id:
+        if rules_unit_view.owner_player_id != requested_player_id:
             raise GameLifecycleError("Repositioned unit player_id drift.")
-        if self.reserve_state_for_unit(requested_unit_id) is not None:
+        if self.reserve_state_for_unit(rules_unit_id) is not None:
             raise GameLifecycleError("Repositioned unit already has a ReserveState.")
-        try:
-            unit_placement = self.battlefield_state.unit_placement_by_id(requested_unit_id)
-        except PlacementError as exc:
-            raise GameLifecycleError(
-                "Repositioned unit must be on the battlefield before entering reserves."
-            ) from exc
-        if unit_placement.player_id != requested_player_id:
-            raise GameLifecycleError("Repositioned unit placement player_id drift.")
-        cargo_state = self.transport_cargo_state_for_transport(requested_unit_id)
+        rules_unit_placement = RulesUnitPlacement.from_battlefield(
+            view=rules_unit_view,
+            battlefield_state=self.battlefield_state,
+        )
+        embarked_unit_ids: set[str] = set()
+        for component_unit_id in rules_unit_view.component_unit_instance_ids:
+            cargo_state = self.transport_cargo_state_for_transport(component_unit_id)
+            if cargo_state is not None:
+                embarked_unit_ids.update(cargo_state.embarked_unit_instance_ids)
         policy = _arrival.reposition_destruction_policy(
             mission_setup=self.mission_setup,
             destruction_deadline_policy=destruction_deadline_policy,
         )
         reserve_state = ReserveState.entered_during_battle(
             player_id=requested_player_id,
-            unit_instance_id=requested_unit_id,
+            unit_instance_id=rules_unit_id,
             reserve_kind=ReserveKind.STRATEGIC_RESERVES,
             battle_round=self.battle_round,
             phase=current_phase,
             reserve_origin=origin,
             destruction_deadline_policy=policy,
-            embarked_unit_instance_ids=(
-                () if cargo_state is None else cargo_state.embarked_unit_instance_ids
-            ),
+            embarked_unit_instance_ids=tuple(sorted(embarked_unit_ids)),
             source_rule_ids=source_rule_ids,
             required_arrival_battle_round=required_arrival_battle_round,
             required_arrival_phase=required_arrival_phase,
             required_arrival_source_rule_id=required_arrival_source_rule_id,
             required_arrival_placement_kind=required_arrival_placement_kind,
         )
-        try:
-            updated_battlefield = self.battlefield_state.without_unit_placement(requested_unit_id)
-        except PlacementError as exc:
-            raise GameLifecycleError("Repositioned unit battlefield removal failed.") from exc
+        updated_battlefield = rules_unit_placement.without_from_battlefield(self.battlefield_state)
         self.record_reserve_state(reserve_state)
         self.battlefield_state = updated_battlefield
         return reserve_state
@@ -4126,25 +4140,10 @@ class GameState:
         )
 
     def unarrived_reserve_model_ids(self) -> tuple[str, ...]:
-        if not self.reserve_states:
-            return ()
-        unit_by_id = {
-            unit.unit_instance_id: unit for army in self.army_definitions for unit in army.units
-        }
-        model_ids: list[str] = []
-        for reserve_state in self.reserve_states:
-            if reserve_state.status is not ReserveStatus.IN_RESERVES:
-                continue
-            impacted_unit_ids = (
-                reserve_state.unit_instance_id,
-                *reserve_state.embarked_unit_instance_ids,
-            )
-            for unit_id in impacted_unit_ids:
-                unit = unit_by_id.get(unit_id)
-                if unit is None:
-                    raise GameLifecycleError("ReserveState references an unknown unit.")
-                model_ids.extend(model.model_instance_id for model in unit.own_models)
-        return tuple(sorted(model_ids))
+        return unarrived_reserve_model_ids(
+            armies=tuple(self.army_definitions),
+            reserve_states=tuple(self.reserve_states),
+        )
 
     def embarked_model_ids(self) -> tuple[str, ...]:
         if not self.transport_cargo_states:

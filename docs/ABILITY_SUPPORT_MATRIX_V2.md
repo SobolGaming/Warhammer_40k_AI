@@ -273,7 +273,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:fortification-cover` | No current generated rows |
 | `catalog-ir:fortification-desperate-escape` | No current generated rows |
 | `catalog-ir:fortification-target-permission` | No current generated rows |
-| `catalog-ir:hit-roll-modifier` | Revel in Desecration |
+| `catalog-ir:granted-ability:stealth` | No current generated rows |
+| `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Revel in Desecration |
 | `catalog-ir:hit-roll-reroll` | Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | Mistshield |
@@ -289,8 +290,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
 | `catalog-ir:once-per-battle-ability` | Malefic Destruction<br>Unholy Vigour |
 | `catalog-ir:passive-hit-reroll` | Reavers of the Void |
-| `catalog-ir:post-shoot-hit-target-effect` | Fury of the Void (Psychic) |
+| `catalog-ir:post-shoot-hit-target-effect` | Fury of the Void (Psychic)<br>Harassment Fire |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth |
+| `catalog-ir:prebattle-redeploy-permission` | Prince of Corsairs |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:range-characteristic-query` | No current generated rows |
 | `catalog-ir:reserve-arrival-restriction` | Aethersense (Psychic) |
@@ -301,6 +303,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:setup-reactive-shoot-charge` | Unleash Wrath |
 | `catalog-ir:shadow-form-choice` | Shadow Form |
 | `catalog-ir:shadow-of-chaos-aura` | The Dark Master (Aura) |
+| `catalog-ir:shooting-start-selected-target-effect` | Hallucinogen Grenades |
 | `catalog-ir:shooting-target-range-restriction` | Wreathed in Shadows (Aura, Psychic) |
 | `catalog-ir:strength-characteristic-modifier` | Daemon Prince of Khorne |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
@@ -311,7 +314,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:tracked-target-selection` | Piratical Raiders |
 | `catalog-ir:unit-move-completed-battle-shock` | No current generated rows |
 | `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede |
-| `catalog-ir:weapon-keyword-grant` | Faolchú<br>Harbinger of Death<br>Piratical Raiders |
+| `catalog-ir:weapon-keyword-grant` | Faolchú<br>Harbinger of Death<br>Piratical Hero<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:c'tan-power` | No current generated rows |
@@ -332,7 +335,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-keyword-grant:precision` | Harbinger of Death<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:psychic` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:rapid-fire` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:sustained-hits` | Harbinger of Death |
+| `catalog-ir:weapon-keyword-grant:sustained-hits` | Harbinger of Death<br>Piratical Hero |
 | `catalog-ir:weapon-keyword-grant:torrent` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:twin-linked` | No current generated rows |
 | `catalog-ir:weapon-skill-characteristic-modifier` | No current generated rows |

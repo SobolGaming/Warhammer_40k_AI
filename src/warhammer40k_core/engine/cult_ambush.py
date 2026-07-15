@@ -978,7 +978,7 @@ def apply_cult_ambush_placement(
     if placement.reserve_state is None:
         raise GameLifecycleError("Cult Ambush placement was not prevalidated with a reserve state.")
     state.replace_battlefield_state(
-        battlefield_state.with_added_unit_placement(submitted.attempted_placement)
+        battlefield_state.with_added_unit_placement(submitted.require_unit_placement())
     )
     arrived_state = placement.reserve_state.mark_arrived(
         battle_round=state.battle_round,
@@ -1052,7 +1052,7 @@ def resolve_cult_ambush_ingress_placement(
     coherency_result = unit_placement_coherency_result(
         scenario=scenario,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
-        unit_placement=submitted.attempted_placement,
+        unit_placement=submitted.require_unit_placement(),
     )
     violations: list[ProposalViolation] = []
     if reserve_state is None:
@@ -1067,20 +1067,20 @@ def resolve_cult_ambush_ingress_placement(
         )
     if marker.marker_id not in {stored.marker_id for stored in state.cult_ambush_markers}:
         violations.append(_violation("marker_not_active", "Cult Ambush marker is not active."))
-    if submitted.attempted_placement.unit_instance_id != submitted.unit_instance_id:
+    if submitted.require_unit_placement().unit_instance_id != submitted.unit_instance_id:
         violations.append(_violation("unit_placement_drift", "UnitPlacement unit drift."))
-    if submitted.attempted_placement.player_id != proposal_request.actor_id:
+    if submitted.require_unit_placement().player_id != proposal_request.actor_id:
         violations.append(_violation("player_id_drift", "UnitPlacement player drift."))
     _append_cult_ambush_marker_placement_violations(
         state=state,
         marker=marker,
-        unit_placement=submitted.attempted_placement,
+        unit_placement=submitted.require_unit_placement(),
         violations=violations,
     )
     if coherency_result.status is UnitCoherencyStatus.BROKEN:
         violations.append(_violation("unit_coherency_broken", "Unit coherency is broken."))
     status = "valid" if not violations else "invalid"
-    transition_batch = _placement_transition_batch(submitted.attempted_placement)
+    transition_batch = _placement_transition_batch(submitted.require_unit_placement())
     return CultAmbushIngressPlacement(
         marker=marker,
         reserve_state=reserve_state,

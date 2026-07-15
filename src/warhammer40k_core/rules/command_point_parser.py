@@ -8,11 +8,16 @@ from warhammer40k_core.rules.rule_ir import (
     RuleConditionKind,
     RuleEffectKind,
     RuleEffectSpec,
+    RuleParameterValue,
     RuleTargetKind,
     RuleTargetSpec,
     RuleTrigger,
     RuleTriggerKind,
     parameters_from_pairs,
+)
+from warhammer40k_core.rules.text_normalization import (
+    OFFICIAL_STRATAGEM_REFERENCE_ALIAS_SOURCE_ID,
+    canonical_stratagem_reference_id,
 )
 
 STRATAGEM_COST_EFFECT_RE = re.compile(
@@ -34,6 +39,14 @@ UNNAMED_ZERO_CP_STRATAGEM_COST_RE = re.compile(
     r"(?:\s+within\s+\d+(?:\.\d+)?\"\s+of\s+"
     r"(?:this\s+model|(?:the\s+)?bearer))?\s+"
     r"with\s+a\s+Stratagem\s+for\s+0\s*CP)\b",
+    re.IGNORECASE,
+)
+NAMED_ZERO_CP_STRATAGEM_COST_RE = re.compile(
+    r"\b(?P<trigger>you\s+(?:can|may)\s+target\s+"
+    r"(?P<source_target>this\s+unit|this\s+model(?:'s\s+unit)?|"
+    r"(?:the\s+)?bearer's\s+unit)\s+with\s+(?:the\s+)?"
+    r"(?P<stratagem_name>Grenade\s+Stratagem|Explosives\s+Stratagem|"
+    r"Tank\s+Shock\s+Stratagem|Crushing\s+Impact\s+Stratagem)\s+for\s+0\s*CP)\b",
     re.IGNORECASE,
 )
 STRATAGEM_COST_TRIGGER_RE = re.compile(
@@ -234,8 +247,23 @@ def parse_command_point_effects(clause_span: TextSpan) -> tuple[RuleEffectSpec, 
                 ),
             )
         )
-    zero_cp_match = UNNAMED_ZERO_CP_STRATAGEM_COST_RE.search(clause_span.text)
+    named_zero_cp_match = NAMED_ZERO_CP_STRATAGEM_COST_RE.search(clause_span.text)
+    zero_cp_match = named_zero_cp_match or UNNAMED_ZERO_CP_STRATAGEM_COST_RE.search(
+        clause_span.text
+    )
     if zero_cp_match is not None:
+        stratagem_parameters: tuple[tuple[str, RuleParameterValue], ...] = ()
+        if named_zero_cp_match is not None:
+            stratagem_parameters = (
+                (
+                    "stratagem_id",
+                    canonical_stratagem_reference_id(named_zero_cp_match.group("stratagem_name")),
+                ),
+                (
+                    "stratagem_reference_source_id",
+                    OFFICIAL_STRATAGEM_REFERENCE_ALIAS_SOURCE_ID,
+                ),
+            )
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.MODIFY_COMMAND_POINTS,
@@ -249,6 +277,7 @@ def parse_command_point_effects(clause_span: TextSpan) -> tuple[RuleEffectSpec, 
                         ("operation", "modify_stratagem_cost"),
                         ("optional", True),
                         ("stacking", "cumulative"),
+                        *stratagem_parameters,
                     )
                 ),
             )
@@ -295,6 +324,7 @@ def has_command_point_effect(text: str) -> bool:
     return (
         STRATAGEM_COST_EFFECT_RE.search(text) is not None
         or UNNAMED_ZERO_CP_STRATAGEM_COST_RE.search(text) is not None
+        or NAMED_ZERO_CP_STRATAGEM_COST_RE.search(text) is not None
         or _COMMAND_POINT_LEDGER_RE.search(text) is not None
     )
 
@@ -305,6 +335,7 @@ def command_point_frequency_span_end(text: str, *, fallback_end: int) -> int:
         return fallback_end
     if (
         UNNAMED_ZERO_CP_STRATAGEM_COST_RE.fullmatch(effect_match.group(0)) is None
+        and NAMED_ZERO_CP_STRATAGEM_COST_RE.fullmatch(effect_match.group(0)) is None
         and _OPTIONAL_COST_USE_RE.search(text) is None
     ):
         return fallback_end
@@ -312,7 +343,10 @@ def command_point_frequency_span_end(text: str, *, fallback_end: int) -> int:
 
 
 def _trigger_is_opponent_use(match: re.Match[str]) -> bool:
-    return match.group("source_target") is None and match.group("direct_source_target") is None
+    return (
+        _optional_match_group(match, "source_target") is None
+        and _optional_match_group(match, "direct_source_target") is None
+    )
 
 
 def _stratagem_target_relationship(match: re.Match[str], clause_text: str) -> str:
@@ -322,7 +356,7 @@ def _stratagem_target_relationship(match: re.Match[str], clause_text: str) -> st
         or STRATAGEM_COST_POST_TRIGGER_RANGE_RE.search(clause_text) is not None
     ):
         return "stratagem_targets_unit_within_source_model_range"
-    direct_source_target = match.group("direct_source_target")
+    direct_source_target = _optional_match_group(match, "direct_source_target")
     if direct_source_target is not None and "friendly" in direct_source_target.lower():
         return "stratagem_targets_friendly_unit"
     return "stratagem_targets_source_unit"
@@ -332,6 +366,9 @@ def _stratagem_cost_trigger_match(text: str) -> re.Match[str] | None:
     explicit_match = STRATAGEM_COST_TRIGGER_RE.search(text)
     if explicit_match is not None:
         return explicit_match
+    named_match = NAMED_ZERO_CP_STRATAGEM_COST_RE.search(text)
+    if named_match is not None:
+        return named_match
     return UNNAMED_ZERO_CP_STRATAGEM_COST_RE.search(text)
 
 
@@ -339,7 +376,16 @@ def _stratagem_cost_effect_match(text: str) -> re.Match[str] | None:
     explicit_match = STRATAGEM_COST_EFFECT_RE.search(text)
     if explicit_match is not None:
         return explicit_match
+    named_match = NAMED_ZERO_CP_STRATAGEM_COST_RE.search(text)
+    if named_match is not None:
+        return named_match
     return UNNAMED_ZERO_CP_STRATAGEM_COST_RE.search(text)
+
+
+def _optional_match_group(match: re.Match[str], group_name: str) -> str | None:
+    if group_name not in match.re.groupindex:
+        return None
+    return match.group(group_name)
 
 
 def _stratagem_cost_relationship_span(

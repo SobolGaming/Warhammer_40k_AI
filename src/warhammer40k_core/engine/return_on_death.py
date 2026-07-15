@@ -441,7 +441,8 @@ def apply_return_on_death_placement_decision(
         result=result,
         ruleset_descriptor=ruleset_descriptor,
     )
-    _restore_returned_target(state=state, pending=pending, placement=submission.attempted_placement)
+    unit_placement = submission.require_unit_placement()
+    _restore_returned_target(state=state, pending=pending, placement=unit_placement)
     resolved = state.resolve_pending_return_on_death(pending.pending_id)
     decisions.event_log.append(
         RETURN_ON_DEATH_SET_BACK_UP_COMPLETED_EVENT_TYPE,
@@ -452,7 +453,7 @@ def apply_return_on_death_placement_decision(
             "request_id": request.request_id,
             "result_id": result.result_id,
             "pending": resolved.to_payload(),
-            "placement": submission.attempted_placement.to_payload(),
+            "placement": unit_placement.to_payload(),
         },
     )
     return resolved
@@ -502,7 +503,7 @@ def _parse_return_on_death_placement_submission(
     _validate_return_on_death_placement(
         state=state,
         pending=pending,
-        placement=submission.attempted_placement,
+        placement=submission.require_unit_placement(),
         ruleset_descriptor=ruleset_descriptor,
     )
     return pending, submission

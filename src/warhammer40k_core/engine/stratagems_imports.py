@@ -136,6 +136,8 @@ from warhammer40k_core.engine.reserves import (
     apply_reinforcement_placement_to_battlefield,
     resolve_reserve_arrival,
 )
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
@@ -235,6 +237,9 @@ __all__ = (
     "ReserveArrivalRestrictionHookRegistry",
     "ReserveState",
     "ReserveStatus",
+    "RulesUnitPlacement",
+    "RulesUnitView",
+    "rules_unit_view_by_id",
     "RulesetDescriptor",
     "SELECT_FEEL_NO_PAIN_DECISION_TYPE",
     "SMOKESCREEN_EFFECT_KIND",

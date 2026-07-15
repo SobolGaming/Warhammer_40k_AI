@@ -220,6 +220,8 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
 )
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
@@ -322,6 +324,9 @@ OWN_STRATAGEM_COST_TEXT = (
 )
 UNNAMED_ZERO_CP_STRATAGEM_COST_TEXT = (
     "Once per battle round, you can target a friendly unit with a Stratagem for 0CP."
+)
+LEGACY_GRENADE_ZERO_CP_STRATAGEM_COST_TEXT = (
+    "Once per turn, you can target this unit with the Grenade Stratagem for 0CP."
 )
 LEADERSHIP_COMMAND_POINT_TEXT = (
     "At the end of your Command phase, if this model is on the battlefield, take a "
@@ -1944,8 +1949,11 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=target_unit,
-        attempted_placement=near_placement,
+        rules_unit=rules_unit_view_from_armies(
+            armies=scenario.armies,
+            unit_instance_id=target_unit.unit_instance_id,
+        ),
+        attempted_rules_unit_placement=RulesUnitPlacement.single(near_placement),
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
     )
     restrictions = registry.restrictions_for(context)
@@ -1968,8 +1976,8 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=target_unit,
-        attempted_placement=near_placement,
+        rules_unit=context.rules_unit,
+        attempted_rules_unit_placement=context.attempted_rules_unit_placement,
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
         registry=registry,
     )
@@ -1996,8 +2004,8 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=target_unit,
-        attempted_placement=exact_placement,
+        rules_unit=context.rules_unit,
+        attempted_rules_unit_placement=RulesUnitPlacement.single(exact_placement),
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
         registry=registry,
     )
@@ -2019,13 +2027,18 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         placement=outside_placement.model_placements[0],
     )
     assert outside_geometry.range_to(source_geometry) > 12.0
-    assert not registry.restrictions_for(replace(context, attempted_placement=outside_placement))
+    assert not registry.restrictions_for(
+        replace(
+            context,
+            attempted_rules_unit_placement=RulesUnitPlacement.single(outside_placement),
+        )
+    )
     assert not reserve_arrival_restriction_violations(
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=target_unit,
-        attempted_placement=outside_placement,
+        rules_unit=context.rules_unit,
+        attempted_rules_unit_placement=RulesUnitPlacement.single(outside_placement),
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
         registry=registry,
     )
@@ -3910,7 +3923,7 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
             selection_clause=distance_selection,
             explicit_target_unit_ids=None,
         )
-    assert (
+    with pytest.raises(GameLifecycleError, match="Rules unit_instance_id is unknown"):
         eligible_selection_target_unit_ids(
             state=state,
             source_player_id=source_army.player_id,
@@ -3919,8 +3932,6 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
             selection_clause=distance_selection,
             explicit_target_unit_ids=("other-target",),
         )
-        == ()
-    )
     assert (
         selection_source_model_ids(
             selection_clause=distance_selection,
@@ -3999,6 +4010,32 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
             target_models=(),
             parameters={"range_kind": "numeric_range"},
         )
+
+
+def test_catalog_selected_target_explicit_component_id_canonicalizes_attached_target() -> None:
+    attached_target_army, source_army = _mustered_attached_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    target_component = attached_target_army.units[0]
+    attached_target_id = attached_target_army.attached_units[0].attached_unit_instance_id
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="catalog-selected-target-explicit-attached-component",
+        armies=(source_army, attached_target_army),
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, attached_target_army),
+        battlefield=scenario.battlefield_state,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+
+    assert eligible_selection_target_unit_ids(
+        state=state,
+        source_player_id=source_army.player_id,
+        source_unit_instance_id=source_unit.unit_instance_id,
+        source_model_instance_id=None,
+        selection_clause=_fight_start_selection_clause(),
+        explicit_target_unit_ids=(target_component.unit_instance_id,),
+    ) == (attached_target_id,)
 
 
 def test_catalog_selected_target_visibility_gate_uses_real_line_of_sight() -> None:
@@ -4920,6 +4957,69 @@ def test_catalog_unnamed_zero_cp_rule_reduces_current_use_by_one_in_generic_regi
 
     assert no_choice_cost == 1
     assert accepted_cost == 0
+
+
+def test_catalog_legacy_grenade_cost_rule_only_matches_explosives_stratagem_id() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    record = _command_point_record(
+        record_id="record:catalog-cp:legacy-grenade-zero-cp-runtime",
+        raw_text=LEGACY_GRENADE_ZERO_CP_STRATAGEM_COST_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (record,)},
+    )
+    eligibility = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=source_army.player_id,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    target_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id=source_army.player_id,
+        target_unit_instance_id=source_unit.unit_instance_id,
+    )
+    source_request, source_result = _test_stratagem_source_decision(
+        actor_id=source_army.player_id,
+        suffix="legacy-grenade-zero-cp",
+    )
+
+    def request_for(stratagem_id: str) -> DecisionRequest | None:
+        return runtime.stratagem_cost_choice_request(
+            StratagemCostChoiceRequestContext(
+                state=state,
+                decisions=DecisionController(),
+                source_request=source_request,
+                source_result=source_result,
+                definition=replace(
+                    _test_stratagem_definition(command_point_cost=1),
+                    stratagem_id=stratagem_id,
+                ),
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+            )
+        )
+
+    assert request_for("explosives") is not None
+    assert request_for("crushing-impact") is None
 
 
 def test_catalog_command_point_cost_frequency_is_consumed_from_stratagem_use_record() -> None:

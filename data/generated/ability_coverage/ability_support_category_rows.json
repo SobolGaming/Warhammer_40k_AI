@@ -32,6 +32,30 @@
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
         "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/faction/000009894/none",
+        "datasheet_id": "000004193",
+        "datasheet_name": "Prince Yriel",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
+        "datasheet_id": "000004195",
+        "datasheet_name": "Starfangs",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/faction/000009894/none",
+        "datasheet_id": "000000605",
+        "datasheet_name": "Vypers",
+        "source_kind": "faction"
       }
     ],
     "ability_names": [
@@ -39,18 +63,24 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 4,
+    "coverage_row_count": 7,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
-      "chaos-daemons-bridge-catalog/000004194/faction/000009894/none"
+      "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000004193/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000605/faction/000009894/none"
     ],
     "datasheet_names": [
       "Corsair Skyreavers",
       "Corsair Voidreavers",
       "Corsair Voidscarred",
-      "Kharseth"
+      "Kharseth",
+      "Prince Yriel",
+      "Starfangs",
+      "Vypers"
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:aeldari:army_rule:fade_back",
@@ -61,7 +91,7 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 4
+      "faction": 7
     },
     "support_stages": [
       "engine_consumed"
@@ -346,6 +376,22 @@
         "datasheet_id": "000001151",
         "datasheet_name": "Soul Grinder",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/core/000008339/none",
+        "datasheet_id": "000004195",
+        "datasheet_name": "Starfangs",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/core/000008339/none",
+        "datasheet_id": "000000605",
+        "datasheet_name": "Vypers",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -353,7 +399,7 @@
     ],
     "category_id": "core.deadly_demise",
     "category_name": "Core Deadly Demise",
-    "coverage_row_count": 8,
+    "coverage_row_count": 10,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
       "chaos-daemons-bridge-catalog/000002758/core/000008339/none",
@@ -362,21 +408,25 @@
       "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004208/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004209/core/000008339/none",
-      "chaos-daemons-bridge-catalog/000001151/core/000008339/none"
+      "chaos-daemons-bridge-catalog/000001151/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004195/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000000605/core/000008339/none"
     ],
     "datasheet_names": [
       "Be'lakor",
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Defiler",
-      "Soul Grinder"
+      "Soul Grinder",
+      "Starfangs",
+      "Vypers"
     ],
     "runtime_consumer_ids": [
       "descriptor:destruction-reaction:deadly-demise-resolution",
       "descriptor:destruction-reaction:deadly-demise-source"
     ],
     "source_kind_counts": {
-      "core": 8
+      "core": 10
     },
     "support_stages": [
       "engine_consumed"
@@ -475,6 +525,74 @@
     "runtime_consumer_ids": [
       "catalog-ir:desperate-escape-roll-modifier",
       "catalog-ir:force-desperate-escape"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000004193:piratical-hero",
+        "ability_name": "Piratical Hero",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:piratical-hero/none",
+        "datasheet_id": "000004193",
+        "datasheet_name": "Prince Yriel",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Piratical Hero"
+    ],
+    "category_id": "datasheet.roll_modifier.hit_roll.selected_unit",
+    "category_name": "Datasheet Roll Modifier Hit Roll Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:piratical-hero/none"
+    ],
+    "datasheet_names": [
+      "Prince Yriel"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:sustained-hits"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000605:harassment-fire",
+        "ability_name": "Harassment Fire",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/datasheet/000000605:harassment-fire/none",
+        "datasheet_id": "000000605",
+        "datasheet_name": "Vypers",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Harassment Fire"
+    ],
+    "category_id": "datasheet.roll_modifier.hit.selected_unit",
+    "category_name": "Datasheet Roll Modifier Hit Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000605/datasheet/000000605:harassment-fire/none"
+    ],
+    "datasheet_names": [
+      "Vypers"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-effect"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -586,6 +704,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004195:hallucinogen-grenades",
+        "ability_name": "Hallucinogen Grenades",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/datasheet/000004195:hallucinogen-grenades/none",
+        "datasheet_id": "000004195",
+        "datasheet_name": "Starfangs",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Hallucinogen Grenades"
+    ],
+    "category_id": "datasheet.rule_ir.grant_ability.selected_unit",
+    "category_name": "Datasheet Rule Ir Grant Ability Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004195/datasheet/000004195:hallucinogen-grenades/none"
+    ],
+    "datasheet_names": [
+      "Starfangs"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:shooting-start-selected-target-effect"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001149:daemonic-lord",
         "ability_name": "Daemonic Lord",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
@@ -608,6 +759,41 @@
     ],
     "runtime_consumer_ids": [
       "catalog-ir:conditional-ability:lone-operative"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000004193:piratical-hero",
+        "ability_name": "Piratical Hero",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:piratical-hero/none",
+        "datasheet_id": "000004193",
+        "datasheet_name": "Prince Yriel",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Piratical Hero"
+    ],
+    "category_id": "datasheet.rule_ir.grant_weapon_ability.selected_unit",
+    "category_name": "Datasheet Rule Ir Grant Weapon Ability Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:piratical-hero/none"
+    ],
+    "datasheet_names": [
+      "Prince Yriel"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:sustained-hits"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -1073,6 +1259,39 @@
     ],
     "runtime_consumer_ids": [
       "catalog-ir:fight-end-triggered-movement"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000004193:prince-of-corsairs",
+        "ability_name": "Prince of Corsairs",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:prince-of-corsairs/none",
+        "datasheet_id": "000004193",
+        "datasheet_name": "Prince Yriel",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Prince of Corsairs"
+    ],
+    "category_id": "datasheet.rule_ir.placement_permission.friendly_unit",
+    "category_name": "Datasheet Rule Ir Placement Permission Friendly Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:prince-of-corsairs/none"
+    ],
+    "datasheet_names": [
+      "Prince Yriel"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:prebattle-redeploy-permission"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -2209,6 +2428,14 @@
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/core/000008346/none",
+        "datasheet_id": "000004193",
+        "datasheet_name": "Prince Yriel",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -2216,18 +2443,20 @@
     ],
     "category_id": "core.leader",
     "category_name": "Leader",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000004194/core/000008346/none"
+      "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
+      "chaos-daemons-bridge-catalog/000004193/core/000008346/none"
     ],
     "datasheet_names": [
-      "Kharseth"
+      "Kharseth",
+      "Prince Yriel"
     ],
     "runtime_consumer_ids": [
       "descriptor:army-mustering:leader-attachment"
     ],
     "source_kind_counts": {
-      "core": 1
+      "core": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -2309,6 +2538,22 @@
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008344",
+        "ability_name": "Scouts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/core/000008344/none",
+        "datasheet_id": "000004193",
+        "datasheet_name": "Prince Yriel",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008344",
+        "ability_name": "Scouts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/core/000008344/none",
+        "datasheet_id": "000004195",
+        "datasheet_name": "Starfangs",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -2316,24 +2561,28 @@
     ],
     "category_id": "core.scouts",
     "category_name": "Scouts",
-    "coverage_row_count": 4,
+    "coverage_row_count": 6,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/core/000008344/none",
       "chaos-daemons-bridge-catalog/000002531/core/000008344/none",
       "chaos-daemons-bridge-catalog/000002532/core/000008344/none",
-      "chaos-daemons-bridge-catalog/000004194/core/000008344/none"
+      "chaos-daemons-bridge-catalog/000004194/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000004193/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000004195/core/000008344/none"
     ],
     "datasheet_names": [
       "Corsair Skyreavers",
       "Corsair Voidreavers",
       "Corsair Voidscarred",
-      "Kharseth"
+      "Kharseth",
+      "Prince Yriel",
+      "Starfangs"
     ],
     "runtime_consumer_ids": [
       "descriptor:prebattle:scouts"
     ],
     "source_kind_counts": {
-      "core": 4
+      "core": 6
     },
     "support_stages": [
       "engine_consumed"

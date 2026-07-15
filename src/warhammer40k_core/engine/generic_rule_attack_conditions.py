@@ -3,15 +3,15 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.battlefield_state import (
-    PlacementError,
-    geometry_model_for_placement,
-)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
+from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_view_by_id,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
-from warhammer40k_core.geometry.volume import Model
 from warhammer40k_core.rules.rule_ir import RuleConditionKind, RuleTargetKind
 
 TARGET_ALLEGIANCE_ENEMY = "enemy"
@@ -359,34 +359,42 @@ def _target_is_not_below_half_strength(
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR half-strength gate requires GameState.")
     target_unit_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
-    target_unit = _unit_instance(state=state, unit_instance_id=target_unit_id)
-    owner_id = _unit_owner(state=state, unit_instance_id=target_unit_id)
-    context = BelowHalfStrengthContext.from_unit(
-        player_id=owner_id,
-        unit=target_unit,
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=target_unit_id,
+    )
+    context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=target_rules_unit,
         starting_strength=state.starting_strength_record_for_unit(target_unit_id),
         current_model_ids=tuple(
-            model.model_instance_id for model in target_unit.own_models if model.is_alive
+            model.model_instance_id for model in target_rules_unit.alive_models()
         ),
     )
     return not context.is_below_half_strength
 
 
 def _enemy_unit_ids_for_player(*, state: object, player_id: str) -> tuple[str, ...]:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
-    requested_player_id = _validate_identifier("player_id", player_id)
-    ids: list[str] = []
-    for army in state.army_definitions:
-        if army.player_id == requested_player_id:
-            continue
-        ids.extend(unit.unit_instance_id for unit in army.units)
-    return tuple(sorted(ids))
+    return _placed_rules_unit_ids_by_allegiance(
+        state=state,
+        player_id=player_id,
+        allegiance=TARGET_ALLEGIANCE_ENEMY,
+    )
 
 
 def _unit_ids_by_allegiance(
+    *,
+    state: object,
+    player_id: str,
+    allegiance: str,
+) -> tuple[str, ...]:
+    return _placed_rules_unit_ids_by_allegiance(
+        state=state,
+        player_id=player_id,
+        allegiance=allegiance,
+    )
+
+
+def _placed_rules_unit_ids_by_allegiance(
     *,
     state: object,
     player_id: str,
@@ -397,31 +405,22 @@ def _unit_ids_by_allegiance(
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR target proximity gate requires GameState.")
     requested_player_id = _validate_identifier("player_id", player_id)
-    ids: list[str] = []
-    for army in state.army_definitions:
-        if allegiance == TARGET_ALLEGIANCE_FRIENDLY:
-            if army.player_id != requested_player_id:
-                continue
-        elif allegiance == TARGET_ALLEGIANCE_ENEMY:
-            if army.player_id == requested_player_id:
-                continue
-        else:
-            raise GameLifecycleError("Unsupported generic RuleIR target proximity allegiance.")
-        ids.extend(unit.unit_instance_id for unit in army.units)
-    return tuple(sorted(ids))
-
-
-def _unit_instance(*, state: object, unit_instance_id: str) -> UnitInstance:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit
-    raise GameLifecycleError("Generic RuleIR target constraint unit is unknown.")
+    if allegiance not in {TARGET_ALLEGIANCE_FRIENDLY, TARGET_ALLEGIANCE_ENEMY}:
+        raise GameLifecycleError("Unsupported generic RuleIR target proximity allegiance.")
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Generic RuleIR target proximity gate requires battlefield_state.")
+    placed_model_ids = frozenset(battlefield.placed_model_ids())
+    return tuple(
+        view.unit_instance_id
+        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        if (view.owner_player_id == requested_player_id)
+        == (allegiance == TARGET_ALLEGIANCE_FRIENDLY)
+        and any(
+            model.is_alive and model.model_instance_id in placed_model_ids
+            for model in view.own_models
+        )
+    )
 
 
 def _unit_owner(*, state: object, unit_instance_id: str) -> str:
@@ -430,11 +429,10 @@ def _unit_owner(*, state: object, unit_instance_id: str) -> str:
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return army.player_id
-    raise GameLifecycleError("Generic RuleIR target constraint unit is unknown.")
+    return rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=requested_unit_id,
+    ).owner_player_id
 
 
 def _closest_unit_distance_inches(
@@ -443,11 +441,15 @@ def _closest_unit_distance_inches(
     first_unit_instance_id: str,
     second_unit_instance_id: str,
 ) -> float:
-    first_models = _geometry_models_for_unit(
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
+    first_models = geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=first_unit_instance_id,
     )
-    second_models = _geometry_models_for_unit(
+    second_models = geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=second_unit_instance_id,
     )
@@ -460,45 +462,20 @@ def _closest_unit_distance_inches(
     )
 
 
-def _geometry_models_for_unit(
-    *,
-    state: object,
-    unit_instance_id: str,
-) -> tuple[Model, ...]:
+def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
-        raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Generic RuleIR target constraint requires battlefield_state.")
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id != requested_unit_id:
-                continue
-            try:
-                return tuple(
-                    geometry_model_for_placement(
-                        model=model,
-                        placement=battlefield_state.model_placement_by_id(model.model_instance_id),
-                    )
-                    for model in unit.own_models
-                    if model.is_alive
-                )
-            except PlacementError as exc:
-                raise GameLifecycleError(
-                    "Generic RuleIR target constraint placement is invalid."
-                ) from exc
-    raise GameLifecycleError("Generic RuleIR target constraint unit is unknown.")
-
-
-def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:
-    unit = _unit_instance(state=state, unit_instance_id=unit_instance_id)
-    requested_keyword = _canonical_keyword(_validate_identifier("keyword", keyword))
-    return requested_keyword in {
-        _canonical_keyword(stored) for stored in (*unit.keywords, *unit.faction_keywords)
-    }
+        raise GameLifecycleError("Generic RuleIR keyword gate requires GameState.")
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
+    )
+    return unit_has_required_keywords(
+        unit_keywords=rules_unit.keywords,
+        faction_keywords=rules_unit.faction_keywords,
+        required_keywords=(_validate_identifier("keyword", keyword),),
+    )
 
 
 def _target_proximity_distance(parameters: dict[str, JsonValue]) -> float:
@@ -543,10 +520,6 @@ def _target_proximity_required_keywords(parameters: dict[str, JsonValue]) -> tup
             "Generic RuleIR target_proximity_required_keyword_sequence must not be empty."
         )
     return tuple(keywords)
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().upper().replace("_", " ").replace("-", " ")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

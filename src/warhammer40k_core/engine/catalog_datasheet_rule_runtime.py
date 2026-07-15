@@ -38,11 +38,14 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
     CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
     CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+    CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
     CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
     clause_is_charge_end_leading_unit_weapon_ability_grant,
     clause_is_conditional_lone_operative,
     clause_is_consolidation_move_distance_modifier,
     clause_is_fight_selected_weapon_ability_choice,
+    clause_is_granted_stealth_effect,
+    clause_is_leading_unit_hit_roll_modifier,
     clause_is_leading_unit_wound_roll_modifier,
     clause_is_passive_characteristic_modifier,
     clause_is_stealth_aura,
@@ -68,6 +71,9 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
+)
+from warhammer40k_core.engine.generic_rule_effect_payloads import (
+    generic_rule_effect_payload_grants_ability,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
@@ -249,15 +255,32 @@ class CatalogDatasheetRuleRuntime:
 
     def hit_roll_modifier_bindings(self) -> tuple[HitRollModifierBinding, ...]:
         sources = self._sources(clause_is_stealth_aura)
-        if not sources:
-            return ()
-        return (
+        bindings: list[HitRollModifierBinding] = []
+        if sources:
+            bindings.append(
+                HitRollModifierBinding(
+                    modifier_id=CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
+                    source_id=CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
+                    handler=self._stealth_handler(sources),
+                )
+            )
+        bindings.extend(
             HitRollModifierBinding(
-                modifier_id=CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
-                source_id=CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
-                handler=self._stealth_handler(sources),
-            ),
+                modifier_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                handler=self._leading_unit_hit_roll_handler(source),
+            )
+            for source in self._sources(clause_is_leading_unit_hit_roll_modifier)
         )
+        if self._sources(clause_is_granted_stealth_effect):
+            bindings.append(
+                HitRollModifierBinding(
+                    modifier_id=CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
+                    source_id=CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
+                    handler=self._granted_stealth_handler,
+                )
+            )
+        return tuple(bindings)
 
     def wound_roll_modifier_bindings(self) -> tuple[WoundRollModifierBinding, ...]:
         return tuple(
@@ -572,6 +595,47 @@ class CatalogDatasheetRuleRuntime:
             return delta
 
         return handler
+
+    def _leading_unit_hit_roll_handler(
+        self, source: _CatalogClauseSource
+    ) -> Callable[[HitRollModifierContext], int]:
+        def handler(context: HitRollModifierContext) -> int:
+            if not _source_applies_to_rules_unit(
+                source=source,
+                context_unit_id=context.attacking_unit_instance_id,
+                state=context.state,
+            ) or not _source_currently_leading_rules_unit(
+                source=source,
+                context_unit_id=context.attacking_unit_instance_id,
+                state=context.state,
+            ):
+                return 0
+            parameters = parameter_payload(source.clause.effects[0].parameters)
+            delta = parameters.get("delta")
+            if type(delta) is not int:
+                raise GameLifecycleError("Catalog datasheet hit delta must be integer.")
+            return delta
+
+        return handler
+
+    def _granted_stealth_handler(self, context: HitRollModifierContext) -> int:
+        if context.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
+            return 0
+        target = rules_unit_view_by_id(
+            state=context.state,
+            unit_instance_id=context.target_unit_instance_id,
+        )
+        return (
+            -1
+            if any(
+                isinstance(effect.effect_payload, dict)
+                and generic_rule_effect_payload_grants_ability(
+                    effect.effect_payload, ability="stealth"
+                )
+                for effect in context.state.persisting_effects_for_unit(target.unit_instance_id)
+            )
+            else 0
+        )
 
     def _stealth_handler(
         self, sources: tuple[_CatalogClauseSource, ...]

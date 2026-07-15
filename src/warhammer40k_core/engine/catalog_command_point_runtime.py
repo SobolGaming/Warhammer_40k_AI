@@ -493,6 +493,12 @@ class CatalogCommandPointRuntime:
         ):
             return False
         parameters = command_point_effect_parameters(source.clause)
+        stratagem_id = parameters.get("stratagem_id")
+        if stratagem_id is not None:
+            if type(stratagem_id) is not str:
+                raise GameLifecycleError("Catalog Stratagem cost stratagem_id is malformed.")
+            if context.definition.stratagem_id != stratagem_id:
+                return False
         affected_player = parameters.get("affected_player")
         if affected_player == "source_player":
             if source.owner_player_id != stratagem_player_id:

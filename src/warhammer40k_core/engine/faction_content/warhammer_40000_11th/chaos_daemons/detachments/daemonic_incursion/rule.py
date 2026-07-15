@@ -31,6 +31,7 @@ from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalDistanceContext,
     ReserveArrivalDistanceGrant,
 )
+from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -73,14 +74,17 @@ def warp_rifts_distance_grants(
         _validate_generic_rule_source(source)
     if context.placement_kind is not BattlefieldPlacementKind.DEEP_STRIKE:
         return ()
-    if context.attempted_placement.unit_instance_id != context.reserve_state.unit_instance_id:
+    if (
+        context.attempted_rules_unit_placement.rules_unit_instance_id
+        != context.reserve_state.unit_instance_id
+    ):
         return ()
-    if context.attempted_placement.player_id != context.reserve_state.player_id:
+    if context.attempted_rules_unit_placement.player_id != context.reserve_state.player_id:
         return ()
     army = _army_for_player(context.state, player_id=context.reserve_state.player_id)
     if not _army_has_daemonic_incursion_detachment(army):
         return ()
-    if not _unit_has_faction_keyword(context.unit, LEGIONES_DAEMONICA):
+    if not _rules_unit_has_faction_keyword(context.rules_unit, LEGIONES_DAEMONICA):
         return ()
 
     within_shadow = _attempted_unit_wholly_within_shadow(context=context)
@@ -116,11 +120,14 @@ def denizens_of_the_warp_distance_grants(
     _validate_generic_rule_source(source)
     if context.placement_kind is not BattlefieldPlacementKind.DEEP_STRIKE:
         return ()
-    if context.attempted_placement.unit_instance_id != context.reserve_state.unit_instance_id:
+    if (
+        context.attempted_rules_unit_placement.rules_unit_instance_id
+        != context.reserve_state.unit_instance_id
+    ):
         return ()
-    if context.attempted_placement.player_id != context.reserve_state.player_id:
+    if context.attempted_rules_unit_placement.player_id != context.reserve_state.player_id:
         return ()
-    if not _unit_has_faction_keyword(context.unit, LEGIONES_DAEMONICA):
+    if not _rules_unit_has_faction_keyword(context.rules_unit, LEGIONES_DAEMONICA):
         return ()
 
     from warhammer40k_core.engine.generic_rule_ability_effects import (
@@ -180,7 +187,7 @@ def _warp_rifts_replay_payload(
         "shadow_of_chaos": within_shadow,
         "greater_daemon_anchor": within_anchor,
         "required_faction_keyword": LEGIONES_DAEMONICA,
-        "shared_god_keywords": list(_god_keywords_for_unit(context.unit)),
+        "shared_god_keywords": list(_god_keywords_for_rules_unit(context.rules_unit)),
     }
     if source is not None:
         payload.update(
@@ -262,7 +269,7 @@ def _attempted_unit_wholly_within_matching_greater_daemon_anchor(
     context: ReserveArrivalDistanceContext,
     army: ArmyDefinition,
 ) -> bool:
-    target_god_keywords = _god_keywords_for_unit(context.unit)
+    target_god_keywords = _god_keywords_for_rules_unit(context.rules_unit)
     if not target_god_keywords:
         return False
     target_models = _attempted_geometry_models(context)
@@ -270,7 +277,7 @@ def _attempted_unit_wholly_within_matching_greater_daemon_anchor(
         return False
     anchor_models: list[GeometryModel] = []
     for source_unit in army.units:
-        if source_unit.unit_instance_id == context.unit.unit_instance_id:
+        if source_unit.unit_instance_id in context.rules_unit.component_unit_instance_ids:
             continue
         anchor_god_keywords = _greater_daemon_anchor_keywords(source_unit)
         if not (target_god_keywords & anchor_god_keywords):
@@ -303,7 +310,16 @@ def _attempted_unit_wholly_within_matching_greater_daemon_anchor(
 def _attempted_geometry_models(
     context: ReserveArrivalDistanceContext,
 ) -> tuple[GeometryModel, ...]:
-    return _geometry_models_for_placement(context.scenario, context.attempted_placement)
+    return tuple(
+        model
+        for component_placement in (
+            context.attempted_rules_unit_placement.component_unit_placements
+        )
+        for model in _geometry_models_for_placement(
+            context.scenario,
+            component_placement,
+        )
+    )
 
 
 def _geometry_models_for_placement(
@@ -377,6 +393,16 @@ def _god_keywords_for_unit(unit: UnitInstance) -> frozenset[str]:
     )
 
 
+def _god_keywords_for_rules_unit(view: RulesUnitView) -> frozenset[str]:
+    if type(view) is not RulesUnitView:
+        raise GameLifecycleError("Warp Rifts god-keyword lookup requires RulesUnitView.")
+    return frozenset(
+        keyword
+        for component in view.components
+        for keyword in _god_keywords_for_unit(component.unit)
+    )
+
+
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
@@ -385,6 +411,12 @@ def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
 def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in unit.faction_keywords)
+
+
+def _rules_unit_has_faction_keyword(view: RulesUnitView, keyword: str) -> bool:
+    if type(view) is not RulesUnitView:
+        raise GameLifecycleError("Warp Rifts faction-keyword lookup requires RulesUnitView.")
+    return all(_unit_has_faction_keyword(component.unit, keyword) for component in view.components)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

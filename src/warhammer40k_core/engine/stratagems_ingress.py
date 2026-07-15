@@ -59,12 +59,14 @@ def _apply_rapid_ingress_placement(
         raise GameLifecycleError("Rapid Ingress placement requires MissionSetup.")
     scenario = _battlefield_scenario(state)
     manifested_battlefield = scenario.battlefield_state
+    rules_unit = _unit_for_reserve_state(state=state, reserve_state=reserve_state)
+    rules_unit_placement = submitted.resolved_rules_unit_placement()
     restriction_violations = reserve_arrival_restriction_violations(
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=_unit_for_reserve_state(state=state, reserve_state=reserve_state),
-        attempted_placement=submitted.attempted_placement,
+        rules_unit=rules_unit,
+        attempted_rules_unit_placement=rules_unit_placement,
         placement_kind=submitted.placement_kind,
         registry=reserve_arrival_restriction_hooks,
     )
@@ -72,7 +74,7 @@ def _apply_rapid_ingress_placement(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         reserve_state=reserve_state,
-        attempted_placement=submitted.attempted_placement,
+        attempted_placement=rules_unit_placement,
         battle_round=state.battle_round,
         placement_kind=submitted.placement_kind,
         battlefield_width_inches=manifested_battlefield.battlefield_width_inches,
@@ -148,6 +150,12 @@ def _apply_rapid_ingress_placement(
         "phase": BattlePhase.MOVEMENT.value,
         "step": "rapid_ingress",
         "unit_instance_id": arrived_state.unit_instance_id,
+        "component_unit_instance_ids": list(
+            placement.candidate.attempted_rules_unit_placement.component_unit_instance_ids
+        ),
+        "rules_unit_placement": validate_json_value(
+            placement.candidate.attempted_rules_unit_placement.to_payload()
+        ),
         "placement_kind": placement.candidate.placement_kind.value,
         "request_id": result.request_id,
         "result_id": result.result_id,

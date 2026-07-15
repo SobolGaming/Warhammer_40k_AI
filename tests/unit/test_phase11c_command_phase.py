@@ -902,7 +902,7 @@ def test_setup_declarations_reject_duplicate_and_drift_contexts() -> None:
             declarations=(cast(Any, object()),),
             destruction_deadline_policy=policy,
         )
-    with pytest.raises(GameLifecycleError, match="unit is unknown"):
+    with pytest.raises(GameLifecycleError, match="unit_instance_id is unknown"):
         state.apply_strategic_reserve_declarations(
             declarations=(
                 StrategicReserveDeclaration(
@@ -972,7 +972,7 @@ def test_setup_declarations_reject_duplicate_and_drift_contexts() -> None:
             ),
             destruction_deadline_policy=policy,
         )
-    with pytest.raises(GameLifecycleError, match="embarked unit is unknown"):
+    with pytest.raises(GameLifecycleError, match="unit_instance_id is unknown"):
         state.apply_strategic_reserve_declarations(
             declarations=(
                 StrategicReserveDeclaration.for_unit(

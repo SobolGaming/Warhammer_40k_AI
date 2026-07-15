@@ -154,7 +154,7 @@ def _restrictions_for_record(
 ) -> tuple[ReserveArrivalRestriction, ...]:
     source_models = {model.model_instance_id: model for model in unit.own_models}
     arriving_models = {
-        model.model_instance_id: model for model in context.unit.own_models if model.is_alive
+        model.model_instance_id: model for model in context.rules_unit.alive_models()
     }
     restrictions: list[ReserveArrivalRestriction] = []
     battlefield_state = context.state.battlefield_state
@@ -170,7 +170,7 @@ def _restrictions_for_record(
                 model=source_model,
                 placement=battlefield_state.model_placement_by_id(source_model_id),
             )
-            for arriving_placement in context.attempted_placement.model_placements:
+            for arriving_placement in context.attempted_rules_unit_placement.model_placements:
                 arriving_model = _required_model(
                     arriving_models,
                     arriving_placement.model_instance_id,

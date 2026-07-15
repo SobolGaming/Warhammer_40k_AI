@@ -1,0 +1,733 @@
+{
+  "artifact_schema": "core-v2-aeldari-yriel-vypers-starfangs-rule-ir-v1",
+  "datasheets": [
+    {
+      "datasheet_id": "000004193",
+      "datasheet_name": "Prince Yriel",
+      "source_page_numbers": [
+        12,
+        13
+      ]
+    },
+    {
+      "datasheet_id": "000000605",
+      "datasheet_name": "Vypers",
+      "source_page_numbers": [
+        16,
+        17
+      ]
+    },
+    {
+      "datasheet_id": "000004195",
+      "datasheet_name": "Starfangs",
+      "source_page_numbers": [
+        18,
+        19
+      ]
+    }
+  ],
+  "package_hash": "4c4365b3bab531561639f390b6cf12d18ee35fd5eb3a11ad8b61d3c7e6a78627",
+  "records": {
+    "000000605:3": {
+      "ability_name": "Harassment Fire",
+      "datasheet_id": "000000605",
+      "datasheet_name": "Vypers",
+      "normalized_text_sha256": "0edca599329b50c2dcb043dba31fbf7dea4d8894766ab3f6a9e8f51fac5fbda8",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:datasheet:000000605:3:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [],
+            "source_span": {
+              "end": 108,
+              "start": 0,
+              "text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks."
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 71,
+                "start": 57,
+                "text": "one enemy unit"
+              }
+            },
+            "template_id": "phase17c:selected-target-constraint",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "just_after_friendly_unit_has_shot"
+                }
+              ],
+              "source_span": {
+                "end": 48,
+                "start": 24,
+                "text": "after this unit has shot"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:aeldari:datasheet:000000605:3:clause:002",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "battle_round_offset",
+                  "value": 1
+                },
+                {
+                  "key": "boundary",
+                  "value": "start"
+                },
+                {
+                  "key": "endpoint",
+                  "value": "turn"
+                },
+                {
+                  "key": "owner",
+                  "value": "source_player"
+                }
+              ],
+              "source_span": {
+                "end": 142,
+                "start": 109,
+                "text": "Until the start of your next turn"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_dice_roll",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "delta",
+                    "value": -1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "hit"
+                  }
+                ],
+                "source_span": {
+                  "end": 279,
+                  "start": 251,
+                  "text": "subtract 1 from the Hit roll"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 280,
+              "start": 109,
+              "text": "Until the start of your next turn, that enemy unit is suppressed. While a unit is suppressed, each time a model in that unit makes an attack, subtract 1 from the Hit roll."
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 159,
+                "start": 144,
+                "text": "that enemy unit"
+              }
+            },
+            "template_id": "phase17c:dice-roll-modifier",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "actor",
+                  "value": "selected_unit"
+                },
+                {
+                  "key": "target_reference",
+                  "value": "selected_unit"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "attack_sequence.attack"
+                }
+              ],
+              "source_span": {
+                "end": 249,
+                "start": 203,
+                "text": "each time a model in that unit makes an attack"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "bdff10f6883ecf496ed868736c3ecca2bcab375d181933d8e31f38f83471169b",
+        "normalized_text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks. Until the start of your next turn, that enemy unit is suppressed. While a unit is suppressed, each time a model in that unit makes an attack, subtract 1 from the Hit roll.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:datasheet:000000605:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-yriel-vypers-starfangs-datasheets-2026-06-09:datasheet:000000605:3"
+      }
+    },
+    "000004193:4": {
+      "ability_name": "Piratical Hero",
+      "datasheet_id": "000004193",
+      "datasheet_name": "Prince Yriel",
+      "normalized_text_sha256": "36829d62aca616cdeccc35f5afc516ee64fb42c13540db601422f77ef38fb388",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:datasheet:000004193:4:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 34,
+                  "start": 0,
+                  "text": "While this model is leading a unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "grant_weapon_ability",
+                "parameters": [
+                  {
+                    "key": "target_scope",
+                    "value": "models_in_selected_unit"
+                  },
+                  {
+                    "key": "weapon_ability",
+                    "value": "Sustained Hits"
+                  },
+                  {
+                    "key": "weapon_ability_value",
+                    "value": 1
+                  },
+                  {
+                    "key": "weapon_scope",
+                    "value": "all"
+                  }
+                ],
+                "source_span": {
+                  "end": 130,
+                  "start": 84,
+                  "text": "that attack has the [SUSTAINED HITS 1] ability"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 157,
+              "start": 0,
+              "text": "While this model is leading a unit, each time a model in that unit makes an attack, that attack has the [SUSTAINED HITS 1] ability and add 1 to the Hit roll."
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 34,
+                "start": 28,
+                "text": "a unit"
+              }
+            },
+            "template_id": "phase17c:weapon-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:aeldari:datasheet:000004193:4:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 34,
+                  "start": 0,
+                  "text": "While this model is leading a unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "modify_dice_roll",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "hit_roll"
+                  }
+                ],
+                "source_span": {
+                  "end": 156,
+                  "start": 135,
+                  "text": "add 1 to the Hit roll"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 157,
+              "start": 0,
+              "text": "While this model is leading a unit, each time a model in that unit makes an attack, that attack has the [SUSTAINED HITS 1] ability and add 1 to the Hit roll."
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 34,
+                "start": 28,
+                "text": "a unit"
+              }
+            },
+            "template_id": "phase17c:dice-roll-modifier",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "actor",
+                  "value": "selected_unit"
+                },
+                {
+                  "key": "roll_type",
+                  "value": "hit"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "attack_sequence.hit"
+                }
+              ],
+              "source_span": {
+                "end": 82,
+                "start": 36,
+                "text": "each time a model in that unit makes an attack"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "8bae6784c37ddc37ff0b28439480e4858aacec3b0e02f382fdf15a6f4c8a0b70",
+        "normalized_text": "While this model is leading a unit, each time a model in that unit makes an attack, that attack has the [SUSTAINED HITS 1] ability and add 1 to the Hit roll.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:datasheet:000004193:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-yriel-vypers-starfangs-datasheets-2026-06-09:datasheet:000004193:4"
+      }
+    },
+    "000004193:5": {
+      "ability_name": "Prince of Corsairs",
+      "datasheet_id": "000004193",
+      "datasheet_name": "Prince Yriel",
+      "normalized_text_sha256": "47668e6eb7c385ed6fec664be841c978e3ca1226fffa1d221925fdb4831be50b",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:datasheet:000004193:5:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "source_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "source_unit_or_embarked_transport_on_battlefield"
+                  }
+                ],
+                "source_span": {
+                  "end": 144,
+                  "start": 47,
+                  "text": "if this unit is on the battlefield (or any Transport it is embarked within is on the battlefield)"
+                }
+              },
+              {
+                "kind": "frequency_limit",
+                "parameters": [
+                  {
+                    "key": "maximum_uses",
+                    "value": 3
+                  },
+                  {
+                    "key": "scope",
+                    "value": "battle"
+                  }
+                ],
+                "source_span": {
+                  "end": 178,
+                  "start": 153,
+                  "text": "up to three AELDARI units"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "placement_permission",
+                "parameters": [
+                  {
+                    "key": "action",
+                    "value": "redeploy"
+                  },
+                  {
+                    "key": "allowed",
+                    "value": true
+                  },
+                  {
+                    "key": "maximum_units",
+                    "value": 3
+                  }
+                ],
+                "source_span": {
+                  "end": 211,
+                  "start": 198,
+                  "text": "redeploy them"
+                }
+              },
+              {
+                "kind": "placement_permission",
+                "parameters": [
+                  {
+                    "key": "action",
+                    "value": "redeploy_to_strategic_reserves"
+                  },
+                  {
+                    "key": "allowed",
+                    "value": true
+                  },
+                  {
+                    "key": "ignore_strategic_reserves_limit",
+                    "value": true
+                  },
+                  {
+                    "key": "maximum_units",
+                    "value": 3
+                  },
+                  {
+                    "key": "placement_kind",
+                    "value": "strategic_reserves"
+                  }
+                ],
+                "source_span": {
+                  "end": 340,
+                  "start": 236,
+                  "text": "set those units up in Strategic Reserves, regardless of how many units are already in Strategic Reserves"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 341,
+              "start": 0,
+              "text": "After both players have deployed their armies, if this unit is on the battlefield (or any Transport it is embarked within is on the battlefield), select up to three AELDARI units from your army and redeploy them. When doing so, you can set those units up in Strategic Reserves, regardless of how many units are already in Strategic Reserves."
+            },
+            "target": {
+              "kind": "friendly_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "friendly"
+                },
+                {
+                  "key": "required_keyword",
+                  "value": "AELDARI"
+                }
+              ],
+              "source_span": {
+                "end": 193,
+                "start": 165,
+                "text": "AELDARI units from your army"
+              }
+            },
+            "template_id": "phase17c:placement-permission-restriction",
+            "trigger": {
+              "kind": "setup",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "after_both_armies_deployed"
+                }
+              ],
+              "source_span": {
+                "end": 45,
+                "start": 0,
+                "text": "After both players have deployed their armies"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "dd4a545a9e6cf5e5b01836b1e6b5007fa5628c7f188a107c755c2d8472188eed",
+        "normalized_text": "After both players have deployed their armies, if this unit is on the battlefield (or any Transport it is embarked within is on the battlefield), select up to three AELDARI units from your army and redeploy them. When doing so, you can set those units up in Strategic Reserves, regardless of how many units are already in Strategic Reserves.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:datasheet:000004193:5",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-yriel-vypers-starfangs-datasheets-2026-06-09:datasheet:000004193:5"
+      }
+    },
+    "000004195:4": {
+      "ability_name": "Hallucinogen Grenades",
+      "datasheet_id": "000004195",
+      "datasheet_name": "Starfangs",
+      "normalized_text_sha256": "a2ff2f5b9d5571f2053ef9688dd57a23a053cdcd81f54e3ff63cc2f0f4e72dcd",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:datasheet:000004195:4:clause:001",
+            "conditions": [
+              {
+                "kind": "visibility_predicate",
+                "parameters": [
+                  {
+                    "key": "observer",
+                    "value": "this_unit"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "visible_to"
+                  },
+                  {
+                    "key": "target_reference",
+                    "value": "selected_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 150,
+                  "start": 140,
+                  "text": "visible to"
+                }
+              },
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": 36.0
+                  },
+                  {
+                    "key": "negated",
+                    "value": false
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "unit"
+                  },
+                  {
+                    "key": "object_reference",
+                    "value": "this"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within"
+                  },
+                  {
+                    "key": "qualifier",
+                    "value": null
+                  },
+                  {
+                    "key": "range_kind",
+                    "value": "numeric_range"
+                  }
+                ],
+                "source_span": {
+                  "end": 178,
+                  "start": 155,
+                  "text": "within 36\" of this unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [],
+            "source_span": {
+              "end": 178,
+              "start": 0,
+              "text": "At the start of your opponent's Shooting phase, this unit can use this ability. If it does, select one Aeldari Infantry unit from your army visible to and within 36\" of this unit"
+            },
+            "target": {
+              "kind": "friendly_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "friendly"
+                },
+                {
+                  "key": "required_keyword_sequence",
+                  "value": [
+                    "AELDARI",
+                    "INFANTRY"
+                  ]
+                }
+              ],
+              "source_span": {
+                "end": 139,
+                "start": 99,
+                "text": "one Aeldari Infantry unit from your army"
+              }
+            },
+            "template_id": "phase17c:selected-target-constraint",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "start"
+                },
+                {
+                  "key": "optional",
+                  "value": true
+                },
+                {
+                  "key": "owner",
+                  "value": "opponent"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                }
+              ],
+              "source_span": {
+                "end": 46,
+                "start": 0,
+                "text": "At the start of your opponent's Shooting phase"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:aeldari:datasheet:000004195:4:clause:002",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "boundary",
+                  "value": "end"
+                },
+                {
+                  "key": "endpoint",
+                  "value": "phase"
+                }
+              ],
+              "source_span": {
+                "end": 206,
+                "start": 180,
+                "text": "until the end of the phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "stealth"
+                  }
+                ],
+                "source_span": {
+                  "end": 241,
+                  "start": 218,
+                  "text": "has the Stealth ability"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 241,
+              "start": 180,
+              "text": "until the end of the phase, that unit has the Stealth ability"
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 217,
+                "start": 208,
+                "text": "that unit"
+              }
+            },
+            "template_id": "phase17c:grant-ability",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "d472d8760259528aedd78963cdd96af7fd44c4a376bc14caac02e32fb872c35b",
+        "normalized_text": "At the start of your opponent's Shooting phase, this unit can use this ability. If it does, select one Aeldari Infantry unit from your army visible to and within 36\" of this unit: until the end of the phase, that unit has the Stealth ability.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:datasheet:000004195:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-yriel-vypers-starfangs-datasheets-2026-06-09:datasheet:000004195:4"
+      }
+    }
+  },
+  "source_package_id": "gw-11e-aeldari-yriel-vypers-starfangs-datasheets-2026-06-09",
+  "source_pdf_filename": "eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
+  "source_pdf_sha256": "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9"
+}

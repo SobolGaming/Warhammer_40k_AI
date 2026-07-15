@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     WeaponKeyword,
+    WeaponProfile,
     WeaponProfileError,
     weapon_keyword_from_token,
 )
@@ -54,6 +55,8 @@ class CatalogWeaponKeywordGrant:
     weapon_scope: str
     ability: AbilityDescriptor | None = None
     tracked_target: CatalogTrackedTargetWeaponGrant | None = None
+    source_unit_instance_id: str | None = None
+    requires_source_leading: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "source_id", validate_identifier("source_id", self.source_id))
@@ -65,6 +68,20 @@ class CatalogWeaponKeywordGrant:
             CatalogTrackedTargetWeaponGrant
         ):
             raise GameLifecycleError("Catalog weapon keyword grant tracked target is invalid.")
+        if self.source_unit_instance_id is not None:
+            object.__setattr__(
+                self,
+                "source_unit_instance_id",
+                validate_identifier("source_unit_instance_id", self.source_unit_instance_id),
+            )
+        if type(self.requires_source_leading) is not bool:
+            raise GameLifecycleError(
+                "Catalog weapon keyword grant leading requirement must be bool."
+            )
+        if self.requires_source_leading and self.source_unit_instance_id is None:
+            raise GameLifecycleError(
+                "Catalog weapon keyword grant leading requirement needs a source unit."
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -193,13 +210,22 @@ def tracked_target_weapon_grant_applies(
         raise GameLifecycleError("Catalog tracked-target weapon grant requires context.")
     if type(grant) is not CatalogWeaponKeywordGrant:
         raise GameLifecycleError("Catalog tracked-target weapon grant requires grant data.")
-    tracked_target = grant.tracked_target
-    if tracked_target is None:
-        return True
     attacking_rules_unit = rules_unit_view_by_id(
         state=context.state,
         unit_instance_id=context.attacking_unit_instance_id,
     )
+    if grant.requires_source_leading and not (
+        attacking_rules_unit.is_attached_rules_unit
+        and any(
+            component.unit.unit_instance_id == grant.source_unit_instance_id
+            and component.role in {"leader", "support"}
+            for component in attacking_rules_unit.components
+        )
+    ):
+        return False
+    tracked_target = grant.tracked_target
+    if tracked_target is None:
+        return True
     source_model_instance_id = None
     source_unit_instance_id = attacking_rules_unit.unit_instance_id
     if tracked_target.owner_scope is TrackedTargetOwnerScope.THIS_MODEL:
@@ -219,6 +245,37 @@ def tracked_target_weapon_grant_applies(
         unit_instance_id=context.target_unit_instance_id,
     ).unit_instance_id
     return record is not None and record.target_unit_instance_id == target_unit_instance_id
+
+
+def profile_with_catalog_weapon_keyword_grant(
+    *,
+    profile: WeaponProfile,
+    grant: CatalogWeaponKeywordGrant,
+) -> WeaponProfile:
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("Catalog weapon keyword grant requires a WeaponProfile.")
+    if type(grant) is not CatalogWeaponKeywordGrant:
+        raise GameLifecycleError("Catalog weapon keyword grant requires grant data.")
+    keywords = profile.keywords
+    if grant.keyword not in keywords:
+        keywords = tuple(sorted((*keywords, grant.keyword), key=lambda keyword: keyword.value))
+    abilities = profile.abilities
+    if grant.ability is not None and all(
+        ability.ability_id != grant.ability.ability_id for ability in abilities
+    ):
+        abilities = tuple(
+            sorted((*abilities, grant.ability), key=lambda ability: ability.ability_id)
+        )
+    source_ids = profile.source_ids
+    if grant.source_id not in source_ids:
+        source_ids = tuple(sorted((*source_ids, grant.source_id)))
+    if (
+        keywords == profile.keywords
+        and abilities == profile.abilities
+        and source_ids == profile.source_ids
+    ):
+        return profile
+    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
 
 
 def catalog_weapon_grant_source_index_and_rules_unit(

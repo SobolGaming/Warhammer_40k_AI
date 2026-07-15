@@ -141,6 +141,9 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
+from warhammer40k_core.rules.text_normalization import (
+    OFFICIAL_STRATAGEM_REFERENCE_ALIAS_SOURCE_ID,
+)
 
 SOURCE_KEYWORD_SEQUENCE_PARTS = (
     datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
@@ -728,6 +731,42 @@ def test_phase17c_named_zero_cp_stratagem_rule_is_not_reinterpreted_as_reduction
     )
     assert CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID not in (
         catalog_rule_ir_consumers_for_rule(rule_ir)
+    )
+
+
+@pytest.mark.parametrize(
+    ("reference", "expected_stratagem_id"),
+    [
+        ("Grenade Stratagem", "explosives"),
+        ("Explosives Stratagem", "explosives"),
+        ("Tank Shock Stratagem", "crushing-impact"),
+        ("Crushing Impact Stratagem", "crushing-impact"),
+    ],
+)
+def test_phase17c_official_stratagem_name_equivalences_emit_canonical_ids(
+    reference: str,
+    expected_stratagem_id: str,
+) -> None:
+    rule_ir = _compiled(
+        f"Once per turn, you can target this unit with the {reference} for 0CP."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert clause_is_supported_stratagem_cost_modifier(clause)
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "affected_player": "source_player",
+        "application_scope": "current_stratagem_use",
+        "delta": -1,
+        "minimum_cost": 0,
+        "operation": "modify_stratagem_cost",
+        "optional": True,
+        "stacking": "cumulative",
+        "stratagem_id": expected_stratagem_id,
+        "stratagem_reference_source_id": OFFICIAL_STRATAGEM_REFERENCE_ALIAS_SOURCE_ID,
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
     )
 
 

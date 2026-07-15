@@ -2,16 +2,22 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict
+from typing import TYPE_CHECKING, Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, SetupStep
 
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.decision_request import DecisionRequest
+    from warhammer40k_core.engine.decision_result import DecisionResult
+    from warhammer40k_core.engine.game_state import GameState
+
 
 class PreBattleActionKind(StrEnum):
     COMPLETE_REDEPLOYS = "complete_redeploys"
     REDEPLOY = "redeploy"
+    REDEPLOY_TO_STRATEGIC_RESERVES = "redeploy_to_strategic_reserves"
     COMPLETE_PREBATTLE_ACTIONS = "complete_prebattle_actions"
     SCOUT_MOVE = "scout_move"
     SCOUT_RESERVE_SETUP = "scout_reserve_setup"
@@ -130,6 +136,48 @@ def prebattle_action_kind_from_token(token: object) -> PreBattleActionKind:
         return PreBattleActionKind(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported PreBattleActionKind token: {token}.") from exc
+
+
+def record_prebattle_action(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    request: DecisionRequest,
+    action_kind: PreBattleActionKind,
+    unit_instance_id: str | None,
+    source_rule_id: str,
+    payload: JsonValue,
+) -> None:
+    if result.actor_id is None:
+        raise GameLifecycleError("Pre-battle action records require actor_id.")
+    state.record_prebattle_action(
+        PreBattleActionRecord(
+            action_id=f"prebattle-action-{len(state.prebattle_action_records) + 1:06d}",
+            game_id=state.game_id,
+            player_id=result.actor_id,
+            setup_step=(
+                state.current_setup_step
+                if state.current_setup_step is not None
+                else setup_step_for_action_kind(action_kind)
+            ),
+            action_kind=action_kind,
+            unit_instance_id=unit_instance_id,
+            source_rule_id=source_rule_id,
+            request_id=request.request_id,
+            result_id=result.result_id,
+            payload=payload,
+        )
+    )
+
+
+def setup_step_for_action_kind(action_kind: PreBattleActionKind) -> SetupStep:
+    if action_kind in {
+        PreBattleActionKind.COMPLETE_REDEPLOYS,
+        PreBattleActionKind.REDEPLOY,
+        PreBattleActionKind.REDEPLOY_TO_STRATEGIC_RESERVES,
+    }:
+        return SetupStep.REDEPLOY_UNITS
+    return SetupStep.RESOLVE_PREBATTLE_ACTIONS
 
 
 def _setup_step_from_token(token: object) -> SetupStep:

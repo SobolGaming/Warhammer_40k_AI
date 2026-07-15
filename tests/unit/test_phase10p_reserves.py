@@ -21,6 +21,7 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     muster_army,
 )
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -93,6 +94,8 @@ from warhammer40k_core.engine.reserves import (
     resolve_reserve_arrival,
     resolve_unarrived_reserve_destruction,
 )
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_from_armies
 from warhammer40k_core.engine.unit_coherency import UnitCoherencyResult
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
@@ -354,6 +357,225 @@ def test_oversized_strategic_reserve_model_can_touch_required_edge() -> None:
         placement=result,
     )
     assert updated_battlefield.unit_placement_by_id(reserve_unit.unit_instance_id) == placement
+
+
+def test_attached_rules_unit_strategic_reserve_arrival_adds_every_component_atomically() -> None:
+    config = _config(ruleset_descriptor=_ruleset())
+    mustered_armies = _mustered_armies(config)
+    alpha = mustered_armies[0]
+    bodyguard = replace(
+        alpha.unit_by_id("army-alpha:intercessor-unit-1"),
+        own_models=alpha.unit_by_id("army-alpha:intercessor-unit-1").own_models[:1],
+    )
+    leader = replace(
+        alpha.unit_by_id("army-alpha:intercessor-unit-2"),
+        own_models=alpha.unit_by_id("army-alpha:intercessor-unit-2").own_models[:1],
+    )
+    attached_id = "attached-unit:army-alpha:reserve-unit"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="test:phase10p-attached-reserve",
+        attachment_source_ids=("test:phase10p-attached-reserve-eligibility",),
+    )
+    alpha = replace(
+        alpha,
+        units=(bodyguard, leader),
+        attached_units=(formation,),
+    )
+    armies = (alpha, mustered_armies[1])
+    placed = create_deterministic_battlefield_scenario(
+        battlefield_id="phase10p-attached-reserve-battlefield",
+        armies=armies,
+    ).battlefield_state
+    battlefield = placed
+    for unit in (*alpha.units, *armies[1].units):
+        battlefield = battlefield.without_unit_placement(unit.unit_instance_id)
+    scenario = BattlefieldScenario(armies=armies, battlefield_state=battlefield)
+    reserve_state = ReserveState.declared_before_battle(
+        player_id=alpha.player_id,
+        unit_instance_id=attached_id,
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+        destruction_deadline_policy=ReserveDestructionTimingPolicy.from_mission_policy(
+            _ruleset().mission_policy
+        ),
+    )
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    state.record_battlefield_state(battlefield)
+    state.record_reserve_state(reserve_state)
+
+    assert state.reserve_state_for_unit(attached_id) == reserve_state
+    assert state.reserve_state_for_unit(bodyguard.unit_instance_id) == reserve_state
+    assert state.reserve_state_for_unit(leader.unit_instance_id) == reserve_state
+
+    grouped_placement = RulesUnitPlacement(
+        rules_unit_instance_id=attached_id,
+        component_unit_placements=(
+            _single_model_reserve_placement(
+                reserve_unit=bodyguard,
+                pose=Pose.at(x=15.0, y=0.75, z=0.0, facing_degrees=0.0),
+            ),
+            _single_model_reserve_placement(
+                reserve_unit=leader,
+                pose=Pose.at(x=16.5, y=0.75, z=0.0, facing_degrees=0.0),
+            ),
+        ),
+    )
+    result = resolve_reserve_arrival(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        reserve_state=reserve_state,
+        attempted_placement=grouped_placement,
+        battle_round=3,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+    )
+
+    assert result.is_valid
+    assert ReserveArrivalCandidate.from_payload(result.candidate.to_payload()) == result.candidate
+    assert result.candidate.attempted_rules_unit_placement == grouped_placement
+    updated_battlefield = apply_reinforcement_placement_to_battlefield(
+        battlefield_state=battlefield,
+        placement=result,
+    )
+    assert all(
+        not battlefield.is_unit_placed(component_id)
+        for component_id in formation.component_unit_instance_ids
+    )
+    assert all(
+        updated_battlefield.is_unit_placed(component_id)
+        for component_id in formation.component_unit_instance_ids
+    )
+    assert (
+        updated_battlefield.unit_placement_by_id(bodyguard.unit_instance_id)
+        == grouped_placement.component_unit_placements[0]
+    )
+    assert (
+        updated_battlefield.unit_placement_by_id(leader.unit_instance_id)
+        == grouped_placement.component_unit_placements[1]
+    )
+
+    arrived_state = result.arrived_reserve_state()
+    state.replace_battlefield_state(updated_battlefield)
+    state.replace_reserve_state(arrived_state)
+    assert state.reserve_state_for_unit(bodyguard.unit_instance_id) == arrived_state
+    assert state.reserve_state_for_unit(leader.unit_instance_id) == arrived_state
+
+
+def test_rules_unit_placement_fail_fast_guards_cover_group_identity_and_boundaries() -> None:
+    _state, scenario, _reserve_state, reserve_unit = _battle_state_with_reserve(
+        reserve_base_diameter_mm=32.0,
+        reserve_model_count=2,
+    )
+    placement = _reserve_placement(
+        reserve_unit=reserve_unit,
+        poses=(
+            Pose.at(x=15.0, y=0.75, z=0.0, facing_degrees=0.0),
+            Pose.at(x=16.5, y=0.75, z=0.0, facing_degrees=0.0),
+        ),
+    )
+    view = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=reserve_unit.unit_instance_id,
+    )
+
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        RulesUnitPlacement(
+            rules_unit_instance_id=reserve_unit.unit_instance_id,
+            component_unit_placements=cast(tuple[UnitPlacement, ...], [placement]),
+        )
+    with pytest.raises(GameLifecycleError, match="at least one"):
+        RulesUnitPlacement(
+            rules_unit_instance_id=reserve_unit.unit_instance_id,
+            component_unit_placements=(),
+        )
+    with pytest.raises(GameLifecycleError, match="must be UnitPlacement"):
+        RulesUnitPlacement(
+            rules_unit_instance_id=reserve_unit.unit_instance_id,
+            component_unit_placements=cast(tuple[UnitPlacement, ...], (object(),)),
+        )
+    with pytest.raises(GameLifecycleError, match="component unit IDs must be unique"):
+        RulesUnitPlacement(
+            rules_unit_instance_id="attached-unit:army-alpha:duplicate",
+            component_unit_placements=(placement, placement),
+        )
+    with pytest.raises(GameLifecycleError, match=r"Single-component.*identity"):
+        RulesUnitPlacement(
+            rules_unit_instance_id="army-alpha:other-unit",
+            component_unit_placements=(placement,),
+        )
+    with pytest.raises(GameLifecycleError, match="Single rules-unit placement"):
+        RulesUnitPlacement.single(cast(UnitPlacement, object()))
+
+    other_model_placements = tuple(
+        replace(
+            model_placement,
+            unit_instance_id="army-alpha:other-unit",
+            model_instance_id=model_placement.model_instance_id.replace(
+                reserve_unit.unit_instance_id,
+                "army-alpha:other-unit",
+            ),
+        )
+        for model_placement in placement.model_placements
+    )
+    other_placement = replace(
+        placement,
+        unit_instance_id="army-alpha:other-unit",
+        model_placements=other_model_placements,
+    )
+    with pytest.raises(GameLifecycleError, match="attached-unit identity"):
+        RulesUnitPlacement(
+            rules_unit_instance_id=reserve_unit.unit_instance_id,
+            component_unit_placements=(placement, other_placement),
+        )
+
+    grouped = RulesUnitPlacement.single(placement)
+    grouped.validate_for_view(view)
+    with pytest.raises(GameLifecycleError, match="requires RulesUnitView"):
+        grouped.validate_for_view(cast(RulesUnitView, object()))
+    wrong_owner_placement = replace(
+        placement,
+        player_id="player-b",
+        model_placements=tuple(
+            replace(model_placement, player_id="player-b")
+            for model_placement in placement.model_placements
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="owner drift"):
+        RulesUnitPlacement.single(wrong_owner_placement).validate_for_view(view)
+    incomplete_placement = replace(
+        placement,
+        model_placements=(placement.model_placements[0],),
+    )
+    with pytest.raises(GameLifecycleError, match="every alive model"):
+        RulesUnitPlacement.single(incomplete_placement).validate_for_view(view)
+
+    with pytest.raises(GameLifecycleError, match="requires RulesUnitView"):
+        RulesUnitPlacement.from_battlefield(
+            view=cast(RulesUnitView, object()),
+            battlefield_state=scenario.battlefield_state,
+        )
+    with pytest.raises(GameLifecycleError, match="requires BattlefieldRuntimeState"):
+        RulesUnitPlacement.from_battlefield(
+            view=view,
+            battlefield_state=cast(BattlefieldRuntimeState, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="must be on the battlefield"):
+        RulesUnitPlacement.from_battlefield(
+            view=view,
+            battlefield_state=scenario.battlefield_state,
+        )
+    with pytest.raises(GameLifecycleError, match="removal requires"):
+        grouped.without_from_battlefield(cast(BattlefieldRuntimeState, object()))
+    with pytest.raises(GameLifecycleError, match="placement requires"):
+        grouped.add_to_battlefield(cast(BattlefieldRuntimeState, object()))
+    with pytest.raises(GameLifecycleError, match="geometry requires"):
+        grouped.geometry_models(cast(BattlefieldScenario, object()))
 
 
 def test_oversized_strategic_reserve_exception_still_rejects_enemy_distance() -> None:
@@ -1421,15 +1643,15 @@ def test_phase10p_reserve_type_guards_are_fail_fast() -> None:
             reserve_state=cast(ReserveState, object()),
             battle_round=3,
             placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
-            attempted_placement=placement,
+            attempted_rules_unit_placement=RulesUnitPlacement.single(placement),
             qualifying_edges=(BattlefieldEdge.SOUTH,),
         )
-    with pytest.raises(GameLifecycleError, match="attempted_placement"):
+    with pytest.raises(GameLifecycleError, match="attempted_rules_unit_placement"):
         ReserveArrivalCandidate(
             reserve_state=reserve_state,
             battle_round=3,
             placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
-            attempted_placement=cast(UnitPlacement, object()),
+            attempted_rules_unit_placement=cast(RulesUnitPlacement, object()),
             qualifying_edges=(BattlefieldEdge.SOUTH,),
         )
     with pytest.raises(GameLifecycleError, match="placement unit drift"):
@@ -1437,7 +1659,7 @@ def test_phase10p_reserve_type_guards_are_fail_fast() -> None:
             reserve_state=replace(reserve_state, unit_instance_id="army-alpha:missing-unit"),
             battle_round=3,
             placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
-            attempted_placement=placement,
+            attempted_rules_unit_placement=RulesUnitPlacement.single(placement),
             qualifying_edges=(BattlefieldEdge.SOUTH,),
         )
     with pytest.raises(GameLifecycleError, match="placement player drift"):
@@ -1445,7 +1667,7 @@ def test_phase10p_reserve_type_guards_are_fail_fast() -> None:
             reserve_state=replace(reserve_state, player_id="player-b"),
             battle_round=3,
             placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
-            attempted_placement=placement,
+            attempted_rules_unit_placement=RulesUnitPlacement.single(placement),
             qualifying_edges=(BattlefieldEdge.SOUTH,),
         )
     with pytest.raises(GameLifecycleError, match="qualifying_edges must be a tuple"):
@@ -1453,7 +1675,7 @@ def test_phase10p_reserve_type_guards_are_fail_fast() -> None:
             reserve_state=reserve_state,
             battle_round=3,
             placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
-            attempted_placement=placement,
+            attempted_rules_unit_placement=RulesUnitPlacement.single(placement),
             qualifying_edges=cast(tuple[BattlefieldEdge, ...], [BattlefieldEdge.SOUTH]),
         )
     with pytest.raises(GameLifecycleError, match="qualifying_edges must not contain duplicates"):
@@ -1461,7 +1683,7 @@ def test_phase10p_reserve_type_guards_are_fail_fast() -> None:
             reserve_state=reserve_state,
             battle_round=3,
             placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
-            attempted_placement=placement,
+            attempted_rules_unit_placement=RulesUnitPlacement.single(placement),
             qualifying_edges=(BattlefieldEdge.SOUTH, BattlefieldEdge.SOUTH),
         )
 
@@ -1708,7 +1930,7 @@ def test_phase10p_reserve_resolution_type_guards_are_fail_fast() -> None:
             placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
             strategic_reserve_rule=cast(StrategicReserveRule, object()),
         )
-    with pytest.raises(GameLifecycleError, match="unknown unit"):
+    with pytest.raises(GameLifecycleError, match="unit_instance_id is unknown"):
         resolve_reserve_arrival(
             scenario=scenario,
             ruleset_descriptor=_ruleset(),

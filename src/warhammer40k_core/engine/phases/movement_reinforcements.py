@@ -195,10 +195,14 @@ def _request_reinforcement_placement(
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
     scenario = _battlefield_scenario(state)
-    unit = scenario.army_by_id(reserve_state.unit_instance_id.split(":", maxsplit=1)[0]).unit_by_id(
-        reserve_state.unit_instance_id
+    rules_unit = _unit_for_reserve_state(
+        scenario=scenario,
+        reserve_state=reserve_state,
     )
-    placement_kinds = _reserve_placement_kinds_for_unit(reserve_state=reserve_state, unit=unit)
+    placement_kinds = _reserve_placement_kinds_for_unit(
+        reserve_state=reserve_state,
+        unit=rules_unit,
+    )
     proposal_kind = _reserve_proposal_kind(reserve_state)
     proposal_request = MovementProposalRequest(
         request_id=state.next_decision_request_id(),
@@ -215,6 +219,10 @@ def _request_reinforcement_placement(
         context={
             "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "reserve_state": validate_json_value(reserve_state.to_payload()),
+            "component_unit_instance_ids": list(rules_unit.component_unit_instance_ids),
+            "model_instance_ids": validate_json_value(
+                sorted(model.model_instance_id for model in rules_unit.alive_models())
+            ),
         },
     )
     request = proposal_request.to_decision_request()
@@ -256,7 +264,7 @@ def _request_reinforcement_placement(
 def _reserve_placement_kinds_for_unit(
     *,
     reserve_state: ReserveState,
-    unit: UnitInstance,
+    unit: RulesUnitView,
 ) -> tuple[BattlefieldPlacementKind, ...]:
     if reserve_state.required_arrival_placement_kind is not None:
         return (
@@ -264,7 +272,7 @@ def _reserve_placement_kinds_for_unit(
         )
     if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
         kinds = [BattlefieldPlacementKind.STRATEGIC_RESERVES]
-        if _unit_has_deep_strike_keyword(unit):
+        if all(_unit_has_deep_strike_keyword(component.unit) for component in unit.components):
             kinds.append(BattlefieldPlacementKind.DEEP_STRIKE)
         return tuple(kinds)
     if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
@@ -357,7 +365,7 @@ def _resolve_reinforcement_placement_submission(
     reserve_arrival_restriction_hooks: ReserveArrivalRestrictionHookRegistry,
     unit_instance_id: str,
     placement_kind: BattlefieldPlacementKind,
-    attempted_placement: UnitPlacement,
+    attempted_placement: RulesUnitPlacement,
     large_model_exceptions: tuple[LargeModelReservePlacementException, ...],
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
@@ -403,8 +411,11 @@ def _resolve_reinforcement_placement_submission(
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=_unit_for_reserve_state(scenario=scenario, reserve_state=reserve_state),
-        attempted_placement=attempted_placement,
+        rules_unit=_unit_for_reserve_state(
+            scenario=scenario,
+            reserve_state=reserve_state,
+        ),
+        attempted_rules_unit_placement=attempted_placement,
         placement_kind=placement_kind,
         registry=reserve_arrival_restriction_hooks,
     )
@@ -463,7 +474,7 @@ def _deep_strike_enemy_distance_for_reserve_arrival(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     reserve_state: ReserveState,
-    attempted_placement: UnitPlacement,
+    attempted_placement: RulesUnitPlacement,
     placement_kind: BattlefieldPlacementKind,
     battle_round: int,
     battlefield_width_inches: float,
@@ -475,14 +486,14 @@ def _deep_strike_enemy_distance_for_reserve_arrival(
 ) -> float | None:
     if placement_kind is not BattlefieldPlacementKind.DEEP_STRIKE:
         return None
-    unit = _unit_for_reserve_state(scenario=scenario, reserve_state=reserve_state)
+    rules_unit = _unit_for_reserve_state(scenario=scenario, reserve_state=reserve_state)
     context = ReserveArrivalDistanceContext(
         state=state,
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         reserve_state=reserve_state,
-        unit=unit,
-        attempted_placement=attempted_placement,
+        rules_unit=rules_unit,
+        attempted_rules_unit_placement=attempted_placement,
         placement_kind=placement_kind,
         battle_round=battle_round,
         battlefield_width_inches=battlefield_width_inches,
@@ -499,11 +510,13 @@ def _unit_for_reserve_state(
     *,
     scenario: BattlefieldScenario,
     reserve_state: ReserveState,
-) -> UnitInstance:
-    army_id = reserve_state.unit_instance_id.split(":", maxsplit=1)[0]
+) -> RulesUnitView:
     try:
-        return scenario.army_by_id(army_id).unit_by_id(reserve_state.unit_instance_id)
-    except ArmyMusteringError as exc:
+        return rules_unit_view_from_armies(
+            armies=scenario.armies,
+            unit_instance_id=reserve_state.unit_instance_id,
+        )
+    except GameLifecycleError as exc:
         raise GameLifecycleError("Reserve arrival distance hook target unit is unknown.") from exc
 
 
@@ -542,6 +555,12 @@ def _apply_valid_reinforcement_placement(
             "phase": BattlePhase.MOVEMENT.value,
             "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "unit_instance_id": arrived_state.unit_instance_id,
+            "component_unit_instance_ids": list(
+                placement.candidate.attempted_rules_unit_placement.component_unit_instance_ids
+            ),
+            "rules_unit_placement": validate_json_value(
+                placement.candidate.attempted_rules_unit_placement.to_payload()
+            ),
             "placement_kind": placement.candidate.placement_kind.value,
             "request_id": result.request_id,
             "result_id": result.result_id,

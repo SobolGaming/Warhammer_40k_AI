@@ -33,6 +33,7 @@ from warhammer40k_core.engine.reserves import (
     reserve_kind_from_token,
     reserve_origin_from_token,
 )
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
@@ -872,18 +873,28 @@ def apply_reserve_declaration_decision(
         )
         return
     unit_id = _require_selection_unit(selection)
-    unit = _unit_for_player(state=state, player_id=selection.player_id, unit_instance_id=unit_id)
+    rules_unit = _unit_for_player(
+        state=state,
+        player_id=selection.player_id,
+        unit_instance_id=unit_id,
+    )
     policy = ReserveDestructionTimingPolicy.from_mission_policy(
         config.ruleset_descriptor.mission_policy
     )
     if selection.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
-        declaration = StrategicReserveDeclaration.for_unit(
-            unit=unit,
+        declaration = StrategicReserveDeclaration(
             player_id=selection.player_id,
+            unit_instance_id=rules_unit.unit_instance_id,
+            reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
+            declared_during_step=SetupStep.DECLARE_BATTLE_FORMATIONS.value,
             unit_points=selection.unit_points,
             embarked_unit_points=selection.embarked_unit_points,
             points_limit=selection.strategic_reserves_points_limit,
             source_rule_id=_require_source_rule_id(selection),
+            has_fortification_keyword=any(
+                _unit_has_keyword(component.unit, "FORTIFICATION")
+                for component in rules_unit.components
+            ),
             embarked_unit_instance_ids=selection.embarked_unit_instance_ids,
         )
         reserve_states = state.apply_strategic_reserve_declarations(
@@ -893,14 +904,19 @@ def apply_reserve_declaration_decision(
         reserve_state = reserve_states[0]
         declaration_payload = validate_json_value(declaration.to_payload())
     elif selection.reserve_kind is ReserveKind.DEEP_STRIKE:
-        deep_strike_declaration = DeepStrikeSetupDeclaration.for_unit(
-            unit=unit,
+        deep_strike_declaration = DeepStrikeSetupDeclaration(
             player_id=selection.player_id,
+            unit_instance_id=rules_unit.unit_instance_id,
+            reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
+            declared_during_step=SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+            has_deep_strike_keyword=all(
+                unit_has_deep_strike(component.unit) for component in rules_unit.components
+            ),
             points_contribution=selection.points_contribution,
             source_rule_id=_require_source_rule_id(selection),
         )
         reserve_state = deep_strike_declaration.to_reserve_state(destruction_deadline_policy=policy)
-        if state.reserve_state_for_unit(unit.unit_instance_id) is not None:
+        if state.reserve_state_for_unit(rules_unit.unit_instance_id) is not None:
             raise GameLifecycleError("Reserve declaration unit already has a ReserveState.")
         state.record_reserve_state(reserve_state)
         declaration_payload = validate_json_value(deep_strike_declaration.to_payload())
@@ -912,7 +928,8 @@ def apply_reserve_declaration_decision(
             "game_id": state.game_id,
             "setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
             "player_id": selection.player_id,
-            "unit_instance_id": unit.unit_instance_id,
+            "unit_instance_id": rules_unit.unit_instance_id,
+            "component_unit_instance_ids": list(rules_unit.component_unit_instance_ids),
             "reserve_kind": reserve_state.reserve_kind.value,
             "reserve_origin": reserve_state.reserve_origin.value,
             "declaration": declaration_payload,
@@ -972,16 +989,24 @@ def _strategic_reserves_option_for_unit(
     state: GameState,
     config: GameConfig,
     context: ReserveLegalityContext,
-    unit: UnitInstance,
+    unit: RulesUnitView,
 ) -> DecisionOption | None:
-    if _unit_has_keyword(unit, "FORTIFICATION"):
+    if any(_unit_has_keyword(component.unit, "FORTIFICATION") for component in unit.components):
         return None
-    unit_points = context.points_for_unit(unit.unit_instance_id)
-    if unit_points is None:
+    component_points = _points_for_rules_unit(context=context, view=unit)
+    if component_points is None:
         return None
-    cargo_unit_ids = _cargo_unit_ids_for_transport(
-        state=state,
-        transport_unit_id=unit.unit_instance_id,
+    cargo_unit_ids = tuple(
+        sorted(
+            {
+                cargo_unit_id
+                for component_unit_id in unit.component_unit_instance_ids
+                for cargo_unit_id in _cargo_unit_ids_for_transport(
+                    state=state,
+                    transport_unit_id=component_unit_id,
+                )
+            }
+        )
     )
     embarked_points = _embarked_points_for_unit_ids(
         context=context,
@@ -989,7 +1014,7 @@ def _strategic_reserves_option_for_unit(
     )
     if embarked_points is None:
         return None
-    contribution = unit_points.points + embarked_points
+    contribution = sum(point_value.points for point_value in component_points) + embarked_points
     after = context.current_strategic_reserves_points + contribution
     if after > context.strategic_reserves_points_limit:
         return None
@@ -1002,12 +1027,12 @@ def _strategic_reserves_option_for_unit(
         reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
         source_rule_id=STRATEGIC_RESERVES_SOURCE_RULE_ID,
         unit=unit,
-        unit_points=unit_points.points,
+        unit_points=sum(point_value.points for point_value in component_points),
         embarked_unit_points=embarked_points,
         points_contribution=contribution,
         points_after_declaration=after,
         embarked_unit_instance_ids=cargo_unit_ids,
-        source_ids=(unit_points.source_id,),
+        source_ids=tuple(sorted({point_value.source_id for point_value in component_points})),
     )
     return DecisionOption(
         option_id=f"declare_strategic_reserves:{unit.unit_instance_id}",
@@ -1021,14 +1046,29 @@ def _deep_strike_option_for_unit(
     state: GameState,
     config: GameConfig,
     context: ReserveLegalityContext,
-    unit: UnitInstance,
+    unit: RulesUnitView,
 ) -> DecisionOption | None:
-    if not unit_has_deep_strike(unit):
+    if not all(unit_has_deep_strike(component.unit) for component in unit.components):
         return None
-    points_value = context.points_for_unit(unit.unit_instance_id)
-    source_ids = unit.datasheet_source_ids
-    if points_value is not None:
-        source_ids = (points_value.source_id, *source_ids)
+    component_points = _points_for_rules_unit(context=context, view=unit)
+    source_ids = tuple(
+        sorted(
+            {
+                source_id
+                for component in unit.components
+                for source_id in component.unit.datasheet_source_ids
+            }
+        )
+    )
+    if component_points is not None:
+        source_ids = tuple(
+            sorted(
+                {
+                    *source_ids,
+                    *(point_value.source_id for point_value in component_points),
+                }
+            )
+        )
     payload = _selection_payload(
         state=state,
         config=config,
@@ -1089,7 +1129,7 @@ def _selection_payload(
     reserve_kind: ReserveKind,
     reserve_origin: ReserveOrigin,
     source_rule_id: str,
-    unit: UnitInstance,
+    unit: RulesUnitView,
     unit_points: int,
     embarked_unit_points: int,
     points_contribution: int,
@@ -1161,7 +1201,11 @@ def _completed_player_ids(decisions: DecisionController) -> set[str]:
     return completed
 
 
-def _declarable_units_for_player(*, state: GameState, player_id: str) -> tuple[UnitInstance, ...]:
+def _declarable_units_for_player(
+    *,
+    state: GameState,
+    player_id: str,
+) -> tuple[RulesUnitView, ...]:
     army = state.army_definition_for_player(player_id)
     if army is None:
         raise GameLifecycleError("Reserve declarations require a mustered army.")
@@ -1176,16 +1220,25 @@ def _declarable_units_for_player(*, state: GameState, player_id: str) -> tuple[U
         for cargo_state in state.transport_cargo_states
         for unit_id in cargo_state.embarked_unit_instance_ids
     }
-    units: list[UnitInstance] = []
-    for unit in army.units:
-        if unit.unit_instance_id in placed_unit_ids:
+    units: list[RulesUnitView] = []
+    seen_rules_unit_ids: set[str] = set()
+    for physical_unit in army.units:
+        view = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=physical_unit.unit_instance_id,
+        )
+        if view.unit_instance_id in seen_rules_unit_ids:
             continue
-        if unit.unit_instance_id in embarked_ids:
+        seen_rules_unit_ids.add(view.unit_instance_id)
+        component_ids = set(view.component_unit_instance_ids)
+        if component_ids & placed_unit_ids:
             continue
-        reserve_state = state.reserve_state_for_unit(unit.unit_instance_id)
+        if component_ids & embarked_ids:
+            continue
+        reserve_state = state.reserve_state_for_unit(view.unit_instance_id)
         if reserve_state is not None and reserve_state.status is ReserveStatus.IN_RESERVES:
             continue
-        units.append(unit)
+        units.append(view)
     return tuple(sorted(units, key=lambda unit: unit.unit_instance_id))
 
 
@@ -1224,23 +1277,30 @@ def _embarked_points_for_unit_ids(
     return total
 
 
+def _points_for_rules_unit(
+    *,
+    context: ReserveLegalityContext,
+    view: RulesUnitView,
+) -> tuple[ReserveUnitPointValue, ...] | None:
+    point_values: list[ReserveUnitPointValue] = []
+    for component_unit_id in view.component_unit_instance_ids:
+        point_value = context.points_for_unit(component_unit_id)
+        if point_value is None:
+            return None
+        point_values.append(point_value)
+    return tuple(point_values)
+
+
 def _unit_for_player(
     *,
     state: GameState,
     player_id: str,
     unit_instance_id: str,
-) -> UnitInstance:
-    owner_by_id = _unit_owner_by_id(state)
-    owner = owner_by_id.get(unit_instance_id)
-    if owner is None:
-        raise GameLifecycleError("Reserve declaration unit is unknown.")
-    if owner != player_id:
+) -> RulesUnitView:
+    view = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    if view.owner_player_id != player_id:
         raise GameLifecycleError("Reserve declaration unit player_id drift.")
-    for army in state.army_definitions:
-        if army.player_id != player_id:
-            continue
-        return army.unit_by_id(unit_instance_id)
-    raise GameLifecycleError("Reserve declaration player has no mustered army.")
+    return view
 
 
 def _unit_owner_by_id(state: GameState) -> dict[str, str]:

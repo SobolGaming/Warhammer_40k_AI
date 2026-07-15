@@ -196,7 +196,7 @@ def _apply_placement_proposal_decision(
             reserve_arrival_restriction_hooks=reserve_arrival_restriction_hooks,
             unit_instance_id=submission.unit_instance_id,
             placement_kind=submission.placement_kind,
-            attempted_placement=submission.attempted_placement,
+            attempted_placement=submission.resolved_rules_unit_placement(),
             large_model_exceptions=submission.large_model_exceptions,
         )
         if (
@@ -242,7 +242,7 @@ def _apply_placement_proposal_decision(
             ruleset_descriptor=ruleset_descriptor,
             unit_instance_id=submission.unit_instance_id,
             transport_unit_instance_id=submission.transport_unit_instance_id,
-            attempted_placement=submission.attempted_placement,
+            attempted_placement=submission.require_unit_placement(),
             disembark_mode=submission.disembark_mode,
             transport_movement_status=submission.transport_movement_status,
             restriction_overrides=submission.restriction_overrides,

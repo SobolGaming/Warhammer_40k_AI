@@ -34,6 +34,7 @@ from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_weapon_ability_granted_profile,
     rule_ir_weapon_selector_applies,
 )
+from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     DamageRollModifierContext,
@@ -584,25 +585,58 @@ def _matching_generic_attack_effects(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR attack hooks require GameState.")
-    attacker_id = _validate_identifier("attacking_unit_instance_id", attacking_unit_instance_id)
+    physical_attacker_id = _validate_identifier(
+        "attacking_unit_instance_id",
+        attacking_unit_instance_id,
+    )
     attacker_model_id = (
         None
         if attacker_model_instance_id is None
         else _validate_identifier("attacker_model_instance_id", attacker_model_instance_id)
     )
-    target_id = (
+    physical_target_id = (
         None
         if target_unit_instance_id is None
         else _validate_identifier("target_unit_instance_id", target_unit_instance_id)
     )
-    target_lookup_ids = (target_id,) if target_unit_lookup_ids is None else target_unit_lookup_ids
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    attacker_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=physical_attacker_id,
+    )
+    attacker_id = attacker_rules_unit.unit_instance_id
+    if attacker_model_id is not None:
+        owning_component_id = attacker_rules_unit.component_unit_id_for_model(attacker_model_id)
+        if physical_attacker_id not in {attacker_id, owning_component_id}:
+            raise GameLifecycleError(
+                "Generic RuleIR attacker model does not belong to the supplied component unit."
+            )
+    target_id = (
+        None
+        if physical_target_id is None
+        else rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=physical_target_id,
+        ).unit_instance_id
+    )
+    target_lookup_ids = (
+        (physical_target_id,) if target_unit_lookup_ids is None else target_unit_lookup_ids
+    )
     role_unit_ids: tuple[tuple[AttackRole, str], ...] = (("attacker", attacker_id),)
     for raw_target_id in target_lookup_ids:
         if raw_target_id is None:
             continue
+        canonical_target_id = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=_validate_identifier(
+                "target_unit_instance_id",
+                raw_target_id,
+            ),
+        ).unit_instance_id
         role_unit_ids = (
             *role_unit_ids,
-            ("target", _validate_identifier("target_unit_instance_id", raw_target_id)),
+            ("target", canonical_target_id),
         )
     matches: list[_GenericAttackEffect] = []
     seen: set[tuple[str, AttackRole]] = set()
@@ -766,6 +800,7 @@ def _generic_effect_context_applies(
     ):
         return False
     if not _generic_effect_selected_target_gate_applies(
+        state=state,
         effect=effect,
         target_unit_instance_id=target_unit_instance_id,
     ):
@@ -830,6 +865,7 @@ def _generic_effect_source_phase_applies(
 
 def _generic_effect_selected_target_gate_applies(
     *,
+    state: object,
     effect: _GenericAttackEffect,
     target_unit_instance_id: str | None,
 ) -> bool:
@@ -840,12 +876,33 @@ def _generic_effect_selected_target_gate_applies(
         raise GameLifecycleError(
             "Generic RuleIR selected_target_unit_instance_id must be a string."
         )
+    if (
+        effect.target_kind is RuleTargetKind.SELECTED_UNIT
+        and _attack_role_parameter(effect.parameters) == "attacker"
+    ):
+        return True
     if target_unit_instance_id is None:
         return False
-    return target_unit_instance_id == _validate_identifier(
-        "selected_target_unit_instance_id",
-        selected_target_id,
-    )
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR selected-target gate requires GameState.")
+    selected_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_validate_identifier(
+            "selected_target_unit_instance_id",
+            selected_target_id,
+        ),
+    ).unit_instance_id
+    current_target_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_validate_identifier(
+            "target_unit_instance_id",
+            target_unit_instance_id,
+        ),
+    ).unit_instance_id
+    return current_target_rules_unit_id == selected_rules_unit_id
 
 
 def _generic_effect_waaagh_gate_applies(
@@ -1314,19 +1371,19 @@ def _conditional_save_reroll_payload(
 
 def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR keyword gate requires GameState.")
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    requested_keyword = _canonical_keyword(_validate_identifier("keyword", keyword))
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id != requested_unit_id:
-                continue
-            return requested_keyword in {
-                _canonical_keyword(stored) for stored in (*unit.keywords, *unit.faction_keywords)
-            }
-    raise GameLifecycleError("Generic RuleIR keyword gate unit is unknown.")
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
+    )
+    return unit_has_required_keywords(
+        unit_keywords=rules_unit.keywords,
+        faction_keywords=rules_unit.faction_keywords,
+        required_keywords=(_validate_identifier("keyword", keyword),),
+    )
 
 
 def _keyword_sequence_parameter(value: object) -> tuple[str, ...]:
@@ -1344,10 +1401,6 @@ def _keyword_sequence_parameter(value: object) -> tuple[str, ...]:
     if not keywords:
         raise GameLifecycleError("Generic RuleIR required_keyword_sequence must not be empty.")
     return tuple(keywords)
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().upper().replace("_", " ").replace("-", " ")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

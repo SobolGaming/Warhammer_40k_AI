@@ -97,6 +97,15 @@ class RulesUnitView:
                 return component.unit.unit_instance_id
         raise GameLifecycleError("RulesUnitView model_instance_id is not in the rules unit.")
 
+    def component_unit_for_model(self, model_instance_id: str) -> UnitInstance:
+        requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+        for component in self.components:
+            if any(
+                model.model_instance_id == requested_model_id for model in component.unit.own_models
+            ):
+                return component.unit
+        raise GameLifecycleError("RulesUnitView model_instance_id is not in the rules unit.")
+
     def component_role_for_model(self, model_instance_id: str) -> RulesUnitComponentRole:
         requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
         for component in self.components:
@@ -161,6 +170,43 @@ def rules_unit_view_from_armies(
     raise GameLifecycleError("Rules unit_instance_id is unknown.")
 
 
+def rules_unit_views_from_armies(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[RulesUnitView, ...]:
+    if type(armies) is not tuple:
+        raise GameLifecycleError("Rules-unit enumeration armies must be a tuple.")
+    views: list[RulesUnitView] = []
+    for army in armies:
+        if type(army) is not ArmyDefinition:
+            raise GameLifecycleError(
+                "Rules-unit enumeration armies must contain ArmyDefinition values."
+            )
+        attached_component_ids = {
+            component_id
+            for attached_unit in army.attached_units
+            for component_id in attached_unit.component_unit_instance_ids
+        }
+        views.extend(
+            _attached_rules_unit_view(army=army, attached_unit=attached_unit)
+            for attached_unit in army.attached_units
+        )
+        views.extend(
+            RulesUnitView(
+                unit_instance_id=unit.unit_instance_id,
+                owner_player_id=army.player_id,
+                components=(RulesUnitComponent(unit=unit, role="unit"),),
+                attached_unit=None,
+            )
+            for unit in army.units
+            if unit.unit_instance_id not in attached_component_ids
+        )
+    view_ids = [view.unit_instance_id for view in views]
+    if len(view_ids) != len(set(view_ids)):
+        raise GameLifecycleError("Rules-unit enumeration identities must be unique.")
+    return tuple(sorted(views, key=lambda view: view.unit_instance_id))
+
+
 def rules_unit_id_for_unit_id(
     *,
     armies: tuple[ArmyDefinition, ...],
@@ -170,6 +216,23 @@ def rules_unit_id_for_unit_id(
         armies=armies,
         unit_instance_id=unit_instance_id,
     ).unit_instance_id
+
+
+def canonical_rules_unit_view_from_armies(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+    unit_instance_id: str,
+    owner_player_id: str,
+) -> RulesUnitView:
+    view = rules_unit_view_from_armies(
+        armies=armies,
+        unit_instance_id=unit_instance_id,
+    )
+    if view.unit_instance_id != unit_instance_id:
+        raise GameLifecycleError("Rules-unit identity must be canonical.")
+    if view.owner_player_id != owner_player_id:
+        raise GameLifecycleError("Rules-unit owner drift.")
+    return view
 
 
 def rules_unit_owner_player_id(*, state: GameState, unit_instance_id: str) -> str:

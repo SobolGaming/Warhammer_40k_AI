@@ -588,6 +588,10 @@ def _apply_rapid_ingress_handler(
                     "stratagem_handler_id": use_record.handler_id,
                     "stratagem_use": validate_json_value(use_record.to_payload()),
                     "reserve_state": validate_json_value(reserve_state.to_payload()),
+                    "component_unit_instance_ids": list(unit.component_unit_instance_ids),
+                    "model_instance_ids": sorted(
+                        model.model_instance_id for model in unit.alive_models()
+                    ),
                 }
             ),
         ),
