@@ -8,6 +8,7 @@ from warhammer40k_core.engine.abilities import AbilityCatalogRecord
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     active_player_id,
+    eligible_selection_target_unit_ids,
     payload_object,
     payload_string,
     payload_string_tuple,
@@ -21,7 +22,7 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.rules.rule_ir import RuleClause
+from warhammer40k_core.rules.rule_ir import RuleClause, RuleClausePayload
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -211,6 +212,7 @@ def selected_target_base_payload(
         "source_unit_instance_id": group.unit.unit_instance_id,
         "source_model_instance_id": group.source_model_instance_id,
         "selection_clause_id": group.selection_clause.clause_id,
+        "selection_clause": validate_json_value(group.selection_clause.to_payload()),
         "effect_clause_ids": [clause.clause_id for clause in group.effect_clauses],
     }
     if group.attack_sequence is not None:
@@ -421,9 +423,24 @@ def _selected_target_drift_field(
     )
     if selected_target_id not in available_target_ids:
         return "target_unit_instance_id"
-    if state.battlefield_state is None:
-        return "battlefield_state"
-    if state.battlefield_state.unit_placement_or_none(selected_target_id) is None:
+    selection_clause_payload = request_payload.get("selection_clause")
+    if not isinstance(selection_clause_payload, dict):
+        return "selection_clause"
+    source_model_id = request_payload.get("source_model_instance_id")
+    if source_model_id is not None and type(source_model_id) is not str:
+        return "source_model_instance_id"
+    current_target_ids = eligible_selection_target_unit_ids(
+        state=state,
+        source_player_id=payload_string(request_payload, key="player_id"),
+        source_unit_instance_id=payload_string(
+            request_payload,
+            key="source_unit_instance_id",
+        ),
+        source_model_instance_id=source_model_id,
+        selection_clause=RuleClause.from_payload(cast(RuleClausePayload, selection_clause_payload)),
+        explicit_target_unit_ids=(selected_target_id,),
+    )
+    if selected_target_id not in current_target_ids:
         return "target_unit_instance_id"
     return None
 

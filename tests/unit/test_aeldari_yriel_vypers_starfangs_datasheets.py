@@ -28,6 +28,11 @@ from warhammer40k_core.engine.ability_catalog import (
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedContext,
+)
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
@@ -57,10 +62,13 @@ from warhammer40k_core.engine.catalog_selected_target_decisions import (
 )
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CatalogSelectedTargetEffectRuntime,
+    apply_catalog_post_shoot_hit_target_effect_result,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.generic_rule_attack_hooks import generic_rule_hit_roll_modifier
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ListValidationError,
@@ -74,6 +82,7 @@ from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
+    LifecycleStatusKind,
     SetupStep,
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseHandler
@@ -88,6 +97,7 @@ from warhammer40k_core.engine.prebattle_records import (
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveStatus
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
+    RuntimeModifierRegistry,
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.shooting_phase_start_hooks import (
@@ -95,10 +105,13 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
     ShootingPhaseStartRequestContext,
     ShootingPhaseStartResultContext,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionHookRegistry,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_ir import (
     RuleConditionKind,
@@ -773,6 +786,330 @@ def test_hallucinogen_grenades_uses_opponent_shooting_start_decision_and_grants_
     )
 
 
+def test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_components() -> None:
+    catalog, armies, state, formation = _attached_runtime_fixture()
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    vypers = _unit(armies, "army-b:vypers")
+    yriel = _unit(armies, "army-a:yriel")
+    voidreavers = _unit(armies, "army-a:voidreavers")
+    attached_id = formation.attached_unit_instance_id
+    target_model_ids = tuple(
+        sorted(model.model_instance_id for model in (*yriel.own_models, *voidreavers.own_models))
+    )
+    sequence = AttackSequence(
+        sequence_id="attack-sequence:harassment-fire:attached-target",
+        attacker_player_id="player-b",
+        attacking_unit_instance_id=vypers.unit_instance_id,
+        source_phase=BattlePhase.SHOOTING,
+        attack_pools=(
+            RangedAttackPool(
+                attacker_model_instance_id=vypers.own_models[0].model_instance_id,
+                wargear_id="wargear:harassment-fire:bright-lance",
+                weapon_profile_id=_weapon_profile(VYPERS_ID, "Bright lance").profile_id,
+                weapon_profile=_weapon_profile(VYPERS_ID, "Bright lance"),
+                target_unit_instance_id=attached_id,
+                shooting_type=ShootingType.NORMAL,
+                attacks=1,
+                target_visible_model_ids=target_model_ids,
+                target_in_range_model_ids=target_model_ids,
+            ),
+        ),
+    )
+    decisions = DecisionController()
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+
+    status = runtime.attack_sequence_completed_bindings()[0].handler(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=sequence,
+            attack_sequence_completed_event_id="event:harassment-fire:attached-target",
+        )
+    )
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = decisions.queue.peek_next()
+    assert isinstance(request.payload, dict)
+    assert request.payload["available_target_unit_instance_ids"] == [attached_id]
+    assert len(request.options) == 1
+    assert isinstance(request.options[0].payload, dict)
+    assert request.options[0].payload["selected_catalog_target_effect"] == {
+        "option_id": request.options[0].option_id,
+        "target_unit_instance_id": attached_id,
+    }
+    result = DecisionResult.for_request(
+        result_id="result:harassment-fire:attached-target",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    decisions.submit_result(result)
+    assert (
+        apply_catalog_post_shoot_hit_target_effect_result(
+            state=state,
+            decisions=decisions,
+            result=result,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id=indexes,
+        )
+        is None
+    )
+    assert len(state.persisting_effects_for_unit(attached_id)) == 1
+    assert state.persisting_effects_for_unit(yriel.unit_instance_id) == ()
+    assert state.persisting_effects_for_unit(voidreavers.unit_instance_id) == ()
+
+    for attacker_model_id, profile in (
+        (
+            voidreavers.own_models[0].model_instance_id,
+            _weapon_profile(VOIDREAVERS_ID, "Shuriken rifle"),
+        ),
+        (
+            yriel.own_models[0].model_instance_id,
+            _weapon_profile(PRINCE_YRIEL_ID, "Shuriken pistol"),
+        ),
+    ):
+        assert (
+            generic_rule_hit_roll_modifier(
+                HitRollModifierContext(
+                    state=state,
+                    attacking_unit_instance_id=attached_id,
+                    attacker_model_instance_id=attacker_model_id,
+                    target_unit_instance_id=vypers.unit_instance_id,
+                    weapon_profile=profile,
+                    source_phase=BattlePhase.SHOOTING,
+                )
+            )
+            == -1
+        )
+
+
+@pytest.mark.parametrize("near_component", ["bodyguard", "leader"])
+def test_hallucinogen_grenades_enumerates_one_attached_rules_unit_from_either_component(
+    near_component: str,
+) -> None:
+    catalog, armies, state, formation = _attached_runtime_fixture()
+    _move_unit_to(state, unit_instance_id="army-a:starfangs", x=5.0, y=10.0)
+    _move_unit_to(
+        state,
+        unit_instance_id="army-a:voidreavers",
+        x=15.0 if near_component == "bodyguard" else 50.0,
+        y=10.0,
+    )
+    _move_unit_to(
+        state,
+        unit_instance_id="army-a:yriel",
+        x=15.0 if near_component == "leader" else 50.0,
+        y=30.0,
+    )
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+
+    request = CatalogSelectedTargetEffectRuntime(indexes, armies).shooting_phase_start_request(
+        ShootingPhaseStartRequestContext(
+            state=state,
+            decisions=DecisionController(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=catalog,
+            shooting_target_restriction_hooks=ShootingTargetRestrictionHookRegistry.empty(),
+        )
+    )
+
+    assert request is not None
+    assert isinstance(request.payload, dict)
+    attached_id = formation.attached_unit_instance_id
+    assert request.payload["available_target_unit_instance_ids"] == [attached_id]
+    target_options = tuple(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict) and option.payload.get("use_ability") is True
+    )
+    assert len(target_options) == 1
+    assert isinstance(target_options[0].payload, dict)
+    assert target_options[0].payload["selected_catalog_target_effect"] == {
+        "option_id": target_options[0].option_id,
+        "target_unit_instance_id": attached_id,
+    }
+
+
+def test_hallucinogen_grenades_persists_and_consumes_stealth_by_rules_unit_id() -> None:
+    catalog, armies, state, formation = _attached_runtime_fixture()
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    decisions = DecisionController()
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    restriction_hooks = ShootingTargetRestrictionHookRegistry.empty()
+    request = runtime.shooting_phase_start_request(
+        ShootingPhaseStartRequestContext(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=catalog,
+            shooting_target_restriction_hooks=restriction_hooks,
+        )
+    )
+    assert request is not None
+    attached_id = formation.attached_unit_instance_id
+    target_option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("use_ability") is True
+        and cast(dict[str, Any], option.payload["selected_catalog_target_effect"])[
+            "target_unit_instance_id"
+        ]
+        == attached_id
+    )
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="hallucinogen-grenades-select-attached-unit",
+        request=request,
+        selected_option_id=target_option.option_id,
+    )
+    decisions.submit_result(result)
+
+    assert (
+        runtime.apply_shooting_phase_start_result(
+            ShootingPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+                ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+                army_catalog=catalog,
+                shooting_target_restriction_hooks=restriction_hooks,
+            )
+        )
+        is True
+    )
+    assert len(state.persisting_effects_for_unit(attached_id)) == 1
+    stealth_binding = next(
+        binding
+        for binding in CatalogDatasheetRuleRuntime(indexes, armies).hit_roll_modifier_bindings()
+        if binding.modifier_id == CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID
+    )
+    enemy_vyper = _unit(armies, "army-b:vypers")
+    for target_component_id in ("army-a:yriel", "army-a:voidreavers"):
+        assert (
+            stealth_binding.handler(
+                HitRollModifierContext(
+                    state=state,
+                    attacking_unit_instance_id=enemy_vyper.unit_instance_id,
+                    attacker_model_instance_id=enemy_vyper.own_models[0].model_instance_id,
+                    target_unit_instance_id=target_component_id,
+                    weapon_profile=_weapon_profile(VYPERS_ID, "Bright lance"),
+                    source_phase=BattlePhase.SHOOTING,
+                )
+            )
+            == -1
+        )
+
+
+def test_hallucinogen_grenades_stale_validation_tracks_surviving_rules_unit() -> None:
+    catalog, armies, state, formation = _attached_runtime_fixture()
+    _move_unit_to(state, unit_instance_id="army-a:starfangs", x=5.0, y=10.0)
+    _move_unit_to(state, unit_instance_id="army-a:voidreavers", x=15.0, y=10.0)
+    _move_unit_to(state, unit_instance_id="army-a:yriel", x=50.0, y=30.0)
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    request = CatalogSelectedTargetEffectRuntime(indexes, armies).shooting_phase_start_request(
+        ShootingPhaseStartRequestContext(
+            state=state,
+            decisions=DecisionController(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=catalog,
+            shooting_target_restriction_hooks=ShootingTargetRestrictionHookRegistry.empty(),
+        )
+    )
+    assert request is not None
+    attached_id = formation.attached_unit_instance_id
+    target_option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("use_ability") is True
+        and cast(dict[str, Any], option.payload["selected_catalog_target_effect"])[
+            "target_unit_instance_id"
+        ]
+        == attached_id
+    )
+    result = DecisionResult.for_request(
+        result_id="hallucinogen-grenades-attached-stale-validation",
+        request=request,
+        selected_option_id=target_option.option_id,
+    )
+    assert isinstance(target_option.payload, dict)
+    submission_kind = cast(str, target_option.payload["submission_kind"])
+
+    _move_unit_to(state, unit_instance_id="army-a:voidreavers", x=50.0, y=10.0)
+    _move_unit_to(state, unit_instance_id="army-a:yriel", x=15.0, y=30.0)
+    assert (
+        invalid_selected_target_effect_status(
+            state=state,
+            request=request,
+            result=result,
+            expected_decision_type=request.decision_type,
+            expected_submission_kind=submission_kind,
+            expected_phase=BattlePhase.SHOOTING,
+            invalid_reason="invalid_hallucinogen_grenades_test_result",
+        )
+        is None
+    )
+
+    _destroy_unit_in_state(state, unit_instance_id="army-a:voidreavers")
+    assert (
+        invalid_selected_target_effect_status(
+            state=state,
+            request=request,
+            result=result,
+            expected_decision_type=request.decision_type,
+            expected_submission_kind=submission_kind,
+            expected_phase=BattlePhase.SHOOTING,
+            invalid_reason="invalid_hallucinogen_grenades_test_result",
+        )
+        is None
+    )
+
+    _destroy_unit_in_state(state, unit_instance_id="army-a:yriel")
+    invalid = invalid_selected_target_effect_status(
+        state=state,
+        request=request,
+        result=result,
+        expected_decision_type=request.decision_type,
+        expected_submission_kind=submission_kind,
+        expected_phase=BattlePhase.SHOOTING,
+        invalid_reason="invalid_hallucinogen_grenades_test_result",
+    )
+    assert invalid is not None
+    assert isinstance(invalid.payload, dict)
+    assert invalid.payload["field"] == "target_unit_instance_id"
+
+
 def test_hallucinogen_grenades_rejects_malformed_finite_results() -> None:
     catalog, armies, state = _runtime_fixture(stage=GameLifecycleStage.BATTLE)
     records = catalog_ability_records_from_catalog(catalog)
@@ -985,6 +1322,124 @@ def test_prince_of_corsairs_reserve_action_rejects_payload_drift_before_mutation
             )
     assert state.reserve_states == []
     assert state.prebattle_action_records == []
+
+
+def _attached_runtime_fixture() -> tuple[
+    Any,
+    tuple[ArmyDefinition, ...],
+    GameState,
+    AttachedUnitFormation,
+]:
+    package = _ability_support_catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    yriel = _instantiate(
+        factory,
+        army_id="army-a",
+        selection_id="yriel",
+        datasheet_id=PRINCE_YRIEL_ID,
+    )
+    voidreavers = factory.instantiate_unit(
+        army_id="army-a",
+        datasheet=catalog.datasheet_by_id(VOIDREAVERS_ID),
+        selection=UnitMusterSelection(
+            unit_selection_id="voidreavers",
+            datasheet_id=VOIDREAVERS_ID,
+            model_profile_selections=(
+                ModelProfileSelection(VOIDREAVER_PROFILE_ID, 4),
+                ModelProfileSelection(VOIDREAVER_FELARCH_PROFILE_ID, 1),
+            ),
+        ),
+    )
+    starfangs = _instantiate(
+        factory,
+        army_id="army-a",
+        selection_id="starfangs",
+        datasheet_id=STARFANGS_ID,
+    )
+    vypers = _instantiate(
+        factory,
+        army_id="army-b",
+        selection_id="vypers",
+        datasheet_id=VYPERS_ID,
+    )
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id="attached-unit:army-a:yriel-voidreavers",
+        bodyguard_unit_instance_id=voidreavers.unit_instance_id,
+        leader_unit_instance_ids=(yriel.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((voidreavers.unit_instance_id, yriel.unit_instance_id))
+        ),
+        source_id="test:selected-target-attached-unit",
+        attachment_source_ids=("test:prince-yriel-leader-eligibility",),
+    )
+    armies = (
+        _army(
+            catalog,
+            army_id="army-a",
+            player_id="player-a",
+            units=(yriel, voidreavers, starfangs),
+            attached_units=(formation,),
+        ),
+        _army(
+            catalog,
+            army_id="army-b",
+            player_id="player-b",
+            units=(vypers,),
+        ),
+    )
+    return (
+        catalog,
+        armies,
+        _state_for_armies(armies, stage=GameLifecycleStage.BATTLE),
+        formation,
+    )
+
+
+def _move_unit_to(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    x: float,
+    y: float,
+) -> None:
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    placement = battlefield.unit_placement_by_id(unit_instance_id)
+    moved = replace(
+        placement,
+        model_placements=tuple(
+            replace(
+                model_placement,
+                pose=Pose.at(x=x, y=y + (2.0 * index)),
+            )
+            for index, model_placement in enumerate(placement.model_placements)
+        ),
+    )
+    state.replace_battlefield_state(battlefield.with_unit_placement(moved))
+
+
+def _destroy_unit_in_state(state: GameState, *, unit_instance_id: str) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    found = False
+    for army in state.army_definitions:
+        units: list[UnitInstance] = []
+        for unit in army.units:
+            if unit.unit_instance_id != unit_instance_id:
+                units.append(unit)
+                continue
+            found = True
+            units.append(
+                replace(
+                    unit,
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0) for model in unit.own_models
+                    ),
+                )
+            )
+        updated_armies.append(replace(army, units=tuple(units)))
+    assert found
+    state.replace_army_definitions(updated_armies)
 
 
 def _catalog() -> Any:

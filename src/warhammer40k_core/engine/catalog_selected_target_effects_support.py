@@ -16,9 +16,7 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
-    UnitPlacement,
 )
-from warhammer40k_core.engine.catalog_geometry import alive_geometry_models_for_placement
 from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
     clause_has_immediate_selected_target_effect,
     effect_is_immediate_selected_target_battle_shock,
@@ -50,7 +48,11 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -139,14 +141,28 @@ def eligible_selection_target_unit_ids(
         armies=tuple(state.army_definitions),
         battlefield_state=state.battlefield_state,
     )
-    source_army = army_for_player(tuple(state.army_definitions), player_id=source_player)
-    source_unit = unit_in_army_by_id(source_army, unit_instance_id=source_unit_id)
-    source_placement = state.battlefield_state.unit_placement_by_id(source_unit_id)
+    source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_id)
+    if source_rules_unit.owner_player_id != source_player:
+        raise GameLifecycleError("Catalog selected-target source owner drift.")
+    if not rules_unit_has_placed_alive_model(state=state, rules_unit=source_rules_unit):
+        return ()
+    if source_model_instance_id is not None and not rules_unit_has_placed_alive_model(
+        state=state,
+        rules_unit=source_rules_unit,
+        model_instance_id=source_model_instance_id,
+    ):
+        return ()
     ruleset_descriptor = state.runtime_ruleset_descriptor()
     explicit_ids = (
         None
         if explicit_target_unit_ids is None
-        else set(validate_identifier_tuple("explicit_target_unit_ids", explicit_target_unit_ids))
+        else canonical_rules_unit_ids(
+            state=state,
+            unit_instance_ids=validate_identifier_tuple(
+                "explicit_target_unit_ids",
+                explicit_target_unit_ids,
+            ),
+        )
     )
     selection_target = selection_clause.target
     if selection_target is None:
@@ -162,35 +178,44 @@ def eligible_selection_target_unit_ids(
     required_keywords = required_keywords_for_clause(selection_clause)
     from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 
-    target_ids: list[str] = []
+    target_rules_units: dict[str, RulesUnitView] = {}
     for placed_army in state.battlefield_state.placed_armies:
         if (placed_army.player_id == source_player) != (target_allegiance == "friendly"):
             continue
         for target_placement in placed_army.unit_placements:
-            if explicit_ids is not None and target_placement.unit_instance_id not in explicit_ids:
-                continue
             target_rules_unit = rules_unit_view_by_id(
                 state=state,
                 unit_instance_id=target_placement.unit_instance_id,
             )
-            if required_keywords and not unit_has_required_keywords(
-                unit_keywords=target_rules_unit.keywords,
-                faction_keywords=target_rules_unit.faction_keywords,
-                required_keywords=required_keywords,
-            ):
-                continue
-            if selection_target_conditions_apply(
-                state=state,
-                scenario=scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                source_unit=source_unit,
-                source_placement=source_placement,
-                source_model_instance_id=source_model_instance_id,
-                target_placement=target_placement,
-                selection_clause=selection_clause,
-            ):
-                target_ids.append(target_placement.unit_instance_id)
-    return tuple(sorted(target_ids))
+            target_rules_units[target_rules_unit.unit_instance_id] = target_rules_unit
+    target_ids: list[str] = []
+    for target_rules_unit_id in sorted(target_rules_units):
+        if explicit_ids is not None and target_rules_unit_id not in explicit_ids:
+            continue
+        target_rules_unit = target_rules_units[target_rules_unit_id]
+        if not rules_unit_has_placed_alive_model(state=state, rules_unit=target_rules_unit):
+            continue
+        if target_rules_unit.owner_player_id == source_player and target_allegiance != "friendly":
+            raise GameLifecycleError("Catalog selected-target allegiance drift.")
+        if target_rules_unit.owner_player_id != source_player and target_allegiance != "enemy":
+            raise GameLifecycleError("Catalog selected-target allegiance drift.")
+        if required_keywords and not unit_has_required_keywords(
+            unit_keywords=target_rules_unit.keywords,
+            faction_keywords=target_rules_unit.faction_keywords,
+            required_keywords=required_keywords,
+        ):
+            continue
+        if selection_target_conditions_apply(
+            state=state,
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            source_rules_unit=source_rules_unit,
+            source_model_instance_id=source_model_instance_id,
+            target_rules_unit=target_rules_unit,
+            selection_clause=selection_clause,
+        ):
+            target_ids.append(target_rules_unit.unit_instance_id)
+    return tuple(target_ids)
 
 
 def selection_target_conditions_apply(
@@ -198,10 +223,9 @@ def selection_target_conditions_apply(
     state: GameState,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
-    source_unit: UnitInstance,
-    source_placement: UnitPlacement,
+    source_rules_unit: RulesUnitView,
     source_model_instance_id: str | None,
-    target_placement: UnitPlacement,
+    target_rules_unit: RulesUnitView,
     selection_clause: RuleClause,
 ) -> bool:
     if not all(
@@ -210,10 +234,10 @@ def selection_target_conditions_apply(
     ):
         raise GameLifecycleError("Catalog selected-target selection condition is unsupported.")
     if not selection_distance_conditions_apply(
-        scenario=scenario,
-        source_placement=source_placement,
+        state=state,
+        source_rules_unit=source_rules_unit,
         source_model_instance_id=source_model_instance_id,
-        target_placement=target_placement,
+        target_rules_unit=target_rules_unit,
         selection_clause=selection_clause,
     ):
         return False
@@ -221,19 +245,19 @@ def selection_target_conditions_apply(
         state=state,
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        source_unit=source_unit,
+        source_rules_unit=source_rules_unit,
         source_model_instance_id=source_model_instance_id,
-        target_placement=target_placement,
+        target_rules_unit=target_rules_unit,
         selection_clause=selection_clause,
     )
 
 
 def selection_distance_conditions_apply(
     *,
-    scenario: BattlefieldScenario,
-    source_placement: UnitPlacement,
+    state: GameState,
+    source_rules_unit: RulesUnitView,
     source_model_instance_id: str | None,
-    target_placement: UnitPlacement,
+    target_rules_unit: RulesUnitView,
     selection_clause: RuleClause,
 ) -> bool:
     distance_conditions = tuple(
@@ -243,10 +267,9 @@ def selection_distance_conditions_apply(
     )
     if not distance_conditions:
         return True
-    target_models = geometry_models_for_placement(
-        scenario=scenario,
-        unit_placement=target_placement,
-        source_model_instance_id=None,
+    target_models = geometry_models_for_rules_unit(
+        state=state,
+        unit_instance_id=target_rules_unit.unit_instance_id,
     )
     for condition in distance_conditions:
         parameters = parameter_payload(condition.parameters)
@@ -267,11 +290,14 @@ def selection_distance_conditions_apply(
             condition_source_model_id = None
         else:
             raise GameLifecycleError("Catalog selected-target distance object kind is unsupported.")
-        source_models = geometry_models_for_placement(
-            scenario=scenario,
-            unit_placement=source_placement,
-            source_model_instance_id=condition_source_model_id,
+        source_models = geometry_models_for_rules_unit(
+            state=state,
+            unit_instance_id=source_rules_unit.unit_instance_id,
         )
+        if condition_source_model_id is not None:
+            source_models = tuple(
+                model for model in source_models if model.model_id == condition_source_model_id
+            )
         if not any_models_satisfy_distance(
             source_models=source_models,
             target_models=target_models,
@@ -286,9 +312,9 @@ def selection_visibility_conditions_apply(
     state: GameState,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
-    source_unit: UnitInstance,
+    source_rules_unit: RulesUnitView,
     source_model_instance_id: str | None,
-    target_placement: UnitPlacement,
+    target_rules_unit: RulesUnitView,
     selection_clause: RuleClause,
 ) -> bool:
     visibility_conditions = tuple(
@@ -317,13 +343,25 @@ def selection_visibility_conditions_apply(
             observer_model_id = None
         else:
             raise GameLifecycleError("Catalog selected-target visibility observer is unsupported.")
-        if not unit_has_line_of_sight_to_target(
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            observing_unit=source_unit,
-            target_unit_id=target_placement.unit_instance_id,
-            observer_model_instance_id=observer_model_id,
-            terrain_features=state.battlefield_state.terrain_features,
+        observing_components = (
+            (source_rules_unit.component_unit_for_model(observer_model_id),)
+            if observer_model_id is not None
+            else tuple(
+                component.unit
+                for component in source_rules_unit.components
+                if any(model.is_alive for model in component.unit.own_models)
+            )
+        )
+        if not any(
+            unit_has_line_of_sight_to_target(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                observing_unit=observing_unit,
+                target_unit_id=target_rules_unit.unit_instance_id,
+                observer_model_instance_id=observer_model_id,
+                terrain_features=state.battlefield_state.terrain_features,
+            )
+            for observing_unit in observing_components
         ):
             return False
     return True
@@ -356,16 +394,36 @@ def any_models_satisfy_distance(
     )
 
 
-def geometry_models_for_placement(
+def canonical_rules_unit_ids(
     *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-    source_model_instance_id: str | None,
-) -> tuple[Model, ...]:
-    return alive_geometry_models_for_placement(
-        scenario=scenario,
-        unit_placement=unit_placement,
-        model_instance_id=source_model_instance_id,
+    state: GameState,
+    unit_instance_ids: tuple[str, ...],
+) -> frozenset[str]:
+    canonical_ids: set[str] = set()
+    for unit_instance_id in unit_instance_ids:
+        canonical_ids.add(
+            rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=unit_instance_id,
+            ).unit_instance_id
+        )
+    return frozenset(canonical_ids)
+
+
+def rules_unit_has_placed_alive_model(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    model_instance_id: str | None = None,
+) -> bool:
+    if state.battlefield_state is None:
+        return False
+    placed_model_ids = frozenset(state.battlefield_state.placed_model_ids())
+    return any(
+        model.is_alive
+        and model.model_instance_id in placed_model_ids
+        and (model_instance_id is None or model.model_instance_id == model_instance_id)
+        for model in rules_unit.own_models
     )
 
 
@@ -379,14 +437,23 @@ def effect_target_unit_ids(
 ) -> tuple[str, ...]:
     if clause.target is None:
         return ()
+    source_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source_unit.unit_instance_id,
+    ).unit_instance_id
     if clause.target.kind in {RuleTargetKind.THIS_MODEL, RuleTargetKind.THIS_UNIT}:
-        return (source_unit.unit_instance_id,)
+        return (source_rules_unit_id,)
     if clause.target.kind in {
         RuleTargetKind.ENEMY_UNIT,
         RuleTargetKind.SELECTED_TARGET,
         RuleTargetKind.SELECTED_UNIT,
     }:
-        return (selected_target_unit_instance_id,)
+        return (
+            rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=selected_target_unit_instance_id,
+            ).unit_instance_id,
+        )
     if clause.target.kind is not RuleTargetKind.FRIENDLY_UNIT:
         return ()
     if state.battlefield_state is None:
@@ -394,7 +461,7 @@ def effect_target_unit_ids(
     from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 
     required_keywords = required_keywords_for_clause(clause)
-    target_ids: list[str] = []
+    target_ids: set[str] = set()
     for placed_army in state.battlefield_state.placed_armies:
         if placed_army.player_id != source_player_id:
             continue
@@ -403,13 +470,15 @@ def effect_target_unit_ids(
                 state=state,
                 unit_instance_id=placement.unit_instance_id,
             )
+            if not rules_unit_has_placed_alive_model(state=state, rules_unit=unit):
+                continue
             if required_keywords and not unit_has_required_keywords(
                 unit_keywords=unit.keywords,
                 faction_keywords=unit.faction_keywords,
                 required_keywords=required_keywords,
             ):
                 continue
-            target_ids.append(placement.unit_instance_id)
+            target_ids.add(unit.unit_instance_id)
     return tuple(sorted(target_ids))
 
 
@@ -818,14 +887,6 @@ def army_for_player(
         if army.player_id == requested_id:
             return army
     raise GameLifecycleError("Catalog selected-target army is missing.")
-
-
-def unit_in_army_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance:
-    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for unit in army.units:
-        if unit.unit_instance_id == requested_id:
-            return unit
-    raise GameLifecycleError("Catalog selected-target unit is missing.")
 
 
 def validate_armies(value: object) -> tuple[ArmyDefinition, ...]:

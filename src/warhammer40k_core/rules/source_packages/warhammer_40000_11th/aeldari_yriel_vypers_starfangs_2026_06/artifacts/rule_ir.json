@@ -26,7 +26,7 @@
       ]
     }
   ],
-  "package_hash": "73e512fd92b206ae1ce5b9ae1ea77f39c21041b475c8689eedfb1b49f2bedebf",
+  "package_hash": "4c4365b3bab531561639f390b6cf12d18ee35fd5eb3a11ad8b61d3c7e6a78627",
   "records": {
     "000000605:3": {
       "ability_name": "Harassment Fire",
@@ -145,7 +145,7 @@
                   },
                   {
                     "key": "roll_type",
-                    "value": "hit_roll"
+                    "value": "hit"
                   }
                 ],
                 "source_span": {
@@ -196,7 +196,7 @@
           }
         ],
         "diagnostics": [],
-        "ir_hash": "d6e5e612e17b06f9673c6016030c0a27b191d6ff6dc1d2a3b79a13fb53c58c7f",
+        "ir_hash": "bdff10f6883ecf496ed868736c3ecca2bcab375d181933d8e31f38f83471169b",
         "normalized_text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks. Until the start of your next turn, that enemy unit is suppressed. While a unit is suppressed, each time a model in that unit makes an attack, subtract 1 from the Hit roll.",
         "parser_version": "manual-source-backed-rule-ir:v1",
         "rule_id": "phase17k:aeldari:datasheet:000000605:3",

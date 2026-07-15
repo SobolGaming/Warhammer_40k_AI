@@ -32,7 +32,7 @@
       "catalog-ir:post-shoot-hit-target-effect"
     ],
     "semantic_categories": [
-      "datasheet.roll_modifier.hit_roll.selected_unit"
+      "datasheet.roll_modifier.hit.selected_unit"
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,

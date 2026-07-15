@@ -365,7 +365,7 @@ def _harassment_fire_rule_ir() -> RuleIR:
                         parameters=_parameters(
                             ("attack_role", "attacker"),
                             ("delta", -1),
-                            ("roll_type", "hit_roll"),
+                            ("roll_type", "hit"),
                         ),
                     ),
                 ),

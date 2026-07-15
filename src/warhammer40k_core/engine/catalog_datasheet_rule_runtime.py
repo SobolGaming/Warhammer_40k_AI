@@ -632,10 +632,7 @@ class CatalogDatasheetRuleRuntime:
                 and generic_rule_effect_payload_grants_ability(
                     effect.effect_payload, ability="stealth"
                 )
-                for component in target.components
-                for effect in context.state.persisting_effects_for_unit(
-                    component.unit.unit_instance_id
-                )
+                for effect in context.state.persisting_effects_for_unit(target.unit_instance_id)
             )
             else 0
         )

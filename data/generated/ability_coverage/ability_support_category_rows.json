@@ -542,7 +542,34 @@
         "datasheet_id": "000004193",
         "datasheet_name": "Prince Yriel",
         "source_kind": "datasheet"
-      },
+      }
+    ],
+    "ability_names": [
+      "Piratical Hero"
+    ],
+    "category_id": "datasheet.roll_modifier.hit_roll.selected_unit",
+    "category_name": "Datasheet Roll Modifier Hit Roll Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:piratical-hero/none"
+    ],
+    "datasheet_names": [
+      "Prince Yriel"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:sustained-hits"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
       {
         "ability_id": "000000605:harassment-fire",
         "ability_name": "Harassment Fire",
@@ -553,28 +580,22 @@
       }
     ],
     "ability_names": [
-      "Harassment Fire",
-      "Piratical Hero"
+      "Harassment Fire"
     ],
-    "category_id": "datasheet.roll_modifier.hit_roll.selected_unit",
-    "category_name": "Datasheet Roll Modifier Hit Roll Selected Unit",
-    "coverage_row_count": 2,
+    "category_id": "datasheet.roll_modifier.hit.selected_unit",
+    "category_name": "Datasheet Roll Modifier Hit Selected Unit",
+    "coverage_row_count": 1,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:piratical-hero/none",
       "chaos-daemons-bridge-catalog/000000605/datasheet/000000605:harassment-fire/none"
     ],
     "datasheet_names": [
-      "Prince Yriel",
       "Vypers"
     ],
     "runtime_consumer_ids": [
-      "catalog-ir:hit-roll-modifier",
-      "catalog-ir:post-shoot-hit-target-effect",
-      "catalog-ir:weapon-keyword-grant",
-      "catalog-ir:weapon-keyword-grant:sustained-hits"
+      "catalog-ir:post-shoot-hit-target-effect"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 1
     },
     "support_stages": [
       "engine_consumed"

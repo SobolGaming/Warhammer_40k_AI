@@ -766,6 +766,7 @@ def _generic_effect_context_applies(
     ):
         return False
     if not _generic_effect_selected_target_gate_applies(
+        state=state,
         effect=effect,
         target_unit_instance_id=target_unit_instance_id,
     ):
@@ -830,6 +831,7 @@ def _generic_effect_source_phase_applies(
 
 def _generic_effect_selected_target_gate_applies(
     *,
+    state: object,
     effect: _GenericAttackEffect,
     target_unit_instance_id: str | None,
 ) -> bool:
@@ -840,12 +842,33 @@ def _generic_effect_selected_target_gate_applies(
         raise GameLifecycleError(
             "Generic RuleIR selected_target_unit_instance_id must be a string."
         )
+    if (
+        effect.target_kind is RuleTargetKind.SELECTED_UNIT
+        and _attack_role_parameter(effect.parameters) == "attacker"
+    ):
+        return True
     if target_unit_instance_id is None:
         return False
-    return target_unit_instance_id == _validate_identifier(
-        "selected_target_unit_instance_id",
-        selected_target_id,
-    )
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR selected-target gate requires GameState.")
+    selected_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_validate_identifier(
+            "selected_target_unit_instance_id",
+            selected_target_id,
+        ),
+    ).unit_instance_id
+    current_target_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_validate_identifier(
+            "target_unit_instance_id",
+            target_unit_instance_id,
+        ),
+    ).unit_instance_id
+    return current_target_rules_unit_id == selected_rules_unit_id
 
 
 def _generic_effect_waaagh_gate_applies(
