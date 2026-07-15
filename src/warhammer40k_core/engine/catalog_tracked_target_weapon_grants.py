@@ -9,13 +9,13 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfileError,
     weapon_keyword_from_token,
 )
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.faction_content.bundle_validation import validate_identifier
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
 from warhammer40k_core.engine.tracked_targets import TrackedTargetOwnerScope, TrackedTargetRole
-from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
@@ -221,11 +221,12 @@ def tracked_target_weapon_grant_applies(
     return record is not None and record.target_unit_instance_id == target_unit_instance_id
 
 
-def catalog_weapon_grant_source_army_and_unit(
+def catalog_weapon_grant_source_index_and_rules_unit(
     *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
     context: WeaponProfileModifierContext,
-) -> tuple[ArmyDefinition, UnitInstance]:
+) -> tuple[AbilityCatalogIndex, RulesUnitView]:
     requested_unit_id = context.attacking_unit_instance_id
     if not any(
         requested_unit_id == unit.unit_instance_id
@@ -242,12 +243,14 @@ def catalog_weapon_grant_source_army_and_unit(
         state=context.state,
         unit_instance_id=requested_unit_id,
     )
-    component_unit_id = rules_unit.component_unit_id_for_model(context.attacker_model_instance_id)
+    rules_unit.component_unit_id_for_model(context.attacker_model_instance_id)
     for army in armies:
-        for unit in army.units:
-            if unit.unit_instance_id == component_unit_id:
-                return army, unit
-    raise GameLifecycleError("Catalog weapon keyword grant source unit is unknown.")
+        if army.player_id == rules_unit.owner_player_id:
+            index = ability_indexes_by_player_id.get(army.player_id)
+            if index is None:
+                raise GameLifecycleError("Catalog weapon keyword grant index is missing player.")
+            return index, rules_unit
+    raise GameLifecycleError("Catalog weapon keyword grant source army is unknown.")
 
 
 def _weapon_scope_from_token(value: object) -> str:

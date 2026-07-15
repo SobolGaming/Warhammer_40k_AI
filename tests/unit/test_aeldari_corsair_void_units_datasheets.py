@@ -32,6 +32,7 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
     catalog_ability_records_from_catalog,
@@ -74,7 +75,8 @@ from warhammer40k_core.engine.tracked_targets import (
     TrackedTargetRole,
     apply_select_tracked_target_decision,
 )
-from warhammer40k_core.engine.unit_factory import UnitFactory
+from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
+from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation_composition import (
     allows_zero_models_from_row,
@@ -913,6 +915,48 @@ def test_piratical_raiders_uses_setup_decision_and_target_gated_weapon_grants() 
     assert WeaponKeyword.PRECISION in modified.keywords
     assert unchanged == profile
 
+    piratical_indexes = {
+        "player-a": AbilityCatalogIndex.from_records(
+            tuple(
+                record
+                for record in indexes["player-a"].all_records()
+                if record.definition.source_id == piratical_source_rule_id
+            )
+        ),
+        "player-b": AbilityCatalogIndex.from_records(()),
+    }
+    tracked_runtime = CatalogTrackedTargetRuntime(piratical_indexes, armies)
+    assert len(tracked_runtime.unit_destroyed_bindings()) == 1
+    assert battle_state.battlefield_state is not None
+    battle_state.battlefield_state = battle_state.battlefield_state.with_removed_models(
+        voidreavers.own_model_ids()
+    )
+    current_phase = battle_state.current_battle_phase
+    assert current_phase is not None
+    expiration_decisions = DecisionController()
+    tracked_runtime.unit_destroyed_handler(
+        UnitDestroyedContext(
+            state=battle_state,
+            decisions=expiration_decisions,
+            completed_phase=current_phase,
+            model_destroyed_event_id="event:piratical-target-destroyed",
+            model_destroyed_payload={
+                "game_id": battle_state.game_id,
+                "battle_round": battle_state.battle_round,
+                "active_player_id": battle_state.active_player_id,
+                "phase": current_phase.value,
+                "destroying_player_id": "player-a",
+                "target_unit_instance_id": voidreavers.unit_instance_id,
+                "model_instance_id": voidreavers.own_models[0].model_instance_id,
+            },
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=voidreavers.unit_instance_id,
+            destroyed_player_id="player-b",
+        )
+    )
+    assert not battle_state.tracked_target_records[0].active
+    assert expiration_decisions.queue.pending_requests == ()
+
 
 def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> None:
     package = _ability_support_catalog_package()
@@ -1049,9 +1093,12 @@ def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> No
         )
         == tracked_target
     )
-    assert setup_state.tracked_targets_for_destroyed_unit(
-        destroyed_unit_instance_id=target_leader.unit_instance_id
-    ) == (tracked_target,)
+    assert (
+        setup_state.tracked_targets_for_destroyed_unit(
+            destroyed_unit_instance_id=target_leader.unit_instance_id
+        )
+        == ()
+    )
 
     battle_state = _battle_state(armies)
     battle_state.record_tracked_target(tracked_target)
@@ -1081,6 +1128,102 @@ def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> No
             replace(context, target_unit_instance_id=unrelated.unit_instance_id)
         )
         == profile
+    )
+
+    leader_model = source_leader.own_models[0]
+    leader_profile = next(
+        weapon_profile
+        for wargear in catalog.wargear
+        if wargear.wargear_id in leader_model.wargear_ids
+        for weapon_profile in wargear.weapon_profiles
+    )
+    leader_context = replace(
+        context,
+        attacker_model_instance_id=leader_model.model_instance_id,
+        weapon_profile=leader_profile,
+    )
+    leader_modified = runtime.weapon_profile_modifier(leader_context)
+    assert WeaponKeyword.LETHAL_HITS in leader_modified.keywords
+    assert WeaponKeyword.PRECISION in leader_modified.keywords
+    assert (
+        runtime.weapon_profile_modifier(
+            replace(leader_context, target_unit_instance_id=unrelated.unit_instance_id)
+        )
+        == leader_profile
+    )
+
+    source_destroyed_state = _battle_state(armies)
+    source_destroyed_state.record_tracked_target(tracked_target)
+    assert source_destroyed_state.battlefield_state is not None
+    source_destroyed_state.battlefield_state = (
+        source_destroyed_state.battlefield_state.with_removed_models(source.own_model_ids())
+    )
+    assert (
+        runtime.weapon_profile_modifier(replace(leader_context, state=source_destroyed_state))
+        == leader_profile
+    )
+
+    tracked_runtime = CatalogTrackedTargetRuntime(indexes, armies)
+    target_expiration_decisions = DecisionController()
+    current_phase = battle_state.current_battle_phase
+    assert current_phase is not None
+
+    def destroyed_context(*, unit: UnitInstance, event_id: str) -> UnitDestroyedContext:
+        return UnitDestroyedContext(
+            state=battle_state,
+            decisions=target_expiration_decisions,
+            completed_phase=current_phase,
+            model_destroyed_event_id=event_id,
+            model_destroyed_payload={
+                "game_id": battle_state.game_id,
+                "battle_round": battle_state.battle_round,
+                "active_player_id": battle_state.active_player_id,
+                "phase": current_phase.value,
+                "destroying_player_id": "player-a",
+                "target_unit_instance_id": unit.unit_instance_id,
+                "model_instance_id": unit.own_models[0].model_instance_id,
+            },
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=unit.unit_instance_id,
+            destroyed_player_id="player-b",
+        )
+
+    assert battle_state.battlefield_state is not None
+    battle_state.battlefield_state = battle_state.battlefield_state.with_removed_models(
+        target_leader.own_model_ids()
+    )
+    tracked_runtime.unit_destroyed_handler(
+        destroyed_context(unit=target_leader, event_id="event:target-leader-destroyed")
+    )
+    assert battle_state.tracked_target_records[0].active
+    assert (
+        battle_state.tracked_targets_for_destroyed_unit(
+            destroyed_unit_instance_id=target_leader.unit_instance_id
+        )
+        == ()
+    )
+
+    battle_state.battlefield_state = battle_state.battlefield_state.with_removed_models(
+        target.own_model_ids()
+    )
+    tracked_runtime.unit_destroyed_handler(
+        destroyed_context(unit=target, event_id="event:target-bodyguard-destroyed")
+    )
+    tracked_runtime.unit_destroyed_handler(
+        destroyed_context(unit=target_leader, event_id="event:target-leader-destroyed-again")
+    )
+    expired_record = next(
+        record
+        for record in battle_state.tracked_target_records
+        if record.record_id == tracked_target.record_id
+    )
+    assert not expired_record.active
+    assert (
+        sum(
+            record.event_type == "tracked_target_expired"
+            for record in target_expiration_decisions.event_log.records
+        )
+        == 1
     )
 
 

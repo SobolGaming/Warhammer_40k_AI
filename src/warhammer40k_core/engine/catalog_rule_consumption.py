@@ -63,7 +63,7 @@ from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
     CatalogWeaponKeywordGrant as CatalogWeaponKeywordGrant,
 )
 from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
-    catalog_weapon_grant_source_army_and_unit,
+    catalog_weapon_grant_source_index_and_rules_unit,
     clause_is_tracked_target_weapon_grant,
     tracked_target_weapon_grant_applies,
     tracked_target_weapon_grant_from_clause,
@@ -847,19 +847,25 @@ class CatalogWeaponKeywordGrantRuntime:
     def weapon_profile_modifier(self, context: WeaponProfileModifierContext) -> WeaponProfile:
         if type(context) is not WeaponProfileModifierContext:
             raise GameLifecycleError("Catalog weapon keyword grant requires context.")
-        army, unit = catalog_weapon_grant_source_army_and_unit(
+        index, rules_unit = catalog_weapon_grant_source_index_and_rules_unit(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
             armies=self.armies,
             context=context,
         )
-        index = self.ability_indexes_by_player_id.get(army.player_id)
-        if index is None:
-            raise GameLifecycleError("Catalog weapon keyword grant index is missing player.")
-        current_model_ids = _current_model_instance_ids_for_unit(state=context.state, unit=unit)
-        grants = catalog_weapon_keyword_grants_for_unit(
-            ability_index=index,
-            unit=unit,
-            current_model_instance_ids=current_model_ids,
-        )
+        grants: list[CatalogWeaponKeywordGrant] = []
+        for component in rules_unit.components:
+            current_model_ids = _current_placed_alive_model_instance_ids_for_unit(
+                state=context.state, unit=component.unit
+            )
+            if not current_model_ids:
+                continue
+            grants.extend(
+                catalog_weapon_keyword_grants_for_unit(
+                    ability_index=index,
+                    unit=component.unit,
+                    current_model_instance_ids=current_model_ids,
+                )
+            )
         profile = context.weapon_profile
         for grant in grants:
             if not tracked_target_weapon_grant_applies(context=context, grant=grant):

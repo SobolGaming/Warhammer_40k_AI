@@ -3085,6 +3085,7 @@ class GameState:
             armies=tuple(self.army_definitions),
             records=self.tracked_target_records,
             destroyed_unit_instance_id=destroyed_unit_instance_id,
+            destroyed_rules_unit_instance_ids=self._destroyed_unit_instance_ids(),
         )
 
     def record_pending_return_on_death(self, pending: PendingReturnOnDeath) -> None:

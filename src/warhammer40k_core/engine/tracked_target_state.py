@@ -108,6 +108,7 @@ def tracked_targets_for_destroyed_unit(
     armies: tuple[ArmyDefinition, ...],
     records: list[TrackedTargetRecord],
     destroyed_unit_instance_id: str,
+    destroyed_rules_unit_instance_ids: set[str],
 ) -> tuple[TrackedTargetRecord, ...]:
     requested_unit = _validate_identifier(
         "destroyed_unit_instance_id",
@@ -117,6 +118,8 @@ def tracked_targets_for_destroyed_unit(
         armies=armies,
         unit_instance_id=requested_unit,
     )
+    if destroyed_rules_unit_id not in destroyed_rules_unit_instance_ids:
+        return ()
     return tuple(
         sorted(
             (

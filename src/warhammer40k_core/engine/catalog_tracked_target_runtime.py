@@ -90,7 +90,7 @@ class CatalogTrackedTargetRuntime:
         )
 
     def unit_destroyed_bindings(self) -> tuple[UnitDestroyedHookBinding, ...]:
-        if not _has_tracked_target_reselection_records(
+        if not _has_until_destroyed_tracked_target_selection_records(
             ability_indexes_by_player_id=self.ability_indexes_by_player_id
         ):
             return ()
@@ -336,6 +336,8 @@ def _tracked_target_reselection_request(
         if not current_model_ids:
             continue
         for record in index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED):
+            if record.definition.source_id != expired_record.source_rule_id:
+                continue
             if not catalog_rule_record_source_matches_unit(
                 record=record,
                 unit=unit,
@@ -584,26 +586,19 @@ def _has_start_battle_tracked_target_selection_records(
     )
 
 
-def _has_tracked_target_reselection_records(
+def _has_until_destroyed_tracked_target_selection_records(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> bool:
     return any(
-        _record_has_supported_tracked_target_reselection(record)
+        _record_has_supported_tracked_target_selection(record)
         for index in ability_indexes_by_player_id.values()
-        for record in index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED)
+        for record in index.all_records()
     )
 
 
 def _record_has_supported_tracked_target_selection(record: AbilityCatalogRecord) -> bool:
-    return any(
+    return record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID and any(
         catalog_rule_clause_is_supported_tracked_target_selection(clause)
-        for clause in catalog_rule_clauses_from_record(record)
-    )
-
-
-def _record_has_supported_tracked_target_reselection(record: AbilityCatalogRecord) -> bool:
-    return any(
-        catalog_rule_clause_is_supported_tracked_target_destroyed_reselect(clause)
         for clause in catalog_rule_clauses_from_record(record)
     )
