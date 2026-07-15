@@ -34,6 +34,7 @@ from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_weapon_ability_granted_profile,
     rule_ir_weapon_selector_applies,
 )
+from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     DamageRollModifierContext,
@@ -1370,19 +1371,19 @@ def _conditional_save_reroll_payload(
 
 def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR keyword gate requires GameState.")
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    requested_keyword = _canonical_keyword(_validate_identifier("keyword", keyword))
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id != requested_unit_id:
-                continue
-            return requested_keyword in {
-                _canonical_keyword(stored) for stored in (*unit.keywords, *unit.faction_keywords)
-            }
-    raise GameLifecycleError("Generic RuleIR keyword gate unit is unknown.")
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
+    )
+    return unit_has_required_keywords(
+        unit_keywords=rules_unit.keywords,
+        faction_keywords=rules_unit.faction_keywords,
+        required_keywords=(_validate_identifier("keyword", keyword),),
+    )
 
 
 def _keyword_sequence_parameter(value: object) -> tuple[str, ...]:
@@ -1400,10 +1401,6 @@ def _keyword_sequence_parameter(value: object) -> tuple[str, ...]:
     if not keywords:
         raise GameLifecycleError("Generic RuleIR required_keyword_sequence must not be empty.")
     return tuple(keywords)
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().upper().replace("_", " ").replace("-", " ")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

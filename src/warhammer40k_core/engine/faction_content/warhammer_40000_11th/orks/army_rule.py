@@ -252,12 +252,20 @@ def waaagh_active_for_player(state: GameState, *, player_id: str) -> bool:
 
 def waaagh_is_active_for_unit(state: GameState, *, unit_instance_id: str) -> bool:
     _validate_game_state(state)
-    unit, army = _unit_and_army_by_id(state, unit_instance_id=unit_instance_id)
-    if not _unit_has_waaagh(unit):
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
+    )
+    if not any(_unit_has_waaagh(component.unit) for component in rules_unit.components):
         return False
     return bool(
-        _active_waaagh_effects_for_player(state, player_id=army.player_id)
-        or _active_generic_waaagh_effects_for_unit(state, unit_instance_id=unit_instance_id)
+        _active_waaagh_effects_for_player(state, player_id=rules_unit.owner_player_id)
+        or _active_generic_waaagh_effects_for_unit(
+            state,
+            unit_instance_id=rules_unit.unit_instance_id,
+        )
     )
 
 

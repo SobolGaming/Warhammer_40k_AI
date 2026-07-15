@@ -27,6 +27,7 @@ from warhammer40k_core.engine.list_validation import (
     WargearSelection,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.runtime_modifiers import (
     DamageRollModifierContext,
     HitRollMinimumUnmodifiedSuccessContext,
@@ -42,6 +43,7 @@ from warhammer40k_core.engine.source_backed_rerolls import (
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
+from warhammer40k_core.geometry.pose import Pose
 
 
 def test_ws14_generic_attack_roll_hooks_bind_attacker_and_target_roles() -> None:
@@ -445,6 +447,266 @@ def test_ws14_attacker_scoped_generic_hooks_use_canonical_attached_rules_unit() 
         assert reroll_context.permission.eligible_roll_type == "attack_sequence.hit"
 
 
+def test_ws14_attached_attacker_conditions_use_rules_unit_ownership_and_keywords() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    bodyguard, leader, formation = _attached_units(catalog)
+    leader = replace(leader, keywords=(*leader.keywords, "LEADER_GATE"))
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender")
+    state = _state(
+        _attached_army(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-a",
+            units=(bodyguard, leader),
+            formation=formation,
+        ),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:attached-allegiance-keyword",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(formation.attached_unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={
+                "roll_type": "hit",
+                "delta": 1,
+                "attack_role": "attacker",
+                "target_allegiance": "enemy",
+                "required_keyword": "LEADER_GATE",
+            },
+        )
+    )
+
+    assert (
+        _hit_modifier(
+            catalog=catalog,
+            state=state,
+            attacker=bodyguard,
+            target=defender,
+        )
+        == 1
+    )
+
+
+def test_ws14_attached_target_proximity_uses_keywords_and_geometry_from_all_components() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    bodyguard, leader, formation = _attached_units(catalog)
+    leader = replace(leader, keywords=(*leader.keywords, "PROXIMITY_GATE"))
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender")
+    armies = (
+        _attached_army(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-a",
+            units=(bodyguard, leader),
+            formation=formation,
+        ),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    state = _state(*armies)
+    _place_armies(state, armies=armies)
+    _move_unit_to(state, unit_instance_id=bodyguard.unit_instance_id, x=40.0, y=40.0)
+    _move_unit_to(state, unit_instance_id=leader.unit_instance_id, x=10.0, y=10.0)
+    _move_unit_to(state, unit_instance_id=defender.unit_instance_id, x=12.0, y=10.0)
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:attached-target-proximity",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(formation.attached_unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={
+                "roll_type": "hit",
+                "delta": 1,
+                "attack_role": "attacker",
+                "target_proximity_distance_inches": 3,
+                "target_proximity_required_keyword_sequence": ["PROXIMITY_GATE"],
+                "target_proximity_unit_allegiance": "friendly",
+            },
+        )
+    )
+
+    assert (
+        _hit_modifier(
+            catalog=catalog,
+            state=state,
+            attacker=bodyguard,
+            target=defender,
+        )
+        == 1
+    )
+
+
+def test_ws14_attached_attacker_closest_target_constraint_uses_rules_unit_geometry() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    bodyguard, leader, formation = _attached_units(catalog)
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender")
+    farther_enemy = _unit(catalog=catalog, army_id="army-b", unit_selection_id="farther-enemy")
+    enemy_army = replace(
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+        units=(defender, farther_enemy),
+    )
+    armies = (
+        _attached_army(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-a",
+            units=(bodyguard, leader),
+            formation=formation,
+        ),
+        enemy_army,
+    )
+    state = _state(*armies)
+    _place_armies(state, armies=armies)
+    _move_unit_to(state, unit_instance_id=bodyguard.unit_instance_id, x=40.0, y=40.0)
+    _move_unit_to(state, unit_instance_id=leader.unit_instance_id, x=10.0, y=10.0)
+    _move_unit_to(state, unit_instance_id=defender.unit_instance_id, x=15.0, y=10.0)
+    _move_unit_to(state, unit_instance_id=farther_enemy.unit_instance_id, x=25.0, y=10.0)
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:attached-closest-target",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(formation.attached_unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={
+                "roll_type": "hit",
+                "delta": 1,
+                "attack_role": "attacker",
+                "target_constraint": "closest_eligible_target_within_18",
+            },
+        )
+    )
+
+    assert (
+        _hit_modifier(
+            catalog=catalog,
+            state=state,
+            attacker=bodyguard,
+            target=defender,
+        )
+        == 1
+    )
+    assert (
+        _hit_modifier(
+            catalog=catalog,
+            state=state,
+            attacker=bodyguard,
+            target=farther_enemy,
+        )
+        == 0
+    )
+
+
+def test_ws14_attached_target_half_strength_uses_complete_rules_unit_strength() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker")
+    bodyguard, leader, formation = _attached_units(catalog, army_id="army-b")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _attached_army(
+            catalog=catalog,
+            player_id="player-b",
+            army_id="army-b",
+            units=(bodyguard, leader),
+            formation=formation,
+        ),
+    )
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:attached-target-half-strength",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={
+                "roll_type": "hit",
+                "delta": 1,
+                "attack_role": "attacker",
+                "target_constraint": "target_not_below_half_strength",
+            },
+        )
+    )
+
+    assert (
+        _hit_modifier(
+            catalog=catalog,
+            state=state,
+            attacker=attacker,
+            target=bodyguard,
+        )
+        == 1
+    )
+    _replace_unit(state, _unit_with_model_wounds(bodyguard, wounds_remaining=0))
+    assert (
+        _hit_modifier(
+            catalog=catalog,
+            state=state,
+            attacker=attacker,
+            target=leader,
+        )
+        == 1
+    )
+    _replace_unit(state, _unit_with_model_wounds(leader, wounds_remaining=0))
+    assert (
+        _hit_modifier(
+            catalog=catalog,
+            state=state,
+            attacker=attacker,
+            target=leader,
+        )
+        == 0
+    )
+
+
+def test_ws14_attached_this_model_effect_does_not_leak_between_components() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    bodyguard, leader, formation = _attached_units(catalog)
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender")
+    state = _state(
+        _attached_army(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-a",
+            units=(bodyguard, leader),
+            formation=formation,
+        ),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:attached-this-model",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(formation.attached_unit_instance_id,),
+            target_kind="this_model",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "hit", "delta": 1, "attack_role": "attacker"},
+            source_model_instance_id=leader.own_models[0].model_instance_id,
+        )
+    )
+
+    assert (
+        _hit_modifier(
+            catalog=catalog,
+            state=state,
+            attacker=leader,
+            target=defender,
+        )
+        == 1
+    )
+    assert (
+        _hit_modifier(
+            catalog=catalog,
+            state=state,
+            attacker=bodyguard,
+            target=defender,
+        )
+        == 0
+    )
+
+
 def test_ws14_generic_attack_hooks_observe_persisting_effect_expiry() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
@@ -780,6 +1042,34 @@ def _attached_army(
     )
 
 
+def _attached_units(
+    catalog: ArmyCatalog,
+    *,
+    army_id: str = "army-a",
+) -> tuple[UnitInstance, UnitInstance, AttachedUnitFormation]:
+    bodyguard = _unit(
+        catalog=catalog,
+        army_id=army_id,
+        unit_selection_id="bodyguard",
+    )
+    leader = _unit(
+        catalog=catalog,
+        army_id=army_id,
+        unit_selection_id="leader",
+    )
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=f"attached-unit:{army_id}:bodyguard-leader",
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="ws14:attached-rules-unit",
+        attachment_source_ids=("ws14:leader-attachment",),
+    )
+    return bodyguard, leader, formation
+
+
 def _state(*armies: ArmyDefinition) -> GameState:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     state = GameState(
@@ -799,6 +1089,57 @@ def _state(*armies: ArmyDefinition) -> GameState:
     for army in armies:
         state.record_army_definition(army)
     return state
+
+
+def _place_armies(state: GameState, *, armies: tuple[ArmyDefinition, ...]) -> None:
+    state.battlefield_state = create_deterministic_battlefield_scenario(
+        battlefield_id="ws14-attack-hooks-battlefield",
+        armies=armies,
+    ).battlefield_state
+
+
+def _move_unit_to(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    x: float,
+    y: float,
+) -> None:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Expected battlefield_state.")
+    placement = battlefield.unit_placement_by_id(unit_instance_id)
+    state.replace_battlefield_state(
+        battlefield.with_unit_placement(
+            replace(
+                placement,
+                model_placements=tuple(
+                    replace(model_placement, pose=Pose.at(x=x, y=y))
+                    for model_placement in placement.model_placements
+                ),
+            )
+        )
+    )
+
+
+def _hit_modifier(
+    *,
+    catalog: ArmyCatalog,
+    state: GameState,
+    attacker: UnitInstance,
+    target: UnitInstance,
+) -> int:
+    model = attacker.own_models[0]
+    return RuntimeModifierRegistry.empty().hit_roll_modifier(
+        HitRollModifierContext(
+            state=state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attacker_model_instance_id=model.model_instance_id,
+            target_unit_instance_id=target.unit_instance_id,
+            weapon_profile=_weapon_profile(catalog, model.wargear_ids[0]),
+        )
+    )
 
 
 def _weapon_profile(catalog: ArmyCatalog, wargear_id: str) -> WeaponProfile:
