@@ -129,10 +129,13 @@ class CatalogTrackedTargetRuntime:
     def unit_destroyed_handler(self, context: UnitDestroyedContext) -> None:
         if context.decisions.queue.pending_requests:
             return
-        for record in context.state.tracked_targets_for_destroyed_unit(
+        matching_records = context.state.tracked_targets_for_destroyed_unit(
             destroyed_unit_instance_id=context.destroyed_unit_instance_id
-        ):
-            expired = context.state.expire_tracked_target(record.record_id)
+        )
+        expired_records = tuple(
+            context.state.expire_tracked_target(record.record_id) for record in matching_records
+        )
+        for expired_record in expired_records:
             context.decisions.event_log.append(
                 TRACKED_TARGET_EXPIRED_EVENT_TYPE,
                 {
@@ -141,18 +144,18 @@ class CatalogTrackedTargetRuntime:
                     "phase": context.completed_phase.value,
                     "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
                     "model_destroyed_event_id": context.model_destroyed_event_id,
-                    "tracked_target_record": expired.to_payload(),
+                    "tracked_target_record": expired_record.to_payload(),
                 },
             )
+        for expired_record in expired_records:
             request = _tracked_target_reselection_request(
                 ability_indexes_by_player_id=self.ability_indexes_by_player_id,
                 armies=self.armies,
                 context=context,
-                expired_record=expired,
+                expired_record=expired_record,
             )
             if request is not None:
                 context.decisions.request_decision(request)
-                return
 
 
 def catalog_tracked_target_battle_round_start_hook_bindings(
