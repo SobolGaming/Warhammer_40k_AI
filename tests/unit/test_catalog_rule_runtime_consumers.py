@@ -3923,7 +3923,7 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
             selection_clause=distance_selection,
             explicit_target_unit_ids=None,
         )
-    assert (
+    with pytest.raises(GameLifecycleError, match="Rules unit_instance_id is unknown"):
         eligible_selection_target_unit_ids(
             state=state,
             source_player_id=source_army.player_id,
@@ -3932,8 +3932,6 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
             selection_clause=distance_selection,
             explicit_target_unit_ids=("other-target",),
         )
-        == ()
-    )
     assert (
         selection_source_model_ids(
             selection_clause=distance_selection,
@@ -4012,6 +4010,32 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
             target_models=(),
             parameters={"range_kind": "numeric_range"},
         )
+
+
+def test_catalog_selected_target_explicit_component_id_canonicalizes_attached_target() -> None:
+    attached_target_army, source_army = _mustered_attached_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    target_component = attached_target_army.units[0]
+    attached_target_id = attached_target_army.attached_units[0].attached_unit_instance_id
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="catalog-selected-target-explicit-attached-component",
+        armies=(source_army, attached_target_army),
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, attached_target_army),
+        battlefield=scenario.battlefield_state,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+
+    assert eligible_selection_target_unit_ids(
+        state=state,
+        source_player_id=source_army.player_id,
+        source_unit_instance_id=source_unit.unit_instance_id,
+        source_model_instance_id=None,
+        selection_clause=_fight_start_selection_clause(),
+        explicit_target_unit_ids=(target_component.unit_instance_id,),
+    ) == (attached_target_id,)
 
 
 def test_catalog_selected_target_visibility_gate_uses_real_line_of_sight() -> None:
