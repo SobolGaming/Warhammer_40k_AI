@@ -25,6 +25,10 @@ from warhammer40k_core.engine.reserves import (
     LargeModelReservePlacementException,
     LargeModelReservePlacementExceptionPayload,
 )
+from warhammer40k_core.engine.rules_unit_placement import (
+    RulesUnitPlacement,
+    RulesUnitPlacementPayload,
+)
 from warhammer40k_core.engine.transports import (
     DisembarkModeKind,
     TransportMovementStatus,
@@ -111,7 +115,8 @@ class PlacementProposalPayloadPayload(TypedDict):
     proposal_kind: str
     unit_instance_id: str
     placement_kind: str
-    attempted_placement: UnitPlacementPayload
+    attempted_placement: NotRequired[UnitPlacementPayload]
+    attempted_rules_unit_placement: NotRequired[RulesUnitPlacementPayload]
     large_model_exceptions: NotRequired[list[LargeModelReservePlacementExceptionPayload]]
     transport_unit_instance_id: NotRequired[str]
     disembark_mode: NotRequired[str]
@@ -584,7 +589,8 @@ class PlacementProposalPayload:
     proposal_kind: ProposalKind
     unit_instance_id: str
     placement_kind: BattlefieldPlacementKind
-    attempted_placement: UnitPlacement
+    attempted_placement: UnitPlacement | None = None
+    attempted_rules_unit_placement: RulesUnitPlacement | None = None
     large_model_exceptions: tuple[LargeModelReservePlacementException, ...] = ()
     transport_unit_instance_id: str | None = None
     disembark_mode: DisembarkModeKind | None = None
@@ -618,12 +624,27 @@ class PlacementProposalPayload:
             "placement_kind",
             battlefield_placement_kind_from_token(self.placement_kind),
         )
-        if type(self.attempted_placement) is not UnitPlacement:
+        if (self.attempted_placement is None) == (self.attempted_rules_unit_placement is None):
             raise GameLifecycleError(
-                "PlacementProposalPayload attempted_placement must be a UnitPlacement."
+                "PlacementProposalPayload requires exactly one attempted placement shape."
             )
-        if self.attempted_placement.unit_instance_id != self.unit_instance_id:
-            raise GameLifecycleError("PlacementProposalPayload attempted_placement unit drift.")
+        if self.attempted_placement is not None:
+            if type(self.attempted_placement) is not UnitPlacement:
+                raise GameLifecycleError(
+                    "PlacementProposalPayload attempted_placement must be a UnitPlacement."
+                )
+            if self.attempted_placement.unit_instance_id != self.unit_instance_id:
+                raise GameLifecycleError("PlacementProposalPayload attempted_placement unit drift.")
+        if self.attempted_rules_unit_placement is not None:
+            if type(self.attempted_rules_unit_placement) is not RulesUnitPlacement:
+                raise GameLifecycleError(
+                    "PlacementProposalPayload attempted_rules_unit_placement must be a "
+                    "RulesUnitPlacement."
+                )
+            if self.attempted_rules_unit_placement.rules_unit_instance_id != self.unit_instance_id:
+                raise GameLifecycleError(
+                    "PlacementProposalPayload attempted_rules_unit_placement unit drift."
+                )
         object.__setattr__(
             self,
             "large_model_exceptions",
@@ -700,6 +721,32 @@ class PlacementProposalPayload:
                 message="Placement kind is not allowed by the pending request.",
                 field="placement_kind",
             )
+        rules_unit_placement = self.resolved_rules_unit_placement()
+        component_result = _placement_proposal_identifier_list_match(
+            request=request,
+            submitted_values=rules_unit_placement.component_unit_instance_ids,
+            context_key="component_unit_instance_ids",
+            violation_code="proposal_component_unit_drift",
+            message=("Placement proposal components do not match the pending rules-unit request."),
+            field="attempted_rules_unit_placement",
+        )
+        if component_result is not None:
+            return component_result
+        model_result = _placement_proposal_identifier_list_match(
+            request=request,
+            submitted_values=tuple(
+                sorted(
+                    placement.model_instance_id
+                    for placement in rules_unit_placement.model_placements
+                )
+            ),
+            context_key="model_instance_ids",
+            violation_code="proposal_model_set_drift",
+            message=("Placement proposal models do not match the pending rules-unit request."),
+            field="attempted_rules_unit_placement",
+        )
+        if model_result is not None:
+            return model_result
         disembark_mode_result = _placement_proposal_disembark_mode_match(
             request=request,
             submitted_value=None if self.disembark_mode is None else self.disembark_mode.value,
@@ -724,14 +771,31 @@ class PlacementProposalPayload:
             proposal_kind=request.proposal_kind,
         )
 
+    def resolved_rules_unit_placement(self) -> RulesUnitPlacement:
+        if self.attempted_rules_unit_placement is not None:
+            return self.attempted_rules_unit_placement
+        if self.attempted_placement is None:
+            raise GameLifecycleError("Placement proposal has no attempted placement.")
+        return RulesUnitPlacement.single(self.attempted_placement)
+
+    def require_unit_placement(self) -> UnitPlacement:
+        if self.attempted_placement is None:
+            raise GameLifecycleError("Placement proposal requires a physical UnitPlacement.")
+        return self.attempted_placement
+
     def to_payload(self) -> PlacementProposalPayloadPayload:
         payload: PlacementProposalPayloadPayload = {
             "proposal_request_id": self.proposal_request_id,
             "proposal_kind": self.proposal_kind.value,
             "unit_instance_id": self.unit_instance_id,
             "placement_kind": self.placement_kind.value,
-            "attempted_placement": self.attempted_placement.to_payload(),
         }
+        if self.attempted_placement is not None:
+            payload["attempted_placement"] = self.attempted_placement.to_payload()
+        if self.attempted_rules_unit_placement is not None:
+            payload["attempted_rules_unit_placement"] = (
+                self.attempted_rules_unit_placement.to_payload()
+            )
         if self.large_model_exceptions:
             payload["large_model_exceptions"] = [
                 exception.to_payload() for exception in self.large_model_exceptions
@@ -754,12 +818,29 @@ class PlacementProposalPayload:
         disembark_mode_payload = payload.get("disembark_mode")
         movement_status_payload = payload.get("transport_movement_status")
         overrides_payload = payload.get("restriction_overrides")
+        has_placement = "attempted_placement" in payload
+        has_rules_unit_placement = "attempted_rules_unit_placement" in payload
+        if not has_placement and not has_rules_unit_placement:
+            raise KeyError("attempted_placement")
+        if has_placement and has_rules_unit_placement:
+            raise GameLifecycleError(
+                "PlacementProposalPayload requires exactly one attempted placement payload."
+            )
+        placement_payload = payload.get("attempted_placement")
+        rules_unit_placement_payload = payload.get("attempted_rules_unit_placement")
         return cls(
             proposal_request_id=payload["proposal_request_id"],
             proposal_kind=proposal_kind_from_token(payload["proposal_kind"]),
             unit_instance_id=payload["unit_instance_id"],
             placement_kind=battlefield_placement_kind_from_token(payload["placement_kind"]),
-            attempted_placement=UnitPlacement.from_payload(payload["attempted_placement"]),
+            attempted_placement=(
+                None if placement_payload is None else UnitPlacement.from_payload(placement_payload)
+            ),
+            attempted_rules_unit_placement=(
+                None
+                if rules_unit_placement_payload is None
+                else RulesUnitPlacement.from_payload(rules_unit_placement_payload)
+            ),
             large_model_exceptions=()
             if large_exceptions_payload is None
             else tuple(
@@ -862,6 +943,39 @@ def _placement_proposal_context_match(
             violation_code=violation_code,
             message=message,
             field=context_key,
+        )
+    return None
+
+
+def _placement_proposal_identifier_list_match(
+    *,
+    request: MovementProposalRequest,
+    submitted_values: tuple[str, ...],
+    context_key: str,
+    violation_code: str,
+    message: str,
+    field: str,
+) -> ProposalValidationResult | None:
+    context = request.context or {}
+    expected = context.get(context_key)
+    if expected is None:
+        return None
+    if not isinstance(expected, list):
+        raise GameLifecycleError(f"Placement proposal context {context_key} must be a list.")
+    expected_values: list[str] = []
+    for value in expected:
+        if type(value) is not str:
+            raise GameLifecycleError(
+                f"Placement proposal context {context_key} must contain strings."
+            )
+        expected_values.append(_validate_identifier(context_key, value))
+    if tuple(sorted(expected_values)) != tuple(sorted(submitted_values)):
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code=violation_code,
+            message=message,
+            field=field,
         )
     return None
 

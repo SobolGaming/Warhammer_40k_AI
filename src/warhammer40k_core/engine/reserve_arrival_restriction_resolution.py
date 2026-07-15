@@ -3,7 +3,6 @@ from __future__ import annotations
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
-    UnitPlacement,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserve_arrival_hooks import (
@@ -15,7 +14,8 @@ from warhammer40k_core.engine.reserves import (
     ReservePlacementViolationCode,
     ReserveState,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import RulesUnitView
 
 
 def reserve_arrival_restriction_violations(
@@ -23,8 +23,8 @@ def reserve_arrival_restriction_violations(
     state: object,
     scenario: BattlefieldScenario,
     reserve_state: ReserveState,
-    unit: UnitInstance,
-    attempted_placement: UnitPlacement,
+    rules_unit: RulesUnitView,
+    attempted_rules_unit_placement: RulesUnitPlacement,
     placement_kind: BattlefieldPlacementKind,
     registry: ReserveArrivalRestrictionHookRegistry,
 ) -> tuple[ReservePlacementViolation, ...]:
@@ -39,8 +39,8 @@ def reserve_arrival_restriction_violations(
             state=state,
             scenario=scenario,
             reserve_state=reserve_state,
-            unit=unit,
-            attempted_placement=attempted_placement,
+            rules_unit=rules_unit,
+            attempted_rules_unit_placement=attempted_rules_unit_placement,
             placement_kind=placement_kind,
         )
     )

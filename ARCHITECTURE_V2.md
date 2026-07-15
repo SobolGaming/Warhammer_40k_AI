@@ -871,6 +871,7 @@ Required tests:
 - Movement phase offers legal Ingress Move choices during Move Units;
 - Deep Strike Ingress placement uses `BattlefieldPlacementKind.DEEP_STRIKE`;
 - Strategic Reserves placement uses `BattlefieldPlacementKind.STRATEGIC_RESERVES`;
+- attached rules units use one canonical reserve state and one grouped arrival candidate containing every physical component; validation flattens all alive models for battlefield legality and coherency, then adds every component atomically;
 - illegal reserve placement fails without mutating state;
 - reserve placement validates coherency and Engagement Range setup restriction;
 - reserve placement validates terrain endpoint support;

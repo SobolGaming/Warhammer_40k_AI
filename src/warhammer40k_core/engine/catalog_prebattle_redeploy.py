@@ -23,6 +23,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveOrigin,
     ReserveState,
 )
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_from_armies
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -298,11 +299,7 @@ def catalog_redeploy_selection_options(
                 ),
             )
         )
-        if (
-            permission is None
-            or not permission.allow_strategic_reserves
-            or view.is_attached_rules_unit
-        ):
+        if permission is None or not permission.allow_strategic_reserves:
             continue
         strategic_payload_value = payload_factory(
             state=state,
@@ -371,21 +368,23 @@ def apply_redeploy_to_strategic_reserves(
     )
     if permission is None or permission.source_rule_id != source_rule_id:
         raise GameLifecycleError("Redeploy to Strategic Reserves permission is unavailable.")
-    if view.is_attached_rules_unit:
-        raise GameLifecycleError(
-            "Redeploying an attached rules unit to Strategic Reserves is unsupported."
-        )
-    if state.reserve_state_for_unit(unit_instance_id) is not None:
+    if state.reserve_state_for_unit(view.unit_instance_id) is not None:
         raise GameLifecycleError("Redeployed unit already has a ReserveState.")
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Redeploy to Strategic Reserves requires battlefield_state.")
-    if battlefield.unit_placement_or_none(unit_instance_id) is None:
-        raise GameLifecycleError("Redeployed unit is no longer on the battlefield.")
-    cargo_state = state.transport_cargo_state_for_transport(unit_instance_id)
+    rules_unit_placement = RulesUnitPlacement.from_battlefield(
+        view=view,
+        battlefield_state=battlefield,
+    )
+    embarked_unit_ids: set[str] = set()
+    for component_unit_id in view.component_unit_instance_ids:
+        cargo_state = state.transport_cargo_state_for_transport(component_unit_id)
+        if cargo_state is not None:
+            embarked_unit_ids.update(cargo_state.embarked_unit_instance_ids)
     reserve_state = ReserveState(
         player_id=player_id,
-        unit_instance_id=unit_instance_id,
+        unit_instance_id=view.unit_instance_id,
         reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
         reserve_kind=ReserveKind.STRATEGIC_RESERVES,
         declared_during_step=SetupStep.REDEPLOY_UNITS.value,
@@ -396,18 +395,17 @@ def apply_redeploy_to_strategic_reserves(
         ),
         source_rule_ids=(source_rule_id,),
         points_contribution=points_contribution,
-        embarked_unit_instance_ids=(
-            () if cargo_state is None else cargo_state.embarked_unit_instance_ids
-        ),
+        embarked_unit_instance_ids=tuple(sorted(embarked_unit_ids)),
     )
+    updated_battlefield = rules_unit_placement.without_from_battlefield(battlefield)
     state.record_reserve_state(reserve_state)
-    state.replace_battlefield_state(battlefield.without_unit_placement(unit_instance_id))
+    state.replace_battlefield_state(updated_battlefield)
     event_payload = validate_json_value(
         {
             "game_id": state.game_id,
             "setup_step": SetupStep.REDEPLOY_UNITS.value,
             "player_id": player_id,
-            "unit_instance_id": unit_instance_id,
+            "unit_instance_id": view.unit_instance_id,
             "component_unit_instance_ids": list(view.component_unit_instance_ids),
             "source_rule_id": source_rule_id,
             "ignore_strategic_reserves_limit": True,
@@ -419,7 +417,7 @@ def apply_redeploy_to_strategic_reserves(
         result=result,
         request=request,
         action_kind=PreBattleActionKind.REDEPLOY_TO_STRATEGIC_RESERVES,
-        unit_instance_id=unit_instance_id,
+        unit_instance_id=view.unit_instance_id,
         source_rule_id=source_rule_id,
         payload=event_payload,
     )

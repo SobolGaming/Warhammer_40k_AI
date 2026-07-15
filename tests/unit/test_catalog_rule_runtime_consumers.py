@@ -220,6 +220,8 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
 )
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
@@ -1947,8 +1949,11 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=target_unit,
-        attempted_placement=near_placement,
+        rules_unit=rules_unit_view_from_armies(
+            armies=scenario.armies,
+            unit_instance_id=target_unit.unit_instance_id,
+        ),
+        attempted_rules_unit_placement=RulesUnitPlacement.single(near_placement),
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
     )
     restrictions = registry.restrictions_for(context)
@@ -1971,8 +1976,8 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=target_unit,
-        attempted_placement=near_placement,
+        rules_unit=context.rules_unit,
+        attempted_rules_unit_placement=context.attempted_rules_unit_placement,
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
         registry=registry,
     )
@@ -1999,8 +2004,8 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=target_unit,
-        attempted_placement=exact_placement,
+        rules_unit=context.rules_unit,
+        attempted_rules_unit_placement=RulesUnitPlacement.single(exact_placement),
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
         registry=registry,
     )
@@ -2022,13 +2027,18 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
         placement=outside_placement.model_placements[0],
     )
     assert outside_geometry.range_to(source_geometry) > 12.0
-    assert not registry.restrictions_for(replace(context, attempted_placement=outside_placement))
+    assert not registry.restrictions_for(
+        replace(
+            context,
+            attempted_rules_unit_placement=RulesUnitPlacement.single(outside_placement),
+        )
+    )
     assert not reserve_arrival_restriction_violations(
         state=state,
         scenario=scenario,
         reserve_state=reserve_state,
-        unit=target_unit,
-        attempted_placement=outside_placement,
+        rules_unit=context.rules_unit,
+        attempted_rules_unit_placement=RulesUnitPlacement.single(outside_placement),
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
         registry=registry,
     )

@@ -11,14 +11,14 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
-    UnitPlacement,
     battlefield_placement_kind_from_token,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveState
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 if TYPE_CHECKING:
@@ -60,8 +60,8 @@ class ReserveArrivalDistanceContext:
     scenario: BattlefieldScenario
     ruleset_descriptor: RulesetDescriptor
     reserve_state: ReserveState
-    unit: UnitInstance
-    attempted_placement: UnitPlacement
+    rules_unit: RulesUnitView
+    attempted_rules_unit_placement: RulesUnitPlacement
     placement_kind: BattlefieldPlacementKind
     battle_round: int
     battlefield_width_inches: float
@@ -86,14 +86,18 @@ class ReserveArrivalDistanceContext:
             raise GameLifecycleError(
                 "ReserveArrivalDistanceContext reserve_state must be a ReserveState."
             )
-        if type(self.unit) is not UnitInstance:
-            raise GameLifecycleError("ReserveArrivalDistanceContext unit must be a UnitInstance.")
-        if self.unit.unit_instance_id != self.reserve_state.unit_instance_id:
-            raise GameLifecycleError("ReserveArrivalDistanceContext unit drift.")
-        if type(self.attempted_placement) is not UnitPlacement:
+        if type(self.rules_unit) is not RulesUnitView:
             raise GameLifecycleError(
-                "ReserveArrivalDistanceContext attempted_placement must be a UnitPlacement."
+                "ReserveArrivalDistanceContext rules_unit must be a RulesUnitView."
             )
+        if self.rules_unit.unit_instance_id != self.reserve_state.unit_instance_id:
+            raise GameLifecycleError("ReserveArrivalDistanceContext unit drift.")
+        if type(self.attempted_rules_unit_placement) is not RulesUnitPlacement:
+            raise GameLifecycleError(
+                "ReserveArrivalDistanceContext attempted_rules_unit_placement must be a "
+                "RulesUnitPlacement."
+            )
+        self.attempted_rules_unit_placement.validate_for_view(self.rules_unit)
         object.__setattr__(
             self,
             "placement_kind",
@@ -158,8 +162,8 @@ class ReserveArrivalRestrictionContext:
     state: GameState
     scenario: BattlefieldScenario
     reserve_state: ReserveState
-    unit: UnitInstance
-    attempted_placement: UnitPlacement
+    rules_unit: RulesUnitView
+    attempted_rules_unit_placement: RulesUnitPlacement
     placement_kind: BattlefieldPlacementKind
 
     def __post_init__(self) -> None:
@@ -175,18 +179,18 @@ class ReserveArrivalRestrictionContext:
             raise GameLifecycleError(
                 "ReserveArrivalRestrictionContext reserve_state must be a ReserveState."
             )
-        if type(self.unit) is not UnitInstance:
+        if type(self.rules_unit) is not RulesUnitView:
             raise GameLifecycleError(
-                "ReserveArrivalRestrictionContext unit must be a UnitInstance."
+                "ReserveArrivalRestrictionContext rules_unit must be a RulesUnitView."
             )
-        if self.unit.unit_instance_id != self.reserve_state.unit_instance_id:
+        if self.rules_unit.unit_instance_id != self.reserve_state.unit_instance_id:
             raise GameLifecycleError("ReserveArrivalRestrictionContext unit drift.")
-        if type(self.attempted_placement) is not UnitPlacement:
+        if type(self.attempted_rules_unit_placement) is not RulesUnitPlacement:
             raise GameLifecycleError(
-                "ReserveArrivalRestrictionContext attempted_placement must be a UnitPlacement."
+                "ReserveArrivalRestrictionContext attempted_rules_unit_placement must be a "
+                "RulesUnitPlacement."
             )
-        if self.attempted_placement.unit_instance_id != self.unit.unit_instance_id:
-            raise GameLifecycleError("ReserveArrivalRestrictionContext placement unit drift.")
+        self.attempted_rules_unit_placement.validate_for_view(self.rules_unit)
         object.__setattr__(
             self,
             "placement_kind",

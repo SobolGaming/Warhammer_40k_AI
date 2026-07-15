@@ -769,7 +769,7 @@ def _resolve_destroyed_transport_disembark_submission(
         battle_round=state.battle_round,
         unit_instance_id=submission.unit_instance_id,
         transport_unit_instance_id=submission.transport_unit_instance_id,
-        attempted_placement=submission.attempted_placement,
+        attempted_placement=submission.require_unit_placement(),
         disembark_mode=submission.disembark_mode,
         transport_movement_status=TransportMovementStatus.NOT_MOVED,
         restriction_overrides=submission.restriction_overrides,

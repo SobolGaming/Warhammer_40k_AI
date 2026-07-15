@@ -716,24 +716,24 @@ def _reserve_state_for_target(
     return reserve_state
 
 
-def _unit_for_reserve_state(*, state: GameState, reserve_state: ReserveState) -> UnitInstance:
-    army = state.army_definition_for_player(reserve_state.player_id)
-    if army is None:
-        raise GameLifecycleError("ReserveState player has no army definition.")
-    for unit in army.units:
-        if unit.unit_instance_id == reserve_state.unit_instance_id:
-            return unit
-    raise GameLifecycleError("ReserveState references an unknown unit.")
+def _unit_for_reserve_state(*, state: GameState, reserve_state: ReserveState) -> RulesUnitView:
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=reserve_state.unit_instance_id,
+    )
+    if rules_unit.owner_player_id != reserve_state.player_id:
+        raise GameLifecycleError("ReserveState player does not own its rules unit.")
+    return rules_unit
 
 
 def _reserve_placement_kinds_for_unit(
     *,
     reserve_state: ReserveState,
-    unit: UnitInstance,
+    unit: RulesUnitView,
 ) -> tuple[BattlefieldPlacementKind, ...]:
     if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
         kinds = [BattlefieldPlacementKind.STRATEGIC_RESERVES]
-        if _unit_has_deep_strike_keyword(unit):
+        if all(_unit_has_deep_strike_keyword(component.unit) for component in unit.components):
             kinds.append(BattlefieldPlacementKind.DEEP_STRIKE)
         return tuple(kinds)
     if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:

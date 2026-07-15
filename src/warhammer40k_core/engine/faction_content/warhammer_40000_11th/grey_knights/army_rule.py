@@ -189,25 +189,23 @@ def apply_gate_of_infinity_turn_end_result(context: TurnEndResultContext) -> boo
         rules_unit_view=rules_unit_view,
     )
     required_arrival_battle_round = _next_movement_battle_round(context.state)
-    reserve_state_payloads: list[JsonValue] = []
-    for unit_instance_id in rules_unit_view.component_unit_instance_ids:
-        reserve_state = context.state.reposition_unit_to_strategic_reserves(
-            player_id=player_id,
-            unit_instance_id=unit_instance_id,
-            reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
-            source_rule_ids=(SOURCE_RULE_ID,),
-            required_arrival_battle_round=required_arrival_battle_round,
-            required_arrival_phase=BattlePhase.MOVEMENT,
-            required_arrival_source_rule_id=SOURCE_RULE_ID,
-        )
-        reserve_state_payloads.append(cast(JsonValue, reserve_state.to_payload()))
+    reserve_state = context.state.reposition_unit_to_strategic_reserves(
+        player_id=player_id,
+        unit_instance_id=rules_unit_view.unit_instance_id,
+        reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
+        source_rule_ids=(SOURCE_RULE_ID,),
+        required_arrival_battle_round=required_arrival_battle_round,
+        required_arrival_phase=BattlePhase.MOVEMENT,
+        required_arrival_source_rule_id=SOURCE_RULE_ID,
+    )
+    reserve_state_payloads = (cast(JsonValue, reserve_state.to_payload()),)
     context.decisions.event_log.append(
         GATE_OF_INFINITY_USED_EVENT,
         _used_event_payload(
             context=context,
             player_id=player_id,
             rules_unit_view=rules_unit_view,
-            reserve_state_payloads=tuple(reserve_state_payloads),
+            reserve_state_payloads=reserve_state_payloads,
             selected_count_after=len(used_rules_unit_ids) + 1,
             max_units=max_units,
         ),

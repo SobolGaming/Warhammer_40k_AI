@@ -650,7 +650,50 @@ def test_piratical_hero_grants_only_while_yriel_is_leading_an_attached_unit() ->
     )
     option_ids = {option.option_id for option in redeploy_request.options}
     assert f"redeploy:{attached_id}" in option_ids
-    assert f"redeploy_to_strategic_reserves:{attached_id}" not in option_ids
+    assert f"redeploy_to_strategic_reserves:{attached_id}" in option_ids
+
+    decisions = DecisionController()
+    decisions.request_decision(redeploy_request)
+    reserve_result = DecisionResult.for_request(
+        result_id="prince-of-corsairs-attached-unit-to-reserves",
+        request=redeploy_request,
+        selected_option_id=f"redeploy_to_strategic_reserves:{attached_id}",
+    )
+    decisions.submit_result(reserve_result)
+    reserve_state = apply_redeploy_to_strategic_reserves(
+        state=attached_setup_state,
+        request=redeploy_request,
+        result=reserve_result,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        points_contribution=0,
+    )
+
+    assert reserve_state.unit_instance_id == attached_id
+    assert attached_setup_state.reserve_states == [reserve_state]
+    assert attached_setup_state.reserve_state_for_unit(yriel.unit_instance_id) == reserve_state
+    assert (
+        attached_setup_state.reserve_state_for_unit(voidreavers.unit_instance_id) == reserve_state
+    )
+    assert attached_setup_state.battlefield_state is not None
+    assert (
+        attached_setup_state.battlefield_state.unit_placement_or_none(yriel.unit_instance_id)
+        is None
+    )
+    assert (
+        attached_setup_state.battlefield_state.unit_placement_or_none(voidreavers.unit_instance_id)
+        is None
+    )
+    assert set(attached_setup_state.unarrived_reserve_model_ids()) == {
+        model.model_instance_id for model in (*yriel.own_models, *voidreavers.own_models)
+    }
+    reserve_event = decisions.event_log.records[-1]
+    assert reserve_event.event_type == "prebattle_redeploy_to_strategic_reserves"
+    assert isinstance(reserve_event.payload, dict)
+    assert reserve_event.payload["unit_instance_id"] == attached_id
+    assert reserve_event.payload["component_unit_instance_ids"] == list(
+        formation.component_unit_instance_ids
+    )
 
 
 def test_hallucinogen_grenades_uses_opponent_shooting_start_decision_and_grants_stealth() -> None:

@@ -130,6 +130,8 @@ from warhammer40k_core.engine.reserves import (
     ReserveStatus,
 )
 from warhammer40k_core.engine.rule_execution import RuleExecutionResult
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
@@ -1757,7 +1759,7 @@ def test_warp_rifts_requires_attempted_placement_to_match_reserve_unit() -> None
         ),
     )
 
-    grants = _runtime_reserve_arrival_registry(state).grants_for(
+    with pytest.raises(GameLifecycleError, match="rules-unit identity drift"):
         _reserve_arrival_distance_context(
             state=state,
             reserve_state=reserve_state,
@@ -1765,9 +1767,6 @@ def test_warp_rifts_requires_attempted_placement_to_match_reserve_unit() -> None
             attempted_placement=drifted_placement,
             placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
         )
-    )
-
-    assert grants == ()
 
 
 def test_warp_rifts_requires_legiones_daemonica() -> None:
@@ -2445,8 +2444,11 @@ def _reserve_arrival_distance_context(
         scenario=scenario,
         ruleset_descriptor=_ruleset(),
         reserve_state=reserve_state,
-        unit=reserve_unit,
-        attempted_placement=attempted_placement,
+        rules_unit=rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=reserve_unit.unit_instance_id,
+        ),
+        attempted_rules_unit_placement=RulesUnitPlacement.single(attempted_placement),
         placement_kind=placement_kind,
         battle_round=state.battle_round,
         battlefield_width_inches=state.battlefield_state.battlefield_width_inches,

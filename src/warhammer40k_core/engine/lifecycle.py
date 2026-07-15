@@ -219,6 +219,7 @@ from warhammer40k_core.engine.return_on_death import (
     apply_return_on_death_placement_decision,
     invalid_return_on_death_placement_status,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
     apply_sequencing_decision_from_request,
@@ -3342,27 +3343,21 @@ def _validate_battlefield_state_consistency(
 def _validate_reserve_state_consistency(*, state: GameState) -> None:
     if not state.reserve_states:
         return
-    unit_owner_by_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
-    }
-    model_ids_by_unit_id = {
-        unit.unit_instance_id: tuple(model.model_instance_id for model in unit.own_models)
-        for army in state.army_definitions
-        for unit in army.units
-    }
     for reserve_state in state.reserve_states:
-        owner = unit_owner_by_id.get(reserve_state.unit_instance_id)
-        if owner is None:
-            raise GameLifecycleError("reserve_states unit is unknown.")
-        if owner != reserve_state.player_id:
+        reserve_view = rules_unit_view_from_armies(
+            armies=tuple(state.army_definitions),
+            unit_instance_id=reserve_state.unit_instance_id,
+        )
+        if reserve_view.unit_instance_id != reserve_state.unit_instance_id:
+            raise GameLifecycleError("reserve_states must use canonical rules-unit identity.")
+        if reserve_view.owner_player_id != reserve_state.player_id:
             raise GameLifecycleError("reserve_states player_id does not match unit owner.")
         for embarked_unit_id in reserve_state.embarked_unit_instance_ids:
-            embarked_owner = unit_owner_by_id.get(embarked_unit_id)
-            if embarked_owner is None:
-                raise GameLifecycleError("reserve_states embarked unit is unknown.")
-            if embarked_owner != reserve_state.player_id:
+            embarked_view = rules_unit_view_from_armies(
+                armies=tuple(state.army_definitions),
+                unit_instance_id=embarked_unit_id,
+            )
+            if embarked_view.owner_player_id != reserve_state.player_id:
                 raise GameLifecycleError("reserve_states embarked unit owner drift.")
 
     battlefield_state = state.battlefield_state
@@ -3371,12 +3366,18 @@ def _validate_reserve_state_consistency(*, state: GameState) -> None:
     placed_model_ids = set(battlefield_state.placed_model_ids())
     removed_model_ids = set(battlefield_state.removed_model_ids)
     for reserve_state in state.reserve_states:
-        reserve_model_ids = set(model_ids_by_unit_id[reserve_state.unit_instance_id])
-        embarked_model_ids = {
-            model_id
-            for embarked_unit_id in reserve_state.embarked_unit_instance_ids
-            for model_id in model_ids_by_unit_id[embarked_unit_id]
-        }
+        reserve_view = rules_unit_view_from_armies(
+            armies=tuple(state.army_definitions),
+            unit_instance_id=reserve_state.unit_instance_id,
+        )
+        reserve_model_ids = {model.model_instance_id for model in reserve_view.own_models}
+        embarked_model_ids: set[str] = set()
+        for embarked_unit_id in reserve_state.embarked_unit_instance_ids:
+            embarked_view = rules_unit_view_from_armies(
+                armies=tuple(state.army_definitions),
+                unit_instance_id=embarked_unit_id,
+            )
+            embarked_model_ids.update(model.model_instance_id for model in embarked_view.own_models)
         if reserve_state.status is ReserveStatus.IN_RESERVES:
             if (reserve_model_ids | embarked_model_ids) & placed_model_ids:
                 raise GameLifecycleError("unarrived reserve models must not be placed.")

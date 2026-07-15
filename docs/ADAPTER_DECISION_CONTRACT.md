@@ -80,7 +80,7 @@ The shared contract uses these objects and payloads:
 - `MeleeDeclarationProposalRequest`: Fight phase parameterized request exposing current melee weapon options, model-engaged target snapshots, the source activation decision context, and ruleset descriptor hash.
 - `MeleeDeclarationProposal`: Fight phase parameterized answer selecting each fighting model's primary melee weapon, optional `[EXTRA ATTACKS]` weapons, and target allocations for those melee weapons.
 - `PsychicAttackModifierIgnoreSelection`: finite Shooting/Fight attack-sequence answer selecting one engine-emitted way to keep or ignore current `[PSYCHIC]` weapon skill and hit-roll modifiers for the active attack context.
-- `PlacementProposalPayload`: parameterized placement answer, including attempted `UnitPlacement`.
+- `PlacementProposalPayload`: parameterized placement answer, including either one attempted physical `UnitPlacement` or one grouped `RulesUnitPlacement` for an attached rules unit.
 - `CultAmbushMarker`: replay-safe Genestealer Cults marker state used by the Cult Ambush marker placement and ingress contracts.
 - `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
 - `DeploymentPlacementProposal`: Deploy Armies placement answer containing the complete selected rules-unit model placement set, placement kind `deployment`, proposal request ID, ruleset hash, and replay-safe source context.
@@ -1110,17 +1110,17 @@ Required Phase 16B adapter-contract tests:
 
 ## Phase 16C Reserve Declaration Decisions
 
-Phase 16C adds setup reserve choices during Declare Battle Formations, after battlefield creation and before Deploy Armies. These choices decide whether units start on the battlefield, in Strategic Reserves, or in a source-backed Deep Strike reserve state. AIRCRAFT mandatory reserve declarations are engine-owned consequences in the same setup step and are recorded as ordinary `ReserveState` payloads.
+Phase 16C adds setup reserve choices during Declare Battle Formations, after battlefield creation and before Deploy Armies. These choices decide whether rules units start on the battlefield, in Strategic Reserves, or in a source-backed Deep Strike reserve state. AIRCRAFT mandatory reserve declarations are engine-owned consequences in the same setup step and are recorded as ordinary `ReserveState` payloads.
 
 Phase 16C exposes the finite decision type `select_reserve_declaration`. The pending request payload contains `payload.reserve_declaration_request` with request ID, game ID, actor/player ID, setup step `declare_battle_formations`, ruleset descriptor hash, Strategic Reserves points limit, current Strategic Reserves points, and available declaration count. Adapters answer by selecting one emitted option ID:
 
-- `declare_strategic_reserves:<unit_instance_id>` for a legal actor-owned unit with source-backed points that does not have `FORTIFICATION` and whose unit plus embarked-unit points fit the Strategic Reserves cap;
-- `declare_deep_strike:<unit_instance_id>` for a legal actor-owned unit whose current source-backed unit keywords include Deep Strike;
+- `declare_strategic_reserves:<rules_unit_instance_id>` for a legal actor-owned rules unit whose components have source-backed points, none has `FORTIFICATION`, and whose aggregate component plus embarked-unit points fit the Strategic Reserves cap;
+- `declare_deep_strike:<rules_unit_instance_id>` for a legal actor-owned rules unit whose every component has Deep Strike;
 - `complete_reserve_declarations` to record that the player is done choosing optional reserve declarations.
 
 Option payloads are complete `ReserveDeclarationSelection` payloads. They include submission kind, action kind, game ID, player ID, setup step, ruleset descriptor hash, reserve origin/kind, source rule ID, selected unit ID, unit points, embarked unit points, Strategic Reserves points limit, current points, points after declaration, points contribution, embarked unit IDs, and source IDs. Adapters must not invent reserve option IDs, infer points from roster display data, mutate reserve state from payloads, or silently deploy a unit whose reserve declaration is illegal.
 
-Accepted Strategic Reserves selections create deterministic `StrategicReserveDeclaration` and `ReserveState` payloads, enforce the battle-size 50% Strategic Reserves cap including embarked units, reject FORTIFICATIONS, preserve source rule IDs and points contribution, and exclude the unit from Deploy Armies options. Accepted Deep Strike selections create a Deep Strike `ReserveState` consumed later by the existing reserve-arrival placement proposal path. Accepted completion selections emit a replay-safe completion event and do not mutate reserve state.
+Accepted Strategic Reserves selections create deterministic `StrategicReserveDeclaration` and `ReserveState` payloads keyed by the canonical rules-unit ID, enforce the battle-size 50% Strategic Reserves cap across every component and embarked unit, reject FORTIFICATIONS, preserve source rule IDs and points contribution, and exclude every component from Deploy Armies options. Accepted Deep Strike selections create one canonical Deep Strike `ReserveState` consumed later by the grouped reserve-arrival placement proposal path. Accepted completion selections emit a replay-safe completion event and do not mutate reserve state.
 
 Malformed, stale, wrong-actor, wrong-step, wrong-ruleset-hash, wrong-current-points, wrong-option, option-payload drift, duplicate, wrong-player, unknown-unit, over-cap, missing source-points, or forbidden-unit submissions reject before the pending queue is popped and before a `DecisionRecord` or reserve mutation is created. Rule-invalid reserve declarations must not be repaired by changing reserve kind, deploying the unit, or dropping it.
 
@@ -1444,7 +1444,7 @@ Current Genestealer Cults Cult Ambush marker ingress options use:
 
 Webway option payloads include `submission_kind: "aeldari_corsair_coterie_webway_pathstone_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`. Fade to Darkness option payloads include `submission_kind: "chaos_daemons_shadow_legion_fade_to_darkness_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`; the request payload also carries `destroyed_enemy_unit_instance_ids` captured by the engine from current Fight phase unit-destroyed evidence. Grey Knights option payloads include `submission_kind: "grey_knights_gate_of_infinity_turn_end"`, player ID, source rule ID, hook ID, ability ID, ability name, target rules-unit ID, component unit IDs, `use_ability`, and action `use` or `complete`. Genestealer Cults marker ingress option payloads include `selection: "decline"` or `selection: "ingress"`, source rule ID, marker ID, and the selected Cult Ambush unit ID for ingress selections. Catalog IR option payloads include `submission_kind: "catalog_ir_turn_end_reserves"`, player ID, source rule ID, hook ID, catalog record ID, ability ID, ability name, target unit ID, and `use_ability`. Adapters must not remove the unit from the battlefield, create a reserve state, decide reserve eligibility locally, synthesize destroyed-enemy evidence for Fade to Darkness, split an attached Grey Knights rules unit, calculate Grey Knights remaining cap locally, or move Cult Ambush units from markers locally.
 
-Accepted use selections validate that the unit is still on the battlefield, not already in reserves, not within Engagement Range when required by the source rule, and, for Fade to Darkness, that the enhanced unit destroyed one or more enemy units in the current Fight phase, then remove it from the battlefield and create a Strategic Reserves `ReserveState` with source evidence. Grey Knights Gate of Infinity validates the selected rules unit and every attached component, removes each component unit through engine-owned reserve mutation, and creates required-arrival Strategic Reserves states for the next Grey Knights Movement phase. Accepted decline or complete selections emit a replay-safe event and do not mutate battlefield or reserve state. Webway Pathstone records a used event once per battle for the enhanced unit and does not offer another decision after use. Fade to Darkness records a use or decline event for the current Fight phase and does not offer another decision for that unit in the same phase. Gate of Infinity records each selected rules unit and re-emits the request until the battle-size cap is exhausted, the Grey Knights player chooses `complete`, or no eligible unit remains. Catalog IR Hunters from the Warp is not once-per-battle in the source text, so it may be offered again in a later eligible opponent turn after the unit returns and becomes eligible.
+Accepted use selections validate that the rules unit is still on the battlefield, not already in reserves, not within Engagement Range when required by the source rule, and, for Fade to Darkness, that the enhanced unit destroyed one or more enemy units in the current Fight phase, then remove every physical component from the battlefield and create one canonical Strategic Reserves `ReserveState` with source evidence. Grey Knights Gate of Infinity uses the same grouped mutation, with one required-arrival reserve state for the selected attached rules unit in the next Grey Knights Movement phase. Accepted decline or complete selections emit a replay-safe event and do not mutate battlefield or reserve state. Webway Pathstone records a used event once per battle for the enhanced unit and does not offer another decision after use. Fade to Darkness records a use or decline event for the current Fight phase and does not offer another decision for that unit in the same phase. Gate of Infinity records each selected rules unit and re-emits the request until the battle-size cap is exhausted, the Grey Knights player chooses `complete`, or no eligible unit remains. Catalog IR Hunters from the Warp is not once-per-battle in the source text, so it may be offered again in a later eligible opponent turn after the unit returns and becomes eligible.
 
 Malformed, stale, wrong-actor, wrong-phase, wrong-hook, unsupported-option, option-payload drift, source-record drift, already-used when the source is once-per-battle, exhausted-cap, attached component drift, missing Gate of Infinity ability on any Grey Knights component, already-in-reserves, unplaced, or Engagement Range submissions reject before unauthorized mutation.
 
@@ -1904,6 +1904,8 @@ arrival.
 
 The request's `placement_kinds` field enumerates the legal physical placement methods available for that unit and state. The submitted payload must match the pending request.
 
+Reserve-arrival requests identify the canonical rules unit and carry deterministic `component_unit_instance_ids` and `model_instance_ids` in their source context. A non-attached unit may use `attempted_placement`. An attached rules unit must instead use `attempted_rules_unit_placement`, containing the canonical `rules_unit_instance_id` and exactly one complete `UnitPlacement` for every physical component. The two attempted-placement fields are mutually exclusive. The engine rejects component or model drift before queue pop and validates battlefield legality and coherency across the flattened rules unit before adding any component.
+
 Example Strategic Reserves submission shape:
 
 ```json
@@ -1926,6 +1928,57 @@ Example Strategic Reserves submission shape:
           "position": {"x": 6.0, "y": 36.0, "z": 0.0},
           "facing": {"degrees": 180.0}
         }
+      }
+    ]
+  },
+  "large_model_exceptions": []
+}
+```
+
+Example attached-unit Strategic Reserves submission shape:
+
+```json
+{
+  "proposal_request_id": "decision-request-000042",
+  "proposal_kind": "strategic_reserves_placement",
+  "unit_instance_id": "attached-unit:army-alpha:leader-and-bodyguard",
+  "placement_kind": "strategic_reserves",
+  "attempted_rules_unit_placement": {
+    "rules_unit_instance_id": "attached-unit:army-alpha:leader-and-bodyguard",
+    "component_unit_placements": [
+      {
+        "army_id": "army-alpha",
+        "player_id": "player-a",
+        "unit_instance_id": "army-alpha:bodyguard",
+        "model_placements": [
+          {
+            "army_id": "army-alpha",
+            "player_id": "player-a",
+            "unit_instance_id": "army-alpha:bodyguard",
+            "model_instance_id": "army-alpha:bodyguard:model-1",
+            "pose": {
+              "position": {"x": 6.0, "y": 36.0, "z": 0.0},
+              "facing": {"degrees": 180.0}
+            }
+          }
+        ]
+      },
+      {
+        "army_id": "army-alpha",
+        "player_id": "player-a",
+        "unit_instance_id": "army-alpha:leader",
+        "model_placements": [
+          {
+            "army_id": "army-alpha",
+            "player_id": "player-a",
+            "unit_instance_id": "army-alpha:leader",
+            "model_instance_id": "army-alpha:leader:model-1",
+            "pose": {
+              "position": {"x": 7.5, "y": 36.0, "z": 0.0},
+              "facing": {"degrees": 180.0}
+            }
+          }
+        ]
       }
     ]
   },
@@ -1969,7 +2022,7 @@ Cult Ambush marker ingress uses the same placement payload shape with `proposal_
 
 Serialized payload helpers may omit empty optional collections such as `large_model_exceptions` or `restriction_overrides`; inbound parsing accepts omitted empty optional fields.
 
-The engine validates placement, coherency, reserve restrictions, transport state, and any rule-specific exceptions before mutating battlefield state.
+The engine validates placement, rules-unit identity, grouped coherency, reserve restrictions, transport state, and any rule-specific exceptions before mutating battlefield state. Accepted attached-unit reserve arrivals add every physical component and transition the single canonical reserve state as one engine operation.
 
 ## Validation and Invalid Results
 
