@@ -584,25 +584,58 @@ def _matching_generic_attack_effects(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR attack hooks require GameState.")
-    attacker_id = _validate_identifier("attacking_unit_instance_id", attacking_unit_instance_id)
+    physical_attacker_id = _validate_identifier(
+        "attacking_unit_instance_id",
+        attacking_unit_instance_id,
+    )
     attacker_model_id = (
         None
         if attacker_model_instance_id is None
         else _validate_identifier("attacker_model_instance_id", attacker_model_instance_id)
     )
-    target_id = (
+    physical_target_id = (
         None
         if target_unit_instance_id is None
         else _validate_identifier("target_unit_instance_id", target_unit_instance_id)
     )
-    target_lookup_ids = (target_id,) if target_unit_lookup_ids is None else target_unit_lookup_ids
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    attacker_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=physical_attacker_id,
+    )
+    attacker_id = attacker_rules_unit.unit_instance_id
+    if attacker_model_id is not None:
+        owning_component_id = attacker_rules_unit.component_unit_id_for_model(attacker_model_id)
+        if physical_attacker_id not in {attacker_id, owning_component_id}:
+            raise GameLifecycleError(
+                "Generic RuleIR attacker model does not belong to the supplied component unit."
+            )
+    target_id = (
+        None
+        if physical_target_id is None
+        else rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=physical_target_id,
+        ).unit_instance_id
+    )
+    target_lookup_ids = (
+        (physical_target_id,) if target_unit_lookup_ids is None else target_unit_lookup_ids
+    )
     role_unit_ids: tuple[tuple[AttackRole, str], ...] = (("attacker", attacker_id),)
     for raw_target_id in target_lookup_ids:
         if raw_target_id is None:
             continue
+        canonical_target_id = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=_validate_identifier(
+                "target_unit_instance_id",
+                raw_target_id,
+            ),
+        ).unit_instance_id
         role_unit_ids = (
             *role_unit_ids,
-            ("target", _validate_identifier("target_unit_instance_id", raw_target_id)),
+            ("target", canonical_target_id),
         )
     matches: list[_GenericAttackEffect] = []
     seen: set[tuple[str, AttackRole]] = set()

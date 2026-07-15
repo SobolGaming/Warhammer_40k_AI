@@ -1411,7 +1411,7 @@ def test_phase17k_daemon_prince_allegiance_modifiers_use_generic_runtime_queries
         source_phase=BattlePhase.FIGHT,
         attacking_unit_instance_id=khorne_unit.unit_instance_id,
         attacker_model_instance_id=khorne_unit.own_models[0].model_instance_id,
-        target_unit_instance_id="runtime-target",
+        target_unit_instance_id=khorne_unit.unit_instance_id,
         weapon_profile=hellforged,
     )
     assert (
@@ -1441,6 +1441,7 @@ def test_phase17k_daemon_prince_allegiance_modifiers_use_generic_runtime_queries
         state=tzeentch_state,
         attacking_unit_instance_id=tzeentch_unit.unit_instance_id,
         attacker_model_instance_id=tzeentch_unit.own_models[0].model_instance_id,
+        target_unit_instance_id=tzeentch_unit.unit_instance_id,
     )
     modified_infernal = tzeentch_registry.modified_weapon_profile(
         replace(tzeentch_context, weapon_profile=infernal_cannon)
@@ -1567,7 +1568,7 @@ def test_phase17k_malefic_destruction_persists_generic_scoped_attacks_modifier()
         source_phase=BattlePhase.FIGHT,
         attacking_unit_instance_id=unit.unit_instance_id,
         attacker_model_instance_id=unit.own_models[0].model_instance_id,
-        target_unit_instance_id="runtime-target",
+        target_unit_instance_id=unit.unit_instance_id,
         weapon_profile=strike,
     )
     modifier_registry = RuntimeModifierRegistry.from_bindings()
@@ -1684,7 +1685,7 @@ def test_phase17k_harbinger_of_death_requires_generic_finite_weapon_choice() -> 
         source_phase=BattlePhase.FIGHT,
         attacking_unit_instance_id=unit.unit_instance_id,
         attacker_model_instance_id=unit.own_models[0].model_instance_id,
-        target_unit_instance_id="runtime-target",
+        target_unit_instance_id=unit.unit_instance_id,
         weapon_profile=strike,
     )
     modifier_registry = RuntimeModifierRegistry.from_bindings()
@@ -1824,8 +1825,8 @@ def test_phase17k_unholy_vigour_any_phase_decision_is_replay_safe_and_runtime_co
                 ),
             ),
             source_phase=BattlePhase.MOVEMENT,
-            attacking_unit_instance_id="runtime-attacker",
-            attacker_model_instance_id="runtime-attacker-model",
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attacker_model_instance_id=unit.own_models[0].model_instance_id,
             weapon_profile=infernal,
         )
     )
@@ -3166,7 +3167,7 @@ def test_phase17k_leading_model_weapon_keyword_text_modifies_scoped_weapon_profi
         source_phase=BattlePhase.FIGHT,
         attacking_unit_instance_id=attached_id,
         attacker_model_instance_id=attacker_model_id,
-        target_unit_instance_id="phase17k-target-unit",
+        target_unit_instance_id=attached_id,
         weapon_profile=melee_profile,
     )
     ranged_context = replace(melee_context, weapon_profile=ranged_profile)
@@ -3303,7 +3304,7 @@ def test_phase17k_named_weapon_ability_choice_records_and_modifies_profile() -> 
         source_phase=BattlePhase.SHOOTING,
         attacking_unit_instance_id=unit.unit_instance_id,
         attacker_model_instance_id=unit.own_models[0].model_instance_id,
-        target_unit_instance_id="phase17k-target-unit",
+        target_unit_instance_id=unit.unit_instance_id,
         weapon_profile=bolt_profile,
     )
     modified_bolt = modifier_registry.modified_weapon_profile(shooting_context)

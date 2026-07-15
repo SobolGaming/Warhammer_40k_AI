@@ -8,6 +8,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpiration,
@@ -293,6 +294,157 @@ def test_ws14_generic_reroll_permission_uses_source_backed_attack_path() -> None
     }
 
 
+def test_ws14_attacker_scoped_generic_hooks_use_canonical_attached_rules_unit() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    bodyguard = _unit(catalog=catalog, army_id="army-a", unit_selection_id="bodyguard")
+    leader = _unit(catalog=catalog, army_id="army-a", unit_selection_id="leader")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender")
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id="attached-unit:army-a:bodyguard-leader",
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="ws14:attached-rules-unit",
+        attachment_source_ids=("ws14:leader-attachment",),
+    )
+    state = _state(
+        _attached_army(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-a",
+            units=(bodyguard, leader),
+            formation=formation,
+        ),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    canonical_attacker_id = formation.attached_unit_instance_id
+    registry = RuntimeModifierRegistry.empty()
+
+    effect_specs: tuple[tuple[str, str, dict[str, JsonValue]], ...] = (
+        (
+            "ws14:attached-wound",
+            "modify_dice_roll",
+            {"roll_type": "wound", "delta": 1, "attack_role": "attacker"},
+        ),
+        (
+            "ws14:attached-damage",
+            "modify_dice_roll",
+            {"roll_type": "damage", "delta": 2, "attack_role": "attacker"},
+        ),
+        (
+            "ws14:attached-save",
+            "modify_dice_roll",
+            {"roll_type": "save", "delta": -1, "attack_role": "attacker"},
+        ),
+        (
+            "ws14:attached-strength",
+            "modify_characteristic",
+            {"characteristic": "strength", "delta": 1, "attack_role": "attacker"},
+        ),
+        (
+            "ws14:attached-hit-reroll",
+            "reroll_permission",
+            {
+                "roll_type": "hit",
+                "attack_role": "attacker",
+                "reroll_unmodified_value": 1,
+            },
+        ),
+    )
+    for effect_id, effect_kind, parameters in effect_specs:
+        state.record_persisting_effect(
+            _generic_effect(
+                effect_id=effect_id,
+                owner_player_id="player-a",
+                target_unit_instance_ids=(canonical_attacker_id,),
+                target_kind="this_unit",
+                effect_kind=effect_kind,
+                parameters=parameters,
+            )
+        )
+
+    for component in (bodyguard, leader):
+        model = component.own_models[0]
+        profile = _weapon_profile(catalog, model.wargear_ids[0])
+        assert (
+            registry.wound_roll_modifier(
+                WoundRollModifierContext(
+                    state=state,
+                    source_phase=BattlePhase.SHOOTING,
+                    attacking_unit_instance_id=component.unit_instance_id,
+                    attacker_model_instance_id=model.model_instance_id,
+                    target_unit_instance_id=defender.unit_instance_id,
+                    weapon_profile=profile,
+                    strength=4,
+                    toughness=4,
+                )
+            )
+            == 1
+        )
+        assert (
+            registry.damage_roll_modifier(
+                DamageRollModifierContext(
+                    state=state,
+                    source_phase=BattlePhase.SHOOTING,
+                    attacking_unit_instance_id=component.unit_instance_id,
+                    attacker_model_instance_id=model.model_instance_id,
+                    target_unit_instance_id=defender.unit_instance_id,
+                    weapon_profile=profile,
+                    current_value=1,
+                )
+            )
+            == 2
+        )
+        assert (
+            registry.modified_weapon_profile(
+                WeaponProfileModifierContext(
+                    state=state,
+                    source_phase=BattlePhase.SHOOTING,
+                    attacking_unit_instance_id=component.unit_instance_id,
+                    attacker_model_instance_id=model.model_instance_id,
+                    target_unit_instance_id=defender.unit_instance_id,
+                    weapon_profile=profile,
+                )
+            ).strength.final
+            == profile.strength.final + 1
+        )
+        assert (
+            registry.modified_save_options(
+                SaveOptionModifierContext(
+                    state=state,
+                    source_phase=BattlePhase.SHOOTING,
+                    attacking_unit_instance_id=component.unit_instance_id,
+                    attacker_model_instance_id=model.model_instance_id,
+                    target_unit_instance_id=defender.unit_instance_id,
+                    weapon_profile=profile,
+                    save_options=(
+                        SaveOption(
+                            save_kind=SaveKind.ARMOUR,
+                            target_number=4,
+                            characteristic_target_number=4,
+                            armor_penetration=0,
+                        ),
+                    ),
+                )
+            )[0].target_number
+            == 5
+        )
+        reroll_context = source_backed_reroll_permission_context_for_unit(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=component.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            roll_type="attack_sequence.hit",
+            timing_window="attack_sequence.hit",
+            attack_kind="ranged",
+            target_unit_instance_id=defender.unit_instance_id,
+        )
+        assert reroll_context is not None
+        assert reroll_context.permission.eligible_roll_type == "attack_sequence.hit"
+
+
 def test_ws14_generic_attack_hooks_observe_persisting_effect_expiry() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
@@ -532,15 +684,16 @@ def test_ws14_generic_this_model_half_strength_hit_modifier_gates_target() -> No
     )
 
     assert registry.hit_roll_modifier(context) == 1
-    assert (
+    with pytest.raises(
+        GameLifecycleError,
+        match="model_instance_id is not in the rules unit",
+    ):
         registry.hit_roll_modifier(
             replace(
                 context,
                 attacker_model_instance_id=defender.own_models[0].model_instance_id,
             )
         )
-        == 0
-    )
     assert (
         registry.hit_roll_modifier(
             replace(context, target_unit_instance_id=attacker.unit_instance_id)
@@ -600,6 +753,30 @@ def _army(
             detachment_ids=(detachment.detachment_id,),
         ),
         units=(unit,),
+    )
+
+
+def _attached_army(
+    *,
+    catalog: ArmyCatalog,
+    player_id: str,
+    army_id: str,
+    units: tuple[UnitInstance, ...],
+    formation: AttachedUnitFormation,
+) -> ArmyDefinition:
+    detachment = catalog.detachments[0]
+    return ArmyDefinition(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=detachment.faction_id,
+            detachment_ids=(detachment.detachment_id,),
+        ),
+        units=units,
+        attached_units=(formation,),
     )
 
 

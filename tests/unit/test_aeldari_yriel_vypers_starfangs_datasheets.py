@@ -20,15 +20,21 @@ from tools.generate_aeldari_yriel_vypers_starfangs_rule_ir import (
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
+from warhammer40k_core.core.dice import DiceRollResult
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword
+from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
     catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
-from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    AttackSequenceStep,
+    attack_sequence_hit_roll_spec,
+    resolve_attack_sequence_until_blocked,
+)
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
@@ -68,7 +74,6 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.generic_rule_attack_hooks import generic_rule_hit_roll_modifier
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ListValidationError,
@@ -875,29 +880,45 @@ def test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_com
     assert state.persisting_effects_for_unit(yriel.unit_instance_id) == ()
     assert state.persisting_effects_for_unit(voidreavers.unit_instance_id) == ()
 
-    for attacker_model_id, profile in (
+    for attacker_model_id, wargear_id, profile in (
         (
             voidreavers.own_models[0].model_instance_id,
-            _weapon_profile(VOIDREAVERS_ID, "Shuriken rifle"),
+            "000002531:shuriken-pistol",
+            _weapon_profile(VOIDREAVERS_ID, "Shuriken pistol"),
         ),
         (
             yriel.own_models[0].model_instance_id,
+            "000004193:shuriken-pistol",
             _weapon_profile(PRINCE_YRIEL_ID, "Shuriken pistol"),
         ),
     ):
         assert (
-            generic_rule_hit_roll_modifier(
-                HitRollModifierContext(
-                    state=state,
-                    attacking_unit_instance_id=attached_id,
-                    attacker_model_instance_id=attacker_model_id,
-                    target_unit_instance_id=vypers.unit_instance_id,
-                    weapon_profile=profile,
-                    source_phase=BattlePhase.SHOOTING,
-                )
+            _resolved_attack_hit_modifier(
+                state=state,
+                sequence_id=f"attack-sequence:harassment-fire:{attacker_model_id}",
+                attacking_rules_unit_id=attached_id,
+                attacker_model_id=attacker_model_id,
+                wargear_id=wargear_id,
+                profile=profile,
+                target=vypers,
             )
             == -1
         )
+
+    _destroy_unit_in_state(state, unit_instance_id=voidreavers.unit_instance_id)
+
+    assert (
+        _resolved_attack_hit_modifier(
+            state=state,
+            sequence_id="attack-sequence:harassment-fire:surviving-yriel",
+            attacking_rules_unit_id=attached_id,
+            attacker_model_id=yriel.own_models[0].model_instance_id,
+            wargear_id="000004193:shuriken-pistol",
+            profile=_weapon_profile(PRINCE_YRIEL_ID, "Shuriken pistol"),
+            target=vypers,
+        )
+        == -1
+    )
 
 
 @pytest.mark.parametrize("near_component", ["bodyguard", "leader"])
@@ -1440,6 +1461,84 @@ def _destroy_unit_in_state(state: GameState, *, unit_instance_id: str) -> None:
         updated_armies.append(replace(army, units=tuple(units)))
     assert found
     state.replace_army_definitions(updated_armies)
+
+
+def _resolved_attack_hit_modifier(
+    *,
+    state: GameState,
+    sequence_id: str,
+    attacking_rules_unit_id: str,
+    attacker_model_id: str,
+    wargear_id: str,
+    profile: WeaponProfile,
+    target: UnitInstance,
+) -> int:
+    target_model_ids = tuple(
+        model.model_instance_id for model in target.own_models if model.is_alive
+    )
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacking_rules_unit_id,
+        attack_pools=(
+            RangedAttackPool(
+                attacker_model_instance_id=attacker_model_id,
+                wargear_id=wargear_id,
+                weapon_profile_id=profile.profile_id,
+                weapon_profile=profile,
+                target_unit_instance_id=target.unit_instance_id,
+                shooting_type=ShootingType.NORMAL,
+                attacks=1,
+                target_visible_model_ids=target_model_ids,
+                target_in_range_model_ids=target_model_ids,
+            ),
+        ),
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    decisions = DecisionController()
+    completed, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            state.game_id,
+            event_log=decisions.event_log,
+            injected_results=(
+                DiceRollResult.from_values(
+                    roll_id=f"roll:{sequence_id}",
+                    spec=hit_spec,
+                    values=(1,),
+                    source="fixed",
+                ),
+            ),
+        ),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    assert completed is None
+    assert allocated_model_ids == ()
+    assert status is None
+    hit_event = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "attack_sequence_step"
+        and isinstance(event.payload, dict)
+        and event.payload["sequence_id"] == sequence_id
+        and event.payload["step"] == AttackSequenceStep.HIT.value
+    )
+    assert isinstance(hit_event.payload, dict)
+    hit_payload = hit_event.payload["payload"]
+    assert isinstance(hit_payload, dict)
+    modifier = hit_payload["modifier"]
+    assert type(modifier) is int
+    return modifier
 
 
 def _catalog() -> Any:

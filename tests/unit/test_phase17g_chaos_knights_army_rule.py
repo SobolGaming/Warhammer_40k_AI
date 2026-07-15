@@ -755,13 +755,22 @@ def test_doom_and_darkness_runtime_modifiers_apply_to_enemy_attacks() -> None:
     state.battle_shocked_unit_ids = [target_unit_id]
     registry = _runtime_modifier_registry()
     profile = _weapon_profile()
+    chaos_model_id = (
+        unit_by_id(
+            state,
+            "army-alpha:intercessor-unit-1",
+        )
+        .own_models[0]
+        .model_instance_id
+    )
+    enemy_model_id = unit_by_id(state, target_unit_id).own_models[0].model_instance_id
 
     wound_modifier = registry.wound_roll_modifier(
         WoundRollModifierContext(
             state=state,
             source_phase=BattlePhase.SHOOTING,
             attacking_unit_instance_id="army-alpha:intercessor-unit-1",
-            attacker_model_instance_id="army-alpha:intercessor-unit-1:model-1",
+            attacker_model_instance_id=chaos_model_id,
             target_unit_instance_id=target_unit_id,
             weapon_profile=profile,
             strength=4,
@@ -772,7 +781,7 @@ def test_doom_and_darkness_runtime_modifiers_apply_to_enemy_attacks() -> None:
         HitRollModifierContext(
             state=state,
             attacking_unit_instance_id=target_unit_id,
-            attacker_model_instance_id="army-beta:intercessor-unit-3:model-1",
+            attacker_model_instance_id=enemy_model_id,
             target_unit_instance_id="army-alpha:intercessor-unit-1",
             weapon_profile=profile,
             source_phase=BattlePhase.SHOOTING,
@@ -798,6 +807,7 @@ def test_harbingers_modifiers_return_neutral_outside_required_contexts() -> None
     state.battle_shocked_unit_ids = [target_unit_id]
     registry = _runtime_modifier_registry()
     profile = _weapon_profile()
+    enemy_model_id = unit_by_id(state, target_unit_id).own_models[0].model_instance_id
 
     assert (
         registry.modified_unit_characteristic(
@@ -816,7 +826,7 @@ def test_harbingers_modifiers_return_neutral_outside_required_contexts() -> None
             HitRollModifierContext(
                 state=state,
                 attacking_unit_instance_id=target_unit_id,
-                attacker_model_instance_id="army-beta:intercessor-unit-3:model-1",
+                attacker_model_instance_id=enemy_model_id,
                 target_unit_instance_id="army-alpha:intercessor-unit-1",
                 weapon_profile=profile,
                 source_phase=BattlePhase.FIGHT,
@@ -830,7 +840,7 @@ def test_harbingers_modifiers_return_neutral_outside_required_contexts() -> None
                 state=state,
                 source_phase=BattlePhase.SHOOTING,
                 attacking_unit_instance_id="army-beta:intercessor-unit-3",
-                attacker_model_instance_id="army-beta:intercessor-unit-3:model-1",
+                attacker_model_instance_id=enemy_model_id,
                 target_unit_instance_id=target_unit_id,
                 weapon_profile=profile,
                 strength=4,
