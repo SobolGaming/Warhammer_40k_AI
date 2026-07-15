@@ -851,6 +851,212 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008344",
+    "ability_name": "Scouts",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002531/core/000008344/none",
+    "datasheet_id": "000002531",
+    "datasheet_name": "Corsair Voidreavers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:scouts"
+    ],
+    "semantic_categories": [
+      "core.scouts"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002531:reavers-of-the-void",
+    "ability_name": "Reavers of the Void",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002531/datasheet/000002531:reavers-of-the-void/none",
+    "datasheet_id": "000002531",
+    "datasheet_name": "Corsair Voidreavers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-reroll",
+      "catalog-ir:passive-hit-reroll"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.reroll_permission.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
+    "datasheet_id": "000002531",
+    "datasheet_name": "Corsair Voidreavers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002531:mistshield",
+    "ability_name": "Mistshield",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002531/wargear/000002531:mistshield/000002531:mistshield",
+    "datasheet_id": "000002531",
+    "datasheet_name": "Corsair Voidreavers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query"
+    ],
+    "semantic_categories": [
+      "wargear.characteristic_set.invulnerable_save.this_model"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000002531:mistshield",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008344",
+    "ability_name": "Scouts",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/core/000008344/none",
+    "datasheet_id": "000002532",
+    "datasheet_name": "Corsair Voidscarred",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:scouts"
+    ],
+    "semantic_categories": [
+      "core.scouts"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002532:piratical-raiders",
+    "ability_name": "Piratical Raiders",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/datasheet/000002532:piratical-raiders/none",
+    "datasheet_id": "000002532",
+    "datasheet_name": "Corsair Voidscarred",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:tracked-target-selection",
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:lethal-hits",
+      "catalog-ir:weapon-keyword-grant:precision"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_weapon_ability.this_unit",
+      "datasheet.rule_ir.select_tracked_target.enemy_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
+    "datasheet_id": "000002532",
+    "datasheet_name": "Corsair Voidscarred",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002532:channeller-stones",
+    "ability_name": "Channeller Stones",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/wargear/000002532:channeller-stones/000002532:channeller-stones",
+    "datasheet_id": "000002532",
+    "datasheet_name": "Corsair Voidscarred",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:first-failed-save-damage-replacement"
+    ],
+    "semantic_categories": [
+      "wargear.characteristic_set.damage.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000002532:channeller-stones",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002532:faolchu",
+    "ability_name": "Faolch\u00fa",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/wargear/000002532:faolchu/000002532:faolchu",
+    "datasheet_id": "000002532",
+    "datasheet_name": "Corsair Voidscarred",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:ignores-cover"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.grant_weapon_ability.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000002532:faolchu",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002532:mistshield",
+    "ability_name": "Mistshield",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/wargear/000002532:mistshield/000002532:mistshield",
+    "datasheet_id": "000002532",
+    "datasheet_name": "Corsair Voidscarred",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query"
+    ],
+    "semantic_categories": [
+      "wargear.characteristic_set.invulnerable_save.this_model"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000002532:mistshield",
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008339",
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",

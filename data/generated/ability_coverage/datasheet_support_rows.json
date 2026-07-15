@@ -42,6 +42,90 @@
   },
   {
     "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002531/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000002531/datasheet/000002531:reavers-of-the-void/none",
+      "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000002531/wargear/000002531:mistshield/000002531:mistshield"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Full",
+    "datasheet_id": "000002531",
+    "datasheet_name": "Corsair Voidreavers",
+    "detachment_ids": [
+      "armoured-warhost",
+      "aspect-host",
+      "corsair-coterie",
+      "devoted-of-ynnead",
+      "eldritch-raiders",
+      "fateful-performance",
+      "ghosts-of-the-webway",
+      "guardian-battlehost",
+      "path-of-the-outcast",
+      "seer-council",
+      "serpents-brood",
+      "spirit-conclave",
+      "twilight-flickers",
+      "warhost",
+      "windrider-host"
+    ],
+    "faction_id": "aeldari",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "overall": "Playable",
+    "supported_detachment_ids": [
+      "corsair-coterie",
+      "path-of-the-outcast"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:hit-roll-reroll`, `catalog-ir:invulnerable-save-characteristic-query`, `catalog-ir:passive-hit-reroll`, `descriptor:prebattle:scouts`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002532/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000002532/datasheet/000002532:piratical-raiders/none",
+      "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000002532/wargear/000002532:channeller-stones/000002532:channeller-stones",
+      "chaos-daemons-bridge-catalog/000002532/wargear/000002532:faolchu/000002532:faolchu",
+      "chaos-daemons-bridge-catalog/000002532/wargear/000002532:mistshield/000002532:mistshield"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Full",
+    "datasheet_id": "000002532",
+    "datasheet_name": "Corsair Voidscarred",
+    "detachment_ids": [
+      "armoured-warhost",
+      "aspect-host",
+      "corsair-coterie",
+      "devoted-of-ynnead",
+      "eldritch-raiders",
+      "fateful-performance",
+      "ghosts-of-the-webway",
+      "guardian-battlehost",
+      "path-of-the-outcast",
+      "seer-council",
+      "serpents-brood",
+      "spirit-conclave",
+      "twilight-flickers",
+      "warhost",
+      "windrider-host"
+    ],
+    "faction_id": "aeldari",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "overall": "Playable",
+    "supported_detachment_ids": [
+      "corsair-coterie",
+      "path-of-the-outcast"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:first-failed-save-damage-replacement`, `catalog-ir:invulnerable-save-characteristic-query`, `catalog-ir:tracked-target-selection`, `catalog-ir:weapon-keyword-grant`, `catalog-ir:weapon-keyword-grant:ignores-cover`, `catalog-ir:weapon-keyword-grant:lethal-hits`, `catalog-ir:weapon-keyword-grant:precision`, `descriptor:prebattle:scouts`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008344/none",
       "chaos-daemons-bridge-catalog/000004194/datasheet/000004194:aethersense-psychic/none",

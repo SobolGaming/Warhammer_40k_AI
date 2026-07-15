@@ -551,7 +551,7 @@ def _model_wargear_ids_by_model_id(
         for model in models_by_profile.get(option.model_profile_id, ()):
             wargear_by_model_id[model.model_instance_id].extend(selection.wargear_ids)
 
-    for option, selection in structured_selections:
+    for option, selection in _ordered_structured_wargear_selections(structured_selections):
         _apply_structured_wargear_selection_to_models(
             option=option,
             selection=selection,
@@ -574,6 +574,60 @@ def _model_wargear_ids_by_model_id(
         model_id: tuple(wargear_ids)
         for model_id, wargear_ids in sorted(wargear_by_model_id.items())
     }
+
+
+def _ordered_structured_wargear_selections(
+    selections: list[tuple[DatasheetWargearOption, WargearSelection]],
+) -> tuple[tuple[DatasheetWargearOption, WargearSelection], ...]:
+    remaining = sorted(selections, key=lambda item: item[0].option_id)
+    ordered: list[tuple[DatasheetWargearOption, WargearSelection]] = []
+    while remaining:
+        produced_by_remaining = {
+            effect.wargear_id: option.option_id
+            for option, selection in remaining
+            for effect in option.effects
+            if effect.wargear_id in selection.wargear_ids
+        }
+        ready = tuple(
+            item
+            for item in remaining
+            if not _structured_selection_dependencies(
+                option=item[0],
+                produced_by_option_id=produced_by_remaining,
+            )
+        )
+        if not ready:
+            raise UnitFactoryError("Structured wargear option dependencies contain a cycle.")
+        ready_ids = {option.option_id for option, _selection in ready}
+        ordered.extend(ready)
+        remaining = [item for item in remaining if item[0].option_id not in ready_ids]
+    return tuple(ordered)
+
+
+def _structured_selection_dependencies(
+    *,
+    option: DatasheetWargearOption,
+    produced_by_option_id: dict[str, str],
+) -> tuple[str, ...]:
+    required_wargear_ids = {
+        effect.replaced_wargear_id
+        for effect in option.effects
+        if effect.replaced_wargear_id is not None
+    }
+    required_wargear_ids.update(
+        wargear_id
+        for condition in option.conditions
+        if condition.kind is WargearOptionConditionKind.MODEL_EQUIPPED_WITH
+        for wargear_id in condition.wargear_ids
+    )
+    return tuple(
+        sorted(
+            producer_id
+            for wargear_id in required_wargear_ids
+            if (producer_id := produced_by_option_id.get(wargear_id)) is not None
+            and producer_id != option.option_id
+        )
+    )
 
 
 def _apply_structured_wargear_selection_to_models(
@@ -601,6 +655,16 @@ def _apply_structured_wargear_selection_to_models(
             continue
         if effect.kind is WargearOptionEffectKind.REPLACE_WARGEAR:
             _apply_replace_wargear_effect_to_models(
+                option=option,
+                effect=effect,
+                selected_wargear=tuple(selected_wargear),
+                selection_count=selection_count,
+                models=models,
+                wargear_by_model_id=wargear_by_model_id,
+            )
+            continue
+        if effect.kind is WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED:
+            _apply_remove_wargear_effect_from_models(
                 option=option,
                 effect=effect,
                 selected_wargear=tuple(selected_wargear),
@@ -672,6 +736,37 @@ def _apply_replace_wargear_effect_to_models(
         model_wargear.extend(effect.wargear_id for _index in range(effect.wargear_count))
 
 
+def _apply_remove_wargear_effect_from_models(
+    *,
+    option: DatasheetWargearOption,
+    effect: DatasheetWargearOptionEffect,
+    selected_wargear: tuple[str, ...],
+    selection_count: int,
+    models: tuple[ModelInstance, ...],
+    wargear_by_model_id: dict[str, list[str]],
+) -> None:
+    if effect.wargear_id not in selected_wargear:
+        return
+    if effect.replaced_wargear_id is None:
+        raise UnitFactoryError("Structured wargear removal target is missing.")
+    candidates = tuple(
+        model
+        for model in _eligible_wargear_effect_models(
+            option=option,
+            models=models,
+            wargear_by_model_id=wargear_by_model_id,
+        )
+        if effect.replaced_wargear_id in wargear_by_model_id[model.model_instance_id]
+    )
+    affected_model_count = effect.model_count * selection_count
+    if len(candidates) < affected_model_count:
+        raise UnitFactoryError(
+            "Structured wargear removal has fewer eligible model bearers than required."
+        )
+    for model in candidates[:affected_model_count]:
+        wargear_by_model_id[model.model_instance_id].remove(effect.replaced_wargear_id)
+
+
 def _eligible_wargear_effect_models(
     *,
     option: DatasheetWargearOption,
@@ -698,6 +793,10 @@ def _model_satisfies_wargear_option_conditions(
         if condition.kind is WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH and (
             current_wargear.intersection(condition.wargear_ids)
         ):
+            return False
+        if condition.kind is WargearOptionConditionKind.MODEL_EQUIPPED_WITH and not set(
+            condition.wargear_ids
+        ).issubset(current_wargear):
             return False
     return True
 

@@ -16,6 +16,11 @@ def validate_replace_wargear_effect_count(
     selected_for_profile: Set[str],
     error_type: type[ValueError],
 ) -> None:
+    if (
+        effect.kind is WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED
+        and effect.wargear_id not in selection_wargear_ids
+    ):
+        return
     if effect.wargear_id not in selection_wargear_ids and any(
         candidate.kind is WargearOptionEffectKind.REPLACE_WARGEAR
         and candidate.replaced_wargear_id == effect.replaced_wargear_id
@@ -38,6 +43,10 @@ def validate_replace_wargear_effect_count(
     selected_wargear_count = sum(
         1 for wargear_id in selection_wargear_ids if wargear_id == effect.wargear_id
     )
+    if effect.kind is WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED:
+        if selected_wargear_count < 1:
+            raise error_type("WargearSelection does not activate a structured wargear removal.")
+        return
     if selected_wargear_count != effect.wargear_count:
         raise error_type(
             "WargearSelection does not satisfy a structured wargear option replacement count."

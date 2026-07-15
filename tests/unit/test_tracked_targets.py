@@ -88,6 +88,7 @@ from warhammer40k_core.engine.source_backed_rerolls import (
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.tracked_targets import (
     SELECT_TRACKED_TARGET_DECISION_TYPE,
+    TRACKED_TARGET_EXPIRED_EVENT_TYPE,
     TrackedTargetOwnerScope,
     TrackedTargetRecord,
     TrackedTargetRole,
@@ -99,7 +100,13 @@ from warhammer40k_core.engine.tracked_targets import (
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
-from warhammer40k_core.rules.rule_ir import RuleClause, RuleEffectKind, RuleEffectSpec, RuleIR
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    RuleTriggerKind,
+)
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_daemons_datasheet_ir_support_2026_27 as belakor_ir_source,
@@ -1581,6 +1588,7 @@ def test_tracked_target_runtime_reselection_defensive_paths() -> None:
             record=record,
             clause=clause,
             unit=source_unit,
+            related_records=(record,),
         )
     assert (
         catalog_tracked_target_runtime_module._reselection_request_for_clause(  # pyright: ignore[reportPrivateUsage]
@@ -1589,14 +1597,10 @@ def test_tracked_target_runtime_reselection_defensive_paths() -> None:
             record=record,
             clause=clause,
             unit=source_unit,
+            related_records=(record,),
         )
         is None
     )
-    with pytest.raises(GameLifecycleError, match="could not find source unit"):
-        catalog_tracked_target_runtime_module._army_and_unit_for_unit_id(  # pyright: ignore[reportPrivateUsage]
-            armies=tuple(state.army_definitions),
-            unit_instance_id="unit:missing",
-        )
 
 
 def test_tracked_target_destroyed_target_expires_and_requests_reselection() -> None:
@@ -1687,6 +1691,237 @@ def test_tracked_target_destroyed_target_expires_and_requests_reselection() -> N
     assert replacement.target_unit_instance_id == replacement_target.unit_instance_id
 
 
+@pytest.mark.parametrize("include_unrelated_reselection", [False, True])
+def test_tracked_target_expiration_does_not_depend_on_reselection_records(
+    *,
+    include_unrelated_reselection: bool,
+) -> None:
+    state = _battle_state_with_scenario(beta_unit_count=2)
+    source_unit = state.army_definitions[0].units[0]
+    destroyed_target = state.army_definitions[1].units[0]
+    selection_record = _tracked_target_catalog_record(
+        trigger_kind=TimingTriggerKind.START_BATTLE_ROUND,
+        source_id="rule:selection-without-reselection",
+        include_reselection=False,
+    )
+    records = [selection_record]
+    if include_unrelated_reselection:
+        records.append(
+            replace(
+                _tracked_target_catalog_record(source_id="rule:unrelated-reselection"),
+                record_id="record:unrelated-reselection",
+            )
+        )
+    runtime = CatalogTrackedTargetRuntime(
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records(tuple(records)),
+            "player-b": AbilityCatalogIndex.from_records(()),
+        },
+        armies=tuple(state.army_definitions),
+    )
+    state.record_tracked_target(
+        TrackedTargetRecord(
+            record_id="tracked:selection-without-reselection",
+            source_rule_id=selection_record.definition.source_id,
+            source_ability_id=selection_record.definition.ability_id,
+            source_clause_id="tracked:initial-clause",
+            source_effect_index=0,
+            owner_player_id="player-a",
+            source_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=source_unit.own_models[0].model_instance_id,
+            owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
+            role=TrackedTargetRole.PREY,
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
+            target_unit_instance_id=destroyed_target.unit_instance_id,
+            target_allegiance="enemy",
+            target_lifecycle="until_destroyed",
+            selected_battle_round=1,
+            selection_request_id="request:selection-without-reselection",
+            selection_result_id="result:selection-without-reselection",
+            active=True,
+        )
+    )
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        destroyed_target.own_model_ids()
+    )
+    decisions = DecisionController()
+    current_phase = state.current_battle_phase
+    assert current_phase is not None
+    context = UnitDestroyedContext(
+        state=state,
+        decisions=decisions,
+        completed_phase=current_phase,
+        model_destroyed_event_id="event:destroyed-selection-target",
+        model_destroyed_payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": current_phase.value,
+            "destroying_player_id": "player-a",
+            "target_unit_instance_id": destroyed_target.unit_instance_id,
+            "model_instance_id": destroyed_target.own_models[0].model_instance_id,
+        },
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=destroyed_target.unit_instance_id,
+        destroyed_player_id="player-b",
+    )
+
+    assert len(runtime.unit_destroyed_bindings()) == 1
+    runtime.unit_destroyed_handler(context)
+    runtime.unit_destroyed_handler(context)
+
+    assert not state.tracked_target_records[0].active
+    assert decisions.queue.pending_requests == ()
+    assert (
+        sum(record.event_type == "tracked_target_expired" for record in decisions.event_log.records)
+        == 1
+    )
+
+
+@pytest.mark.parametrize(
+    ("reselect_record_id", "passive_record_id"),
+    [
+        ("tracked:000-reselect", "tracked:999-passive"),
+        ("tracked:999-reselect", "tracked:000-passive"),
+    ],
+)
+def test_tracked_target_shared_target_expires_all_records_before_reselection(
+    *,
+    reselect_record_id: str,
+    passive_record_id: str,
+) -> None:
+    state = _battle_state_with_scenario(alpha_unit_count=2, beta_unit_count=2)
+    source_units = state.army_definitions[0].units
+    destroyed_target = state.army_definitions[1].units[0]
+    reselect_record = _tracked_target_catalog_record(source_id="rule:shared-target-reselect")
+    passive_record = _tracked_target_catalog_record(
+        trigger_kind=TimingTriggerKind.START_BATTLE_ROUND,
+        source_id="rule:shared-target-passive",
+        include_reselection=False,
+    )
+    runtime = CatalogTrackedTargetRuntime(
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records(
+                (reselect_record, replace(passive_record, record_id="record:shared-passive"))
+            ),
+            "player-b": AbilityCatalogIndex.from_records(()),
+        },
+        armies=tuple(state.army_definitions),
+    )
+    tracked_records = (
+        _shared_target_record(
+            record_id=reselect_record_id,
+            catalog_record=reselect_record,
+            source_unit_instance_id=source_units[0].unit_instance_id,
+            source_model_instance_id=source_units[0].own_models[0].model_instance_id,
+            target_unit_instance_id=destroyed_target.unit_instance_id,
+        ),
+        _shared_target_record(
+            record_id=passive_record_id,
+            catalog_record=passive_record,
+            source_unit_instance_id=source_units[1].unit_instance_id,
+            source_model_instance_id=source_units[1].own_models[0].model_instance_id,
+            target_unit_instance_id=destroyed_target.unit_instance_id,
+        ),
+    )
+    for tracked_record in tracked_records:
+        state.record_tracked_target(tracked_record)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        destroyed_target.own_model_ids()
+    )
+    decisions = DecisionController()
+    context = _tracked_target_destroyed_context(
+        state=state,
+        decisions=decisions,
+        destroyed_unit_instance_id=destroyed_target.unit_instance_id,
+        destroyed_model_instance_id=destroyed_target.own_models[0].model_instance_id,
+    )
+
+    runtime.unit_destroyed_handler(context)
+
+    assert all(not record.active for record in state.tracked_target_records)
+    assert tuple(record.event_type for record in decisions.event_log.records) == (
+        TRACKED_TARGET_EXPIRED_EVENT_TYPE,
+        TRACKED_TARGET_EXPIRED_EVENT_TYPE,
+        "decision_requested",
+    )
+    assert len(decisions.queue.pending_requests) == 1
+    request = decisions.queue.pending_requests[0]
+    assert isinstance(request.payload, dict)
+    assert request.payload["source_rule_id"] == reselect_record.definition.source_id
+    assert request.payload["source_unit_instance_id"] == source_units[0].unit_instance_id
+
+    runtime.unit_destroyed_handler(context)
+    assert tuple(record.event_type for record in decisions.event_log.records) == (
+        TRACKED_TARGET_EXPIRED_EVENT_TYPE,
+        TRACKED_TARGET_EXPIRED_EVENT_TYPE,
+        "decision_requested",
+    )
+
+
+def test_tracked_target_shared_target_preserves_all_reselection_requests() -> None:
+    state = _battle_state_with_scenario(alpha_unit_count=2, beta_unit_count=2)
+    source_units = state.army_definitions[0].units
+    destroyed_target = state.army_definitions[1].units[0]
+    reselect_record = _tracked_target_catalog_record(source_id="rule:shared-reselection")
+    runtime = CatalogTrackedTargetRuntime(
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records((reselect_record,)),
+            "player-b": AbilityCatalogIndex.from_records(()),
+        },
+        armies=tuple(state.army_definitions),
+    )
+    tracked_records = (
+        _shared_target_record(
+            record_id="tracked:999-source-one",
+            catalog_record=reselect_record,
+            source_unit_instance_id=source_units[0].unit_instance_id,
+            source_model_instance_id=source_units[0].own_models[0].model_instance_id,
+            target_unit_instance_id=destroyed_target.unit_instance_id,
+        ),
+        _shared_target_record(
+            record_id="tracked:000-source-two",
+            catalog_record=reselect_record,
+            source_unit_instance_id=source_units[1].unit_instance_id,
+            source_model_instance_id=source_units[1].own_models[0].model_instance_id,
+            target_unit_instance_id=destroyed_target.unit_instance_id,
+        ),
+    )
+    for tracked_record in tracked_records:
+        state.record_tracked_target(tracked_record)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        destroyed_target.own_model_ids()
+    )
+    decisions = DecisionController()
+
+    runtime.unit_destroyed_handler(
+        _tracked_target_destroyed_context(
+            state=state,
+            decisions=decisions,
+            destroyed_unit_instance_id=destroyed_target.unit_instance_id,
+            destroyed_model_instance_id=destroyed_target.own_models[0].model_instance_id,
+        )
+    )
+
+    assert all(not record.active for record in state.tracked_target_records)
+    assert tuple(record.event_type for record in decisions.event_log.records) == (
+        TRACKED_TARGET_EXPIRED_EVENT_TYPE,
+        TRACKED_TARGET_EXPIRED_EVENT_TYPE,
+        "decision_requested",
+        "decision_requested",
+    )
+    assert [
+        cast(dict[str, JsonValue], request.payload)["source_unit_instance_id"]
+        for request in decisions.queue.pending_requests
+    ] == [
+        source_units[1].unit_instance_id,
+        source_units[0].unit_instance_id,
+    ]
+
+
 def _record_selection(
     *,
     state: GameState,
@@ -1719,10 +1954,17 @@ def _record_selection(
     )
 
 
-def _battle_state_with_scenario(*, beta_unit_count: int = 1) -> GameState:
+def _battle_state_with_scenario(
+    *,
+    alpha_unit_count: int = 1,
+    beta_unit_count: int = 1,
+) -> GameState:
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="tracked-target-battlefield",
-        armies=_mustered_armies(beta_unit_count=beta_unit_count),
+        armies=_mustered_armies(
+            alpha_unit_count=alpha_unit_count,
+            beta_unit_count=beta_unit_count,
+        ),
     )
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     state = GameState(
@@ -1747,12 +1989,21 @@ def _battle_state_with_scenario(*, beta_unit_count: int = 1) -> GameState:
     return state
 
 
-def _mustered_armies(*, beta_unit_count: int = 1) -> tuple[ArmyDefinition, ...]:
+def _mustered_armies(
+    *,
+    alpha_unit_count: int = 1,
+    beta_unit_count: int = 1,
+) -> tuple[ArmyDefinition, ...]:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return (
         muster_army(
             catalog=catalog,
-            request=_muster_request(catalog=catalog, player_id="player-a", army_id="army-alpha"),
+            request=_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_count=alpha_unit_count,
+            ),
         ),
         muster_army(
             catalog=catalog,
@@ -1763,6 +2014,65 @@ def _mustered_armies(*, beta_unit_count: int = 1) -> tuple[ArmyDefinition, ...]:
                 unit_count=beta_unit_count,
             ),
         ),
+    )
+
+
+def _shared_target_record(
+    *,
+    record_id: str,
+    catalog_record: AbilityCatalogRecord,
+    source_unit_instance_id: str,
+    source_model_instance_id: str,
+    target_unit_instance_id: str,
+) -> TrackedTargetRecord:
+    return TrackedTargetRecord(
+        record_id=record_id,
+        source_rule_id=catalog_record.definition.source_id,
+        source_ability_id=catalog_record.definition.ability_id,
+        source_clause_id="tracked:initial-clause",
+        source_effect_index=0,
+        owner_player_id="player-a",
+        source_unit_instance_id=source_unit_instance_id,
+        source_model_instance_id=source_model_instance_id,
+        owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
+        role=TrackedTargetRole.PREY,
+        supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
+        target_unit_instance_id=target_unit_instance_id,
+        target_allegiance="enemy",
+        target_lifecycle="until_destroyed",
+        selected_battle_round=1,
+        selection_request_id=f"request:{record_id}",
+        selection_result_id=f"result:{record_id}",
+        active=True,
+    )
+
+
+def _tracked_target_destroyed_context(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    destroyed_unit_instance_id: str,
+    destroyed_model_instance_id: str,
+) -> UnitDestroyedContext:
+    current_phase = state.current_battle_phase
+    assert current_phase is not None
+    return UnitDestroyedContext(
+        state=state,
+        decisions=decisions,
+        completed_phase=current_phase,
+        model_destroyed_event_id=f"event:destroyed:{destroyed_unit_instance_id}",
+        model_destroyed_payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": current_phase.value,
+            "destroying_player_id": "player-a",
+            "target_unit_instance_id": destroyed_unit_instance_id,
+            "model_instance_id": destroyed_model_instance_id,
+        },
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=destroyed_unit_instance_id,
+        destroyed_player_id="player-b",
     )
 
 
@@ -1808,6 +2118,7 @@ def _tracked_target_catalog_record(
     trigger_kind: TimingTriggerKind = TimingTriggerKind.AFTER_UNIT_DESTROYED,
     raw_text: str = PREY_TARGET_TEXT,
     source_id: str = "rule:tracked-target",
+    include_reselection: bool = True,
 ) -> AbilityCatalogRecord:
     source = RuleSourceText.from_raw(
         source_id=source_id,
@@ -1817,6 +2128,16 @@ def _tracked_target_catalog_record(
         source,
         source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     ).rule_ir
+    if not include_reselection:
+        rule_ir = replace(
+            rule_ir,
+            clauses=tuple(
+                clause
+                for clause in rule_ir.clauses
+                if clause.trigger is None
+                or clause.trigger.kind is not RuleTriggerKind.UNIT_DESTROYED
+            ),
+        )
     return AbilityCatalogRecord(
         record_id="record:tracked-target",
         definition=AbilityDefinition(

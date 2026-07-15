@@ -18,7 +18,6 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
     AbilityHandlerBinding,
     AbilityHandlerRegistry,
-    default_ability_handler_registry,
 )
 from warhammer40k_core.engine.ability_catalog import build_player_ability_index
 from warhammer40k_core.engine.advance_eligibility_hooks import (
@@ -87,6 +86,15 @@ from warhammer40k_core.engine.faction_content.hooks import (
     hook_bindings_by_event_from_sources,
     hook_bindings_for_event,
     validate_any_hook_bindings,
+)
+from warhammer40k_core.engine.faction_content.registry_merging import (
+    merged_ability_registry as _merged_ability_registry,
+)
+from warhammer40k_core.engine.faction_content.registry_merging import (
+    merged_rule_registry as _merged_rule_registry,
+)
+from warhammer40k_core.engine.faction_content.registry_merging import (
+    merged_stratagem_registry as _merged_stratagem_registry,
 )
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerBinding,
@@ -1345,6 +1353,10 @@ class RuntimeContentBundle:
         )
         battle_formation_hook_registry = BattleFormationHookRegistry.from_bindings(
             (
+                *catalog_runtime_hooks.battle_formation_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
                 *generic_detachment_rule_effects.battle_formation_hook_bindings(
                     activation,
                     records,
@@ -1736,7 +1748,8 @@ class RuntimeContentBundle:
                 lambda contribution: contribution.wound_roll_modifier_bindings,
             ),
             save_option_modifier_bindings=(
-                generic_rule_lifecycle_hooks.save_option_modifier_bindings(
+                catalog_rules.save_option_modifier_bindings()
+                + generic_rule_lifecycle_hooks.save_option_modifier_bindings(
                     activation=activation,
                     execution_records=records,
                 )
@@ -1782,6 +1795,10 @@ class RuntimeContentBundle:
             + catalog_weapon_profile_modifier_bindings(
                 ability_indexes_by_player_id=ability_indexes_by_player_id,
                 armies=validated_armies,
+            ),
+            attack_reroll_permission_bindings=(catalog_rules.attack_reroll_permission_bindings()),
+            failed_save_damage_replacement_bindings=(
+                catalog_rules.failed_save_damage_replacement_bindings()
             ),
         )
         return cls(
@@ -1911,42 +1928,6 @@ def _selected_stratagem_ids_for_army(
         if detachment.detachment_id in selected_detachment_ids:
             selected.update(detachment.stratagem_ids)
     return tuple(sorted(selected))
-
-
-def _merged_ability_registry(
-    base: AbilityHandlerRegistry | None,
-    contribution_bindings: tuple[AbilityHandlerBinding, ...],
-) -> AbilityHandlerRegistry:
-    resolved_base = default_ability_handler_registry() if base is None else base
-    if type(resolved_base) is not AbilityHandlerRegistry:
-        raise GameLifecycleError("Runtime content base ability registry is invalid.")
-    return AbilityHandlerRegistry.from_bindings(
-        (*resolved_base.all_bindings(), *contribution_bindings)
-    )
-
-
-def _merged_stratagem_registry(
-    base: StratagemHandlerRegistry | None,
-    contribution_bindings: tuple[StratagemHandlerBinding, ...],
-) -> StratagemHandlerRegistry:
-    resolved_base = StratagemHandlerRegistry.empty() if base is None else base
-    if type(resolved_base) is not StratagemHandlerRegistry:
-        raise GameLifecycleError("Runtime content base Stratagem registry is invalid.")
-    return StratagemHandlerRegistry.from_bindings(
-        (*resolved_base.all_bindings(), *contribution_bindings)
-    )
-
-
-def _merged_rule_registry(
-    base: RuleExecutionRegistry | None,
-    contribution_bindings: tuple[RuleRuntimeBinding, ...],
-) -> RuleExecutionRegistry:
-    resolved_base = RuleExecutionRegistry.empty() if base is None else base
-    if type(resolved_base) is not RuleExecutionRegistry:
-        raise GameLifecycleError("Runtime content base rule registry is invalid.")
-    return RuleExecutionRegistry.from_bindings(
-        (*resolved_base.all_bindings(), *contribution_bindings)
-    )
 
 
 def _merged_named_handlers(

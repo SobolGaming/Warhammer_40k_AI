@@ -4,6 +4,19 @@ from collections.abc import Mapping
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import WeaponProfileError, weapon_keyword_from_token
+from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
+    clause_uses_exact_datasheet_runtime_template,
+    exact_datasheet_runtime_descriptor_for_clause,
+    first_failed_save_damage_replacement_descriptor_for_clause,
+    invulnerable_save_descriptor_for_clause,
+    passive_hit_reroll_descriptor_for_clause,
+)
+from warhammer40k_core.engine.catalog_tracked_target_selection_descriptors import (
+    clause_has_invalid_exact_tracked_target_selection_shape,
+)
+from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
+    clause_has_invalid_exact_tracked_target_weapon_grant_shape,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -26,6 +39,24 @@ CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:wound-roll
 CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID = (
     "catalog-ir:fight-activation-movement-distance"
 )
+CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID = (
+    "catalog-ir:invulnerable-save-characteristic-query"
+)
+CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID = "catalog-ir:passive-hit-reroll"
+CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID = (
+    "catalog-ir:first-failed-save-damage-replacement"
+)
+
+
+def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool:
+    return (
+        (
+            clause_uses_exact_datasheet_runtime_template(clause)
+            and exact_datasheet_runtime_descriptor_for_clause(clause) is None
+        )
+        or clause_has_invalid_exact_tracked_target_weapon_grant_shape(clause)
+        or clause_has_invalid_exact_tracked_target_selection_shape(clause)
+    )
 
 
 def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
@@ -43,6 +74,12 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
             _required_string(parameter_payload(clause.effects[0].parameters), "characteristic")
         )
         consumer_ids.add(f"catalog-ir:{characteristic.value}-characteristic-modifier")
+    if clause_is_passive_invulnerable_save_set(clause):
+        consumer_ids.add(CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID)
+    if clause_is_passive_hit_reroll(clause):
+        consumer_ids.add(CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID)
+    if clause_is_first_failed_save_damage_replacement(clause):
+        consumer_ids.add(CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID)
     if clause_is_fight_selected_weapon_ability_choice(clause):
         consumer_ids.add(CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID)
         consumer_ids.add(CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID)
@@ -78,6 +115,9 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
                 CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID,
                 CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
+                CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,
+                CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID,
+                CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID,
             }
         )
     )
@@ -138,6 +178,18 @@ def clause_is_passive_characteristic_modifier(clause: RuleClause) -> bool:
         and type(parameter_payload(condition.parameters).get("required_keyword")) is str
         for condition in clause.conditions
     )
+
+
+def clause_is_passive_invulnerable_save_set(clause: RuleClause) -> bool:
+    return invulnerable_save_descriptor_for_clause(clause) is not None
+
+
+def clause_is_passive_hit_reroll(clause: RuleClause) -> bool:
+    return passive_hit_reroll_descriptor_for_clause(clause) is not None
+
+
+def clause_is_first_failed_save_damage_replacement(clause: RuleClause) -> bool:
+    return first_failed_save_damage_replacement_descriptor_for_clause(clause) is not None
 
 
 def clause_is_conditional_lone_operative(clause: RuleClause) -> bool:

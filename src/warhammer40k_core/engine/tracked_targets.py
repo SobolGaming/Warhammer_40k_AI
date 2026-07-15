@@ -9,7 +9,12 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    SetupStep,
+)
 from warhammer40k_core.engine.source_backed_rerolls import SourceBackedRerollPermissionContext
 
 if TYPE_CHECKING:
@@ -287,6 +292,15 @@ def build_select_tracked_target_request(
     )
     scope = _owner_scope_from_token(owner_scope)
     tracked_role = _role_from_token(role)
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit)
+    if scope is TrackedTargetOwnerScope.THIS_UNIT:
+        source_unit = source_rules_unit.unit_instance_id
+    else:
+        if source_model is None:
+            raise GameLifecycleError("THIS_MODEL tracked target requires a source model.")
+        source_unit = source_rules_unit.component_unit_id_for_model(source_model)
     attack_roll_pairs = _validate_supported_attack_roll_pairs(supported_attack_roll_pairs)
     attack_kinds = _supported_attack_kinds_for_pairs(attack_roll_pairs)
     roll_types = _supported_roll_types_for_pairs(attack_roll_pairs)
@@ -455,7 +469,7 @@ def apply_select_tracked_target_decision(
         target_unit_instance_id=target_unit_id,
         target_allegiance=_payload_string(request_payload, key="target_allegiance"),
         target_lifecycle="until_destroyed",
-        selected_battle_round=state.battle_round,
+        selected_battle_round=_tracked_target_selection_battle_round(state),
         selection_request_id=request.request_id,
         selection_result_id=result.result_id,
         active=True,
@@ -477,6 +491,17 @@ def apply_select_tracked_target_decision(
         },
     )
     return record
+
+
+def _tracked_target_selection_battle_round(state: GameState) -> int:
+    if state.battle_round >= 1:
+        return state.battle_round
+    if (
+        state.stage is GameLifecycleStage.SETUP
+        and state.current_setup_step is SetupStep.DECLARE_BATTLE_FORMATIONS
+    ):
+        return 1
+    raise GameLifecycleError("Tracked target selection requires battle round context.")
 
 
 def invalid_select_tracked_target_status(
@@ -638,7 +663,9 @@ def _legal_target_unit_ids(
     removed_model_ids = set(
         () if state.battlefield_state is None else state.battlefield_state.removed_model_ids
     )
-    legal: list[str] = []
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    legal: set[str] = set()
     for army in state.army_definitions:
         owner_matches = army.player_id == owner
         if allegiance == "enemy" and owner_matches:
@@ -646,12 +673,13 @@ def _legal_target_unit_ids(
         if allegiance == "friendly" and not owner_matches:
             continue
         for unit in army.units:
-            model_ids = {model.model_instance_id for model in unit.own_models}
-            if model_ids and model_ids <= removed_model_ids:
+            rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id)
+            if not any(
+                model.is_alive and model.model_instance_id not in removed_model_ids
+                for model in rules_unit.own_models
+            ):
                 continue
-            if not any(model.is_alive for model in unit.own_models):
-                continue
-            legal.append(unit.unit_instance_id)
+            legal.add(rules_unit.unit_instance_id)
     return tuple(sorted(legal))
 
 

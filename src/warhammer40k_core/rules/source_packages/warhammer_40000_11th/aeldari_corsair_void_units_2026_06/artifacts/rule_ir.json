@@ -1,0 +1,581 @@
+{
+  "artifact_schema": "core-v2-corsair-void-units-datasheet-rule-ir-v1",
+  "datasheets": {
+    "000002531": "Corsair Voidreavers",
+    "000002532": "Corsair Voidscarred"
+  },
+  "package_hash": "27757f36ccef22e12d95a41f9cc556bbd675ea3e1f319f8c46458fd525d317fe",
+  "records": {
+    "000002531:3": {
+      "ability_name": "Reavers of the Void",
+      "normalized_text_sha256": "cfbfaeea3f3b92051700a6ba37fbb6cb2c68b18d76d70ffc55a8cba4114e3642",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:corsair-void-units:000002531:3:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "full_reroll_if_target_within_objective_range",
+                    "value": true
+                  },
+                  {
+                    "key": "reroll_unmodified_value",
+                    "value": 1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "hit"
+                  }
+                ],
+                "source_span": {
+                  "end": 71,
+                  "start": 48,
+                  "text": "re-roll a Hit roll of 1"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 179,
+              "start": 0,
+              "text": "Each time a model in this unit makes an attack, re-roll a Hit roll of 1. If the target of that attack is within range of an objective marker, you can re-roll the Hit roll instead."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 30,
+                "start": 21,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17c:conditional-objective-hit-reroll",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "8b236c49bdabd7c141c1e639f987286dacb1bc887fe6287234a8d3d51e0f1e08",
+        "normalized_text": "Each time a model in this unit makes an attack, re-roll a Hit roll of 1. If the target of that attack is within range of an objective marker, you can re-roll the Hit roll instead.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:corsair-void-units:datasheet:000002531:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-corsair-void-units-datasheets-2026-06-14:datasheet:000002531:3"
+      }
+    },
+    "000002531:4": {
+      "ability_name": "Mistshield",
+      "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:corsair-void-units:000002531:4:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "set_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "invulnerable_save"
+                  },
+                  {
+                    "key": "value",
+                    "value": 4
+                  }
+                ],
+                "source_span": {
+                  "end": 37,
+                  "start": 17,
+                  "text": "4+ invulnerable save"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 38,
+              "start": 0,
+              "text": "The bearer has a 4+ invulnerable save."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 10,
+                "start": 4,
+                "text": "bearer"
+              }
+            },
+            "template_id": "phase17c:passive-model-characteristic-set",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "c9e741d2465eeffab87d43147f36f5646ce280f5f9855312c2556fb4bc05bcf4",
+        "normalized_text": "The bearer has a 4+ invulnerable save.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:corsair-void-units:datasheet:000002531:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-corsair-void-units-datasheets-2026-06-14:datasheet:000002531:4"
+      }
+    },
+    "000002532:3": {
+      "ability_name": "Piratical Raiders",
+      "normalized_text_sha256": "13a15de5421db6bd4c31d598b2d8757f286aec0a8a3b1c75a2e42cdae3c302a3",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:corsair-void-units:000002532:3:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "select_tracked_target",
+                "parameters": [
+                  {
+                    "key": "replacement",
+                    "value": false
+                  },
+                  {
+                    "key": "selection_kind",
+                    "value": "select_one"
+                  },
+                  {
+                    "key": "target_allegiance",
+                    "value": "enemy"
+                  },
+                  {
+                    "key": "target_lifecycle",
+                    "value": "until_destroyed"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "enemy_unit"
+                  },
+                  {
+                    "key": "tracked_target_owner",
+                    "value": "this_unit"
+                  },
+                  {
+                    "key": "tracked_target_role",
+                    "value": "prey"
+                  }
+                ],
+                "source_span": {
+                  "end": 69,
+                  "start": 28,
+                  "text": "select one unit from your opponent's army"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 186,
+              "start": 0,
+              "text": "At the start of the battle, select one unit from your opponent's army. Weapons equipped by models in this unit have the [LETHAL HITS] and [PRECISION] abilities while targeting that unit."
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 69,
+                "start": 35,
+                "text": "one unit from your opponent's army"
+              }
+            },
+            "template_id": "phase17c:start-battle-tracked-target-selection",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "start"
+                },
+                {
+                  "key": "owner",
+                  "value": "controlling_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "battle"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "start_battle"
+                }
+              ],
+              "source_span": {
+                "end": 26,
+                "start": 0,
+                "text": "At the start of the battle"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:aeldari:corsair-void-units:000002532:3:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "attack_target"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "attack_targets_tracked_target"
+                  },
+                  {
+                    "key": "target_reference",
+                    "value": "tracked_target"
+                  },
+                  {
+                    "key": "tracked_target_owner",
+                    "value": "this_unit"
+                  },
+                  {
+                    "key": "tracked_target_role",
+                    "value": "prey"
+                  }
+                ],
+                "source_span": {
+                  "end": 185,
+                  "start": 160,
+                  "text": "while targeting that unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "grant_weapon_ability",
+                "parameters": [
+                  {
+                    "key": "target_reference",
+                    "value": "tracked_target"
+                  },
+                  {
+                    "key": "tracked_target_owner",
+                    "value": "this_unit"
+                  },
+                  {
+                    "key": "tracked_target_role",
+                    "value": "prey"
+                  },
+                  {
+                    "key": "weapon_ability",
+                    "value": "Lethal Hits"
+                  },
+                  {
+                    "key": "weapon_scope",
+                    "value": "all"
+                  }
+                ],
+                "source_span": {
+                  "end": 133,
+                  "start": 120,
+                  "text": "[LETHAL HITS]"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 186,
+              "start": 0,
+              "text": "At the start of the battle, select one unit from your opponent's army. Weapons equipped by models in this unit have the [LETHAL HITS] and [PRECISION] abilities while targeting that unit."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 110,
+                "start": 101,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17c:tracked-target-weapon-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:aeldari:corsair-void-units:000002532:3:clause:003",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "attack_target"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "attack_targets_tracked_target"
+                  },
+                  {
+                    "key": "target_reference",
+                    "value": "tracked_target"
+                  },
+                  {
+                    "key": "tracked_target_owner",
+                    "value": "this_unit"
+                  },
+                  {
+                    "key": "tracked_target_role",
+                    "value": "prey"
+                  }
+                ],
+                "source_span": {
+                  "end": 185,
+                  "start": 160,
+                  "text": "while targeting that unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "grant_weapon_ability",
+                "parameters": [
+                  {
+                    "key": "target_reference",
+                    "value": "tracked_target"
+                  },
+                  {
+                    "key": "tracked_target_owner",
+                    "value": "this_unit"
+                  },
+                  {
+                    "key": "tracked_target_role",
+                    "value": "prey"
+                  },
+                  {
+                    "key": "weapon_ability",
+                    "value": "Precision"
+                  },
+                  {
+                    "key": "weapon_scope",
+                    "value": "all"
+                  }
+                ],
+                "source_span": {
+                  "end": 149,
+                  "start": 138,
+                  "text": "[PRECISION]"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 186,
+              "start": 0,
+              "text": "At the start of the battle, select one unit from your opponent's army. Weapons equipped by models in this unit have the [LETHAL HITS] and [PRECISION] abilities while targeting that unit."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 110,
+                "start": 101,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17c:tracked-target-weapon-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "0d71bc50b0c2fef102384c63ac401d9a645ca210e910d0040964aa6a3b9febc8",
+        "normalized_text": "At the start of the battle, select one unit from your opponent's army. Weapons equipped by models in this unit have the [LETHAL HITS] and [PRECISION] abilities while targeting that unit.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:corsair-void-units:datasheet:000002532:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-corsair-void-units-datasheets-2026-06-14:datasheet:000002532:3"
+      }
+    },
+    "000002532:4": {
+      "ability_name": "Channeller Stones",
+      "normalized_text_sha256": "d1c2e17b8a4066aa45126f5c055f8919d391df0d953827717feb820cca7c398f",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:corsair-void-units:000002532:4:clause:001",
+            "conditions": [
+              {
+                "kind": "frequency_limit",
+                "parameters": [
+                  {
+                    "key": "activation_kind",
+                    "value": "automatic_first_occurrence"
+                  },
+                  {
+                    "key": "max_uses",
+                    "value": 1
+                  },
+                  {
+                    "key": "scope",
+                    "value": "turn"
+                  },
+                  {
+                    "key": "usage_subject",
+                    "value": "bearers_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 13,
+                  "start": 0,
+                  "text": "Once per turn"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "set_characteristic",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "defender"
+                  },
+                  {
+                    "key": "characteristic",
+                    "value": "damage"
+                  },
+                  {
+                    "key": "value",
+                    "value": 0
+                  }
+                ],
+                "source_span": {
+                  "end": 130,
+                  "start": 78,
+                  "text": "change the Damage characteristic of that attack to 0"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 131,
+              "start": 0,
+              "text": "Once per turn, the first time a saving throw is failed for the bearer's unit, change the Damage characteristic of that attack to 0."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 76,
+                "start": 63,
+                "text": "bearer's unit"
+              }
+            },
+            "template_id": "phase17c:first-failed-save-damage-replacement",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "outcome",
+                  "value": "failed"
+                },
+                {
+                  "key": "roll_type",
+                  "value": "attack_sequence.save"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "after_failed_saving_throw"
+                }
+              ],
+              "source_span": {
+                "end": 54,
+                "start": 15,
+                "text": "the first time a saving throw is failed"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "55678d6038a3fa49ccd8d70a47e81a2069638bb1d9ca7f6686e908996bb23253",
+        "normalized_text": "Once per turn, the first time a saving throw is failed for the bearer's unit, change the Damage characteristic of that attack to 0.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:corsair-void-units:datasheet:000002532:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-corsair-void-units-datasheets-2026-06-14:datasheet:000002532:4"
+      }
+    },
+    "000002532:6": {
+      "ability_name": "Mistshield",
+      "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:corsair-void-units:000002532:6:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "set_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "invulnerable_save"
+                  },
+                  {
+                    "key": "value",
+                    "value": 4
+                  }
+                ],
+                "source_span": {
+                  "end": 37,
+                  "start": 17,
+                  "text": "4+ invulnerable save"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 38,
+              "start": 0,
+              "text": "The bearer has a 4+ invulnerable save."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 10,
+                "start": 4,
+                "text": "bearer"
+              }
+            },
+            "template_id": "phase17c:passive-model-characteristic-set",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "e206b02ed0c42c433d14ede5af68061b902b07015e0b51e512fb33b98273b617",
+        "normalized_text": "The bearer has a 4+ invulnerable save.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:corsair-void-units:datasheet:000002532:6",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-corsair-void-units-datasheets-2026-06-14:datasheet:000002532:6"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-aeldari-corsair-void-units-datasheets-2026-06-14",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}

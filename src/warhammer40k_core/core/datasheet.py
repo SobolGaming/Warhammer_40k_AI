@@ -22,6 +22,7 @@ from warhammer40k_core.core.content_scope import (
     CatalogContentScopeError,
     catalog_content_scope_from_token,
 )
+from warhammer40k_core.core.datasheet_composition import validate_unit_composition_counts
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 from warhammer40k_core.core.wargear_selection_limits import (
     DatasheetWargearSelectionLimit,
@@ -68,12 +69,14 @@ class DamagedWeaponScope(StrEnum):
 
 
 class WargearOptionConditionKind(StrEnum):
+    MODEL_EQUIPPED_WITH = "model_equipped_with"
     MODEL_NOT_EQUIPPED_WITH = "model_not_equipped_with"
 
 
 class WargearOptionEffectKind(StrEnum):
     ADD_WARGEAR = "add_wargear"
     ADD_WARGEAR_IF_SELECTED = "add_wargear_if_selected"
+    REMOVE_WARGEAR_IF_SELECTED = "remove_wargear_if_selected"
     REPLACE_WARGEAR = "replace_wargear"
 
 
@@ -209,6 +212,7 @@ class DatasheetDefinitionPayload(TypedDict):
     keywords: DatasheetKeywordSetPayload
     model_profiles: list[ModelProfileDefinitionPayload]
     composition: list[UnitCompositionDefinitionPayload]
+    max_unit_models: NotRequired[int | None]
     wargear_options: list[DatasheetWargearOptionPayload]
     mustering_options: list[DatasheetMusteringOptionPayload]
     abilities: list[DatasheetAbilityDescriptorPayload]
@@ -351,23 +355,22 @@ class UnitCompositionDefinition:
     model_profile_id: str
     min_models: int
     max_models: int
+    allows_zero_models: bool = False
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "model_profile_id",
-            _validate_identifier(
-                "UnitCompositionDefinition model_profile_id", self.model_profile_id
-            ),
+        model_profile_id = _validate_identifier(
+            "UnitCompositionDefinition model_profile_id", self.model_profile_id
         )
-        min_models = _validate_positive_int("UnitCompositionDefinition min_models", self.min_models)
-        max_models = _validate_positive_int("UnitCompositionDefinition max_models", self.max_models)
-        if max_models < min_models:
-            raise DatasheetCatalogError(
-                "UnitCompositionDefinition max_models must be at least min_models."
-            )
+        object.__setattr__(self, "model_profile_id", model_profile_id)
+        min_models, max_models, allows_zero_models = validate_unit_composition_counts(
+            min_models=self.min_models,
+            max_models=self.max_models,
+            allows_zero_models=self.allows_zero_models,
+            error_type=DatasheetCatalogError,
+        )
         object.__setattr__(self, "min_models", min_models)
         object.__setattr__(self, "max_models", max_models)
+        object.__setattr__(self, "allows_zero_models", allows_zero_models)
 
     def to_payload(self) -> UnitCompositionDefinitionPayload:
         return {
@@ -382,6 +385,7 @@ class UnitCompositionDefinition:
             model_profile_id=payload["model_profile_id"],
             min_models=payload["min_models"],
             max_models=payload["max_models"],
+            allows_zero_models=payload["min_models"] == 0,
         )
 
 
@@ -476,28 +480,40 @@ class DatasheetWargearOptionEffect:
             "model_count",
             _validate_positive_int("DatasheetWargearOptionEffect model_count", self.model_count),
         )
-        object.__setattr__(
-            self,
-            "wargear_count",
-            _validate_positive_int(
+        if kind is WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED:
+            wargear_count = _validate_non_negative_int(
                 "DatasheetWargearOptionEffect wargear_count",
                 self.wargear_count,
-            ),
-        )
+            )
+            if wargear_count != 0:
+                raise DatasheetCatalogError(
+                    "REMOVE_WARGEAR_IF_SELECTED effect wargear_count must be 0."
+                )
+        else:
+            wargear_count = _validate_positive_int(
+                "DatasheetWargearOptionEffect wargear_count",
+                self.wargear_count,
+            )
+        object.__setattr__(self, "wargear_count", wargear_count)
         replaced_wargear_id = _validate_optional_identifier(
             "DatasheetWargearOptionEffect replaced_wargear_id",
             self.replaced_wargear_id,
         )
-        if kind is not WargearOptionEffectKind.REPLACE_WARGEAR and replaced_wargear_id is not None:
+        removal_kinds = {
+            WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED,
+            WargearOptionEffectKind.REPLACE_WARGEAR,
+        }
+        if kind not in removal_kinds and replaced_wargear_id is not None:
             raise DatasheetCatalogError(
                 "Additive DatasheetWargearOptionEffect must not include replaced_wargear_id."
             )
-        if kind is WargearOptionEffectKind.REPLACE_WARGEAR:
+        if kind in removal_kinds:
             if replaced_wargear_id is None:
-                raise DatasheetCatalogError(
-                    "REPLACE_WARGEAR DatasheetWargearOptionEffect requires replaced_wargear_id."
-                )
-            if replaced_wargear_id == self.wargear_id:
+                raise DatasheetCatalogError("Wargear removal effect requires replaced_wargear_id.")
+            if (
+                kind is WargearOptionEffectKind.REPLACE_WARGEAR
+                and replaced_wargear_id == self.wargear_id
+            ):
                 raise DatasheetCatalogError(
                     "REPLACE_WARGEAR DatasheetWargearOptionEffect replacement must differ."
                 )
@@ -1127,6 +1143,7 @@ class DatasheetDefinition:
     keywords: DatasheetKeywordSet
     model_profiles: tuple[ModelProfileDefinition, ...]
     composition: tuple[UnitCompositionDefinition, ...]
+    max_unit_models: int | None = None
     wargear_options: tuple[DatasheetWargearOption, ...] = ()
     mustering_options: tuple[DatasheetMusteringOption, ...] = ()
     abilities: tuple[DatasheetAbilityDescriptor, ...] = ()
@@ -1172,6 +1189,21 @@ class DatasheetDefinition:
             if composition_part.model_profile_id not in model_profile_ids:
                 raise DatasheetCatalogError(
                     "DatasheetDefinition composition references an unknown model profile."
+                )
+        max_unit_models = _validate_optional_positive_int(
+            "DatasheetDefinition max_unit_models",
+            self.max_unit_models,
+        )
+        if max_unit_models is not None:
+            minimum_unit_models = sum(part.min_models for part in composition)
+            maximum_unit_models = sum(part.max_models for part in composition)
+            if max_unit_models < minimum_unit_models:
+                raise DatasheetCatalogError(
+                    "DatasheetDefinition max_unit_models is below the composition minimum."
+                )
+            if max_unit_models > maximum_unit_models:
+                raise DatasheetCatalogError(
+                    "DatasheetDefinition max_unit_models exceeds the composition maximum."
                 )
         wargear_options = _validate_wargear_option_tuple(
             "DatasheetDefinition wargear_options",
@@ -1249,6 +1281,7 @@ class DatasheetDefinition:
             "composition",
             tuple(sorted(composition, key=lambda value: value.model_profile_id)),
         )
+        object.__setattr__(self, "max_unit_models", max_unit_models)
         object.__setattr__(
             self,
             "wargear_options",
@@ -1296,7 +1329,7 @@ class DatasheetDefinition:
         raise DatasheetCatalogError("DatasheetDefinition model_profile_id was not found.")
 
     def to_payload(self) -> DatasheetDefinitionPayload:
-        return {
+        payload: DatasheetDefinitionPayload = {
             "datasheet_id": self.datasheet_id,
             "name": self.name,
             "content_scope": self.content_scope.value,
@@ -1312,6 +1345,9 @@ class DatasheetDefinition:
             ],
             "source_ids": list(self.source_ids),
         }
+        if self.max_unit_models is not None:
+            payload["max_unit_models"] = self.max_unit_models
+        return payload
 
     @classmethod
     def from_payload(cls, payload: DatasheetDefinitionPayload) -> Self:
@@ -1327,6 +1363,7 @@ class DatasheetDefinition:
             composition=tuple(
                 UnitCompositionDefinition.from_payload(part) for part in payload["composition"]
             ),
+            max_unit_models=payload.get("max_unit_models"),
             wargear_options=tuple(
                 DatasheetWargearOption.from_payload(option) for option in payload["wargear_options"]
             ),
@@ -1776,10 +1813,12 @@ def _validate_wargear_option_effect_tuple(
 def _wargear_option_effect_sort_order(kind: WargearOptionEffectKind) -> int:
     if kind is WargearOptionEffectKind.REPLACE_WARGEAR:
         return 0
+    if kind is WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED:
+        return 1
     if kind is WargearOptionEffectKind.ADD_WARGEAR:
-        return 1
+        return 2
     if kind is WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED:
-        return 1
+        return 2
     raise DatasheetCatalogError("Unsupported WargearOptionEffectKind sort order.")
 
 

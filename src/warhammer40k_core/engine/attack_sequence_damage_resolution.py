@@ -123,6 +123,7 @@ def _save_options_for_allocation(
             attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
             attacker_model_instance_id=pool.attacker_model_instance_id,
             target_unit_instance_id=pool.target_unit_instance_id,
+            allocated_model_instance_id=allocated_model_id,
             weapon_profile=pool.weapon_profile,
             save_options=save_options_for_model(
                 model=model_by_id(state=state, model_instance_id=allocated_model_id),

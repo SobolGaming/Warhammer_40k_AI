@@ -10,6 +10,9 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.saves import SaveOption
+from warhammer40k_core.engine.source_backed_rerolls import (
+    SourceBackedRerollPermissionContext,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -37,6 +40,14 @@ type ChargeRollModifierHandler = Callable[
     tuple[RollModifier, ...],
 ]
 type WeaponProfileModifierHandler = Callable[["WeaponProfileModifierContext"], WeaponProfile]
+type AttackRerollPermissionHandler = Callable[
+    ["AttackRerollPermissionContext"],
+    SourceBackedRerollPermissionContext | None,
+]
+type FailedSaveDamageReplacementHandler = Callable[
+    ["FailedSaveDamageReplacementContext"],
+    "FailedSaveDamageReplacement | None",
+]
 
 
 @dataclass(frozen=True, slots=True)
@@ -267,6 +278,7 @@ class SaveOptionModifierContext:
     attacking_unit_instance_id: str | None = None
     attacker_model_instance_id: str | None = None
     weapon_profile: WeaponProfile | None = None
+    allocated_model_instance_id: str | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -306,6 +318,14 @@ class SaveOptionModifierContext:
         )
         if self.weapon_profile is not None and type(self.weapon_profile) is not WeaponProfile:
             raise GameLifecycleError("Save option modifier profile must be WeaponProfile.")
+        object.__setattr__(
+            self,
+            "allocated_model_instance_id",
+            _validate_optional_identifier(
+                "allocated_model_instance_id",
+                self.allocated_model_instance_id,
+            ),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -474,6 +494,97 @@ class WeaponProfileModifierContext:
 
 
 @dataclass(frozen=True, slots=True)
+class AttackRerollPermissionContext:
+    state: GameState
+    player_id: str
+    attacking_unit_instance_id: str
+    attacker_model_instance_id: str | None
+    target_unit_instance_id: str
+    source_phase: BattlePhase
+    roll_type: str
+    timing_window: str
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Attack reroll permission state must be GameState.")
+        for field_name in (
+            "player_id",
+            "attacking_unit_instance_id",
+            "target_unit_instance_id",
+            "roll_type",
+            "timing_window",
+        ):
+            object.__setattr__(
+                self,
+                field_name,
+                _validate_identifier(field_name, getattr(self, field_name)),
+            )
+        if self.attacker_model_instance_id is not None:
+            object.__setattr__(
+                self,
+                "attacker_model_instance_id",
+                _validate_identifier(
+                    "attacker_model_instance_id",
+                    self.attacker_model_instance_id,
+                ),
+            )
+        object.__setattr__(self, "source_phase", _battle_phase_from_token(self.source_phase))
+
+
+@dataclass(frozen=True, slots=True)
+class FailedSaveDamageReplacementContext:
+    state: GameState
+    attacking_unit_instance_id: str
+    attacker_model_instance_id: str
+    target_unit_instance_id: str
+    allocated_model_instance_id: str
+    source_phase: BattlePhase
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Failed-save damage replacement state must be GameState.")
+        for field_name in (
+            "attacking_unit_instance_id",
+            "attacker_model_instance_id",
+            "target_unit_instance_id",
+            "allocated_model_instance_id",
+        ):
+            object.__setattr__(
+                self,
+                field_name,
+                _validate_identifier(field_name, getattr(self, field_name)),
+            )
+        object.__setattr__(self, "source_phase", _battle_phase_from_token(self.source_phase))
+
+
+@dataclass(frozen=True, slots=True)
+class FailedSaveDamageReplacement:
+    source_id: str
+    source_unit_instance_id: str
+    replacement_damage: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        object.__setattr__(
+            self,
+            "source_unit_instance_id",
+            _validate_identifier(
+                "source_unit_instance_id",
+                self.source_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "replacement_damage",
+            _validate_non_negative_int("replacement_damage", self.replacement_damage),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class UnitCharacteristicModifierBinding:
     modifier_id: str
     source_id: str
@@ -624,6 +735,36 @@ class WeaponProfileModifierBinding:
 
 
 @dataclass(frozen=True, slots=True)
+class AttackRerollPermissionBinding:
+    modifier_id: str
+    source_id: str
+    handler: AttackRerollPermissionHandler
+
+    def __post_init__(self) -> None:
+        _validate_modifier_binding(
+            field_prefix="attack reroll permission",
+            modifier_id=self.modifier_id,
+            source_id=self.source_id,
+            handler=self.handler,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class FailedSaveDamageReplacementBinding:
+    modifier_id: str
+    source_id: str
+    handler: FailedSaveDamageReplacementHandler
+
+    def __post_init__(self) -> None:
+        _validate_modifier_binding(
+            field_prefix="failed-save damage replacement",
+            modifier_id=self.modifier_id,
+            source_id=self.source_id,
+            handler=self.handler,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeModifierRegistry:
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
@@ -635,6 +776,11 @@ class RuntimeModifierRegistry:
     advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = ()
     charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = ()
     weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
+    attack_reroll_permission_bindings: tuple[AttackRerollPermissionBinding, ...] = ()
+    failed_save_damage_replacement_bindings: tuple[
+        FailedSaveDamageReplacementBinding,
+        ...,
+    ] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -727,6 +873,24 @@ class RuntimeModifierRegistry:
                 WeaponProfileModifierBinding,
             ),
         )
+        object.__setattr__(
+            self,
+            "attack_reroll_permission_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry attack_reroll_permission_bindings",
+                self.attack_reroll_permission_bindings,
+                AttackRerollPermissionBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "failed_save_damage_replacement_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry failed_save_damage_replacement_bindings",
+                self.failed_save_damage_replacement_bindings,
+                FailedSaveDamageReplacementBinding,
+            ),
+        )
 
     @classmethod
     def empty(cls) -> Self:
@@ -749,6 +913,11 @@ class RuntimeModifierRegistry:
         advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = (),
         charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = (),
         weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = (),
+        attack_reroll_permission_bindings: tuple[AttackRerollPermissionBinding, ...] = (),
+        failed_save_damage_replacement_bindings: tuple[
+            FailedSaveDamageReplacementBinding,
+            ...,
+        ] = (),
     ) -> Self:
         return cls(
             unit_characteristic_modifier_bindings=unit_characteristic_modifier_bindings,
@@ -761,6 +930,8 @@ class RuntimeModifierRegistry:
             advance_roll_modifier_bindings=advance_roll_modifier_bindings,
             charge_roll_modifier_bindings=charge_roll_modifier_bindings,
             weapon_profile_modifier_bindings=weapon_profile_modifier_bindings,
+            attack_reroll_permission_bindings=attack_reroll_permission_bindings,
+            failed_save_damage_replacement_bindings=(failed_save_damage_replacement_bindings),
         )
 
     def all_unit_characteristic_bindings(self) -> tuple[UnitCharacteristicModifierBinding, ...]:
@@ -792,6 +963,41 @@ class RuntimeModifierRegistry:
 
     def all_weapon_profile_bindings(self) -> tuple[WeaponProfileModifierBinding, ...]:
         return self.weapon_profile_modifier_bindings
+
+    def all_attack_reroll_permission_bindings(
+        self,
+    ) -> tuple[AttackRerollPermissionBinding, ...]:
+        return self.attack_reroll_permission_bindings
+
+    def attack_reroll_permission_context(
+        self,
+        context: AttackRerollPermissionContext,
+    ) -> SourceBackedRerollPermissionContext | None:
+        if type(context) is not AttackRerollPermissionContext:
+            raise GameLifecycleError("Attack reroll permissions require a context.")
+        candidates = tuple(
+            candidate
+            for binding in self.attack_reroll_permission_bindings
+            if (candidate := binding.handler(context)) is not None
+        )
+        if len(candidates) > 1:
+            raise GameLifecycleError("Multiple attack reroll permissions are available.")
+        return candidates[0] if candidates else None
+
+    def failed_save_damage_replacement(
+        self,
+        context: FailedSaveDamageReplacementContext,
+    ) -> FailedSaveDamageReplacement | None:
+        if type(context) is not FailedSaveDamageReplacementContext:
+            raise GameLifecycleError("Failed-save damage replacements require a context.")
+        candidates = tuple(
+            candidate
+            for binding in self.failed_save_damage_replacement_bindings
+            if (candidate := binding.handler(context)) is not None
+        )
+        if len(candidates) > 1:
+            raise GameLifecycleError("Multiple failed-save damage replacements are available.")
+        return candidates[0] if candidates else None
 
     def modified_unit_characteristic(self, context: UnitCharacteristicModifierContext) -> int:
         if type(context) is not UnitCharacteristicModifierContext:

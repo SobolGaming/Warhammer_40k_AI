@@ -12,6 +12,22 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
+        "datasheet_id": "000002531",
+        "datasheet_name": "Corsair Voidreavers",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
+        "datasheet_id": "000002532",
+        "datasheet_name": "Corsair Voidscarred",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
@@ -23,13 +39,17 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 2,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004194/faction/000009894/none"
     ],
     "datasheet_names": [
       "Corsair Skyreavers",
+      "Corsair Voidreavers",
+      "Corsair Voidscarred",
       "Kharseth"
     ],
     "runtime_consumer_ids": [
@@ -41,7 +61,7 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 2
+      "faction": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -636,6 +656,42 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000002532:piratical-raiders",
+        "ability_name": "Piratical Raiders",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/datasheet/000002532:piratical-raiders/none",
+        "datasheet_id": "000002532",
+        "datasheet_name": "Corsair Voidscarred",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Piratical Raiders"
+    ],
+    "category_id": "datasheet.rule_ir.grant_weapon_ability.this_unit",
+    "category_name": "Datasheet Rule Ir Grant Weapon Ability This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002532/datasheet/000002532:piratical-raiders/none"
+    ],
+    "datasheet_names": [
+      "Corsair Voidscarred"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:tracked-target-selection",
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:lethal-hits",
+      "catalog-ir:weapon-keyword-grant:precision"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001115:brass-stampede",
         "ability_name": "Brass Stampede",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
@@ -1127,6 +1183,40 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000002531:reavers-of-the-void",
+        "ability_name": "Reavers of the Void",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002531/datasheet/000002531:reavers-of-the-void/none",
+        "datasheet_id": "000002531",
+        "datasheet_name": "Corsair Voidreavers",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Reavers of the Void"
+    ],
+    "category_id": "datasheet.rule_ir.reroll_permission.this_unit",
+    "category_name": "Datasheet Rule Ir Reroll Permission This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002531/datasheet/000002531:reavers-of-the-void/none"
+    ],
+    "datasheet_names": [
+      "Corsair Voidreavers"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-reroll",
+      "catalog-ir:passive-hit-reroll"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001148:pall-of-despair-aura-psychic",
         "ability_name": "Pall of Despair (Aura, Psychic)",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:pall-of-despair-aura-psychic/none",
@@ -1150,6 +1240,42 @@
     "runtime_consumer_ids": [
       "catalog-ir:battle-shock-failed-heal",
       "catalog-ir:battle-shock-forced-test"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002532:piratical-raiders",
+        "ability_name": "Piratical Raiders",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/datasheet/000002532:piratical-raiders/none",
+        "datasheet_id": "000002532",
+        "datasheet_name": "Corsair Voidscarred",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Piratical Raiders"
+    ],
+    "category_id": "datasheet.rule_ir.select_tracked_target.enemy_unit",
+    "category_name": "Datasheet Rule Ir Select Tracked Target Enemy Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002532/datasheet/000002532:piratical-raiders/none"
+    ],
+    "datasheet_names": [
+      "Corsair Voidscarred"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:tracked-target-selection",
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:lethal-hits",
+      "catalog-ir:weapon-keyword-grant:precision"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -2163,6 +2289,22 @@
       {
         "ability_id": "000008344",
         "ability_name": "Scouts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002531/core/000008344/none",
+        "datasheet_id": "000002531",
+        "datasheet_name": "Corsair Voidreavers",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008344",
+        "ability_name": "Scouts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/core/000008344/none",
+        "datasheet_id": "000002532",
+        "datasheet_name": "Corsair Voidscarred",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008344",
+        "ability_name": "Scouts",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/core/000008344/none",
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
@@ -2174,20 +2316,24 @@
     ],
     "category_id": "core.scouts",
     "category_name": "Scouts",
-    "coverage_row_count": 2,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000002531/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000002532/core/000008344/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008344/none"
     ],
     "datasheet_names": [
       "Corsair Skyreavers",
+      "Corsair Voidreavers",
+      "Corsair Voidscarred",
       "Kharseth"
     ],
     "runtime_consumer_ids": [
       "descriptor:prebattle:scouts"
     ],
     "source_kind_counts": {
-      "core": 2
+      "core": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -2308,6 +2454,116 @@
     },
     "support_stages": [
       "descriptor_only"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002532:channeller-stones",
+        "ability_name": "Channeller Stones",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/wargear/000002532:channeller-stones/000002532:channeller-stones",
+        "datasheet_id": "000002532",
+        "datasheet_name": "Corsair Voidscarred",
+        "source_kind": "wargear"
+      }
+    ],
+    "ability_names": [
+      "Channeller Stones"
+    ],
+    "category_id": "wargear.characteristic_set.damage.this_unit",
+    "category_name": "Wargear Characteristic Set Damage This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002532/wargear/000002532:channeller-stones/000002532:channeller-stones"
+    ],
+    "datasheet_names": [
+      "Corsair Voidscarred"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:first-failed-save-damage-replacement"
+    ],
+    "source_kind_counts": {
+      "wargear": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002531:mistshield",
+        "ability_name": "Mistshield",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002531/wargear/000002531:mistshield/000002531:mistshield",
+        "datasheet_id": "000002531",
+        "datasheet_name": "Corsair Voidreavers",
+        "source_kind": "wargear"
+      },
+      {
+        "ability_id": "000002532:mistshield",
+        "ability_name": "Mistshield",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/wargear/000002532:mistshield/000002532:mistshield",
+        "datasheet_id": "000002532",
+        "datasheet_name": "Corsair Voidscarred",
+        "source_kind": "wargear"
+      }
+    ],
+    "ability_names": [
+      "Mistshield"
+    ],
+    "category_id": "wargear.characteristic_set.invulnerable_save.this_model",
+    "category_name": "Wargear Characteristic Set Invulnerable Save This Model",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002531/wargear/000002531:mistshield/000002531:mistshield",
+      "chaos-daemons-bridge-catalog/000002532/wargear/000002532:mistshield/000002532:mistshield"
+    ],
+    "datasheet_names": [
+      "Corsair Voidreavers",
+      "Corsair Voidscarred"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query"
+    ],
+    "source_kind_counts": {
+      "wargear": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002532:faolchu",
+        "ability_name": "Faolch\u00fa",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/wargear/000002532:faolchu/000002532:faolchu",
+        "datasheet_id": "000002532",
+        "datasheet_name": "Corsair Voidscarred",
+        "source_kind": "wargear"
+      }
+    ],
+    "ability_names": [
+      "Faolch\u00fa"
+    ],
+    "category_id": "wargear.rule_ir.grant_weapon_ability.this_unit",
+    "category_name": "Wargear Rule Ir Grant Weapon Ability This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002532/wargear/000002532:faolchu/000002532:faolchu"
+    ],
+    "datasheet_names": [
+      "Corsair Voidscarred"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:ignores-cover"
+    ],
+    "source_kind_counts": {
+      "wargear": 1
+    },
+    "support_stages": [
+      "engine_consumed"
     ]
   },
   {

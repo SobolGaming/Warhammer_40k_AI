@@ -118,6 +118,7 @@ def _roll_hit_and_wound(
             attack_context_id=attack_context_id,
             source_phase=attack_sequence.source_phase,
             weapon_profile_id=pool.weapon_profile_id,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         if status is not None:
             return None, status
@@ -484,6 +485,7 @@ def _request_source_backed_hit_reroll_if_available(
     attack_context_id: str,
     source_phase: BattlePhase,
     weapon_profile_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> LifecycleStatus | None:
     if roll_state is None:
         return None
@@ -506,11 +508,38 @@ def _request_source_backed_hit_reroll_if_available(
         attack_kind=_source_backed_attack_kind_for_phase(source_phase),
         target_unit_instance_id=target_unit_instance_id,
     )
+    registry = (
+        RuntimeModifierRegistry.empty()
+        if runtime_modifier_registry is None
+        else runtime_modifier_registry
+    )
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Attack hit reroll requires RuntimeModifierRegistry.")
+    catalog_permission_context = None
+    if target_unit_instance_id is not None:
+        catalog_permission_context = registry.attack_reroll_permission_context(
+            AttackRerollPermissionContext(
+                state=state,
+                player_id=actor_id,
+                attacking_unit_instance_id=attacking_unit_instance_id,
+                attacker_model_instance_id=attacker_model_instance_id,
+                target_unit_instance_id=target_unit_instance_id,
+                source_phase=source_phase,
+                roll_type=roll_state.original_result.spec.roll_type,
+                timing_window="attack_sequence.hit",
+            )
+        )
+    if permission_context is not None and catalog_permission_context is not None:
+        raise GameLifecycleError("Multiple source-backed hit reroll permissions are available.")
+    if catalog_permission_context is not None:
+        permission_context = catalog_permission_context
     if permission_context is None:
         return None
     permission = _source_backed_hit_permission_for_attack(
         permission_context=permission_context,
         roll_state=roll_state,
+        state=state,
+        target_unit_instance_id=target_unit_instance_id,
     )
     if permission is None:
         return None
@@ -563,6 +592,8 @@ def _source_backed_hit_permission_for_attack(
     *,
     permission_context: SourceBackedRerollPermissionContext,
     roll_state: DiceRollState,
+    state: GameState,
+    target_unit_instance_id: str | None,
 ) -> RerollPermission | None:
     source_payload = permission_context.source_payload
     conditional = source_payload.get("conditional_hit_reroll")
@@ -570,6 +601,13 @@ def _source_backed_hit_permission_for_attack(
         return permission_context.permission
     if not isinstance(conditional, dict):
         raise GameLifecycleError("Conditional hit reroll payload must be an object.")
+    if target_unit_instance_id is not None and _conditional_wound_full_reroll_applies(
+        state=state,
+        conditional=conditional,
+        target_unit_instance_id=target_unit_instance_id,
+        attacker_keywords=(),
+    ):
+        return permission_context.permission
     reroll_values = conditional.get("reroll_unmodified_values")
     if not isinstance(reroll_values, list) or not all(
         type(value) is int for value in reroll_values
@@ -1027,15 +1065,25 @@ def _target_unit_within_any_objective_marker_range(
 ) -> bool:
     if state.mission_setup is None or state.battlefield_state is None:
         return False
-    unit_placement = state.battlefield_state.unit_placement_or_none(target_unit_instance_id)
-    if unit_placement is None:
-        return False
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=target_unit_instance_id,
+    )
+    alive_model_ids = {model.model_instance_id for model in rules_unit.alive_models()}
+    removed_model_ids = set(state.battlefield_state.removed_model_ids)
     target_models = tuple(
         geometry_model_for_placement(
             model=model_by_id(state=state, model_instance_id=placement.model_instance_id),
             placement=placement,
         )
+        for component in rules_unit.components
+        for unit_placement in (
+            state.battlefield_state.unit_placement_or_none(component.unit.unit_instance_id),
+        )
+        if unit_placement is not None
         for placement in unit_placement.model_placements
+        if placement.model_instance_id in alive_model_ids
+        and placement.model_instance_id not in removed_model_ids
     )
     return any(
         objective_marker_controls_model(
