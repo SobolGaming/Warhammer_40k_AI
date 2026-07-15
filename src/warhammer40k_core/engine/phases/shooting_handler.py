@@ -616,6 +616,73 @@ class ShootingPhaseHandler:
             invalid_reason="attack_group_payload_drift",
         )
 
+    def invalid_shooting_phase_start_faction_rule_status(
+        self,
+        *,
+        state: GameState,
+        request: DecisionRequest,
+        result: DecisionResult,
+        decisions: DecisionController,
+    ) -> LifecycleStatus | None:
+        invalid_status = invalid_shooting_phase_start_faction_rule_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+        if invalid_status is not None:
+            return invalid_status
+        request_payload = _decision_payload_object(request.payload)
+        result_payload = _decision_payload_object(result.payload)
+        if (
+            "available_target_unit_instance_ids" not in request_payload
+            or result_payload.get("use_ability") is False
+        ):
+            return None
+        current_request = self.shooting_phase_start_hooks.next_request_for(
+            ShootingPhaseStartRequestContext(
+                state=state,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                army_catalog=_army_catalog_for_handler(self),
+                shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
+            )
+        )
+        expected_option = (
+            None
+            if current_request is None
+            else next(
+                (
+                    option
+                    for option in current_request.options
+                    if option.option_id == result.selected_option_id
+                ),
+                None,
+            )
+        )
+        current_request_payload = (
+            None if current_request is None else _decision_payload_object(current_request.payload)
+        )
+        if (
+            current_request_payload is not None
+            and current_request_payload.get("hook_id") == request_payload.get("hook_id")
+            and expected_option is not None
+            and expected_option.payload == result.payload
+        ):
+            return None
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Shooting phase start selected target is no longer eligible.",
+            payload=validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "player_id": result.actor_id,
+                    "battle_round": state.battle_round,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "invalid_reason": "shooting_phase_start_selected_target_drift",
+                }
+            ),
+        )
+
     def apply_decision(
         self,
         *,

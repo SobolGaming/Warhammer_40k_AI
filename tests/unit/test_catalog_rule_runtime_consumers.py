@@ -323,6 +323,9 @@ OWN_STRATAGEM_COST_TEXT = (
 UNNAMED_ZERO_CP_STRATAGEM_COST_TEXT = (
     "Once per battle round, you can target a friendly unit with a Stratagem for 0CP."
 )
+LEGACY_GRENADE_ZERO_CP_STRATAGEM_COST_TEXT = (
+    "Once per turn, you can target this unit with the Grenade Stratagem for 0CP."
+)
 LEADERSHIP_COMMAND_POINT_TEXT = (
     "At the end of your Command phase, if this model is on the battlefield, take a "
     "Leadership test for this model; if that test is passed, you gain 1CP."
@@ -4920,6 +4923,69 @@ def test_catalog_unnamed_zero_cp_rule_reduces_current_use_by_one_in_generic_regi
 
     assert no_choice_cost == 1
     assert accepted_cost == 0
+
+
+def test_catalog_legacy_grenade_cost_rule_only_matches_explosives_stratagem_id() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    record = _command_point_record(
+        record_id="record:catalog-cp:legacy-grenade-zero-cp-runtime",
+        raw_text=LEGACY_GRENADE_ZERO_CP_STRATAGEM_COST_TEXT,
+        source_unit=source_unit,
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+    runtime = _command_point_runtime(
+        armies=(source_army, target_army),
+        records_by_player={source_army.player_id: (record,)},
+    )
+    eligibility = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=source_army.player_id,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    target_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id=source_army.player_id,
+        target_unit_instance_id=source_unit.unit_instance_id,
+    )
+    source_request, source_result = _test_stratagem_source_decision(
+        actor_id=source_army.player_id,
+        suffix="legacy-grenade-zero-cp",
+    )
+
+    def request_for(stratagem_id: str) -> DecisionRequest | None:
+        return runtime.stratagem_cost_choice_request(
+            StratagemCostChoiceRequestContext(
+                state=state,
+                decisions=DecisionController(),
+                source_request=source_request,
+                source_result=source_result,
+                definition=replace(
+                    _test_stratagem_definition(command_point_cost=1),
+                    stratagem_id=stratagem_id,
+                ),
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+            )
+        )
+
+    assert request_for("explosives") is not None
+    assert request_for("crushing-impact") is None
 
 
 def test_catalog_command_point_cost_frequency_is_consumed_from_stratagem_use_record() -> None:

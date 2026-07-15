@@ -1664,18 +1664,20 @@
         {
           "ability_id": "000000605:harassment-fire",
           "ability_name": "Harassment Fire",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "0edca599329b50c2dcb043dba31fbf7dea4d8894766ab3f6a9e8f51fac5fbda8",
           "raw_text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks. Until the start of your next turn, that enemy unit is suppressed. While a unit is suppressed, each time a model in that unit makes an attack, subtract 1 from the Hit roll.",
           "raw_text_sha256": "0edca599329b50c2dcb043dba31fbf7dea4d8894766ab3f6a9e8f51fac5fbda8",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-effect"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000605:3:description:clause:003:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:post-shoot-hit-target-effect"
+              ],
+              "semantic_id": "phase17k:aeldari:datasheet:000000605:3:clause:002:effect:0",
               "semantic_kind": "modify_dice_roll"
             }
           ],
@@ -1684,14 +1686,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000605:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000605",
       "datasheet_name": "Vypers",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Complete Datasheets, physical PDF pages 12-21",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "complete_pdf"
     },
     {
@@ -3879,11 +3881,25 @@
           "normalized_text_sha256": "a63430bf0577ca4ba2df10e81496f8cd34ec2fc52603db795e15f39cf35c6aad",
           "raw_text": "While this model is leading a unit, each time a model in that unit makes an attack, that attack has the [SUSTAINED HITS 1] ability and add 1 to the Hit roll.",
           "raw_text_sha256": "36829d62aca616cdeccc35f5afc516ee64fb42c13540db601422f77ef38fb388",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-modifier",
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:sustained-hits"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004193:4:description:clause:001:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:weapon-keyword-grant",
+                "catalog-ir:weapon-keyword-grant:sustained-hits"
+              ],
+              "semantic_id": "phase17k:aeldari:datasheet:000004193:4:clause:001:effect:0",
+              "semantic_kind": "grant_weapon_ability"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:hit-roll-modifier"
+              ],
+              "semantic_id": "phase17k:aeldari:datasheet:000004193:4:clause:002:effect:0",
               "semantic_kind": "modify_dice_roll"
             }
           ],
@@ -3892,33 +3908,48 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000004193:4",
-          "support_stage": "generic_ir_executable"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000004193:prince-of-corsairs",
           "ability_name": "Prince of Corsairs",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "47668e6eb7c385ed6fec664be841c978e3ca1226fffa1d221925fdb4831be50b",
           "raw_text": "After both players have deployed their armies, if this unit is on the battlefield (or any Transport it is embarked within is on the battlefield), select up to three AELDARI units from your army and redeploy them. When doing so, you can set those units up in Strategic Reserves, regardless of how many units are already in Strategic Reserves.",
           "raw_text_sha256": "47668e6eb7c385ed6fec664be841c978e3ca1226fffa1d221925fdb4831be50b",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:prebattle-redeploy-permission"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:prebattle-redeploy-permission"
+              ],
+              "semantic_id": "phase17k:aeldari:datasheet:000004193:5:clause:001:effect:0",
+              "semantic_kind": "placement_permission"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:prebattle-redeploy-permission"
+              ],
+              "semantic_id": "phase17k:aeldari:datasheet:000004193:5:clause:001:effect:1",
+              "semantic_kind": "placement_permission"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004193:5"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000004193:5",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000004193",
       "datasheet_name": "Prince Yriel",
       "group": "Anhrathe / Corsairs",
       "pdf_page_reference": "Complete Datasheets, physical PDF pages 12-21",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "complete_pdf"
     },
     {
@@ -3990,28 +4021,36 @@
         {
           "ability_id": "000004195:hallucinogen-grenades",
           "ability_name": "Hallucinogen Grenades",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "a2ff2f5b9d5571f2053ef9688dd57a23a053cdcd81f54e3ff63cc2f0f4e72dcd",
           "raw_text": "At the start of your opponent's Shooting phase, this unit can use this ability. If it does, select one Aeldari Infantry unit from your army visible to and within 36\" of this unit: until the end of the phase, that unit has the Stealth ability.",
           "raw_text_sha256": "a2ff2f5b9d5571f2053ef9688dd57a23a053cdcd81f54e3ff63cc2f0f4e72dcd",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:shooting-start-selected-target-effect"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:shooting-start-selected-target-effect"
+              ],
+              "semantic_id": "phase17k:aeldari:datasheet:000004195:4:clause:002:effect:0",
+              "semantic_kind": "grant_ability"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004195:4"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000004195:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000004195",
       "datasheet_name": "Starfangs",
       "group": "Anhrathe / Corsairs",
       "pdf_page_reference": "Complete Datasheets, physical PDF pages 12-21",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "complete_pdf"
     },
     {
@@ -4063,28 +4102,28 @@
   "faction_id": "aeldari",
   "faction_name": "Aeldari",
   "generated_by": "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py",
-  "overlay_pack_hash": "e32c52e7339413eb1be1255ea8ff5216920ece7753cff7f3afab7c14edc9ebb2",
+  "overlay_pack_hash": "d84b589b64b4393f159cac88d52946ced653d241c02973db64915d120eac9974",
   "pdf_filename": "eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
   "pdf_sha256": "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9",
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 4,
+    "All exact abilities consumed": 7,
     "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 60
+    "Exact ability IR unsupported": 57
   },
   "source_artifact_hashes": {
-    "Abilities": "f4075183c9ea2e94e96be1f68a6250d2d5f4acd482291d3ff1a4315740614c45",
-    "Datasheets": "b8fd841b77502eaa420d5fb7db8df1a033315d249571caeb5e5b962c749b2fd7",
-    "Datasheets_abilities": "bfd9d556318bc372f4b2560a5015ecd209ad9284c5be706f51ae25fea46d3c10",
-    "Datasheets_keywords": "dd28fac5b40af8e3d89b8b7c0884c199a21fa9e02b3d5842f5a72b01447c44d9",
-    "Datasheets_leader": "7260f35df6c1d0eb1f6c535c76168d78046b23990b8a0cda675f6443bbb5e5ea",
-    "Datasheets_models": "d5a8f7a60861d596e50febb9761c01356e6d36dd02f2a97432a18895ca4d8acc",
-    "Datasheets_models_cost": "8580c3733d87b71704e44ba080c708c014afe98eb508a7675737c63ccf60c89b",
-    "Datasheets_options": "5dd4eb33afcb07ead4262da10451bf0ee59590c2bb462f2d130245c5b804553b",
-    "Datasheets_unit_composition": "741d8d49e35e4f5e4aaa5c4bf3fceb70a8fbc5eebf5fccb6c2ac78efd56ac878",
-    "Datasheets_wargear": "a30d4b07028543a0dbdfe79fb8aae1c7bfb1d74c6954199c8836d2da4f891c17",
-    "Factions": "9005d071b831806dd1e8162ecf05449ed95185a5fe2ae9e5415c51c871c02fd3"
+    "Abilities": "4d235cf5e50c7f1f399143094642902575a364ff9f41cd1a8559dd1e162d0e76",
+    "Datasheets": "dd9ab8f297d16d1bf034857ccc45efc3a69cb1857608aa535ff88016da94a545",
+    "Datasheets_abilities": "59e638d77cf37a16fd39764c598837a94aa34fce877ef5d3aa4e9240470dd5ad",
+    "Datasheets_keywords": "9509cbecd271906d59dce61fb7907081016f954db1fb06d9019a885c79e59c29",
+    "Datasheets_leader": "7d4a6bf356cc3bd94ce86850bb3818b50871c0dbdce27a930a1e757694e67569",
+    "Datasheets_models": "f9cc73f2a9b9679b02172ba06096f22e7929f8f7a07990ab171961b0f218cc0a",
+    "Datasheets_models_cost": "dfefbcaadabc6356dc6979d0e7c995db35566a4f099f8fb729007f85829faa61",
+    "Datasheets_options": "921c26234f5ade8fa8c38b9cd35a739cda604d5accedbc47067f18ca786388e2",
+    "Datasheets_unit_composition": "7ec86db6380bb5c35c4456892a50e4b080485481b1550a138540b6af978afab2",
+    "Datasheets_wargear": "738d3c2f413a71787947f33a8742c43888f450326e1dc8ee7a029ce899f94a02",
+    "Factions": "1efa1b395c9c37fc092b94e1e13728ce507a064ad78930b7b428ba6808f0605c"
   },
   "source_snapshot_path": "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json",
   "treatment_counts": {

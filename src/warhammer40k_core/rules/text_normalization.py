@@ -73,6 +73,19 @@ _RANGE_WORD_RE = re.compile(
 _RANGE_QUOTE_RE = re.compile(r'(?<![A-Za-z0-9_])(?P<distance>\d+)\s*"')
 _WHITESPACE_RE = re.compile(r"\s+")
 _LINEBREAK_RE = re.compile(r"\r\n?|\n")
+OFFICIAL_STRATAGEM_REFERENCE_ALIAS_SOURCE_ID = (
+    "gw-11e-official-faq:stratagem-name-equivalence:grenade-tank-shock"
+)
+_CANONICAL_STRATAGEM_REFERENCE_IDS = {
+    "explosives stratagem": "explosives",
+    "grenade stratagem": "explosives",
+    "crushing impact stratagem": "crushing-impact",
+    "tank shock stratagem": "crushing-impact",
+}
+_CANONICAL_STRATAGEM_REFERENCE_NAMES = {
+    "explosives": "Explosives Stratagem",
+    "crushing-impact": "Crushing Impact Stratagem",
+}
 
 _CANONICAL_KEYWORDS = (*canonical_weapon_keyword_tokens(), *canonical_rule_keyword_tokens())
 _KEYWORD_PATTERNS = tuple(
@@ -154,6 +167,22 @@ def normalize_source_label(raw_text: object) -> str:
 
 def canonical_keyword_forms() -> tuple[str, ...]:
     return _CANONICAL_KEYWORDS
+
+
+def canonical_stratagem_reference_id(raw_text: object) -> str:
+    text = _collapse_whitespace(normalize_source_characters(_validate_raw_text(raw_text)))
+    stratagem_id = _CANONICAL_STRATAGEM_REFERENCE_IDS.get(text.casefold())
+    if stratagem_id is None:
+        raise TextNormalizationError("Stratagem reference does not have an approved alias.")
+    return stratagem_id
+
+
+def canonical_stratagem_reference_name(raw_text: object) -> str:
+    stratagem_id = canonical_stratagem_reference_id(raw_text)
+    stratagem_name = _CANONICAL_STRATAGEM_REFERENCE_NAMES.get(stratagem_id)
+    if stratagem_name is None:
+        raise TextNormalizationError("Stratagem reference canonical ID is unsupported.")
+    return stratagem_name
 
 
 def normalize_source_characters(raw_text: object) -> str:

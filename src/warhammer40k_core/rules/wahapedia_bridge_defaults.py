@@ -144,6 +144,42 @@ AELDARI_KHARSETH_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_YRIEL_VYPERS_STARFANGS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000004193",
+        model_name="Prince Yriel - EPIC HERO",
+        height=2.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:prince-yriel:height",
+        height_document_reference=(
+            "Aeldari Faction Pack p.12-13 assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (40mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000605",
+        model_name="Vypers",
+        height=2.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:vypers:height",
+        height_document_reference=(
+            "Aeldari Faction Pack p.16-17 assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (105x70mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000004195",
+        model_name="Starfangs",
+        height=2.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:starfangs:height",
+        height_document_reference=(
+            "Aeldari Faction Pack p.18-19 assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (105x70mm base)"
+        ),
+    ),
+)
+
 AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004196",

@@ -103,6 +103,7 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityHookRegistry,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     AttackSequenceEvent,
@@ -204,7 +205,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     _post_shoot_hit_target_status_option_id,  # pyright: ignore[reportPrivateUsage]
     _post_shoot_hit_target_status_selected_payload,  # pyright: ignore[reportPrivateUsage]
     _post_shoot_status_source_model_ids,  # pyright: ignore[reportPrivateUsage]
-    _profile_with_catalog_weapon_keyword_grant,  # pyright: ignore[reportPrivateUsage]
     _record_can_select_catalog_named_weapon_ability,  # pyright: ignore[reportPrivateUsage]
     _record_can_select_catalog_post_shoot_hit_target_status,  # pyright: ignore[reportPrivateUsage]
     _record_can_select_catalog_unit_move_completed_mortal_wounds_target,  # pyright: ignore[reportPrivateUsage]
@@ -242,6 +242,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects import (
     CatalogSelectedTargetEffectRuntime,
     apply_catalog_post_shoot_hit_target_effect_result,
     invalid_catalog_post_shoot_hit_target_effect_status,
+)
+from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
+    profile_with_catalog_weapon_keyword_grant as _profile_with_catalog_weapon_keyword_grant,
 )
 from warhammer40k_core.engine.catalog_turn_end_reserves import (
     CATALOG_TURN_END_RESERVES_USED_EVENT,
@@ -3092,7 +3095,26 @@ def test_phase17k_model_reroll_runtime_uses_scoped_catalog_clause_record() -> No
 def test_phase17k_leading_model_weapon_keyword_text_modifies_scoped_weapon_profiles() -> None:
     package = _advance_charge_package()
     unit = _advance_charge_unit(package=package)
-    army = _flesh_hounds_army(package=package, unit=unit)
+    bodyguard = _advance_charge_unit(
+        package=package,
+        unit_selection_id="advance-charge-bodyguard-1",
+    )
+    attached_id = "attached-unit:army-daemons:advance-charge-test"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(unit.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, unit.unit_instance_id))
+        ),
+        source_id="test:phase17k:leading-weapon-grant",
+        attachment_source_ids=("test:phase17k:leading-weapon-grant:eligibility",),
+    )
+    army = replace(
+        _flesh_hounds_army(package=package, unit=unit),
+        units=(unit, bodyguard),
+        attached_units=(formation,),
+    )
     player_index = _player_ability_index(package=package, army=army)
     records_by_name = {record.definition.name: record for record in player_index.all_records()}
     weapon_grant_record = records_by_name["Pack Killers"]
@@ -3100,6 +3122,19 @@ def test_phase17k_leading_model_weapon_keyword_text_modifies_scoped_weapon_profi
     assert isinstance(replay_payload, dict)
     rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
     battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    placed_army = battlefield.placed_armies[0]
+    battlefield = replace(
+        battlefield,
+        placed_armies=(
+            replace(
+                placed_army,
+                unit_placements=(
+                    *placed_army.unit_placements,
+                    _single_model_unit_placement(army, bodyguard, x=14.0),
+                ),
+            ),
+        ),
+    )
     state = _battle_state_with_army(army=army, battlefield=battlefield)
     current_model_ids = _current_model_ids(battlefield=battlefield, unit=unit)
     swift_claws = next(
@@ -3129,7 +3164,7 @@ def test_phase17k_leading_model_weapon_keyword_text_modifies_scoped_weapon_profi
     melee_context = WeaponProfileModifierContext(
         state=state,
         source_phase=BattlePhase.FIGHT,
-        attacking_unit_instance_id=unit.unit_instance_id,
+        attacking_unit_instance_id=attached_id,
         attacker_model_instance_id=attacker_model_id,
         target_unit_instance_id="phase17k-target-unit",
         weapon_profile=melee_profile,
@@ -5820,6 +5855,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
 
     assert _catalog_weapon_keyword_grant_from_effect(
         record=record,
+        unit=unit,
         clause=clause,
         effect_index=0,
         effect=clause.effects[0],
@@ -5828,10 +5864,13 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
         keyword=WeaponKeyword.LETHAL_HITS,
         weapon_scope="melee",
         ability=AbilityDescriptor.lethal_hits(),
+        source_unit_instance_id=unit.unit_instance_id,
+        requires_source_leading=True,
     )
     assert (
         _catalog_weapon_keyword_grant_from_effect(
             record=record,
+            unit=unit,
             clause=clause,
             effect_index=1,
             effect=_effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="hit", delta=1),
@@ -5841,6 +5880,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     assert (
         _catalog_weapon_keyword_grant_from_effect(
             record=record,
+            unit=unit,
             clause=clause,
             effect_index=1,
             effect=_effect(RuleEffectKind.GRANT_WEAPON_ABILITY, weapon_scope="melee"),
@@ -5850,6 +5890,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     assert (
         _catalog_weapon_keyword_grant_from_effect(
             record=record,
+            unit=unit,
             clause=clause,
             effect_index=1,
             effect=_effect(RuleEffectKind.GRANT_WEAPON_ABILITY, weapon_ability="Lethal Hits"),
@@ -5859,6 +5900,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     assert (
         _catalog_weapon_keyword_grant_from_effect(
             record=record,
+            unit=unit,
             clause=clause,
             effect_index=1,
             effect=_effect(
@@ -5950,6 +5992,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     with pytest.raises(GameLifecycleError, match="requires an ability record"):
         _catalog_weapon_keyword_grant_from_effect(
             record=cast(AbilityCatalogRecord, object()),
+            unit=unit,
             clause=clause,
             effect_index=0,
             effect=clause.effects[0],
@@ -5957,6 +6000,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     with pytest.raises(GameLifecycleError, match="requires a rule clause"):
         _catalog_weapon_keyword_grant_from_effect(
             record=record,
+            unit=unit,
             clause=cast(RuleClause, object()),
             effect_index=0,
             effect=clause.effects[0],
@@ -5964,6 +6008,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     with pytest.raises(GameLifecycleError, match="effect_index must be non-negative"):
         _catalog_weapon_keyword_grant_from_effect(
             record=record,
+            unit=unit,
             clause=clause,
             effect_index=-1,
             effect=clause.effects[0],
@@ -5971,6 +6016,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     with pytest.raises(GameLifecycleError, match="requires a rule effect"):
         _catalog_weapon_keyword_grant_from_effect(
             record=record,
+            unit=unit,
             clause=clause,
             effect_index=0,
             effect=cast(RuleEffectSpec, object()),
@@ -6699,14 +6745,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Exact IR parsed; host needed | Exact ability IR unsupported | "
         "Exact ability bridge blocked |"
     ) in aeldari_markdown
-    assert "| Craftworlds / Asuryani | None | Crimson Hunter" in aeldari_markdown
+    assert "| Craftworlds / Asuryani | Vypers (`000000605`) | Crimson Hunter" in (aeldari_markdown)
     assert "Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)" in aeldari_markdown
     assert "Eldrad Ulthran (`000000568`)<br>Falcon (`000000609`)" in aeldari_markdown
     assert "Wraithguard (`000000597`)" in aeldari_markdown
     assert (
         "| Anhrathe / Corsairs | Corsair Skyreavers (`000004196`)<br>"
         "Corsair Voidreavers (`000002531`)<br>Corsair Voidscarred (`000002532`)<br>"
-        "Kharseth (`000004194`) | None | Prince Yriel"
+        "Kharseth (`000004194`)<br>Prince Yriel (`000004193`)<br>"
+        "Starfangs (`000004195`) | None | None | None |"
     ) in aeldari_markdown
     assert "| Harlequins | None | Skyweavers (`000002539`) |" in aeldari_markdown
     assert "| Ynnari | None | None | The Visarch" in aeldari_markdown
@@ -6750,7 +6797,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "Current coverage categories:" not in generated_markdown
     assert "## Runtime Hook Inventory" in generated_markdown
     assert "| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |" in generated_markdown
-    assert "| `catalog-ir:hit-roll-modifier` | Revel in Desecration |" in generated_markdown
+    assert (
+        "| `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Revel in Desecration |"
+        in generated_markdown
+    )
     assert "| `catalog-ir:wound-roll-modifier` | No current generated rows |" in generated_markdown
     assert (
         "| `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |"
@@ -6762,8 +6812,16 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
             "Harbinger of Death<br>Piratical Raiders |"
         ) in generated_markdown
     assert (
-        "| `catalog-ir:weapon-keyword-grant:sustained-hits` | Harbinger of Death |"
+        "| `catalog-ir:weapon-keyword-grant:sustained-hits` | "
+        "Harbinger of Death<br>Piratical Hero |"
     ) in generated_markdown
+    assert (
+        "| `catalog-ir:prebattle-redeploy-permission` | Prince of Corsairs |" in generated_markdown
+    )
+    assert (
+        "| `catalog-ir:shooting-start-selected-target-effect` | Hallucinogen Grenades |"
+        in generated_markdown
+    )
     assert (
         "| `catalog-ir:can-advance-and-charge` | No current generated rows |"
     ) in generated_markdown
@@ -8740,15 +8798,17 @@ def _flesh_hounds_unit(
 def _advance_charge_unit(
     *,
     package: CanonicalCatalogPackage,
+    army_id: str = "army-daemons",
+    unit_selection_id: str = "advance-charge-unit-1",
 ) -> UnitInstance:
     datasheet = package.army_catalog.datasheet_by_id("test-advance-charge-unit")
     return UnitFactory(
         catalog=package.army_catalog,
         model_geometries=package.model_geometries,
     ).instantiate_unit(
-        army_id="army-daemons",
+        army_id=army_id,
         selection=UnitMusterSelection(
-            unit_selection_id="advance-charge-unit-1",
+            unit_selection_id=unit_selection_id,
             datasheet_id=datasheet.datasheet_id,
             model_profile_selections=(
                 ModelProfileSelection(

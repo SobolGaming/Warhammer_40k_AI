@@ -7,7 +7,9 @@ from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import 
 )
 from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     clause_is_fight_start_selected_target_selection,
+    clause_is_shooting_start_selected_target_selection,
     fight_start_selected_target_effect_clauses_after,
+    shooting_start_selected_target_effect_clauses_after,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
@@ -21,6 +23,9 @@ from warhammer40k_core.rules.rule_ir import (
 
 CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:selected-target-effect"
 CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-effect"
+CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID = (
+    "catalog-ir:shooting-start-selected-target-effect"
+)
 
 _POST_SHOOT_TRIGGER_KEYS = frozenset(
     {
@@ -76,6 +81,25 @@ def post_shoot_hit_target_effect_clause_ids(rule_ir: RuleIR) -> tuple[str, ...]:
     return tuple(sorted(clause_ids))
 
 
+def rule_has_shooting_start_selected_target_effect(rule_ir: RuleIR) -> bool:
+    return bool(shooting_start_selected_target_effect_clause_ids(rule_ir))
+
+
+def shooting_start_selected_target_effect_clause_ids(rule_ir: RuleIR) -> tuple[str, ...]:
+    clause_ids: set[str] = set()
+    for index, clause in enumerate(rule_ir.clauses):
+        if not clause_is_shooting_start_selected_target_selection(clause):
+            continue
+        clause_ids.update(
+            effect_clause.clause_id
+            for effect_clause in shooting_start_selected_target_effect_clauses_after(
+                rule_ir.clauses,
+                index,
+            )
+        )
+    return tuple(sorted(clause_ids))
+
+
 def contextual_consumers_for_clause(
     *,
     rule_ir: RuleIR,
@@ -90,6 +114,8 @@ def contextual_consumers_for_clause(
         consumer_ids.add(CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID)
     if clause.clause_id in post_shoot_hit_target_effect_clause_ids(rule_ir):
         consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
+    if clause.clause_id in shooting_start_selected_target_effect_clause_ids(rule_ir):
+        consumer_ids.add(CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID)
     return tuple(sorted(consumer_ids))
 
 

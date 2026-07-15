@@ -76,6 +76,9 @@ RELEASE_MANIFEST_PATH = OVERLAY_DIR / "source_release_manifest.json"
 SOURCE_DATE = "2026-06-09"
 SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p23"
 KHARSETH_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p14-15"
+PRINCE_YRIEL_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p12-13"
+VYPERS_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p16-17"
+STARFANGS_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p18-19"
 CORSAIR_SKYREAVERS_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p20-21"
 CORSAIR_VOID_UNITS_KEYWORD_SOURCE_REFERENCE = (
     "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_keywords"
@@ -292,6 +295,49 @@ def _overlay_pack(
             fields=(),
         )
     )
+    for datasheet_id, datasheet_name, source_row_id, source_reference in (
+        (
+            "000004193",
+            "Prince Yriel",
+            "000004193:blank-keyword:global:true:15614",
+            PRINCE_YRIEL_SOURCE_REFERENCE,
+        ),
+        (
+            "000000605",
+            "Vypers",
+            "000000605:blank-keyword:global:true:2352",
+            VYPERS_SOURCE_REFERENCE,
+        ),
+        (
+            "000004195",
+            "Starfangs",
+            "000004195:blank-keyword:global:true:15631",
+            STARFANGS_SOURCE_REFERENCE,
+        ),
+    ):
+        blank_keyword_row = _required_row(
+            rows_by_table,
+            "Datasheets_keywords",
+            source_row_id,
+        )
+        operations.append(
+            SourceOverlayOperation(
+                op_id=f"aeldari-supersede-{datasheet_id}-blank-faction-keyword",
+                order_index=len(operations) + 1,
+                operation_kind=SourceOverlayOperationKind.SUPERSEDE_ROW,
+                target_edition=TARGET_EDITION,
+                source_table="Datasheets_keywords",
+                source_row_id=blank_keyword_row.source_row_id,
+                source_reference=source_reference,
+                effective_date=SOURCE_DATE,
+                reason=(
+                    "Supersede the mirrored blank faction-keyword row before the strict "
+                    f"{datasheet_name} catalog bridge."
+                ),
+                expected_preimage_hash=source_row_hash(blank_keyword_row),
+                fields=(),
+            )
+        )
     add_index = len(operations) + 1
     operations.append(
         SourceOverlayOperation(

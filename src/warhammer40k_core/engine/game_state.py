@@ -4128,6 +4128,8 @@ class GameState:
     def unarrived_reserve_model_ids(self) -> tuple[str, ...]:
         if not self.reserve_states:
             return ()
+        from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+
         unit_by_id = {
             unit.unit_instance_id: unit for army in self.army_definitions for unit in army.units
         }
@@ -4135,11 +4137,12 @@ class GameState:
         for reserve_state in self.reserve_states:
             if reserve_state.status is not ReserveStatus.IN_RESERVES:
                 continue
-            impacted_unit_ids = (
-                reserve_state.unit_instance_id,
-                *reserve_state.embarked_unit_instance_ids,
+            reserve_view = rules_unit_view_from_armies(
+                armies=tuple(self.army_definitions),
+                unit_instance_id=reserve_state.unit_instance_id,
             )
-            for unit_id in impacted_unit_ids:
+            model_ids.extend(model.model_instance_id for model in reserve_view.own_models)
+            for unit_id in reserve_state.embarked_unit_instance_ids:
                 unit = unit_by_id.get(unit_id)
                 if unit is None:
                     raise GameLifecycleError("ReserveState references an unknown unit.")

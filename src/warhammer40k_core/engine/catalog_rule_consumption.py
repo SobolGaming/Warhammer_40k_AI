@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
@@ -30,6 +30,7 @@ from warhammer40k_core.engine import catalog_datasheet_rule_support as _datashee
 from warhammer40k_core.engine import catalog_fight_end_triggered_movement_support as _fight_end_move
 from warhammer40k_core.engine import catalog_movement_transit as _t
 from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
+from warhammer40k_core.engine import catalog_prebattle_redeploy as _prebattle_redeploy
 from warhammer40k_core.engine import (
     catalog_reserve_arrival_restriction_classification as _reserve_restriction,
 )
@@ -65,6 +66,7 @@ from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
 from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
     catalog_weapon_grant_source_index_and_rules_unit,
     clause_is_tracked_target_weapon_grant,
+    profile_with_catalog_weapon_keyword_grant,
     tracked_target_weapon_grant_applies,
     tracked_target_weapon_grant_from_clause,
 )
@@ -178,6 +180,12 @@ CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID = "catalog-ir:post-shoot-hit
 CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:selected-target-effect"
 CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID = "catalog-ir:once-per-battle-ability"
 CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-effect"
+CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID = (
+    _st.CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID
+)
+CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID = (
+    _prebattle_redeploy.CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID
+)
 CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID = (
     "catalog-ir:unit-move-completed-mortal-wounds"
 )
@@ -285,6 +293,7 @@ _CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
         ),
         "can_be_placed_in_reserves": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
         "turn_end_reserves": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+        "stealth": _datasheet.CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
     }
 )
 _CATALOG_IR_FALL_BACK_ELIGIBILITY_GRANT_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
@@ -875,9 +884,9 @@ class CatalogWeaponKeywordGrantRuntime:
                 profile=profile,
             ):
                 continue
-            profile = _profile_with_catalog_weapon_keyword_grant(profile=profile, grant=grant)
+            profile = profile_with_catalog_weapon_keyword_grant(profile=profile, grant=grant)
         for grant in _selected_catalog_named_weapon_ability_grants(context):
-            profile = _profile_with_catalog_weapon_keyword_grant(profile=profile, grant=grant)
+            profile = profile_with_catalog_weapon_keyword_grant(profile=profile, grant=grant)
         return profile
 
 
@@ -1407,6 +1416,8 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+        CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+        CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         *_ucbs.registered_hook_ids(),
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
@@ -1666,6 +1677,7 @@ def catalog_weapon_keyword_grants_for_unit(
             for effect_index, effect in enumerate(clause.effects):
                 grant = _catalog_weapon_keyword_grant_from_effect(
                     record=record,
+                    unit=unit,
                     clause=clause,
                     effect_index=effect_index,
                     effect=effect,
@@ -3827,6 +3839,8 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID)
     if _st.rule_has_post_shoot_hit_target_effect(rule_ir):
         consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
+    if _st.rule_has_shooting_start_selected_target_effect(rule_ir):
+        consumer_ids.add(CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID)
     return tuple(sorted(consumer_ids))
 
 
@@ -3868,6 +3882,8 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID)
     if _reserve_restriction.clause_is_reserve_arrival_restriction(clause):
         consumer_ids.add(CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID)
+    if _prebattle_redeploy.clause_is_prebattle_redeploy_permission(clause):
+        consumer_ids.add(CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID)
     if _fight_end_move.clause_is_fight_end_triggered_movement(clause):
         consumer_ids.add(_fight_end_move.CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID)
     if _clause_is_structured_wound_reroll_clause(clause):
@@ -3929,6 +3945,8 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
         if _datasheet.clause_has_invalid_exact_datasheet_runtime_shape(clause):
             continue
         hook_ids.update(_catalog_ir_hook_ids_for_clause(clause))
+        if _prebattle_redeploy.clause_is_prebattle_redeploy_permission(clause):
+            continue
         for effect in clause.effects:
             if _effect_is_charge_roll_modifier(effect):
                 hook_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
@@ -3937,6 +3955,8 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
         hook_ids.add(CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID)
     if _st.rule_has_post_shoot_hit_target_effect(rule_ir):
         hook_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
+    if _st.rule_has_shooting_start_selected_target_effect(rule_ir):
+        hook_ids.add(CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID)
     return tuple(sorted(hook_ids))
 
 
@@ -3965,6 +3985,8 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         hook_ids.add(CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID)
     if _reserve_restriction.clause_is_reserve_arrival_restriction(clause):
         hook_ids.add(CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID)
+    if _prebattle_redeploy.clause_is_prebattle_redeploy_permission(clause):
+        hook_ids.add(CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID)
     if _fight_end_move.clause_is_fight_end_triggered_movement(clause):
         hook_ids.add(_fight_end_move.CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID)
     hook_ids.update(_contextual.consumer_ids_for_clause(clause))
@@ -5384,12 +5406,14 @@ def _catalog_roll_reroll_permission(
 def _catalog_weapon_keyword_grant_from_effect(
     *,
     record: AbilityCatalogRecord,
+    unit: UnitInstance,
     clause: RuleClause,
     effect_index: int,
     effect: RuleEffectSpec,
 ) -> CatalogWeaponKeywordGrant | None:
     if type(record) is not AbilityCatalogRecord:
         raise GameLifecycleError("Catalog weapon keyword grant requires an ability record.")
+    _validate_unit(unit)
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog weapon keyword grant requires a rule clause.")
     if type(effect_index) is not int or effect_index < 0:
@@ -5413,38 +5437,9 @@ def _catalog_weapon_keyword_grant_from_effect(
             clause=clause,
             source_rule_id=record.definition.source_id,
         ),
+        source_unit_instance_id=unit.unit_instance_id,
+        requires_source_leading=_clause_has_leading_unit_relationship(clause),
     )
-
-
-def _profile_with_catalog_weapon_keyword_grant(
-    *,
-    profile: WeaponProfile,
-    grant: CatalogWeaponKeywordGrant,
-) -> WeaponProfile:
-    if type(profile) is not WeaponProfile:
-        raise GameLifecycleError("Catalog weapon keyword grant requires a WeaponProfile.")
-    if type(grant) is not CatalogWeaponKeywordGrant:
-        raise GameLifecycleError("Catalog weapon keyword grant requires grant data.")
-    keywords = profile.keywords
-    if grant.keyword not in keywords:
-        keywords = tuple(sorted((*keywords, grant.keyword), key=lambda keyword: keyword.value))
-    abilities = profile.abilities
-    if grant.ability is not None and all(
-        ability.ability_id != grant.ability.ability_id for ability in abilities
-    ):
-        abilities = tuple(
-            sorted((*abilities, grant.ability), key=lambda ability: ability.ability_id)
-        )
-    source_ids = profile.source_ids
-    if grant.source_id not in source_ids:
-        source_ids = tuple(sorted((*source_ids, grant.source_id)))
-    if (
-        keywords == profile.keywords
-        and abilities == profile.abilities
-        and source_ids == profile.source_ids
-    ):
-        return profile
-    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
 
 
 def _weapon_keyword_from_parameters(parameters: Mapping[str, object]) -> WeaponKeyword | None:
@@ -5961,6 +5956,11 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         ) in {"shoot", "charge"}:
             return (CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,)
         return ()
+    if (
+        effect.kind is RuleEffectKind.PLACEMENT_PERMISSION
+        and _prebattle_redeploy.effect_is_prebattle_redeploy_permission(effect)
+    ):
+        return (CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,)
     if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
         consumer_ids = _weapon_keyword_grant_consumer_ids_for_effect(effect)
         if consumer_ids:

@@ -191,7 +191,6 @@ from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
-    invalid_shooting_phase_start_faction_rule_status,
 )
 from warhammer40k_core.engine.phases.shooting import (
     invalid_catalog_post_shoot_decision_status as invalid_post_shoot_status,
@@ -1471,10 +1470,13 @@ class GameLifecycle:
             if invalid_status is not None:
                 return invalid_status
         if request.decision_type == SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE:
-            invalid_status = invalid_shooting_phase_start_faction_rule_status(
-                state=state,
-                request=request,
-                result=result,
+            invalid_status = (
+                self._shooting_phase_handler.invalid_shooting_phase_start_faction_rule_status(
+                    state=state,
+                    request=request,
+                    result=result,
+                    decisions=self.decision_controller,
+                )
             )
             if invalid_status is not None:
                 return invalid_status

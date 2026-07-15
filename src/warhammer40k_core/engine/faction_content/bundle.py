@@ -47,7 +47,6 @@ from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatas
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_advance_eligibility_hook_bindings,
     catalog_fall_back_eligibility_hook_bindings,
-    catalog_named_weapon_ability_choice_hook_bindings,
     catalog_post_shoot_hit_target_status_hook_bindings,
     catalog_weapon_profile_modifier_bindings,
 )
@@ -1430,7 +1429,7 @@ class RuntimeContentBundle:
         )
         shooting_phase_start_hook_registry = ShootingPhaseStartHookRegistry.from_bindings(
             (
-                *catalog_named_weapon_ability_choice_hook_bindings(
+                *catalog_runtime_hooks.shooting_phase_start_hook_bindings(
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
                 ),

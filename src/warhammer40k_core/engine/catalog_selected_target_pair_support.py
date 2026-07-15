@@ -113,6 +113,7 @@ _IMMEDIATE_BATTLE_SHOCK_PARAMETER_KEYS = frozenset(
 )
 _FIGHT_START_TRIGGER_PARAMETER_KEYS = frozenset({"edge", "owner", "phase"})
 _FIGHT_START_TARGET_PARAMETER_KEYS = frozenset({"allegiance"})
+_SHOOTING_START_TARGET_PARAMETER_KEYS = frozenset({"allegiance", "required_keyword_sequence"})
 _SELECTION_DISTANCE_PARAMETER_KEYS = frozenset(
     {
         "distance_inches",
@@ -135,6 +136,23 @@ _SELECTION_VISIBILITY_PARAMETER_KEYS = frozenset(
 
 def clause_is_fight_start_selected_target_selection(clause: RuleClause) -> bool:
     return fight_start_selected_target_selection_is_supported(clause)
+
+
+def clause_is_shooting_start_selected_target_selection(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog selected-target classifier requires RuleClause.")
+    return (
+        clause.is_supported
+        and clause.template_id == "phase17c:selected-target-constraint"
+        and _shooting_start_selection_trigger_is_supported(clause)
+        and _shooting_start_selection_target_is_supported(clause.target)
+        and all(
+            selected_target_selection_condition_is_supported(condition)
+            for condition in clause.conditions
+        )
+        and not clause.effects
+        and clause.duration is None
+    )
 
 
 def fight_start_selected_target_selection_is_supported(clause: RuleClause) -> bool:
@@ -186,6 +204,28 @@ def fight_start_selected_target_effect_clauses_after(
             selection_clause=selection_clause,
             effect_clause=clause,
         ):
+            selected.append(clause)
+    return tuple(selected)
+
+
+def shooting_start_selected_target_effect_clauses_after(
+    clauses: tuple[RuleClause, ...],
+    selection_index: int,
+) -> tuple[RuleClause, ...]:
+    if type(clauses) is not tuple or any(type(clause) is not RuleClause for clause in clauses):
+        raise GameLifecycleError(
+            "Shooting-start selected-target discovery requires RuleClause values."
+        )
+    if type(selection_index) is not int or not 0 <= selection_index < len(clauses):
+        raise GameLifecycleError("Shooting-start selected-target selection_index is invalid.")
+    selection_clause = clauses[selection_index]
+    if not clause_is_shooting_start_selected_target_selection(selection_clause):
+        return ()
+    selected: list[RuleClause] = []
+    for clause in clauses[selection_index + 1 :]:
+        if clause.template_id == "phase17c:selected-target-constraint":
+            break
+        if selected_target_persisting_effect_clause_is_supported(clause):
             selected.append(clause)
     return tuple(selected)
 
@@ -355,6 +395,21 @@ def _fight_start_selection_trigger_is_supported(clause: RuleClause) -> bool:
     )
 
 
+def _shooting_start_selection_trigger_is_supported(clause: RuleClause) -> bool:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return False
+    parameters = parameter_payload(trigger.parameters)
+    return (
+        frozenset(parameters) == frozenset({"edge", "optional", "owner", "phase", "subject"})
+        and parameters.get("edge") == "start"
+        and parameters.get("optional") is True
+        and parameters.get("owner") == "opponent"
+        and parameters.get("phase") == BattlePhase.SHOOTING.value
+        and parameters.get("subject") == "this_unit"
+    )
+
+
 def _fight_start_selection_target_is_supported(target: RuleTargetSpec | None) -> bool:
     if target is None or target.kind is not RuleTargetKind.ENEMY_UNIT:
         return False
@@ -362,6 +417,23 @@ def _fight_start_selection_target_is_supported(target: RuleTargetSpec | None) ->
     return (
         frozenset(parameters) == _FIGHT_START_TARGET_PARAMETER_KEYS
         and parameters.get("allegiance") == "enemy"
+    )
+
+
+def _shooting_start_selection_target_is_supported(target: RuleTargetSpec | None) -> bool:
+    if target is None or target.kind is not RuleTargetKind.FRIENDLY_UNIT:
+        return False
+    parameters = parameter_payload(target.parameters)
+    keywords = parameters.get("required_keyword_sequence")
+    return (
+        frozenset(parameters) == _SHOOTING_START_TARGET_PARAMETER_KEYS
+        and parameters.get("allegiance") == "friendly"
+        and type(keywords) is tuple
+        and bool(keywords)
+        and all(
+            type(keyword) is str and keyword.strip() == keyword and bool(keyword)
+            for keyword in keywords
+        )
     )
 
 
@@ -462,6 +534,10 @@ def _effect_trigger_is_supported(clause: RuleClause) -> bool:
         and (
             (actor == "this_model" and target_kind is RuleTargetKind.THIS_MODEL)
             or (actor == "this_unit" and target_kind is RuleTargetKind.THIS_UNIT)
+            or (
+                actor == "selected_unit"
+                and target_kind in {RuleTargetKind.SELECTED_TARGET, RuleTargetKind.SELECTED_UNIT}
+            )
         )
     )
 
@@ -472,10 +548,22 @@ def _effect_duration_is_supported(duration: RuleDuration | None) -> bool:
     parameters = parameter_payload(duration.parameters)
     if duration.kind is RuleDurationKind.PERMANENT:
         return not parameters
+    if duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT:
+        return False
+    if frozenset(parameters) in {
+        frozenset({"endpoint"}),
+        frozenset({"boundary", "endpoint"}),
+    }:
+        return (
+            parameters.get("endpoint") in _SUPPORTED_DURATION_ENDPOINTS
+            and parameters.get("boundary", "end") == "end"
+        )
     return (
-        duration.kind is RuleDurationKind.UNTIL_TIMING_ENDPOINT
-        and frozenset(parameters) == frozenset({"endpoint"})
-        and parameters.get("endpoint") in _SUPPORTED_DURATION_ENDPOINTS
+        frozenset(parameters) == frozenset({"battle_round_offset", "boundary", "endpoint", "owner"})
+        and parameters.get("battle_round_offset") == 1
+        and parameters.get("boundary") == "start"
+        and parameters.get("endpoint") == "turn"
+        and parameters.get("owner") == "source_player"
     )
 
 
@@ -530,6 +618,11 @@ def _selected_target_effect_is_supported(
         effect_is_supported = _reroll_permission_is_supported(parameters)
     elif effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
         effect_is_supported = _weapon_ability_grant_is_supported(parameters)
+    elif effect.kind is RuleEffectKind.GRANT_ABILITY:
+        return (
+            frozenset(parameters) == frozenset({"ability"})
+            and parameters.get("ability") == "stealth"
+        )
     else:
         return False
     return (
@@ -582,6 +675,9 @@ def _resolved_effect_attack_role(
 ) -> str | None:
     if clause.target is None:
         return None
+    explicit_role = parameter_payload(effect.parameters).get("attack_role")
+    if explicit_role is not None and explicit_role not in {"attacker", "target"}:
+        return None
     target_kind = clause.target.kind
     if target_kind in _ATTACKER_EFFECT_TARGET_KINDS:
         target_role = "attacker"
@@ -593,15 +689,15 @@ def _resolved_effect_attack_role(
     trigger_role: str | None = None
     if clause.trigger is not None:
         actor = parameter_payload(clause.trigger.parameters).get("actor")
-        if actor in {"this_model", "this_unit"}:
+        if actor in {"selected_unit", "this_model", "this_unit"}:
             trigger_role = "attacker"
-    if trigger_role is not None and trigger_role != target_role:
-        return None
+    if trigger_role is not None:
+        if explicit_role is not None:
+            return str(explicit_role) if explicit_role == trigger_role else None
+        if trigger_role != target_role:
+            return None
 
-    explicit_role = parameter_payload(effect.parameters).get("attack_role")
-    if explicit_role is not None and explicit_role != target_role:
-        return None
-    return target_role
+    return target_role if explicit_role is None or explicit_role == target_role else None
 
 
 def _characteristic_modifier_is_supported(

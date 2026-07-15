@@ -36,11 +36,16 @@ from tools.generate_aeldari_datasheet_semantic_coverage import (
     generated_aeldari_datasheet_semantic_coverage,
 )
 
+from warhammer40k_core.engine.catalog_prebattle_redeploy import (
+    CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID,
+    CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+    CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
 )
 from warhammer40k_core.engine.core_descriptor_consumption import (
     CORE_LEADER_ATTACHMENT_CONSUMER_ID,
@@ -206,9 +211,12 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
 
     non_daemons_rows = tuple(row for row in support_rows if row.faction_id != "chaos-daemons")
     assert {(row.faction_id, row.datasheet_id, row.overall) for row in non_daemons_rows} == {
+        ("aeldari", "000000605", "Playable"),
         ("aeldari", "000002531", "Playable"),
         ("aeldari", "000002532", "Playable"),
+        ("aeldari", "000004193", "Playable"),
         ("aeldari", "000004194", "Playable"),
+        ("aeldari", "000004195", "Playable"),
         ("aeldari", "000004196", "Playable"),
         ("death-guard", "000004209", "Partial"),
         ("emperors-children", "000004208", "Partial"),
@@ -304,9 +312,9 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 4,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 7,
         SEMANTIC_BUCKET_HOST_NEEDED: 6,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 60,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 57,
     }
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
@@ -326,6 +334,47 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
         "Fury of the Void (Psychic)": (
             "engine_consumed",
             (CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,),
+        ),
+    }
+    prince_yriel = rows_by_id["000004193"]
+    assert prince_yriel.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    assert {
+        ability.ability_name: (ability.support_stage.value, ability.runtime_consumer_ids)
+        for ability in prince_yriel.abilities
+    } == {
+        "Piratical Hero": (
+            "engine_consumed",
+            (
+                CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+                CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+                f"{CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID}:sustained-hits",
+            ),
+        ),
+        "Prince of Corsairs": (
+            "engine_consumed",
+            (CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,),
+        ),
+    }
+    vypers = rows_by_id["000000605"]
+    assert vypers.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    assert {
+        ability.ability_name: (ability.support_stage.value, ability.runtime_consumer_ids)
+        for ability in vypers.abilities
+    } == {
+        "Harassment Fire": (
+            "engine_consumed",
+            (CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,),
+        ),
+    }
+    starfangs = rows_by_id["000004195"]
+    assert starfangs.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    assert {
+        ability.ability_name: (ability.support_stage.value, ability.runtime_consumer_ids)
+        for ability in starfangs.abilities
+    } == {
+        "Hallucinogen Grenades": (
+            "engine_consumed",
+            (CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,),
         ),
     }
     skyreavers = rows_by_id["000004196"]

@@ -4,6 +4,69 @@
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",
     "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/core/000008339/none",
+    "datasheet_id": "000000605",
+    "datasheet_name": "Vypers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000605:harassment-fire",
+    "ability_name": "Harassment Fire",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/datasheet/000000605:harassment-fire/none",
+    "datasheet_id": "000000605",
+    "datasheet_name": "Vypers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-effect"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.hit_roll.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/faction/000009894/none",
+    "datasheet_id": "000000605",
+    "datasheet_name": "Vypers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/core/000008339/none",
     "datasheet_id": "000001030",
     "datasheet_name": "Defiler",
@@ -1257,6 +1320,109 @@
     "ability_name": "Leader",
     "catalog_id": "chaos-daemons-bridge-catalog",
     "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/core/000008346/none",
+    "datasheet_id": "000004193",
+    "datasheet_name": "Prince Yriel",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008344",
+    "ability_name": "Scouts",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/core/000008344/none",
+    "datasheet_id": "000004193",
+    "datasheet_name": "Prince Yriel",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:scouts"
+    ],
+    "semantic_categories": [
+      "core.scouts"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004193:piratical-hero",
+    "ability_name": "Piratical Hero",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:piratical-hero/none",
+    "datasheet_id": "000004193",
+    "datasheet_name": "Prince Yriel",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:sustained-hits"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.hit_roll.selected_unit",
+      "datasheet.rule_ir.grant_weapon_ability.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004193:prince-of-corsairs",
+    "ability_name": "Prince of Corsairs",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:prince-of-corsairs/none",
+    "datasheet_id": "000004193",
+    "datasheet_name": "Prince Yriel",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:prebattle-redeploy-permission"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.placement_permission.friendly_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/faction/000009894/none",
+    "datasheet_id": "000004193",
+    "datasheet_name": "Prince Yriel",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
     "datasheet_id": "000004194",
     "datasheet_name": "Kharseth",
@@ -1336,6 +1502,88 @@
     "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
     "datasheet_id": "000004194",
     "datasheet_name": "Kharseth",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/core/000008339/none",
+    "datasheet_id": "000004195",
+    "datasheet_name": "Starfangs",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008344",
+    "ability_name": "Scouts",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/core/000008344/none",
+    "datasheet_id": "000004195",
+    "datasheet_name": "Starfangs",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:scouts"
+    ],
+    "semantic_categories": [
+      "core.scouts"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004195:hallucinogen-grenades",
+    "ability_name": "Hallucinogen Grenades",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/datasheet/000004195:hallucinogen-grenades/none",
+    "datasheet_id": "000004195",
+    "datasheet_name": "Starfangs",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:shooting-start-selected-target-effect"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
+    "datasheet_id": "000004195",
+    "datasheet_name": "Starfangs",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:aeldari:army_rule:fade_back",

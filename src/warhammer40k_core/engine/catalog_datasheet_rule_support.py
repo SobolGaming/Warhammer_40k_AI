@@ -31,11 +31,13 @@ from warhammer40k_core.rules.rule_ir import (
 CATALOG_IR_MUSTERING_SELECTION_CONSUMER_ID = "army-mustering:required-datasheet-option"
 CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID = "catalog-ir:conditional-ability:lone-operative"
 CATALOG_IR_STEALTH_AURA_CONSUMER_ID = "catalog-ir:aura-ability:stealth"
+CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID = "catalog-ir:granted-ability:stealth"
 CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = (
     "catalog-ir:fight-selected-weapon-ability-choice"
 )
 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
 CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:wound-roll-modifier"
+CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:hit-roll-modifier"
 CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID = (
     "catalog-ir:fight-activation-movement-distance"
 )
@@ -99,6 +101,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
             consumer_ids.add(f"catalog-ir:weapon-keyword-grant:{token}")
     if clause_is_leading_unit_wound_roll_modifier(clause):
         consumer_ids.add(CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID)
+    if clause_is_leading_unit_hit_roll_modifier(clause):
+        consumer_ids.add(CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID)
     if clause_is_consolidation_move_distance_modifier(clause):
         consumer_ids.add(CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID)
     return tuple(sorted(consumer_ids))
@@ -111,9 +115,11 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_MUSTERING_SELECTION_CONSUMER_ID,
                 CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
                 CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
+                CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
                 CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
                 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
                 CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+                CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID,
                 CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
                 CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,
                 CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID,
@@ -217,6 +223,18 @@ def clause_is_stealth_aura(clause: RuleClause) -> bool:
     )
 
 
+def clause_is_granted_stealth_effect(clause: RuleClause) -> bool:
+    return (
+        clause.is_supported
+        and clause.target is not None
+        and clause.target.kind in {RuleTargetKind.SELECTED_TARGET, RuleTargetKind.SELECTED_UNIT}
+        and clause.duration is not None
+        and len(clause.effects) == 1
+        and clause.effects[0].kind is RuleEffectKind.GRANT_ABILITY
+        and parameter_payload(clause.effects[0].parameters).get("ability") == "stealth"
+    )
+
+
 def clause_is_fight_selected_weapon_ability_choice(clause: RuleClause) -> bool:
     if (
         not clause.is_supported
@@ -257,6 +275,18 @@ def clause_is_fight_selected_weapon_ability_choice(clause: RuleClause) -> bool:
 
 
 def clause_is_leading_unit_wound_roll_modifier(clause: RuleClause) -> bool:
+    return _clause_is_leading_unit_roll_modifier(clause, roll_tokens={"wound", "wound_roll"})
+
+
+def clause_is_leading_unit_hit_roll_modifier(clause: RuleClause) -> bool:
+    return _clause_is_leading_unit_roll_modifier(clause, roll_tokens={"hit", "hit_roll"})
+
+
+def _clause_is_leading_unit_roll_modifier(
+    clause: RuleClause,
+    *,
+    roll_tokens: set[str],
+) -> bool:
     if (
         not clause.is_supported
         or clause.trigger is None
@@ -267,7 +297,7 @@ def clause_is_leading_unit_wound_roll_modifier(clause: RuleClause) -> bool:
     ):
         return False
     trigger_parameters = parameter_payload(clause.trigger.parameters)
-    if trigger_parameters.get("roll_type") not in {"wound", "wound_roll"}:
+    if trigger_parameters.get("roll_type") not in roll_tokens:
         return False
     if not any(
         condition.kind is RuleConditionKind.TARGET_CONSTRAINT
@@ -280,7 +310,7 @@ def clause_is_leading_unit_wound_roll_modifier(clause: RuleClause) -> bool:
         return False
     parameters = parameter_payload(effect.parameters)
     return (
-        parameters.get("roll_type") in {"wound", "wound_roll"}
+        parameters.get("roll_type") in roll_tokens
         and parameters.get("attack_role") == "attacker"
         and type(parameters.get("delta")) is int
     )

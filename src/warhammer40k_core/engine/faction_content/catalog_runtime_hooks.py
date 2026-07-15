@@ -26,6 +26,9 @@ from warhammer40k_core.engine.catalog_return_on_death_runtime import (
     catalog_return_on_death_phase_end_hook_bindings,
     catalog_return_on_death_unit_destroyed_hook_bindings,
 )
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    CatalogNamedWeaponAbilityChoiceRuntime,
+)
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CatalogSelectedTargetEffectRuntime,
     catalog_selected_target_attack_sequence_completed_hook_bindings,
@@ -48,6 +51,11 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
 from warhammer40k_core.engine.phase import LifecycleStatus
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalRestrictionHookRegistry,
+)
+from warhammer40k_core.engine.shooting_phase_start_hooks import (
+    ShootingPhaseStartHookBinding,
+    ShootingPhaseStartRequestContext,
+    ShootingPhaseStartResultContext,
 )
 from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlHookBinding,
@@ -156,6 +164,44 @@ def fight_phase_start_hook_bindings(
         FightPhaseStartHookBinding(
             hook_id="catalog-ir:fight-phase-start",
             source_id="catalog-ir:fight-phase-start",
+            request_handler=request_handler,
+            result_handler=result_handler,
+        ),
+    )
+
+
+def shooting_phase_start_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[ShootingPhaseStartHookBinding, ...]:
+    named_weapon = CatalogNamedWeaponAbilityChoiceRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    )
+    selected_target = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    )
+    if not (named_weapon.bindings() or selected_target.shooting_phase_start_bindings()):
+        return ()
+
+    def request_handler(context: ShootingPhaseStartRequestContext) -> DecisionRequest | None:
+        request = named_weapon.request_handler(context)
+        if request is not None:
+            return request
+        return selected_target.shooting_phase_start_request(context)
+
+    def result_handler(context: ShootingPhaseStartResultContext) -> bool | LifecycleStatus:
+        handled = named_weapon.result_handler(context)
+        if handled is not False:
+            return handled
+        return selected_target.apply_shooting_phase_start_result(context)
+
+    return (
+        ShootingPhaseStartHookBinding(
+            hook_id="catalog-ir:shooting-phase-start",
+            source_id="catalog-ir:shooting-phase-start",
             request_handler=request_handler,
             result_handler=result_handler,
         ),
