@@ -98,6 +98,14 @@ to be distribution-sensitive; document that reason when reporting checks.
 Focused test subsets may run serially when that is the simpler or faster
 diagnostic path.
 
+Every behavioral test-file addition, deletion, move, or rename must update the
+committed four-shard inventory in `ci/test_shards/`. Regenerate
+`durations.json` and `shard-1.txt` through `shard-4.txt` from a representative
+JUnit profile as documented in `README.md`; do not commit a behavioral test
+file that is missing from the shard manifests. Before committing any test-file
+change, and before every PR, run this exact fail-closed check:
+`uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4`.
+
 Engine behavior tests must use real domain objects or canonical fixtures. This includes movement, shooting, charge, fight, deployment, transports, attached units, damage allocation, replay, decision dispatch, UI routing, and network serialization.
 
 Tests must not replace `lifecycle.decision_controller` directly. Tests must not import from other `test_*.py` modules; shared setup used across test modules lives in named shared helpers. Each major phase family must have facade-driven coverage through `AdapterGameSession` / `LocalGameSession` submissions and viewer-scoped projections or event deltas.
@@ -277,6 +285,7 @@ uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
 uv run pytest -n auto --dist=worksteal tests/
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
 uv run lint-imports
 uv run pre-commit run --all-files
 
