@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-import ast
 from pathlib import Path
 
+from tests.code_quality.source_index import (
+    combined_source_for,
+    function_source_for,
+    source_for,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_abilities import (
     ability_rows,
 )
@@ -37,24 +41,12 @@ SHOOTING_PHASE_SPLIT_PATHS = tuple(sorted(SHOOTING_PHASE_PATH.parent.glob("shoot
 ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
 
 
-def _function_source_from_paths(paths: tuple[Path, ...], function_name: str) -> str:
-    for path in paths:
-        module_source = path.read_text(encoding="utf-8")
-        module = ast.parse(module_source)
-        for node in module.body:
-            if isinstance(node, ast.FunctionDef) and node.name == function_name:
-                source = ast.get_source_segment(module_source, node)
-                assert source is not None
-                return source
-    raise AssertionError(f"Function {function_name} not found.")
-
-
 def _attack_sequence_source() -> str:
-    return "\n".join(path.read_text(encoding="utf-8") for path in ATTACK_SEQUENCE_SPLIT_PATHS)
+    return combined_source_for(ATTACK_SEQUENCE_SPLIT_PATHS)
 
 
 def _stratagems_source() -> str:
-    return "\n".join(path.read_text(encoding="utf-8") for path in STRATAGEMS_SPLIT_PATHS)
+    return combined_source_for(STRATAGEMS_SPLIT_PATHS)
 
 
 def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
@@ -86,8 +78,8 @@ def test_phase14i_core_ability_source_rows_have_no_unsupported_handlers() -> Non
 
 
 def test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime() -> None:
-    architecture = ARCHITECTURE_PATH.read_text(encoding="utf-8")
-    readme = README_PATH.read_text(encoding="utf-8")
+    architecture = source_for(ARCHITECTURE_PATH)
+    readme = source_for(README_PATH)
     phase14i_section = architecture.split("## Phase 14I:", maxsplit=1)[1].split(
         "\n## ",
         maxsplit=1,
@@ -107,18 +99,18 @@ def test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime() -> N
 
 
 def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit() -> None:
-    transport_source = TRANSPORTS_PATH.read_text(encoding="utf-8")
+    transport_source = source_for(TRANSPORTS_PATH)
     attack_sequence_source = _attack_sequence_source()
-    damage_allocation_source = DAMAGE_ALLOCATION_PATH.read_text(encoding="utf-8")
-    hazard_source = HAZARD_PATH.read_text(encoding="utf-8")
-    game_state_source = GAME_STATE_PATH.read_text(encoding="utf-8")
-    unit_state_source = UNIT_STATE_PATH.read_text(encoding="utf-8")
-    healing_source = HEALING_PATH.read_text(encoding="utf-8")
-    datasheet_source = DATASHEET_PATH.read_text(encoding="utf-8")
-    attachment_eligibility_source = ATTACHMENT_ELIGIBILITY_PATH.read_text(encoding="utf-8")
-    list_validation_source = LIST_VALIDATION_PATH.read_text(encoding="utf-8")
-    army_mustering_source = ARMY_MUSTERING_PATH.read_text(encoding="utf-8")
-    attached_unit_formation_source = ATTACHED_UNIT_FORMATION_PATH.read_text(encoding="utf-8")
+    damage_allocation_source = source_for(DAMAGE_ALLOCATION_PATH)
+    hazard_source = source_for(HAZARD_PATH)
+    game_state_source = source_for(GAME_STATE_PATH)
+    unit_state_source = source_for(UNIT_STATE_PATH)
+    healing_source = source_for(HEALING_PATH)
+    datasheet_source = source_for(DATASHEET_PATH)
+    attachment_eligibility_source = source_for(ATTACHMENT_ELIGIBILITY_PATH)
+    list_validation_source = source_for(LIST_VALIDATION_PATH)
+    army_mustering_source = source_for(ARMY_MUSTERING_PATH)
+    attached_unit_formation_source = source_for(ATTACHED_UNIT_FORMATION_PATH)
     stratagems_source = _stratagems_source()
 
     assert "def resolve_combat_disembark(" in transport_source
@@ -166,23 +158,19 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
 
 
 def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> None:
-    active_selector_source = _function_source_from_paths(
+    active_selector_source = function_source_for(
         SHOOTING_PHASE_SPLIT_PATHS,
         "_active_player_placed_unit_ids",
     )
-    legal_selector_source = _function_source_from_paths(
+    legal_selector_source = function_source_for(
         SHOOTING_PHASE_SPLIT_PATHS, "_legal_shooting_unit_ids"
     )
-    options_source = _function_source_from_paths(
-        SHOOTING_PHASE_SPLIT_PATHS, "_shooting_unit_options"
-    )
-    available_weapons_source = _function_source_from_paths(
+    options_source = function_source_for(SHOOTING_PHASE_SPLIT_PATHS, "_shooting_unit_options")
+    available_weapons_source = function_source_for(
         SHOOTING_PHASE_SPLIT_PATHS,
         "_available_weapons_for_rules_unit",
     )
-    range_source = _function_source_from_paths(
-        SHOOTING_PHASE_SPLIT_PATHS, "_unit_target_within_max_range"
-    )
+    range_source = function_source_for(SHOOTING_PHASE_SPLIT_PATHS, "_unit_target_within_max_range")
 
     assert "rules_unit_id_for_unit_id" in active_selector_source
     assert "unit_ids.append(placement.unit_instance_id)" not in active_selector_source
@@ -204,8 +192,8 @@ def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> 
 
 
 def test_phase14h_docs_mark_complete_after_attached_formation_cutover() -> None:
-    architecture = ARCHITECTURE_PATH.read_text(encoding="utf-8")
-    readme = README_PATH.read_text(encoding="utf-8")
+    architecture = source_for(ARCHITECTURE_PATH)
+    readme = source_for(README_PATH)
     phase14h_section = architecture.split("## Phase 14H:", maxsplit=1)[1].split(
         "\n## Phase 14I:",
         maxsplit=1,
@@ -238,7 +226,7 @@ def test_phase14h_docs_mark_complete_after_attached_formation_cutover() -> None:
     assert "repositioned-unit Advance/Fall Back/Disembark history" in readme
     assert "destroyed-Transport orchestration from real destruction timing" not in architecture
     assert "destroyed-Transport orchestration from real destruction timing" not in readme
-    adapter_contract = ADAPTER_CONTRACT_PATH.read_text(encoding="utf-8")
+    adapter_contract = source_for(ADAPTER_CONTRACT_PATH)
     assert "player-facing destruction-time host remains Phase 14H work" not in adapter_contract
     assert "actual destruction event before Transport removal and Deadly Demise" in adapter_contract
     assert "mixed-Toughness attached-unit attack handling" not in architecture

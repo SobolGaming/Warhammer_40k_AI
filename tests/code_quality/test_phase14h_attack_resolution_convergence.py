@@ -3,18 +3,16 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+from tests.code_quality.source_index import ast_for, source_for
+
 ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
 ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
 ATTACK_SEQUENCE_SPLIT_PATHS = tuple(sorted(ATTACK_SEQUENCE_PATH.parent.glob("attack_sequence*.py")))
 
 
-def _attack_sequence_module_sources() -> tuple[str, ...]:
-    return tuple(path.read_text(encoding="utf-8") for path in ATTACK_SEQUENCE_SPLIT_PATHS)
-
-
 def test_phase14h_single_save_resolution_entry_point() -> None:
-    trees = tuple(ast.parse(source) for source in _attack_sequence_module_sources())
+    trees = tuple(ast_for(path) for path in ATTACK_SEQUENCE_SPLIT_PATHS)
     function_names = {
         node.name for tree in trees for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
     }
@@ -54,7 +52,7 @@ def test_phase14h_retired_attack_allocation_surface_is_absent() -> None:
     )
     offenders: list[str] = []
     for path in SRC_ROOT.rglob("*.py"):
-        text = path.read_text(encoding="utf-8")
+        text = source_for(path)
         if any(symbol in text for symbol in retired_text):
             offenders.append(str(path.relative_to(ROOT)))
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from tests.code_quality.source_index import combined_source_for, python_files, source_for
 from warhammer40k_core.core.ruleset_descriptor import (
     CoherencyPolicyKind,
     CoverEffect,
@@ -43,7 +44,7 @@ def test_phase14k_retired_attack_save_choice_surfaces_absent_from_runtime() -> N
     violations: list[str] = []
 
     for path in _runtime_python_files():
-        text = path.read_text(encoding="utf-8")
+        text = source_for(path)
         relative_path = path.relative_to(ROOT).as_posix()
         for token in retired_tokens:
             if token in text:
@@ -74,7 +75,7 @@ def test_phase14k_damage_allocation_model_choice_is_runtime_and_contract_registe
         if token not in _source_for_path(path):
             missing.append(f"{path.relative_to(ROOT).as_posix()}: missing {token!r}")
 
-    contract_text = ADAPTER_CONTRACT_PATH.read_text(encoding="utf-8")
+    contract_text = source_for(ADAPTER_CONTRACT_PATH)
     if "select_damage_allocation_model" not in contract_text:
         missing.append("docs/ADAPTER_DECISION_CONTRACT.md: missing damage model decision")
 
@@ -103,7 +104,7 @@ def test_phase14k_retired_aircraft_minimum_move_policy_absent_from_runtime_and_d
     violations: list[str] = []
 
     for path in (*_runtime_python_files(), ARCHITECTURE_PATH, README_PATH):
-        text = path.read_text(encoding="utf-8")
+        text = source_for(path)
         relative_path = path.relative_to(ROOT).as_posix()
         for token in retired_tokens:
             if token in text:
@@ -118,7 +119,7 @@ def test_phase14k_retired_aircraft_minimum_move_policy_absent_from_runtime_and_d
 def test_phase14k_reserve_arrivals_use_move_units_and_eight_inch_enemy_distance() -> None:
     assert StrategicReserveRule().enemy_horizontal_distance_inches == 8.0
 
-    source = RESERVES_PATH.read_text(encoding="utf-8")
+    source = source_for(RESERVES_PATH)
     forbidden_tokens = (
         'source_step="' + "reinforcements" + '"',
         "enemy_horizontal_distance_inches: float = 9.0",
@@ -192,7 +193,7 @@ def test_phase14k_core_stratagem_source_package_uses_current_names() -> None:
     rapid_ingress = next(row for row in rows if row.stratagem_id == "rapid-ingress")
     assert "reinforcements step" not in rapid_ingress.effect_descriptor.lower()
 
-    source = CORE_STRATAGEMS_PATH.read_text(encoding="utf-8")
+    source = source_for(CORE_STRATAGEMS_PATH)
     assert "Counter-offensive" not in source
     assert "stratagem_id=" + '"grenade"' not in source
     assert "stratagem_id=" + '"tank-shock"' not in source
@@ -200,8 +201,8 @@ def test_phase14k_core_stratagem_source_package_uses_current_names() -> None:
 
 
 def test_phase14k_docs_mark_phase_complete() -> None:
-    architecture = ARCHITECTURE_PATH.read_text(encoding="utf-8")
-    readme = README_PATH.read_text(encoding="utf-8")
+    architecture = source_for(ARCHITECTURE_PATH)
+    readme = source_for(README_PATH)
     phase14k_section = architecture.split("## Phase 14K:", maxsplit=1)[1].split(
         "\n## ",
         maxsplit=1,
@@ -215,12 +216,10 @@ def test_phase14k_docs_mark_phase_complete() -> None:
 
 
 def _runtime_python_files() -> tuple[Path, ...]:
-    return tuple(sorted(SRC_ROOT.rglob("*.py"), key=lambda path: path.as_posix()))
+    return python_files(SRC_ROOT)
 
 
 def _source_for_path(path: Path) -> str:
     if path == SHOOTING_PHASE_PATH:
-        return "\n".join(
-            split_path.read_text(encoding="utf-8") for split_path in SHOOTING_PHASE_SPLIT_PATHS
-        )
-    return path.read_text(encoding="utf-8")
+        return combined_source_for(SHOOTING_PHASE_SPLIT_PATHS)
+    return source_for(path)
