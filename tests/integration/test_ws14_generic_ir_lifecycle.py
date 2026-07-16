@@ -52,7 +52,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -97,6 +96,9 @@ from warhammer40k_core.engine.triggered_movement import SELECT_TRIGGERED_MOVEMEN
 from warhammer40k_core.engine.unit_rule_effects import (
     charge_transit_through_non_vehicle_monster_models_allowed,
     movement_transit_through_terrain_features_allowed,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -1439,6 +1441,7 @@ def _spectacle_muster_request(
             detachment_ids=("spectacle-of-slaughter",),
             enhancement_ids=("000010900002", "000010900003"),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,
@@ -1737,6 +1740,7 @@ def _court_muster_request(
                 "000010654005",
             ),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,
@@ -1820,6 +1824,7 @@ def _more_dakka_muster_request(
             detachment_ids=("more-dakka",),
             enhancement_ids=("000009991003", "000009991004", "000009991005"),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=tuple(unit_selections),
         enhancement_assignments=(
             EnhancementAssignment(

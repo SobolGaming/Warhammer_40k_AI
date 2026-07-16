@@ -22,9 +22,7 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
 )
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -42,6 +40,10 @@ from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_context_for_unit,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.geometry.pose import Pose
 
@@ -1014,6 +1016,7 @@ def _army(
             faction_id=detachment.faction_id,
             detachment_ids=(detachment.detachment_id,),
         ),
+        force_disposition_id="purge-the-foe",
         units=(unit,),
     )
 
@@ -1037,6 +1040,7 @@ def _attached_army(
             faction_id=detachment.faction_id,
             detachment_ids=(detachment.detachment_id,),
         ),
+        force_disposition_id="purge-the-foe",
         units=units,
         attached_units=(formation,),
     )

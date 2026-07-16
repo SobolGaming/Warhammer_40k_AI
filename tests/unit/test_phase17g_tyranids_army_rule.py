@@ -69,7 +69,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -86,6 +85,9 @@ from warhammer40k_core.engine.runtime_modifiers import (
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
@@ -1186,6 +1188,7 @@ def _tyranids_config(*, game_id: str) -> GameConfig:
                     faction_id=army_rule.TYRANIDS_FACTION_ID,
                     detachment_ids=(TYRANIDS_DETACHMENT_ID,),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(
                     _unit_selection("warriors", TYRANIDS_WARRIORS_DATASHEET_ID),
                     _unit_selection("gaunts", TYRANIDS_GAUNTS_DATASHEET_ID),
@@ -1201,6 +1204,7 @@ def _tyranids_config(*, game_id: str) -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(_unit_selection("enemy-unit", "core-intercessor-like-infantry"),),
             ),
         ),

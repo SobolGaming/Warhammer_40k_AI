@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import NotRequired, Self, TypedDict, cast
+from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
 from warhammer40k_core.core.datasheet import (
@@ -18,6 +18,7 @@ from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
+from warhammer40k_core.engine.list_validation_errors import ListValidationError
 from warhammer40k_core.engine.scaled_wargear_limits import (
     ScaledWargearSelection,
     validate_scaled_wargear_selections,
@@ -25,10 +26,12 @@ from warhammer40k_core.engine.scaled_wargear_limits import (
 from warhammer40k_core.engine.structured_wargear_validation import (
     validate_replace_wargear_effect_count,
 )
-
-
-class ListValidationError(ValueError):
-    """Raised when army list data violates CORE V2 mustering invariants."""
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    ModelProfileSelectionPayload,
+    WargearSelection,
+    WargearSelectionPayload,
+)
 
 
 class BattleSize(StrEnum):
@@ -94,18 +97,6 @@ class BattleSizeMusteringPolicyPayload(TypedDict):
     enhancement_limit: int
     unit_limit: int
     battleline_unit_limit: int
-
-
-class ModelProfileSelectionPayload(TypedDict):
-    model_profile_id: str
-    model_count: int
-
-
-class WargearSelectionPayload(TypedDict):
-    option_id: str
-    model_profile_id: str
-    wargear_ids: list[str]
-    selection_count: NotRequired[int]
 
 
 class MusteringOptionSelectionPayload(TypedDict):
@@ -250,108 +241,6 @@ class BattleSizeMusteringPolicy:
             "unit_limit": self.unit_limit,
             "battleline_unit_limit": self.battleline_unit_limit,
         }
-
-
-@dataclass(frozen=True, slots=True)
-class ModelProfileSelection:
-    model_profile_id: str
-    model_count: int
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "model_profile_id",
-            _validate_identifier("ModelProfileSelection model_profile_id", self.model_profile_id),
-        )
-        object.__setattr__(
-            self,
-            "model_count",
-            _validate_positive_int("ModelProfileSelection model_count", self.model_count),
-        )
-
-    def to_payload(self) -> ModelProfileSelectionPayload:
-        return {
-            "model_profile_id": self.model_profile_id,
-            "model_count": self.model_count,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: ModelProfileSelectionPayload) -> Self:
-        return cls(
-            model_profile_id=payload["model_profile_id"],
-            model_count=payload["model_count"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class WargearSelection:
-    option_id: str
-    model_profile_id: str
-    wargear_ids: tuple[str, ...]
-    selection_count: int | None = None
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "option_id",
-            _validate_unprefixed_identifier(
-                "WargearSelection option_id",
-                self.option_id,
-                "wargear-option:",
-            ),
-        )
-        object.__setattr__(
-            self,
-            "model_profile_id",
-            _validate_identifier("WargearSelection model_profile_id", self.model_profile_id),
-        )
-        object.__setattr__(
-            self,
-            "wargear_ids",
-            _validate_identifier_tuple(
-                "WargearSelection wargear_ids",
-                self.wargear_ids,
-                min_length=0,
-            ),
-        )
-        if self.selection_count is not None:
-            if type(self.selection_count) is not int or self.selection_count < 0:
-                raise ListValidationError(
-                    "WargearSelection selection_count must be a non-negative integer."
-                )
-            if self.wargear_ids and self.selection_count == 0:
-                raise ListValidationError(
-                    "WargearSelection selection_count must be positive when wargear is selected."
-                )
-            if not self.wargear_ids and self.selection_count != 0:
-                raise ListValidationError(
-                    "WargearSelection selection_count must be zero when no wargear is selected."
-                )
-
-    @property
-    def resolved_selection_count(self) -> int:
-        if self.selection_count is not None:
-            return self.selection_count
-        return 1 if self.wargear_ids else 0
-
-    def to_payload(self) -> WargearSelectionPayload:
-        payload: WargearSelectionPayload = {
-            "option_id": self.option_id,
-            "model_profile_id": self.model_profile_id,
-            "wargear_ids": list(self.wargear_ids),
-        }
-        if self.selection_count is not None:
-            payload["selection_count"] = self.selection_count
-        return payload
-
-    @classmethod
-    def from_payload(cls, payload: WargearSelectionPayload) -> Self:
-        return cls(
-            option_id=payload["option_id"],
-            model_profile_id=payload["model_profile_id"],
-            wargear_ids=tuple(payload["wargear_ids"]),
-            selection_count=payload.get("selection_count"),
-        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -642,6 +531,30 @@ def selected_force_disposition_ids(
         for force_disposition_id in detachment.force_disposition_ids
     }
     return tuple(sorted(force_disposition_ids))
+
+
+def validate_force_disposition_selection(
+    *,
+    catalog: ArmyCatalog,
+    detachment_selection: DetachmentSelection,
+    force_disposition_id: str,
+    battle_size: BattleSize = BattleSize.STRIKE_FORCE,
+) -> str:
+    selected_id = _validate_unprefixed_identifier(
+        "force_disposition_id",
+        force_disposition_id,
+        "force-disposition:",
+    )
+    available_ids = selected_force_disposition_ids(
+        catalog=catalog,
+        selection=detachment_selection,
+        battle_size=battle_size,
+    )
+    if selected_id not in available_ids:
+        raise ListValidationError(
+            "Selected Force Disposition is not provided by the selected detachments."
+        )
+    return selected_id
 
 
 def validate_unit_selection_for_faction(
@@ -1199,8 +1112,17 @@ def _validate_wargear_option_semantics(
             for wargear_id in other_selection.wargear_ids
         }
         for condition in option.conditions:
-            if condition.kind is WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH and (
-                other_selected_for_profile.intersection(condition.wargear_ids)
+            if (
+                condition.kind is WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH
+                and (other_selected_for_profile.intersection(condition.wargear_ids))
+                and not _not_equipped_condition_can_use_distinct_models(
+                    selection=selection,
+                    option=option,
+                    condition_wargear_ids=condition.wargear_ids,
+                    selections_by_profile=selections_by_profile,
+                    options_by_id=options_by_id,
+                    model_profile_selections=model_profile_selections,
+                )
             ):
                 raise ListValidationError(
                     "WargearSelection violates a structured wargear option condition."
@@ -1238,6 +1160,62 @@ def _validate_wargear_option_semantics(
         datasheet=datasheet,
         model_profile_selections=model_profile_selections,
     )
+
+
+def _not_equipped_condition_can_use_distinct_models(
+    *,
+    selection: WargearSelection,
+    option: DatasheetWargearOption,
+    condition_wargear_ids: tuple[str, ...],
+    selections_by_profile: dict[str, list[WargearSelection]],
+    options_by_id: dict[str, DatasheetWargearOption],
+    model_profile_selections: tuple[ModelProfileSelection, ...] | None,
+) -> bool:
+    if model_profile_selections is None:
+        return False
+    selected_model_count = next(
+        (
+            profile_selection.model_count
+            for profile_selection in model_profile_selections
+            if profile_selection.model_profile_id == selection.model_profile_id
+        ),
+        0,
+    )
+    conflicting_selections = tuple(
+        other_selection
+        for other_selection in selections_by_profile[selection.model_profile_id]
+        if other_selection.option_id != selection.option_id
+        and set(other_selection.wargear_ids).intersection(condition_wargear_ids)
+    )
+    if not option.effects or any(
+        not options_by_id[other_selection.option_id].effects
+        for other_selection in conflicting_selections
+    ):
+        return False
+    required_bearer_count = _structured_selection_bearer_count(
+        selection=selection,
+        option=option,
+    ) + sum(
+        _structured_selection_bearer_count(
+            selection=other_selection,
+            option=options_by_id[other_selection.option_id],
+        )
+        for other_selection in conflicting_selections
+    )
+    return required_bearer_count <= selected_model_count
+
+
+def _structured_selection_bearer_count(
+    *,
+    selection: WargearSelection,
+    option: DatasheetWargearOption,
+) -> int:
+    effect_model_counts = tuple(
+        effect.model_count * selection.resolved_selection_count
+        for effect in option.effects
+        if effect.wargear_id in selection.wargear_ids
+    )
+    return max(effect_model_counts, default=selection.resolved_selection_count)
 
 
 def _validate_scaled_wargear_selection_limits(

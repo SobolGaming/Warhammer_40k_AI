@@ -54,7 +54,6 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -88,6 +87,9 @@ from warhammer40k_core.engine.reserves import (
     ReservePlacementViolationCode,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.base import BaseShape, CircularBase
 from warhammer40k_core.geometry.movement_envelope import MovementDistanceWitness
 from warhammer40k_core.geometry.pathing import PathValidationContext, PathWitness
@@ -1675,6 +1677,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=unit_selections,
     )
 

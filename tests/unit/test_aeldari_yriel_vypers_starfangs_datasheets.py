@@ -76,11 +76,11 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ListValidationError,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
     resolve_wargear_selections,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
@@ -115,6 +115,10 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionHookRegistry,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -1691,6 +1695,7 @@ def _army(
             faction_id="AE",
             detachment_ids=("corsair-coterie",),
         ),
+        force_disposition_id="purge-the-foe",
         units=units,
         attached_units=attached_units,
     )

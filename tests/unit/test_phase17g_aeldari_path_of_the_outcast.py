@@ -1412,6 +1412,7 @@ def _army(
                 stratagems.NOMADS_OF_THE_HIDDEN_WAY_STRATAGEM_ID,
             ),
         ),
+        force_disposition_id="purge-the-foe",
         units=units,
         enhancement_assignments=enhancement_assignments,
     )

@@ -271,7 +271,14 @@ Current status:
   wargear, weapon, and remaining faction execution remains later Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
-  HARLEQUINS and ANHRATHE units.
+  HARLEQUINS and ANHRATHE units. Player-provided roster artifacts load through
+  a strict JSON boundary into the same `ArmyMusterRequest` path, require an
+  explicit Force Disposition, and validate declared per-unit and total points
+  against a source-identified MFM package before mustering. Artifact unit-array
+  order is the repeated-datasheet pricing order; source-backed unit and
+  Enhancement/Upgrade point records plus the MFM package identity remain
+  authoritative through the mustered army. Historical game result metadata is
+  optional so the same schema represents ordinary pre-game lists.
 - Drukhari `Power from Pain` runtime support includes a deterministic Pain token
   ledger, token gain at the owning Command phase start, enemy Battle-shock
   failures, and enemy unit destruction, plus Lithe Agility empowerment for

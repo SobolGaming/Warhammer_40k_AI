@@ -68,7 +68,6 @@ from warhammer40k_core.engine.game_state import GameConfig, GameState, GameState
 from warhammer40k_core.engine.list_validation import (
     BattleSize,
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.movement_proposals import (
@@ -97,6 +96,9 @@ from warhammer40k_core.engine.stratagems import (
 from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 
@@ -2170,6 +2172,7 @@ def _army(
             faction_id=faction_id,
             detachment_ids=(f"{faction_id}-detachment",),
         ),
+        force_disposition_id="purge-the-foe",
         units=units,
         roster_legality_report=RosterLegalityReport(battle_size=battle_size),
         battle_size=battle_size,
@@ -2401,6 +2404,7 @@ def _muster_request(
             faction_id=faction_id,
             detachment_ids=(f"{faction_id}-detachment",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

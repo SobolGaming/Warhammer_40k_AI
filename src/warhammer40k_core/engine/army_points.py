@@ -19,15 +19,22 @@ from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     EnhancementAssignment,
-    RosterUnitPointValue,
 )
 from warhammer40k_core.engine.list_validation import (
-    ListValidationError,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
     resolve_model_profile_selections,
     resolve_wargear_selections,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
+)
+from warhammer40k_core.engine.roster_points import (
+    RosterEnhancementPointValue,
+    RosterUnitPointValue,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
 )
 from warhammer40k_core.rules.mfm_source import (
     MfmDetachmentRecord,
@@ -102,6 +109,14 @@ class MfmEnhancementPointLine:
         object.__setattr__(self, "points", _validate_non_negative_int(self.points))
         object.__setattr__(self, "source_id", _validate_identifier(self.source_id))
 
+    def roster_enhancement_point_value(self) -> RosterEnhancementPointValue:
+        return RosterEnhancementPointValue(
+            enhancement_id=self.enhancement_id,
+            target_unit_selection_id=self.target_unit_selection_id,
+            points=self.points,
+            source_id=self.source_id,
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class MfmArmyPointCalculation:
@@ -124,6 +139,9 @@ class MfmArmyPointCalculation:
 
     def roster_unit_point_values(self) -> tuple[RosterUnitPointValue, ...]:
         return tuple(line.roster_unit_point_value() for line in self.unit_lines)
+
+    def roster_enhancement_point_values(self) -> tuple[RosterEnhancementPointValue, ...]:
+        return tuple(line.roster_enhancement_point_value() for line in self.enhancement_lines)
 
 
 def calculate_mfm_army_points(
@@ -339,7 +357,7 @@ def _priced_unit_records(
     faction: MfmFactionRecord,
 ) -> tuple[tuple[UnitMusterSelection, DatasheetDefinition, MfmUnitRecord, int], ...]:
     ordered: list[tuple[UnitMusterSelection, DatasheetDefinition, MfmUnitRecord]] = []
-    for selection in sorted(request.unit_selections, key=lambda value: value.unit_selection_id):
+    for selection in request.unit_selections:
         datasheet = _catalog_datasheet(catalog=catalog, datasheet_id=selection.datasheet_id)
         ordered.append(
             (
@@ -851,7 +869,7 @@ def _validate_unit_line_tuple(values: tuple[MfmUnitPointLine, ...]) -> tuple[Mfm
         if value.unit_selection_id in seen:
             raise ArmyPointsError("MfmArmyPointCalculation unit_lines must not contain duplicates.")
         seen.add(value.unit_selection_id)
-    return tuple(sorted(values, key=lambda value: value.unit_selection_id))
+    return values
 
 
 def _validate_enhancement_line_tuple(

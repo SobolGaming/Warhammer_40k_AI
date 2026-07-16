@@ -41,7 +41,6 @@ from warhammer40k_core.engine.army_mustering import (
     DedicatedTransportManifest,
     EnhancementAssignment,
     RosterLegalityReport,
-    RosterUnitPointValue,
     WarlordSelection,
     muster_army,
     validate_roster_legality,
@@ -58,11 +57,8 @@ from warhammer40k_core.engine.list_validation import (
     BattleSize,
     BattleSizeMusteringPolicy,
     DetachmentSelection,
-    ListValidationError,
-    ModelProfileSelection,
     MusteringOptionSelection,
     UnitMusterSelection,
-    WargearSelection,
     battle_size_from_token,
     resolve_model_profile_selections,
     resolve_wargear_selections,
@@ -70,8 +66,12 @@ from warhammer40k_core.engine.list_validation import (
     validate_detachment_selection,
     validate_unit_selection_for_faction,
 )
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
+)
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError, SetupStep
+from warhammer40k_core.engine.roster_points import RosterUnitPointValue
 from warhammer40k_core.engine.rules_units import (
     RulesUnitComponent,
     RulesUnitComponentRole,
@@ -84,6 +84,10 @@ from warhammer40k_core.engine.unit_factory import (
     UnitFactory,
     UnitFactoryError,
     UnitInstance,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -129,19 +133,39 @@ def _muster_request(
     roster_legality_required: bool = False,
     catalog_id: str | None = None,
     battle_size: BattleSize = BattleSize.STRIKE_FORCE,
+    force_disposition_id: str | None = None,
 ) -> ArmyMusterRequest:
+    selected_detachments = (
+        detachment_selection
+        if detachment_selection is not None
+        else DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+        )
+    )
+    selected_force_disposition_id = force_disposition_id
+    if selected_force_disposition_id is None:
+        matching_detachments = tuple(
+            detachment
+            for detachment in catalog.detachments
+            if detachment.detachment_id in selected_detachments.detachment_ids
+        )
+        selected_force_disposition_id = next(
+            (
+                disposition_id
+                for detachment in matching_detachments
+                for disposition_id in detachment.force_disposition_ids
+            ),
+            "purge-the-foe",
+        )
     return ArmyMusterRequest(
         army_id=army_id,
         player_id=player_id,
         catalog_id=catalog.catalog_id if catalog_id is None else catalog_id,
         source_package_id=catalog.source_package_id,
         ruleset_id=catalog.ruleset_id,
-        detachment_selection=detachment_selection
-        if detachment_selection is not None
-        else DetachmentSelection(
-            faction_id="core-marine-force",
-            detachment_ids=("core-combined-arms",),
-        ),
+        detachment_selection=selected_detachments,
+        force_disposition_id=selected_force_disposition_id,
         unit_selections=unit_selections if unit_selections is not None else (_unit_selection(),),
         attachment_declarations=attachment_declarations,
         unit_points=unit_points,

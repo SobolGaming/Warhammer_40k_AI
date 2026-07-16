@@ -53,7 +53,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -66,6 +65,9 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_decline_payload,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -563,6 +565,7 @@ def _chaos_daemons_lifecycle_config() -> GameConfig:
                     faction_id=army_rule.CHAOS_DAEMONS_FACTION_ID,
                     detachment_ids=("warptide",),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="manifestation-daemon",
@@ -586,6 +589,7 @@ def _chaos_daemons_lifecycle_config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="enemy-unit",

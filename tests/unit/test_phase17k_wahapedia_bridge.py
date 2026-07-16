@@ -321,13 +321,13 @@ from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ListValidationError,
-    ModelProfileSelection,
     MusteringOptionSelection,
     UnitMusterSelection,
-    WargearSelection,
     resolve_mustering_option_selections,
     resolve_wargear_selections,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -387,6 +387,10 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     resolve_unit_move_completed_mortal_wound_hooks,
 )
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
@@ -712,6 +716,7 @@ def test_phase17k_bloodthirster_bridge_supports_replacement_wargear_loadouts() -
                 ),
             ),
         )
+
     assert lash_option.allowed_wargear_ids == (axe_id, lash_id)
 
 
@@ -848,7 +853,7 @@ def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear()
     assert doomsday_records_by_name["Reverberating Summons"].wargear_id == doomsday_bell_id
 
 
-def test_phase17k_keeper_of_secrets_bridge_supports_required_one_of_wargear() -> None:
+def test_phase17k_keeper_of_secrets_bridge_supports_optional_one_of_wargear() -> None:
     package = build_canonical_catalog_package(
         package_id=_catalog_package_id(),
         catalog_version=_catalog_version(),
@@ -868,7 +873,7 @@ def test_phase17k_keeper_of_secrets_bridge_supports_required_one_of_wargear() ->
     assert option.model_profile_id == model_profile_id
     assert option.default_wargear_ids == ()
     assert option.allowed_wargear_ids == (living_whip_id, ritual_knife_id, shining_aegis_id)
-    assert option.min_selections == 1
+    assert option.min_selections == 0
     assert option.max_selections == 1
     assert option.conditions == ()
     assert tuple(effect.kind for effect in option.effects) == (
@@ -890,7 +895,6 @@ def test_phase17k_keeper_of_secrets_bridge_supports_required_one_of_wargear() ->
         "characteristic": "save",
         "value": "3+",
     }
-
     assert _resolved_keeper_of_secrets_model_wargear(
         package,
         requested_selections=(
@@ -922,24 +926,29 @@ def test_phase17k_keeper_of_secrets_bridge_supports_required_one_of_wargear() ->
         shining_aegis_id,
     )
 
-    with pytest.raises(ListValidationError, match="minimum selections"):
-        resolve_wargear_selections(
-            catalog=package.army_catalog,
-            datasheet=datasheet,
-            requested_selections=(),
-        )
-    with pytest.raises(ListValidationError, match="minimum selections"):
-        resolve_wargear_selections(
-            catalog=package.army_catalog,
-            datasheet=datasheet,
-            requested_selections=(
-                WargearSelection(
-                    option_id=option_id,
-                    model_profile_id=model_profile_id,
-                    wargear_ids=(),
-                ),
+    assert _resolved_keeper_of_secrets_model_wargear(
+        package,
+        requested_selections=(),
+    ) == (
+        "000001137:phantasmagoria",
+        "000001137:snapping-claws",
+        "000001137:witstealer-sword",
+    )
+    assert _resolved_keeper_of_secrets_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(),
+                selection_count=0,
             ),
-        )
+        ),
+    ) == (
+        "000001137:phantasmagoria",
+        "000001137:snapping-claws",
+        "000001137:witstealer-sword",
+    )
     with pytest.raises(ListValidationError, match="exceeds maximum selections"):
         resolve_wargear_selections(
             catalog=package.army_catalog,
@@ -1004,6 +1013,52 @@ def test_phase17k_keeper_of_secrets_bridge_supports_required_one_of_wargear() ->
     assert "Shining Aegis" not in whip_records_by_name
     assert aegis_records_by_name["Shining Aegis"].wargear_id == shining_aegis_id
     assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
+
+
+def test_phase17k_lord_of_change_bridge_keeps_extra_weapon_choice_optional() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_lord_of_change_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000001120")
+    option = next(
+        option
+        for option in datasheet.wargear_options
+        if option.option_id == "000001120:equipment-choice:option-1"
+    )
+
+    assert option.default_wargear_ids == ()
+    assert option.allowed_wargear_ids == (
+        "000001120:baleful-sword",
+        "000001120:rod-of-sorcery",
+    )
+    assert option.min_selections == 0
+    assert option.max_selections == 1
+    resolved = resolve_wargear_selections(
+        catalog=package.army_catalog,
+        datasheet=datasheet,
+        requested_selections=(
+            WargearSelection(
+                option_id=option.option_id,
+                model_profile_id="000001120:lord-of-change",
+                wargear_ids=(),
+                selection_count=0,
+            ),
+        ),
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id="000001120:lord-of-change",
+                model_count=1,
+            ),
+        ),
+    )
+    assert (
+        next(
+            selection for selection in resolved if selection.option_id == option.option_id
+        ).wargear_ids
+        == ()
+    )
 
 
 def test_phase17k_keeper_bridge_rejects_non_single_item_equipment_choice() -> None:
@@ -1891,6 +1946,7 @@ def test_phase17k_unholy_vigour_submits_through_local_game_session() -> None:
             source_package_id=catalog.source_package_id,
             ruleset_id=catalog.ruleset_id,
             detachment_selection=detachment_selection,
+            force_disposition_id="phase17k-force",
             unit_selections=(source_selection,),
         ),
         ArmyMusterRequest(
@@ -1900,6 +1956,7 @@ def test_phase17k_unholy_vigour_submits_through_local_game_session() -> None:
             source_package_id=catalog.source_package_id,
             ruleset_id=catalog.ruleset_id,
             detachment_selection=detachment_selection,
+            force_disposition_id="phase17k-force",
             unit_selections=(enemy_selection,),
         ),
     )
@@ -2281,6 +2338,7 @@ def test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record() -> 
             faction_id=package.army_catalog.factions[0].faction_id,
             detachment_ids=("phase17k-daemons",),
         ),
+        force_disposition_id="phase17k-force",
         units=(unit,),
     )
 
@@ -8347,6 +8405,46 @@ def test_phase17k_structured_wargear_option_semantics_block_icon_and_instrument_
             ),
         )
 
+    resolved_for_distinct_bearers = resolve_wargear_selections(
+        catalog=package.army_catalog,
+        datasheet=datasheet,
+        requested_selections=(
+            WargearSelection(
+                option_id="000001115:instrument-of-chaos:option-1",
+                model_profile_id="000001115:bloodcrushers",
+                wargear_ids=("000001115:instrument-of-chaos",),
+            ),
+            WargearSelection(
+                option_id="000001115:daemonic-icon:option-2",
+                model_profile_id="000001115:bloodcrushers",
+                wargear_ids=("000001115:daemonic-icon",),
+            ),
+        ),
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id="000001115:bloodcrushers",
+                model_count=5,
+            ),
+            ModelProfileSelection(
+                model_profile_id="000001115:bloodhunter",
+                model_count=1,
+            ),
+        ),
+    )
+
+    assert {
+        selection.option_id
+        for selection in resolved_for_distinct_bearers
+        if selection.option_id
+        in {
+            "000001115:daemonic-icon:option-2",
+            "000001115:instrument-of-chaos:option-1",
+        }
+    } == {
+        "000001115:daemonic-icon:option-2",
+        "000001115:instrument-of-chaos:option-1",
+    }
+
 
 def test_phase17k_structured_wargear_option_effects_are_count_aware() -> None:
     package = build_canonical_catalog_package(
@@ -8874,6 +8972,7 @@ def _bloodcrushers_army(
             faction_id=package.army_catalog.factions[0].faction_id,
             detachment_ids=("phase17k-daemons",),
         ),
+        force_disposition_id="phase17k-force",
         units=(unit,),
     )
 
@@ -8895,6 +8994,7 @@ def _flesh_hounds_army(
             faction_id=package.army_catalog.factions[0].faction_id,
             detachment_ids=("phase17k-daemons",),
         ),
+        force_disposition_id="phase17k-force",
         units=(unit,),
     )
 
@@ -9779,6 +9879,24 @@ def _keeper_of_secrets_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                 height_units=GeometrySourceUnits.INCHES,
                 height_source_id="geometry-review:chaos-daemons:keeper-of-secrets:height",
                 height_document_reference="Chaos Daemons Faction Pack p.90-91",
+            ),
+        ),
+    )
+
+
+def _lord_of_change_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001120",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001120",
+                model_name="Lord of Change",
+                height=5.5,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:lord-of-change:height",
+                height_document_reference="Chaos Daemons Faction Pack p.40-41",
             ),
         ),
     )

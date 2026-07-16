@@ -41,7 +41,6 @@ from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -84,6 +83,9 @@ from warhammer40k_core.engine.stratagems_generic_rule_ir_context import (
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -920,6 +922,9 @@ def _army(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
         ),
+        force_disposition_id=(
+            "purge-the-foe" if faction_id == "core-marine-force" else "phase17g-force"
+        ),
         units=units,
     )
 
@@ -1092,6 +1097,9 @@ def _warptide_lifecycle_muster_request(
         detachment_selection=DetachmentSelection(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
+        ),
+        force_disposition_id=(
+            "purge-the-foe" if faction_id == "core-marine-force" else "phase17g-force"
         ),
         unit_selections=(
             UnitMusterSelection(

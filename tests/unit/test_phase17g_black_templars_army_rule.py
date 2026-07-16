@@ -47,7 +47,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -77,6 +76,9 @@ from warhammer40k_core.engine.source_backed_rerolls import (
 from warhammer40k_core.engine.sticky_objective_control import PhaseEndObjectiveControlContext
 from warhammer40k_core.engine.target_restriction_hooks import ChargeTargetRestrictionContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
@@ -467,6 +469,7 @@ def _black_templars_config(
                     faction_id=army_rule.BLACK_TEMPLARS_FACTION_ID,
                     detachment_ids=("marshals-household",),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(_unit_selection("crusader-squad", BLACK_TEMPLARS_DATASHEET_ID),),
             ),
             ArmyMusterRequest(
@@ -479,6 +482,7 @@ def _black_templars_config(
                     faction_id="core-marine-force",
                     detachment_ids=("phase17g-black-templars-enemy-force",),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(
                     _unit_selection("enemy-psyker", ENEMY_PSYKER_DATASHEET_ID),
                     _unit_selection("enemy-non-psyker", ENEMY_NON_PSYKER_DATASHEET_ID),

@@ -62,7 +62,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_decisions import (
@@ -149,6 +148,9 @@ from warhammer40k_core.engine.turn_cleanup import (
     EndTurnCleanupState,
     battlefield_removal_kind_from_token,
     resolve_end_turn_cleanup,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -4735,6 +4737,7 @@ def _config_with_player_a_vehicle() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     _unit_muster_selection(
                         unit_selection_id="intercessor-unit-1",
@@ -4788,6 +4791,7 @@ def _config_with_player_b_vehicles(vehicle_unit_ids: tuple[str, ...]) -> GameCon
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=tuple(
                     _unit_muster_selection(
                         unit_selection_id=unit_id,
@@ -4830,6 +4834,7 @@ def _config_with_player_b_horde_units(unit_ids: tuple[str, ...]) -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=tuple(
                     _unit_muster_selection(
                         unit_selection_id=unit_id,
@@ -5059,6 +5064,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=tuple(
             _unit_muster_selection(
                 unit_selection_id=unit_selection_id,

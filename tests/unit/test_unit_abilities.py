@@ -14,7 +14,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetCatalogError,
 )
-from warhammer40k_core.engine.list_validation import ModelProfileSelection, UnitMusterSelection
+from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.unit_abilities import (
     deadly_demise_profile_for_unit,
     firing_deck_value_for_unit,
@@ -29,6 +29,7 @@ from warhammer40k_core.engine.unit_abilities import (
     unit_has_support,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 
 
 def test_core_keyword_ability_descriptors_enable_boolean_families_without_keywords() -> None:

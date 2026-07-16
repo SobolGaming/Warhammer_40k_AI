@@ -37,7 +37,6 @@ from warhammer40k_core.engine.faction_resources import FactionResourceStatus
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
@@ -48,6 +47,9 @@ from warhammer40k_core.engine.runtime_modifiers import (
 )
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 
 VOTANN_DATASHEET_ID = "phase17g-leagues-of-votann-hearthkyn"
 VOTANN_DETACHMENT_ID = "hearthband"
@@ -782,6 +784,7 @@ def _votann_runtime_config() -> GameConfig:
                     faction_id=army_rule.LEAGUES_OF_VOTANN_FACTION_ID,
                     detachment_ids=(VOTANN_DETACHMENT_ID,),
                 ),
+                force_disposition_id="phase17g-leagues-of-votann-force",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="hearthkyn",
@@ -805,6 +808,7 @@ def _votann_runtime_config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="intercessors",

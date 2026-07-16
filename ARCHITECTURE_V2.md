@@ -3618,9 +3618,18 @@ damage, healing, and split logic can consume them.
 
 Implemented coverage:
 
+- versioned player-provided army-list JSON artifacts normalize external roster
+  input once, preserve app/data and point-source provenance, require an explicit
+  Force Disposition, and build the same strict `ArmyMusterRequest` used by
+  setup;
+- player army-list conversion recalculates repeated-datasheet brackets,
+  wargear, Enhancements, and Upgrades from an explicitly identified MFM package
+  and rejects per-unit or total point drift before mustering; artifact array
+  order, not identifier spelling, defines repeated-datasheet pricing order;
 - `ArmyMusterRequest` accepts strict roster metadata for source-backed unit
-  points, Warlord selection, Enhancement assignment, and Dedicated Transport
-  starting-cargo manifests;
+  and Enhancement/Upgrade points, their exact MFM source package, Warlord
+  selection, Enhancement assignment, and Dedicated Transport starting-cargo
+  manifests;
 - `validate_roster_legality(...)` emits deterministic JSON-safe
   `RosterLegalityReport` diagnostics for Strike Force unit points plus selected
   Enhancement points, unit limits, missing source data, Warlord legality,
@@ -3647,6 +3656,8 @@ Implemented coverage:
 
 Modules:
 
+- `engine/player_army_list.py`
+- `engine/roster_points.py`
 - `engine/army_mustering.py`
 - `engine/unit_factory.py`
 - `engine/setup_flow.py`
@@ -3662,6 +3673,9 @@ Modules:
 
 Objects:
 
+- `PlayerArmyList`
+- `PlayerArmyListUnit`
+- `PlayerArmyListProvenance`
 - `ArmyMusterRequest`
 - `ArmyDefinition`
 - `BattleSizeMusteringPolicy`
@@ -3671,6 +3685,8 @@ Objects:
 - `AttachmentDeclaration`
 - `AttachedUnitRuntimeBinding`
 - `EnhancementAssignment`
+- `RosterUnitPointValue`
+- `RosterEnhancementPointValue`
 - `WarlordSelection`
 - `DedicatedTransportManifest`
 - `DedicatedTransportSetupConsequence`
@@ -3691,6 +3707,20 @@ Invariants:
   rules, units, Stratagems, Enhancements, and Force Dispositions; missing
   detachment point values, unit grants, or Force Disposition grants are explicit
   awaiting-source data, not defaults;
+- exactly one Force Disposition is selected explicitly for the roster and must
+  be granted by at least one selected detachment; the selection is preserved by
+  `ArmyMusterRequest` and `ArmyDefinition` payloads;
+- player-provided declared unit points include Enhancements and Upgrades assigned
+  to that unit, must match source-backed MFM calculation independently for every
+  unit, and must sum to the declared roster total;
+- player-list unit array order is the authoritative repeated-datasheet copy
+  order and survives request payload round trips; opaque unit identifiers never
+  choose a price bracket;
+- source-backed unit and Enhancement/Upgrade point records and their exact MFM
+  package identity survive mustering; catalog Enhancement price drift and
+  player-supplied Enhancement assignment source drift are invalid;
+- `game_result` is optional historical metadata and is absent for normal
+  pre-session roster input rather than being fabricated;
 - the army must include at least one eligible `CHARACTER` model to be Warlord;
 - the Warlord must have the same Faction keyword as the rest of the army;
 - selected Warlord gains the `WARLORD` keyword;
@@ -3745,7 +3775,14 @@ Required tests:
 - multi-detachment Strike Force combinations whose total Detachment Point cost
   is less than or equal to 3, plus rejection above 3;
 - selected detachment Force Disposition union and selected-detachment unit
-  grants;
+  grants, plus explicit selected-Force-Disposition validation and payload
+  round-trip;
+- player army-list JSON fail-fast loading, MFM source identity, repeated-unit
+  price brackets under opaque/reordered identifiers and different unit
+  compositions, repeated Upgrade costs, authoritative Enhancement point records,
+  stale catalog/assignment-source rejection, optional result metadata,
+  per-unit/total point drift rejection, and ordinary mustering through the
+  resulting strict request without deleting source-backed wargear options;
 - Epic Hero uniqueness and Enhancement denial;
 - Enhancement count, uniqueness, Character-only, and one-per-attached-squad restrictions;
 - source-awaiting detachment point, enhancement eligibility, base-size,

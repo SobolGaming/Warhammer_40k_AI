@@ -51,7 +51,6 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
     EnhancementAssignment,
-    RosterUnitPointValue,
     WarlordSelection,
     muster_army,
     validate_roster_legality,
@@ -124,7 +123,6 @@ from warhammer40k_core.engine.generic_target_restriction_effects import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -142,6 +140,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
+from warhammer40k_core.engine.roster_points import RosterUnitPointValue
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
@@ -220,6 +219,9 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     resolve_unit_move_completed_mortal_wound_hooks,
 )
 from warhammer40k_core.engine.unit_state import starting_strength_records_for_units
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -5587,6 +5589,7 @@ def _corsair_muster_request(
                 sorted({assignment.enhancement_id for assignment in enhancement_assignments})
             ),
         ),
+        force_disposition_id="phase17g-force",
         unit_selections=unit_selections,
         unit_points=tuple(
             RosterUnitPointValue(
@@ -5651,6 +5654,7 @@ def _army(
             ),
             stratagem_ids=(),
         ),
+        force_disposition_id="phase17g-force",
         units=units,
         enhancement_assignments=enhancement_assignments,
     )

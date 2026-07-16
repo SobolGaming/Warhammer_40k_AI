@@ -44,7 +44,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -56,6 +55,9 @@ from warhammer40k_core.engine.runtime_modifiers import (
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 ORKS_DATASHEET_ID = "phase17g-orks-boyz"
@@ -469,6 +471,7 @@ def _orks_config() -> GameConfig:
                     faction_id=army_rule.ORKS_FACTION_ID,
                     detachment_ids=("war-horde",),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(_unit_selection("boyz", ORKS_DATASHEET_ID),),
             ),
             ArmyMusterRequest(
@@ -481,6 +484,7 @@ def _orks_config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(_unit_selection("enemy-unit", "core-intercessor-like-infantry"),),
             ),
         ),

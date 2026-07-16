@@ -59,7 +59,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -77,6 +76,9 @@ from warhammer40k_core.engine.saves import SaveKind, SaveOption
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
@@ -1363,6 +1365,7 @@ def _astra_config(
                     faction_id=army_rule.ASTRA_MILITARUM_FACTION_ID,
                     detachment_ids=("combined-regiment",),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(
                     _unit_selection("castellan", OFFICER_DATASHEET_ID),
                     _unit_selection("infantry", INFANTRY_DATASHEET_ID),
@@ -1380,6 +1383,7 @@ def _astra_config(
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(_unit_selection("enemy-unit", "core-intercessor-like-infantry"),),
             ),
         ),

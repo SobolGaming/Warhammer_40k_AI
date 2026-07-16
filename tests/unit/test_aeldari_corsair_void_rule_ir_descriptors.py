@@ -20,11 +20,13 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.catalog_tracked_target_runtime import CatalogTrackedTargetRuntime
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleParameter
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_corsair_void_units_2026_06 as void_units_package,
@@ -257,5 +259,6 @@ def _catalog_and_army() -> tuple[Any, ArmyDefinition]:
             faction_id=catalog.factions[0].faction_id,
             detachment_ids=("void-rule-ir-descriptor-test",),
         ),
+        force_disposition_id="purge-the-foe",
         units=(voidreavers, voidscarred),
     )
