@@ -21,6 +21,9 @@ from warhammer40k_core.engine.abilities import (
     KeywordGate,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_support import (
+    clause_is_movement_end_reactive_normal_move,
+)
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -262,6 +265,10 @@ def _catalog_ability_source_kind(source_kind: CatalogAbilitySourceKind) -> Abili
 
 def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     for clause in rule_ir.clauses:
+        movement_end_timing = _catalog_movement_end_reactive_timing_descriptor_for_clause(clause)
+        if movement_end_timing is not None:
+            return movement_end_timing
+    for clause in rule_ir.clauses:
         setup_reactive_timing = _catalog_setup_reactive_timing_descriptor_for_clause(clause)
         if setup_reactive_timing is not None:
             return setup_reactive_timing
@@ -350,6 +357,9 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
 def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDescriptor:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog timing descriptor requires a RuleClause.")
+    movement_end_timing = _catalog_movement_end_reactive_timing_descriptor_for_clause(clause)
+    if movement_end_timing is not None:
+        return movement_end_timing
     setup_reactive_timing = _catalog_setup_reactive_timing_descriptor_for_clause(clause)
     if setup_reactive_timing is not None:
         return setup_reactive_timing
@@ -404,6 +414,17 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL)
     return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+
+
+def _catalog_movement_end_reactive_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    if not clause_is_movement_end_reactive_normal_move(clause):
+        return None
+    return AbilityTimingDescriptor(
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        phase=battle_phase_kind_from_token("movement"),
+    )
 
 
 def _catalog_setup_reactive_timing_descriptor_for_clause(

@@ -89,6 +89,12 @@ from warhammer40k_core.engine.catalog_fight_end_triggered_movement_runtime impor
 from warhammer40k_core.engine.catalog_fight_end_triggered_movement_support import (
     CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID,
 )
+from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_runtime import (
+    CatalogMovementEndReactiveNormalMoveRuntime,
+)
+from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_support import (
+    CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CATALOG_ONCE_PER_BATTLE_ABILITY_ACTIVATED_EVENT,
     CATALOG_ONCE_PER_BATTLE_ABILITY_DECLINED_EVENT,
@@ -196,12 +202,22 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
+from warhammer40k_core.engine.movement_end_surge_hooks import (
+    MovementEndSurgeContext,
+    MovementEndSurgeGrant,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
+)
+from warhammer40k_core.engine.phases.movement_reactions import (
+    _movement_end_surge_event_already_processed,
+    _movement_end_surge_grant_groups,  # pyright: ignore[reportPrivateUsage]
+    _movement_end_surge_reaction_group_key,  # pyright: ignore[reportPrivateUsage]
+    _request_movement_end_surge_if_available,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserve_arrival_hooks import (
@@ -250,7 +266,11 @@ from warhammer40k_core.engine.stratagems import (
     StratagemUseRecord,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.engine.triggered_movement import SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
+from warhammer40k_core.engine.triggered_movement import (
+    DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+    SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
+    TriggeredMovementKind,
+)
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import UnitMoveCompletedContext
@@ -5910,6 +5930,231 @@ def test_catalog_fight_end_triggered_movement_runtime_does_not_expose_attached_u
         runtime.next_request(FightPhaseEndRequestContext(state=state, decisions=decisions)) is None
     )
     assert not decisions.event_log.records
+
+
+@pytest.mark.parametrize(
+    ("triggering_x", "expected_grant_count"),
+    [(19.5, 0), (22.0, 1), (40.0, 0)],
+)
+def test_catalog_movement_end_reactive_normal_move_runtime_enforces_range(
+    triggering_x: float,
+    expected_grant_count: int,
+) -> None:
+    source_army, triggering_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    triggering_unit = triggering_army.units[0]
+    battlefield = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=10.0,
+        target_army=triggering_army,
+        target_unit=triggering_unit,
+        target_x=triggering_x,
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, triggering_army),
+        battlefield=battlefield,
+        active_player_id=triggering_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="test:aeldari:rangers:path-of-the-outcast",
+            raw_text=(
+                "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
+                "of this unit, if this unit is not within Engagement Range of one or more "
+                'enemy units, this unit can make a Normal move of up to D6".'
+            ),
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
+    record = _ability_record(
+        record_id="record:aeldari:rangers:path-of-the-outcast",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        datasheet_id=source_unit.datasheet_id,
+        phase=BattlePhaseKind.MOVEMENT,
+    )
+    runtime = CatalogMovementEndReactiveNormalMoveRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            triggering_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, triggering_army),
+    )
+
+    bindings = runtime.bindings()
+    assert len(bindings) == 1
+    assert bindings[0].hook_id == CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID
+    grants = bindings[0].handler(
+        MovementEndSurgeContext(
+            state=state,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            triggering_unit_instance_id=triggering_unit.unit_instance_id,
+            triggering_player_id=triggering_army.player_id,
+            reacting_player_id=source_army.player_id,
+            trigger_event_id="event:enemy-move-completed",
+            movement_phase_action="normal_move",
+            trigger_event_payload={"unit_instance_id": triggering_unit.unit_instance_id},
+        )
+    )
+
+    assert len(grants) == expected_grant_count
+    if not grants:
+        return
+    grant = grants[0]
+    assert grant.unit_instance_id == source_unit.unit_instance_id
+    assert grant.descriptor_source_rule_id == record.definition.source_id
+    assert grant.movement_kind.value == "triggered"
+    assert grant.allow_battle_shocked is True
+    assert grant.one_per_phase is False
+    assert grant.independent_unit_reaction is True
+    replay_payload = cast(dict[str, JsonValue], grant.replay_payload)
+    assert replay_payload["catalog_record_id"] == record.record_id
+    assert cast(float, replay_payload["trigger_distance_inches"]) <= 8.0
+    assert replay_payload["trigger_event_id"] == "event:enemy-move-completed"
+
+
+def test_catalog_movement_end_reactive_normal_move_bundle_loads_without_manual_binding() -> None:
+    source_army, triggering_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="test:aeldari:rangers:path-of-the-outcast:bundle",
+            raw_text=(
+                "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
+                "of this unit, if this unit is not within Engagement Range of one or more "
+                'enemy units, this unit can make a Normal move of up to D6".'
+            ),
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
+    record = _ability_record(
+        record_id="record:aeldari:rangers:path-of-the-outcast:bundle",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        datasheet_id=source_unit.datasheet_id,
+        phase=BattlePhaseKind.MOVEMENT,
+    )
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=RuntimeContentActivation.from_armies(
+            armies=(source_army, triggering_army),
+            catalog=catalog,
+        ),
+        armies=(source_army, triggering_army),
+        catalog=catalog,
+        contributions=(),
+        base_ability_records=(record,),
+    )
+
+    assert CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID in {
+        binding.hook_id for binding in bundle.movement_end_surge_hook_registry.all_bindings()
+    }
+    triggering_unit = triggering_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, triggering_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=triggering_army,
+            target_unit=triggering_unit,
+            target_x=22.0,
+        ),
+        active_player_id=triggering_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+    decisions = DecisionController()
+    trigger_event = decisions.event_log.append(
+        "movement_activation_completed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": triggering_army.player_id,
+            "movement_phase_action": "normal_move",
+            "unit_instance_id": triggering_unit.unit_instance_id,
+        },
+    )
+
+    status = _request_movement_end_surge_if_available(
+        state=state,
+        decisions=decisions,
+        registry=bundle.movement_end_surge_hook_registry,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+    )
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = decisions.queue.peek_next()
+    assert request.decision_type == SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
+    assert {option.option_id for option in request.options} == {
+        DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+        f"triggered:{source_unit.unit_instance_id}",
+    }
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    descriptor = cast(dict[str, JsonValue], request_payload["descriptor"])
+    assert descriptor["source_rule_id"] == record.definition.source_id
+    assert descriptor["movement_kind"] == "triggered"
+    assert descriptor["movement_mode"] == "normal"
+    assert descriptor["allow_battle_shocked"] is True
+    assert descriptor["allow_within_engagement_range"] is False
+    assert descriptor["one_per_phase"] is False
+    assert 1.0 <= cast(float, descriptor["max_distance_inches"]) <= 6.0
+    triggered_event = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "movement_end_surge_triggered"
+    )
+    triggered_payload = cast(dict[str, JsonValue], triggered_event.payload)
+    assert triggered_payload["trigger_event_id"] == trigger_event.event_id
+    assert isinstance(triggered_payload["reaction_group_key"], list)
+
+
+def test_movement_end_reactive_units_have_independent_processed_windows() -> None:
+    grants = tuple(
+        MovementEndSurgeGrant(
+            hook_id=CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+            source_id=CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+            unit_instance_id=unit_instance_id,
+            descriptor_source_rule_id="source:aeldari:rangers:path-of-the-outcast",
+            movement_kind=TriggeredMovementKind.TRIGGERED,
+            allow_battle_shocked=True,
+            one_per_phase=False,
+            independent_unit_reaction=True,
+        )
+        for unit_instance_id in ("rangers-alpha", "rangers-beta")
+    )
+
+    groups = _movement_end_surge_grant_groups(grants)
+
+    assert tuple(group[0].unit_instance_id for group in groups) == (
+        "rangers-alpha",
+        "rangers-beta",
+    )
+    decisions = DecisionController()
+    trigger_event_id = "event:enemy-move"
+    first_group_key = _movement_end_surge_reaction_group_key(groups[0])
+    second_group_key = _movement_end_surge_reaction_group_key(groups[1])
+    decisions.event_log.append(
+        "movement_end_surge_triggered",
+        {
+            "trigger_event_id": trigger_event_id,
+            "reaction_group_key": list(first_group_key),
+        },
+    )
+    assert _movement_end_surge_event_already_processed(
+        decisions=decisions,
+        trigger_event_id=trigger_event_id,
+        reaction_group_key=first_group_key,
+    )
+    assert not _movement_end_surge_event_already_processed(
+        decisions=decisions,
+        trigger_event_id=trigger_event_id,
+        reaction_group_key=second_group_key,
+    )
 
 
 def _mustered_core_armies() -> tuple[ArmyDefinition, ArmyDefinition]:

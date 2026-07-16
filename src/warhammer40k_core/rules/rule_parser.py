@@ -129,8 +129,8 @@ from warhammer40k_core.rules.selected_target_parser import (
     is_structural_target_keyword,
     selected_target_spec_from_text,
 )
-from warhammer40k_core.rules.setup_reactive_parser import (
-    compile_setup_reactive_shoot_charge_clause,
+from warhammer40k_core.rules.triggered_action_parser import (
+    compile_triggered_action_clause,
 )
 
 RULE_PARSER_VERSION = "phase17c-rule-parser-v2"
@@ -773,13 +773,13 @@ def _compile_clause(
     parsed_text: ParsedRuleText,
     parser_context: _RuleParserContext,
 ) -> RuleClause:
-    setup_reactive_clause = compile_setup_reactive_shoot_charge_clause(
+    triggered_action_clause = compile_triggered_action_clause(
         source_id=source_id,
         clause_index=clause_index,
         clause_text=clause_text,
     )
-    if setup_reactive_clause is not None:
-        return setup_reactive_clause
+    if triggered_action_clause is not None:
+        return triggered_action_clause
     trigger = _parse_trigger(clause_text)
     conditions = _dedupe_conditions(
         (

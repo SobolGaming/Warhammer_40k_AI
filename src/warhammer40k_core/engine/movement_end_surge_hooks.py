@@ -8,6 +8,7 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.triggered_movement import TriggeredMovementKind
 
 if TYPE_CHECKING:
     from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -19,6 +20,11 @@ class MovementEndSurgeGrantPayload(TypedDict):
     source_id: str
     unit_instance_id: str
     max_distance_bonus_inches: int
+    descriptor_source_rule_id: str | None
+    movement_kind: str
+    allow_battle_shocked: bool
+    one_per_phase: bool
+    independent_unit_reaction: bool
     replay_payload: JsonValue
     decision_effect_payload: JsonValue
 
@@ -96,6 +102,11 @@ class MovementEndSurgeGrant:
     source_id: str
     unit_instance_id: str
     max_distance_bonus_inches: int = 0
+    descriptor_source_rule_id: str | None = None
+    movement_kind: TriggeredMovementKind = TriggeredMovementKind.SURGE
+    allow_battle_shocked: bool = False
+    one_per_phase: bool = True
+    independent_unit_reaction: bool = False
     replay_payload: JsonValue = None
     decision_effect_payload: JsonValue = None
 
@@ -115,6 +126,26 @@ class MovementEndSurgeGrant:
                 self.max_distance_bonus_inches,
             ),
         )
+        if self.descriptor_source_rule_id is not None:
+            object.__setattr__(
+                self,
+                "descriptor_source_rule_id",
+                _validate_identifier(
+                    "descriptor_source_rule_id",
+                    self.descriptor_source_rule_id,
+                ),
+            )
+        if type(self.movement_kind) is not TriggeredMovementKind:
+            raise GameLifecycleError(
+                "Movement-end surge hook movement_kind must be TriggeredMovementKind."
+            )
+        for field_name, value in (
+            ("allow_battle_shocked", self.allow_battle_shocked),
+            ("one_per_phase", self.one_per_phase),
+            ("independent_unit_reaction", self.independent_unit_reaction),
+        ):
+            if type(value) is not bool:
+                raise GameLifecycleError(f"Movement-end surge hook {field_name} must be boolean.")
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
         object.__setattr__(
             self,
@@ -128,6 +159,11 @@ class MovementEndSurgeGrant:
             "source_id": self.source_id,
             "unit_instance_id": self.unit_instance_id,
             "max_distance_bonus_inches": self.max_distance_bonus_inches,
+            "descriptor_source_rule_id": self.descriptor_source_rule_id,
+            "movement_kind": self.movement_kind.value,
+            "allow_battle_shocked": self.allow_battle_shocked,
+            "one_per_phase": self.one_per_phase,
+            "independent_unit_reaction": self.independent_unit_reaction,
             "replay_payload": self.replay_payload,
             "decision_effect_payload": self.decision_effect_payload,
         }

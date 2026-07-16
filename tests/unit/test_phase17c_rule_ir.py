@@ -47,6 +47,9 @@ from warhammer40k_core.engine.catalog_command_point_support import (
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
 )
+from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_support import (
+    CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_movement_transit import (
     movement_mode_tokens_or_none as _movement_mode_tokens_or_none,
 )
@@ -469,6 +472,97 @@ def test_phase17c_setup_reactive_shoot_charge_compiles_to_generic_out_of_phase_a
     )
     assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
         CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
+    )
+
+
+def test_phase17c_movement_end_reactive_normal_move_compiles_to_generic_rule_ir() -> None:
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17c:test:movement-end-reactive-normal-move",
+            raw_text=(
+                "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
+                "of this unit, if this unit is not within Engagement Range of one or more "
+                'enemy units, this unit can make a Normal move of up to D6".'
+            ),
+        )
+    ).rule_ir
+
+    assert rule_ir.is_supported is True
+    assert len(rule_ir.clauses) == 1
+    clause = rule_ir.clauses[0]
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "after",
+        "owner": "opponent",
+        "phase": "movement",
+        "subject": "enemy_unit",
+        "timing_window": "enemy_unit_move_end",
+    }
+    assert tuple(condition.kind for condition in clause.conditions) == (
+        RuleConditionKind.DISTANCE_PREDICATE,
+        RuleConditionKind.DISTANCE_PREDICATE,
+    )
+    assert parameter_payload(clause.conditions[0].parameters) == {
+        "distance_inches": 8,
+        "object_kind": "unit",
+        "object_reference": "this",
+        "predicate": "within",
+        "qualifier": None,
+        "range_kind": "numeric_range",
+        "subject": "enemy_unit",
+    }
+    assert parameter_payload(clause.conditions[1].parameters) == {
+        "distance_inches": None,
+        "negated": True,
+        "object_allegiance": "enemy",
+        "object_kind": "unit",
+        "object_quantity": "one_or_more",
+        "predicate": "within_engagement_range",
+        "qualifier": None,
+        "range_kind": "engagement_range",
+        "subject": "this_unit",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert len(clause.effects) == 1
+    effect = clause.effects[0]
+    assert effect.kind is RuleEffectKind.OUT_OF_PHASE_ACTION
+    assert parameter_payload(effect.parameters) == {
+        "action": "move",
+        "action_group": "movement_end_reactive_normal_move",
+        "distance_bonus": 0,
+        "distance_dice_quantity": 1,
+        "distance_dice_sides": 6,
+        "movement_kind": "triggered",
+        "movement_mode": "normal",
+        "optional": True,
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+    )
+
+
+def test_phase17c_movement_end_reactive_parser_rejects_semantic_drift() -> None:
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17c:test:movement-end-reactive-fall-back",
+            raw_text=(
+                "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
+                "of this unit, if this unit is not within Engagement Range of one or more "
+                'enemy units, this unit can make a Fall Back move of up to D6".'
+            ),
+        )
+    ).rule_ir
+
+    assert CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID not in (
+        catalog_rule_ir_consumers_for_rule(rule_ir)
+    )
+    assert CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID not in (
+        catalog_rule_ir_hook_ids_for_rule(rule_ir)
     )
 
 

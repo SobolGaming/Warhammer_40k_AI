@@ -374,20 +374,27 @@ empowerment effect, and may then emit the normal `select_dice_reroll` request
 for the Advance roll. Adapters must not decrement Pain tokens or grant the
 reroll locally.
 
-Phase 17G Movement-end surge rules use the same finite/proposal split as other
-physical movement. After an enemy unit completes a Normal Move, Advance, or
-Fall Back in the Movement phase, the engine may emit `select_triggered_movement`
-for the reacting player. Optional surge windows include
-`decline_triggered_movement`; each legal reacting unit is exposed through a
-deterministic `surge:<unit_instance_id>` option. The option payload identifies
-the selected rules unit, source hook, source rule, triggering unit, triggering
-move event, optional engine-owned decision effect payload, and engine-rolled
-maximum surge distance. Selecting a surge unit records that finite choice,
-records any source-backed decision effect, and immediately emits a parameterized
-`submit_movement_proposal` request with proposal kind `surge_move`. Adapters
-must not roll the D6 locally, invent candidate units, move models from the
-finite option payload, spend source resources locally, or continue the Movement
-phase while either request is pending.
+Phase 17G Movement-end surge and generic RuleIR reactive-movement rules use the
+same finite/proposal split as other physical movement. After an enemy unit
+completes a Normal Move, Advance, or Fall Back in the Movement phase, the engine
+may emit `select_triggered_movement` for the reacting player. Optional windows
+include `decline_triggered_movement`; each legal reacting rules unit is exposed
+through a deterministic `surge:<unit_instance_id>` or
+`triggered:<unit_instance_id>` option according to the source movement kind.
+The option payload identifies the selected rules unit, source hook, source rule,
+triggering unit, triggering move event, optional engine-owned decision effect
+payload, and engine-rolled maximum movement distance. Independently triggering
+datasheet abilities may emit a separate decision window for each eligible rules
+unit and for each triggering enemy move. Selecting a unit records that finite
+choice, records any source-backed decision effect, and immediately emits a
+parameterized `submit_movement_proposal` request with proposal kind
+`surge_move`. Aeldari Rangers' source-backed Path of the Outcast RuleIR uses
+this contract after an enemy unit ends a move within 8 inches: the engine
+excludes engaged Rangers rules units, rolls D6, and offers an optional Normal
+Move through a PathWitness-validated proposal. Adapters must not roll the D6
+locally, invent candidate units, move models from the finite option payload,
+spend source resources locally, or continue the Movement phase while either
+request is pending.
 
 Shooting phase after-shot surge rules reuse `select_triggered_movement` and the
 same `surge_move` proposal contract. After an enemy unit has shot, runtime

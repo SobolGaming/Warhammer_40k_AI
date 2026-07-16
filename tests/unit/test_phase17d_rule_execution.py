@@ -1635,6 +1635,14 @@ def test_phase17d_catalog_builder_emits_clause_records_for_compound_ability() ->
             TimingTriggerKind.END_TURN,
         ),
         (
+            (
+                "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
+                "of this unit, if this unit is not within Engagement Range of one or more "
+                'enemy units, this unit can make a Normal move of up to D6".'
+            ),
+            TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        ),
+        (
             "This unit is eligible to declare a charge in a turn in  which it Advanced.",
             TimingTriggerKind.PASSIVE_QUERY,
         ),
@@ -1675,6 +1683,8 @@ def test_phase17d_catalog_builder_classifies_single_clause_generic_timing(
     )
     if raw_text == ONCE_PER_BATTLE_FIGHT_BOOST_TEXT:
         assert records[0].definition.timing.phase is BattlePhaseKind.FIGHT
+    if raw_text.startswith("In your opponent's Movement phase"):
+        assert records[0].definition.timing.phase is BattlePhaseKind.MOVEMENT
 
 
 def test_phase17d_once_per_battle_activation_submits_through_local_session_and_replays() -> None:

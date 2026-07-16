@@ -144,6 +144,20 @@ AELDARI_KHARSETH_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_RANGERS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000592",
+        model_name="Rangers",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:rangers:height",
+        height_document_reference=(
+            "Warhammer Community Aeldari Designers' Notes 2022-03-23 assembled Rangers "
+            "imagery; Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+)
+
 AELDARI_YRIEL_VYPERS_STARFANGS_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004193",

@@ -1505,6 +1505,10 @@ class RuntimeContentBundle:
         )
         movement_end_surge_hook_registry = MovementEndSurgeHookRegistry.from_bindings(
             (
+                *catalog_runtime_hooks.movement_end_surge_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
                 *generic_rule_lifecycle_hooks.movement_end_surge_hook_bindings(
                     activation=activation,
                     execution_records=records,

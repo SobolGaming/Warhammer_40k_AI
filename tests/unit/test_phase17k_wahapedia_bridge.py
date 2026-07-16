@@ -6804,7 +6804,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Exact IR parsed; host needed | Exact ability IR unsupported | "
         "Exact ability bridge blocked |"
     ) in aeldari_markdown
-    assert "| Craftworlds / Asuryani | Vypers (`000000605`) | Crimson Hunter" in (aeldari_markdown)
+    assert (
+        "| Craftworlds / Asuryani | Rangers (`000000592`)<br>Vypers (`000000605`) | Crimson Hunter"
+    ) in aeldari_markdown
     assert "Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)" in aeldari_markdown
     assert "Eldrad Ulthran (`000000568`)<br>Falcon (`000000609`)" in aeldari_markdown
     assert "Wraithguard (`000000597`)" in aeldari_markdown

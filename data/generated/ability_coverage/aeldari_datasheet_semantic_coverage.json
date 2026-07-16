@@ -1013,28 +1013,36 @@
         {
           "ability_id": "000000592:path-of-the-outcast",
           "ability_name": "Path of the Outcast",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "fe4df2ee69573da7b744c83d873508ce047c76096938f0a845d36b3109cb42ff",
           "raw_text": "In your opponent's Movement phase, if an enemy unit ends a move within 8\" of this unit, if this unit is not within Engagement Range of one or more enemy units, this unit can make a Normal move of up to D6\".",
           "raw_text_sha256": "fe4df2ee69573da7b744c83d873508ce047c76096938f0a845d36b3109cb42ff",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-end-reactive-normal-move"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-end-reactive-normal-move"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000592:4:description:clause:001:effect:0",
+              "semantic_kind": "out_of_phase_action"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000592:4"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000592:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000592",
       "datasheet_name": "Rangers",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "rules_update"
     },
     {
@@ -4102,28 +4110,28 @@
   "faction_id": "aeldari",
   "faction_name": "Aeldari",
   "generated_by": "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py",
-  "overlay_pack_hash": "d84b589b64b4393f159cac88d52946ced653d241c02973db64915d120eac9974",
+  "overlay_pack_hash": "aba0ba6bf9197f22804bc19f45ce6c82da9eef097c35cf8b178c8b9449513a3f",
   "pdf_filename": "eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
   "pdf_sha256": "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9",
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 7,
+    "All exact abilities consumed": 8,
     "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 57
+    "Exact ability IR unsupported": 56
   },
   "source_artifact_hashes": {
-    "Abilities": "4d235cf5e50c7f1f399143094642902575a364ff9f41cd1a8559dd1e162d0e76",
-    "Datasheets": "dd9ab8f297d16d1bf034857ccc45efc3a69cb1857608aa535ff88016da94a545",
-    "Datasheets_abilities": "59e638d77cf37a16fd39764c598837a94aa34fce877ef5d3aa4e9240470dd5ad",
-    "Datasheets_keywords": "9509cbecd271906d59dce61fb7907081016f954db1fb06d9019a885c79e59c29",
-    "Datasheets_leader": "7d4a6bf356cc3bd94ce86850bb3818b50871c0dbdce27a930a1e757694e67569",
-    "Datasheets_models": "f9cc73f2a9b9679b02172ba06096f22e7929f8f7a07990ab171961b0f218cc0a",
-    "Datasheets_models_cost": "dfefbcaadabc6356dc6979d0e7c995db35566a4f099f8fb729007f85829faa61",
-    "Datasheets_options": "921c26234f5ade8fa8c38b9cd35a739cda604d5accedbc47067f18ca786388e2",
-    "Datasheets_unit_composition": "7ec86db6380bb5c35c4456892a50e4b080485481b1550a138540b6af978afab2",
-    "Datasheets_wargear": "738d3c2f413a71787947f33a8742c43888f450326e1dc8ee7a029ce899f94a02",
-    "Factions": "1efa1b395c9c37fc092b94e1e13728ce507a064ad78930b7b428ba6808f0605c"
+    "Abilities": "dd7d779531e88bd2c30ee2405275b41dba0e5d56007c43a7fcf8bb7c105032e0",
+    "Datasheets": "874cd5578bb7eda0294212beaf6c6e3f1ce215c7699fd491718a45a688dbbafc",
+    "Datasheets_abilities": "44a5aa857c2a576af664dc47cd9eea0c8404f1c238cad2b22d585a38a77a79fa",
+    "Datasheets_keywords": "a11cd8e0d802daa8280eb261245df02b288b1565deed1baef734bb198fa9e1c4",
+    "Datasheets_leader": "829f8e33527795ad982e82c4558d215f09a4549976288dc0bb75a3ffa25950fc",
+    "Datasheets_models": "c2f0fe096494ab19f652736357213918b446cf97fc36f5ff4c78f2432a42ef47",
+    "Datasheets_models_cost": "540f6b6c13dd527ced1e84742a261f050274237360c33c28f7de18054a3f69e8",
+    "Datasheets_options": "727c94f2c06270ace1ef8b049748ab3786a274397c974bbc60b06360be74eeaf",
+    "Datasheets_unit_composition": "44dcf2add274d3e647d9bc0f7b201bf76f094daf57d2190ba942fec179d2d07b",
+    "Datasheets_wargear": "ee91a79c82d38e19099bb99e464ce7538cb82911ed3e1036b0dcd05f1805143a",
+    "Factions": "fc69d0e36743c08ce18af07155eae022794fd5985420ef5c512bc2e266bee135"
   },
   "source_snapshot_path": "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json",
   "treatment_counts": {
