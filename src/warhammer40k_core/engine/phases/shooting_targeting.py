@@ -12,6 +12,9 @@ from warhammer40k_core.engine.phases.shooting_requests import *
 from warhammer40k_core.engine.phases.shooting_unit_selection import *
 from warhammer40k_core.engine.phases.shooting_decisions import *
 from warhammer40k_core.engine.phases.shooting_declaration_validation import *
+from warhammer40k_core.engine.shooting_selection_range import (
+    target_within_shooting_selection_range,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -133,35 +136,12 @@ def _unit_target_within_max_range(
     target_unit_id: str,
     range_inches: int,
 ) -> bool:
-    battlefield = scenario.battlefield_state
-    unit_placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
-    target_rules_unit = rules_unit_view_from_armies(
-        armies=scenario.armies,
-        unit_instance_id=target_unit_id,
-    )
-    target_placements = _unit_placements_for_rules_unit_or_none(
+    return target_within_shooting_selection_range(
         scenario=scenario,
-        rules_unit=target_rules_unit,
+        attacking_unit_instance_id=unit.unit_instance_id,
+        target_unit_instance_id=target_unit_id,
+        max_range_inches=range_inches,
     )
-    if target_placements is None:
-        return False
-    for attacker_model_placement in unit_placement.model_placements:
-        attacker_model = geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(attacker_model_placement),
-            placement=attacker_model_placement,
-        )
-        for target_placement in target_placements:
-            for target_model_placement in target_placement.model_placements:
-                target_model = geometry_model_for_placement(
-                    model=scenario.model_instance_for_placement(target_model_placement),
-                    placement=target_model_placement,
-                )
-                if DistanceMeasurementContext.from_models(
-                    attacker_model,
-                    target_model,
-                ).closest_distance_inches() <= float(range_inches):
-                    return True
-    return False
 
 
 def _unit_placements_for_rules_unit_or_none(

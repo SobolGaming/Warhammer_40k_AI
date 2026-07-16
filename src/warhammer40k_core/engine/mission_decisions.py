@@ -21,6 +21,10 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mission_terrain import (
+    terrain_feature_within_player_deployment_zone,
+    terrain_feature_within_player_territory,
+)
 from warhammer40k_core.engine.missions import mission_pack_for_id, mission_scoring_policy_from_setup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -980,9 +984,9 @@ def _trappable_terrain_target_ids_by_unit(
         feature
         for feature in state.mission_setup.terrain_features
         if feature.feature_id not in trapped_feature_ids
-        and not _terrain_feature_within_player_deployment_zone(
+        and not terrain_feature_within_player_deployment_zone(
             feature,
-            state=state,
+            mission_setup=state.mission_setup,
             player_id=requested_player,
         )
     )
@@ -1068,9 +1072,9 @@ def _terrain_area_target_ids_by_unit(
         feature
         for feature in state.mission_setup.terrain_features
         if feature.feature_id not in excluded_ids
-        and not _terrain_feature_within_player_deployment_zone(
+        and not terrain_feature_within_player_territory(
             feature,
-            state=state,
+            mission_setup=state.mission_setup,
             player_id=requested_player,
         )
     )
@@ -1115,32 +1119,6 @@ def _home_objective_ids_for_player(
         for marker in state.mission_setup.objective_markers
         if any(zone.contains_point(marker.x_inches, marker.y_inches) for zone in zones)
     )
-
-
-def _terrain_feature_within_player_deployment_zone(
-    feature: TerrainFeatureDefinition,
-    *,
-    state: GameState,
-    player_id: str,
-) -> bool:
-    if type(feature) is not TerrainFeatureDefinition:
-        raise GameLifecycleError("terrain feature target requires TerrainFeatureDefinition.")
-    if state.mission_setup is None:
-        raise GameLifecycleError("Deployment-zone terrain target check requires MissionSetup.")
-    requested_player = _validate_player_id(state=state, player_id=player_id)
-    zones = tuple(
-        zone for zone in state.mission_setup.deployment_zones if zone.player_id == requested_player
-    )
-    if not zones:
-        raise GameLifecycleError("Deployment-zone terrain target check requires player zone.")
-    min_x, min_y, max_x, max_y = feature.bounds()
-    corners = (
-        (min_x, min_y),
-        (min_x, max_y),
-        (max_x, min_y),
-        (max_x, max_y),
-    )
-    return all(any(zone.contains_point(x, y) for zone in zones) for x, y in corners)
 
 
 def _model_is_within_terrain_area(

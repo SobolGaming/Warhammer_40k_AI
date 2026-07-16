@@ -503,6 +503,19 @@ def apply_destruction_reaction_decision(
     )
     if decision.player_id != context["destroyed_model_controller_player_id"]:
         raise GameLifecycleError("Destruction reaction defender drift.")
+    if (
+        selected_source is not None
+        and selected_source.reaction_kind is DestructionReactionKind.FIGHT_ON_DEATH
+    ):
+        restore_selected_model_awaiting_fight_on_death(
+            state=state,
+            decisions=decisions,
+            model_destroyed_event_id=context["model_destroyed_event_id"],
+            model_instance_id=context["model_instance_id"],
+            source_id=selected_source.source_id,
+            source_rule_id=selected_source.source_rule_id,
+            source_phase=attack_sequence.source_phase,
+        )
     decisions.event_log.append(
         "destruction_reaction_resolved",
         {
@@ -1230,6 +1243,27 @@ def _resolve_grouped_current_pool(
     if attack_sequence.generated_hit_index != 0 or attack_sequence.current_hit_roll is not None:
         raise GameLifecycleError("Pooled attack resolution cannot start with generated hit state.")
     pool = attack_sequence.current_pool()
+    allocation_target_state = damage_allocation_target_state(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+    )
+    if allocation_target_state is DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS:
+        decisions.event_log.append(
+            "attack_pool_not_allocated",
+            {
+                "sequence_id": attack_sequence.sequence_id,
+                "pool_index": attack_sequence.pool_index,
+                "target_unit_instance_id": pool.target_unit_instance_id,
+                "reason": "target_present_without_living_models",
+            },
+        )
+        return (
+            _advance_after_current_pool(attack_sequence=attack_sequence),
+            allocated_model_ids,
+            None,
+        )
+    if allocation_target_state is DamageAllocationTargetState.ABSENT:
+        raise GameLifecycleError("Pooled attack target is absent from the battlefield.")
     allocation_context = allocation_context_for_unit(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,

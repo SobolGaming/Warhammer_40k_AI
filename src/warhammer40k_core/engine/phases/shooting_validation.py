@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
 from warhammer40k_core.engine.phases.shooting_handler import *
@@ -244,10 +245,7 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     if battlefield_state is None:
         raise GameLifecycleError("Shooting phase requires battlefield_state.")
     try:
-        scenario = BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=battlefield_state,
-        )
+        scenario = battlefield_scenario_for_state(state=state)
         scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
     except PlacementError as exc:
         raise GameLifecycleError("Shooting battlefield scenario is invalid.") from exc

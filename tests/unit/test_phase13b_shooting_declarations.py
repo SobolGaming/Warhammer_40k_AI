@@ -135,6 +135,7 @@ from warhammer40k_core.engine.attack_sequence import (
     resolve_attack_sequence_until_blocked,
     wound_roll_target_number,
 )
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRuntimeState,
@@ -193,6 +194,10 @@ from warhammer40k_core.engine.damage_allocation import (
     mortal_wound_feel_no_pain_source_context,
     resolve_mortal_wound_feel_no_pain_decision,
 )
+from warhammer40k_core.engine.damage_allocation_targets import (
+    DamageAllocationTargetState,
+    damage_allocation_target_state,
+)
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -202,6 +207,12 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_on_death import (
+    model_is_present_on_battlefield,
+    remove_models_awaiting_fight_on_death,
+    restore_model_awaiting_fight_on_death,
+)
+from warhammer40k_core.engine.fight_resolution import melee_target_unit_ids
 from warhammer40k_core.engine.game_state import (
     GameState,
     GameStatePayload,
@@ -232,6 +243,8 @@ from warhammer40k_core.engine.phases.shooting import (
     request_out_of_phase_shooting_declaration,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.saves import (
     PlungingFireModifier,
     PlungingFireModifierResult,
@@ -10511,6 +10524,281 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
         record.result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
         for record in lifecycle.decision_controller.records
     )
+    awaiting_events = _event_payloads(lifecycle, "fight_on_death_model_awaiting_attack")
+    cleanup_events = _event_payloads(lifecycle, "fight_on_death_models_removed")
+    if selected_source_kind is DestructionReactionKind.FIGHT_ON_DEATH:
+        assert [payload["model_instance_id"] for payload in awaiting_events] == [
+            defender_model.model_instance_id
+        ]
+        assert any(payload["reason"] == "phase_end" for payload in cleanup_events)
+    else:
+        assert awaiting_events == ()
+
+
+def test_phase13e_fight_on_death_model_is_present_but_does_not_contribute_keywords() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    original_placement = battlefield.model_placement_by_id(defender_model.model_instance_id)
+    _replace_unit_instance_in_state(
+        state=state,
+        replacement=replace(
+            defender,
+            own_models=tuple(replace(model, wounds_remaining=0) for model in defender.own_models),
+        ),
+    )
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models)
+    )
+
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=original_placement,
+        effect_id="test-fight-on-death-awaiting",
+        source_rule_id="test-fight-on-death-rule",
+        source_phase=BattlePhase.SHOOTING,
+    )
+
+    assert model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=defender_model.model_instance_id,
+    )
+    assert [
+        model.model_id
+        for model in geometry_models_for_rules_unit(
+            state=state,
+            unit_instance_id=defender.unit_instance_id,
+        )
+    ] == [defender_model.model_instance_id]
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=defender.unit_instance_id,
+    )
+    assert rules_unit.keywords == ()
+    assert rules_unit.faction_keywords == ()
+    replayed_state = GameState.from_payload(state.to_payload())
+    assert model_is_present_on_battlefield(
+        state=replayed_state,
+        model_instance_id=defender_model.model_instance_id,
+    )
+
+    removed_model_ids = remove_models_awaiting_fight_on_death(state=state)
+
+    assert removed_model_ids == (defender_model.model_instance_id,)
+    assert not model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=defender_model.model_instance_id,
+    )
+
+
+def test_phase13e_fight_on_death_only_unit_accepts_ranged_declaration_without_allocation() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    awaiting_model = defender.own_models[0]
+    awaiting_placement = battlefield.model_placement_by_id(awaiting_model.model_instance_id)
+    destroyed_model_ids = tuple(model.model_instance_id for model in defender.own_models)
+    _replace_unit_instance_in_state(
+        state=state,
+        replacement=replace(
+            defender,
+            own_models=tuple(replace(model, wounds_remaining=0) for model in defender.own_models),
+        ),
+    )
+    state.replace_battlefield_state(battlefield.with_removed_models(destroyed_model_ids))
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=awaiting_placement,
+        effect_id="phase13e-ranged-target-awaiting",
+        source_rule_id="phase13e-ranged-target-rule",
+        source_phase=BattlePhase.SHOOTING,
+    )
+
+    assert (
+        damage_allocation_target_state(
+            state=state,
+            target_unit_instance_id=defender.unit_instance_id,
+        )
+        is DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="present but has no living models",
+    ):
+        allocation_context_for_unit(
+            state=state,
+            target_unit_instance_id=defender.unit_instance_id,
+        )
+
+    lifecycle = replace(lifecycle, state=GameState.from_payload(state.to_payload()))
+    state = _state(lifecycle)
+    assert (
+        damage_allocation_target_state(
+            state=state,
+            target_unit_instance_id=defender.unit_instance_id,
+        )
+        is DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="phase13e-fod-ranged-select",
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=defender.unit_instance_id,
+    )
+
+    status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=proposal.to_payload(),
+        result_id="phase13e-fod-ranged-declaration",
+    )
+
+    assert status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    }
+    accepted = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    assert (
+        cast(list[dict[str, object]], accepted["attack_pools"])[0]["target_unit_instance_id"]
+        == defender.unit_instance_id
+    )
+    assert _event_payloads(lifecycle, "attack_pool_not_allocated") == (
+        {
+            "sequence_id": "attack-sequence:phase13e-fod-ranged-declaration",
+            "pool_index": 0,
+            "target_unit_instance_id": defender.unit_instance_id,
+            "reason": "target_present_without_living_models",
+        },
+    )
+    assert _event_payloads(lifecycle, "attack_sequence_completed")
+
+
+def test_phase13e_fight_target_enumeration_includes_fight_on_death_only_unit() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(11.0, 35.0),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    awaiting_model = defender.own_models[0]
+    awaiting_placement = battlefield.model_placement_by_id(awaiting_model.model_instance_id)
+    _replace_unit_instance_in_state(
+        state=state,
+        replacement=replace(
+            defender,
+            own_models=tuple(replace(model, wounds_remaining=0) for model in defender.own_models),
+        ),
+    )
+    state.replace_battlefield_state(
+        battlefield.with_removed_models(
+            tuple(model.model_instance_id for model in defender.own_models)
+        )
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=awaiting_placement,
+        effect_id="phase13e-fight-target-awaiting",
+        source_rule_id="phase13e-fight-target-rule",
+        source_phase=BattlePhase.FIGHT,
+    )
+    scenario = battlefield_scenario_for_state(state=state)
+
+    assert melee_target_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        unit_instance_id=attacker.unit_instance_id,
+        state=state,
+    ) == (defender.unit_instance_id,)
+
+
+def test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_allocation() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    awaiting_model = defender.own_models[0]
+    awaiting_placement = battlefield.model_placement_by_id(awaiting_model.model_instance_id)
+    replacement = replace(
+        defender,
+        own_models=(
+            replace(awaiting_model, wounds_remaining=0),
+            *defender.own_models[1:],
+        ),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=replacement)
+    state.replace_battlefield_state(
+        battlefield.with_removed_models((awaiting_model.model_instance_id,))
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=awaiting_placement,
+        effect_id="phase13e-mixed-target-awaiting",
+        source_rule_id="phase13e-mixed-target-rule",
+        source_phase=BattlePhase.SHOOTING,
+    )
+    scenario = battlefield_scenario_for_state(state=state)
+    weapon_profile = _first_weapon_profile(lifecycle, attacker)
+    candidate = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=weapon_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+    )[0]
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+
+    assert candidate.is_legal
+    assert awaiting_model.model_instance_id in candidate.target_in_range_model_ids
+    assert awaiting_model.model_instance_id in candidate.target_visible_model_ids
+    assert awaiting_model.model_instance_id not in allocation_context.alive_model_ids
+    assert allocation_context.alive_model_ids == tuple(
+        model.model_instance_id for model in replacement.own_models[1:]
+    )
+    assert BattlefieldScenario.from_payload(scenario.to_payload()) == scenario
+
+    replayed_state = GameState.from_payload(state.to_payload())
+    replayed_scenario = battlefield_scenario_for_state(state=replayed_state)
+    replayed_attacker = (
+        rules_unit_view_by_id(
+            state=replayed_state,
+            unit_instance_id=attacker.unit_instance_id,
+        )
+        .components[0]
+        .unit
+    )
+    replayed_candidate = shooting_target_candidates_for_unit(
+        scenario=replayed_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=replayed_attacker,
+        weapon_profile=weapon_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+    )[0]
+    replayed_allocation_context = allocation_context_for_unit(
+        state=replayed_state,
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+
+    assert replayed_candidate.to_payload() == candidate.to_payload()
+    assert replayed_allocation_context.to_payload() == allocation_context.to_payload()
 
 
 def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:

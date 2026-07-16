@@ -10,6 +10,7 @@ from tests.setup_completion_helpers import enter_battle_for_fixture
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -32,6 +33,7 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     VictoryPointTransaction,
 )
+from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audit
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 PHASE16A_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
@@ -80,7 +82,7 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
             amount=60,
             source_kind=VictoryPointSourceKind.PRIMARY,
             source_id="take-and-hold",
-            scoring_timing="phase_end",
+            scoring_timing="end_of_battle",
             metadata={"scoring_rule_id": "phase11f-primary-cap"},
         )
     )
@@ -116,7 +118,7 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
             amount=60,
             source_kind=VictoryPointSourceKind.PRIMARY,
             source_id="take-and-hold",
-            scoring_timing="phase_end",
+            scoring_timing="end_of_battle",
             metadata={"scoring_rule_id": "phase11f-opponent-primary-cap"},
         )
     )
@@ -155,18 +157,19 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
     assert state.mission_setup is not None
     state.mission_setup = replace(state.mission_setup, primary_mission_id="primary-death-trap")
     policy = mission_scoring_policy_from_setup(state.mission_setup)
-    state.award_victory_points(
-        VictoryPointAward(
-            player_id="player-a",
-            battle_round=1,
-            phase=BattlePhase.COMMAND.value,
-            amount=44,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id="primary-death-trap",
-            scoring_timing="phase_end",
-            metadata={"scoring_rule_id": "phase11f-primary-action-base"},
+    for battle_round, amount in ((1, 15), (2, 15), (3, 14)):
+        state.award_victory_points(
+            VictoryPointAward(
+                player_id="player-a",
+                battle_round=battle_round,
+                phase=BattlePhase.COMMAND.value,
+                amount=amount,
+                source_kind=VictoryPointSourceKind.PRIMARY,
+                source_id="primary-death-trap",
+                scoring_timing="phase_end",
+                metadata={"scoring_rule_id": "phase11f-primary-action-base"},
+            )
         )
-    )
     state.award_victory_points(
         VictoryPointAward(
             player_id="player-a",
@@ -183,7 +186,7 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
     death_trap_transaction = state.award_victory_points(
         policy.mission_action_award(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.SHOOTING.value,
             action_id="death-trap:center:player-a",
             source_id="primary-death-trap",
@@ -224,6 +227,103 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
         )
         == 2
     )
+
+
+def test_phase11f_end_of_battle_primary_vp_is_exempt_from_battle_round_cap() -> None:
+    state = _battle_state()
+    assert state.mission_setup is not None
+    state.mission_setup = replace(state.mission_setup, primary_mission_id="take-and-hold")
+    state.award_victory_points(
+        VictoryPointAward(
+            player_id="player-a",
+            battle_round=5,
+            phase=BattlePhase.FIGHT.value,
+            amount=15,
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id="take-and-hold",
+            scoring_timing="phase_end",
+            metadata={"scoring_rule_id": "phase11f-round-five-primary"},
+        )
+    )
+    round_capped = state.award_victory_points(
+        VictoryPointAward(
+            player_id="player-a",
+            battle_round=5,
+            phase=BattlePhase.FIGHT.value,
+            amount=5,
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id="take-and-hold",
+            scoring_timing="phase_end",
+            metadata={"scoring_rule_id": "phase11f-round-five-primary-extra"},
+        )
+    )
+    end_of_battle = state.award_victory_points(
+        VictoryPointAward(
+            player_id="player-a",
+            battle_round=5,
+            phase=BattlePhase.FIGHT.value,
+            amount=5,
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id="take-and-hold",
+            scoring_timing="end_of_battle",
+            metadata={"scoring_rule_id": "phase11f-end-of-battle-primary"},
+        )
+    )
+
+    assert round_capped.amount == 0
+    assert _cap_reasons(round_capped) == ["primary_battle_round_vp_cap"]
+    assert end_of_battle.amount == 5
+    assert state.victory_point_total("player-a") == 20
+
+
+def test_phase11f_vp_cap_audit_metadata_shapes_and_validation_are_explicit() -> None:
+    def audit(
+        metadata: object,
+        *,
+        requested_amount: int = 5,
+        applied_amount: int = 3,
+        capped_reasons: tuple[str, ...] = ("primary_battle_round_vp_cap",),
+    ) -> object:
+        return metadata_with_vp_cap_audit(
+            cast(JsonValue, metadata),
+            requested_amount=requested_amount,
+            applied_amount=applied_amount,
+            source_cap=10,
+            source_points_before=7,
+            source_points_after=10,
+            total_cap=100,
+            total_points_before=20,
+            total_points_after=23,
+            capped_reasons=capped_reasons,
+        )
+
+    empty_metadata = audit(None)
+    scalar_metadata = cast(dict[str, object], audit("source-audit"))
+
+    assert empty_metadata == {
+        "vp_cap_audit": {
+            "requested_amount": 5,
+            "applied_amount": 3,
+            "source_cap": 10,
+            "source_points_before": 7,
+            "source_points_after": 10,
+            "total_cap": 100,
+            "total_points_before": 20,
+            "total_points_after": 23,
+            "capped_reasons": ["primary_battle_round_vp_cap"],
+        }
+    }
+    assert scalar_metadata["original_metadata"] == "source-audit"
+    with pytest.raises(GameLifecycleError, match="already contains vp_cap_audit"):
+        audit({"vp_cap_audit": {}})
+    with pytest.raises(GameLifecycleError, match="requested_amount must be a positive integer"):
+        audit(None, requested_amount=0)
+    with pytest.raises(GameLifecycleError, match="applied_amount must be a non-negative integer"):
+        audit(None, applied_amount=-1)
+    with pytest.raises(GameLifecycleError, match="capped_reasons must be a non-empty tuple"):
+        audit(None, capped_reasons=())
+    with pytest.raises(GameLifecycleError, match="capped_reasons must not contain duplicates"):
+        audit(None, capped_reasons=("total_vp_cap", "total_vp_cap"))
 
 
 def test_phase11f_final_result_requires_policy_scoring_windows() -> None:

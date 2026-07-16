@@ -39,6 +39,7 @@ __all__ = (
     "invalid_stratagem_use_status",
     "is_heroic_intervention_charge_move_request",
     "is_stratagem_placement_proposal_request",
+    "stratagem_cost_increase_made_use_unaffordable",
 )
 
 
@@ -88,6 +89,7 @@ def apply_stratagem_decision(
     stratagem_handler_registry: StratagemHandlerRegistry | None = None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None = None,
+    resolve_unaffordable_cost_increase_as_used: bool = False,
 ) -> StratagemUseRecord:
     if type(result) is not DecisionResult:
         raise GameLifecycleError("Stratagem application requires a DecisionResult.")
@@ -108,6 +110,7 @@ def apply_stratagem_decision(
         stratagem_handler_registry=stratagem_handler_registry,
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
+        resolve_unaffordable_cost_increase_as_used=resolve_unaffordable_cost_increase_as_used,
     )
 
 
@@ -125,6 +128,7 @@ def _apply_stratagem_use(
     stratagem_handler_registry: StratagemHandlerRegistry | None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None,
+    resolve_unaffordable_cost_increase_as_used: bool = False,
 ) -> StratagemUseRecord:
     definition = catalog_record.definition
     if _stratagem_handler_is_unsupported(definition):
@@ -142,7 +146,29 @@ def _apply_stratagem_use(
         source_decision_result_id=result.result_id,
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
-    if violation is not None:
+    unresolved_cost_increase = (
+        resolve_unaffordable_cost_increase_as_used and violation == "insufficient_command_points"
+    )
+    if unresolved_cost_increase:
+        remaining_violation = _stratagem_unavailable_reason(
+            state=state,
+            record=catalog_record,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            decisions=decisions,
+            source_decision_request_id=result.request_id,
+            source_decision_result_id=result.result_id,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+            ignore_command_point_affordability=True,
+        )
+        if remaining_violation is not None:
+            raise GameLifecycleError(
+                f"Prevalidated Stratagem is no longer legal: {remaining_violation}."
+            )
+    elif violation is not None:
         raise GameLifecycleError(f"Prevalidated stratagem is no longer legal: {violation}.")
     use_id = _next_stratagem_use_id(state=state, player_id=context.player_id)
     command_point_modification = _selected_command_point_cost_result(
@@ -157,6 +183,10 @@ def _apply_stratagem_use(
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     command_point_cost = command_point_modification.command_point_cost
+    if unresolved_cost_increase and (not command_point_modification.increased_modifier_ids):
+        raise GameLifecycleError(
+            "Unresolved Stratagem use requires a selected Command-point cost increase."
+        )
     try:
         targeted_unit_ids = _stratagem_targeted_unit_ids(
             state=state,
@@ -195,9 +225,28 @@ def _apply_stratagem_use(
         handler_id=definition.handler_id,
         command_point_modifier_ids=command_point_modification.modifier_ids,
         command_point_modifier_source_ids=command_point_modification.source_ids,
+        effects_resolved=not unresolved_cost_increase,
+        unresolved_reason=(
+            "insufficient_command_points_after_cost_increase" if unresolved_cost_increase else None
+        ),
         effect_selection=effect_selection,
         effect_payload=definition.effect_payload,
     )
+    if unresolved_cost_increase:
+        state.record_stratagem_use(use_record)
+        decisions.event_log.append("stratagem_used", use_record.to_payload())
+        decisions.event_log.append(
+            "stratagem_effects_not_resolved",
+            {
+                "use_id": use_record.use_id,
+                "player_id": use_record.player_id,
+                "stratagem_id": use_record.stratagem_id,
+                "command_point_cost": use_record.command_point_cost,
+                "available_command_points": state.command_point_total(context.player_id),
+                "unresolved_reason": use_record.unresolved_reason,
+            },
+        )
+        return use_record
     _validate_supported_stratagem_handler_preflight(
         state=state,
         decisions=decisions,
@@ -305,6 +354,7 @@ def apply_stratagem_target_proposal(
     stratagem_handler_registry: StratagemHandlerRegistry | None = None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None = None,
+    resolve_unaffordable_cost_increase_as_used: bool = False,
 ) -> StratagemUseRecord:
     proposal = _proposal_from_result_payload(result.payload)
     if proposal is None or proposal.target_binding is None:
@@ -330,6 +380,43 @@ def apply_stratagem_target_proposal(
         stratagem_handler_registry=stratagem_handler_registry,
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
+        resolve_unaffordable_cost_increase_as_used=resolve_unaffordable_cost_increase_as_used,
+    )
+
+
+def stratagem_cost_increase_made_use_unaffordable(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
+) -> bool:
+    selection = _stratagem_selection_from_result_payload(result.payload)
+    if selection is None:
+        proposal = _proposal_from_result_payload(result.payload)
+        if proposal is None or proposal.target_binding is None:
+            raise GameLifecycleError("Stratagem cost increase check requires a selection.")
+        selection = (
+            proposal.context,
+            proposal.catalog_record,
+            proposal.target_binding,
+            proposal.effect_selection,
+        )
+    context, catalog_record, target_binding, effect_selection = selection
+    modification = _selected_command_point_cost_result(
+        state=state,
+        definition=catalog_record.definition,
+        context=context,
+        target_binding=target_binding,
+        effect_selection=effect_selection,
+        decisions=decisions,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+    )
+    return (
+        bool(modification.increased_modifier_ids)
+        and state.command_point_total(context.player_id) < modification.command_point_cost
     )
 
 

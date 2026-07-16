@@ -26,6 +26,7 @@ class StratagemCostModificationResult:
     command_point_cost: int
     modifier_ids: tuple[str, ...]
     source_ids: tuple[str, ...]
+    increased_modifier_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -43,6 +44,18 @@ class StratagemCostModificationResult:
             "source_ids",
             _validate_identifier_tuple("source_ids", self.source_ids),
         )
+        object.__setattr__(
+            self,
+            "increased_modifier_ids",
+            _validate_identifier_tuple(
+                "increased_modifier_ids",
+                self.increased_modifier_ids,
+            ),
+        )
+        if not set(self.increased_modifier_ids) <= set(self.modifier_ids):
+            raise GameLifecycleError(
+                "Stratagem cost increased_modifier_ids must be applied modifier IDs."
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -169,6 +182,7 @@ class StratagemCostModifierRegistry:
         current = context.current_command_point_cost
         modifier_ids: list[str] = []
         source_ids: list[str] = []
+        increased_modifier_ids: list[str] = []
         for binding in self.bindings:
             raw_modified = _validate_int(
                 f"{binding.modifier_id} returned command point cost",
@@ -178,11 +192,14 @@ class StratagemCostModifierRegistry:
             if modified != current:
                 modifier_ids.append(binding.modifier_id)
                 source_ids.append(binding.source_id)
+            if modified > current:
+                increased_modifier_ids.append(binding.modifier_id)
             current = modified
         return StratagemCostModificationResult(
             command_point_cost=current,
             modifier_ids=tuple(modifier_ids),
             source_ids=tuple(source_ids),
+            increased_modifier_ids=tuple(increased_modifier_ids),
         )
 
 

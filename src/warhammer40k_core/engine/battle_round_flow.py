@@ -27,6 +27,7 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEvent,
     RuntimeContentEventIndex,
 )
+from warhammer40k_core.engine.fight_on_death import remove_models_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -65,6 +66,7 @@ from warhammer40k_core.engine.unit_destroyed_hooks import (
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.reaction_queue import ReactionQueue
+    from warhammer40k_core.engine.unit_factory import ModelInstance
 
 
 _LIFECYCLE_TIMING_RULE_ID = "core-rules-lifecycle-timing"
@@ -307,6 +309,21 @@ class BattleRoundFlow:
                     "request_id": turn_end_request.request_id,
                 },
             )
+        if state.battlefield_state is not None:
+            removed_fight_on_death_model_ids = remove_models_awaiting_fight_on_death(state=state)
+            if removed_fight_on_death_model_ids:
+                decisions.event_log.append(
+                    "fight_on_death_models_removed",
+                    validate_json_value(
+                        {
+                            "game_id": state.game_id,
+                            "battle_round": state.battle_round,
+                            "phase": current_phase.value,
+                            "model_instance_ids": list(removed_fight_on_death_model_ids),
+                            "reason": "phase_end",
+                        }
+                    ),
+                )
         completed_phase = state.advance_to_next_battle_phase(
             runtime_modifier_registry=self._runtime_modifier_registry
         )
@@ -722,7 +739,6 @@ def _unit_destruction_completion_events_for_phase(
 ) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
     if state.battlefield_state is None:
         return ()
-    removed_model_ids = set(state.battlefield_state.removed_model_ids)
     events_by_unit: dict[str, list[tuple[int, str, dict[str, JsonValue]]]] = {}
     for event_order, record in enumerate(decisions.event_log.records):
         if record.event_type != "model_destroyed":
@@ -747,10 +763,10 @@ def _unit_destruction_completion_events_for_phase(
         )
     completions: list[tuple[int, str, dict[str, JsonValue]]] = []
     for target_unit_id, events in events_by_unit.items():
-        model_ids = _model_instance_ids_for_unit(state=state, unit_instance_id=target_unit_id)
-        if not model_ids:
+        models = _models_for_unit(state=state, unit_instance_id=target_unit_id)
+        if not models:
             continue
-        if not model_ids <= removed_model_ids:
+        if any(model.is_alive for model in models):
             continue
         completions.append(sorted(events, key=lambda item: item[0])[-1])
     return tuple((event_id, payload) for _order, event_id, payload in sorted(completions))
@@ -764,12 +780,12 @@ def _player_id_for_unit(*, state: GameState, unit_instance_id: str) -> str:
     raise GameLifecycleError("Unit owner lookup failed for unit-destroyed hook.")
 
 
-def _model_instance_ids_for_unit(*, state: GameState, unit_instance_id: str) -> set[str]:
+def _models_for_unit(*, state: GameState, unit_instance_id: str) -> tuple[ModelInstance, ...]:
     requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
     for army in state.army_definitions:
         for unit in army.units:
             if unit.unit_instance_id == requested_unit:
-                return {model.model_instance_id for model in unit.own_models}
+                return unit.own_models
     raise GameLifecycleError("Model lookup failed for unit-destroyed hook.")
 
 

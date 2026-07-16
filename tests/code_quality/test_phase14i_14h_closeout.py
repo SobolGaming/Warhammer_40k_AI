@@ -198,8 +198,9 @@ def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> 
     assert "_available_weapons_for_unit" in available_weapons_source
     assert "for component in rules_unit.components" in available_weapons_source
 
-    assert "rules_unit_view_from_armies" in range_source
-    assert "_unit_placements_for_rules_unit_or_none" in range_source
+    assert "target_within_shooting_selection_range" in range_source
+    assert "rules_unit_view_from_armies" not in range_source
+    assert "_unit_placements_for_rules_unit_or_none" not in range_source
     assert "unit_placement_by_id(component" not in range_source
 
 
