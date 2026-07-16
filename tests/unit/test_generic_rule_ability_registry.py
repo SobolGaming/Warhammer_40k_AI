@@ -55,7 +55,6 @@ from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
 )
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.phase import (
@@ -78,6 +77,9 @@ from warhammer40k_core.engine.stratagems import (
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -1250,6 +1252,7 @@ def _muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,
@@ -1327,6 +1330,7 @@ def _army(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
         ),
+        force_disposition_id="purge-the-foe",
         units=units,
     )
 

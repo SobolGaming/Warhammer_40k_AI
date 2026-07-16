@@ -21,9 +21,7 @@ from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
 )
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
@@ -50,6 +48,10 @@ from warhammer40k_core.engine.stratagems import (
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload, parameter_payload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
@@ -496,6 +498,7 @@ def _army(
             faction_id=detachment.faction_id if faction_id is None else faction_id,
             detachment_ids=(detachment.detachment_id if detachment_id is None else detachment_id,),
         ),
+        force_disposition_id="purge-the-foe",
         units=(unit,),
     )
 

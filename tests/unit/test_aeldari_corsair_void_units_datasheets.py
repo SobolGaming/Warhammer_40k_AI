@@ -54,11 +54,11 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ListValidationError,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
     resolve_model_profile_selections,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, SetupStep
@@ -77,6 +77,10 @@ from warhammer40k_core.engine.tracked_targets import (
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation_composition import (
     allows_zero_models_from_row,
@@ -1476,6 +1480,7 @@ def _army_with_units(
             faction_id=catalog.factions[0].faction_id,
             detachment_ids=("void-unit-test-detachment",),
         ),
+        force_disposition_id="purge-the-foe",
         units=units,
         attached_units=attached_units,
     )
@@ -1511,6 +1516,7 @@ def _muster_request(
         source_package_id=army.source_package_id,
         ruleset_id=army.ruleset_id,
         detachment_selection=army.detachment_selection,
+        force_disposition_id="purge-the-foe",
         unit_selections=(selection,),
     )
 

@@ -40,12 +40,14 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.interfaces.cli import render_pending_decision_for_cli, submit_cli_choice
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
@@ -314,6 +316,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

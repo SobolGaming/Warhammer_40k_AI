@@ -34,11 +34,11 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_consumers_for_rule,
 )
 from warhammer40k_core.engine.list_validation import (
-    ListValidationError,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
     resolve_wargear_selections,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.scaled_wargear_limits import (
@@ -46,6 +46,10 @@ from warhammer40k_core.engine.scaled_wargear_limits import (
     validate_scaled_wargear_selections,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.rules.rule_ir import (
     RuleConditionKind,
     RuleEffectKind,

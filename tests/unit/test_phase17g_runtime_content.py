@@ -115,7 +115,6 @@ from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.lifecycle_hooks import HookBinding, LifecycleHookEvent
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -139,6 +138,9 @@ from warhammer40k_core.engine.stratagems import (
     StratagemUseRecord,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
@@ -1890,6 +1892,7 @@ def _muster_request(catalog: ArmyCatalog) -> ArmyMusterRequest:
             enhancement_ids=("runtime-enhancement",),
             stratagem_ids=("runtime-ambush",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id="intercessor-unit-1",
@@ -2159,6 +2162,7 @@ def _config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="enemy-unit",
@@ -2197,6 +2201,7 @@ def _canonical_lifecycle_config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="intercessor-unit-1",
@@ -2220,6 +2225,7 @@ def _canonical_lifecycle_config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="enemy-unit",

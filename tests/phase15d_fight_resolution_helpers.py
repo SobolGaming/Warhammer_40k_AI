@@ -26,12 +26,14 @@ from warhammer40k_core.engine.fight_resolution import (
 )
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.geometry.pose import Pose
 
 
@@ -203,6 +205,7 @@ def melee_armies(
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     unit_muster_selection(
                         unit_selection_id="target-a",
@@ -239,6 +242,7 @@ def army_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=tuple(
             unit_muster_selection(
                 unit_selection_id=unit_id,

@@ -63,7 +63,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.movement_legality import (
@@ -73,6 +72,9 @@ from warhammer40k_core.engine.movement_legality import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -1126,6 +1128,7 @@ def _muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=unit_selections,
     )
 

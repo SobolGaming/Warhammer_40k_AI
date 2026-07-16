@@ -84,9 +84,7 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
@@ -103,6 +101,10 @@ from warhammer40k_core.engine.runtime_modifiers import (
 from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -1262,6 +1264,7 @@ def _world_eaters_config() -> GameConfig:
                     faction_id=army_rule.WORLD_EATERS_FACTION_ID,
                     detachment_ids=("berzerker-warband",),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="berzerkers",
@@ -1292,6 +1295,7 @@ def _world_eaters_config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(default_unit_selection("enemy-unit"),),
             ),
         ),

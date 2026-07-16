@@ -48,7 +48,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -69,6 +68,9 @@ from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_context_for_unit,
 )
 from warhammer40k_core.engine.triggered_movement import TRIGGERED_MOVEMENT_PROPOSAL_ACTION
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
@@ -379,6 +381,7 @@ def _thousand_sons_config(*, game_id: str) -> GameConfig:
                     faction_id=army_rule.THOUSAND_SONS_FACTION_ID,
                     detachment_ids=(THOUSAND_SONS_DETACHMENT_ID,),
                 ),
+                force_disposition_id="phase17g-thousand-sons-force",
                 unit_selections=(
                     _unit_selection("rubric-marines", MANIFESTER_DATASHEET_ID),
                     _unit_selection("scarab-occult", FRIENDLY_TARGET_DATASHEET_ID),
@@ -394,6 +397,7 @@ def _thousand_sons_config(*, game_id: str) -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=(OPFOR_DETACHMENT_ID,),
                 ),
+                force_disposition_id="phase17g-thousand-sons-opfor",
                 unit_selections=(
                     _unit_selection("enemy-unit", "core-intercessor-like-infantry"),
                     _unit_selection("enemy-unit-2", "core-intercessor-like-infantry"),

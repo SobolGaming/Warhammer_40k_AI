@@ -91,6 +91,13 @@ If a test object lacks a required field, fix the fixture. Do not weaken producti
 
 Stubs are allowed only for pure functions and must be marked `stubbed`.
 
+Full-suite pytest runs must use xdist work stealing by default:
+`uv run pytest -n auto --dist=worksteal tests/`. Do not run the full suite
+serially unless xdist is unavailable or a specific test is known or suspected
+to be distribution-sensitive; document that reason when reporting checks.
+Focused test subsets may run serially when that is the simpler or faster
+diagnostic path.
+
 Engine behavior tests must use real domain objects or canonical fixtures. This includes movement, shooting, charge, fight, deployment, transports, attached units, damage allocation, replay, decision dispatch, UI routing, and network serialization.
 
 Tests must not replace `lifecycle.decision_controller` directly. Tests must not import from other `test_*.py` modules; shared setup used across test modules lives in named shared helpers. Each major phase family must have facade-driven coverage through `AdapterGameSession` / `LocalGameSession` submissions and viewer-scoped projections or event deltas.
@@ -269,7 +276,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-uv run pytest tests/
+uv run pytest -n auto --dist=worksteal tests/
 uv run lint-imports
 uv run pre-commit run --all-files
 

@@ -30,6 +30,25 @@ The engine-facing path is shared:
 
 Adapters are producers of answers. The engine remains the owner of validation, mutation, events, and replay records.
 
+## Pre-session army-list input
+
+A player-provided army list is pre-session input, not a separate mutation or
+decision path. Adapters normalize the external roster once into a versioned
+`PlayerArmyList` JSON artifact and call
+`army_muster_request_from_player_army_list(...)`. The resulting strict
+`ArmyMusterRequest` is the only roster input passed to `GameConfig` and the
+ordinary setup lifecycle.
+
+The artifact must carry a selected `force_disposition_id`, Battle Size,
+detachment selection, source IDs, declared points for every unit, declared
+total points, and the exact MFM package identity used to price it. The engine
+recalculates repeated-datasheet brackets, wargear, and Enhancement or Upgrade
+costs, rejects any per-unit or total drift, and populates source-backed
+`RosterUnitPointValue` records. During mustering, the engine rejects a Force
+Disposition not granted by one of the selected detachments. Adapters must not
+infer a default Force Disposition, accept stale point totals, or mutate an army
+from the artifact directly.
+
 ## Core Objects
 
 The shared contract uses these objects and payloads:
@@ -39,6 +58,11 @@ The shared contract uses these objects and payloads:
   producer adapters. It is the adapter-facing route to lifecycle advancement,
   viewer-safe projection, source-hashed catalog projection, viewer-scoped event
   deltas, finite submissions, and parameterized payload submissions.
+- `PlayerArmyList`: versioned, fail-fast pre-session roster artifact containing
+  normalized roster selections, one explicit Force Disposition, declared point
+  totals, and source/app provenance.
+- `ArmyMusterRequest`: strict engine roster request produced from a validated
+  player army list and consumed by the shared setup lifecycle.
 - `DecisionRequest`: engine request for one player choice.
 - `FiniteOptionSubmission`: adapter wrapper for selecting one finite option.
 - `ParameterizedSubmission`: adapter wrapper for submitting JSON-safe proposal payloads.
@@ -148,6 +172,8 @@ Relevant modules:
 - `src/warhammer40k_core/adapters/event_stream.py`
 - `src/warhammer40k_core/adapters/local_session.py`
 - `src/warhammer40k_core/engine/decision_request.py`
+- `src/warhammer40k_core/engine/player_army_list.py`
+- `src/warhammer40k_core/engine/army_mustering.py`
 - `src/warhammer40k_core/engine/decision_result.py`
 - `src/warhammer40k_core/engine/decision_record.py`
 - `src/warhammer40k_core/engine/movement_proposals.py`

@@ -607,6 +607,7 @@ def _army(
             faction_id=faction_id,
             detachment_ids=("phase17g-test-detachment",),
         ),
+        force_disposition_id="purge-the-foe",
         units=units,
         attached_units=attached_units,
         roster_legality_report=RosterLegalityReport(battle_size=battle_size),

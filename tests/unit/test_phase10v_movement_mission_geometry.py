@@ -7,7 +7,6 @@ from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, Unit
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.phases.movement import (
@@ -17,6 +16,9 @@ from warhammer40k_core.engine.phases.movement import (
     resolve_advance_move,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 
@@ -120,6 +122,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

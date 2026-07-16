@@ -20,10 +20,12 @@ from warhammer40k_core.engine.army_mustering import (
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.phase import GameLifecycleStage
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.model_geometry import GeometrySourceKind, HeightSourceKind
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.catalog_package import (
@@ -320,6 +322,7 @@ def _plague_marines_muster_request(catalog: ArmyCatalog) -> ArmyMusterRequest:
             faction_id="death-guard",
             detachment_ids=("tallyband-summoners",),
         ),
+        force_disposition_id="disruption",
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id="plague-marines-1",

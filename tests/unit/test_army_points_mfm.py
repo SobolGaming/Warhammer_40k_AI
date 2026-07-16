@@ -45,8 +45,10 @@ from warhammer40k_core.engine.army_points import (
 )
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
 )
 from warhammer40k_core.rules.mfm_source import (
     MfmDetachmentRecord,
@@ -94,6 +96,7 @@ def test_calculate_mfm_army_points_handles_variable_add_on_wargear_and_enhanceme
             detachment_ids=("test-detachment",),
             enhancement_ids=("test-enhancement",),
         ),
+        force_disposition_id="test-force",
         unit_selections=(
             _unit_selection("variable-one", "variable-unit", (("variable-model", 1),)),
             _unit_selection("variable-two", "variable-unit", (("variable-model", 1),)),
@@ -161,6 +164,7 @@ def test_calculate_mfm_army_points_matches_composite_named_model_rows() -> None:
             detachment_ids=("test-detachment",),
             enhancement_ids=(),
         ),
+        force_disposition_id="test-force",
         unit_selections=(
             _unit_selection(
                 "headtakers-one",
@@ -197,6 +201,7 @@ def test_calculate_mfm_army_points_maps_section_qualified_records_by_unit_name()
             detachment_ids=("test-detachment",),
             enhancement_ids=(),
         ),
+        force_disposition_id="test-force",
         unit_selections=(_unit_selection("alias-one", "alias-datasheet", (("alias-unit", 1),)),),
         enhancement_assignments=(),
     )
@@ -249,6 +254,7 @@ def test_catalog_with_mfm_points_overlays_enhancement_prices_for_roster_total() 
             detachment_ids=("test-detachment",),
             enhancement_ids=("test-enhancement",),
         ),
+        force_disposition_id="test-force",
         unit_selections=(
             _unit_selection("variable-one", "variable-unit", (("variable-model", 1),)),
             _unit_selection("variable-two", "variable-unit", (("variable-model", 1),)),
@@ -307,6 +313,7 @@ def test_catalog_with_mfm_points_feeds_roster_legality_enhancement_prices() -> N
             detachment_ids=("test-detachment",),
             enhancement_ids=("test-enhancement",),
         ),
+        force_disposition_id="test-force",
         unit_selections=(_unit_selection("leader-one", "leader", (("leader", 1),)),),
         unit_points=(
             RosterUnitPointValue(
@@ -401,6 +408,7 @@ def test_calculate_mfm_army_points_rejects_catalog_identity_drift() -> None:
             detachment_ids=("test-detachment",),
             enhancement_ids=(),
         ),
+        force_disposition_id="test-force",
         unit_selections=(
             _unit_selection("variable-one", "variable-unit", (("variable-model", 1),)),
         ),
@@ -428,6 +436,7 @@ def test_calculate_mfm_army_points_rejects_missing_enhancement_target() -> None:
             detachment_ids=("test-detachment",),
             enhancement_ids=("test-enhancement",),
         ),
+        force_disposition_id="test-force",
         unit_selections=(
             _unit_selection("variable-one", "variable-unit", (("variable-model", 1),)),
         ),

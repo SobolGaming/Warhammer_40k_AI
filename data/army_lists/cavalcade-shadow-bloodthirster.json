@@ -1,0 +1,243 @@
+{
+  "artifact_schema": "core-v2-player-army-list-v1",
+  "army_list_id": "cavalcade-shadow-bloodthirster",
+  "name": "Cavalcade Shadow Bloodthirster",
+  "faction_id": "chaos-daemons",
+  "detachment_selection": {
+    "faction_id": "chaos-daemons",
+    "detachment_ids": [
+      "cavalcade-of-chaos",
+      "shadow-legion"
+    ],
+    "enhancement_ids": [
+      "apocalyptic-steeds"
+    ],
+    "stratagem_ids": []
+  },
+  "force_disposition_id": "purge-the-foe",
+  "battle_size": "strike_force",
+  "declared_total_points": 1995,
+  "units": [
+    {
+      "selection": {
+        "unit_selection_id": "belakor",
+        "datasheet_id": "000001148",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001148:belakor-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 390
+    },
+    {
+      "selection": {
+        "unit_selection_id": "bloodthirster",
+        "datasheet_id": "000002582",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000002582:bloodthirster",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 320
+    },
+    {
+      "selection": {
+        "unit_selection_id": "lord-of-change-1",
+        "datasheet_id": "000001120",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001120:lord-of-change",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 300
+    },
+    {
+      "selection": {
+        "unit_selection_id": "lord-of-change-2",
+        "datasheet_id": "000001120",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001120:lord-of-change",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 300
+    },
+    {
+      "selection": {
+        "unit_selection_id": "plaguebearers",
+        "datasheet_id": "000001132",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001132:plagueridden",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000001132:plaguebearers",
+            "model_count": 9
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000001132:daemonic-icon:option-2",
+            "model_profile_id": "000001132:plaguebearers",
+            "wargear_ids": [
+              "000001132:daemonic-icon"
+            ]
+          },
+          {
+            "option_id": "000001132:instrument-of-chaos:option-1",
+            "model_profile_id": "000001132:plaguebearers",
+            "wargear_ids": [
+              "000001132:instrument-of-chaos"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 115
+    },
+    {
+      "selection": {
+        "unit_selection_id": "bloodcrushers-1",
+        "datasheet_id": "000001115",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001115:bloodhunter",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000001115:bloodcrushers",
+            "model_count": 5
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000001115:daemonic-icon:option-2",
+            "model_profile_id": "000001115:bloodcrushers",
+            "wargear_ids": [
+              "000001115:daemonic-icon"
+            ]
+          },
+          {
+            "option_id": "000001115:instrument-of-chaos:option-1",
+            "model_profile_id": "000001115:bloodcrushers",
+            "wargear_ids": [
+              "000001115:instrument-of-chaos"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 190
+    },
+    {
+      "selection": {
+        "unit_selection_id": "bloodcrushers-2",
+        "datasheet_id": "000001115",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001115:bloodhunter",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000001115:bloodcrushers",
+            "model_count": 5
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000001115:daemonic-icon:option-2",
+            "model_profile_id": "000001115:bloodcrushers",
+            "wargear_ids": [
+              "000001115:daemonic-icon"
+            ]
+          },
+          {
+            "option_id": "000001115:instrument-of-chaos:option-1",
+            "model_profile_id": "000001115:bloodcrushers",
+            "wargear_ids": [
+              "000001115:instrument-of-chaos"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 190
+    },
+    {
+      "selection": {
+        "unit_selection_id": "bloodcrushers-3",
+        "datasheet_id": "000001115",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001115:bloodhunter",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000001115:bloodcrushers",
+            "model_count": 5
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000001115:daemonic-icon:option-2",
+            "model_profile_id": "000001115:bloodcrushers",
+            "wargear_ids": [
+              "000001115:daemonic-icon"
+            ]
+          },
+          {
+            "option_id": "000001115:instrument-of-chaos:option-1",
+            "model_profile_id": "000001115:bloodcrushers",
+            "wargear_ids": [
+              "000001115:instrument-of-chaos"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 190
+    }
+  ],
+  "attachment_declarations": [],
+  "enhancement_assignments": [
+    {
+      "enhancement_id": "apocalyptic-steeds",
+      "target_unit_selection_id": "bloodcrushers-1",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds"
+    },
+    {
+      "enhancement_id": "apocalyptic-steeds",
+      "target_unit_selection_id": "bloodcrushers-2",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds"
+    }
+  ],
+  "warlord_selection": {
+    "unit_selection_id": "belakor",
+    "source_id": "player-army-list:cavalcade-shadow-bloodthirster:warlord"
+  },
+  "dedicated_transport_manifests": [],
+  "provenance": {
+    "source_format": "warhammer-40000-app-text",
+    "app_version": "v2.1.0 (3)",
+    "data_version": "v895",
+    "game_result": "win",
+    "points_source_package_id": "gw-11e-mfm-2026-06"
+  }
+}

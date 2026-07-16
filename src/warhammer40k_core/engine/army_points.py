@@ -22,12 +22,16 @@ from warhammer40k_core.engine.army_mustering import (
     RosterUnitPointValue,
 )
 from warhammer40k_core.engine.list_validation import (
-    ListValidationError,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
     resolve_model_profile_selections,
     resolve_wargear_selections,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
 )
 from warhammer40k_core.rules.mfm_source import (
     MfmDetachmentRecord,

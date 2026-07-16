@@ -67,9 +67,7 @@ from warhammer40k_core.engine.fight_resolution import (
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
 )
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest, ProposalKind
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
@@ -82,6 +80,10 @@ from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyViolation,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.engine.weapon_abilities import CLEAVE_RULE_ID, LANCE_RULE_ID
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
@@ -2586,6 +2588,7 @@ def _armies(
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     _unit_muster_selection(
                         unit_selection_id="target-a",
@@ -2622,6 +2625,7 @@ def _army_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=tuple(
             _unit_muster_selection(
                 unit_selection_id=unit_id,

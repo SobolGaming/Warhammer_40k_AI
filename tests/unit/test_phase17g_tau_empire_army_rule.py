@@ -46,7 +46,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -69,6 +68,9 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
     ShootingPhaseStartResultContext,
 )
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
@@ -845,6 +847,7 @@ def _tau_config(*, non_tau_selected: bool) -> GameConfig:
                     faction_id=player_a_faction_id,
                     detachment_ids=(player_a_detachment_id,),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(
                     _unit_selection("pathfinders", MARKER_OBSERVER_DATASHEET_ID),
                     _unit_selection("strike-team", OBSERVER_DATASHEET_ID),
@@ -863,6 +866,7 @@ def _tau_config(*, non_tau_selected: bool) -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     _unit_selection("enemy-unit", "core-intercessor-like-infantry"),
                     _unit_selection("enemy-unit-2", "core-intercessor-like-infantry"),

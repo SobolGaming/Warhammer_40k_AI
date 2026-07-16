@@ -60,7 +60,6 @@ from warhammer40k_core.engine.game_state import GameConfig, GameState, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -100,6 +99,9 @@ from warhammer40k_core.engine.saves import (
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
@@ -1570,6 +1572,7 @@ def _death_guard_config() -> GameConfig:
                     faction_id=army_rule.DEATH_GUARD_FACTION_ID,
                     detachment_ids=("plague-company",),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="plague-marine",
@@ -1593,6 +1596,7 @@ def _death_guard_config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=(default_unit_selection("enemy-unit"),),
             ),
         ),

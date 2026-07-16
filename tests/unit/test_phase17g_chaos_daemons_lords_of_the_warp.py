@@ -455,6 +455,7 @@ def _army(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
         ),
+        force_disposition_id="purge-the-foe",
         units=units,
     )
 

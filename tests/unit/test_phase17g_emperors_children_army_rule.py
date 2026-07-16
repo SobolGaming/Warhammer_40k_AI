@@ -51,7 +51,6 @@ from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -108,6 +107,9 @@ from warhammer40k_core.engine.turn_start_engagement import (
     turn_start_enemy_unit_ids_for_friendly_unit,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.engine.weapon_declaration import (
     RangedAttackPool,
     ShootingDeclarationProposal,
@@ -1186,6 +1188,7 @@ def _emperors_children_config(
                     faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
                     detachment_ids=("frenzied-host",),
                 ),
+                force_disposition_id="phase17g-force",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="noise-marine",
@@ -1209,6 +1212,7 @@ def _emperors_children_config(
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
+                force_disposition_id="purge-the-foe",
                 unit_selections=tuple(
                     default_unit_selection(unit_id) for unit_id in enemy_unit_ids
                 ),

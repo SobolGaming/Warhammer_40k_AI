@@ -321,13 +321,13 @@ from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ListValidationError,
-    ModelProfileSelection,
     MusteringOptionSelection,
     UnitMusterSelection,
-    WargearSelection,
     resolve_mustering_option_selections,
     resolve_wargear_selections,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -387,6 +387,10 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     resolve_unit_move_completed_mortal_wound_hooks,
 )
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
@@ -712,6 +716,7 @@ def test_phase17k_bloodthirster_bridge_supports_replacement_wargear_loadouts() -
                 ),
             ),
         )
+
     assert lash_option.allowed_wargear_ids == (axe_id, lash_id)
 
 
@@ -1891,6 +1896,7 @@ def test_phase17k_unholy_vigour_submits_through_local_game_session() -> None:
             source_package_id=catalog.source_package_id,
             ruleset_id=catalog.ruleset_id,
             detachment_selection=detachment_selection,
+            force_disposition_id="phase17k-force",
             unit_selections=(source_selection,),
         ),
         ArmyMusterRequest(
@@ -1900,6 +1906,7 @@ def test_phase17k_unholy_vigour_submits_through_local_game_session() -> None:
             source_package_id=catalog.source_package_id,
             ruleset_id=catalog.ruleset_id,
             detachment_selection=detachment_selection,
+            force_disposition_id="phase17k-force",
             unit_selections=(enemy_selection,),
         ),
     )
@@ -2281,6 +2288,7 @@ def test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record() -> 
             faction_id=package.army_catalog.factions[0].faction_id,
             detachment_ids=("phase17k-daemons",),
         ),
+        force_disposition_id="phase17k-force",
         units=(unit,),
     )
 
@@ -8347,6 +8355,46 @@ def test_phase17k_structured_wargear_option_semantics_block_icon_and_instrument_
             ),
         )
 
+    resolved_for_distinct_bearers = resolve_wargear_selections(
+        catalog=package.army_catalog,
+        datasheet=datasheet,
+        requested_selections=(
+            WargearSelection(
+                option_id="000001115:instrument-of-chaos:option-1",
+                model_profile_id="000001115:bloodcrushers",
+                wargear_ids=("000001115:instrument-of-chaos",),
+            ),
+            WargearSelection(
+                option_id="000001115:daemonic-icon:option-2",
+                model_profile_id="000001115:bloodcrushers",
+                wargear_ids=("000001115:daemonic-icon",),
+            ),
+        ),
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id="000001115:bloodcrushers",
+                model_count=5,
+            ),
+            ModelProfileSelection(
+                model_profile_id="000001115:bloodhunter",
+                model_count=1,
+            ),
+        ),
+    )
+
+    assert {
+        selection.option_id
+        for selection in resolved_for_distinct_bearers
+        if selection.option_id
+        in {
+            "000001115:daemonic-icon:option-2",
+            "000001115:instrument-of-chaos:option-1",
+        }
+    } == {
+        "000001115:daemonic-icon:option-2",
+        "000001115:instrument-of-chaos:option-1",
+    }
+
 
 def test_phase17k_structured_wargear_option_effects_are_count_aware() -> None:
     package = build_canonical_catalog_package(
@@ -8874,6 +8922,7 @@ def _bloodcrushers_army(
             faction_id=package.army_catalog.factions[0].faction_id,
             detachment_ids=("phase17k-daemons",),
         ),
+        force_disposition_id="phase17k-force",
         units=(unit,),
     )
 
@@ -8895,6 +8944,7 @@ def _flesh_hounds_army(
             faction_id=package.army_catalog.factions[0].faction_id,
             detachment_ids=("phase17k-daemons",),
         ),
+        force_disposition_id="phase17k-force",
         units=(unit,),
     )
 

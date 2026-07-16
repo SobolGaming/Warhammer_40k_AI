@@ -99,7 +99,6 @@ from warhammer40k_core.engine.lifecycle_reaction_queue import (
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.movement_proposals import (
@@ -149,6 +148,9 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
@@ -4159,6 +4161,7 @@ def _muster_request_with_unit_ids(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,
@@ -4186,6 +4189,7 @@ def _attached_leader_support_muster_request(catalog: ArmyCatalog) -> ArmyMusterR
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id="bodyguard-unit",

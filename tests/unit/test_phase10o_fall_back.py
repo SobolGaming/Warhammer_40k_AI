@@ -41,7 +41,6 @@ from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -76,6 +75,9 @@ from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     UnitCoherencyResult,
     unit_placement_coherency_result,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
@@ -1246,6 +1248,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

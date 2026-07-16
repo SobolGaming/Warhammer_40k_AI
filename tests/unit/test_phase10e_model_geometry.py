@@ -21,13 +21,14 @@ from warhammer40k_core.core.model_geometry_catalog import (
     ModelGeometrySourceEvidence,
     ModelHeightDefinition,
 )
-from warhammer40k_core.engine.list_validation import ModelProfileSelection, UnitMusterSelection
+from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.unit_factory import (
     ModelInstance,
     ModelInstancePayload,
     UnitFactory,
     UnitFactoryError,
 )
+from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.geometry.measurement import millimeters_to_inches
 from warhammer40k_core.geometry.model_geometry import (
     BaseFootprintKind,

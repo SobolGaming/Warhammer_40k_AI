@@ -19,7 +19,6 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -34,6 +33,9 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointTransaction,
 )
 from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audit
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 PHASE16A_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
@@ -437,6 +439,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

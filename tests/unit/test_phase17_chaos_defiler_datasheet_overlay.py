@@ -9,11 +9,13 @@ import pytest
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.engine.list_validation import (
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitFactoryError, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import DataPackageId

@@ -27,7 +27,6 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -44,6 +43,9 @@ from warhammer40k_core.engine.unit_coherency import (
     resolve_unit_movement_endpoint_coherency,
     unit_coherency_status_from_token,
     unit_placement_coherency_result,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
 )
 from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.pose import Pose
@@ -609,6 +611,7 @@ def _muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

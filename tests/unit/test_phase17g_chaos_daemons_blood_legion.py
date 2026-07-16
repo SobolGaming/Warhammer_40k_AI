@@ -47,7 +47,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -76,6 +75,9 @@ from warhammer40k_core.engine.phases.movement import (
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
@@ -488,6 +490,9 @@ def _army_muster_request(
         detachment_selection=DetachmentSelection(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
+        ),
+        force_disposition_id=(
+            "purge-the-foe" if faction_id == "core-marine-force" else "phase17g-force"
         ),
         unit_selections=tuple(unit_selections),
     )

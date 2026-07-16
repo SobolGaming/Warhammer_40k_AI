@@ -53,7 +53,6 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -148,6 +147,9 @@ from warhammer40k_core.engine.timing_windows import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.engine.weapon_abilities import SNAP_SHOOTING_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposal,
@@ -4978,6 +4980,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=(
             *(
                 UnitMusterSelection(

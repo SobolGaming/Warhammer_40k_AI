@@ -11,8 +11,10 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.list_validation import (
-    ListValidationError,
     battle_size_mustering_policy,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
 )
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,

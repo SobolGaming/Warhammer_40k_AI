@@ -26,9 +26,7 @@ from warhammer40k_core.engine.damaged_effects import (
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
-    WargearSelection,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -38,6 +36,10 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 
 
 def test_damaged_effects_modify_hit_roll_and_objective_control_inside_wound_range() -> None:
@@ -725,6 +727,7 @@ def _army(*, catalog: ArmyCatalog, unit: UnitInstance) -> ArmyDefinition:
             faction_id=detachment.faction_id,
             detachment_ids=(detachment.detachment_id,),
         ),
+        force_disposition_id="purge-the-foe",
         units=(unit,),
     )
 

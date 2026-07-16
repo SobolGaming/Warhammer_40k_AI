@@ -63,7 +63,6 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.phase import (
@@ -86,6 +85,9 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     resolve_unit_move_completed_battle_shock_hooks,
 )
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
@@ -988,6 +990,7 @@ def _muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
+        force_disposition_id="purge-the-foe",
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=f"{army_id}-unit",

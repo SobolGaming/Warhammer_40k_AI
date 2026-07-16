@@ -99,7 +99,6 @@ from warhammer40k_core.engine.healing import HealingStep, HealingStepKind
 from warhammer40k_core.engine.list_validation import (
     BattleSize,
     DetachmentSelection,
-    ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
@@ -178,6 +177,9 @@ from warhammer40k_core.engine.unit_abilities import (
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+)
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
@@ -3719,6 +3721,7 @@ def _shadow_legion_muster_request(
             faction_id=CHAOS_DAEMONS_FACTION_ID,
             detachment_ids=(rule.DETACHMENT_ID,),
         ),
+        force_disposition_id="phase17g-shadow-legion-force",
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=selection_id,

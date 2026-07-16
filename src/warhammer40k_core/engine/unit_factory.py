@@ -30,15 +30,19 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 from warhammer40k_core.engine.list_validation import (
-    ListValidationError,
     MusteringOptionSelection,
     MusteringOptionSelectionPayload,
     UnitMusterSelection,
-    WargearSelection,
-    WargearSelectionPayload,
     resolve_model_profile_selections,
     resolve_mustering_option_selections,
     resolve_wargear_selections,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
+)
+from warhammer40k_core.engine.wargear_selections import (
+    WargearSelection,
+    WargearSelectionPayload,
 )
 from warhammer40k_core.geometry.model_geometry import (
     GeometrySourceKind,

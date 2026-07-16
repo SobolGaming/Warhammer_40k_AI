@@ -32,7 +32,6 @@ from warhammer40k_core.engine.list_validation import (
     BattleSize,
     DetachmentSelection,
     DetachmentSelectionPayload,
-    ListValidationError,
     UnitMusterSelection,
     UnitMusterSelectionPayload,
     battle_size_from_token,
@@ -45,7 +44,11 @@ from warhammer40k_core.engine.list_validation import (
     resolve_mustering_option_selections,
     shadow_legion_thralls_datasheet_allowed_for_faction,
     validate_detachment_selection,
+    validate_force_disposition_selection,
     validate_unit_selection_for_army,
+)
+from warhammer40k_core.engine.list_validation_errors import (
+    ListValidationError,
 )
 from warhammer40k_core.engine.unit_factory import (
     UnitFactory,
@@ -185,6 +188,7 @@ class ArmyMusterRequestPayload(TypedDict):
     source_package_id: str
     ruleset_id: RulesetIdPayload
     detachment_selection: DetachmentSelectionPayload
+    force_disposition_id: str
     unit_selections: list[UnitMusterSelectionPayload]
     attachment_declarations: list[AttachmentDeclarationPayload]
     unit_points: list[RosterUnitPointValuePayload]
@@ -202,6 +206,7 @@ class ArmyDefinitionPayload(TypedDict):
     source_package_id: str
     ruleset_id: RulesetIdPayload
     detachment_selection: DetachmentSelectionPayload
+    force_disposition_id: str
     units: list[UnitInstancePayload]
     attached_units: list[AttachedUnitFormationPayload]
     unit_points: list[RosterUnitPointValuePayload]
@@ -627,6 +632,7 @@ class ArmyMusterRequest:
     source_package_id: str
     ruleset_id: RulesetId
     detachment_selection: DetachmentSelection
+    force_disposition_id: str
     unit_selections: tuple[UnitMusterSelection, ...]
     attachment_declarations: tuple[AttachmentDeclaration, ...] = ()
     unit_points: tuple[RosterUnitPointValue, ...] = ()
@@ -670,6 +676,15 @@ class ArmyMusterRequest:
             raise ArmyMusteringError(
                 "ArmyMusterRequest detachment_selection must be a DetachmentSelection."
             )
+        object.__setattr__(
+            self,
+            "force_disposition_id",
+            _validate_unprefixed_identifier(
+                "ArmyMusterRequest force_disposition_id",
+                self.force_disposition_id,
+                "force-disposition:",
+            ),
+        )
         unit_selections = _validate_unit_muster_selection_tuple(
             "ArmyMusterRequest unit_selections",
             self.unit_selections,
@@ -722,6 +737,7 @@ class ArmyMusterRequest:
             "source_package_id": self.source_package_id,
             "ruleset_id": self.ruleset_id.to_payload(),
             "detachment_selection": self.detachment_selection.to_payload(),
+            "force_disposition_id": self.force_disposition_id,
             "unit_selections": [selection.to_payload() for selection in self.unit_selections],
             "attachment_declarations": [
                 declaration.to_payload() for declaration in self.attachment_declarations
@@ -749,6 +765,7 @@ class ArmyMusterRequest:
             source_package_id=payload["source_package_id"],
             ruleset_id=_ruleset_id_from_payload(payload["ruleset_id"]),
             detachment_selection=DetachmentSelection.from_payload(payload["detachment_selection"]),
+            force_disposition_id=payload["force_disposition_id"],
             unit_selections=tuple(
                 UnitMusterSelection.from_payload(selection)
                 for selection in payload["unit_selections"]
@@ -786,6 +803,7 @@ class ArmyDefinition:
     source_package_id: str
     ruleset_id: RulesetId
     detachment_selection: DetachmentSelection
+    force_disposition_id: str
     units: tuple[UnitInstance, ...]
     attached_units: tuple[AttachedUnitFormation, ...] = ()
     unit_points: tuple[RosterUnitPointValue, ...] = ()
@@ -828,6 +846,15 @@ class ArmyDefinition:
             raise ArmyMusteringError(
                 "ArmyDefinition detachment_selection must be a DetachmentSelection."
             )
+        object.__setattr__(
+            self,
+            "force_disposition_id",
+            _validate_unprefixed_identifier(
+                "ArmyDefinition force_disposition_id",
+                self.force_disposition_id,
+                "force-disposition:",
+            ),
+        )
         units = _validate_unit_instance_tuple("ArmyDefinition units", self.units)
         _validate_unique_unit_instance_ids(units)
         _validate_unit_ids_scoped_to_army(army_id=self.army_id, units=units)
@@ -896,6 +923,7 @@ class ArmyDefinition:
             "source_package_id": self.source_package_id,
             "ruleset_id": self.ruleset_id.to_payload(),
             "detachment_selection": self.detachment_selection.to_payload(),
+            "force_disposition_id": self.force_disposition_id,
             "units": [unit.to_payload() for unit in self.units],
             "attached_units": [attached.to_payload() for attached in self.attached_units],
             "unit_points": [point.to_payload() for point in self.unit_points],
@@ -921,6 +949,7 @@ class ArmyDefinition:
             source_package_id=payload["source_package_id"],
             ruleset_id=_ruleset_id_from_payload(payload["ruleset_id"]),
             detachment_selection=DetachmentSelection.from_payload(payload["detachment_selection"]),
+            force_disposition_id=payload["force_disposition_id"],
             units=tuple(_unit_instance_from_payload(unit) for unit in payload["units"]),
             attached_units=tuple(
                 AttachedUnitFormation.from_payload(attached)
@@ -964,6 +993,12 @@ def muster_army(
         faction, _detachments = validate_detachment_selection(
             catalog=catalog,
             selection=request.detachment_selection,
+            battle_size=request.battle_size,
+        )
+        validate_force_disposition_selection(
+            catalog=catalog,
+            detachment_selection=request.detachment_selection,
+            force_disposition_id=request.force_disposition_id,
             battle_size=request.battle_size,
         )
     except ListValidationError as exc:
@@ -1024,6 +1059,7 @@ def muster_army(
         source_package_id=request.source_package_id,
         ruleset_id=request.ruleset_id,
         detachment_selection=request.detachment_selection,
+        force_disposition_id=request.force_disposition_id,
         units=resolved_units,
         attached_units=attached_units,
         unit_points=request.unit_points,
@@ -1050,6 +1086,12 @@ def validate_roster_legality(
         faction, detachments = validate_detachment_selection(
             catalog=catalog,
             selection=request.detachment_selection,
+            battle_size=request.battle_size,
+        )
+        validate_force_disposition_selection(
+            catalog=catalog,
+            detachment_selection=request.detachment_selection,
+            force_disposition_id=request.force_disposition_id,
             battle_size=request.battle_size,
         )
     except ListValidationError as exc:
