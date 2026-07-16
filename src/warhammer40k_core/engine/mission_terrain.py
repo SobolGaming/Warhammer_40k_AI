@@ -4,6 +4,7 @@ from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 
@@ -23,15 +24,9 @@ def terrain_feature_within_player_deployment_zone(
     )
     if not zones:
         raise GameLifecycleError("Deployment-zone terrain target check requires player zone.")
-    min_x, min_y, max_x, max_y = feature.bounds()
-    return all(
-        any(zone.contains_point(x, y) for zone in zones)
-        for x, y in (
-            (min_x, min_y),
-            (min_x, max_y),
-            (max_x, min_y),
-            (max_x, max_y),
-        )
+    return shapely_backend.deployment_zone_shapes_cover_bounds(
+        shapes=tuple(zone.shape for zone in zones),
+        bounds=feature.bounds(),
     )
 
 
@@ -60,15 +55,9 @@ def terrain_feature_within_player_territory(
     if len(territories) != 1:
         raise GameLifecycleError("Territory terrain target check requires one player territory.")
     territory = territories[0]
-    min_x, min_y, max_x, max_y = feature.bounds()
-    return all(
-        territory.contains_point(x, y)
-        for x, y in (
-            (min_x, min_y),
-            (min_x, max_y),
-            (max_x, min_y),
-            (max_x, max_y),
-        )
+    return shapely_backend.deployment_zone_shapes_cover_bounds(
+        shapes=(territory.shape,),
+        bounds=feature.bounds(),
     )
 
 

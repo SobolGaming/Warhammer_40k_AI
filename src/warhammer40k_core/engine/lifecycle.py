@@ -27,6 +27,7 @@ from warhammer40k_core.engine.attack_sequence import (
     is_destroyed_transport_disembark_proposal_request,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
@@ -3344,10 +3345,7 @@ def _validate_battlefield_state_consistency(
             "before DEPLOY_ARMIES."
         )
     try:
-        scenario = BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=state.battlefield_state,
-        )
+        scenario = battlefield_scenario_for_state(state=state)
         if _state_requires_deployed_battlefield_state(state):
             scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
         if config is not None and _state_requires_deployed_battlefield_state(state):

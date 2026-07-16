@@ -46,6 +46,7 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookRegistry,
     attack_sequence_completed_event_id,
 )
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -2112,10 +2113,7 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     if battlefield_state is None:
         raise GameLifecycleError("Fight phase requires battlefield_state.")
     try:
-        return BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=battlefield_state,
-        )
+        return battlefield_scenario_for_state(state=state)
     except PlacementError as exc:
         raise GameLifecycleError("Fight battlefield scenario is invalid.") from exc
 

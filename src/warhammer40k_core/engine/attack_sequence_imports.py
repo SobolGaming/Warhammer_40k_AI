@@ -111,6 +111,10 @@ from warhammer40k_core.engine.damage_allocation import (
     unit_by_id,
     unit_owner_player_id,
 )
+from warhammer40k_core.engine.damage_allocation_targets import (
+    DamageAllocationTargetState,
+    damage_allocation_target_state,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -274,6 +278,7 @@ __all__ = (
     "DEVASTATING_WOUNDS_RULE_ID",
     "DICE_REROLL_DECISION_TYPE",
     "DamageAllocationModelDecision",
+    "DamageAllocationTargetState",
     "DamageApplication",
     "DamageApplicationPayload",
     "DamageKind",
@@ -411,6 +416,7 @@ __all__ = (
     "canonical_json",
     "cast",
     "continue_mortal_wound_application",
+    "damage_allocation_target_state",
     "damage_kind_from_token",
     "dataclass",
     "devastating_wounds_resolution",

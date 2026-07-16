@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -653,10 +654,7 @@ def _battlefield_scenario_for_stratagem(state: GameState) -> BattlefieldScenario
     if battlefield_state is None:
         raise GameLifecycleError("Stratagem battlefield scenario requires battlefield_state.")
     try:
-        return BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=battlefield_state,
-        )
+        return battlefield_scenario_for_state(state=state)
     except PlacementError as exc:
         raise GameLifecycleError("Stratagem battlefield scenario is invalid.") from exc
 
@@ -766,10 +764,7 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Stratagem placement requires battlefield_state.")
-    return BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=battlefield_state,
-    )
+    return battlefield_scenario_for_state(state=state)
 
 
 def _proposal_from_request_payload(payload: JsonValue) -> StratagemTargetProposal | None:

@@ -66,12 +66,13 @@ def geometry_models_for_fight_unit_placement(
         model = model_by_id.get(placement.model_instance_id)
         if model is None:
             continue
-        if state is None and not model.is_alive:
-            continue
-        if state is not None and not model_is_present_on_battlefield(
+        scenario_presence = scenario.model_is_present_on_battlefield(model.model_instance_id)
+        if state is not None and scenario_presence != model_is_present_on_battlefield(
             state=state,
             model_instance_id=model.model_instance_id,
         ):
+            raise GameLifecycleError("Fight geometry battlefield presence snapshot drift.")
+        if not scenario_presence:
             continue
         models.append(geometry_model_for_placement(model=model, placement=placement))
     return tuple(models)

@@ -26,6 +26,28 @@ if TYPE_CHECKING:
 FIGHT_ON_DEATH_AWAITING_EFFECT_KIND = "fight_on_death_awaiting_attack"
 
 
+def fight_on_death_model_ids_awaiting_attack(*, state: GameState) -> tuple[str, ...]:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Fight On Death presence snapshot requires battlefield_state.")
+    model_ids = tuple(
+        sorted(
+            _awaiting_effect_model_id(effect)
+            for effect in state.persisting_effects
+            if _is_fight_on_death_awaiting_effect(effect)
+        )
+    )
+    if len(set(model_ids)) != len(model_ids):
+        raise GameLifecycleError("Fight On Death model has duplicate awaiting effects.")
+    for model_id in model_ids:
+        model, _unit = _model_and_unit_by_id(state=state, model_instance_id=model_id)
+        if model.is_alive:
+            raise GameLifecycleError("Fight On Death awaiting model cannot be alive.")
+        if battlefield.model_placement_or_none(model_id) is None:
+            raise GameLifecycleError("Fight On Death awaiting model placement is missing.")
+    return model_ids
+
+
 def model_is_present_on_battlefield(
     *,
     state: GameState,

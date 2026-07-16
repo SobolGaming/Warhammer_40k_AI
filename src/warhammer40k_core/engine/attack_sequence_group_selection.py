@@ -1243,6 +1243,27 @@ def _resolve_grouped_current_pool(
     if attack_sequence.generated_hit_index != 0 or attack_sequence.current_hit_roll is not None:
         raise GameLifecycleError("Pooled attack resolution cannot start with generated hit state.")
     pool = attack_sequence.current_pool()
+    allocation_target_state = damage_allocation_target_state(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+    )
+    if allocation_target_state is DamageAllocationTargetState.PRESENT_WITHOUT_LIVING_MODELS:
+        decisions.event_log.append(
+            "attack_pool_not_allocated",
+            {
+                "sequence_id": attack_sequence.sequence_id,
+                "pool_index": attack_sequence.pool_index,
+                "target_unit_instance_id": pool.target_unit_instance_id,
+                "reason": "target_present_without_living_models",
+            },
+        )
+        return (
+            _advance_after_current_pool(attack_sequence=attack_sequence),
+            allocated_model_ids,
+            None,
+        )
+    if allocation_target_state is DamageAllocationTargetState.ABSENT:
+        raise GameLifecycleError("Pooled attack target is absent from the battlefield.")
     allocation_context = allocation_context_for_unit(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,

@@ -2119,6 +2119,7 @@ def _scenario_with_unit_placement(
     return BattlefieldScenario(
         armies=scenario.armies,
         battlefield_state=scenario.battlefield_state.with_unit_placement(placement),
+        present_destroyed_model_ids=scenario.present_destroyed_model_ids,
     )
 
 

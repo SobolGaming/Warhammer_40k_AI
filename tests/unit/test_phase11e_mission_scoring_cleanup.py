@@ -15,6 +15,10 @@ from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
+from warhammer40k_core.core.deployment_zones import (
+    DeploymentZoneCircleCutout,
+    DeploymentZoneShape,
+)
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -2866,6 +2870,100 @@ def test_plunder_excludes_terrain_area_in_player_territory_outside_deployment_zo
     )
 
     assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+
+
+def test_plunder_territory_containment_rejects_footprint_crossing_cutout() -> None:
+    mission_setup = _event_companion_mission_setup_with_scoring_terrain_feature()
+    feature = _terrain_feature_by_id(mission_setup, SCORING_TERRAIN_FEATURE_ID)
+    territory = next(
+        region
+        for region in mission_setup.battlefield_regions
+        if region.region_kind is BattlefieldRegionKind.TERRITORY and region.owner_role == "attacker"
+    )
+    shape = DeploymentZoneShape(
+        polygons=DeploymentZoneShape.rectangle(
+            min_x=20.0,
+            min_y=10.0,
+            max_x=40.0,
+            max_y=30.0,
+        ).polygons,
+        cutouts=(
+            DeploymentZoneCircleCutout(
+                center_x=feature.footprint_center_x_inches,
+                center_y=feature.footprint_center_y_inches,
+                radius=1.0,
+            ),
+        ),
+    )
+    mission_setup = replace(
+        mission_setup,
+        battlefield_regions=tuple(
+            replace(region, shape=shape) if region.region_id == territory.region_id else region
+            for region in mission_setup.battlefield_regions
+        ),
+    )
+    min_x, min_y, max_x, max_y = feature.bounds()
+
+    assert all(
+        shape.contains_point(x, y)
+        for x, y in (
+            (min_x, min_y),
+            (min_x, max_y),
+            (max_x, min_y),
+            (max_x, max_y),
+        )
+    )
+    assert not terrain_feature_within_player_territory(
+        feature,
+        mission_setup=mission_setup,
+        player_id="player-a",
+    )
+
+
+def test_plunder_territory_containment_rejects_footprint_crossing_polygon_gap() -> None:
+    mission_setup = _event_companion_mission_setup_with_scoring_terrain_feature()
+    feature = _terrain_feature_by_id(mission_setup, SCORING_TERRAIN_FEATURE_ID)
+    territory = next(
+        region
+        for region in mission_setup.battlefield_regions
+        if region.region_kind is BattlefieldRegionKind.TERRITORY and region.owner_role == "attacker"
+    )
+    left = DeploymentZoneShape.rectangle(
+        min_x=20.0,
+        min_y=10.0,
+        max_x=28.0,
+        max_y=30.0,
+    )
+    right = DeploymentZoneShape.rectangle(
+        min_x=32.0,
+        min_y=10.0,
+        max_x=40.0,
+        max_y=30.0,
+    )
+    shape = DeploymentZoneShape(polygons=(*left.polygons, *right.polygons))
+    mission_setup = replace(
+        mission_setup,
+        battlefield_regions=tuple(
+            replace(region, shape=shape) if region.region_id == territory.region_id else region
+            for region in mission_setup.battlefield_regions
+        ),
+    )
+    min_x, min_y, max_x, max_y = feature.bounds()
+
+    assert all(
+        shape.contains_point(x, y)
+        for x, y in (
+            (min_x, min_y),
+            (min_x, max_y),
+            (max_x, min_y),
+            (max_x, max_y),
+        )
+    )
+    assert not terrain_feature_within_player_territory(
+        feature,
+        mission_setup=mission_setup,
+        player_id="player-a",
+    )
 
 
 def test_terrain_area_membership_queries_fail_fast_on_missing_source_context() -> None:

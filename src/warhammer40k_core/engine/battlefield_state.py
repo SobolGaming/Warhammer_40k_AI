@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import hashlib
-import json
 import math
 from dataclasses import dataclass
 from enum import StrEnum
@@ -13,6 +11,13 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyDefinitionPayload,
     ArmyMusteringError,
 )
+from warhammer40k_core.engine.placement_errors import PlacementError as PlacementError
+from warhammer40k_core.engine.spatial_index_state import (
+    SpatialIndexState as SpatialIndexState,
+)
+from warhammer40k_core.engine.spatial_index_state import (
+    SpatialIndexStatePayload as SpatialIndexStatePayload,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pathing import PathWitness, PathWitnessPayload
 from warhammer40k_core.geometry.pose import Pose, PosePayload
@@ -20,14 +25,9 @@ from warhammer40k_core.geometry.spatial_index import SpatialIndex
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
     TerrainFeatureDefinitionPayload,
-    TerrainFeatureRulesGeometryPayload,
 )
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.geometry.volume import ModelVolume
-
-
-class PlacementError(ValueError):
-    """Raised when battlefield placement violates CORE V2 invariants."""
 
 
 class ModelDisplacementKind(StrEnum):
@@ -98,15 +98,6 @@ class BattlefieldTransitionBatchPayload(TypedDict):
     displacements: list[ModelDisplacementRecordPayload]
 
 
-class SpatialIndexStatePayload(TypedDict):
-    terrain_revision: int
-    model_blocker_revision: int
-    terrain_feature_ids: list[str]
-    terrain_volume_ids: list[str]
-    los_cache_key: str
-    pathing_cache_key: str
-
-
 class ModelPlacementPayload(TypedDict):
     army_id: str
     player_id: str
@@ -140,140 +131,7 @@ class BattlefieldRuntimeStatePayload(TypedDict):
 class BattlefieldScenarioPayload(TypedDict):
     armies: list[ArmyDefinitionPayload]
     battlefield_state: BattlefieldRuntimeStatePayload
-
-
-@dataclass(frozen=True, slots=True)
-class SpatialIndexState:
-    terrain_revision: int = 0
-    model_blocker_revision: int = 0
-    terrain_feature_ids: tuple[str, ...] = ()
-    terrain_volume_ids: tuple[str, ...] = ()
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "terrain_revision",
-            _validate_non_negative_int(
-                "SpatialIndexState terrain_revision",
-                self.terrain_revision,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "model_blocker_revision",
-            _validate_non_negative_int(
-                "SpatialIndexState model_blocker_revision",
-                self.model_blocker_revision,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "terrain_feature_ids",
-            _validate_identifier_tuple(
-                "SpatialIndexState terrain_feature_ids",
-                self.terrain_feature_ids,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "terrain_volume_ids",
-            _validate_identifier_tuple(
-                "SpatialIndexState terrain_volume_ids",
-                self.terrain_volume_ids,
-            ),
-        )
-
-    @classmethod
-    def empty(cls) -> Self:
-        return cls()
-
-    @classmethod
-    def from_terrain_features(
-        cls,
-        features: tuple[TerrainFeatureDefinition, ...],
-        *,
-        model_blocker_revision: int = 0,
-    ) -> Self:
-        terrain_features = _validate_terrain_feature_tuple(
-            "SpatialIndexState features",
-            features,
-        )
-        return cls(
-            terrain_revision=_terrain_revision_for_features(terrain_features),
-            model_blocker_revision=model_blocker_revision,
-            terrain_feature_ids=tuple(feature.feature_id for feature in terrain_features),
-            terrain_volume_ids=tuple(
-                volume.terrain_id
-                for feature in terrain_features
-                for volume in feature.terrain_volumes()
-            ),
-        )
-
-    def los_cache_key(self) -> str:
-        return _spatial_cache_key(
-            "los",
-            terrain_revision=self.terrain_revision,
-            model_blocker_revision=self.model_blocker_revision,
-            terrain_feature_ids=self.terrain_feature_ids,
-            terrain_volume_ids=self.terrain_volume_ids,
-        )
-
-    def pathing_cache_key(self) -> str:
-        return _spatial_cache_key(
-            "pathing",
-            terrain_revision=self.terrain_revision,
-            model_blocker_revision=self.model_blocker_revision,
-            terrain_feature_ids=self.terrain_feature_ids,
-            terrain_volume_ids=self.terrain_volume_ids,
-        )
-
-    def rebuild_spatial_index(
-        self,
-        features: tuple[TerrainFeatureDefinition, ...],
-    ) -> SpatialIndex:
-        expected_state = type(self).from_terrain_features(
-            features,
-            model_blocker_revision=self.model_blocker_revision,
-        )
-        if expected_state != self:
-            raise PlacementError("SpatialIndexState does not match the supplied terrain features.")
-        return SpatialIndex(
-            terrain=tuple(
-                volume
-                for feature in _validate_terrain_feature_tuple(
-                    "SpatialIndexState features",
-                    features,
-                )
-                for volume in feature.terrain_volumes()
-            ),
-            generation=self.terrain_revision,
-        )
-
-    def to_payload(self) -> SpatialIndexStatePayload:
-        return {
-            "terrain_revision": self.terrain_revision,
-            "model_blocker_revision": self.model_blocker_revision,
-            "terrain_feature_ids": list(self.terrain_feature_ids),
-            "terrain_volume_ids": list(self.terrain_volume_ids),
-            "los_cache_key": self.los_cache_key(),
-            "pathing_cache_key": self.pathing_cache_key(),
-        }
-
-    @classmethod
-    def from_payload(cls, payload: SpatialIndexStatePayload) -> Self:
-        state = cls(
-            terrain_revision=payload["terrain_revision"],
-            model_blocker_revision=payload["model_blocker_revision"],
-            terrain_feature_ids=tuple(payload["terrain_feature_ids"]),
-            terrain_volume_ids=tuple(payload["terrain_volume_ids"]),
-        )
-        if payload["los_cache_key"] != state.los_cache_key():
-            raise PlacementError("SpatialIndexState los_cache_key does not match payload state.")
-        if payload["pathing_cache_key"] != state.pathing_cache_key():
-            raise PlacementError(
-                "SpatialIndexState pathing_cache_key does not match payload state."
-            )
-        return state
+    present_destroyed_model_ids: list[str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -1189,6 +1047,7 @@ class BattlefieldRuntimeState:
 class BattlefieldScenario:
     armies: tuple[ArmyDefinition, ...]
     battlefield_state: BattlefieldRuntimeState
+    present_destroyed_model_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         armies = _validate_army_definitions("BattlefieldScenario armies", self.armies)
@@ -1200,7 +1059,37 @@ class BattlefieldScenario:
             battlefield_state=self.battlefield_state,
             armies=armies,
         )
+        present_destroyed_model_ids = _validate_identifier_tuple(
+            "BattlefieldScenario present_destroyed_model_ids",
+            self.present_destroyed_model_ids,
+        )
+        placed_model_ids = set(self.battlefield_state.placed_model_ids())
+        models_by_id = {
+            model.model_instance_id: model
+            for army in armies
+            for unit in army.units
+            for model in unit.own_models
+        }
+        for model_id in present_destroyed_model_ids:
+            model = models_by_id.get(model_id)
+            if model is None:
+                raise PlacementError(
+                    "BattlefieldScenario present destroyed model ID was not found."
+                )
+            if model.is_alive:
+                raise PlacementError(
+                    "BattlefieldScenario present destroyed model must not be alive."
+                )
+            if model_id not in placed_model_ids:
+                raise PlacementError(
+                    "BattlefieldScenario present destroyed model must have a placement."
+                )
         object.__setattr__(self, "armies", armies)
+        object.__setattr__(
+            self,
+            "present_destroyed_model_ids",
+            present_destroyed_model_ids,
+        )
 
     def army_by_id(self, army_id: str) -> ArmyDefinition:
         requested_id = _validate_unprefixed_identifier("army_id", army_id, "army:")
@@ -1229,6 +1118,24 @@ class BattlefieldScenario:
                 return model
         raise PlacementError("BattlefieldScenario model_instance_id was not found.")
 
+    def model_is_present_on_battlefield(self, model_instance_id: str) -> bool:
+        requested_id = _validate_identifier("model_instance_id", model_instance_id)
+        placement = self.battlefield_state.model_placement_or_none(requested_id)
+        if placement is None:
+            return False
+        return self.model_is_present_at_placement(placement)
+
+    def model_is_present_at_placement(self, placement: ModelPlacement) -> bool:
+        if type(placement) is not ModelPlacement:
+            raise PlacementError("BattlefieldScenario presence query requires a ModelPlacement.")
+        model = self.model_instance_for_placement(placement)
+        if model.is_alive:
+            return True
+        current_placement = self.battlefield_state.model_placement_or_none(model.model_instance_id)
+        return current_placement == placement and model.model_instance_id in set(
+            self.present_destroyed_model_ids
+        )
+
     def placed_geometry_models(self) -> tuple[GeometryModel, ...]:
         return tuple(
             geometry_model_for_placement(
@@ -1238,6 +1145,7 @@ class BattlefieldScenario:
             for placed_army in self.battlefield_state.placed_armies
             for unit_placement in placed_army.unit_placements
             for model_placement in unit_placement.model_placements
+            if self.model_is_present_at_placement(model_placement)
         )
 
     def spatial_index(self) -> SpatialIndex:
@@ -1301,6 +1209,7 @@ class BattlefieldScenario:
         return {
             "armies": [army.to_payload() for army in self.armies],
             "battlefield_state": self.battlefield_state.to_payload(),
+            "present_destroyed_model_ids": list(self.present_destroyed_model_ids),
         }
 
     @classmethod
@@ -1308,6 +1217,7 @@ class BattlefieldScenario:
         return cls(
             armies=tuple(_army_definition_from_payload(army) for army in payload["armies"]),
             battlefield_state=BattlefieldRuntimeState.from_payload(payload["battlefield_state"]),
+            present_destroyed_model_ids=tuple(payload["present_destroyed_model_ids"]),
         )
 
 
@@ -1575,14 +1485,6 @@ def _validate_no_duplicate_placed_models(placed_armies: tuple[PlacedArmy, ...]) 
             seen.add(model_id)
 
 
-def _validate_non_negative_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise PlacementError(f"{field_name} must be an integer.")
-    if value < 0:
-        raise PlacementError(f"{field_name} must not be negative.")
-    return value
-
-
 def _validate_positive_number(field_name: str, value: object) -> float:
     if not isinstance(value, int | float) or type(value) is bool:
         raise PlacementError(f"{field_name} must be a number.")
@@ -1642,49 +1544,6 @@ def _validate_terrain_features_within_battlefield(
             raise PlacementError(
                 "BattlefieldRuntimeState terrain feature y is outside the battlefield."
             )
-
-
-def _terrain_revision_for_features(features: tuple[TerrainFeatureDefinition, ...]) -> int:
-    if not features:
-        return 0
-    payloads: list[TerrainFeatureRulesGeometryPayload] = [
-        feature.to_rules_geometry_payload()
-        for feature in _validate_terrain_feature_tuple(
-            "SpatialIndexState features",
-            features,
-        )
-    ]
-    encoded = json.dumps(
-        payloads,
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=True,
-    ).encode("utf-8")
-    return int(hashlib.sha256(encoded).hexdigest()[:16], 16)
-
-
-def _spatial_cache_key(
-    namespace: str,
-    *,
-    terrain_revision: int,
-    model_blocker_revision: int,
-    terrain_feature_ids: tuple[str, ...],
-    terrain_volume_ids: tuple[str, ...],
-) -> str:
-    cache_payload = {
-        "namespace": namespace,
-        "terrain_revision": terrain_revision,
-        "model_blocker_revision": model_blocker_revision,
-        "terrain_feature_ids": list(terrain_feature_ids),
-        "terrain_volume_ids": list(terrain_volume_ids),
-    }
-    encoded = json.dumps(
-        cache_payload,
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=True,
-    ).encode("utf-8")
-    return f"{namespace}:{hashlib.sha256(encoded).hexdigest()[:16]}"
 
 
 def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str) -> str:

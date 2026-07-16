@@ -530,7 +530,7 @@ def unit_placement_coherency_result(
     models: list[Model] = []
     for placement in unit_placement.model_placements:
         model_instance = scenario.model_instance_for_placement(placement)
-        if model_instance.is_alive:
+        if scenario.model_is_present_at_placement(placement):
             models.append(geometry_model_for_placement(model=model_instance, placement=placement))
     return context.validate_models(tuple(models))
 
