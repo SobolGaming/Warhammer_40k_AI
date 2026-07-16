@@ -122,7 +122,7 @@ def geometry_models_for_unit_placement(
     geometry_models: list[Model] = []
     for model_placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(model_placement)
-        if not model.is_alive:
+        if not scenario.model_is_present_on_battlefield(model_placement.model_instance_id):
             continue
         geometry_models.append(geometry_model_for_placement(model=model, placement=model_placement))
     return tuple(geometry_models)

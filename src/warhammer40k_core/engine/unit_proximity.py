@@ -6,6 +6,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -59,7 +60,10 @@ def _unit_geometry_models(
             placement=model_placement,
         )
         for model_placement in unit_placement.model_placements
-        if scenario.model_instance_for_placement(model_placement).is_alive
+        if model_is_present_on_battlefield(
+            state=state,
+            model_instance_id=model_placement.model_instance_id,
+        )
     )
 
 

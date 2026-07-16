@@ -74,15 +74,29 @@ class RulesUnitView:
 
     @property
     def keywords(self) -> tuple[str, ...]:
-        keywords = {keyword for component in self.components for keyword in component.unit.keywords}
+        keywords = {
+            keyword
+            for component in self.keyword_contributing_components
+            for keyword in component.unit.keywords
+        }
         return tuple(sorted(keywords))
 
     @property
     def faction_keywords(self) -> tuple[str, ...]:
         keywords = {
-            keyword for component in self.components for keyword in component.unit.faction_keywords
+            keyword
+            for component in self.keyword_contributing_components
+            for keyword in component.unit.faction_keywords
         }
         return tuple(sorted(keywords))
+
+    @property
+    def keyword_contributing_components(self) -> tuple[RulesUnitComponent, ...]:
+        return tuple(
+            component
+            for component in self.components
+            if any(model.is_alive for model in component.unit.own_models)
+        )
 
     @property
     def is_attached_rules_unit(self) -> bool:

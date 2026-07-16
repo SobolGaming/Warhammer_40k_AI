@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Protocol, cast
 from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose, validate_point3
 
 if TYPE_CHECKING:
-    from warhammer40k_core.core.deployment_zones import DeploymentZone
+    from warhammer40k_core.core.deployment_zones import DeploymentZone, DeploymentZoneShape
     from warhammer40k_core.geometry.base import BaseShape
     from warhammer40k_core.geometry.terrain import TerrainVolume
     from warhammer40k_core.geometry.volume import Model
@@ -134,12 +134,15 @@ def footprint_for_terrain(terrain: TerrainVolume) -> _Geometry:
 
 def footprint_for_deployment_zone(deployment_zone: DeploymentZone) -> _Geometry:
     valid_zone = _validate_deployment_zone("deployment_zone", deployment_zone)
+    return footprint_for_deployment_zone_shape(valid_zone.shape)
+
+
+def footprint_for_deployment_zone_shape(shape: DeploymentZoneShape) -> _Geometry:
+    valid_shape = _validate_deployment_zone_shape("shape", shape)
     zone_parts = tuple(
-        _deployment_zone_polygon_footprint(polygon) for polygon in valid_zone.shape.polygons
+        _deployment_zone_polygon_footprint(polygon) for polygon in valid_shape.polygons
     )
-    cutouts = tuple(
-        _deployment_zone_cutout_footprint(cutout) for cutout in valid_zone.shape.cutouts
-    )
+    cutouts = tuple(_deployment_zone_cutout_footprint(cutout) for cutout in valid_shape.cutouts)
     adjusted_parts: list[_Geometry] = []
     for zone_part in zone_parts:
         adjusted_part = zone_part
@@ -150,6 +153,22 @@ def footprint_for_deployment_zone(deployment_zone: DeploymentZone) -> _Geometry:
     for adjusted_part in adjusted_parts[1:]:
         zone_footprint = zone_footprint.union(adjusted_part)
     return zone_footprint
+
+
+def deployment_zone_shapes_cover_bounds(
+    *,
+    shapes: tuple[DeploymentZoneShape, ...],
+    bounds: tuple[float, float, float, float],
+) -> bool:
+    if type(shapes) is not tuple or not shapes:
+        raise GeometryError("deployment-zone shapes must be a non-empty tuple.")
+    zone_footprint = footprint_for_deployment_zone_shape(shapes[0])
+    for shape in shapes[1:]:
+        zone_footprint = zone_footprint.union(footprint_for_deployment_zone_shape(shape))
+    min_x, min_y, max_x, max_y = bounds
+    if min_x >= max_x or min_y >= max_y:
+        raise GeometryError("covered bounds must have positive width and depth.")
+    return zone_footprint.covers(_box(min_x, min_y, max_x, max_y))
 
 
 def base_footprint_within_bounds(
@@ -401,6 +420,17 @@ def _validate_deployment_zone(field_name: str, value: object) -> DeploymentZone:
 
     if type(value) is not DeploymentZone:
         raise GeometryError(f"{field_name} must be a DeploymentZone.")
+    return value
+
+
+def _validate_deployment_zone_shape(
+    field_name: str,
+    value: object,
+) -> DeploymentZoneShape:
+    from warhammer40k_core.core.deployment_zones import DeploymentZoneShape
+
+    if type(value) is not DeploymentZoneShape:
+        raise GeometryError(f"{field_name} must be a DeploymentZoneShape.")
     return value
 
 

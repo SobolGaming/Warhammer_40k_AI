@@ -111,6 +111,10 @@ from warhammer40k_core.engine.damage_allocation import (
     unit_by_id,
     unit_owner_player_id,
 )
+from warhammer40k_core.engine.damage_allocation_targets import (
+    DamageAllocationTargetState,
+    damage_allocation_target_state,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -120,6 +124,9 @@ from warhammer40k_core.engine.event_log import (
     JsonValue,
     canonical_json,
     validate_json_value,
+)
+from warhammer40k_core.engine.fight_on_death import (
+    restore_selected_model_awaiting_fight_on_death,
 )
 from warhammer40k_core.engine.hazard import (
     hazard_mortal_wounds_per_failed_roll,
@@ -271,6 +278,7 @@ __all__ = (
     "DEVASTATING_WOUNDS_RULE_ID",
     "DICE_REROLL_DECISION_TYPE",
     "DamageAllocationModelDecision",
+    "DamageAllocationTargetState",
     "DamageApplication",
     "DamageApplicationPayload",
     "DamageKind",
@@ -408,6 +416,7 @@ __all__ = (
     "canonical_json",
     "cast",
     "continue_mortal_wound_application",
+    "damage_allocation_target_state",
     "damage_kind_from_token",
     "dataclass",
     "devastating_wounds_resolution",
@@ -432,6 +441,7 @@ __all__ = (
     "resolve_feel_no_pain_rolls",
     "resolve_mortal_wound_feel_no_pain_decision",
     "resolve_saving_throw",
+    "restore_selected_model_awaiting_fight_on_death",
     "rules_unit_view_by_id",
     "save_options_for_model",
     "saving_throw_roll_spec",

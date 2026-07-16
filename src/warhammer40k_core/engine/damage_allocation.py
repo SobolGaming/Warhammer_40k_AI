@@ -14,6 +14,15 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import PlacementError
+from warhammer40k_core.engine.damage_allocation_targets import (
+    DamageKind as DamageKind,
+)
+from warhammer40k_core.engine.damage_allocation_targets import (
+    allocatable_rules_unit,
+)
+from warhammer40k_core.engine.damage_allocation_targets import (
+    damage_kind_from_token as damage_kind_from_token,
+)
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -44,11 +53,6 @@ class FeelNoPainAttackCondition(StrEnum):
 
 
 DECLINE_DESTRUCTION_REACTION_OPTION_ID = "decline_destruction_reaction"
-
-
-class DamageKind(StrEnum):
-    NORMAL = "normal"
-    MORTAL = "mortal"
 
 
 class DestructionReactionKind(StrEnum):
@@ -1727,17 +1731,6 @@ class DestructionReactionDecision:
         }
 
 
-def damage_kind_from_token(token: object) -> DamageKind:
-    if type(token) is DamageKind:
-        return token
-    if type(token) is not str:
-        raise GameLifecycleError("DamageKind token must be a string.")
-    try:
-        return DamageKind(token)
-    except ValueError as exc:
-        raise GameLifecycleError(f"Unsupported DamageKind token: {token}.") from exc
-
-
 def allocation_group_role_from_token(token: object) -> AllocationGroupRole:
     if type(token) is AllocationGroupRole:
         return token
@@ -1782,7 +1775,7 @@ def allocation_context_for_unit(
     already_allocated_model_ids: tuple[str, ...] = (),
     attacker_constraint: AttackAllocationConstraint | None = None,
 ) -> AttackAllocationRuleContext:
-    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
+    rules_unit = allocatable_rules_unit(state=state, unit_id=target_unit_instance_id)
     alive_models = alive_placed_models_for_rules_unit(state=state, rules_unit=rules_unit)
     bodyguard_model_ids, character_model_ids = _rules_unit_model_roles(
         state=state,

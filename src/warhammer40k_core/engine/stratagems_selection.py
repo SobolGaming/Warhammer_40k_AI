@@ -268,6 +268,7 @@ def _stratagem_unavailable_reason(
     source_decision_request_id: str | None = None,
     source_decision_result_id: str | None = None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
+    ignore_command_point_affordability: bool = False,
 ) -> str | None:
     if state.stage is not GameLifecycleStage.BATTLE:
         return "not_battle_stage"
@@ -298,7 +299,10 @@ def _stratagem_unavailable_reason(
         source_decision_result_id=source_decision_result_id,
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
-    if state.command_point_total(context.player_id) < command_point_cost:
+    if (
+        not ignore_command_point_affordability
+        and state.command_point_total(context.player_id) < command_point_cost
+    ):
         return "insufficient_command_points"
     if not _detachment_gate_allows(state=state, record=record, player_id=context.player_id):
         return "detachment_gate_closed"

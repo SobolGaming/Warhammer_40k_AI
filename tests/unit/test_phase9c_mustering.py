@@ -1610,6 +1610,68 @@ def test_rules_unit_view_resolves_physical_and_mustered_attached_units() -> None
     assert physical_view.character_model_ids(physical_view.alive_models()) == ()
 
 
+def test_destroyed_models_stop_contributing_unit_keywords() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(unit_selection_id="bodyguard-unit"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+    army = muster_army(catalog=catalog, request=request)
+    leader = army.unit_by_id("army-alpha:leader-unit")
+    leader = replace(
+        leader,
+        keywords=(*leader.keywords, "Leader Exclusive"),
+        faction_keywords=(*leader.faction_keywords, "Leader Faction Exclusive"),
+        own_models=tuple(replace(model, wounds_remaining=0) for model in leader.own_models),
+    )
+    army_with_destroyed_leader = replace(
+        army,
+        units=tuple(
+            leader if unit.unit_instance_id == leader.unit_instance_id else unit
+            for unit in army.units
+        ),
+    )
+
+    surviving_bodyguard_view = rules_unit_view_from_armies(
+        armies=(army_with_destroyed_leader,),
+        unit_instance_id="army-alpha:bodyguard-unit",
+    )
+    fully_destroyed_army = replace(
+        army_with_destroyed_leader,
+        units=tuple(
+            replace(
+                unit,
+                own_models=tuple(replace(model, wounds_remaining=0) for model in unit.own_models),
+            )
+            for unit in army_with_destroyed_leader.units
+        ),
+    )
+    fully_destroyed_view = rules_unit_view_from_armies(
+        armies=(fully_destroyed_army,),
+        unit_instance_id="army-alpha:bodyguard-unit",
+    )
+
+    assert "LEADER EXCLUSIVE" not in surviving_bodyguard_view.keywords
+    assert "LEADER FACTION EXCLUSIVE" not in surviving_bodyguard_view.faction_keywords
+    assert "INFANTRY" in surviving_bodyguard_view.keywords
+    assert fully_destroyed_view.keywords == ()
+    assert fully_destroyed_view.faction_keywords == ()
+
+
 def test_rules_unit_projection_value_objects_fail_fast() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     army = muster_army(catalog=catalog, request=_muster_request(catalog))
@@ -3539,6 +3601,49 @@ def test_phase16d_upgrade_and_leader_enhancement_cannot_stack_on_attached_squad(
     }
 
     assert "attached_squad_enhancement_limit_exceeded" in codes
+
+
+def test_phase16d_attached_unit_can_receive_one_upgrade_enhancement() -> None:
+    catalog = _phase16d_catalog(upgrade_enhancement=True)
+    request = _phase16d_transport_roster_request(
+        catalog,
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="core-upgrade",
+                target_unit_selection_id="bodyguard-unit",
+                source_id="assignment:bodyguard",
+            ),
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+    army = muster_army(catalog=catalog, request=request)
+
+    assert report.is_legal
+    assert army.enhancement_assignments == request.enhancement_assignments
+    assert len(army.attached_units) == 1
+
+
+def test_phase16d_epic_hero_can_attach_to_unit_with_upgrade_enhancement() -> None:
+    catalog = _phase16d_catalog(upgrade_enhancement=True, epic_leader=True)
+    request = _phase16d_transport_roster_request(
+        catalog,
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="core-upgrade",
+                target_unit_selection_id="bodyguard-unit",
+                source_id="assignment:bodyguard",
+            ),
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+    army = muster_army(catalog=catalog, request=request)
+    leader = army.unit_by_id("army-alpha:leader-unit")
+
+    assert report.is_legal
+    assert "EPIC HERO" in leader.keywords
+    assert army.attached_units[0].leader_unit_instance_ids == (leader.unit_instance_id,)
 
 
 def test_phase16d_transport_manifest_validates_capacity_and_attached_group_completeness() -> None:
