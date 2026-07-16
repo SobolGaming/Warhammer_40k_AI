@@ -58,7 +58,14 @@
             "model_count": 1
           }
         ],
-        "wargear_selections": [],
+        "wargear_selections": [
+          {
+            "option_id": "000001120:equipment-choice:option-1",
+            "model_profile_id": "000001120:lord-of-change",
+            "wargear_ids": [],
+            "selection_count": 0
+          }
+        ],
         "mustering_option_selections": []
       },
       "declared_points": 300
@@ -73,7 +80,14 @@
             "model_count": 1
           }
         ],
-        "wargear_selections": [],
+        "wargear_selections": [
+          {
+            "option_id": "000001120:equipment-choice:option-1",
+            "model_profile_id": "000001120:lord-of-change",
+            "wargear_ids": [],
+            "selection_count": 0
+          }
+        ],
         "mustering_option_selections": []
       },
       "declared_points": 300

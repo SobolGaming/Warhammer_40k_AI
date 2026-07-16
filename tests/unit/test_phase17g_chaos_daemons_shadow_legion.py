@@ -46,7 +46,6 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
     EnhancementAssignment,
-    RosterUnitPointValue,
     WarlordSelection,
     muster_army,
     validate_roster_legality,
@@ -132,6 +131,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
     ReserveStatus,
 )
+from warhammer40k_core.engine.roster_points import RosterUnitPointValue
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,

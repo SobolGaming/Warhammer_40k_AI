@@ -41,7 +41,6 @@ from warhammer40k_core.engine.army_mustering import (
     DedicatedTransportManifest,
     EnhancementAssignment,
     RosterLegalityReport,
-    RosterUnitPointValue,
     WarlordSelection,
     muster_army,
     validate_roster_legality,
@@ -72,6 +71,7 @@ from warhammer40k_core.engine.list_validation_errors import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError, SetupStep
+from warhammer40k_core.engine.roster_points import RosterUnitPointValue
 from warhammer40k_core.engine.rules_units import (
     RulesUnitComponent,
     RulesUnitComponentRole,

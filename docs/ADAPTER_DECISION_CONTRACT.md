@@ -43,11 +43,17 @@ The artifact must carry a selected `force_disposition_id`, Battle Size,
 detachment selection, source IDs, declared points for every unit, declared
 total points, and the exact MFM package identity used to price it. The engine
 recalculates repeated-datasheet brackets, wargear, and Enhancement or Upgrade
-costs, rejects any per-unit or total drift, and populates source-backed
-`RosterUnitPointValue` records. During mustering, the engine rejects a Force
-Disposition not granted by one of the selected detachments. Adapters must not
-infer a default Force Disposition, accept stale point totals, or mutate an army
-from the artifact directly.
+costs, rejects any per-unit or total drift, and populates separate source-backed
+`RosterUnitPointValue` and `RosterEnhancementPointValue` records. The artifact
+`units` array order is authoritative for repeated-datasheet copy numbering; unit
+identifiers do not affect price brackets. `points_source_package_id` and both
+point-record families survive `ArmyMusterRequest` and `ArmyDefinition` payload
+round trips, and mustering rejects catalog Enhancement price drift instead of
+switching point authorities. An optional `game_result` is historical/training
+metadata and is omitted for an ordinary pre-game list. During mustering, the
+engine rejects a Force Disposition not granted by one of the selected
+detachments. Adapters must not infer a default Force Disposition, reorder units,
+accept stale point totals, or mutate an army from the artifact directly.
 
 ## Core Objects
 
@@ -60,9 +66,11 @@ The shared contract uses these objects and payloads:
   deltas, finite submissions, and parameterized payload submissions.
 - `PlayerArmyList`: versioned, fail-fast pre-session roster artifact containing
   normalized roster selections, one explicit Force Disposition, declared point
-  totals, and source/app provenance.
+  totals, deterministic pricing order, and source/app provenance; post-game
+  result metadata is optional.
 - `ArmyMusterRequest`: strict engine roster request produced from a validated
-  player army list and consumed by the shared setup lifecycle.
+  player army list and consumed by the shared setup lifecycle, including the
+  authoritative MFM package and unit plus Enhancement/Upgrade point ledger.
 - `DecisionRequest`: engine request for one player choice.
 - `FiniteOptionSubmission`: adapter wrapper for selecting one finite option.
 - `ParameterizedSubmission`: adapter wrapper for submitting JSON-safe proposal payloads.

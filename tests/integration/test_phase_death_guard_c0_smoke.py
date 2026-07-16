@@ -14,7 +14,6 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyDefinitionPayload,
     ArmyMusterRequest,
-    RosterUnitPointValue,
     muster_army,
 )
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
@@ -23,6 +22,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.phase import GameLifecycleStage
+from warhammer40k_core.engine.roster_points import RosterUnitPointValue
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )

@@ -50,7 +50,7 @@ def append_choice_rows(
         "model_profile_id": model_profile_ids[0],
         "default_wargear_ids": "",
         "allowed_wargear_ids": ",".join(choice_wargear_ids),
-        "min_selections": "1",
+        "min_selections": "0",
         "max_selections": "1",
         "condition_kind": "",
         "condition_wargear_ids": "",

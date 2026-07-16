@@ -22,6 +22,7 @@ from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import roster_points
 from warhammer40k_core.engine.attached_unit_formation import (
     AttachedUnitFormation,
     AttachedUnitFormationPayload,
@@ -49,6 +50,12 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.list_validation_errors import (
     ListValidationError,
+)
+from warhammer40k_core.engine.roster_points import (
+    RosterEnhancementPointValue,
+    RosterEnhancementPointValuePayload,
+    RosterUnitPointValue,
+    RosterUnitPointValuePayload,
 )
 from warhammer40k_core.engine.unit_factory import (
     UnitFactory,
@@ -191,7 +198,9 @@ class ArmyMusterRequestPayload(TypedDict):
     force_disposition_id: str
     unit_selections: list[UnitMusterSelectionPayload]
     attachment_declarations: list[AttachmentDeclarationPayload]
+    points_source_package_id: str | None
     unit_points: list[RosterUnitPointValuePayload]
+    enhancement_point_values: list[RosterEnhancementPointValuePayload]
     enhancement_assignments: list[EnhancementAssignmentPayload]
     warlord_selection: WarlordSelectionPayload | None
     dedicated_transport_manifests: list[DedicatedTransportManifestPayload]
@@ -209,18 +218,14 @@ class ArmyDefinitionPayload(TypedDict):
     force_disposition_id: str
     units: list[UnitInstancePayload]
     attached_units: list[AttachedUnitFormationPayload]
+    points_source_package_id: str | None
     unit_points: list[RosterUnitPointValuePayload]
+    enhancement_point_values: list[RosterEnhancementPointValuePayload]
     enhancement_assignments: list[EnhancementAssignmentPayload]
     warlord_selection: WarlordSelectionPayload | None
     dedicated_transport_manifests: list[DedicatedTransportManifestPayload]
     roster_legality_report: RosterLegalityReportPayload
     battle_size: str
-
-
-class RosterUnitPointValuePayload(TypedDict):
-    unit_selection_id: str
-    points: int
-    source_id: str
 
 
 class EnhancementAssignmentPayload(TypedDict):
@@ -260,49 +265,6 @@ class RosterLegalityReportPayload(TypedDict):
     battle_size: str
     is_legal: bool
     violations: list[RosterLegalityViolationPayload]
-
-
-@dataclass(frozen=True, slots=True)
-class RosterUnitPointValue:
-    unit_selection_id: str
-    points: int
-    source_id: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "unit_selection_id",
-            _validate_unprefixed_identifier(
-                "RosterUnitPointValue unit_selection_id",
-                self.unit_selection_id,
-                "unit-selection:",
-            ),
-        )
-        object.__setattr__(
-            self,
-            "points",
-            _validate_non_negative_int("RosterUnitPointValue points", self.points),
-        )
-        object.__setattr__(
-            self,
-            "source_id",
-            _validate_identifier("RosterUnitPointValue source_id", self.source_id),
-        )
-
-    def to_payload(self) -> RosterUnitPointValuePayload:
-        return {
-            "unit_selection_id": self.unit_selection_id,
-            "points": self.points,
-            "source_id": self.source_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: RosterUnitPointValuePayload) -> Self:
-        return cls(
-            unit_selection_id=payload["unit_selection_id"],
-            points=payload["points"],
-            source_id=payload["source_id"],
-        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -635,7 +597,9 @@ class ArmyMusterRequest:
     force_disposition_id: str
     unit_selections: tuple[UnitMusterSelection, ...]
     attachment_declarations: tuple[AttachmentDeclaration, ...] = ()
+    points_source_package_id: str | None = None
     unit_points: tuple[RosterUnitPointValue, ...] = ()
+    enhancement_point_values: tuple[RosterEnhancementPointValue, ...] = ()
     enhancement_assignments: tuple[EnhancementAssignment, ...] = ()
     warlord_selection: WarlordSelection | None = None
     dedicated_transport_manifests: tuple[DedicatedTransportManifest, ...] = ()
@@ -697,18 +661,45 @@ class ArmyMusterRequest:
         )
         _validate_unique_attachment_source_ids(attachment_declarations)
         object.__setattr__(self, "attachment_declarations", attachment_declarations)
-        unit_points = _validate_roster_unit_point_tuple(
+        points_source_package_id = _validate_optional_identifier(
+            "ArmyMusterRequest points_source_package_id",
+            self.points_source_package_id,
+        )
+        object.__setattr__(self, "points_source_package_id", points_source_package_id)
+        unit_points = roster_points.validate_roster_unit_point_tuple(
             "ArmyMusterRequest unit_points",
             self.unit_points,
+            error_type=ArmyMusteringError,
         )
-        _validate_unique_roster_unit_points(unit_points)
         object.__setattr__(self, "unit_points", unit_points)
+        enhancement_point_values = roster_points.validate_roster_enhancement_point_tuple(
+            "ArmyMusterRequest enhancement_point_values",
+            self.enhancement_point_values,
+            error_type=ArmyMusteringError,
+        )
+        object.__setattr__(self, "enhancement_point_values", enhancement_point_values)
         enhancement_assignments = _validate_enhancement_assignment_tuple(
             "ArmyMusterRequest enhancement_assignments",
             self.enhancement_assignments,
         )
         _validate_unique_enhancement_assignments(enhancement_assignments)
         object.__setattr__(self, "enhancement_assignments", enhancement_assignments)
+        roster_points.validate_source_backed_point_ledger(
+            owner="ArmyMusterRequest",
+            points_source_package_id=points_source_package_id,
+            unit_selection_ids=tuple(selection.unit_selection_id for selection in unit_selections),
+            unit_points=unit_points,
+            enhancement_assignments=tuple(
+                (
+                    assignment.target_unit_selection_id,
+                    assignment.enhancement_id,
+                    assignment.source_id,
+                )
+                for assignment in enhancement_assignments
+            ),
+            enhancement_point_values=enhancement_point_values,
+            error_type=ArmyMusteringError,
+        )
         object.__setattr__(
             self,
             "warlord_selection",
@@ -742,7 +733,11 @@ class ArmyMusterRequest:
             "attachment_declarations": [
                 declaration.to_payload() for declaration in self.attachment_declarations
             ],
+            "points_source_package_id": self.points_source_package_id,
             "unit_points": [point.to_payload() for point in self.unit_points],
+            "enhancement_point_values": [
+                point.to_payload() for point in self.enhancement_point_values
+            ],
             "enhancement_assignments": [
                 assignment.to_payload() for assignment in self.enhancement_assignments
             ],
@@ -774,8 +769,13 @@ class ArmyMusterRequest:
                 AttachmentDeclaration.from_payload(declaration)
                 for declaration in payload["attachment_declarations"]
             ),
+            points_source_package_id=payload["points_source_package_id"],
             unit_points=tuple(
                 RosterUnitPointValue.from_payload(point) for point in payload["unit_points"]
+            ),
+            enhancement_point_values=tuple(
+                RosterEnhancementPointValue.from_payload(point)
+                for point in payload["enhancement_point_values"]
             ),
             enhancement_assignments=tuple(
                 EnhancementAssignment.from_payload(assignment)
@@ -806,7 +806,9 @@ class ArmyDefinition:
     force_disposition_id: str
     units: tuple[UnitInstance, ...]
     attached_units: tuple[AttachedUnitFormation, ...] = ()
+    points_source_package_id: str | None = None
     unit_points: tuple[RosterUnitPointValue, ...] = ()
+    enhancement_point_values: tuple[RosterEnhancementPointValue, ...] = ()
     enhancement_assignments: tuple[EnhancementAssignment, ...] = ()
     warlord_selection: WarlordSelection | None = None
     dedicated_transport_manifests: tuple[DedicatedTransportManifest, ...] = ()
@@ -869,18 +871,48 @@ class ArmyDefinition:
             attached_units=attached_units,
         )
         object.__setattr__(self, "attached_units", attached_units)
-        unit_points = _validate_roster_unit_point_tuple(
+        points_source_package_id = _validate_optional_identifier(
+            "ArmyDefinition points_source_package_id",
+            self.points_source_package_id,
+        )
+        object.__setattr__(self, "points_source_package_id", points_source_package_id)
+        unit_points = roster_points.validate_roster_unit_point_tuple(
             "ArmyDefinition unit_points",
             self.unit_points,
+            error_type=ArmyMusteringError,
         )
-        _validate_unique_roster_unit_points(unit_points)
         object.__setattr__(self, "unit_points", unit_points)
+        enhancement_point_values = roster_points.validate_roster_enhancement_point_tuple(
+            "ArmyDefinition enhancement_point_values",
+            self.enhancement_point_values,
+            error_type=ArmyMusteringError,
+        )
+        object.__setattr__(self, "enhancement_point_values", enhancement_point_values)
         enhancement_assignments = _validate_enhancement_assignment_tuple(
             "ArmyDefinition enhancement_assignments",
             self.enhancement_assignments,
         )
         _validate_unique_enhancement_assignments(enhancement_assignments)
         object.__setattr__(self, "enhancement_assignments", enhancement_assignments)
+        army_unit_prefix = f"{self.army_id}:"
+        roster_points.validate_source_backed_point_ledger(
+            owner="ArmyDefinition",
+            points_source_package_id=points_source_package_id,
+            unit_selection_ids=tuple(
+                unit.unit_instance_id.removeprefix(army_unit_prefix) for unit in units
+            ),
+            unit_points=unit_points,
+            enhancement_assignments=tuple(
+                (
+                    assignment.target_unit_selection_id,
+                    assignment.enhancement_id,
+                    assignment.source_id,
+                )
+                for assignment in enhancement_assignments
+            ),
+            enhancement_point_values=enhancement_point_values,
+            error_type=ArmyMusteringError,
+        )
         object.__setattr__(
             self,
             "warlord_selection",
@@ -926,7 +958,11 @@ class ArmyDefinition:
             "force_disposition_id": self.force_disposition_id,
             "units": [unit.to_payload() for unit in self.units],
             "attached_units": [attached.to_payload() for attached in self.attached_units],
+            "points_source_package_id": self.points_source_package_id,
             "unit_points": [point.to_payload() for point in self.unit_points],
+            "enhancement_point_values": [
+                point.to_payload() for point in self.enhancement_point_values
+            ],
             "enhancement_assignments": [
                 assignment.to_payload() for assignment in self.enhancement_assignments
             ],
@@ -955,8 +991,13 @@ class ArmyDefinition:
                 AttachedUnitFormation.from_payload(attached)
                 for attached in payload["attached_units"]
             ),
+            points_source_package_id=payload["points_source_package_id"],
             unit_points=tuple(
                 RosterUnitPointValue.from_payload(point) for point in payload["unit_points"]
+            ),
+            enhancement_point_values=tuple(
+                RosterEnhancementPointValue.from_payload(point)
+                for point in payload["enhancement_point_values"]
             ),
             enhancement_assignments=tuple(
                 EnhancementAssignment.from_payload(assignment)
@@ -1062,7 +1103,9 @@ def muster_army(
         force_disposition_id=request.force_disposition_id,
         units=resolved_units,
         attached_units=attached_units,
+        points_source_package_id=request.points_source_package_id,
         unit_points=request.unit_points,
+        enhancement_point_values=request.enhancement_point_values,
         enhancement_assignments=request.enhancement_assignments,
         warlord_selection=request.warlord_selection,
         dedicated_transport_manifests=request.dedicated_transport_manifests,
@@ -1276,16 +1319,35 @@ def _append_unit_point_violations(
                     source_id=point.source_id,
                 )
             )
-    enhancement_points_by_id = {
-        enhancement.enhancement_id: enhancement.points
-        for enhancement in catalog.enhancements
-        if enhancement.points is not None
-    }
-    total_points = sum(point.points for point in request.unit_points) + sum(
-        enhancement_points_by_id[assignment.enhancement_id]
-        for assignment in request.enhancement_assignments
-        if assignment.enhancement_id in enhancement_points_by_id
-    )
+    if request.points_source_package_id is None:
+        enhancement_points_by_id = {
+            enhancement.enhancement_id: enhancement.points
+            for enhancement in catalog.enhancements
+            if enhancement.points is not None
+        }
+        enhancement_points = sum(
+            enhancement_points_by_id[assignment.enhancement_id]
+            for assignment in request.enhancement_assignments
+            if assignment.enhancement_id in enhancement_points_by_id
+        )
+    else:
+        enhancement_points = sum(point.points for point in request.enhancement_point_values)
+        violations.extend(
+            RosterLegalityViolation(
+                violation_code="source_backed_enhancement_points_mismatch",
+                message="Catalog Enhancement points differ from the source-backed roster ledger.",
+                unit_selection_id=point.target_unit_selection_id,
+                source_id=point.source_id,
+            )
+            for point in roster_points.mismatched_catalog_enhancement_point_values(
+                catalog_points_by_id={
+                    enhancement.enhancement_id: enhancement.points
+                    for enhancement in catalog.enhancements
+                },
+                point_values=request.enhancement_point_values,
+            )
+        )
+    total_points = sum(point.points for point in request.unit_points) + enhancement_points
     if total_points > policy_points_limit:
         violations.append(
             RosterLegalityViolation(
@@ -3330,20 +3392,6 @@ def _validate_attachment_declaration_tuple(
     )
 
 
-def _validate_roster_unit_point_tuple(
-    field_name: str,
-    values: object,
-) -> tuple[RosterUnitPointValue, ...]:
-    if type(values) is not tuple:
-        raise ArmyMusteringError(f"{field_name} must be a tuple.")
-    validated: list[RosterUnitPointValue] = []
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not RosterUnitPointValue:
-            raise ArmyMusteringError(f"{field_name} must contain RosterUnitPointValue values.")
-        validated.append(value)
-    return tuple(sorted(validated, key=lambda point: point.unit_selection_id))
-
-
 def _validate_enhancement_assignment_tuple(
     field_name: str,
     values: object,
@@ -3422,14 +3470,6 @@ def _validate_unique_attachment_source_ids(
                 "ArmyMusterRequest attachment_declarations must have unique source unit IDs."
             )
         seen.add(declaration.source_unit_selection_id)
-
-
-def _validate_unique_roster_unit_points(points: tuple[RosterUnitPointValue, ...]) -> None:
-    seen: set[str] = set()
-    for point in points:
-        if point.unit_selection_id in seen:
-            raise ArmyMusteringError("RosterUnitPointValue values must be unique by unit.")
-        seen.add(point.unit_selection_id)
 
 
 def _validate_unique_enhancement_assignments(
@@ -3622,12 +3662,4 @@ def _validate_positive_int(field_name: str, value: object) -> int:
         raise ArmyMusteringError(f"{field_name} must be an integer.")
     if value < 1:
         raise ArmyMusteringError(f"{field_name} must be at least 1.")
-    return value
-
-
-def _validate_non_negative_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise ArmyMusteringError(f"{field_name} must be an integer.")
-    if value < 0:
-        raise ArmyMusteringError(f"{field_name} must not be negative.")
     return value

@@ -126,14 +126,55 @@ def test_saved_player_army_list_musters_with_exact_current_mfm_points() -> None:
         ("apocalyptic-steeds", "bloodcrushers-2", 10),
     )
     assert calculation.total_points == 1995
+    assert request.points_source_package_id == points_source.source_package_id
+    assert sum(point.points for point in request.unit_points) == 1975
+    assert tuple(
+        (
+            point.enhancement_id,
+            point.target_unit_selection_id,
+            point.points,
+            point.source_id,
+        )
+        for point in request.enhancement_point_values
+    ) == (
+        (
+            "apocalyptic-steeds",
+            "bloodcrushers-1",
+            10,
+            (
+                "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:"
+                "cavalcade-of-chaos:enhancement:apocalyptic-steeds"
+            ),
+        ),
+        (
+            "apocalyptic-steeds",
+            "bloodcrushers-2",
+            10,
+            (
+                "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:"
+                "cavalcade-of-chaos:enhancement:apocalyptic-steeds"
+            ),
+        ),
+    )
 
     army = muster_army(catalog=catalog, request=request)
 
     assert army.force_disposition_id == "purge-the-foe"
+    assert army.points_source_package_id == points_source.source_package_id
+    assert army.enhancement_point_values == request.enhancement_point_values
     assert army.roster_legality_report.is_legal
     assert len(army.units) == 8
     assert army.warlord_selection is not None
     assert army.warlord_selection.unit_selection_id == "belakor"
+    units_by_selection_id = {
+        unit.unit_instance_id.removeprefix(f"{army.army_id}:"): unit for unit in army.units
+    }
+    for selection_id in ("lord-of-change-1", "lord-of-change-2"):
+        assert len(units_by_selection_id[selection_id].own_models) == 1
+        assert set(units_by_selection_id[selection_id].own_models[0].wargear_ids) == {
+            "000001120:bolt-of-change",
+            "000001120:staff-of-tzeentch",
+        }
     assert ArmyMusterRequest.from_payload(request.to_payload()).to_payload() == request.to_payload()
 
 
@@ -191,6 +232,64 @@ def test_player_army_list_json_loader_is_strict_and_round_trips() -> None:
     )
 
 
+def test_player_army_list_allows_missing_pre_game_result_but_rejects_null() -> None:
+    payload = json.loads(_ARMY_LIST_PATH.read_bytes())
+    del payload["provenance"]["game_result"]
+
+    pre_game = player_army_list_from_json_bytes(json.dumps(payload).encode())
+
+    assert pre_game.provenance.game_result is None
+    assert "game_result" not in pre_game.to_payload()["provenance"]
+
+    payload["provenance"]["game_result"] = None
+    with pytest.raises(PlayerArmyListError, match="non-canonical"):
+        player_army_list_from_json_bytes(json.dumps(payload).encode())
+
+
+def test_player_army_list_rejects_stale_catalog_enhancement_points() -> None:
+    army_list = load_player_army_list(_ARMY_LIST_PATH)
+    catalog = _player_army_list_catalog()
+    stale_catalog = replace(
+        catalog,
+        enhancements=tuple(
+            replace(enhancement, points=999)
+            if enhancement.enhancement_id == "apocalyptic-steeds"
+            else enhancement
+            for enhancement in catalog.enhancements
+        ),
+    )
+
+    with pytest.raises(PlayerArmyListError, match="catalog Enhancement points"):
+        army_muster_request_from_player_army_list(
+            catalog=stale_catalog,
+            army_list=army_list,
+            points_source_package=mfm_2026_06.source_package(),
+            army_id="stale-enhancement-price",
+            player_id="player-a",
+        )
+
+
+def test_player_army_list_rejects_non_mfm_enhancement_assignment_source() -> None:
+    army_list = load_player_army_list(_ARMY_LIST_PATH)
+    first, *remaining = army_list.enhancement_assignments
+    mismatched = replace(
+        army_list,
+        enhancement_assignments=(
+            replace(first, source_id="player-list:unverified-enhancement-source"),
+            *remaining,
+        ),
+    )
+
+    with pytest.raises(PlayerArmyListError, match="assignment source"):
+        army_muster_request_from_player_army_list(
+            catalog=_player_army_list_catalog(),
+            army_list=mismatched,
+            points_source_package=mfm_2026_06.source_package(),
+            army_id="mismatched-enhancement-source",
+            player_id="player-a",
+        )
+
+
 @lru_cache(maxsize=1)
 def _player_army_list_catalog() -> ArmyCatalog:
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
@@ -230,22 +329,8 @@ def _player_army_list_catalog() -> ArmyCatalog:
         package.army_catalog.factions[0],
         faction_id="chaos-daemons",
     )
-    datasheets = tuple(
-        replace(
-            datasheet,
-            wargear_options=tuple(
-                option
-                for option in datasheet.wargear_options
-                if option.option_id != "000001120:equipment-choice:option-1"
-            ),
-        )
-        if datasheet.datasheet_id == "000001120"
-        else datasheet
-        for datasheet in package.army_catalog.datasheets
-    )
     catalog = replace(
         package.army_catalog,
-        datasheets=datasheets,
         factions=(chaos_daemons_faction,),
         detachments=(
             DetachmentDefinition(

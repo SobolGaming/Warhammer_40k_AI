@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from pathlib import Path
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 import msgspec
 
@@ -56,8 +56,8 @@ class PlayerArmyListProvenancePayload(TypedDict):
     source_format: str
     app_version: str
     data_version: str
-    game_result: str
     points_source_package_id: str
+    game_result: NotRequired[str]
 
 
 class PlayerArmyListUnitPayload(TypedDict):
@@ -87,8 +87,8 @@ class PlayerArmyListProvenance:
     source_format: str
     app_version: str
     data_version: str
-    game_result: PlayerArmyListGameResult
     points_source_package_id: str
+    game_result: PlayerArmyListGameResult | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -106,9 +106,9 @@ class PlayerArmyListProvenance:
             "data_version",
             _validate_text("PlayerArmyListProvenance data_version", self.data_version),
         )
-        if type(self.game_result) is not PlayerArmyListGameResult:
+        if self.game_result is not None and type(self.game_result) is not PlayerArmyListGameResult:
             raise PlayerArmyListError(
-                "PlayerArmyListProvenance game_result must be a PlayerArmyListGameResult."
+                "PlayerArmyListProvenance game_result must be a PlayerArmyListGameResult or None."
             )
         object.__setattr__(
             self,
@@ -120,28 +120,38 @@ class PlayerArmyListProvenance:
         )
 
     def to_payload(self) -> PlayerArmyListProvenancePayload:
-        return {
+        payload: PlayerArmyListProvenancePayload = {
             "source_format": self.source_format,
             "app_version": self.app_version,
             "data_version": self.data_version,
-            "game_result": self.game_result.value,
             "points_source_package_id": self.points_source_package_id,
         }
+        if self.game_result is not None:
+            payload["game_result"] = self.game_result.value
+        return payload
 
     @classmethod
     def from_payload(cls, payload: PlayerArmyListProvenancePayload) -> Self:
-        try:
-            game_result = PlayerArmyListGameResult(payload["game_result"])
-        except ValueError as exc:
-            raise PlayerArmyListError(
-                "PlayerArmyListProvenance game_result is unsupported."
-            ) from exc
+        game_result_value = payload.get("game_result")
+        if game_result_value is None:
+            game_result = None
+        else:
+            if type(game_result_value) is not str:
+                raise PlayerArmyListError(
+                    "PlayerArmyListProvenance game_result must be a string when present."
+                )
+            try:
+                game_result = PlayerArmyListGameResult(game_result_value)
+            except ValueError as exc:
+                raise PlayerArmyListError(
+                    "PlayerArmyListProvenance game_result is unsupported."
+                ) from exc
         return cls(
             source_format=payload["source_format"],
             app_version=payload["app_version"],
             data_version=payload["data_version"],
-            game_result=game_result,
             points_source_package_id=payload["points_source_package_id"],
+            game_result=game_result,
         )
 
 
@@ -434,7 +444,17 @@ def army_muster_request_from_player_army_list(
             "Player army-list points could not be resolved from the selected MFM package."
         ) from exc
     _validate_declared_points(army_list=army_list, calculation=calculation)
-    return replace(request, unit_points=calculation.roster_unit_point_values())
+    _validate_enhancement_point_authority(
+        catalog=catalog,
+        army_list=army_list,
+        calculation=calculation,
+    )
+    return replace(
+        request,
+        points_source_package_id=points_source_package.source_package_id,
+        unit_points=calculation.roster_unit_point_values(),
+        enhancement_point_values=calculation.roster_enhancement_point_values(),
+    )
 
 
 def _validate_declared_points(
@@ -461,6 +481,33 @@ def _validate_declared_points(
         raise PlayerArmyListError(
             "Player army-list declared_total_points does not match MFM calculation."
         )
+
+
+def _validate_enhancement_point_authority(
+    *,
+    catalog: ArmyCatalog,
+    army_list: PlayerArmyList,
+    calculation: MfmArmyPointCalculation,
+) -> None:
+    assignments_by_key = {
+        (assignment.target_unit_selection_id, assignment.enhancement_id): assignment
+        for assignment in army_list.enhancement_assignments
+    }
+    catalog_by_id = {
+        enhancement.enhancement_id: enhancement for enhancement in catalog.enhancements
+    }
+    for line in calculation.enhancement_lines:
+        key = (line.target_unit_selection_id, line.enhancement_id)
+        assignment = assignments_by_key.get(key)
+        if assignment is None or assignment.source_id != line.source_id:
+            raise PlayerArmyListError(
+                "Player army-list Enhancement assignment source does not match MFM calculation."
+            )
+        enhancement = catalog_by_id.get(line.enhancement_id)
+        if enhancement is None or enhancement.points != line.points:
+            raise PlayerArmyListError(
+                "Player army-list catalog Enhancement points do not match MFM calculation."
+            )
 
 
 def _validate_units(value: object) -> tuple[PlayerArmyListUnit, ...]:

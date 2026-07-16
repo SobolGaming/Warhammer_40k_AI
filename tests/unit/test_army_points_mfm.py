@@ -30,7 +30,6 @@ from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     EnhancementAssignment,
-    RosterUnitPointValue,
     validate_roster_legality,
 )
 from warhammer40k_core.engine.army_points import (
@@ -47,6 +46,7 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
+from warhammer40k_core.engine.roster_points import RosterUnitPointValue
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -127,10 +127,10 @@ def test_calculate_mfm_army_points_handles_variable_add_on_wargear_and_enhanceme
         (line.unit_selection_id, line.base_points, line.wargear_points, line.total_points)
         for line in calculation.unit_lines
     ] == [
-        ("defiler-one", 270, 20, 290),
-        ("outrider-one", 125, 0, 125),
         ("variable-one", 100, 0, 100),
         ("variable-two", 120, 0, 120),
+        ("defiler-one", 270, 20, 290),
+        ("outrider-one", 125, 0, 125),
     ]
     assert [
         (line.enhancement_id, line.target_unit_selection_id, line.points)
@@ -144,10 +144,71 @@ def test_calculate_mfm_army_points_handles_variable_add_on_wargear_and_enhanceme
             source_package=_mfm_package(),
         )
     ] == [
-        ("defiler-one", 290),
-        ("outrider-one", 125),
         ("variable-one", 100),
         ("variable-two", 120),
+        ("defiler-one", 290),
+        ("outrider-one", 125),
+    ]
+
+
+def test_repeated_unit_pricing_uses_request_order_not_identifier_spelling() -> None:
+    catalog = _catalog()
+    vanguard = _unit_selection(
+        "vanguard-crushers",
+        "variable-unit",
+        (("variable-model", 2),),
+    )
+    alpha = _unit_selection(
+        "alpha-crushers",
+        "variable-unit",
+        (("variable-model", 1),),
+    )
+    red = _unit_selection(
+        "red-crushers",
+        "variable-unit",
+        (("variable-model", 2),),
+    )
+    request = ArmyMusterRequest(
+        army_id="army-one",
+        player_id="player-one",
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="test-faction",
+            detachment_ids=("test-detachment",),
+            enhancement_ids=(),
+        ),
+        force_disposition_id="test-force",
+        unit_selections=(vanguard, alpha, red),
+    )
+
+    calculation = calculate_mfm_army_points(
+        catalog=catalog,
+        request=request,
+        source_package=_mfm_package(),
+    )
+    reordered = calculate_mfm_army_points(
+        catalog=catalog,
+        request=replace(request, unit_selections=(red, vanguard, alpha)),
+        source_package=_mfm_package(),
+    )
+
+    assert [
+        (line.unit_selection_id, line.unit_number, line.model_count, line.total_points)
+        for line in calculation.unit_lines
+    ] == [
+        ("vanguard-crushers", 1, 2, 150),
+        ("alpha-crushers", 2, 1, 120),
+        ("red-crushers", 3, 2, 180),
+    ]
+    assert [
+        (line.unit_selection_id, line.unit_number, line.model_count, line.total_points)
+        for line in reordered.unit_lines
+    ] == [
+        ("red-crushers", 1, 2, 150),
+        ("vanguard-crushers", 2, 2, 180),
+        ("alpha-crushers", 3, 1, 120),
     ]
 
 
@@ -502,7 +563,7 @@ def _catalog() -> ArmyCatalog:
         _datasheet(
             datasheet_id="variable-unit",
             name="Variable Unit",
-            profiles=(("variable-model", "Variable Unit", 1, 1),),
+            profiles=(("variable-model", "Variable Unit", 1, 2),),
         ),
         _datasheet(
             datasheet_id="defiler",
@@ -698,8 +759,8 @@ def _mfm_package() -> MfmSourcePackage:
         units=(
             _mfm_unit(
                 raw_name="Variable Unit",
-                rows_1=(("1 model", 100),),
-                rows_2=(("1 model", 120),),
+                rows_1=(("1 model", 100), ("2 models", 150)),
+                rows_2=(("1 model", 120), ("2 models", 180)),
             ),
             _mfm_unit(
                 raw_name="Defiler",

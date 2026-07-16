@@ -51,7 +51,6 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
     EnhancementAssignment,
-    RosterUnitPointValue,
     WarlordSelection,
     muster_army,
     validate_roster_legality,
@@ -141,6 +140,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
+from warhammer40k_core.engine.roster_points import RosterUnitPointValue
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
