@@ -120,6 +120,7 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTargetProposal,
     StratagemTargetProposalPayload,
     StratagemUseRecord,
+    _handler_unavailable_reason,
     create_stratagem_target_proposal_decision_request,
     create_stratagem_use_decision_request,
     invalid_heroic_intervention_charge_move_status,
@@ -416,23 +417,50 @@ def test_command_reroll_allows_eleventh_edition_number_of_attacks_roll_for_actor
     assert _has_event(lifecycle.decision_controller, "command_reroll_resolved")
 
 
-@pytest.mark.parametrize(
-    "roll_type",
-    [
+def test_phase14i_command_reroll_unlisted_roll_classes_are_domain_invalid() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    command_reroll = _source_stratagem_record("command-reroll")
+
+    for roll_type in (
         "attack_sequence.allocation_order.no_save",
         "battle_shock_roll",
         "leadership_roll",
         "desperate_escape_roll",
-    ],
-)
-def test_phase14i_command_reroll_excludes_unlisted_roll_classes(
-    roll_type: str,
-) -> None:
+    ):
+        roll_state = _roll_command_reroll_candidate(
+            lifecycle,
+            actor_id="player-a",
+            roll_type=roll_type,
+        )
+        context = _context(
+            state=state,
+            player_id="player-a",
+            trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+            trigger_payload=_command_reroll_trigger_payload(roll_state),
+        )
+
+        assert (
+            _handler_unavailable_reason(
+                state=state,
+                definition=command_reroll.definition,
+                context=context,
+                target_binding=StratagemTargetBinding.none(),
+                effect_selection=None,
+                ruleset_descriptor=lifecycle.config.ruleset_descriptor,
+            )
+            == "ineligible_dice_roll_type"
+        )
+
+
+def test_phase14i_command_reroll_unlisted_roll_rejects_without_mutation() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.COMMAND)
     _grant_cp(state, player_id="player-a", amount=1)
     command_reroll = _source_stratagem_record("command-reroll")
+    roll_type = "battle_shock_roll"
     roll_state = _roll_command_reroll_candidate(
         lifecycle,
         actor_id="player-a",

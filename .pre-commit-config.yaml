@@ -19,19 +19,23 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
+        stages: [pre-push]
       - id: pyright
         name: pyright strict
         entry: uv run pyright
         language: system
         types: [python]
         pass_filenames: false
+        stages: [pre-push]
       - id: pytest-code-quality
         name: code quality tests
-        entry: uv run pytest tests/code_quality -q --no-cov
+        entry: uv run pytest tests/code_quality -q -n0 --no-cov
         language: system
         pass_filenames: false
+        stages: [pre-push]
       - id: import-linter
         name: import boundary contracts
         entry: uv run lint-imports
         language: system
         pass_filenames: false
+        stages: [pre-push]

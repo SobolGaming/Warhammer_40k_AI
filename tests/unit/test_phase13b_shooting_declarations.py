@@ -25,6 +25,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _catalog_with_extra_bolt_profile,
     _catalog_with_same_profile_id_target_cache_collision_weapons,
     _command_reroll_use_option_id,
+    _compact_shooting_lifecycle,
     _compact_test_unit_poses,
     _continue_damage_model_choices,
     _damage_model_choice_lifecycle,
@@ -313,10 +314,41 @@ from warhammer40k_core.geometry.visibility import (
 )
 
 
+def test_cached_shooting_lifecycle_templates_are_mutation_isolated() -> None:
+    first, first_units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    second, second_units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    first_state = _state(first)
+    second_state = _state(second)
+    first_battlefield = first_state.battlefield_state
+    second_battlefield = second_state.battlefield_state
+    assert first_battlefield is not None
+    assert second_battlefield is not None
+
+    first_state.battle_round = 3
+    first_state.battlefield_state = first_battlefield.without_unit_placement(
+        first_units["enemy"].unit_instance_id
+    )
+    first_units.pop("enemy")
+
+    assert second_state.battle_round == 1
+    assert (
+        second_battlefield.unit_placement_by_id(second_units["enemy"].unit_instance_id) is not None
+    )
+    assert "enemy" in second_units
+
+    fresh, fresh_units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    fresh_state = _state(fresh)
+    fresh_battlefield = fresh_state.battlefield_state
+    assert fresh_battlefield is not None
+    assert fresh_state.battle_round == 1
+    assert fresh_battlefield.unit_placement_by_id(fresh_units["enemy"].unit_instance_id) is not None
+
+
 def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None:
     allocation_profile = _phase13f_gate_weapon_profile()
-    lifecycle, units = _shooting_lifecycle(
+    lifecycle, units = _compact_shooting_lifecycle(
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
+        enemy_model_count=2,
         game_id="phase13b-allocation-0005",
         catalog=_catalog_with_extra_bolt_profile(allocation_profile),
     )
@@ -407,7 +439,7 @@ def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None
 
 
 def test_phase14f_select_shooting_type_is_finite_before_declaration() -> None:
-    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    lifecycle, units = _compact_shooting_lifecycle()
     unit_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     type_request = _decision_request(
         _submit_result(

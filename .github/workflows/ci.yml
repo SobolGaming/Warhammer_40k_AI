@@ -3,6 +3,13 @@ name: ci
 on:
   pull_request:
     branches: [main]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  merge_group:
+    types: [checks_requested]
   push:
     branches: [main]
 
@@ -13,102 +20,211 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  PYTHON_VERSION: "3.14.5"
+  UV_VERSION: "0.11.29"
+
 jobs:
-  quality:
-    name: quality
+  quality-fast:
+    name: quality-fast
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        run: |
-          git init .
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
-            git fetch --no-tags --depth=1 origin "refs/pull/${{ github.event.pull_request.number }}/merge"
-          else
-            git fetch --no-tags --depth=1 origin "${GITHUB_REF}"
-          fi
-          git checkout --detach FETCH_HEAD
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
-      - name: Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install Python
-        run: uv python install 3.14.5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
 
-      - name: Sync dependencies
-        run: uv sync --all-groups
+      - name: Sync quality dependencies
+        run: uv sync --locked --no-default-groups --group lint --group test
 
       - name: Ruff check
-        run: uv run ruff check .
+        run: uv run --no-sync ruff check .
 
       - name: Ruff format check
-        run: uv run ruff format --check .
-
-      - name: Mypy
-        run: uv run mypy src tests
-
-      - name: Pyright
-        run: uv run pyright
+        run: uv run --no-sync ruff format --check .
 
       - name: Import boundary contracts
-        run: uv run lint-imports
+        run: uv run --no-sync lint-imports
 
-  unit-tests:
-    name: unit-tests
+      - name: Verify behavioral shard manifests
+        run: uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
+
+      - name: Code-quality tests
+        run: uv run --no-sync pytest tests/code_quality -q -n0 --no-cov
+
+  mypy:
+    name: mypy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        run: |
-          git init .
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
-            git fetch --no-tags --depth=1 origin "refs/pull/${{ github.event.pull_request.number }}/merge"
-          else
-            git fetch --no-tags --depth=1 origin "${GITHUB_REF}"
-          fi
-          git checkout --detach FETCH_HEAD
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
-      - name: Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install Python
-        run: uv python install 3.14.5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
 
-      - name: Sync dependencies
-        run: uv sync --all-groups
+      - name: Sync type-check dependencies
+        run: uv sync --locked --no-default-groups --group typecheck
 
-      - name: Run coverage tests
-        run: uv run pytest tests/
+      - name: Mypy
+        run: uv run --no-sync mypy src tests
 
-  integration-smoke:
-    name: integration-smoke
+  pyright:
+    name: pyright
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Sync type-check dependencies
+        run: uv sync --locked --no-default-groups --group typecheck
+
+      - name: Pyright
+        run: uv run --no-sync pyright
+
+  behavior-tests:
+    name: behavior-shard-${{ matrix.shard_id }}
+    if: >-
+      ${{
+        github.event_name != 'pull_request' ||
+        github.event.pull_request.draft == false
+      }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard_id: "1"
+            manifest: ci/test_shards/shard-1.txt
+          - shard_id: "2"
+            manifest: ci/test_shards/shard-2.txt
+          - shard_id: "3"
+            manifest: ci/test_shards/shard-3.txt
+          - shard_id: "4"
+            manifest: ci/test_shards/shard-4.txt
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Sync test dependencies
+        run: uv sync --locked --no-default-groups --group test
+
+      - name: Run behavioral coverage shard
+        env:
+          COVERAGE_FILE: .coverage.${{ matrix.shard_id }}
+          SHARD_ID: ${{ matrix.shard_id }}
+          SHARD_MANIFEST: ${{ matrix.manifest }}
         run: |
-          git init .
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
-            git fetch --no-tags --depth=1 origin "refs/pull/${{ github.event.pull_request.number }}/merge"
-          else
-            git fetch --no-tags --depth=1 origin "${GITHUB_REF}"
-          fi
-          git checkout --detach FETCH_HEAD
+          mkdir -p reports
+          mapfile -t shard_paths < "$SHARD_MANIFEST"
+          uv run --no-sync pytest "${shard_paths[@]}" \
+            -n auto \
+            --dist=worksteal \
+            --cov=warhammer40k_core \
+            --cov-report= \
+            --cov-fail-under=0 \
+            --durations=100 \
+            --durations-min=0.1 \
+            --junitxml="reports/behavior-shard-${SHARD_ID}.xml"
 
-      - name: Install uv
+      - name: Upload shard test report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: behavior-report-${{ matrix.shard_id }}
+          path: reports/behavior-shard-${{ matrix.shard_id }}.xml
+          if-no-files-found: warn
+
+      - name: Upload shard coverage
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: behavior-coverage-${{ matrix.shard_id }}
+          path: .coverage.${{ matrix.shard_id }}
+          include-hidden-files: true
+          if-no-files-found: error
+
+  coverage-gate:
+    name: coverage-gate
+    if: >-
+      ${{
+        always() &&
+        (
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.draft == false
+        )
+      }}
+    needs: behavior-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require successful behavioral shards
+        if: needs.behavior-tests.result != 'success'
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "One or more behavioral shards did not succeed."
+          exit 1
 
-      - name: Install Python
-        run: uv python install 3.14.5
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
-      - name: Sync dependencies
-        run: uv sync --all-groups
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Run code-quality and integration tests
-        run: uv run pytest tests/code_quality tests/integration -q --no-cov
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Sync coverage dependencies
+        run: uv sync --locked --no-default-groups --group test
+
+      - name: Download shard coverage
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          pattern: behavior-coverage-*
+          path: coverage-data
+          merge-multiple: true
+
+      - name: Combine coverage and enforce branch threshold
+        run: |
+          uv run --no-sync coverage combine coverage-data
+          uv run --no-sync coverage report --fail-under=85

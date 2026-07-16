@@ -1,0 +1,49 @@
+{
+  "decision": {
+    "ci_distribution": "worksteal",
+    "ci_worker_count": "auto",
+    "reason": "Auto uses the logical CPUs exposed by each local or hosted runner. On the 10-core benchmark host, auto with worksteal completed in 33.88 seconds versus 85.01 seconds with two workers; worksteal also protects shards from uneven lifecycle-test durations."
+  },
+  "environment": {
+    "logical_cpu_count": 10,
+    "platform": "darwin",
+    "python_version": "3.14.5"
+  },
+  "results": [
+    {
+      "distribution": "none",
+      "junit_testcase_seconds": 158.407,
+      "wall_seconds": 160.5,
+      "workers": 0
+    },
+    {
+      "distribution": "load",
+      "junit_testcase_seconds": 161.363,
+      "wall_seconds": 83.96,
+      "workers": 2
+    },
+    {
+      "distribution": "worksteal",
+      "junit_testcase_seconds": 161.312,
+      "wall_seconds": 85.01,
+      "workers": 2
+    },
+    {
+      "distribution": "load",
+      "junit_testcase_seconds": 205.522,
+      "wall_seconds": 37.49,
+      "workers": "auto (10)"
+    },
+    {
+      "distribution": "worksteal",
+      "junit_testcase_seconds": 209.281,
+      "wall_seconds": 33.88,
+      "workers": "auto (10)"
+    }
+  ],
+  "suite": [
+    "tests/unit/test_phase13b_shooting_declarations.py",
+    "tests/unit/test_phase13b_shooting_phase_declarations.py"
+  ],
+  "test_count": 179
+}

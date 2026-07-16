@@ -15,21 +15,40 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-  "ruff>=0.12",
-  "mypy>=1.16",
-  "pyright>=1.1",
+test = [
   "pytest>=8.4",
   "pytest-cov>=6.2",
   "pytest-xdist>=3.7",
   "coverage[toml]>=7.9",
   "hypothesis>=6.135",
-  "pre-commit>=4.2",
+  "jsonschema>=4.23",
+  "pytest-benchmark>=5.1",
+]
+lint = [
+  "ruff>=0.12",
   "import-linter>=2.3",
   "deptry>=0.23",
-  "pytest-benchmark>=5.1",
+]
+typecheck = [
+  "mypy>=1.16",
+  "pyright>=1.1",
+  "pytest>=8.4",
+  "hypothesis>=6.135",
   "jsonschema>=4.23",
   "types-jsonschema>=4.26.0.20260518",
+]
+benchmark = [
+  { include-group = "test" },
+]
+precommit = [
+  "pre-commit>=4.2",
+]
+dev = [
+  { include-group = "test" },
+  { include-group = "lint" },
+  { include-group = "typecheck" },
+  { include-group = "benchmark" },
+  { include-group = "precommit" },
 ]
 
 [build-system]
@@ -71,7 +90,7 @@ pretty = true
 mypy_path = "src"
 
 [tool.pytest.ini_options]
-addopts = "-ra --strict-markers --strict-config -n auto -m 'not benchmark' --benchmark-disable --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85"
+addopts = "-ra --strict-markers --strict-config -m 'not benchmark' --benchmark-disable"
 testpaths = ["tests"]
 markers = [
   "benchmark: opt-in performance benchmarks excluded from default test runs",

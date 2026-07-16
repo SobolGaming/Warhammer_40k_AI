@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from functools import cache
 from typing import Any, cast
 
 import warhammer40k_core.engine.attack_sequence as attack_sequence_module
@@ -13,6 +14,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetWargearOption,
+    UnitCompositionDefinition,
 )
 from warhammer40k_core.core.dice import (
     DiceExpression,
@@ -58,6 +60,7 @@ from warhammer40k_core.engine.attack_sequence import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
+    BattlefieldRuntimeState,
     BattlefieldScenario,
     ModelPlacement,
     UnitPlacement,
@@ -83,7 +86,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -91,7 +94,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionMode,
 )
 from warhammer40k_core.engine.hazard import hazard_roll_spec
-from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     DetachmentSelection,
@@ -160,7 +163,11 @@ from warhammer40k_core.geometry.visibility import (
     CoverSourceReason,
     CoverSourceRecord,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.chapter_approved_2026_27 import (
+    MISSION_PACK_ID,
+    SOURCE_PACKAGE_ID,
+    SOURCE_VERSION,
+)
 
 __all__ = (
     "_advanced_unit_state",
@@ -188,6 +195,7 @@ __all__ = (
     "_catalog_with_same_profile_id_target_cache_collision_weapons",
     "_catalog_with_stealth_datasheet",
     "_command_reroll_use_option_id",
+    "_compact_shooting_lifecycle",
     "_compact_test_unit_poses",
     "_config",
     "_continue_damage_model_choices",
@@ -456,6 +464,115 @@ def _shooting_lifecycle(
     enemy_pose: Pose | None = None,
     catalog: ArmyCatalog | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
+    if (
+        alpha_datasheets is None
+        and not alpha_attachment_declarations
+        and enemy_unit_specs is None
+        and not enemy_attachment_declarations
+        and not embarked_unit_ids
+        and enemy_pose is None
+        and catalog is None
+    ):
+        config, armies, battlefield, cached_units = _cached_default_shooting_lifecycle_template(
+            alpha_unit_ids,
+            game_id,
+            alpha_unit_specs,
+            enemy_datasheet,
+        )
+        lifecycle = GameLifecycle()
+        lifecycle.start(config)
+        lifecycle.decision_controller.event_log = EventLog()
+        state = _state(lifecycle)
+        _configure_shooting_battle_state(
+            state=state,
+            armies=armies,
+            battlefield=battlefield,
+            units=dict(cached_units),
+            embarked_unit_ids=(),
+        )
+        return lifecycle, dict(cached_units)
+    return _build_shooting_lifecycle(
+        alpha_unit_ids=alpha_unit_ids,
+        game_id=game_id,
+        alpha_datasheets=alpha_datasheets,
+        alpha_unit_specs=alpha_unit_specs,
+        alpha_attachment_declarations=alpha_attachment_declarations,
+        enemy_datasheet=enemy_datasheet,
+        enemy_unit_specs=enemy_unit_specs,
+        enemy_attachment_declarations=enemy_attachment_declarations,
+        embarked_unit_ids=embarked_unit_ids,
+        enemy_pose=enemy_pose,
+        catalog=catalog,
+    )
+
+
+def _compact_shooting_lifecycle(
+    *,
+    alpha_unit_ids: tuple[str, ...] = ("intercessor-1",),
+    enemy_model_count: int = 1,
+    game_id: str = "phase13b-compact-game",
+    catalog: ArmyCatalog | None = None,
+) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
+    if type(enemy_model_count) is not int or enemy_model_count < 1:
+        raise AssertionError("Compact shooting lifecycle requires at least one enemy model.")
+    resolved_catalog = (
+        _compact_intercessor_catalog(_canonical_catalog())
+        if catalog is None
+        else _compact_intercessor_catalog(catalog)
+    )
+    return _shooting_lifecycle(
+        alpha_unit_ids=alpha_unit_ids,
+        game_id=game_id,
+        alpha_unit_specs=tuple(
+            (unit_id, "core-intercessor-like-infantry", "core-intercessor-like", 1)
+            for unit_id in alpha_unit_ids
+        ),
+        enemy_datasheet=(
+            "core-intercessor-like-infantry",
+            "core-intercessor-like",
+            enemy_model_count,
+        ),
+        enemy_pose=Pose.at(30.0, 35.0),
+        catalog=resolved_catalog,
+    )
+
+
+def _compact_intercessor_catalog(catalog: ArmyCatalog) -> ArmyCatalog:
+    compact_datasheets: list[DatasheetDefinition] = []
+    for datasheet in catalog.datasheets:
+        if datasheet.datasheet_id != "core-intercessor-like-infantry":
+            compact_datasheets.append(datasheet)
+            continue
+        compact_datasheets.append(
+            replace(
+                datasheet,
+                composition=tuple(
+                    UnitCompositionDefinition(
+                        model_profile_id=part.model_profile_id,
+                        min_models=1,
+                        max_models=part.max_models,
+                    )
+                    for part in datasheet.composition
+                ),
+            )
+        )
+    return replace(catalog, datasheets=tuple(compact_datasheets))
+
+
+def _build_shooting_lifecycle(
+    *,
+    alpha_unit_ids: tuple[str, ...],
+    game_id: str = "phase13b-game",
+    alpha_datasheets: dict[str, tuple[str, str, int]] | None = None,
+    alpha_unit_specs: tuple[tuple[str, str, str, int], ...] | None = None,
+    alpha_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    enemy_datasheet: tuple[str, str, int] | None = None,
+    enemy_unit_specs: tuple[tuple[str, str, str, int], ...] | None = None,
+    enemy_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    embarked_unit_ids: tuple[str, ...] = (),
+    enemy_pose: Pose | None = None,
+    catalog: ArmyCatalog | None = None,
+) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     resolved_enemy_pose = Pose.at(35.0, 35.0) if enemy_pose is None else enemy_pose
     config = _config(
         game_id=game_id,
@@ -515,7 +632,28 @@ def _shooting_lifecycle(
         )
         if army_id == "army-alpha":
             friendly_unit_index += 1
-    state = GameState.from_config(config)
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.decision_controller.event_log = EventLog()
+    state = _state(lifecycle)
+    _configure_shooting_battle_state(
+        state=state,
+        armies=armies,
+        battlefield=battlefield,
+        units=units,
+        embarked_unit_ids=embarked_unit_ids,
+    )
+    return lifecycle, units
+
+
+def _configure_shooting_battle_state(
+    *,
+    state: GameState,
+    armies: tuple[ArmyDefinition, ...],
+    battlefield: BattlefieldRuntimeState,
+    units: dict[str, UnitInstance],
+    embarked_unit_ids: tuple[str, ...],
+) -> None:
     for army in armies:
         state.record_army_definition(army)
     state.record_battlefield_state(battlefield)
@@ -552,17 +690,35 @@ def _shooting_lifecycle(
                 ),
             )
         )
-    payload = cast(
-        GameLifecyclePayload,
-        {
-            "config": config.to_payload(),
-            "parameterized_movement_proposals": True,
-            "state": state.to_payload(),
-            "decisions": lifecycle_decisions_payload(),
-            "reaction_queue": {"frames": []},
-        },
+
+
+@cache
+def _cached_default_shooting_lifecycle_template(
+    alpha_unit_ids: tuple[str, ...],
+    game_id: str,
+    alpha_unit_specs: tuple[tuple[str, str, str, int], ...] | None,
+    enemy_datasheet: tuple[str, str, int] | None,
+) -> tuple[
+    GameConfig,
+    tuple[ArmyDefinition, ...],
+    BattlefieldRuntimeState,
+    tuple[tuple[str, UnitInstance], ...],
+]:
+    lifecycle, units = _build_shooting_lifecycle(
+        alpha_unit_ids=alpha_unit_ids,
+        game_id=game_id,
+        alpha_unit_specs=alpha_unit_specs,
+        enemy_datasheet=enemy_datasheet,
     )
-    return GameLifecycle.from_payload(payload), units
+    state = _state(lifecycle)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    return (
+        lifecycle.config,
+        tuple(state.army_definitions),
+        battlefield,
+        tuple(sorted(units.items())),
+    )
 
 
 def _compact_test_unit_poses(*, origin: Pose, model_count: int) -> tuple[Pose, ...]:
@@ -585,7 +741,7 @@ def lifecycle_decisions_payload() -> dict[str, object]:
 
 
 def _catalog_with_extra_bolt_profile(extra_profile: WeaponProfile) -> ArmyCatalog:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _canonical_catalog()
     updated_wargear: list[Wargear] = []
     for wargear in catalog.wargear:
         if wargear.wargear_id == "core-bolt-rifle":
@@ -603,7 +759,7 @@ def _catalog_with_extra_bolt_profile(extra_profile: WeaponProfile) -> ArmyCatalo
 def _catalog_with_replaced_bolt_profiles(
     weapon_profiles: tuple[WeaponProfile, ...],
 ) -> ArmyCatalog:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _canonical_catalog()
     updated_wargear: list[Wargear] = []
     for wargear in catalog.wargear:
         if wargear.wargear_id == "core-bolt-rifle":
@@ -614,7 +770,7 @@ def _catalog_with_replaced_bolt_profiles(
 
 
 def _catalog_with_same_profile_id_target_cache_collision_weapons() -> ArmyCatalog:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _canonical_catalog()
     base_profile = _weapon_profile_by_wargear(
         wargear_id="core-bolt-rifle",
         weapon_profile_id="core-bolt-rifle:standard",
@@ -739,7 +895,7 @@ def _catalog_with_stealth_datasheet() -> ArmyCatalog:
 def _catalog_with_core_datasheet_ability(
     ability: DatasheetAbilityDescriptor,
 ) -> ArmyCatalog:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _canonical_catalog()
     if type(ability) is not DatasheetAbilityDescriptor:
         raise AssertionError("Test catalog core ability requires a descriptor.")
     updated_datasheets: list[DatasheetDefinition] = []
@@ -790,7 +946,7 @@ def _config(
     enemy_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
-    resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
+    resolved_catalog = _canonical_catalog() if catalog is None else catalog
     enemy_datasheet_id, enemy_model_profile_id, enemy_model_count = (
         ("core-intercessor-like-infantry", "core-intercessor-like", 5)
         if enemy_datasheet is None
@@ -851,12 +1007,12 @@ def _alpha_unit_spec(
     return (unit_id, "core-intercessor-like-infantry", "core-intercessor-like", 5)
 
 
+@cache
 def _mission_setup() -> MissionSetup:
-    mission_pack = chapter_approved_2026_27_mission_pack()
     return MissionSetup(
-        mission_pack_id=mission_pack.mission_pack_id,
-        source_version=mission_pack.source_version,
-        source_id=mission_pack.source_id,
+        mission_pack_id=MISSION_PACK_ID,
+        source_version=SOURCE_VERSION,
+        source_id=SOURCE_PACKAGE_ID,
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         primary_mission_id="take-and-hold",
         battlefield_layout_id=None,
@@ -1262,8 +1418,14 @@ def _state(lifecycle: GameLifecycle) -> GameState:
     return lifecycle.state
 
 
+@cache
 def _ruleset() -> RulesetDescriptor:
     return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase13b-test")
+
+
+@cache
+def _canonical_catalog() -> ArmyCatalog:
+    return ArmyCatalog.phase9a_canonical_content_pack()
 
 
 def _attack_sequence_private(name: str) -> Any:

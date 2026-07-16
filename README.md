@@ -11,6 +11,60 @@ uv sync
 uv run pytest
 ```
 
+## Test commands
+
+Pytest defaults are intentionally lightweight: narrow local and IDE runs do not start xdist
+workers or collect coverage unless requested.
+
+Fast local feedback excludes benchmarks and tests marked `slow`:
+
+```bash
+uv run pytest -m "not benchmark and not slow" -q -n0 --no-cov
+```
+
+Architecture and source-shape audits run serially without behavioral coverage:
+
+```bash
+uv run pytest tests/code_quality -q -n0 --no-cov
+```
+
+The unsharded full behavioral coverage gate is:
+
+```bash
+uv run pytest tests --ignore=tests/code_quality \
+  -n auto --dist=worksteal \
+  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
+```
+
+CI shards this same behavioral suite, combines branch coverage, and applies the single 85%
+gate after every shard succeeds. Full type checking and architecture checks also remain required
+in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
+format for a shorter edit/commit loop.
+
+The four behavioral manifests in `ci/test_shards/` are generated from historical JUnit file
+durations with deterministic largest-processing-time balancing. Verify that every behavioral test
+file appears exactly once with:
+
+```bash
+uv run python scripts/build_test_shards.py --check --shard-count 4
+```
+
+After collecting a representative full-suite profile, rebalance the manifests with:
+
+```bash
+uv run python scripts/build_test_shards.py \
+  --junit reports/full-behavior-profile.xml \
+  --shard-count 4
+```
+
+CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
+run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the
+faster quality and parallel type-check feedback without repeatedly running the complete suite.
+The stable `coverage-gate` aggregate fails closed when any behavioral shard does not succeed, then
+combines all four coverage artifacts and enforces the branch-coverage threshold. Repositories that
+enable branch protection can require `quality-fast`, `mypy`, `pyright`, and `coverage-gate` without
+encoding matrix shard names in the protection rule.
+
 # CORE V2 Architecture
 
 ## 1. Purpose
