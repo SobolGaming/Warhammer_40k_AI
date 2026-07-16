@@ -60,6 +60,10 @@ uv run python scripts/build_test_shards.py \
 CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
 run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the
 faster quality and parallel type-check feedback without repeatedly running the complete suite.
+The stable `coverage-gate` aggregate fails closed when any behavioral shard does not succeed, then
+combines all four coverage artifacts and enforces the branch-coverage threshold. Repositories that
+enable branch protection can require `quality-fast`, `mypy`, `pyright`, and `coverage-gate` without
+encoding matrix shard names in the protection rule.
 
 # CORE V2 Architecture
 
