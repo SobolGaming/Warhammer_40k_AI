@@ -219,9 +219,11 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     non_daemons_rows = tuple(row for row in support_rows if row.faction_id != "chaos-daemons")
     assert {(row.faction_id, row.datasheet_id, row.overall) for row in non_daemons_rows} == {
         ("aeldari", "000000592", "Playable"),
+        ("aeldari", "000000598", "Playable"),
         ("aeldari", "000000605", "Playable"),
         ("aeldari", "000002531", "Playable"),
         ("aeldari", "000002532", "Playable"),
+        ("aeldari", "000002533", "Playable"),
         ("aeldari", "000004193", "Playable"),
         ("aeldari", "000004194", "Playable"),
         ("aeldari", "000004195", "Playable"),
@@ -326,11 +328,11 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 8,
-        SEMANTIC_BUCKET_HOST_NEEDED: 6,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 56,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 11,
+        SEMANTIC_BUCKET_HOST_NEEDED: 5,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 54,
     }
-    assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
+    assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000571"].semantic_bucket == SEMANTIC_BUCKET_UNSUPPORTED_IR
     assert rows_by_id["000002531"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
@@ -427,16 +429,19 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
         for ability in rows_by_id["000000597"].abilities
         if ability.ability_name == "Psychic Guidance"
     )
-    assert psychic_guidance.support_stage.value == "generic_ir_executable"
-    assert psychic_guidance.runtime_consumer_ids == (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,)
+    assert psychic_guidance.support_stage.value == "engine_consumed"
+    assert psychic_guidance.runtime_consumer_ids == (
+        CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,
+    )
     assert tuple(
         (semantic.semantic_kind, semantic.runtime_consumer_ids)
         for semantic in psychic_guidance.semantic_consumers
     ) == (
         ("set_characteristic", (CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,)),
-        ("modify_dice_roll", ()),
+        ("modify_dice_roll", (CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,)),
     )
-    assert CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID not in (
+    assert CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID in (
         consumer_id
         for semantic in psychic_guidance.semantic_consumers
         for consumer_id in semantic.runtime_consumer_ids

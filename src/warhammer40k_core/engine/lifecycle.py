@@ -33,6 +33,7 @@ from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
     invalid_any_phase_once_per_battle_status,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
     apply_catalog_unit_move_completed_mortal_wounds_target_result,
@@ -2425,6 +2426,10 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
+        CatalogDatasheetRuleRuntime(
+            bundle.ability_indexes_by_player_id,
+            armies,
+        ).record_static_destruction_reaction_sources(state=state)
         self._runtime_content_bundle = bundle
         self._setup_flow = replace(
             self._setup_flow,

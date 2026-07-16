@@ -57,6 +57,25 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000000592:ranged-invulnerable-save",
+    "ability_name": "Ranged Invulnerable Save",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/datasheet/000000592:ranged-invulnerable-save/none",
+    "datasheet_id": "000000592",
+    "datasheet_name": "Rangers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query"
+    ],
+    "semantic_categories": [
+      "datasheet.characteristic_set.invulnerable_save.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000009894",
     "ability_name": "Battle Focus",
     "catalog_id": "chaos-daemons-bridge-catalog",
@@ -78,6 +97,65 @@
     ],
     "source_kind": "faction",
     "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000598:malevolent-souls",
+    "ability_name": "Malevolent Souls",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none",
+    "datasheet_id": "000000598",
+    "datasheet_name": "Wraithblades",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:fight-on-death-source"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000598:psychic-guidance",
+    "ability_name": "Psychic Guidance",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:psychic-guidance/none",
+    "datasheet_id": "000000598",
+    "datasheet_name": "Wraithblades",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:leadership-characteristic-query"
+    ],
+    "semantic_categories": [
+      "datasheet.characteristic_set.leadership.this_unit",
+      "datasheet.roll_modifier.hit.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000598:forceshield",
+    "ability_name": "Forceshield",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000598/wargear/000000598:forceshield/000000598:forceshield",
+    "datasheet_id": "000000598",
+    "datasheet_name": "Wraithblades",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query"
+    ],
+    "semantic_categories": [
+      "wargear.characteristic_set.invulnerable_save.this_model"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000000598:forceshield",
     "support_stage": "engine_consumed"
   },
   {
@@ -1198,6 +1276,106 @@
     ],
     "source_kind": "wargear",
     "source_wargear_id": "000002532:mistshield",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008344",
+    "ability_name": "Scouts",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/core/000008344/none",
+    "datasheet_id": "000002533",
+    "datasheet_name": "Shroud Runners",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:scouts"
+    ],
+    "semantic_categories": [
+      "core.scouts"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008337",
+    "ability_name": "Stealth",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/core/000008337/none",
+    "datasheet_id": "000002533",
+    "datasheet_name": "Shroud Runners",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "core:stealth"
+    ],
+    "semantic_categories": [
+      "core.stealth"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002533:ranged-invulnerable-save",
+    "ability_name": "Ranged Invulnerable Save",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/datasheet/000002533:ranged-invulnerable-save/none",
+    "datasheet_id": "000002533",
+    "datasheet_name": "Shroud Runners",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query"
+    ],
+    "semantic_categories": [
+      "datasheet.characteristic_set.invulnerable_save.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002533:target-acquisition",
+    "ability_name": "Target Acquisition",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/datasheet/000002533:target-acquisition/none",
+    "datasheet_id": "000002533",
+    "datasheet_name": "Shroud Runners",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-status"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.enemy_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/faction/000009894/none",
+    "datasheet_id": "000002533",
+    "datasheet_name": "Shroud Runners",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
     "support_stage": "engine_consumed"
   },
   {

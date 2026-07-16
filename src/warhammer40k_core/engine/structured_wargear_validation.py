@@ -28,10 +28,6 @@ def validate_replace_wargear_effect_count(
         for candidate in option_effects
     ):
         return
-    if effect.model_count != 1:
-        raise error_type(
-            "WargearSelection structured wargear option replacement model count is unsupported."
-        )
     if effect.replaced_wargear_id is None:
         raise error_type(
             "WargearSelection structured wargear option replacement target is missing."

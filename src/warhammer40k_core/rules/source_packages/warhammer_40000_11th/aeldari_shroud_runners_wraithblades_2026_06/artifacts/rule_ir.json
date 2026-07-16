@@ -1,0 +1,327 @@
+{
+  "artifact_schema": "core-v2-aeldari-shroud-runners-wraithblades-rule-ir-v1",
+  "datasheets": {
+    "000000598": "Wraithblades",
+    "000002533": "Shroud Runners"
+  },
+  "package_hash": "68fb87b5cc51bee327efbd5b067ba8b00ee51c6ea52e4b95f66eddc948ce53c4",
+  "records": {
+    "000000598:1": {
+      "ability_name": "Malevolent Souls",
+      "normalized_text_sha256": "d5ed4c90b6b4b86faeb2157916e95ba15feb8cd1ba576184ebe23b45152545c9",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:shroud-runners-wraithblades:000000598:1:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "attack_kind",
+                    "value": "melee"
+                  },
+                  {
+                    "key": "gate_subject",
+                    "value": "destroyed_model"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "destroyed_by_attack"
+                  }
+                ],
+                "source_span": {
+                  "end": 61,
+                  "start": 34,
+                  "text": "destroyed by a melee attack"
+                }
+              },
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "destroyed_model"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "has_not_fought_this_phase"
+                  }
+                ],
+                "source_span": {
+                  "end": 102,
+                  "start": 66,
+                  "text": "that model has not fought this phase"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "fight_on_death"
+                  },
+                  {
+                    "key": "optional",
+                    "value": true
+                  },
+                  {
+                    "key": "trigger_roll_threshold",
+                    "value": 3
+                  },
+                  {
+                    "key": "trigger_roll_type",
+                    "value": "aeldari_malevolent_souls"
+                  }
+                ],
+                "source_span": {
+                  "end": 241,
+                  "start": 154,
+                  "text": "that destroyed model can fight after the attacking unit has finished making its attacks"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 273,
+              "start": 0,
+              "text": "Each time a model in this unit is destroyed by a melee attack, if that model has not fought this phase, roll one D6. On a 3+, do not remove it from play; that destroyed model can fight after the attacking unit has finished making its attacks, and is then removed from play."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 30,
+                "start": 10,
+                "text": "a model in this unit"
+              }
+            },
+            "template_id": "phase17c:conditional-model-fight-on-death",
+            "trigger": {
+              "kind": "model_destroyed",
+              "parameters": [
+                {
+                  "key": "destroyed_target",
+                  "value": "this_model"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "after_attacking_unit_finished_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 61,
+                "start": 10,
+                "text": "a model in this unit is destroyed by a melee attack"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "3beba0ad4b8f98661b8527d5072172e19a8baf3f6ea291ea074653d1bc3c1ea0",
+        "normalized_text": "Each time a model in this unit is destroyed by a melee attack, if that model has not fought this phase, roll one D6. On a 3+, do not remove it from play; that destroyed model can fight after the attacking unit has finished making its attacks, and is then removed from play.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:shroud-runners-wraithblades:datasheet:000000598:1",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-shroud-runners-wraithblades-datasheets-2026-06-14:datasheet:000000598:1"
+      }
+    },
+    "000000598:3": {
+      "ability_name": "Forceshield",
+      "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:shroud-runners-wraithblades:000000598:3:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "set_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "invulnerable_save"
+                  },
+                  {
+                    "key": "value",
+                    "value": 4
+                  }
+                ],
+                "source_span": {
+                  "end": 37,
+                  "start": 17,
+                  "text": "4+ invulnerable save"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 38,
+              "start": 0,
+              "text": "The bearer has a 4+ invulnerable save."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 10,
+                "start": 4,
+                "text": "bearer"
+              }
+            },
+            "template_id": "phase17c:passive-model-characteristic-set",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "b0a69d11b91bd4d25fa4dee22486d8746abb96bf44129c7d5e37d3061d4b76e1",
+        "normalized_text": "The bearer has a 4+ invulnerable save.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:shroud-runners-wraithblades:datasheet:000000598:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-shroud-runners-wraithblades-datasheets-2026-06-14:datasheet:000000598:3"
+      }
+    },
+    "000002533:4": {
+      "ability_name": "Target Acquisition",
+      "normalized_text_sha256": "c2968e27284a9e0215893019a44477a6eb5f8e3018f73606ea1e6309becc8739",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:shroud-runners-wraithblades:000002533:4:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "endpoint",
+                  "value": "phase"
+                }
+              ],
+              "source_span": {
+                "end": 158,
+                "start": 132,
+                "text": "Until the end of the phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "set_contextual_status",
+                "parameters": [
+                  {
+                    "key": "operation",
+                    "value": "deny"
+                  },
+                  {
+                    "key": "rules_context",
+                    "value": "status_denial"
+                  },
+                  {
+                    "key": "status",
+                    "value": "benefit_of_cover"
+                  },
+                  {
+                    "key": "status_label",
+                    "value": "Benefit of Cover"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "selected_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 208,
+                  "start": 160,
+                  "text": "that enemy unit cannot have the Benefit of Cover"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 209,
+              "start": 0,
+              "text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks made with a long rifle. Until the end of the phase, that enemy unit cannot have the Benefit of Cover."
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 107,
+                "start": 57,
+                "text": "one enemy unit hit by one or more of those attacks"
+              }
+            },
+            "template_id": "phase17c:weapon-filtered-post-shoot-status-denial",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "just_after_friendly_unit_has_shot"
+                },
+                {
+                  "key": "weapon_names",
+                  "value": [
+                    "Long rifle"
+                  ]
+                }
+              ],
+              "source_span": {
+                "end": 48,
+                "start": 0,
+                "text": "In your Shooting phase, after this unit has shot"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "0af96c9a032391895864e005f496feda602e4af732a1cd44c931425569411447",
+        "normalized_text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks made with a long rifle. Until the end of the phase, that enemy unit cannot have the Benefit of Cover.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:shroud-runners-wraithblades:datasheet:000002533:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-shroud-runners-wraithblades-datasheets-2026-06-14:datasheet:000002533:4"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-aeldari-shroud-runners-wraithblades-datasheets-2026-06-14",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}

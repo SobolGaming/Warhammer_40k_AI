@@ -29,6 +29,7 @@ from warhammer40k_core.engine import catalog_contextual_status_consumption as _c
 from warhammer40k_core.engine import catalog_datasheet_rule_support as _datasheet
 from warhammer40k_core.engine import catalog_movement_transit as _t
 from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
+from warhammer40k_core.engine import catalog_post_shoot_status_descriptors as _status
 from warhammer40k_core.engine import catalog_prebattle_redeploy as _prebattle_redeploy
 from warhammer40k_core.engine import (
     catalog_reserve_arrival_restriction_classification as _reserve_restriction,
@@ -134,6 +135,11 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTriggerKind,
     parameter_payload,
 )
+
+_clause_is_supported_post_shoot_hit_target_status_denial = (
+    _status.clause_is_post_shoot_hit_target_status_denial
+)
+_effect_is_supported_status_denial = _status.effect_is_status_denial
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -2012,6 +2018,8 @@ def _catalog_post_shoot_hit_target_status_groups_from_clause(
         raise GameLifecycleError("Catalog post-shoot status requires a rule clause.")
     if not _clause_is_supported_post_shoot_hit_target_status_denial(clause):
         return ()
+    if clause.trigger is None:
+        raise GameLifecycleError("Catalog post-shoot status classification lost its trigger.")
     supported_effects = tuple(
         (effect_index, effect)
         for effect_index, effect in enumerate(clause.effects)
@@ -2024,6 +2032,8 @@ def _catalog_post_shoot_hit_target_status_groups_from_clause(
     status = _required_string_parameter(parameters, key="status")
     status_label = _required_string_parameter(parameters, key="status_label")
     target_scope = _required_string_parameter(parameters, key="target_scope")
+    trigger_parameters = parameter_payload(clause.trigger.parameters)
+    weapon_names = _optional_named_weapon_names(trigger_parameters) or ()
     source_model_ids = _post_shoot_status_source_model_ids(
         record=record,
         unit=unit,
@@ -2037,6 +2047,7 @@ def _catalog_post_shoot_hit_target_status_groups_from_clause(
             decisions=context.decisions,
             sequence=context.attack_sequence,
             attacker_model_instance_id=source_model_id,
+            weapon_names=weapon_names,
         )
         options = tuple(
             CatalogPostShootHitTargetStatusOption(
@@ -3691,7 +3702,11 @@ def catalog_leadership_characteristic_for_unit(
     ):
         rule_ir = _rule_ir_from_record(record)
         for clause in rule_ir.clauses:
-            if not _clause_targets_this_unit(clause):
+            if (
+                not _clause_targets_this_unit(clause)
+                or clause.trigger is not None
+                or clause.conditions
+            ):
                 continue
             for effect in clause.effects:
                 if not _effect_is_leadership_set(effect):
@@ -5062,47 +5077,6 @@ def _effect_is_named_weapon_ability_choice_option(effect: RuleEffectSpec) -> boo
     return keyword is not None and _weapon_ability_choice_has_supported_runtime_shape(
         parameters,
         keyword=keyword,
-    )
-
-
-def _clause_is_supported_post_shoot_hit_target_status_denial(clause: RuleClause) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
-    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
-        return False
-    trigger_parameters = parameter_payload(clause.trigger.parameters)
-    if (
-        trigger_parameters.get("edge") != "after"
-        or trigger_parameters.get("owner") != "active_player"
-        or trigger_parameters.get("phase") != BattlePhase.SHOOTING.value
-        or trigger_parameters.get("timing_window") != "just_after_friendly_unit_has_shot"
-        or trigger_parameters.get("target_relationship") != "hit_by_those_attacks"
-    ):
-        return False
-    if trigger_parameters.get("subject") not in {"this_model", "this_unit", "bearer"}:
-        return False
-    if (
-        clause.duration is None
-        or clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
-        or parameter_payload(clause.duration.parameters).get("endpoint") != "phase"
-    ):
-        return False
-    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
-        return False
-    return sum(1 for effect in clause.effects if _effect_is_supported_status_denial(effect)) == 1
-
-
-def _effect_is_supported_status_denial(effect: RuleEffectSpec) -> bool:
-    if type(effect) is not RuleEffectSpec:
-        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
-    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
-        return False
-    parameters = parameter_payload(effect.parameters)
-    return (
-        parameters.get("rules_context") == "status_denial"
-        and parameters.get("operation") == "deny"
-        and parameters.get("status") == "benefit_of_cover"
-        and parameters.get("target_scope") in {"selected_unit", "models_in_selected_unit"}
     )
 
 

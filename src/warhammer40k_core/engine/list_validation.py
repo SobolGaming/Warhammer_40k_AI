@@ -1266,10 +1266,6 @@ def _validate_add_wargear_effect_count(
     selection: WargearSelection,
     effect: DatasheetWargearOptionEffect,
 ) -> None:
-    if effect.model_count != 1:
-        raise ListValidationError(
-            "WargearSelection structured wargear option effect model count is unsupported."
-        )
     selected_wargear_count = sum(
         1 for wargear_id in selection.wargear_ids if wargear_id == effect.wargear_id
     )
@@ -1284,10 +1280,6 @@ def _validate_conditional_add_wargear_effect_count(
     selection: WargearSelection,
     effect: DatasheetWargearOptionEffect,
 ) -> None:
-    if effect.model_count != 1:
-        raise ListValidationError(
-            "WargearSelection structured wargear option effect model count is unsupported."
-        )
     selected_wargear_count = sum(
         1 for wargear_id in selection.wargear_ids if wargear_id == effect.wargear_id
     )
