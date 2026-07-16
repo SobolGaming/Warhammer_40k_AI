@@ -41,6 +41,26 @@ gate after every shard succeeds. Full type checking and architecture checks also
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
+The four behavioral manifests in `ci/test_shards/` are generated from historical JUnit file
+durations with deterministic largest-processing-time balancing. Verify that every behavioral test
+file appears exactly once with:
+
+```bash
+uv run python scripts/build_test_shards.py --check --shard-count 4
+```
+
+After collecting a representative full-suite profile, rebalance the manifests with:
+
+```bash
+uv run python scripts/build_test_shards.py \
+  --junit reports/full-behavior-profile.xml \
+  --shard-count 4
+```
+
+CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
+run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the
+faster quality and parallel type-check feedback without repeatedly running the complete suite.
+
 # CORE V2 Architecture
 
 ## 1. Purpose

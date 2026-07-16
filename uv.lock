@@ -964,8 +964,11 @@ test = [
     { name = "pytest-xdist" },
 ]
 typecheck = [
+    { name = "hypothesis" },
+    { name = "jsonschema" },
     { name = "mypy" },
     { name = "pyright" },
+    { name = "pytest" },
     { name = "types-jsonschema" },
 ]
 
@@ -1020,7 +1023,10 @@ test = [
     { name = "pytest-xdist", specifier = ">=3.7" },
 ]
 typecheck = [
+    { name = "hypothesis", specifier = ">=6.135" },
+    { name = "jsonschema", specifier = ">=4.23" },
     { name = "mypy", specifier = ">=1.16" },
     { name = "pyright", specifier = ">=1.1" },
+    { name = "pytest", specifier = ">=8.4" },
     { name = "types-jsonschema", specifier = ">=4.26.0.20260518" },
 ]

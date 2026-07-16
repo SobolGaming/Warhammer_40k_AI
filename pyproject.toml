@@ -32,6 +32,9 @@ lint = [
 typecheck = [
   "mypy>=1.16",
   "pyright>=1.1",
+  "pytest>=8.4",
+  "hypothesis>=6.135",
+  "jsonschema>=4.23",
   "types-jsonschema>=4.26.0.20260518",
 ]
 benchmark = [
