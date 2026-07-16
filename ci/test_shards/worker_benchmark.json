@@ -1,8 +1,8 @@
 {
   "decision": {
     "ci_distribution": "worksteal",
-    "ci_worker_count": 2,
-    "reason": "Two fixed workers match the hosted runner allocation; worksteal stayed within measurement noise of load at two workers and better protects shards from uneven lifecycle-test durations."
+    "ci_worker_count": "auto",
+    "reason": "Auto uses the logical CPUs exposed by each local or hosted runner. On the 10-core benchmark host, auto with worksteal completed in 33.88 seconds versus 85.01 seconds with two workers; worksteal also protects shards from uneven lifecycle-test durations."
   },
   "environment": {
     "logical_cpu_count": 10,

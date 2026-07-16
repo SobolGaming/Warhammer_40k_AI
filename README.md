@@ -32,7 +32,7 @@ The unsharded full behavioral coverage gate is:
 
 ```bash
 uv run pytest tests --ignore=tests/code_quality \
-  -n 2 --dist=worksteal \
+  -n auto --dist=worksteal \
   --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
 ```
 

@@ -145,7 +145,7 @@ jobs:
           mkdir -p reports
           mapfile -t shard_paths < "$SHARD_MANIFEST"
           uv run --no-sync pytest "${shard_paths[@]}" \
-            -n 2 \
+            -n auto \
             --dist=worksteal \
             --cov=warhammer40k_core \
             --cov-report= \
