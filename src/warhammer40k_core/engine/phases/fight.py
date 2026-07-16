@@ -84,6 +84,7 @@ from warhammer40k_core.engine.fight_activation_abilities import (
 from warhammer40k_core.engine.fight_eligibility_queries import (
     unit_was_eligible_to_fight_this_phase,
 )
+from warhammer40k_core.engine.fight_on_death import remove_models_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import (
     DECLINE_FIGHT_INTERRUPT_OPTION_ID,
     ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
@@ -650,6 +651,7 @@ def _advance_fight_attack_sequence(
         reaction_queue=reaction_queue,
         policy=policy,
         activation=activation,
+        unit_attacked=True,
     )
 
 
@@ -681,6 +683,7 @@ def _advance_active_fight_activation(
         scenario=scenario,
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
         unit_instance_id=activation.unit_instance_id,
+        state=state,
     )
     unit = _unit_by_id(state=state, unit_instance_id=activation.unit_instance_id)
     available_weapons = available_melee_weapons_payloads(
@@ -713,6 +716,7 @@ def _advance_active_fight_activation(
             reaction_queue=reaction_queue,
             policy=policy,
             activation=activation,
+            unit_attacked=False,
         )
     ability_status = _request_fight_activation_ability_if_available(
         handler=handler,
@@ -789,9 +793,29 @@ def _complete_active_fight_activation(
     reaction_queue: ReactionQueue | None,
     policy: FightPolicyDescriptor,
     activation: FightActivationSelection,
+    unit_attacked: bool,
 ) -> LifecycleStatus | None:
     fight_state = _require_fight_state(state)
     state.replace_fight_phase_state(fight_state.with_active_activation(None))
+    if unit_attacked:
+        removed_model_ids = remove_models_awaiting_fight_on_death(
+            state=state,
+            unit_instance_id=activation.unit_instance_id,
+        )
+        if removed_model_ids:
+            decisions.event_log.append(
+                "fight_on_death_models_removed",
+                validate_json_value(
+                    {
+                        "game_id": state.game_id,
+                        "battle_round": state.battle_round,
+                        "phase": BattlePhase.FIGHT.value,
+                        "unit_instance_id": activation.unit_instance_id,
+                        "model_instance_ids": list(removed_model_ids),
+                        "reason": "unit_attacked",
+                    }
+                ),
+            )
     event = decisions.event_log.append(
         "unit_has_fought",
         validate_json_value(
@@ -1209,6 +1233,7 @@ def invalid_fight_movement_proposal_status(
             proposal_request=proposal_request,
             ruleset_descriptor=ruleset_descriptor,
         ),
+        state=state,
     )
     if not rule_validation.is_valid:
         return _reject_invalid_fight_proposal(
@@ -1392,6 +1417,7 @@ def _apply_fight_movement_proposal(
             unit_instance_id=proposal.unit_instance_id,
             proposal_kind=proposal.proposal_kind,
         ),
+        state=state,
     )
     resolution_violation = fight_movement_resolution_violation(
         proposal_request=proposal_request,
@@ -1399,6 +1425,7 @@ def _apply_fight_movement_proposal(
         resolution=resolution,
         scenario=scenario,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        state=state,
     )
     if resolution_violation is not None:
         violation_code = _first_proposal_violation_code(resolution_violation)
@@ -1723,6 +1750,7 @@ def _fight_movement_request_context(
                     scenario=scenario,
                     ruleset_descriptor=state.runtime_ruleset_descriptor(),
                     unit_instance_id=unit_instance_id,
+                    state=state,
                 )
             ),
         }
@@ -1752,6 +1780,7 @@ def _fight_movement_request_context(
                 ruleset_descriptor=state.runtime_ruleset_descriptor(),
                 unit_instance_id=unit_instance_id,
                 objective_markers=objective_markers,
+                state=state,
             )
         ],
         "objective_markers": [
@@ -1780,6 +1809,7 @@ def _eligible_fight_movement_unit_ids(
                     scenario=scenario,
                     ruleset_descriptor=state.runtime_ruleset_descriptor(),
                     unit_instance_id=unit_id,
+                    state=state,
                 )
             ):
                 continue
@@ -1787,6 +1817,7 @@ def _eligible_fight_movement_unit_ids(
                 scenario=scenario,
                 ruleset_descriptor=state.runtime_ruleset_descriptor(),
                 unit_instance_id=unit_id,
+                state=state,
             ):
                 continue
             eligible.append(unit_id)
@@ -1805,6 +1836,7 @@ def _eligible_fight_movement_unit_ids(
                 ruleset_descriptor=state.runtime_ruleset_descriptor(),
                 unit_instance_id=unit_id,
                 objective_markers=_objective_markers_for_state(state),
+                state=state,
             ):
                 continue
             eligible.append(unit_id)

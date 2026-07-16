@@ -342,6 +342,7 @@ __all__ = (
     "request_stratagem_use_from_index",
     "stratagem_availability_kind_from_token",
     "stratagem_category_from_token",
+    "stratagem_cost_increase_made_use_unaffordable",
     "stratagem_decline_option",
     "stratagem_decline_payload",
     "stratagem_selection_from_decision_result",

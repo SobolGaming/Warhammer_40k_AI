@@ -13,6 +13,7 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audit
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 
 
@@ -2891,11 +2892,36 @@ class MissionScoringPolicy:
                 fixed_secondary_cap - fixed_secondary_points_before,
                 0,
             )
+        primary_battle_round_cap: int | None = None
+        primary_battle_round_points_before = 0
+        primary_battle_round_remaining = award.amount
+        if (
+            cap_bucket is VictoryPointCapBucket.PRIMARY
+            and self.primary_max_vp_per_turn is not None
+            and award.scoring_timing != "end_of_battle"
+        ):
+            primary_battle_round_cap = self.primary_max_vp_per_turn
+            primary_battle_round_points_before = sum(
+                transaction.amount
+                for transaction in ledger.transactions
+                if transaction.battle_round == award.battle_round
+                and transaction.scoring_timing != "end_of_battle"
+                and self.cap_bucket_for_victory_point_source(
+                    source_kind=transaction.source_kind,
+                    source_id=transaction.source_id,
+                )
+                is VictoryPointCapBucket.PRIMARY
+            )
+            primary_battle_round_remaining = max(
+                primary_battle_round_cap - primary_battle_round_points_before,
+                0,
+            )
         total_remaining = max(self.total_vp_cap - ledger.victory_points, 0)
         applied_amount = min(
             award.amount,
             source_remaining,
             fixed_secondary_remaining,
+            primary_battle_round_remaining,
             total_remaining,
         )
         if applied_amount == award.amount:
@@ -2906,11 +2932,13 @@ class MissionScoringPolicy:
             capped_reasons.append(self._source_cap_reason(cap_bucket))
         if fixed_secondary_remaining < award.amount:
             capped_reasons.append("fixed_secondary_mission_vp_cap")
+        if primary_battle_round_remaining < award.amount:
+            capped_reasons.append("primary_battle_round_vp_cap")
         if total_remaining < award.amount:
             capped_reasons.append("total_vp_cap")
         return (
             applied_amount,
-            _metadata_with_vp_cap_audit(
+            metadata_with_vp_cap_audit(
                 award.metadata,
                 requested_amount=award.amount,
                 applied_amount=applied_amount,
@@ -2925,6 +2953,11 @@ class MissionScoringPolicy:
                 fixed_secondary_mission_points_before=fixed_secondary_points_before,
                 fixed_secondary_mission_points_after=(
                     fixed_secondary_points_before + applied_amount
+                ),
+                primary_battle_round_cap=primary_battle_round_cap,
+                primary_battle_round_points_before=primary_battle_round_points_before,
+                primary_battle_round_points_after=(
+                    primary_battle_round_points_before + applied_amount
                 ),
             ),
         )
@@ -4095,73 +4128,6 @@ def _validate_required_final_scoring_windows(
         )
         raise GameLifecycleError(f"Final scoring requires recorded policy windows: {missing_text}.")
     return validated_windows
-
-
-def _metadata_with_vp_cap_audit(
-    metadata: JsonValue,
-    *,
-    requested_amount: int,
-    applied_amount: int,
-    source_cap: int,
-    source_points_before: int,
-    source_points_after: int,
-    total_cap: int,
-    total_points_before: int,
-    total_points_after: int,
-    capped_reasons: tuple[str, ...],
-    fixed_secondary_mission_cap: int | None = None,
-    fixed_secondary_mission_points_before: int = 0,
-    fixed_secondary_mission_points_after: int = 0,
-) -> JsonValue:
-    audit = {
-        "requested_amount": _validate_positive_int("requested_amount", requested_amount),
-        "applied_amount": _validate_non_negative_int("applied_amount", applied_amount),
-        "source_cap": _validate_non_negative_int("source_cap", source_cap),
-        "source_points_before": _validate_non_negative_int(
-            "source_points_before", source_points_before
-        ),
-        "source_points_after": _validate_non_negative_int(
-            "source_points_after", source_points_after
-        ),
-        "total_cap": _validate_positive_int("total_cap", total_cap),
-        "total_points_before": _validate_non_negative_int(
-            "total_points_before", total_points_before
-        ),
-        "total_points_after": _validate_non_negative_int("total_points_after", total_points_after),
-        "capped_reasons": list(
-            _validate_identifier_tuple_ordered(
-                "capped_reasons",
-                capped_reasons,
-                min_length=1,
-            )
-        ),
-    }
-    if fixed_secondary_mission_cap is not None:
-        audit["fixed_secondary_mission_cap"] = _validate_positive_int(
-            "fixed_secondary_mission_cap",
-            fixed_secondary_mission_cap,
-        )
-        audit["fixed_secondary_mission_points_before"] = _validate_non_negative_int(
-            "fixed_secondary_mission_points_before",
-            fixed_secondary_mission_points_before,
-        )
-        audit["fixed_secondary_mission_points_after"] = _validate_non_negative_int(
-            "fixed_secondary_mission_points_after",
-            fixed_secondary_mission_points_after,
-        )
-    validated_metadata = validate_json_value(metadata)
-    if validated_metadata is None:
-        return {"vp_cap_audit": validate_json_value(audit)}
-    if isinstance(validated_metadata, dict):
-        if "vp_cap_audit" in validated_metadata:
-            raise GameLifecycleError("Victory point metadata already contains vp_cap_audit.")
-        updated = dict(validated_metadata)
-        updated["vp_cap_audit"] = validate_json_value(audit)
-        return updated
-    return {
-        "original_metadata": validated_metadata,
-        "vp_cap_audit": validate_json_value(audit),
-    }
 
 
 def _ledger_points_from_source(

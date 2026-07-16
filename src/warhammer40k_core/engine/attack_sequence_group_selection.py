@@ -503,6 +503,19 @@ def apply_destruction_reaction_decision(
     )
     if decision.player_id != context["destroyed_model_controller_player_id"]:
         raise GameLifecycleError("Destruction reaction defender drift.")
+    if (
+        selected_source is not None
+        and selected_source.reaction_kind is DestructionReactionKind.FIGHT_ON_DEATH
+    ):
+        restore_selected_model_awaiting_fight_on_death(
+            state=state,
+            decisions=decisions,
+            model_destroyed_event_id=context["model_destroyed_event_id"],
+            model_instance_id=context["model_instance_id"],
+            source_id=selected_source.source_id,
+            source_rule_id=selected_source.source_rule_id,
+            source_phase=attack_sequence.source_phase,
+        )
     decisions.event_log.append(
         "destruction_reaction_resolved",
         {

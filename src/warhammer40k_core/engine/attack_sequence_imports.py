@@ -121,6 +121,9 @@ from warhammer40k_core.engine.event_log import (
     canonical_json,
     validate_json_value,
 )
+from warhammer40k_core.engine.fight_on_death import (
+    restore_selected_model_awaiting_fight_on_death,
+)
 from warhammer40k_core.engine.hazard import (
     hazard_mortal_wounds_per_failed_roll,
     hazard_roll_failed,
@@ -432,6 +435,7 @@ __all__ = (
     "resolve_feel_no_pain_rolls",
     "resolve_mortal_wound_feel_no_pain_decision",
     "resolve_saving_throw",
+    "restore_selected_model_awaiting_fight_on_death",
     "rules_unit_view_by_id",
     "save_options_for_model",
     "saving_throw_roll_spec",

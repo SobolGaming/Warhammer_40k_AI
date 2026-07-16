@@ -263,6 +263,8 @@ class StratagemUseRecordPayload(TypedDict):
     command_point_modifier_source_ids: NotRequired[list[str]]
     command_point_transaction_id: str | None
     handler_id: str
+    effects_resolved: bool
+    unresolved_reason: str | None
     effect_selection: JsonValue
     effect_payload: JsonValue
 
@@ -1178,6 +1180,8 @@ class StratagemUseRecord:
     handler_id: str
     command_point_modifier_ids: tuple[str, ...] = ()
     command_point_modifier_source_ids: tuple[str, ...] = ()
+    effects_resolved: bool = True
+    unresolved_reason: str | None = None
     effect_selection: JsonValue = None
     effect_payload: JsonValue = None
 
@@ -1285,6 +1289,25 @@ class StratagemUseRecord:
             "handler_id",
             _validate_identifier("StratagemUseRecord handler_id", self.handler_id),
         )
+        object.__setattr__(
+            self,
+            "effects_resolved",
+            _validate_bool("StratagemUseRecord effects_resolved", self.effects_resolved),
+        )
+        object.__setattr__(
+            self,
+            "unresolved_reason",
+            _validate_optional_identifier(
+                "StratagemUseRecord unresolved_reason",
+                self.unresolved_reason,
+            ),
+        )
+        if self.effects_resolved and self.unresolved_reason is not None:
+            raise GameLifecycleError("Resolved Stratagem use cannot have unresolved_reason.")
+        if not self.effects_resolved and self.unresolved_reason is None:
+            raise GameLifecycleError("Unresolved Stratagem use requires unresolved_reason.")
+        if not self.effects_resolved and self.command_point_transaction_id is not None:
+            raise GameLifecycleError("Unresolved Stratagem use cannot spend Command points.")
         object.__setattr__(self, "effect_selection", validate_json_value(self.effect_selection))
         object.__setattr__(self, "effect_payload", validate_json_value(self.effect_payload))
 
@@ -1309,6 +1332,8 @@ class StratagemUseRecord:
             "command_point_modifier_source_ids": list(self.command_point_modifier_source_ids),
             "command_point_transaction_id": self.command_point_transaction_id,
             "handler_id": self.handler_id,
+            "effects_resolved": self.effects_resolved,
+            "unresolved_reason": self.unresolved_reason,
             "effect_selection": self.effect_selection,
             "effect_payload": self.effect_payload,
         }
@@ -1337,6 +1362,8 @@ class StratagemUseRecord:
             ),
             command_point_transaction_id=payload["command_point_transaction_id"],
             handler_id=payload["handler_id"],
+            effects_resolved=payload["effects_resolved"],
+            unresolved_reason=payload["unresolved_reason"],
             effect_selection=payload["effect_selection"],
             effect_payload=payload["effect_payload"],
         )

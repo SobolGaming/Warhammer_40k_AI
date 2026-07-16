@@ -266,6 +266,9 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_window_decline_allowed,
     stratagem_window_decline_event_payload,
 )
+from warhammer40k_core.engine.stratagems_unaffordable_resolution import (
+    invalid_status_is_unaffordable_cost_increase,
+)
 from warhammer40k_core.engine.tracked_targets import (
     SELECT_TRACKED_TARGET_DECISION_TYPE,
     apply_select_tracked_target_decision,
@@ -2628,7 +2631,14 @@ class GameLifecycle:
                     self._require_runtime_content_bundle().stratagem_cost_modifier_registry
                 ),
             )
-            if invalid_status is not None:
+            cost_increase_unaffordable = invalid_status_is_unaffordable_cost_increase(
+                invalid_status=invalid_status,
+                state=state,
+                result=source_result,
+                decisions=self.decision_controller,
+                stratagem_cost_modifier_registry=self._require_runtime_content_bundle().stratagem_cost_modifier_registry,
+            )
+            if invalid_status is not None and not cost_increase_unaffordable:
                 return invalid_status
             apply_stratagem_decision(
                 state=state,
@@ -2643,6 +2653,7 @@ class GameLifecycle:
                 shooting_unit_selected_grant_hooks=(
                     self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
                 ),
+                resolve_unaffordable_cost_increase_as_used=cost_increase_unaffordable,
             )
             if self._result_resolves_active_reaction_frame(result):
                 follow_up_request = self._pending_decision_request()
@@ -2671,7 +2682,14 @@ class GameLifecycle:
                 self._require_runtime_content_bundle().stratagem_cost_modifier_registry
             ),
         )
-        if invalid_status is not None:
+        cost_increase_unaffordable = invalid_status_is_unaffordable_cost_increase(
+            invalid_status=invalid_status,
+            state=state,
+            result=source_result,
+            decisions=self.decision_controller,
+            stratagem_cost_modifier_registry=self._require_runtime_content_bundle().stratagem_cost_modifier_registry,
+        )
+        if invalid_status is not None and not cost_increase_unaffordable:
             return invalid_status
         apply_stratagem_target_proposal(
             state=state,
@@ -2686,6 +2704,7 @@ class GameLifecycle:
             shooting_unit_selected_grant_hooks=(
                 self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
             ),
+            resolve_unaffordable_cost_increase_as_used=cost_increase_unaffordable,
         )
         advanced_status = self.advance_until_decision_or_terminal()
         if self._result_resolves_active_reaction_frame(result):

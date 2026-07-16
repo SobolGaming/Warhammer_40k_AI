@@ -2911,6 +2911,82 @@ def test_archraider_lord_of_deceit_lifecycle_pauses_and_resumes_stratagem_cost()
     )
 
 
+def test_archraider_cost_increase_can_make_stratagem_used_without_resolving_effects() -> None:
+    assignments = (_assignment(enhancements.ARCHRAIDER_ENHANCEMENT_ID, "archraider"),)
+    config = _corsair_game_config(enhancement_assignments=assignments)
+    state, _corsair_army, _enemy_army = _corsair_state(
+        enhancement_assignments=assignments,
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        archraider_x=10.0,
+        enemy_x=18.0,
+    )
+    state.gain_command_points(
+        player_id="player-b",
+        amount=1,
+        source_id="phase17g-corsair-unaffordable-lord-of-deceit-test-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    lifecycle = _corsair_lifecycle_for_state(config=config, state=state)
+    _record_archraider_model_selection(state)
+    definition = replace(
+        _test_stratagem_definition(),
+        target_spec=StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT),
+    )
+    catalog_record = StratagemCatalogRecord(
+        record_id="phase17g-corsair-unaffordable-enemy-self-buff",
+        definition=definition,
+    )
+    status = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=(catalog_record,),
+        context=StratagemEligibilityContext.from_state(
+            state=state,
+            player_id="player-b",
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
+    )
+    stratagem_request = _decision_request(status)
+    cost_choice_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-corsair-unaffordable-enemy-stratagem",
+            request=stratagem_request,
+            selected_option_id=f"use-stratagem:enemy-self-buff:target:{_LIFECYCLE_ENEMY_UNIT_ID}",
+        )
+    )
+    cost_choice_request = _decision_request(cost_choice_status)
+
+    resolved_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-corsair-unaffordable-lord-of-deceit-use",
+            request=cost_choice_request,
+            selected_option_id=(
+                "aeldari:corsair-coterie:archraider:"
+                "phase17g-corsair-unaffordable-enemy-stratagem:"
+                f"{_LIFECYCLE_ENEMY_UNIT_ID}:use"
+            ),
+        )
+    )
+
+    assert resolved_status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.command_point_total("player-b") == 1
+    assert len(state.stratagem_use_records) == 1
+    use_record = state.stratagem_use_records[0]
+    assert use_record.command_point_cost == 2
+    assert use_record.command_point_transaction_id is None
+    assert use_record.effects_resolved is False
+    assert use_record.unresolved_reason == "insufficient_command_points_after_cost_increase"
+    assert use_record.command_point_modifier_ids == (enhancements.ARCHRAIDER_COST_MODIFIER_ID,)
+    assert use_record.command_point_modifier_source_ids == (enhancements.ARCHRAIDER_SOURCE_RULE_ID,)
+    assert StratagemUseRecord.from_payload(use_record.to_payload()) == use_record
+    assert any(
+        record.event_type == "stratagem_effects_not_resolved"
+        for record in lifecycle.decision_controller.event_log.records
+    )
+
+
 def test_relentless_raiders_lifecycle_resolves_move_completed_mortal_wounds_once() -> None:
     config = _corsair_game_config()
     state, _corsair_army, _enemy_army = _corsair_state(

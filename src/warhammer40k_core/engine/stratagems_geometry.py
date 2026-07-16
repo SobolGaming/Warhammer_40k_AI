@@ -11,6 +11,7 @@ from warhammer40k_core.engine.stratagems_apply import *
 from warhammer40k_core.engine.stratagems_selection import *
 from warhammer40k_core.engine.stratagems_eligibility import *
 from warhammer40k_core.engine.stratagems_targeting import *
+from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 
 # fmt: off
@@ -337,12 +338,14 @@ def _model_is_alive_and_placed(*, state: GameState, model_instance_id: str) -> b
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Stratagem model placement requires battlefield_state.")
-    placed_model_ids = set(battlefield_state.placed_model_ids())
     for army in state.army_definitions:
         for unit in army.units:
             for model in unit.own_models:
                 if model.model_instance_id == requested_model_id:
-                    return model.is_alive and requested_model_id in placed_model_ids
+                    return model_is_present_on_battlefield(
+                        state=state,
+                        model_instance_id=requested_model_id,
+                    )
     raise GameLifecycleError("model_instance_id is unknown.")
 
 
@@ -476,7 +479,10 @@ def _explosives_target_is_visible_and_in_range(
     terrain_features = _stratagem_terrain_features(state)
     profile = _explosives_visibility_profile()
     for model in unit.own_models:
-        if not model.is_alive:
+        if not model_is_present_on_battlefield(
+            state=state,
+            model_instance_id=model.model_instance_id,
+        ):
             continue
         candidate = shooting_target_candidate_for_model(
             scenario=scenario,
@@ -632,7 +638,10 @@ def _geometry_models_for_unit(
                 placement=battlefield_state.model_placement_by_id(model.model_instance_id),
             )
             for model in unit.own_models
-            if model.is_alive
+            if model_is_present_on_battlefield(
+                state=state,
+                model_instance_id=model.model_instance_id,
+            )
         )
     except PlacementError as exc:
         raise GameLifecycleError("Stratagem geometry placement is invalid.") from exc

@@ -14,6 +14,7 @@ from tests.setup_completion_helpers import enter_battle_for_fixture
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -69,6 +70,10 @@ from warhammer40k_core.engine.mission_decisions import (
     request_tactical_secondary_score,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mission_terrain import (
+    terrain_feature_within_player_deployment_zone,
+    terrain_feature_within_player_territory,
+)
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
     mission_scoring_policy_from_setup,
@@ -2754,7 +2759,7 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
 def test_plunder_mission_action_completes_immediately_and_records_secondary_evidence() -> None:
     lifecycle = _battle_lifecycle(
         player_a_secondary=SecondaryMissionMode.TACTICAL,
-        mission_setup=_mission_setup_with_scoring_terrain_feature(),
+        mission_setup=_event_companion_mission_setup_with_scoring_terrain_feature(),
     )
     state = lifecycle.state
     assert state is not None
@@ -2810,6 +2815,106 @@ def test_plunder_mission_action_completes_immediately_and_records_secondary_evid
         record.event_type == "secondary_terrain_area_plundered"
         for record in lifecycle.decision_controller.event_log.records
     )
+
+
+def test_plunder_excludes_terrain_area_in_player_territory_outside_deployment_zone() -> None:
+    mission_setup = _event_companion_mission_setup_with_scoring_terrain_feature()
+    scoring_feature = _terrain_feature_by_id(mission_setup, SCORING_TERRAIN_FEATURE_ID)
+    center_x, center_y = _territory_point_outside_deployment_for_feature(
+        mission_setup,
+        player_id="player-a",
+        feature=scoring_feature,
+    )
+    scoring_feature = replace(
+        scoring_feature,
+        footprint_center_x_inches=center_x,
+        footprint_center_y_inches=center_y,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=center_x,
+            center_y_inches=center_y,
+            width_inches=scoring_feature.footprint_width_inches,
+            depth_inches=scoring_feature.footprint_depth_inches,
+            display_template_id="phase11e_scoring_debris_8x8_in_territory",
+        ),
+    )
+    mission_setup = replace(
+        mission_setup,
+        terrain_features=tuple(
+            scoring_feature if feature.feature_id == scoring_feature.feature_id else feature
+            for feature in mission_setup.terrain_features
+        ),
+    )
+    lifecycle = _battle_lifecycle(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        mission_setup=mission_setup,
+    )
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    _place_unit_near_point(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        x_inches=center_x,
+        y_inches=center_y,
+    )
+
+    status = request_mission_action_start(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+        mission_action_id="plunder-terrain",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+
+
+def test_terrain_area_membership_queries_fail_fast_on_missing_source_context() -> None:
+    mission_setup = _event_companion_mission_setup_with_scoring_terrain_feature()
+    feature = _terrain_feature_by_id(mission_setup, SCORING_TERRAIN_FEATURE_ID)
+
+    assert terrain_feature_within_player_territory(
+        feature,
+        mission_setup=mission_setup,
+        player_id="player-b",
+    )
+    with pytest.raises(GameLifecycleError, match="terrain feature target requires"):
+        terrain_feature_within_player_deployment_zone(
+            cast(TerrainFeatureDefinition, object()),
+            mission_setup=mission_setup,
+            player_id="player-a",
+        )
+    with pytest.raises(GameLifecycleError, match="requires MissionSetup"):
+        terrain_feature_within_player_territory(
+            feature,
+            mission_setup=cast(MissionSetup, object()),
+            player_id="player-a",
+        )
+    with pytest.raises(GameLifecycleError, match="requires player zone"):
+        terrain_feature_within_player_deployment_zone(
+            feature,
+            mission_setup=mission_setup,
+            player_id="player-without-zone",
+        )
+    with pytest.raises(GameLifecycleError, match="has no mission role"):
+        terrain_feature_within_player_territory(
+            feature,
+            mission_setup=mission_setup,
+            player_id="player-without-role",
+        )
+    setup_without_territories = replace(
+        mission_setup,
+        battlefield_regions=tuple(
+            region
+            for region in mission_setup.battlefield_regions
+            if region.region_kind is not BattlefieldRegionKind.TERRITORY
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="requires one player territory"):
+        terrain_feature_within_player_territory(
+            feature,
+            mission_setup=setup_without_territories,
+            player_id="player-a",
+        )
 
 
 def test_public_payload_redacts_hidden_secondary_scoring_evidence() -> None:
@@ -3971,6 +4076,42 @@ def _first_non_player_deployment_terrain_feature(
     raise AssertionError("test mission setup requires terrain outside player deployment zone")
 
 
+def _territory_point_outside_deployment_for_feature(
+    mission_setup: MissionSetup,
+    *,
+    player_id: str,
+    feature: TerrainFeatureDefinition,
+) -> tuple[float, float]:
+    owner_role = "attacker" if player_id == mission_setup.attacker_player_id else "defender"
+    territory = next(
+        region
+        for region in mission_setup.battlefield_regions
+        if region.region_kind is BattlefieldRegionKind.TERRITORY and region.owner_role == owner_role
+    )
+    zones = tuple(zone for zone in mission_setup.deployment_zones if zone.player_id == player_id)
+    half_width = feature.footprint_width_inches / 2.0
+    half_depth = feature.footprint_depth_inches / 2.0
+    for x_inches in range(
+        int(half_width) + 1,
+        int(mission_setup.battlefield_width_inches - half_width),
+    ):
+        for y_inches in range(
+            int(half_depth) + 1,
+            int(mission_setup.battlefield_depth_inches - half_depth),
+        ):
+            corners = (
+                (x_inches - half_width, y_inches - half_depth),
+                (x_inches - half_width, y_inches + half_depth),
+                (x_inches + half_width, y_inches - half_depth),
+                (x_inches + half_width, y_inches + half_depth),
+            )
+            if all(territory.contains_point(x, y) for x, y in corners) and not all(
+                any(zone.contains_point(x, y) for zone in zones) for x, y in corners
+            ):
+                return float(x_inches), float(y_inches)
+    raise AssertionError("test mission setup requires territory outside deployment")
+
+
 def _battle_state_with_unarrived_reserve_at_round_three_deadline() -> tuple[GameState, str]:
     state = _battle_state()
     assert state.battlefield_state is not None
@@ -4195,8 +4336,10 @@ def _place_unit_near_point(
     x_inches: float,
     y_inches: float,
 ) -> None:
+    if state.mission_setup is None or not state.mission_setup.objective_markers:
+        raise AssertionError("test state requires an objective marker")
     marker = replace(
-        _center_marker_definition(state),
+        state.mission_setup.objective_markers[0],
         x_inches=x_inches,
         y_inches=y_inches,
     )
@@ -4706,6 +4849,22 @@ def _mission_setup_with_scoring_terrain_feature(
     feature_id: str = SCORING_TERRAIN_FEATURE_ID,
 ) -> MissionSetup:
     return _with_scoring_terrain_feature(_mission_setup(), feature_id=feature_id)
+
+
+def _event_companion_mission_setup_with_scoring_terrain_feature(
+    *,
+    feature_id: str = SCORING_TERRAIN_FEATURE_ID,
+) -> MissionSetup:
+    return _with_scoring_terrain_feature(
+        MissionSetup.from_mission_pack(
+            mission_pack=warhammer_event_companion_2026_06_mission_pack(),
+            mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
+            terrain_layout_id="take-and-hold-vs-take-and-hold-layout-1",
+            attacker_player_id="player-a",
+            defender_player_id="player-b",
+        ),
+        feature_id=feature_id,
+    )
 
 
 def _with_scoring_terrain_feature(

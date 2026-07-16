@@ -202,6 +202,11 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_on_death import (
+    model_is_present_on_battlefield,
+    remove_models_awaiting_fight_on_death,
+    restore_model_awaiting_fight_on_death,
+)
 from warhammer40k_core.engine.game_state import (
     GameState,
     GameStatePayload,
@@ -232,6 +237,8 @@ from warhammer40k_core.engine.phases.shooting import (
     request_out_of_phase_shooting_declaration,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.saves import (
     PlungingFireModifier,
     PlungingFireModifierResult,
@@ -10510,6 +10517,74 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
     assert any(
         record.result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
         for record in lifecycle.decision_controller.records
+    )
+    awaiting_events = _event_payloads(lifecycle, "fight_on_death_model_awaiting_attack")
+    cleanup_events = _event_payloads(lifecycle, "fight_on_death_models_removed")
+    if selected_source_kind is DestructionReactionKind.FIGHT_ON_DEATH:
+        assert [payload["model_instance_id"] for payload in awaiting_events] == [
+            defender_model.model_instance_id
+        ]
+        assert any(payload["reason"] == "phase_end" for payload in cleanup_events)
+    else:
+        assert awaiting_events == ()
+
+
+def test_phase13e_fight_on_death_model_is_present_but_does_not_contribute_keywords() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    original_placement = battlefield.model_placement_by_id(defender_model.model_instance_id)
+    _replace_unit_instance_in_state(
+        state=state,
+        replacement=replace(
+            defender,
+            own_models=tuple(replace(model, wounds_remaining=0) for model in defender.own_models),
+        ),
+    )
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models)
+    )
+
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=original_placement,
+        effect_id="test-fight-on-death-awaiting",
+        source_rule_id="test-fight-on-death-rule",
+        source_phase=BattlePhase.SHOOTING,
+    )
+
+    assert model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=defender_model.model_instance_id,
+    )
+    assert [
+        model.model_id
+        for model in geometry_models_for_rules_unit(
+            state=state,
+            unit_instance_id=defender.unit_instance_id,
+        )
+    ] == [defender_model.model_instance_id]
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=defender.unit_instance_id,
+    )
+    assert rules_unit.keywords == ()
+    assert rules_unit.faction_keywords == ()
+    replayed_state = GameState.from_payload(state.to_payload())
+    assert model_is_present_on_battlefield(
+        state=replayed_state,
+        model_instance_id=defender_model.model_instance_id,
+    )
+
+    removed_model_ids = remove_models_awaiting_fight_on_death(state=state)
+
+    assert removed_model_ids == (defender_model.model_instance_id,)
+    assert not model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=defender_model.model_instance_id,
     )
 
 
