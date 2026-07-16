@@ -11,6 +11,36 @@ uv sync
 uv run pytest
 ```
 
+## Test commands
+
+Pytest defaults are intentionally lightweight: narrow local and IDE runs do not start xdist
+workers or collect coverage unless requested.
+
+Fast local feedback excludes benchmarks and tests marked `slow`:
+
+```bash
+uv run pytest -m "not benchmark and not slow" -q -n0 --no-cov
+```
+
+Architecture and source-shape audits run serially without behavioral coverage:
+
+```bash
+uv run pytest tests/code_quality -q -n0 --no-cov
+```
+
+The unsharded full behavioral coverage gate is:
+
+```bash
+uv run pytest tests --ignore=tests/code_quality \
+  -n 2 --dist=worksteal \
+  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
+```
+
+CI shards this same behavioral suite, combines branch coverage, and applies the single 85%
+gate after every shard succeeds. Full type checking and architecture checks also remain required
+in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
+format for a shorter edit/commit loop.
+
 # CORE V2 Architecture
 
 ## 1. Purpose
