@@ -1,5 +1,86 @@
 [
   {
+    "ability_id": "000008345",
+    "ability_name": "Infiltrators",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/core/000008345/none",
+    "datasheet_id": "000000592",
+    "datasheet_name": "Rangers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:infiltrators"
+    ],
+    "semantic_categories": [
+      "core.infiltrators"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008337",
+    "ability_name": "Stealth",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/core/000008337/none",
+    "datasheet_id": "000000592",
+    "datasheet_name": "Rangers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "core:stealth"
+    ],
+    "semantic_categories": [
+      "core.stealth"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000592:path-of-the-outcast",
+    "ability_name": "Path of the Outcast",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/datasheet/000000592:path-of-the-outcast/none",
+    "datasheet_id": "000000592",
+    "datasheet_name": "Rangers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-end-reactive-normal-move"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.out_of_phase_action.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/faction/000009894/none",
+    "datasheet_id": "000000592",
+    "datasheet_name": "Rangers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008339",
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",

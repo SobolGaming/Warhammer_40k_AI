@@ -44,6 +44,14 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/faction/000009894/none",
+        "datasheet_id": "000000592",
+        "datasheet_name": "Rangers",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
         "datasheet_id": "000004195",
         "datasheet_name": "Starfangs",
@@ -63,13 +71,14 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 7,
+    "coverage_row_count": 8,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004193/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000592/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000605/faction/000009894/none"
     ],
@@ -79,6 +88,7 @@
       "Corsair Voidscarred",
       "Kharseth",
       "Prince Yriel",
+      "Rangers",
       "Starfangs",
       "Vypers"
     ],
@@ -91,7 +101,7 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 7
+      "faction": 8
     },
     "support_stages": [
       "engine_consumed"
@@ -458,6 +468,39 @@
     "runtime_consumer_ids": [
       "descriptor:lost-wound:feel-no-pain-resolution",
       "descriptor:lost-wound:feel-no-pain-source"
+    ],
+    "source_kind_counts": {
+      "core": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000008345",
+        "ability_name": "Infiltrators",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/core/000008345/none",
+        "datasheet_id": "000000592",
+        "datasheet_name": "Rangers",
+        "source_kind": "core"
+      }
+    ],
+    "ability_names": [
+      "Infiltrators"
+    ],
+    "category_id": "core.infiltrators",
+    "category_name": "Core Infiltrators",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000592/core/000008345/none"
+    ],
+    "datasheet_names": [
+      "Rangers"
+    ],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:infiltrators"
     ],
     "source_kind_counts": {
       "core": 1
@@ -1243,25 +1286,37 @@
         "datasheet_id": "000004196",
         "datasheet_name": "Corsair Skyreavers",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000000592:path-of-the-outcast",
+        "ability_name": "Path of the Outcast",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/datasheet/000000592:path-of-the-outcast/none",
+        "datasheet_id": "000000592",
+        "datasheet_name": "Rangers",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
+      "Path of the Outcast",
       "Raid and Run"
     ],
     "category_id": "datasheet.rule_ir.out_of_phase_action.this_unit",
     "category_name": "Datasheet Rule Ir Out Of Phase Action This Unit",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000004196/datasheet/000004196:raid-and-run/none"
+      "chaos-daemons-bridge-catalog/000004196/datasheet/000004196:raid-and-run/none",
+      "chaos-daemons-bridge-catalog/000000592/datasheet/000000592:path-of-the-outcast/none"
     ],
     "datasheet_names": [
-      "Corsair Skyreavers"
+      "Corsair Skyreavers",
+      "Rangers"
     ],
     "runtime_consumer_ids": [
-      "catalog-ir:fight-end-triggered-movement"
+      "catalog-ir:fight-end-triggered-movement",
+      "catalog-ir:movement-end-reactive-normal-move"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -2597,6 +2652,14 @@
         "datasheet_id": "000001148",
         "datasheet_name": "Be'lakor",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008337",
+        "ability_name": "Stealth",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/core/000008337/none",
+        "datasheet_id": "000000592",
+        "datasheet_name": "Rangers",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -2604,18 +2667,20 @@
     ],
     "category_id": "core.stealth",
     "category_name": "Stealth",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000001148/core/000008337/none"
+      "chaos-daemons-bridge-catalog/000001148/core/000008337/none",
+      "chaos-daemons-bridge-catalog/000000592/core/000008337/none"
     ],
     "datasheet_names": [
-      "Be'lakor"
+      "Be'lakor",
+      "Rangers"
     ],
     "runtime_consumer_ids": [
       "core:stealth"
     ],
     "source_kind_counts": {
-      "core": 1
+      "core": 2
     },
     "support_stages": [
       "engine_consumed"

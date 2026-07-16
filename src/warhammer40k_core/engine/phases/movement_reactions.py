@@ -707,17 +707,6 @@ def _request_movement_end_surge_if_available(
         triggering_unit_id = payload.get("unit_instance_id")
         if type(triggering_unit_id) is not str:
             raise GameLifecycleError("Movement completion event missing unit_instance_id.")
-        triggering_unit = _unit_instance_by_id(
-            state=state,
-            unit_instance_id=triggering_unit_id,
-        )
-        if _unit_has_keyword(triggering_unit, "AIRCRAFT"):
-            continue
-        if _movement_end_surge_event_already_processed(
-            decisions=decisions,
-            trigger_event_id=record.event_id,
-        ):
-            continue
         for reacting_player_id in sorted(
             player_id for player_id in state.player_ids if player_id != active_player_id
         ):
@@ -734,70 +723,88 @@ def _request_movement_end_surge_if_available(
             grants = registry.grants_for(context)
             if not grants:
                 continue
-            max_distance_bonus_inches = _movement_end_surge_grant_distance_bonus(grants)
-            roll_state = _dice_roll_manager_for_state(state=state, decisions=decisions).roll(
-                _movement_end_surge_distance_roll_spec(
-                    source_rule_id=grants[0].source_id,
-                    player_id=reacting_player_id,
-                    triggering_unit_instance_id=triggering_unit_id,
+            for reaction_grants in _movement_end_surge_grant_groups(grants):
+                reaction_group_key = _movement_end_surge_reaction_group_key(reaction_grants)
+                if _movement_end_surge_event_already_processed(
+                    decisions=decisions,
                     trigger_event_id=record.event_id,
+                    reaction_group_key=reaction_group_key,
+                ):
+                    continue
+                first_grant = reaction_grants[0]
+                max_distance_bonus_inches = _movement_end_surge_grant_distance_bonus(
+                    reaction_grants
                 )
-            )
-            descriptor = TriggeredMovementDescriptor(
-                movement_kind=TriggeredMovementKind.SURGE,
-                source_rule_id=grants[0].source_id,
-                trigger_timing=TriggeredReactionWindow(
-                    phase=BattlePhase.MOVEMENT,
-                    window_kind=ReactionWindowKind.RULE_TRIGGER,
-                    source_step=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE.value,
-                    source_event_id=record.event_id,
-                ),
-                max_distance_inches=float(roll_state.current_total + max_distance_bonus_inches),
-                movement_mode=MovementMode.NORMAL,
-                allow_battle_shocked=False,
-                allow_within_engagement_range=False,
-                one_per_phase=True,
-                optional=True,
-            )
-            request = triggered_movement_unit_selection_request(
-                state=state,
-                player_id=reacting_player_id,
-                descriptor=descriptor,
-                eligible_units=_eligible_triggered_movement_units_from_grants(grants),
-            )
-            decisions.request_decision(request)
-            decisions.event_log.append(
-                "movement_end_surge_triggered",
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "active_player_id": active_player_id,
-                    "reacting_player_id": reacting_player_id,
-                    "phase": BattlePhase.MOVEMENT.value,
-                    "triggering_unit_instance_id": triggering_unit_id,
-                    "trigger_event_id": record.event_id,
-                    "movement_phase_action": movement_action,
-                    "surge_distance_roll": roll_state.to_payload(),
-                    "max_distance_bonus_inches": max_distance_bonus_inches,
-                    "descriptor": descriptor.to_payload(),
-                    "grants": [grant.to_payload() for grant in grants],
-                    "request_id": request.request_id,
-                    "phase_body_status": "movement_end_surge_pending",
-                },
-            )
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.BATTLE,
-                decision_request=request,
-                payload={
-                    "phase": BattlePhase.MOVEMENT.value,
-                    "battle_round": state.battle_round,
-                    "active_player_id": active_player_id,
-                    "reacting_player_id": reacting_player_id,
-                    "triggering_unit_instance_id": triggering_unit_id,
-                    "decision_type": request.decision_type,
-                    "phase_body_status": "movement_end_surge_pending",
-                },
-            )
+                descriptor_source_rule_id = (
+                    first_grant.descriptor_source_rule_id or first_grant.source_id
+                )
+                roll_state = _dice_roll_manager_for_state(
+                    state=state,
+                    decisions=decisions,
+                ).roll(
+                    _movement_end_surge_distance_roll_spec(
+                        source_rule_id=descriptor_source_rule_id,
+                        player_id=reacting_player_id,
+                        triggering_unit_instance_id=triggering_unit_id,
+                        trigger_event_id=record.event_id,
+                    )
+                )
+                descriptor = TriggeredMovementDescriptor(
+                    movement_kind=first_grant.movement_kind,
+                    source_rule_id=descriptor_source_rule_id,
+                    trigger_timing=TriggeredReactionWindow(
+                        phase=BattlePhase.MOVEMENT,
+                        window_kind=ReactionWindowKind.RULE_TRIGGER,
+                        source_step=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE.value,
+                        source_event_id=record.event_id,
+                    ),
+                    max_distance_inches=float(roll_state.current_total + max_distance_bonus_inches),
+                    movement_mode=MovementMode.NORMAL,
+                    allow_battle_shocked=first_grant.allow_battle_shocked,
+                    allow_within_engagement_range=False,
+                    one_per_phase=first_grant.one_per_phase,
+                    optional=True,
+                )
+                request = triggered_movement_unit_selection_request(
+                    state=state,
+                    player_id=reacting_player_id,
+                    descriptor=descriptor,
+                    eligible_units=_eligible_triggered_movement_units_from_grants(reaction_grants),
+                )
+                decisions.request_decision(request)
+                decisions.event_log.append(
+                    "movement_end_surge_triggered",
+                    {
+                        "game_id": state.game_id,
+                        "battle_round": state.battle_round,
+                        "active_player_id": active_player_id,
+                        "reacting_player_id": reacting_player_id,
+                        "phase": BattlePhase.MOVEMENT.value,
+                        "triggering_unit_instance_id": triggering_unit_id,
+                        "trigger_event_id": record.event_id,
+                        "reaction_group_key": list(reaction_group_key),
+                        "movement_phase_action": movement_action,
+                        "surge_distance_roll": roll_state.to_payload(),
+                        "max_distance_bonus_inches": max_distance_bonus_inches,
+                        "descriptor": descriptor.to_payload(),
+                        "grants": [grant.to_payload() for grant in reaction_grants],
+                        "request_id": request.request_id,
+                        "phase_body_status": "movement_end_surge_pending",
+                    },
+                )
+                return LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.BATTLE,
+                    decision_request=request,
+                    payload={
+                        "phase": BattlePhase.MOVEMENT.value,
+                        "battle_round": state.battle_round,
+                        "active_player_id": active_player_id,
+                        "reacting_player_id": reacting_player_id,
+                        "triggering_unit_instance_id": triggering_unit_id,
+                        "decision_type": request.decision_type,
+                        "phase_body_status": "movement_end_surge_pending",
+                    },
+                )
     return None
 
 
@@ -828,7 +835,7 @@ def _eligible_triggered_movement_units_from_grants(
             TriggeredMovementEligibleUnit(
                 unit_instance_id=grant.unit_instance_id,
                 hook_id=grant.hook_id,
-                source_id=grant.source_id,
+                source_id=grant.descriptor_source_rule_id or grant.source_id,
                 replay_payload=grant.replay_payload,
                 decision_effect_payload=grant.decision_effect_payload,
             )
@@ -856,27 +863,79 @@ def _movement_end_surge_event_already_processed(
     *,
     decisions: DecisionController,
     trigger_event_id: str,
+    reaction_group_key: tuple[str, ...],
 ) -> bool:
     requested_event_id = _validate_identifier("trigger_event_id", trigger_event_id)
+    requested_group_key = tuple(
+        _validate_identifier(
+            f"movement_end_surge reaction_group_key[{index}]",
+            value,
+        )
+        for index, value in enumerate(reaction_group_key)
+    )
     for record in decisions.event_log.records:
-        if record.event_type not in {
-            "movement_end_surge_triggered",
-            "triggered_movement_declined",
-            "triggered_movement_unit_selected",
-            "triggered_movement_resolved",
-        }:
+        if record.event_type != "movement_end_surge_triggered":
             continue
         payload = record.payload
         if not isinstance(payload, dict):
             continue
-        if payload.get("trigger_event_id") == requested_event_id:
-            return True
-        trigger_timing = payload.get("trigger_timing")
-        if isinstance(trigger_timing, dict) and trigger_timing.get("source_event_id") == (
-            requested_event_id
+        stored_group_key = payload.get("reaction_group_key")
+        if (
+            payload.get("trigger_event_id") == requested_event_id
+            and isinstance(stored_group_key, list)
+            and tuple(stored_group_key) == requested_group_key
         ):
             return True
     return False
+
+
+def _movement_end_surge_grant_groups(
+    grants: tuple[MovementEndSurgeGrant, ...],
+) -> tuple[tuple[MovementEndSurgeGrant, ...], ...]:
+    if type(grants) is not tuple or not grants:
+        raise GameLifecycleError("Movement-end surge grouping requires a non-empty grant tuple.")
+    grouped: dict[tuple[str, ...], list[MovementEndSurgeGrant]] = {}
+    for grant in grants:
+        if type(grant) is not MovementEndSurgeGrant:
+            raise GameLifecycleError(
+                "Movement-end surge grouping requires MovementEndSurgeGrant values."
+            )
+        key = _movement_end_surge_grant_group_key(grant)
+        grouped.setdefault(key, []).append(grant)
+    return tuple(
+        tuple(sorted(grouped[key], key=lambda grant: grant.unit_instance_id))
+        for key in sorted(grouped)
+    )
+
+
+def _movement_end_surge_grant_group_key(grant: MovementEndSurgeGrant) -> tuple[str, ...]:
+    if type(grant) is not MovementEndSurgeGrant:
+        raise GameLifecycleError("Movement-end surge group key requires a grant.")
+    descriptor_source_rule_id = grant.descriptor_source_rule_id or grant.source_id
+    unit_scope = grant.unit_instance_id if grant.independent_unit_reaction else "shared"
+    return (
+        grant.hook_id,
+        grant.source_id,
+        descriptor_source_rule_id,
+        grant.movement_kind.value,
+        "battle-shocked-allowed" if grant.allow_battle_shocked else "battle-shocked-forbidden",
+        "one-per-phase" if grant.one_per_phase else "repeatable",
+        "independent" if grant.independent_unit_reaction else "grouped",
+        unit_scope,
+    )
+
+
+def _movement_end_surge_reaction_group_key(
+    grants: tuple[MovementEndSurgeGrant, ...],
+) -> tuple[str, ...]:
+    if type(grants) is not tuple or not grants:
+        raise GameLifecycleError(
+            "Movement-end surge reaction key requires a non-empty grant tuple."
+        )
+    keys = {_movement_end_surge_grant_group_key(grant) for grant in grants}
+    if len(keys) != 1:
+        raise GameLifecycleError("Movement-end surge reaction grants have configuration drift.")
+    return keys.pop()
 
 
 def _active_player_end_movement_overwatch_trigger_unit_ids(

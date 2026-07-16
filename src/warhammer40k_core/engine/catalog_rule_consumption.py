@@ -27,7 +27,6 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.engine import catalog_command_point_support as _command_points
 from warhammer40k_core.engine import catalog_contextual_status_consumption as _contextual
 from warhammer40k_core.engine import catalog_datasheet_rule_support as _datasheet
-from warhammer40k_core.engine import catalog_fight_end_triggered_movement_support as _fight_end_move
 from warhammer40k_core.engine import catalog_movement_transit as _t
 from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
 from warhammer40k_core.engine import catalog_prebattle_redeploy as _prebattle_redeploy
@@ -35,6 +34,7 @@ from warhammer40k_core.engine import (
     catalog_reserve_arrival_restriction_classification as _reserve_restriction,
 )
 from warhammer40k_core.engine import catalog_rule_selected_target_classification as _st
+from warhammer40k_core.engine import catalog_triggered_movement_support as _triggered_move
 from warhammer40k_core.engine import catalog_unit_move_completed_battle_shock_support as _ucbs
 from warhammer40k_core.engine import rules_units as _rules_units
 from warhammer40k_core.engine.abilities import (
@@ -1422,6 +1422,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         *_ucbs.registered_hook_ids(),
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
         CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
+        *_triggered_move.registered_hook_ids(),
     }
     for characteristic in Characteristic:
         hook_ids.add(_catalog_ir_characteristic_query_consumer_id(characteristic))
@@ -3884,8 +3885,7 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID)
     if _prebattle_redeploy.clause_is_prebattle_redeploy_permission(clause):
         consumer_ids.add(CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID)
-    if _fight_end_move.clause_is_fight_end_triggered_movement(clause):
-        consumer_ids.add(_fight_end_move.CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID)
+    consumer_ids.update(_triggered_move.consumer_ids_for_clause(clause))
     if _clause_is_structured_wound_reroll_clause(clause):
         consumer_ids.add(CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID)
     if _clause_is_structured_destroyed_unit_restore_clause(clause):
@@ -3987,8 +3987,7 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         hook_ids.add(CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID)
     if _prebattle_redeploy.clause_is_prebattle_redeploy_permission(clause):
         hook_ids.add(CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID)
-    if _fight_end_move.clause_is_fight_end_triggered_movement(clause):
-        hook_ids.add(_fight_end_move.CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID)
+    hook_ids.update(_triggered_move.consumer_ids_for_clause(clause))
     hook_ids.update(_contextual.consumer_ids_for_clause(clause))
     return tuple(sorted(hook_ids))
 
@@ -5949,8 +5948,8 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         return (_catalog_ir_characteristic_modifier_consumer_id(Characteristic.MOVEMENT),)
     if effect.kind is RuleEffectKind.OUT_OF_PHASE_ACTION:
         parameters = parameter_payload(effect.parameters)
-        if _fight_end_move.effect_is_fight_end_triggered_movement(effect):
-            return (_fight_end_move.CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID,)
+        if triggered_movement_ids := _triggered_move.consumer_ids_for_effect(effect):
+            return triggered_movement_ids
         if parameters.get("action_group") == "setup_reactive_shoot_charge" and parameters.get(
             "action"
         ) in {"shoot", "charge"}:

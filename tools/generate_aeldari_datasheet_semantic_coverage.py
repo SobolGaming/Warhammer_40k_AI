@@ -297,6 +297,12 @@ def _overlay_pack(
     )
     for datasheet_id, datasheet_name, source_row_id, source_reference in (
         (
+            "000000592",
+            "Rangers",
+            "000000592:blank-keyword:global:true:2268",
+            SOURCE_REFERENCE,
+        ),
+        (
             "000004193",
             "Prince Yriel",
             "000004193:blank-keyword:global:true:15614",

@@ -284,6 +284,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures |
 | `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
+| `catalog-ir:movement-end-reactive-normal-move` | Path of the Outcast |
 | `catalog-ir:movement-transit-permission` | Scuttling Walker |
 | `catalog-ir:named-weapon-ability-choice` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
@@ -362,6 +363,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:lost-wound:feel-no-pain-resolution` | Feel No Pain |
 | `descriptor:lost-wound:feel-no-pain-source` | Feel No Pain |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
+| `descriptor:prebattle:infiltrators` | Infiltrators |
 | `descriptor:prebattle:scouts` | Scouts |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
 | `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>Corrupt Realspace<br>DEATH DENIED<br>Daemonic Infestation<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Soulseeing<br>The Realm of Chaos<br>Vengeful Sorrow<br>Warp Surge<br>Warp-Riders |

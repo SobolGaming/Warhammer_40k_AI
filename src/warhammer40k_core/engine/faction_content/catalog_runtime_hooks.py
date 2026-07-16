@@ -16,6 +16,9 @@ from warhammer40k_core.engine.catalog_battle_shock_runtime import (
 from warhammer40k_core.engine.catalog_fight_end_triggered_movement_runtime import (
     catalog_fight_end_triggered_movement_hook_bindings,
 )
+from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_runtime import (
+    catalog_movement_end_reactive_normal_move_hook_bindings,
+)
 from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CatalogOncePerBattleRuntime,
 )
@@ -48,6 +51,7 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
     FightPhaseStartRequestContext,
     FightPhaseStartResultContext,
 )
+from warhammer40k_core.engine.movement_end_surge_hooks import MovementEndSurgeHookBinding
 from warhammer40k_core.engine.phase import LifecycleStatus
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalRestrictionHookRegistry,
@@ -97,6 +101,17 @@ def battle_shock_hook_bindings(
     armies: tuple[ArmyDefinition, ...],
 ) -> tuple[BattleShockHookBinding, ...]:
     return catalog_battle_shock_hook_bindings(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    )
+
+
+def movement_end_surge_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[MovementEndSurgeHookBinding, ...]:
+    return catalog_movement_end_reactive_normal_move_hook_bindings(
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         armies=armies,
     )

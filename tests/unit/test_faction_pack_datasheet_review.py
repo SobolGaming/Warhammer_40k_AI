@@ -36,6 +36,9 @@ from tools.generate_aeldari_datasheet_semantic_coverage import (
     generated_aeldari_datasheet_semantic_coverage,
 )
 
+from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_support import (
+    CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_prebattle_redeploy import (
     CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
 )
@@ -48,12 +51,16 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
 )
 from warhammer40k_core.engine.core_descriptor_consumption import (
+    CORE_INFILTRATORS_PREBATTLE_CONSUMER_ID,
     CORE_LEADER_ATTACHMENT_CONSUMER_ID,
     CORE_SCOUTS_PREBATTLE_CONSUMER_ID,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
+)
+from warhammer40k_core.rules.wahapedia_bridge_defaults import (
+    AELDARI_RANGERS_HEIGHT_OVERRIDES,
 )
 
 AELDARI_COMPLETE_IDS = frozenset({"000000605", "000004193", "000004194", "000004195", "000004196"})
@@ -211,6 +218,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
 
     non_daemons_rows = tuple(row for row in support_rows if row.faction_id != "chaos-daemons")
     assert {(row.faction_id, row.datasheet_id, row.overall) for row in non_daemons_rows} == {
+        ("aeldari", "000000592", "Playable"),
         ("aeldari", "000000605", "Playable"),
         ("aeldari", "000002531", "Playable"),
         ("aeldari", "000002532", "Playable"),
@@ -223,6 +231,12 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("thousand-sons", "000001030", "Playable"),
         ("world-eaters", "000004207", "Partial"),
     }
+    rangers_infiltrators = next(
+        row
+        for row in ability_rows
+        if row.datasheet_id == "000000592" and row.ability_name == "Infiltrators"
+    )
+    assert rangers_infiltrators.runtime_consumer_ids == (CORE_INFILTRATORS_PREBATTLE_CONSUMER_ID,)
     for row in non_daemons_rows:
         markdown = markdown_by_filename[f"{row.faction_id}.md"]
         assert markdown.index("## Datasheet Source Review") < markdown.index(
@@ -312,15 +326,26 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 7,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 8,
         SEMANTIC_BUCKET_HOST_NEEDED: 6,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 57,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 56,
     }
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000571"].semantic_bucket == SEMANTIC_BUCKET_UNSUPPORTED_IR
     assert rows_by_id["000002531"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert rows_by_id["000002532"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    rangers = rows_by_id["000000592"]
+    assert rangers.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    assert {
+        ability.ability_name: (ability.support_stage.value, ability.runtime_consumer_ids)
+        for ability in rangers.abilities
+    } == {
+        "Path of the Outcast": (
+            "engine_consumed",
+            (CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,),
+        ),
+    }
     kharseth = rows_by_id["000004194"]
     assert kharseth.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert {
@@ -441,6 +466,17 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert 'ends a move within 8"' in rangers_text
     assert "in a turn it disembarked from this TRANSPORT" in starweaver_text
     assert "Designer's Note" not in aspect_token_text
+
+
+def test_aeldari_rangers_catalog_geometry_is_source_reviewed() -> None:
+    assert len(AELDARI_RANGERS_HEIGHT_OVERRIDES) == 1
+    geometry = AELDARI_RANGERS_HEIGHT_OVERRIDES[0]
+    assert geometry.datasheet_id == "000000592"
+    assert geometry.model_name == "Rangers"
+    assert geometry.height == 2.0
+    assert geometry.height_source_id == "geometry-review:aeldari:rangers:height"
+    assert "Aeldari Designers' Notes" in geometry.height_document_reference
+    assert CORE_INFILTRATORS_PREBATTLE_CONSUMER_ID == "descriptor:prebattle:infiltrators"
 
 
 def test_aeldari_semantic_coverage_artifacts_are_current() -> None:
