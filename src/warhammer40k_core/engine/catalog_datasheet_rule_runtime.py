@@ -132,6 +132,7 @@ from warhammer40k_core.engine.target_restriction_hooks import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_proximity import (
     rules_unit_within_friendly_keyworded_models,
+    rules_unit_within_friendly_keyworded_units,
 )
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -1138,7 +1139,16 @@ def _friendly_keyworded_unit_within(*, source: _CatalogClauseSource, state: obje
     required = parameters.get("required_keyword_sequence")
     if not isinstance(required, tuple) or not all(type(value) is str for value in required):
         raise GameLifecycleError("Catalog conditional ability keyword sequence is malformed.")
-    return rules_unit_within_friendly_keyworded_models(
+    object_kind = parameters.get("object_kind")
+    if type(object_kind) is not str:
+        raise GameLifecycleError("Catalog conditional ability object kind is unsupported.")
+    proximity_query = {
+        "model": rules_unit_within_friendly_keyworded_models,
+        "unit": rules_unit_within_friendly_keyworded_units,
+    }.get(object_kind)
+    if proximity_query is None:
+        raise GameLifecycleError("Catalog conditional ability object kind is unsupported.")
+    return proximity_query(
         state=state,
         source_unit_instance_id=source.unit.unit_instance_id,
         required_keyword_sequence=required,

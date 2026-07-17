@@ -120,6 +120,14 @@ class DestructionProvenance:
             "attack_context_id": self.attack_context_id,
         }
 
+    def validate_authoritative_weapon_profile(self, weapon_profile: WeaponProfile) -> None:
+        if self.destruction_source_kind is not DestructionSourceKind.ATTACK:
+            raise GameLifecycleError("Only attack provenance has an authoritative weapon profile.")
+        if type(weapon_profile) is not WeaponProfile:
+            raise GameLifecycleError("Authoritative attack provenance requires WeaponProfile.")
+        if self.source_weapon_profile != weapon_profile:
+            raise GameLifecycleError("Destruction reaction source weapon profile drift.")
+
     @classmethod
     def from_payload(cls, payload: object) -> Self:
         if not isinstance(payload, dict):

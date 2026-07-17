@@ -501,6 +501,14 @@ def apply_destruction_reaction_decision(
         attack_context=attack_context,
         context_name="Destruction reaction",
     )
+    provenance = DestructionProvenance.from_payload(context["destruction_provenance"])
+    if provenance.destruction_source_kind is DestructionSourceKind.ATTACK:
+        context_sequence = _attack_sequence_for_context(
+            attack_sequence=attack_sequence,
+            attack_context=attack_context,
+        )
+        authoritative_profile = context_sequence.current_pool().weapon_profile
+        provenance.validate_authoritative_weapon_profile(authoritative_profile)
     if decision.player_id != context["destroyed_model_controller_player_id"]:
         raise GameLifecycleError("Destruction reaction defender drift.")
     if (

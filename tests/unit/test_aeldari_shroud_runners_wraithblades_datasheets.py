@@ -22,7 +22,9 @@ from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRoll
 from warhammer40k_core.core.ruleset_descriptor import FightEligibilityKind, RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
     DamageProfile,
+    RangeProfile,
     RangeProfileKind,
+    WeaponKeyword,
     WeaponProfile,
 )
 from warhammer40k_core.engine.ability_catalog import (
@@ -63,9 +65,7 @@ from warhammer40k_core.engine.damage_allocation import (
     DamageKind,
     DestructionReactionKind,
     DestructionReactionSource,
-    MortalWoundApplicationProgress,
     apply_damage_to_model,
-    continue_mortal_wound_application,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -74,8 +74,11 @@ from warhammer40k_core.engine.destruction_provenance import (
     DestructionProvenance,
     DestructionSourceKind,
 )
+from warhammer40k_core.engine.destruction_reaction_conditions import (
+    optional_destruction_reaction_trigger_conditions_met,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_on_death import (
     model_is_present_on_battlefield,
 )
@@ -109,6 +112,9 @@ from warhammer40k_core.engine.runtime_modifiers import (
 from warhammer40k_core.engine.saves import SaveKind, SaveOption, saving_throw_roll_spec
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.unit_proximity import (
+    rules_unit_within_friendly_keyworded_units,
+)
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection, WargearSelection
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
@@ -445,6 +451,48 @@ def test_psychic_guidance_uses_only_keyworded_component_models_for_attached_unit
     assert guidance_values(destroyed) == (8, 0)
 
 
+def test_unit_scoped_lone_operative_proximity_uses_qualifying_rules_unit_geometry() -> None:
+    fixture = _runtime_fixture(attach_shroud_to_wraith=True)
+    source = fixture.psyker
+    bodyguard = fixture.wraith_shields
+    leader = fixture.shroud
+    _move_unit(fixture.state, source.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(fixture.state, bodyguard.unit_instance_id, x=50.0, y=10.0)
+    _move_unit(fixture.state, fixture.wraith_swords.unit_instance_id, x=80.0, y=10.0)
+    _move_unit(fixture.state, leader.unit_instance_id, x=12.0, y=10.0)
+
+    def qualifies(state: GameState) -> bool:
+        return rules_unit_within_friendly_keyworded_units(
+            state=state,
+            source_unit_instance_id=source.unit_instance_id,
+            required_keyword_sequence=("WRAITH CONSTRUCT",),
+            max_range_inches=3.0,
+        )
+
+    def replayed(state: GameState) -> GameState:
+        return GameState.from_payload(json.loads(json.dumps(state.to_payload(), sort_keys=True)))
+
+    assert qualifies(fixture.state)
+    assert qualifies(replayed(fixture.state))
+
+    _move_unit(fixture.state, leader.unit_instance_id, x=70.0, y=10.0)
+    assert not qualifies(fixture.state)
+    assert not qualifies(replayed(fixture.state))
+
+    _move_unit(fixture.state, leader.unit_instance_id, x=12.0, y=10.0)
+    for model in bodyguard.own_models:
+        apply_damage_to_model(
+            state=fixture.state,
+            target_unit_instance_id=bodyguard.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.MORTAL,
+            remove_destroyed_model=False,
+        )
+    assert not qualifies(fixture.state)
+    assert not qualifies(replayed(fixture.state))
+
+
 def test_malevolent_souls_registers_idempotent_serializable_model_sources() -> None:
     fixture = _runtime_fixture()
 
@@ -599,6 +647,75 @@ def test_malevolent_souls_direct_melee_success_replays_and_enters_fight_on_death
         if event.event_type == "fight_on_death_models_removed"
     )
     assert cast(dict[str, JsonValue], cleanup_event.payload)["reason"] == "unit_attacked"
+
+
+@pytest.mark.parametrize("drift_kind", ["range", "damage", "keywords", "source_ids"])
+def test_destruction_reaction_rejects_full_authoritative_weapon_profile_drift(
+    drift_kind: str,
+) -> None:
+    fixture, decisions, remaining, _allocated, _status, target_model = _resolve_malevolent_attack(
+        attack_kind=DestructionAttackKind.MELEE,
+        trigger_roll=3,
+    )
+    assert remaining is not None
+    assert remaining.pending_grouped_damage is not None
+    lifecycle_payload = cast(
+        dict[str, Any],
+        json.loads(
+            json.dumps(
+                GameLifecycle(decision_controller=decisions, state=fixture.state).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    request_payload = lifecycle_payload["decisions"]["queue"]["pending_requests"][0]
+    provenance_payload = request_payload["payload"]["destruction_context"]["destruction_provenance"]
+    provenance = DestructionProvenance.from_payload(provenance_payload)
+    profile = provenance.source_weapon_profile
+    assert profile is not None
+    if drift_kind == "range":
+        drifted = replace(profile, range_profile=RangeProfile.distance(12))
+        provenance_payload["attack_kind"] = DestructionAttackKind.RANGED.value
+    elif drift_kind == "damage":
+        drifted = replace(profile, damage_profile=DamageProfile.fixed(1))
+    elif drift_kind == "keywords":
+        drifted = replace(profile, keywords=(WeaponKeyword.LETHAL_HITS,))
+    else:
+        drifted = replace(profile, source_ids=(*profile.source_ids, "test:provenance-drift"))
+    provenance_payload["source_weapon_profile"] = drifted.to_payload()
+
+    replayed = GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
+    state = cast(GameState, replayed.state)
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    assert fight_state.attack_sequence is not None
+    request = replayed.decision_controller.queue.peek_next()
+    selected_source = next(
+        option.option_id
+        for option in request.options
+        if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+    result = DecisionResult.for_request(
+        result_id=f"result:profile-drift:{drift_kind}",
+        request=request,
+        selected_option_id=selected_source,
+    )
+    replayed.decision_controller.submit_result(result)
+    event_count = len(replayed.decision_controller.event_log.records)
+    with pytest.raises(GameLifecycleError, match="source weapon profile drift"):
+        apply_destruction_reaction_decision(
+            state=state,
+            decisions=replayed.decision_controller,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            attack_sequence=fight_state.attack_sequence,
+            result=result,
+            already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
+        )
+    assert len(replayed.decision_controller.event_log.records) == event_count
+    assert not model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=target_model.model_instance_id,
+    )
 
 
 @pytest.mark.parametrize(
@@ -758,40 +875,23 @@ def test_malevolent_souls_does_not_trigger_for_deadly_demise_collateral_in_fight
 
 def test_malevolent_souls_does_not_trigger_for_ability_mortal_wounds_in_fight() -> None:
     fixture = _runtime_fixture()
-    fixture.runtime.record_static_destruction_reaction_sources(state=fixture.state)
     target = fixture.wraith_swords
     model = target.own_models[0]
-    _leave_only_model_placed(fixture.state, target, model.model_instance_id)
-    phases = tuple(fixture.state.battle_phase_sequence)
-    fixture.state.battle_phase_index = phases.index(BattlePhase.FIGHT)
-    progress = MortalWoundApplicationProgress.start(
-        application_id="application:malevolent-ability-mortal-wounds",
-        source_rule_id="rule:test-ability-mortal-wounds",
-        source_context=validate_json_value(
-            {
-                "source_kind": DestructionSourceKind.ABILITY.value,
-                "phase": BattlePhase.FIGHT.value,
-            }
-        ),
+    damage = apply_damage_to_model(
+        state=fixture.state,
         target_unit_instance_id=target.unit_instance_id,
-        defender_player_id="player-a",
-        mortal_wounds=model.wounds_remaining,
-        spill_over=False,
-    )
-
-    routed = continue_mortal_wound_application(
-        state=fixture.state,
-        request_id=fixture.state.next_decision_request_id(),
-        progress=progress,
-        dice_manager=DiceRollManager(fixture.state.game_id),
-    )
-
-    assert routed.request is None
-    assert routed.application is not None
-    assert routed.application.applications[-1].destroyed is True
-    assert not model_is_present_on_battlefield(
-        state=fixture.state,
         model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.MORTAL,
+        remove_destroyed_model=False,
+    )
+
+    assert damage.destroyed
+    assert not optional_destruction_reaction_trigger_conditions_met(
+        state=fixture.state,
+        destruction_provenance=DestructionProvenance.for_non_attack(DestructionSourceKind.ABILITY),
+        damage=damage,
+        descriptor={"requires_destroyed_by_melee_attack": True},
     )
 
 
@@ -891,7 +991,11 @@ class _RuntimeFixture:
         self.runtime = CatalogDatasheetRuleRuntime(indexes, armies)
 
 
-def _runtime_fixture(*, attach_psyker_to_wraith: bool = False) -> _RuntimeFixture:
+def _runtime_fixture(
+    *,
+    attach_psyker_to_wraith: bool = False,
+    attach_shroud_to_wraith: bool = False,
+) -> _RuntimeFixture:
     package = _package()
     catalog = package.army_catalog
     factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
@@ -958,6 +1062,19 @@ def _runtime_fixture(*, attach_psyker_to_wraith: bool = False) -> _RuntimeFixtur
                 ),
                 source_id="test:psychic-guidance-attachment",
                 attachment_source_ids=("test:psychic-guidance-leader-eligibility",),
+            ),
+        )
+    elif attach_shroud_to_wraith:
+        attached_units = (
+            AttachedUnitFormation(
+                attached_unit_instance_id="attached-unit:army-a:wraith-shroud",
+                bodyguard_unit_instance_id=wraith_shields.unit_instance_id,
+                leader_unit_instance_ids=(shroud.unit_instance_id,),
+                component_unit_instance_ids=tuple(
+                    sorted((wraith_shields.unit_instance_id, shroud.unit_instance_id))
+                ),
+                source_id="test:conditional-lone-operative-attachment",
+                attachment_source_ids=("test:conditional-lone-operative-eligibility",),
             ),
         )
     armies = (

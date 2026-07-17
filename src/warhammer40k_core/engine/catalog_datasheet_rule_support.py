@@ -220,6 +220,7 @@ def clause_is_conditional_lone_operative(clause: RuleClause) -> bool:
     return any(
         condition.kind is RuleConditionKind.DISTANCE_PREDICATE
         and parameter_payload(condition.parameters).get("predicate") == "within"
+        and parameter_payload(condition.parameters).get("object_kind") == "unit"
         and type(parameter_payload(condition.parameters).get("distance_inches")) in {int, float}
         and parameter_payload(condition.parameters).get("allegiance") == "friendly"
         and type(parameter_payload(condition.parameters).get("required_keyword_sequence")) is tuple

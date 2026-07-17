@@ -591,6 +591,7 @@ def _daemon_prince_special_rule_ir(source_row_id: str) -> RuleIR:
                         _parameter("predicate", "within"),
                         _parameter("distance_inches", 3),
                         _parameter("allegiance", "friendly"),
+                        _parameter("object_kind", "unit"),
                         _parameter(
                             "required_keyword_sequence",
                             ("LEGIONES DAEMONICA", "INFANTRY"),
