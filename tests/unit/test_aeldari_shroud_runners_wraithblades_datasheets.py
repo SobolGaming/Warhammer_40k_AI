@@ -9,6 +9,8 @@ import pytest
 from tests.lifecycle_submission_helpers import (
     apply_pending_damage_allocation,
     battle_lifecycle_payload,
+    drift_pending_destruction_reaction_payload,
+    successful_attack_roll_results,
 )
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
@@ -25,8 +27,8 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import FightEligibilityKind, RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
     DamageProfile,
-    RangeProfile,
     RangeProfileKind,
     WeaponKeyword,
     WeaponProfile,
@@ -645,13 +647,27 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
     assert cast(dict[str, JsonValue], cleanup_event.payload)["reason"] == "unit_attacked"
 
 
-@pytest.mark.parametrize("drift_kind", ["range", "damage", "keywords", "source_ids"])
-def test_destruction_reaction_rejects_full_authoritative_weapon_profile_drift(
+@pytest.mark.parametrize(
+    "drift_kind",
+    [
+        "attack_context",
+        "generated_hit_context",
+        "range",
+        "damage",
+        "keywords",
+        "source_ids",
+    ],
+)
+def test_destruction_reaction_rejects_authoritative_context_or_weapon_profile_drift(
     drift_kind: str,
 ) -> None:
     fixture, decisions, remaining, _allocated, _status, target_model = _resolve_malevolent_attack(
         attack_kind=DestructionAttackKind.MELEE,
         trigger_roll=3,
+        attacks=1 if drift_kind == "generated_hit_context" else 3,
+        damage_per_attack=2,
+        placed_model_count=3,
+        sustained_hits=drift_kind == "generated_hit_context",
     )
     assert remaining is not None
     assert remaining.pending_grouped_damage is not None
@@ -662,21 +678,11 @@ def test_destruction_reaction_rejects_full_authoritative_weapon_profile_drift(
             decisions=decisions,
         ),
     )
-    request_payload = lifecycle_payload["decisions"]["queue"]["pending_requests"][0]
-    provenance_payload = request_payload["payload"]["destruction_context"]["destruction_provenance"]
-    provenance = DestructionProvenance.from_payload(provenance_payload)
-    profile = provenance.source_weapon_profile
-    assert profile is not None
-    if drift_kind == "range":
-        drifted = replace(profile, range_profile=RangeProfile.distance(12))
-        provenance_payload["attack_kind"] = DestructionAttackKind.RANGED.value
-    elif drift_kind == "damage":
-        drifted = replace(profile, damage_profile=DamageProfile.fixed(1))
-    elif drift_kind == "keywords":
-        drifted = replace(profile, keywords=(WeaponKeyword.LETHAL_HITS,))
-    else:
-        drifted = replace(profile, source_ids=(*profile.source_ids, "test:provenance-drift"))
-    provenance_payload["source_weapon_profile"] = drifted.to_payload()
+    drift_pending_destruction_reaction_payload(
+        lifecycle_payload=lifecycle_payload,
+        attack_sequence=remaining,
+        drift_kind=drift_kind,
+    )
 
     replayed = GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
     state = cast(GameState, replayed.state)
@@ -1261,6 +1267,7 @@ def _resolve_malevolent_attack(
     attacks: int = 1,
     damage_per_attack: int | None = None,
     placed_model_count: int = 1,
+    sustained_hits: bool = False,
 ) -> tuple[
     _RuntimeFixture,
     DecisionController,
@@ -1299,6 +1306,12 @@ def _resolve_malevolent_attack(
             target_model.wounds_remaining if damage_per_attack is None else damage_per_attack
         ),
     )
+    if sustained_hits:
+        profile = replace(
+            profile,
+            keywords=(*profile.keywords, WeaponKeyword.SUSTAINED_HITS),
+            abilities=(*profile.abilities, AbilityDescriptor.sustained_hits(1)),
+        )
     sequence = _attack_sequence(
         sequence_id=f"attack-sequence:malevolent-{attack_kind.value}",
         attacker=attacker,
@@ -1331,46 +1344,18 @@ def _resolve_malevolent_attack(
                 ),
             )
         fixture.state.fight_phase_state = replace(started_fight, attack_sequence=sequence)
-    hit_wound_results: list[DiceRollResult] = []
-    save_results: list[DiceRollResult] = []
-    for attack_index in range(attacks):
-        attack_context_id = replace(sequence, attack_index=attack_index).attack_context_id()
-        roll_suffix = f"{attack_kind.value}-attack-{attack_index + 1}"
-        hit_wound_results.extend(
-            (
-                _fixed_roll(
-                    f"roll:malevolent-{roll_suffix}-hit",
-                    attack_sequence_hit_roll_spec(
-                        weapon_profile_id=profile.profile_id,
-                        attack_context_id=attack_context_id,
-                        attacker_player_id=attacker_player_id,
-                    ),
-                    6,
-                ),
-                _fixed_roll(
-                    f"roll:malevolent-{roll_suffix}-wound",
-                    attack_sequence_wound_roll_spec(
-                        weapon_profile_id=profile.profile_id,
-                        attack_context_id=attack_context_id,
-                        attacker_player_id=attacker_player_id,
-                    ),
-                    6,
-                ),
-            )
+    injected_results = list(
+        successful_attack_roll_results(
+            attack_sequence=sequence,
+            attacks=attacks,
+            weapon_profile=profile,
+            roll_id_prefix=f"malevolent-{attack_kind.value}",
+            attacker_player_id=attacker_player_id,
+            defender_player_id=defender_player_id,
+            allocated_model_id=target_model.model_instance_id,
+            include_generated_hit=sustained_hits,
         )
-        save_results.append(
-            _fixed_roll(
-                f"roll:malevolent-{roll_suffix}-save",
-                saving_throw_roll_spec(
-                    save_kind=SaveKind.ARMOUR,
-                    player_id=defender_player_id,
-                    allocated_model_id=target_model.model_instance_id,
-                    attack_context_id=attack_context_id,
-                ),
-                1,
-            )
-        )
-    injected_results = [*hit_wound_results, *save_results]
+    )
     if trigger_roll is not None:
         injected_results.append(
             _fixed_roll(

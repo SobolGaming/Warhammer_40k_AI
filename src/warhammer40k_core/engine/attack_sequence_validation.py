@@ -483,10 +483,14 @@ def _validate_attack_context_matches_sequence(
     attack_context: AttackResolutionContextPayload,
     context_name: str,
 ) -> None:
-    if _attack_context_matches_pending_grouped_damage(
-        attack_sequence=attack_sequence,
-        attack_context=attack_context,
-    ):
+    if attack_sequence.pending_grouped_damage is not None:
+        if not _attack_context_matches_pending_grouped_damage(
+            attack_sequence=attack_sequence,
+            attack_context=attack_context,
+        ):
+            raise GameLifecycleError(
+                f"{context_name} does not match the current grouped damage context."
+            )
         return
     if attack_context["sequence_id"] != attack_sequence.sequence_id:
         raise GameLifecycleError(f"{context_name} attack context sequence drift.")
