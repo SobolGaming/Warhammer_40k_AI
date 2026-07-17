@@ -21,6 +21,7 @@ class WargearSelectionPayload(TypedDict):
 
 
 class WargearBearerAssignmentPayload(TypedDict):
+    wargear_id: str
     model_ordinal: int
     selection_count: int
 
@@ -58,10 +59,16 @@ class ModelProfileSelection:
 
 @dataclass(frozen=True, slots=True)
 class WargearBearerAssignment:
+    wargear_id: str
     model_ordinal: int
     selection_count: int
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "wargear_id",
+            _validate_identifier("WargearBearerAssignment wargear_id", self.wargear_id),
+        )
         object.__setattr__(
             self,
             "model_ordinal",
@@ -81,6 +88,7 @@ class WargearBearerAssignment:
 
     def to_payload(self) -> WargearBearerAssignmentPayload:
         return {
+            "wargear_id": self.wargear_id,
             "model_ordinal": self.model_ordinal,
             "selection_count": self.selection_count,
         }
@@ -88,6 +96,7 @@ class WargearBearerAssignment:
     @classmethod
     def from_payload(cls, payload: WargearBearerAssignmentPayload) -> Self:
         return cls(
+            wargear_id=payload["wargear_id"],
             model_ordinal=payload["model_ordinal"],
             selection_count=payload["selection_count"],
         )
@@ -143,8 +152,21 @@ class WargearSelection:
             raise ListValidationError(
                 "WargearSelection bearer assignments require selected wargear."
             )
+        assigned_wargear_ids = {assignment.wargear_id for assignment in assignments}
+        if not assigned_wargear_ids.issubset(self.wargear_ids):
+            raise ListValidationError(
+                "WargearSelection bearer assignment references unselected wargear."
+            )
+        if assignments and assigned_wargear_ids != set(self.wargear_ids):
+            raise ListValidationError(
+                "WargearSelection bearer assignments must cover every selected wargear ID."
+            )
         assignment_count = sum(assignment.selection_count for assignment in assignments)
-        if assignments and assignment_count != self.resolved_selection_count:
+        if (
+            assignments
+            and self.selection_count is not None
+            and assignment_count != self.selection_count
+        ):
             raise ListValidationError(
                 "WargearSelection bearer assignment count must match selection_count."
             )
@@ -152,9 +174,25 @@ class WargearSelection:
 
     @property
     def resolved_selection_count(self) -> int:
+        if self.bearer_assignments:
+            return sum(assignment.selection_count for assignment in self.bearer_assignments)
         if self.selection_count is not None:
             return self.selection_count
         return 1 if self.wargear_ids else 0
+
+    def selection_count_for_wargear(self, wargear_id: str) -> int:
+        selected_wargear_id = _validate_identifier(
+            "WargearSelection selected wargear count ID", wargear_id
+        )
+        if selected_wargear_id not in self.wargear_ids:
+            return 0
+        if self.bearer_assignments:
+            return sum(
+                assignment.selection_count
+                for assignment in self.bearer_assignments
+                if assignment.wargear_id == selected_wargear_id
+            )
+        return self.resolved_selection_count
 
     def to_payload(self) -> WargearSelectionPayload:
         payload: WargearSelectionPayload = {
@@ -227,16 +265,22 @@ def _validate_bearer_assignments(value: object) -> tuple[WargearBearerAssignment
     if type(value) is not tuple:
         raise ListValidationError("WargearSelection bearer_assignments must be a tuple.")
     assignments: list[WargearBearerAssignment] = []
-    seen_ordinals: set[int] = set()
+    seen_assignments: set[tuple[str, int]] = set()
     for assignment in cast(tuple[object, ...], value):
         if type(assignment) is not WargearBearerAssignment:
             raise ListValidationError(
                 "WargearSelection bearer_assignments must contain WargearBearerAssignment values."
             )
-        if assignment.model_ordinal in seen_ordinals:
+        assignment_key = (assignment.wargear_id, assignment.model_ordinal)
+        if assignment_key in seen_assignments:
             raise ListValidationError(
-                "WargearSelection bearer_assignments must not duplicate model ordinals."
+                "WargearSelection bearer_assignments must not duplicate wargear/model pairs."
             )
-        seen_ordinals.add(assignment.model_ordinal)
+        seen_assignments.add(assignment_key)
         assignments.append(assignment)
-    return tuple(sorted(assignments, key=lambda assignment: assignment.model_ordinal))
+    return tuple(
+        sorted(
+            assignments,
+            key=lambda assignment: (assignment.wargear_id, assignment.model_ordinal),
+        )
+    )

@@ -642,8 +642,8 @@ def _apply_structured_wargear_selection_to_models(
     wargear_by_model_id: dict[str, list[str]],
 ) -> None:
     selected_wargear = list(selection.wargear_ids)
-    selection_count = selection.resolved_selection_count
     for effect in option.effects:
+        effect_selection_count = selection.selection_count_for_wargear(effect.wargear_id)
         if effect.kind in {
             WargearOptionEffectKind.ADD_WARGEAR,
             WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED,
@@ -652,7 +652,7 @@ def _apply_structured_wargear_selection_to_models(
                 option=option,
                 effect=effect,
                 selected_wargear=tuple(selected_wargear),
-                selection_count=selection_count,
+                selection_count=effect_selection_count,
                 selection=selection,
                 models=models,
                 wargear_by_model_id=wargear_by_model_id,
@@ -663,7 +663,7 @@ def _apply_structured_wargear_selection_to_models(
                 option=option,
                 effect=effect,
                 selected_wargear=tuple(selected_wargear),
-                selection_count=selection_count,
+                selection_count=effect_selection_count,
                 selection=selection,
                 models=models,
                 wargear_by_model_id=wargear_by_model_id,
@@ -674,7 +674,7 @@ def _apply_structured_wargear_selection_to_models(
                 option=option,
                 effect=effect,
                 selected_wargear=tuple(selected_wargear),
-                selection_count=selection_count,
+                selection_count=effect_selection_count,
                 selection=selection,
                 models=models,
                 wargear_by_model_id=wargear_by_model_id,
@@ -707,6 +707,7 @@ def _apply_add_wargear_effect_to_models(
         )
     candidate_slots = _assigned_or_default_wargear_effect_slots(
         selection=selection,
+        wargear_id=effect.wargear_id,
         models=models,
         eligible_models=candidates,
         default_capacity_per_model=per_model_capacity,
@@ -743,6 +744,7 @@ def _apply_replace_wargear_effect_to_models(
     )
     candidates = _assigned_or_default_wargear_effect_slots(
         selection=selection,
+        wargear_id=effect.wargear_id,
         models=models,
         eligible_models=eligible_models,
         default_capacity_by_model={
@@ -784,6 +786,7 @@ def _apply_remove_wargear_effect_from_models(
     )
     candidates = _assigned_or_default_wargear_effect_slots(
         selection=selection,
+        wargear_id=effect.wargear_id,
         models=models,
         eligible_models=eligible_models,
         default_capacity_by_model={
@@ -805,6 +808,7 @@ def _apply_remove_wargear_effect_from_models(
 def _assigned_or_default_wargear_effect_slots(
     *,
     selection: WargearSelection,
+    wargear_id: str,
     models: tuple[ModelInstance, ...],
     eligible_models: tuple[ModelInstance, ...],
     default_capacity_per_model: int | None = None,
@@ -814,6 +818,8 @@ def _assigned_or_default_wargear_effect_slots(
         eligible_model_ids = {model.model_instance_id for model in eligible_models}
         slots: list[ModelInstance] = []
         for assignment in selection.bearer_assignments:
+            if assignment.wargear_id != wargear_id:
+                continue
             if assignment.model_ordinal > len(models):
                 raise UnitFactoryError(
                     "WargearSelection bearer assignment references a missing model ordinal."

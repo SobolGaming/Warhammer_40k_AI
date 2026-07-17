@@ -1221,8 +1221,10 @@ def _structured_selection_bearer_count(
     selection: WargearSelection,
     option: DatasheetWargearOption,
 ) -> int:
+    if selection.bearer_assignments:
+        return len({assignment.model_ordinal for assignment in selection.bearer_assignments})
     effect_model_counts = tuple(
-        effect.model_count * selection.resolved_selection_count
+        effect.model_count * selection.selection_count_for_wargear(effect.wargear_id)
         for effect in option.effects
         if effect.wargear_id in selection.wargear_ids
     )
