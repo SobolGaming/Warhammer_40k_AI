@@ -238,7 +238,11 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
 )
-from warhammer40k_core.engine.start_battle_hooks import StartBattleRequestContext
+from warhammer40k_core.engine.start_battle_hooks import (
+    StartBattleRequestContext,
+    invalid_pending_start_battle_request_status,
+    is_start_battle_boundary,
+)
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
     StratagemCostChoiceRequestContext,
@@ -1035,27 +1039,27 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
+            if is_start_battle_boundary(state):
+                return invalid_pending_start_battle_request_status(
+                    registry=self._require_runtime_content_bundle().start_battle_hook_registry,
+                    context=StartBattleRequestContext(
+                        state=state,
+                        decisions=self.decision_controller,
+                        config=self._require_config(),
+                    ),
+                    request=request,
+                    invalid_reason="invalid_faction_rule_setup_option_result",
+                    message="Start-battle faction rule submission is stale.",
+                )
             if state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
-                bundle = self._require_runtime_content_bundle()
-                try:
-                    bundle.start_battle_hook_registry.validate_pending_request(
-                        context=StartBattleRequestContext(
-                            state=state,
-                            decisions=self.decision_controller,
-                            config=self._require_config(),
-                        ),
-                        request=request,
-                    )
-                except GameLifecycleError as exc:
-                    return LifecycleStatus.invalid(
-                        stage=state.stage,
-                        message="Start-battle faction rule submission is stale.",
-                        payload={
-                            "invalid_reason": "invalid_faction_rule_setup_option_result",
-                            "field": "authoritative_request",
-                            "detail": str(exc),
-                        },
-                    )
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Faction rule setup submission is stale.",
+                    payload={
+                        "invalid_reason": "invalid_faction_rule_setup_option_result",
+                        "field": "authoritative_request",
+                    },
+                )
         return None
 
     def _apply_setup_decision(
@@ -1987,8 +1991,23 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
+        state = self._require_state()
+        if is_start_battle_boundary(state):
+            invalid_status = invalid_pending_start_battle_request_status(
+                registry=self._require_runtime_content_bundle().start_battle_hook_registry,
+                context=StartBattleRequestContext(
+                    state=state,
+                    decisions=self.decision_controller,
+                    config=self._require_config(),
+                ),
+                request=request,
+                invalid_reason="invalid_tracked_target_result",
+                message="Start-battle tracked target submission is stale.",
+            )
+            if invalid_status is not None:
+                return invalid_status
         return invalid_select_tracked_target_status(
-            state=self._require_state(),
+            state=state,
             request=request,
             result=result,
         )

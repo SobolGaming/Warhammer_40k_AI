@@ -1202,7 +1202,9 @@ def _validate_bindings[T](
             | ObjectiveControlModifierBinding
             | AdvanceRollModifierBinding
             | ChargeRollModifierBinding
-            | WeaponProfileModifierBinding,
+            | WeaponProfileModifierBinding
+            | AttackRerollPermissionBinding
+            | FailedSaveDamageReplacementBinding,
             binding,
         ).modifier_id
         if modifier_id in seen:
@@ -1224,6 +1226,8 @@ def _modifier_id_for_binding(binding: object) -> str:
         AdvanceRollModifierBinding,
         ChargeRollModifierBinding,
         WeaponProfileModifierBinding,
+        AttackRerollPermissionBinding,
+        FailedSaveDamageReplacementBinding,
     }:
         return cast(
             UnitCharacteristicModifierBinding
@@ -1235,7 +1239,9 @@ def _modifier_id_for_binding(binding: object) -> str:
             | ObjectiveControlModifierBinding
             | AdvanceRollModifierBinding
             | ChargeRollModifierBinding
-            | WeaponProfileModifierBinding,
+            | WeaponProfileModifierBinding
+            | AttackRerollPermissionBinding
+            | FailedSaveDamageReplacementBinding,
             binding,
         ).modifier_id
     raise GameLifecycleError("Runtime modifier binding has an unsupported type.")

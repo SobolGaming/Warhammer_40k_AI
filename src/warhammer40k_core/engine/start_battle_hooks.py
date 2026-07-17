@@ -9,7 +9,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
-from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameConfig, GameState
@@ -190,6 +190,29 @@ class StartBattleHookRegistry:
         return bool(handled_ids)
 
 
+def invalid_pending_start_battle_request_status(
+    *,
+    registry: StartBattleHookRegistry,
+    context: StartBattleRequestContext,
+    request: DecisionRequest,
+    invalid_reason: str,
+    message: str,
+) -> LifecycleStatus | None:
+    try:
+        registry.validate_pending_request(context=context, request=request)
+    except GameLifecycleError as exc:
+        return LifecycleStatus.invalid(
+            stage=context.state.stage,
+            message=message,
+            payload={
+                "invalid_reason": invalid_reason,
+                "field": "authoritative_request",
+                "detail": str(exc),
+            },
+        )
+    return None
+
+
 def _validate_hook_bindings(value: object) -> tuple[StartBattleHookBinding, ...]:
     return validate_hook_bindings(
         value,
@@ -203,10 +226,16 @@ def _validate_hook_bindings(value: object) -> tuple[StartBattleHookBinding, ...]
 
 
 def _validate_start_battle_boundary(state: GameState) -> None:
-    if state.stage is not GameLifecycleStage.SETUP:
-        raise GameLifecycleError("Start-battle hooks require setup stage.")
-    if state.setup_step_index is None or state.setup_step_index + 1 != len(state.setup_sequence):
+    if not is_start_battle_boundary(state):
         raise GameLifecycleError("Start-battle hooks require the final setup boundary.")
+
+
+def is_start_battle_boundary(state: GameState) -> bool:
+    return (
+        state.stage is GameLifecycleStage.SETUP
+        and state.setup_step_index is not None
+        and state.setup_step_index + 1 == len(state.setup_sequence)
+    )
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
