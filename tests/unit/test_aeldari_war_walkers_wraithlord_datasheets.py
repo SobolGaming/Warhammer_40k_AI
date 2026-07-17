@@ -23,7 +23,11 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    BattlePhaseSequenceDescriptor,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
@@ -968,6 +972,67 @@ def test_fated_hero_stale_requests_reject_before_any_lifecycle_mutation(
     assert lifecycle.to_payload() == before
 
 
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "changed_submission_kind",
+        "missing_submission_kind",
+        "changed_hook_id",
+        "conflicting_hook_and_submission_kind",
+        "non_object_request_payload",
+        "fully_malformed_final_boundary_request",
+    ],
+)
+def test_fated_hero_malformed_dispatch_signatures_reject_without_mutation(
+    pending_fated_hero_lifecycle_payload: dict[str, Any],
+    mutation: str,
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(pending_fated_hero_lifecycle_payload)),
+    )
+    request_payload = payload["decisions"]["queue"]["pending_requests"][0]
+    if mutation == "changed_submission_kind":
+        request_payload["payload"]["submission_kind"] = "catalog_keyword_choice:drift"
+        for option in request_payload["options"]:
+            option["payload"]["submission_kind"] = "catalog_keyword_choice:drift"
+    elif mutation == "missing_submission_kind":
+        request_payload["payload"].pop("submission_kind")
+        for option in request_payload["options"]:
+            option["payload"].pop("submission_kind")
+    elif mutation == "changed_hook_id":
+        request_payload["payload"]["hook_id"] = "catalog-ir:tracked-target:start-battle"
+        for option in request_payload["options"]:
+            option["payload"]["hook_id"] = "catalog-ir:tracked-target:start-battle"
+    elif mutation == "conflicting_hook_and_submission_kind":
+        request_payload["payload"]["submission_kind"] = "select_tracked_target"
+        for option in request_payload["options"]:
+            option["payload"]["submission_kind"] = "select_tracked_target"
+    elif mutation == "non_object_request_payload":
+        request_payload["payload"] = ["malformed-final-boundary-request"]
+    elif mutation == "fully_malformed_final_boundary_request":
+        request_payload["actor_id"] = "player-b"
+        request_payload["payload"] = {"malformed": True}
+        for option in request_payload["options"]:
+            option["payload"] = {"malformed": True}
+    else:
+        raise AssertionError(f"Unhandled mutation: {mutation}")
+    lifecycle = GameLifecycle.from_payload(cast(Any, payload))
+    request = lifecycle.decision_controller.queue.peek_next()
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=request.options[0].option_id,
+        result_id=f"result:fated-hero-malformed:{mutation}",
+    ).to_result(request)
+    before = json.loads(json.dumps(lifecycle.to_payload()))
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, Any], status.payload)["field"] == "authoritative_request"
+    assert lifecycle.to_payload() == before
+
+
 @pytest.fixture(scope="module")
 def resolved_fated_hero_lifecycle_payload() -> dict[str, Any]:
     lifecycle = GameLifecycle()
@@ -988,6 +1053,77 @@ def resolved_fated_hero_lifecycle_payload() -> dict[str, Any]:
         ).to_result(request)
     )
     return cast(dict[str, Any], json.loads(json.dumps(lifecycle.to_payload())))
+
+
+@pytest.fixture(scope="module")
+def completed_fated_hero_lifecycle_payload() -> dict[str, Any]:
+    config = _compact_fated_hero_config()
+    lifecycle = GameLifecycle()
+    request = _advance_to_fated_hero_request(lifecycle, lifecycle.start(config))
+    status = lifecycle.submit_decision(
+        FiniteOptionSubmission(
+            request_id=request.request_id,
+            selected_option_id=request.options[0].option_id,
+            result_id="result:fated-hero-complete-game",
+        ).to_result(request)
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert status.status_kind is LifecycleStatusKind.TERMINAL
+    assert state.stage is GameLifecycleStage.COMPLETE
+    assert not any(
+        _is_fated_hero_effect_payload(cast(dict[str, Any], effect.to_payload()))
+        for effect in state.persisting_effects
+    )
+    return cast(dict[str, Any], json.loads(json.dumps(lifecycle.to_payload())))
+
+
+def test_fated_hero_completed_game_round_trips_after_effect_expiration(
+    completed_fated_hero_lifecycle_payload: dict[str, Any],
+) -> None:
+    restored = GameLifecycle.from_payload(cast(Any, completed_fated_hero_lifecycle_payload))
+
+    assert restored.to_payload() == completed_fated_hero_lifecycle_payload
+    assert restored.state is not None
+    assert restored.state.stage is GameLifecycleStage.COMPLETE
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["tampered_decision_record", "missing_decision_record", "tampered_selected_event"],
+)
+def test_fated_hero_completed_game_rejects_historical_provenance_drift(
+    completed_fated_hero_lifecycle_payload: dict[str, Any],
+    mutation: str,
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(completed_fated_hero_lifecycle_payload)),
+    )
+    records = payload["decisions"]["records"]
+    fated_record = next(
+        record
+        for record in records
+        if record["request"]["payload"].get("submission_kind")
+        == "catalog_start_battle_keyword_choice"
+    )
+    selected_event = next(
+        event
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == CATALOG_START_BATTLE_KEYWORD_SELECTED_EVENT
+    )
+    if mutation == "tampered_decision_record":
+        fated_record["request"]["payload"]["source_rule_ir_hash"] = "sha256:drift"
+    elif mutation == "missing_decision_record":
+        assert records[-1] is fated_record
+        records.pop()
+    elif mutation == "tampered_selected_event":
+        selected_event["payload"]["selected_option_id"] = "fated-hero-option:drift"
+    else:
+        raise AssertionError(f"Unhandled mutation: {mutation}")
+
+    with pytest.raises(GameLifecycleError, match="Catalog keyword choice"):
+        GameLifecycle.from_payload(cast(Any, payload))
 
 
 @pytest.mark.parametrize(
@@ -1355,6 +1491,31 @@ def _fated_hero_config(
         fixed_secondary_mission_ids=("assassination", "bring_it_down"),
         mission_setup=_mission_setup(),
     )
+
+
+def _compact_fated_hero_config() -> GameConfig:
+    config = _fated_hero_config()
+    descriptor = config.ruleset_descriptor
+    compact_descriptor = RulesetDescriptor(
+        ruleset_id=descriptor.ruleset_id,
+        source_date=descriptor.source_date,
+        descriptor_version=descriptor.descriptor_version,
+        engagement_policy=descriptor.engagement_policy,
+        movement_policy=descriptor.movement_policy,
+        charge_policy=descriptor.charge_policy,
+        fight_policy=descriptor.fight_policy,
+        terrain_movement_policy=descriptor.terrain_movement_policy,
+        terrain_visibility_policy=descriptor.terrain_visibility_policy,
+        objective_policy=descriptor.objective_policy,
+        coherency_policy=descriptor.coherency_policy,
+        fly_policy=descriptor.fly_policy,
+        mission_policy=descriptor.mission_policy,
+        setup_sequence=descriptor.setup_sequence,
+        battle_phase_sequence=BattlePhaseSequenceDescriptor(
+            phases=(BattlePhaseKind.COMMAND, BattlePhaseKind.FIGHT)
+        ),
+    )
+    return replace(config, ruleset_descriptor=compact_descriptor)
 
 
 @cache

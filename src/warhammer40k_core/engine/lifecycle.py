@@ -238,6 +238,7 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
 )
+from warhammer40k_core.engine.start_battle_hooks import StartBattleRequestContext
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
     StratagemCostChoiceRequestContext,
@@ -1034,19 +1035,27 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
-            payload = request.payload
-            if isinstance(payload, dict) and payload.get("submission_kind") == (
-                _sbkc.CATALOG_START_BATTLE_KEYWORD_CHOICE_SUBMISSION_KIND
-            ):
+            if state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
                 bundle = self._require_runtime_content_bundle()
-                return _sbkc.invalid_catalog_start_battle_keyword_choice_status(
-                    state=state,
-                    config=self._require_config(),
-                    decisions=self.decision_controller,
-                    ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
-                    armies=tuple(state.army_definitions),
-                    request=request,
-                )
+                try:
+                    bundle.start_battle_hook_registry.validate_pending_request(
+                        context=StartBattleRequestContext(
+                            state=state,
+                            decisions=self.decision_controller,
+                            config=self._require_config(),
+                        ),
+                        request=request,
+                    )
+                except GameLifecycleError as exc:
+                    return LifecycleStatus.invalid(
+                        stage=state.stage,
+                        message="Start-battle faction rule submission is stale.",
+                        payload={
+                            "invalid_reason": "invalid_faction_rule_setup_option_result",
+                            "field": "authoritative_request",
+                            "detail": str(exc),
+                        },
+                    )
         return None
 
     def _apply_setup_decision(

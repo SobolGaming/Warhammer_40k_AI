@@ -430,6 +430,9 @@ def _build_request_from_effect(
         return None
     return build_select_tracked_target_request(
         state=context.state,
+        request_id=(
+            context.issue_request_id() if type(context) is StartBattleRequestContext else None
+        ),
         actor_player_id=actor_player_id,
         source_rule_id=record.definition.source_id,
         source_ability_id=record.definition.ability_id,

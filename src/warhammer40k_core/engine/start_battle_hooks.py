@@ -24,6 +24,7 @@ class StartBattleRequestContext:
     state: GameState
     decisions: DecisionController
     config: GameConfig
+    authoritative_request_id: str | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameConfig, GameState
@@ -36,7 +37,21 @@ class StartBattleRequestContext:
             )
         if type(self.config) is not GameConfig:
             raise GameLifecycleError("StartBattleRequestContext config must be GameConfig.")
+        if self.authoritative_request_id is not None:
+            object.__setattr__(
+                self,
+                "authoritative_request_id",
+                _validate_identifier(
+                    "authoritative_request_id",
+                    self.authoritative_request_id,
+                ),
+            )
         _validate_start_battle_boundary(self.state)
+
+    def issue_request_id(self) -> str:
+        if self.authoritative_request_id is not None:
+            return self.authoritative_request_id
+        return self.state.next_decision_request_id()
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,6 +147,31 @@ class StartBattleHookRegistry:
                 "Start-battle hooks produced multiple simultaneous requests at the same priority."
             )
         return selected_requests[0]
+
+    def validate_pending_request(
+        self,
+        *,
+        context: StartBattleRequestContext,
+        request: DecisionRequest,
+    ) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(context) is not StartBattleRequestContext or type(request) is not DecisionRequest:
+            raise GameLifecycleError(
+                "Start-battle pending request validation requires typed inputs."
+            )
+        authoritative_request = self.next_request_for(
+            StartBattleRequestContext(
+                state=GameState.from_payload(context.state.to_payload()),
+                decisions=DecisionController.from_payload(context.decisions.to_payload()),
+                config=context.config,
+                authoritative_request_id=request.request_id,
+            )
+        )
+        if authoritative_request is None:
+            raise GameLifecycleError("Start-battle pending request has no authoritative source.")
+        if request != authoritative_request:
+            raise GameLifecycleError("Start-battle pending request drifted.")
 
     def apply_result(self, context: StartBattleResultContext) -> bool:
         if type(context) is not StartBattleResultContext:

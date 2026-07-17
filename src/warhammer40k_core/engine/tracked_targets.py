@@ -261,6 +261,7 @@ class TrackedTargetRecord:
 def build_select_tracked_target_request(
     *,
     state: GameState,
+    request_id: str | None = None,
     actor_player_id: str,
     source_rule_id: str,
     source_ability_id: str,
@@ -357,7 +358,7 @@ def build_select_tracked_target_request(
         }
     )
     return DecisionRequest(
-        request_id=state.next_decision_request_id(),
+        request_id=(state.next_decision_request_id() if request_id is None else request_id),
         decision_type=SELECT_TRACKED_TARGET_DECISION_TYPE,
         actor_id=player_id,
         payload=common_payload,
