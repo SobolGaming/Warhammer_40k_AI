@@ -518,6 +518,7 @@ def invalid_select_tracked_target_status(
     if type(request) is not DecisionRequest or type(result) is not DecisionResult:
         raise GameLifecycleError("Tracked target invalid status requires request/result.")
     try:
+        _tracked_target_selection_battle_round(state)
         result.validate_for_request(request)
         request_payload = _payload_object(request.payload)
         result_payload = _payload_object(result.payload)

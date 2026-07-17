@@ -1036,6 +1036,113 @@ def test_piratical_raiders_rejects_authoritative_request_drift_without_mutation(
     assert state.tracked_target_records == []
 
 
+def test_piratical_raiders_rejects_setup_boundary_drift_without_mutation(
+    pending_piratical_raiders_lifecycle_payload: dict[str, Any],
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(pending_piratical_raiders_lifecycle_payload)),
+    )
+    payload["state"]["setup_step_index"] -= 1
+    lifecycle = GameLifecycle.from_payload(cast(Any, payload))
+    request = lifecycle.decision_controller.queue.peek_next()
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=request.options[0].option_id,
+        result_id="result:piratical-raiders-setup-boundary-drift",
+    ).to_result(request)
+    before = json.loads(json.dumps(lifecycle.to_payload()))
+    state = lifecycle.state
+    assert state is not None
+    before_record_count = len(lifecycle.decision_controller.records)
+    before_event_count = len(lifecycle.decision_controller.event_log.records)
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, Any], status.payload)["invalid_reason"] == (
+        "invalid_tracked_target_result"
+    )
+    assert cast(dict[str, Any], status.payload)["field"] == "authoritative_request"
+    assert lifecycle.to_payload() == before
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert len(lifecycle.decision_controller.event_log.records) == before_event_count
+    assert state.tracked_target_records == []
+
+
+@pytest.mark.parametrize(
+    "drifted_decision_type",
+    ["select_secondary_missions", "select_deployment_unit"],
+)
+def test_piratical_raiders_rejects_decision_type_drift_before_dispatch(
+    pending_piratical_raiders_lifecycle_payload: dict[str, Any],
+    drifted_decision_type: str,
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(pending_piratical_raiders_lifecycle_payload)),
+    )
+    payload["decisions"]["queue"]["pending_requests"][0]["decision_type"] = drifted_decision_type
+    lifecycle = GameLifecycle.from_payload(cast(Any, payload))
+    request = lifecycle.decision_controller.queue.peek_next()
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=request.options[0].option_id,
+        result_id=f"result:piratical-raiders-decision-type-drift:{drifted_decision_type}",
+    ).to_result(request)
+    before = json.loads(json.dumps(lifecycle.to_payload()))
+    state = lifecycle.state
+    assert state is not None
+    before_record_count = len(lifecycle.decision_controller.records)
+    before_event_count = len(lifecycle.decision_controller.event_log.records)
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, Any], status.payload)["invalid_reason"] == (
+        "invalid_tracked_target_result"
+    )
+    assert cast(dict[str, Any], status.payload)["field"] == "authoritative_request"
+    assert lifecycle.to_payload() == before
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert len(lifecycle.decision_controller.event_log.records) == before_event_count
+    assert state.tracked_target_records == []
+
+
+def test_final_setup_prebattle_request_is_not_misclassified_as_start_battle() -> None:
+    lifecycle = GameLifecycle()
+    request = _advance_to_piratical_prebattle_request(
+        lifecycle,
+        lifecycle.start(_piratical_raiders_config()),
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.setup_step_index is not None
+    assert state.setup_step_index + 1 == len(state.setup_sequence)
+    restored = GameLifecycle.from_payload(json.loads(json.dumps(lifecycle.to_payload())))
+    restored_request = restored.decision_controller.queue.peek_next()
+    complete_option = next(
+        option
+        for option in restored_request.options
+        if option.option_id == "complete_prebattle_actions"
+    )
+
+    status = restored.submit_decision(
+        FiniteOptionSubmission(
+            request_id=restored_request.request_id,
+            selected_option_id=complete_option.option_id,
+            result_id="result:complete-authoritative-final-prebattle",
+        ).to_result(restored_request)
+    )
+
+    assert request.decision_type == "select_prebattle_action"
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "select_tracked_target"
+
+
 def test_piratical_raiders_accepts_unchanged_round_tripped_authoritative_request(
     pending_piratical_raiders_lifecycle_payload: dict[str, Any],
 ) -> None:
@@ -1745,10 +1852,31 @@ def _piratical_raiders_lifecycle_catalog() -> ArmyCatalog:
 
 
 def _advance_to_piratical_raiders_request(lifecycle: GameLifecycle, status: Any) -> Any:
+    return _advance_to_piratical_setup_request(
+        lifecycle,
+        status,
+        expected_decision_type="select_tracked_target",
+    )
+
+
+def _advance_to_piratical_prebattle_request(lifecycle: GameLifecycle, status: Any) -> Any:
+    return _advance_to_piratical_setup_request(
+        lifecycle,
+        status,
+        expected_decision_type="select_prebattle_action",
+    )
+
+
+def _advance_to_piratical_setup_request(
+    lifecycle: GameLifecycle,
+    status: Any,
+    *,
+    expected_decision_type: str,
+) -> Any:
     while True:
         request = status.decision_request
         if request is not None:
-            if request.decision_type == "select_tracked_target":
+            if request.decision_type == expected_decision_type:
                 return request
             if request.decision_type == "select_secondary_missions":
                 status = lifecycle.submit_decision(
