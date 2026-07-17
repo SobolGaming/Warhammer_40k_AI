@@ -8,6 +8,15 @@ from warhammer40k_core.engine.attack_sequence_damage_helpers import (
     no_save_damage_order_roll_spec as _no_save_damage_order_roll_spec,
 )
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.destruction_reaction_conditions import (
+    optional_destruction_reaction_active_effect_requirement_is_met as _optional_destruction_reaction_active_effect_requirement_is_met,
+)
+from warhammer40k_core.engine.destruction_reaction_conditions import (
+    optional_destruction_reaction_trigger_battle_round_is_current as _optional_destruction_reaction_trigger_battle_round_is_current,
+)
+from warhammer40k_core.engine.destruction_reaction_conditions import (
+    optional_destruction_reaction_trigger_conditions_met as _optional_destruction_reaction_trigger_conditions_met,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -320,6 +329,10 @@ def _apply_damage_after_feel_no_pain(
         manager=manager,
         attack_sequence=attack_sequence,
         attack_context=attack_context,
+        destruction_provenance=DestructionProvenance.for_attack(
+            weapon_profile=attack_sequence.current_pool().weapon_profile,
+            attack_context_id=attack_context["attack_context_id"],
+        ),
         damage=damage,
         destroyed_emission=destroyed_emission,
     )
@@ -355,6 +368,7 @@ def _destruction_reaction_status_if_needed(
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
     attack_context: AttackResolutionContextPayload,
+    destruction_provenance: DestructionProvenance,
     damage: DamageApplication | None,
     destroyed_emission: DestroyedModelEmission | None,
     destroyed_model_controller_player_id: str | None = None,
@@ -381,6 +395,7 @@ def _destruction_reaction_status_if_needed(
     destruction_context = validate_json_value(
         _destruction_reaction_context_payload(
             attack_context=attack_context,
+            destruction_provenance=destruction_provenance,
             damage=damage,
             destroyed_emission=destroyed_emission,
             destroyed_model_controller_player_id=controller_player_id,
@@ -393,6 +408,7 @@ def _destruction_reaction_status_if_needed(
         manager=manager,
         attack_sequence=attack_sequence,
         attack_context=attack_context,
+        destruction_provenance=destruction_provenance,
         damage=damage,
         destroyed_emission=destroyed_emission,
         sources=tuple(source for source in sources if source.optional),
@@ -415,6 +431,7 @@ def _destruction_reaction_status_if_needed(
             "model_instance_id": damage.model_instance_id,
             "target_unit_instance_id": damage.target_unit_instance_id,
             "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
+            "destruction_provenance": destruction_provenance.to_payload(),
             "sources": [source.to_payload() for source in optional_sources],
             "request_id": request.request_id,
         },
@@ -427,6 +444,7 @@ def _destruction_reaction_status_if_needed(
             "decision_type": SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
             "attack_context_id": attack_sequence.attack_context_id(),
             "model_instance_id": damage.model_instance_id,
+            "destruction_source_kind": destruction_provenance.destruction_source_kind.value,
         },
     )
 
@@ -438,6 +456,7 @@ def _optional_destruction_reaction_sources_after_trigger_rolls(
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
     attack_context: AttackResolutionContextPayload,
+    destruction_provenance: DestructionProvenance,
     damage: DamageApplication,
     destroyed_emission: DestroyedModelEmission,
     sources: tuple[DestructionReactionSource, ...],
@@ -453,7 +472,7 @@ def _optional_destruction_reaction_sources_after_trigger_rolls(
             continue
         if not _optional_destruction_reaction_trigger_conditions_met(
             state=state,
-            attack_sequence=attack_sequence,
+            destruction_provenance=destruction_provenance,
             damage=damage,
             descriptor=descriptor,
         ):
@@ -465,6 +484,7 @@ def _optional_destruction_reaction_sources_after_trigger_rolls(
                     "model_instance_id": damage.model_instance_id,
                     "target_unit_instance_id": damage.target_unit_instance_id,
                     "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
+                    "destruction_provenance": destruction_provenance.to_payload(),
                     "selected_source": source.to_payload(),
                     "descriptor": descriptor,
                 },
@@ -488,6 +508,7 @@ def _optional_destruction_reaction_sources_after_trigger_rolls(
                 "model_instance_id": damage.model_instance_id,
                 "target_unit_instance_id": damage.target_unit_instance_id,
                 "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
+                "destruction_provenance": destruction_provenance.to_payload(),
                 "selected_source": source.to_payload(),
                 "descriptor": descriptor,
                 "trigger_roll": roll_state.to_payload(),
@@ -515,93 +536,6 @@ def _optional_destruction_reaction_trigger_descriptor(
     if "trigger_roll_threshold" not in payload:
         return None
     return payload
-
-
-def _optional_destruction_reaction_trigger_conditions_met(
-    *,
-    state: GameState,
-    attack_sequence: AttackSequence,
-    damage: DamageApplication,
-    descriptor: dict[str, JsonValue],
-) -> bool:
-    if not _optional_destruction_reaction_trigger_battle_round_is_current(
-        state=state,
-        descriptor=descriptor,
-    ):
-        return False
-    if not _optional_destruction_reaction_active_effect_requirement_is_met(
-        state=state,
-        descriptor=descriptor,
-    ):
-        return False
-    if (
-        descriptor.get("requires_destroyed_by_melee_attack") is True
-        and attack_sequence.source_phase is not BattlePhase.FIGHT
-    ):
-        return False
-    if descriptor.get("requires_not_fought_this_phase") is True:
-        fight_state = state.fight_phase_state
-        if (
-            fight_state is not None
-            and damage.target_unit_instance_id
-            in fight_state.fight_order_state.selected_to_fight_unit_ids
-        ):
-            return False
-    return True
-
-
-def _optional_destruction_reaction_trigger_battle_round_is_current(
-    *,
-    state: GameState,
-    descriptor: dict[str, JsonValue],
-) -> bool:
-    if "battle_round" not in descriptor:
-        return True
-    return _payload_positive_int(descriptor, key="battle_round") == state.battle_round
-
-
-def _optional_destruction_reaction_active_effect_requirement_is_met(
-    *,
-    state: GameState,
-    descriptor: dict[str, JsonValue],
-) -> bool:
-    raw_requirement = descriptor.get("requires_active_persisting_effect")
-    if raw_requirement is None:
-        return True
-    requirement = _payload_object(raw_requirement)
-    required_owner_id = _optional_payload_string(requirement, key="owner_player_id")
-    required_source_rule_id = _optional_payload_string(requirement, key="source_rule_id")
-    required_effect_kind = _optional_payload_string(requirement, key="effect_kind")
-    required_target_unit_id = _optional_payload_string(requirement, key="target_unit_instance_id")
-    required_battle_round = (
-        _payload_positive_int(requirement, key="battle_round")
-        if "battle_round" in requirement
-        else None
-    )
-    required_selected_id = _optional_payload_string(requirement, key="selected_blessing_id")
-    for effect in state.persisting_effects:
-        if required_owner_id is not None and effect.owner_player_id != required_owner_id:
-            continue
-        if required_source_rule_id is not None and effect.source_rule_id != required_source_rule_id:
-            continue
-        if required_target_unit_id is not None and not effect.applies_to_unit(
-            required_target_unit_id
-        ):
-            continue
-        payload = _payload_object(effect.effect_payload)
-        if required_effect_kind is not None and payload.get("effect_kind") != required_effect_kind:
-            continue
-        if required_battle_round is not None and payload.get("battle_round") != (
-            required_battle_round
-        ):
-            continue
-        if required_selected_id is not None and required_selected_id not in _payload_string_list(
-            payload,
-            key="selected_blessing_ids",
-        ):
-            continue
-        return True
-    return False
 
 
 def _destruction_reaction_trigger_threshold(descriptor: dict[str, JsonValue]) -> int:
@@ -995,6 +929,9 @@ def _resolve_deadly_demise_secondary_destroyed_models(
             manager=manager,
             attack_sequence=attack_sequence,
             attack_context=attack_context,
+            destruction_provenance=DestructionProvenance.for_non_attack(
+                DestructionSourceKind.DEADLY_DEMISE
+            ),
             damage=secondary_damage,
             destroyed_emission=destroyed_emission,
             destroyed_model_controller_player_id=secondary_controller_player_id,
@@ -1167,6 +1104,10 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
         manager=manager,
         attack_sequence=attack_sequence,
         attack_context=attack_context,
+        destruction_provenance=DestructionProvenance.for_attack(
+            weapon_profile=attack_sequence.current_pool().weapon_profile,
+            attack_context_id=attack_context["attack_context_id"],
+        ),
         damage=damage,
         destroyed_emission=destroyed_emission,
         destroyed_model_controller_player_id=destroyed_model_controller_player_id,
@@ -1462,6 +1403,7 @@ def _pre_removal_destruction_reaction_context_payload(
 def _destruction_reaction_context_payload(
     *,
     attack_context: AttackResolutionContextPayload,
+    destruction_provenance: DestructionProvenance,
     damage: DamageApplication,
     destroyed_emission: DestroyedModelEmission,
     destroyed_model_controller_player_id: str,
@@ -1474,6 +1416,7 @@ def _destruction_reaction_context_payload(
     return {
         "context_kind": "attack_sequence_model_destroyed",
         "attack_context": attack_context,
+        "destruction_provenance": destruction_provenance.to_payload(),
         "damage_application": validate_json_value(damage.to_payload()),
         "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
         "damage_event_id": destroyed_emission.damage_event_id,

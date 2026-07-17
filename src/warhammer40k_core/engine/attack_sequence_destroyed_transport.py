@@ -385,6 +385,10 @@ def _continue_pending_destroyed_transport_disembark(
         manager=manager,
         attack_sequence=sequence_without_pending,
         attack_context=pending.attack_context,
+        destruction_provenance=DestructionProvenance.for_attack(
+            weapon_profile=sequence_without_pending.current_pool().weapon_profile,
+            attack_context_id=pending.attack_context["attack_context_id"],
+        ),
         damage=pending.damage_application,
         destroyed_emission=destroyed_emission,
         destroyed_model_controller_player_id=pending.destroyed_model_controller_player_id,

@@ -541,9 +541,22 @@ def _destruction_reaction_context_from_payload(
     attack_context = raw["attack_context"]
     if not isinstance(attack_context, dict):
         raise GameLifecycleError("Destruction reaction context attack_context must be an object.")
+    provenance_payload = raw["destruction_provenance"]
+    if not isinstance(provenance_payload, dict):
+        raise GameLifecycleError("Destruction reaction provenance must be an object.")
+    provenance = DestructionProvenance.from_payload(
+        cast(DestructionProvenancePayload, provenance_payload)
+    )
+    if provenance.destruction_source_kind is DestructionSourceKind.ATTACK and (
+        provenance.attack_context_id != attack_context.get("attack_context_id")
+        or provenance.source_weapon_profile is None
+        or provenance.source_weapon_profile.profile_id != attack_context.get("weapon_profile_id")
+    ):
+        raise GameLifecycleError("Destruction reaction attack provenance drift.")
     return {
         "context_kind": "attack_sequence_model_destroyed",
         "attack_context": cast(AttackResolutionContextPayload, attack_context),
+        "destruction_provenance": provenance.to_payload(),
         "damage_application": validate_json_value(raw["damage_application"]),
         "model_destroyed_event_id": _payload_string(raw, key="model_destroyed_event_id"),
         "damage_event_id": _payload_string(raw, key="damage_event_id"),

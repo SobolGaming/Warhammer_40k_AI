@@ -118,6 +118,12 @@ from warhammer40k_core.engine.damage_allocation_targets import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionAttackKind,
+    DestructionProvenance,
+    DestructionProvenancePayload,
+    DestructionSourceKind,
+)
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.event_log import (
     EventRecord,
@@ -305,6 +311,10 @@ __all__ = (
     "DiceRollSpec",
     "DiceRollState",
     "DiceRollStatePayload",
+    "DestructionAttackKind",
+    "DestructionProvenance",
+    "DestructionProvenancePayload",
+    "DestructionSourceKind",
     "DisembarkModeKind",
     "DisembarkSelection",
     "DistanceMeasurementContext",

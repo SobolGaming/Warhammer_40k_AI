@@ -364,6 +364,7 @@ class LostWoundContextPayload(TypedDict):
 class DestructionReactionContextPayload(TypedDict):
     context_kind: str
     attack_context: AttackResolutionContextPayload
+    destruction_provenance: DestructionProvenancePayload
     damage_application: JsonValue
     model_destroyed_event_id: str
     damage_event_id: str

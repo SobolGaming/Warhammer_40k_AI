@@ -18,14 +18,28 @@ from tools.generate_aeldari_shroud_runners_wraithblades_rule_ir import (
 )
 
 from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
+from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
+from warhammer40k_core.core.ruleset_descriptor import FightEligibilityKind, RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import (
+    DamageProfile,
+    RangeProfileKind,
+    WeaponProfile,
+)
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
     catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    AttackSequenceStep,
+    apply_destruction_reaction_decision,
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+    deadly_demise_trigger_roll_spec,
+    resolve_attack_sequence_until_blocked,
+)
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
@@ -44,16 +58,47 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_consumers_for_rule,
 )
 from warhammer40k_core.engine.damage_allocation import (
+    DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+    SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+    DamageKind,
     DestructionReactionKind,
     DestructionReactionSource,
+    MortalWoundApplicationProgress,
+    apply_damage_to_model,
+    continue_mortal_wound_application,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionAttackKind,
+    DestructionProvenance,
+    DestructionSourceKind,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_on_death import (
+    model_is_present_on_battlefield,
+)
+from warhammer40k_core.engine.fight_order import (
+    FightActivationSelection,
+    FightPhaseState,
+    FightsFirstRegistry,
+)
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
+from warhammer40k_core.engine.phases.fight import (
+    FightPhaseHandler,
+    _complete_active_fight_activation,  # pyright: ignore[reportPrivateUsage]
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
@@ -61,7 +106,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     SaveOptionModifierContext,
     UnitCharacteristicModifierContext,
 )
-from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.saves import SaveKind, SaveOption, saving_throw_roll_spec
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection, WargearSelection
@@ -330,6 +375,76 @@ def test_psychic_guidance_is_proximity_gated_for_leadership_and_hit_rolls() -> N
     assert registry.hit_roll_modifier(hit_context) == 0
 
 
+def test_psychic_guidance_uses_only_keyworded_component_models_for_attached_units() -> None:
+    fixture = _runtime_fixture(attach_psyker_to_wraith=True)
+    registry = RuntimeModifierRegistry.from_bindings(
+        unit_characteristic_modifier_bindings=(
+            fixture.runtime.unit_characteristic_modifier_bindings()
+        ),
+        hit_roll_modifier_bindings=fixture.runtime.hit_roll_modifier_bindings(),
+    )
+    wraith = fixture.wraith_shields
+    psyker_model = fixture.psyker.own_models[0]
+    _move_unit(fixture.state, wraith.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(fixture.state, fixture.shroud.unit_instance_id, x=20.0, y=10.0)
+    _move_unit(fixture.state, fixture.psyker.unit_instance_id, x=50.0, y=10.0)
+
+    def guidance_values(state: GameState) -> tuple[int, int]:
+        return (
+            registry.modified_unit_characteristic(
+                UnitCharacteristicModifierContext(
+                    state=state,
+                    unit_instance_id=wraith.unit_instance_id,
+                    characteristic=Characteristic.LEADERSHIP,
+                    base_value=8,
+                    current_value=8,
+                )
+            ),
+            registry.hit_roll_modifier(
+                HitRollModifierContext(
+                    state=state,
+                    attacking_unit_instance_id=wraith.unit_instance_id,
+                    attacker_model_instance_id=wraith.own_models[0].model_instance_id,
+                    target_unit_instance_id=fixture.enemy_one.unit_instance_id,
+                    weapon_profile=_profile(WRAITHBLADES_ID, "Ghostaxe"),
+                    source_phase=BattlePhase.FIGHT,
+                )
+            ),
+        )
+
+    assert guidance_values(fixture.state) == (8, 0)
+    restored_far = GameState.from_payload(
+        json.loads(json.dumps(fixture.state.to_payload(), sort_keys=True))
+    )
+    assert guidance_values(restored_far) == (8, 0)
+
+    _move_unit(fixture.state, fixture.psyker.unit_instance_id, x=20.0, y=10.0)
+    assert guidance_values(fixture.state) == (6, 1)
+    near_payload = json.loads(json.dumps(fixture.state.to_payload(), sort_keys=True))
+    restored_near = GameState.from_payload(near_payload)
+    assert guidance_values(restored_near) == (6, 1)
+
+    unplaced = GameState.from_payload(near_payload)
+    battlefield = unplaced.battlefield_state
+    assert battlefield is not None
+    unplaced.replace_battlefield_state(
+        battlefield.with_removed_models((psyker_model.model_instance_id,))
+    )
+    assert guidance_values(unplaced) == (8, 0)
+
+    destroyed = GameState.from_payload(near_payload)
+    application = apply_damage_to_model(
+        state=destroyed,
+        target_unit_instance_id=fixture.psyker.unit_instance_id,
+        model_instance_id=psyker_model.model_instance_id,
+        damage=psyker_model.wounds_remaining,
+        damage_kind=DamageKind.MORTAL,
+        remove_destroyed_model=False,
+    )
+    assert application.destroyed is True
+    assert guidance_values(destroyed) == (8, 0)
+
+
 def test_malevolent_souls_registers_idempotent_serializable_model_sources() -> None:
     fixture = _runtime_fixture()
 
@@ -363,6 +478,320 @@ def test_malevolent_souls_registers_idempotent_serializable_model_sources() -> N
     )
     assert restored.destruction_reaction_sources_by_model_id == (
         fixture.state.destruction_reaction_sources_by_model_id
+    )
+
+
+def test_malevolent_souls_direct_melee_success_replays_and_enters_fight_on_death() -> None:
+    fixture, decisions, remaining, allocated_ids, status, target_model = _resolve_malevolent_attack(
+        attack_kind=DestructionAttackKind.MELEE, trigger_roll=3
+    )
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = status.decision_request
+    assert request is not None
+    assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+    assert remaining is not None
+    assert allocated_ids == (target_model.model_instance_id,)
+    payload = cast(dict[str, JsonValue], request.payload)
+    context = cast(dict[str, JsonValue], payload["destruction_context"])
+    provenance = DestructionProvenance.from_payload(context["destruction_provenance"])
+    assert provenance.destruction_source_kind is DestructionSourceKind.ATTACK
+    assert provenance.attack_kind is DestructionAttackKind.MELEE
+    attack_context = cast(dict[str, JsonValue], context["attack_context"])
+    assert provenance.attack_context_id == attack_context["attack_context_id"]
+    assert provenance.source_weapon_profile is not None
+    assert provenance.source_weapon_profile.profile_id == attack_context["weapon_profile_id"]
+    drifted_provenance = provenance.to_payload()
+    drifted_provenance["attack_kind"] = DestructionAttackKind.RANGED.value
+    with pytest.raises(GameLifecycleError, match="attack kind drift"):
+        DestructionProvenance.from_payload(drifted_provenance)
+
+    lifecycle = GameLifecycle(decision_controller=decisions, state=fixture.state)
+    replayed = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+        )
+    )
+    replayed_state = replayed.state
+    assert replayed_state is not None
+    replayed_fight_state = replayed_state.fight_phase_state
+    assert replayed_fight_state is not None
+    assert replayed_fight_state.attack_sequence is not None
+    replayed_request = replayed.decision_controller.queue.peek_next()
+    replayed_context = cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], replayed_request.payload)["destruction_context"],
+    )
+    assert replayed_context["destruction_provenance"] == provenance.to_payload()
+    assert not model_is_present_on_battlefield(
+        state=replayed_state,
+        model_instance_id=target_model.model_instance_id,
+    )
+
+    selected_source = next(
+        option.option_id
+        for option in replayed_request.options
+        if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+    result = DecisionResult.for_request(
+        result_id="result:malevolent-souls-fight-on-death",
+        request=replayed_request,
+        selected_option_id=selected_source,
+    )
+    replayed.decision_controller.submit_result(result)
+    apply_destruction_reaction_decision(
+        state=replayed_state,
+        decisions=replayed.decision_controller,
+        ruleset_descriptor=replayed_state.runtime_ruleset_descriptor(),
+        attack_sequence=replayed_fight_state.attack_sequence,
+        result=result,
+        already_allocated_model_ids=replayed_fight_state.allocated_model_ids_this_phase,
+    )
+
+    assert model_is_present_on_battlefield(
+        state=replayed_state,
+        model_instance_id=target_model.model_instance_id,
+    )
+    assert any(
+        event.event_type == "fight_on_death_model_awaiting_attack"
+        for event in replayed.decision_controller.event_log.records
+    )
+    policy = replayed_state.runtime_ruleset_descriptor().fight_policy
+    activation = FightActivationSelection(
+        player_id="player-a",
+        battle_round=replayed_state.battle_round,
+        unit_instance_id=fixture.wraith_swords.unit_instance_id,
+        ordering_band=replayed_fight_state.current_ordering_band,
+        fight_type=policy.fight_types[0],
+        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+        request_id="request:malevolent-souls-fight-on-death-activation",
+        result_id="result:malevolent-souls-fight-on-death-activation",
+    )
+    replayed_state.replace_fight_phase_state(
+        replace(
+            replayed_fight_state,
+            active_activation=activation,
+            attack_sequence=None,
+        )
+    )
+    assert (
+        _complete_active_fight_activation(
+            handler=FightPhaseHandler(
+                ruleset_descriptor=replayed_state.runtime_ruleset_descriptor()
+            ),
+            state=replayed_state,
+            decisions=replayed.decision_controller,
+            reaction_queue=None,
+            policy=policy,
+            activation=activation,
+            unit_attacked=True,
+        )
+        is None
+    )
+    assert not model_is_present_on_battlefield(
+        state=replayed_state,
+        model_instance_id=target_model.model_instance_id,
+    )
+    cleanup_event = next(
+        event
+        for event in reversed(replayed.decision_controller.event_log.records)
+        if event.event_type == "fight_on_death_models_removed"
+    )
+    assert cast(dict[str, JsonValue], cleanup_event.payload)["reason"] == "unit_attacked"
+
+
+@pytest.mark.parametrize(
+    ("attack_kind", "trigger_roll", "already_fought"),
+    [
+        (DestructionAttackKind.MELEE, 2, False),
+        (DestructionAttackKind.RANGED, None, False),
+        (DestructionAttackKind.MELEE, None, True),
+    ],
+)
+def test_malevolent_souls_does_not_open_for_failed_ranged_or_already_fought_destruction(
+    attack_kind: DestructionAttackKind,
+    trigger_roll: int | None,
+    already_fought: bool,
+) -> None:
+    _fixture, decisions, remaining, allocated_ids, status, target_model = (
+        _resolve_malevolent_attack(
+            attack_kind=attack_kind,
+            trigger_roll=trigger_roll,
+            already_fought=already_fought,
+        )
+    )
+
+    assert remaining is None
+    assert allocated_ids == (target_model.model_instance_id,)
+    assert status is None
+    assert decisions.queue.pending_requests == ()
+    trigger_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "destruction_reaction_trigger_rolled"
+    )
+    assert len(trigger_events) == (1 if trigger_roll == 2 else 0)
+
+
+def test_malevolent_souls_does_not_trigger_for_deadly_demise_collateral_in_fight() -> None:
+    fixture = _runtime_fixture()
+    fixture.runtime.record_static_destruction_reaction_sources(state=fixture.state)
+    attacker = fixture.wraith_swords
+    defender = fixture.enemy_one
+    attacker_model = attacker.own_models[0]
+    defender_model = defender.own_models[0]
+    _leave_only_model_placed(fixture.state, attacker, attacker_model.model_instance_id)
+    _leave_only_model_placed(fixture.state, defender, defender_model.model_instance_id)
+    for unit in (
+        fixture.shroud,
+        fixture.wraith_shields,
+        fixture.psyker,
+        fixture.enemy_two,
+    ):
+        _move_unit(fixture.state, unit.unit_instance_id, x=80.0, y=80.0)
+    _move_unit(fixture.state, attacker.unit_instance_id, x=20.0, y=20.0)
+    _move_unit(fixture.state, defender.unit_instance_id, x=21.0, y=20.0)
+    deadly_demise = DestructionReactionSource(
+        source_id="test:malevolent-souls-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="test:malevolent-souls-deadly-demise-rule",
+        payload={
+            "trigger_roll_threshold": 6,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "fixed", "value": attacker_model.wounds_remaining},
+        },
+        optional=False,
+    )
+    fixture.state.record_model_destruction_reaction_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(deadly_demise,),
+    )
+    profile = replace(
+        _profile(WRAITHBLADES_ID, "Ghostaxe"),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence = _attack_sequence(
+        sequence_id="attack-sequence:malevolent-deadly-demise",
+        attacker=attacker,
+        defender=defender,
+        profile=profile,
+        source_phase=BattlePhase.FIGHT,
+        attacker_player_id="player-a",
+    )
+    attack_context_id = sequence.attack_context_id()
+    manager = DiceRollManager(
+        fixture.state.game_id,
+        event_log=DecisionController().event_log,
+        injected_results=(
+            _fixed_roll(
+                "roll:malevolent-dd-hit",
+                attack_sequence_hit_roll_spec(
+                    weapon_profile_id=profile.profile_id,
+                    attack_context_id=attack_context_id,
+                    attacker_player_id="player-a",
+                ),
+                6,
+            ),
+            _fixed_roll(
+                "roll:malevolent-dd-wound",
+                attack_sequence_wound_roll_spec(
+                    weapon_profile_id=profile.profile_id,
+                    attack_context_id=attack_context_id,
+                    attacker_player_id="player-a",
+                ),
+                6,
+            ),
+            _fixed_roll(
+                "roll:malevolent-dd-save",
+                saving_throw_roll_spec(
+                    save_kind=SaveKind.ARMOUR,
+                    player_id="player-b",
+                    allocated_model_id=defender_model.model_instance_id,
+                    attack_context_id=attack_context_id,
+                ),
+                1,
+            ),
+            _fixed_roll(
+                "roll:malevolent-dd-trigger",
+                deadly_demise_trigger_roll_spec(
+                    source=deadly_demise,
+                    player_id="player-b",
+                    model_instance_id=defender_model.model_instance_id,
+                ),
+                6,
+            ),
+        ),
+    )
+    decisions = DecisionController(event_log=manager.event_log)
+
+    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=fixture.state,
+        decisions=decisions,
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=manager,
+    )
+
+    assert remaining is None
+    assert allocated_ids == (defender_model.model_instance_id,)
+    assert status is None
+    assert decisions.queue.pending_requests == ()
+    assert attacker_model.model_instance_id not in (
+        fixture.state.battlefield_state.placed_model_ids()
+        if fixture.state.battlefield_state is not None
+        else ()
+    )
+    not_applicable = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "destruction_reaction_trigger_not_applicable"
+    )
+    assert len(not_applicable) == 1
+    provenance = cast(dict[str, JsonValue], not_applicable[0].payload)["destruction_provenance"]
+    assert (
+        provenance
+        == DestructionProvenance.for_non_attack(DestructionSourceKind.DEADLY_DEMISE).to_payload()
+    )
+
+
+def test_malevolent_souls_does_not_trigger_for_ability_mortal_wounds_in_fight() -> None:
+    fixture = _runtime_fixture()
+    fixture.runtime.record_static_destruction_reaction_sources(state=fixture.state)
+    target = fixture.wraith_swords
+    model = target.own_models[0]
+    _leave_only_model_placed(fixture.state, target, model.model_instance_id)
+    phases = tuple(fixture.state.battle_phase_sequence)
+    fixture.state.battle_phase_index = phases.index(BattlePhase.FIGHT)
+    progress = MortalWoundApplicationProgress.start(
+        application_id="application:malevolent-ability-mortal-wounds",
+        source_rule_id="rule:test-ability-mortal-wounds",
+        source_context=validate_json_value(
+            {
+                "source_kind": DestructionSourceKind.ABILITY.value,
+                "phase": BattlePhase.FIGHT.value,
+            }
+        ),
+        target_unit_instance_id=target.unit_instance_id,
+        defender_player_id="player-a",
+        mortal_wounds=model.wounds_remaining,
+        spill_over=False,
+    )
+
+    routed = continue_mortal_wound_application(
+        state=fixture.state,
+        request_id=fixture.state.next_decision_request_id(),
+        progress=progress,
+        dice_manager=DiceRollManager(fixture.state.game_id),
+    )
+
+    assert routed.request is None
+    assert routed.application is not None
+    assert routed.application.applications[-1].destroyed is True
+    assert not model_is_present_on_battlefield(
+        state=fixture.state,
+        model_instance_id=model.model_instance_id,
     )
 
 
@@ -462,7 +891,7 @@ class _RuntimeFixture:
         self.runtime = CatalogDatasheetRuleRuntime(indexes, armies)
 
 
-def _runtime_fixture() -> _RuntimeFixture:
+def _runtime_fixture(*, attach_psyker_to_wraith: bool = False) -> _RuntimeFixture:
     package = _package()
     catalog = package.army_catalog
     factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
@@ -503,6 +932,8 @@ def _runtime_fixture() -> _RuntimeFixture:
         ),
         keywords=("AELDARI", "INFANTRY", "PSYKER"),
     )
+    if attach_psyker_to_wraith:
+        psyker = replace(psyker, own_models=(psyker.own_models[0],))
     enemy_one = _instantiate(
         factory,
         army_id="army-b",
@@ -515,8 +946,28 @@ def _runtime_fixture() -> _RuntimeFixture:
         selection_id="enemy-two",
         datasheet_id=WRAITHBLADES_ID,
     )
+    attached_units: tuple[AttachedUnitFormation, ...] = ()
+    if attach_psyker_to_wraith:
+        attached_units = (
+            AttachedUnitFormation(
+                attached_unit_instance_id="attached-unit:army-a:shroud-psyker",
+                bodyguard_unit_instance_id=shroud.unit_instance_id,
+                leader_unit_instance_ids=(psyker.unit_instance_id,),
+                component_unit_instance_ids=tuple(
+                    sorted((shroud.unit_instance_id, psyker.unit_instance_id))
+                ),
+                source_id="test:psychic-guidance-attachment",
+                attachment_source_ids=("test:psychic-guidance-leader-eligibility",),
+            ),
+        )
     armies = (
-        _army(catalog, "army-a", "player-a", (shroud, wraith_shields, wraith_swords, psyker)),
+        _army(
+            catalog,
+            "army-a",
+            "player-a",
+            (shroud, wraith_shields, wraith_swords, psyker),
+            attached_units=attached_units,
+        ),
         _army(catalog, "army-b", "player-b", (enemy_one, enemy_two)),
     )
     state = _state(armies)
@@ -576,6 +1027,8 @@ def _army(
     army_id: str,
     player_id: str,
     units: tuple[UnitInstance, ...],
+    *,
+    attached_units: tuple[AttachedUnitFormation, ...] = (),
 ) -> ArmyDefinition:
     return ArmyDefinition(
         army_id=army_id,
@@ -589,6 +1042,7 @@ def _army(
         ),
         force_disposition_id="purge-the-foe",
         units=units,
+        attached_units=attached_units,
     )
 
 
@@ -690,6 +1144,202 @@ def _move_unit(state: GameState, unit_instance_id: str, *, x: float, y: float) -
         ),
     )
     state.replace_battlefield_state(battlefield.with_unit_placement(moved))
+
+
+def _resolve_malevolent_attack(
+    *,
+    attack_kind: DestructionAttackKind,
+    trigger_roll: int | None,
+    already_fought: bool = False,
+) -> tuple[
+    _RuntimeFixture,
+    DecisionController,
+    AttackSequence | None,
+    tuple[str, ...],
+    LifecycleStatus | None,
+    Any,
+]:
+    fixture = _runtime_fixture()
+    fixture.runtime.record_static_destruction_reaction_sources(state=fixture.state)
+    if attack_kind is DestructionAttackKind.MELEE:
+        attacker = fixture.enemy_one
+        defender = fixture.wraith_swords
+        attacker_player_id = "player-b"
+        defender_player_id = "player-a"
+        source_phase = BattlePhase.FIGHT
+        profile = _profile(WRAITHBLADES_ID, "Ghostaxe")
+    elif attack_kind is DestructionAttackKind.RANGED:
+        attacker = fixture.shroud
+        defender = fixture.enemy_one
+        attacker_player_id = "player-a"
+        defender_player_id = "player-b"
+        source_phase = BattlePhase.SHOOTING
+        profile = _profile(SHROUD_RUNNERS_ID, "Long rifle")
+    else:
+        raise AssertionError("Malevolent attack helper requires melee or ranged attack.")
+    target_model = defender.own_models[0]
+    _leave_only_model_placed(fixture.state, defender, target_model.model_instance_id)
+    _move_unit(fixture.state, attacker.unit_instance_id, x=20.0, y=20.0)
+    _move_unit(fixture.state, defender.unit_instance_id, x=21.0, y=20.0)
+    profile = replace(
+        profile,
+        damage_profile=DamageProfile.fixed(target_model.wounds_remaining),
+    )
+    sequence = _attack_sequence(
+        sequence_id=f"attack-sequence:malevolent-{attack_kind.value}",
+        attacker=attacker,
+        defender=defender,
+        profile=profile,
+        source_phase=source_phase,
+        attacker_player_id=attacker_player_id,
+    )
+    phases = tuple(fixture.state.battle_phase_sequence)
+    fixture.state.battle_phase_index = phases.index(source_phase)
+    fixture.state.active_player_id = attacker_player_id
+    if source_phase is BattlePhase.FIGHT:
+        started_fight = FightPhaseState.start(
+            battle_round=fixture.state.battle_round,
+            active_player_id=attacker_player_id,
+            policy=fixture.state.runtime_ruleset_descriptor().fight_policy,
+            engaged_at_fight_step_start_unit_ids=(
+                attacker.unit_instance_id,
+                defender.unit_instance_id,
+            ),
+            fights_first_registry=FightsFirstRegistry(),
+        )
+        if already_fought:
+            started_fight = replace(
+                started_fight,
+                fight_order_state=replace(
+                    started_fight.fight_order_state,
+                    selected_to_fight_unit_ids=(defender.unit_instance_id,),
+                ),
+            )
+        fixture.state.fight_phase_state = replace(started_fight, attack_sequence=sequence)
+    attack_context_id = sequence.attack_context_id()
+    injected_results = [
+        _fixed_roll(
+            f"roll:malevolent-{attack_kind.value}-hit",
+            attack_sequence_hit_roll_spec(
+                weapon_profile_id=profile.profile_id,
+                attack_context_id=attack_context_id,
+                attacker_player_id=attacker_player_id,
+            ),
+            6,
+        ),
+        _fixed_roll(
+            f"roll:malevolent-{attack_kind.value}-wound",
+            attack_sequence_wound_roll_spec(
+                weapon_profile_id=profile.profile_id,
+                attack_context_id=attack_context_id,
+                attacker_player_id=attacker_player_id,
+            ),
+            6,
+        ),
+        _fixed_roll(
+            f"roll:malevolent-{attack_kind.value}-save",
+            saving_throw_roll_spec(
+                save_kind=SaveKind.ARMOUR,
+                player_id=defender_player_id,
+                allocated_model_id=target_model.model_instance_id,
+                attack_context_id=attack_context_id,
+            ),
+            1,
+        ),
+    ]
+    if trigger_roll is not None:
+        injected_results.append(
+            _fixed_roll(
+                f"roll:malevolent-{attack_kind.value}-trigger",
+                DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason="Destruction reaction trigger",
+                    roll_type="aeldari_malevolent_souls",
+                    actor_id=defender_player_id,
+                ),
+                trigger_roll,
+            )
+        )
+    decisions = DecisionController()
+    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=fixture.state,
+        decisions=decisions,
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            fixture.state.game_id,
+            event_log=decisions.event_log,
+            injected_results=tuple(injected_results),
+        ),
+    )
+    if source_phase is BattlePhase.FIGHT:
+        fight_state = fixture.state.fight_phase_state
+        assert fight_state is not None
+        fixture.state.fight_phase_state = replace(
+            fight_state,
+            attack_sequence=remaining,
+            allocated_model_ids_this_phase=allocated_ids,
+        )
+    return fixture, decisions, remaining, allocated_ids, status, target_model
+
+
+def _attack_sequence(
+    *,
+    sequence_id: str,
+    attacker: UnitInstance,
+    defender: UnitInstance,
+    profile: WeaponProfile,
+    source_phase: BattlePhase,
+    attacker_player_id: str,
+) -> AttackSequence:
+    target_ids = tuple(model.model_instance_id for model in defender.own_models if model.is_alive)
+    return AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id=attacker_player_id,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        source_phase=source_phase,
+        attack_pools=(
+            RangedAttackPool(
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                wargear_id=f"test:{profile.profile_id}:wargear",
+                weapon_profile_id=profile.profile_id,
+                weapon_profile=profile,
+                target_unit_instance_id=defender.unit_instance_id,
+                shooting_type=ShootingType.NORMAL,
+                attacks=1,
+                target_visible_model_ids=target_ids,
+                target_in_range_model_ids=target_ids,
+            ),
+        ),
+    )
+
+
+def _leave_only_model_placed(
+    state: GameState,
+    unit: UnitInstance,
+    model_instance_id: str,
+) -> None:
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.replace_battlefield_state(
+        battlefield.with_removed_models(
+            tuple(
+                model.model_instance_id
+                for model in unit.own_models
+                if model.model_instance_id != model_instance_id
+            )
+        )
+    )
+
+
+def _fixed_roll(roll_id: str, spec: DiceRollSpec, value: int) -> DiceRollResult:
+    return DiceRollResult.from_values(
+        roll_id=roll_id,
+        spec=spec,
+        values=(value,),
+        source="fixed",
+    )
 
 
 def _ranged_pool(

@@ -1015,6 +1015,10 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
         manager=manager,
         attack_sequence=attack_sequence,
         attack_context=attack_context,
+        destruction_provenance=DestructionProvenance.for_attack(
+            weapon_profile=attack_sequence.current_pool().weapon_profile,
+            attack_context_id=attack_context["attack_context_id"],
+        ),
         damage=damage,
         destroyed_emission=destroyed_emission,
         destroyed_model_controller_player_id=destroyed_model_controller_player_id,

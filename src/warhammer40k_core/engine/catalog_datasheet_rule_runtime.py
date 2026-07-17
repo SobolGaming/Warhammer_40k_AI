@@ -130,6 +130,9 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     TargetRestriction,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_proximity import (
+    rules_unit_within_friendly_keyworded_models,
+)
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
@@ -1135,25 +1138,12 @@ def _friendly_keyworded_unit_within(*, source: _CatalogClauseSource, state: obje
     required = parameters.get("required_keyword_sequence")
     if not isinstance(required, tuple) or not all(type(value) is str for value in required):
         raise GameLifecycleError("Catalog conditional ability keyword sequence is malformed.")
-    required_tokens = set(required)
-    seen: set[str] = set()
-    for army in state.army_definitions:
-        if army.player_id != source.player_id:
-            continue
-        for unit in army.units:
-            view = rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id)
-            if view.unit_instance_id in seen:
-                continue
-            seen.add(view.unit_instance_id)
-            keywords = {*view.keywords, *view.faction_keywords}
-            if required_tokens.issubset(keywords) and _rules_units_within(
-                state,
-                source.unit.unit_instance_id,
-                view.unit_instance_id,
-                _clause_distance(source.clause),
-            ):
-                return True
-    return False
+    return rules_unit_within_friendly_keyworded_models(
+        state=state,
+        source_unit_instance_id=source.unit.unit_instance_id,
+        required_keyword_sequence=required,
+        max_range_inches=_clause_distance(source.clause),
+    )
 
 
 def _rules_unit_has_required_aura_keyword(view: RulesUnitView, clause: RuleClause) -> bool:
