@@ -43,6 +43,7 @@ from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
     WeaponKeyword,
     WeaponProfile,
+    WeaponProfileError,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -411,6 +412,7 @@ __all__ = (
     "VisibilityBlockerKind",
     "WeaponKeyword",
     "WeaponProfile",
+    "WeaponProfileError",
     "WoundRollModifierContext",
     "allocation_context_for_unit",
     "allocation_groups_for_context",

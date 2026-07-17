@@ -80,6 +80,7 @@ __all__ = (
     "_validate_roll_modifier_tuple",
     "_validate_save_die_entry_payload",
     "_validate_save_die_entry_tuple",
+    "validate_destruction_reaction_context_matches_sequence",
 )
 
 
@@ -544,9 +545,14 @@ def _destruction_reaction_context_from_payload(
     provenance_payload = raw["destruction_provenance"]
     if not isinstance(provenance_payload, dict):
         raise GameLifecycleError("Destruction reaction provenance must be an object.")
-    provenance = DestructionProvenance.from_payload(
-        cast(DestructionProvenancePayload, provenance_payload)
-    )
+    try:
+        provenance = DestructionProvenance.from_payload(
+            cast(DestructionProvenancePayload, provenance_payload)
+        )
+    except WeaponProfileError as exc:
+        raise GameLifecycleError(
+            "Destruction reaction provenance weapon profile is invalid."
+        ) from exc
     if provenance.destruction_source_kind is DestructionSourceKind.ATTACK and (
         provenance.attack_context_id != attack_context.get("attack_context_id")
         or provenance.source_weapon_profile is None
@@ -576,6 +582,30 @@ def _destruction_reaction_context_from_payload(
         ),
         "continuation": validate_json_value(raw["continuation"]),
     }
+
+
+def validate_destruction_reaction_context_matches_sequence(
+    *,
+    attack_sequence: AttackSequence,
+    destruction_context: JsonValue,
+) -> DestructionReactionContextPayload:
+    context = _destruction_reaction_context_from_payload(destruction_context)
+    attack_context = context["attack_context"]
+    _validate_attack_context_matches_sequence(
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        context_name="Destruction reaction",
+    )
+    provenance = DestructionProvenance.from_payload(context["destruction_provenance"])
+    if provenance.destruction_source_kind is DestructionSourceKind.ATTACK:
+        context_sequence = _attack_sequence_for_context(
+            attack_sequence=attack_sequence,
+            attack_context=attack_context,
+        )
+        provenance.validate_authoritative_weapon_profile(
+            context_sequence.current_pool().weapon_profile
+        )
+    return context
 
 
 def _state_feel_no_pain_sources(

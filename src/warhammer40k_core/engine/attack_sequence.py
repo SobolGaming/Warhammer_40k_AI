@@ -322,6 +322,7 @@ __all__ = (
     "selected_attack_weapon_group_from_result",
     "selected_resolve_target_from_result",
     "unresolved_target_unit_ids",
+    "validate_destruction_reaction_context_matches_sequence",
     "validate_psychic_attack_modifier_ignore_decision",
     "wound_roll_target_number",
 )

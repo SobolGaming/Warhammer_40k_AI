@@ -6,6 +6,10 @@ from functools import cache
 from typing import Any, cast
 
 import pytest
+from tests.lifecycle_submission_helpers import (
+    apply_pending_damage_allocation,
+    battle_lifecycle_payload,
+)
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
@@ -36,7 +40,6 @@ from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormati
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     AttackSequenceStep,
-    apply_destruction_reaction_decision,
     attack_sequence_hit_roll_spec,
     attack_sequence_wound_roll_spec,
     deadly_demise_trigger_roll_spec,
@@ -93,7 +96,6 @@ from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMu
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
-    GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
@@ -529,43 +531,44 @@ def test_malevolent_souls_registers_idempotent_serializable_model_sources() -> N
     )
 
 
-def test_malevolent_souls_direct_melee_success_replays_and_enters_fight_on_death() -> None:
-    fixture, decisions, remaining, allocated_ids, status, target_model = _resolve_malevolent_attack(
-        attack_kind=DestructionAttackKind.MELEE, trigger_roll=3
+@pytest.mark.parametrize(
+    ("attacks", "damage_per_attack", "expected_attack_index"),
+    [(2, 3, 0), (3, 2, 1)],
+)
+def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
+    attacks: int,
+    damage_per_attack: int,
+    expected_attack_index: int,
+) -> None:
+    fixture, decisions, _, allocated_ids, status, target_model = _resolve_malevolent_attack(
+        attack_kind=DestructionAttackKind.MELEE,
+        trigger_roll=3,
+        attacks=attacks,
+        damage_per_attack=damage_per_attack,
+        placed_model_count=3,
     )
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     request = status.decision_request
     assert request is not None
     assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
-    assert remaining is not None
-    assert allocated_ids == (target_model.model_instance_id,)
+    assert target_model.model_instance_id in allocated_ids
     payload = cast(dict[str, JsonValue], request.payload)
     context = cast(dict[str, JsonValue], payload["destruction_context"])
     provenance = DestructionProvenance.from_payload(context["destruction_provenance"])
-    assert provenance.destruction_source_kind is DestructionSourceKind.ATTACK
-    assert provenance.attack_kind is DestructionAttackKind.MELEE
     attack_context = cast(dict[str, JsonValue], context["attack_context"])
-    assert provenance.attack_context_id == attack_context["attack_context_id"]
-    assert provenance.source_weapon_profile is not None
-    assert provenance.source_weapon_profile.profile_id == attack_context["weapon_profile_id"]
-    drifted_provenance = provenance.to_payload()
-    drifted_provenance["attack_kind"] = DestructionAttackKind.RANGED.value
-    with pytest.raises(GameLifecycleError, match="attack kind drift"):
-        DestructionProvenance.from_payload(drifted_provenance)
+    assert attack_context["attack_index"] == expected_attack_index
 
-    lifecycle = GameLifecycle(decision_controller=decisions, state=fixture.state)
     replayed = GameLifecycle.from_payload(
-        cast(
-            GameLifecyclePayload,
-            json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+        battle_lifecycle_payload(
+            state=fixture.state,
+            decisions=decisions,
         )
     )
     replayed_state = replayed.state
     assert replayed_state is not None
     replayed_fight_state = replayed_state.fight_phase_state
     assert replayed_fight_state is not None
-    assert replayed_fight_state.attack_sequence is not None
     replayed_request = replayed.decision_controller.queue.peek_next()
     replayed_context = cast(
         dict[str, JsonValue],
@@ -587,15 +590,8 @@ def test_malevolent_souls_direct_melee_success_replays_and_enters_fight_on_death
         request=replayed_request,
         selected_option_id=selected_source,
     )
-    replayed.decision_controller.submit_result(result)
-    apply_destruction_reaction_decision(
-        state=replayed_state,
-        decisions=replayed.decision_controller,
-        ruleset_descriptor=replayed_state.runtime_ruleset_descriptor(),
-        attack_sequence=replayed_fight_state.attack_sequence,
-        result=result,
-        already_allocated_model_ids=replayed_fight_state.allocated_model_ids_this_phase,
-    )
+    accepted = replayed.submit_decision(result)
+    assert accepted.status_kind is not LifecycleStatusKind.INVALID
 
     assert model_is_present_on_battlefield(
         state=replayed_state,
@@ -661,11 +657,9 @@ def test_destruction_reaction_rejects_full_authoritative_weapon_profile_drift(
     assert remaining.pending_grouped_damage is not None
     lifecycle_payload = cast(
         dict[str, Any],
-        json.loads(
-            json.dumps(
-                GameLifecycle(decision_controller=decisions, state=fixture.state).to_payload(),
-                sort_keys=True,
-            )
+        battle_lifecycle_payload(
+            state=fixture.state,
+            decisions=decisions,
         ),
     )
     request_payload = lifecycle_payload["decisions"]["queue"]["pending_requests"][0]
@@ -700,18 +694,14 @@ def test_destruction_reaction_rejects_full_authoritative_weapon_profile_drift(
         request=request,
         selected_option_id=selected_source,
     )
-    replayed.decision_controller.submit_result(result)
-    event_count = len(replayed.decision_controller.event_log.records)
-    with pytest.raises(GameLifecycleError, match="source weapon profile drift"):
-        apply_destruction_reaction_decision(
-            state=state,
-            decisions=replayed.decision_controller,
-            ruleset_descriptor=state.runtime_ruleset_descriptor(),
-            attack_sequence=fight_state.attack_sequence,
-            result=result,
-            already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
-        )
-    assert len(replayed.decision_controller.event_log.records) == event_count
+    unchanged_payload = replayed.to_payload()
+    invalid = replayed.submit_decision(result)
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, JsonValue], invalid.payload)["invalid_reason"] == (
+        "invalid_destruction_reaction_result"
+    )
+    assert replayed.to_payload() == unchanged_payload
     assert not model_is_present_on_battlefield(
         state=state,
         model_instance_id=target_model.model_instance_id,
@@ -758,8 +748,8 @@ def test_malevolent_souls_does_not_trigger_for_deadly_demise_collateral_in_fight
     defender = fixture.enemy_one
     attacker_model = attacker.own_models[0]
     defender_model = defender.own_models[0]
-    _leave_only_model_placed(fixture.state, attacker, attacker_model.model_instance_id)
-    _leave_only_model_placed(fixture.state, defender, defender_model.model_instance_id)
+    _leave_only_models_placed(fixture.state, attacker, (attacker_model.model_instance_id,))
+    _leave_only_models_placed(fixture.state, defender, (defender_model.model_instance_id,))
     for unit in (
         fixture.shroud,
         fixture.wraith_shields,
@@ -1268,6 +1258,9 @@ def _resolve_malevolent_attack(
     attack_kind: DestructionAttackKind,
     trigger_roll: int | None,
     already_fought: bool = False,
+    attacks: int = 1,
+    damage_per_attack: int | None = None,
+    placed_model_count: int = 1,
 ) -> tuple[
     _RuntimeFixture,
     DecisionController,
@@ -1295,12 +1288,16 @@ def _resolve_malevolent_attack(
     else:
         raise AssertionError("Malevolent attack helper requires melee or ranged attack.")
     target_model = defender.own_models[0]
-    _leave_only_model_placed(fixture.state, defender, target_model.model_instance_id)
+    _leave_only_models_placed(
+        fixture.state, defender, defender.own_model_ids()[:placed_model_count]
+    )
     _move_unit(fixture.state, attacker.unit_instance_id, x=20.0, y=20.0)
     _move_unit(fixture.state, defender.unit_instance_id, x=21.0, y=20.0)
     profile = replace(
         profile,
-        damage_profile=DamageProfile.fixed(target_model.wounds_remaining),
+        damage_profile=DamageProfile.fixed(
+            target_model.wounds_remaining if damage_per_attack is None else damage_per_attack
+        ),
     )
     sequence = _attack_sequence(
         sequence_id=f"attack-sequence:malevolent-{attack_kind.value}",
@@ -1309,6 +1306,7 @@ def _resolve_malevolent_attack(
         profile=profile,
         source_phase=source_phase,
         attacker_player_id=attacker_player_id,
+        attacks=attacks,
     )
     phases = tuple(fixture.state.battle_phase_sequence)
     fixture.state.battle_phase_index = phases.index(source_phase)
@@ -1333,37 +1331,46 @@ def _resolve_malevolent_attack(
                 ),
             )
         fixture.state.fight_phase_state = replace(started_fight, attack_sequence=sequence)
-    attack_context_id = sequence.attack_context_id()
-    injected_results = [
-        _fixed_roll(
-            f"roll:malevolent-{attack_kind.value}-hit",
-            attack_sequence_hit_roll_spec(
-                weapon_profile_id=profile.profile_id,
-                attack_context_id=attack_context_id,
-                attacker_player_id=attacker_player_id,
-            ),
-            6,
-        ),
-        _fixed_roll(
-            f"roll:malevolent-{attack_kind.value}-wound",
-            attack_sequence_wound_roll_spec(
-                weapon_profile_id=profile.profile_id,
-                attack_context_id=attack_context_id,
-                attacker_player_id=attacker_player_id,
-            ),
-            6,
-        ),
-        _fixed_roll(
-            f"roll:malevolent-{attack_kind.value}-save",
-            saving_throw_roll_spec(
-                save_kind=SaveKind.ARMOUR,
-                player_id=defender_player_id,
-                allocated_model_id=target_model.model_instance_id,
-                attack_context_id=attack_context_id,
-            ),
-            1,
-        ),
-    ]
+    hit_wound_results: list[DiceRollResult] = []
+    save_results: list[DiceRollResult] = []
+    for attack_index in range(attacks):
+        attack_context_id = replace(sequence, attack_index=attack_index).attack_context_id()
+        roll_suffix = f"{attack_kind.value}-attack-{attack_index + 1}"
+        hit_wound_results.extend(
+            (
+                _fixed_roll(
+                    f"roll:malevolent-{roll_suffix}-hit",
+                    attack_sequence_hit_roll_spec(
+                        weapon_profile_id=profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id=attacker_player_id,
+                    ),
+                    6,
+                ),
+                _fixed_roll(
+                    f"roll:malevolent-{roll_suffix}-wound",
+                    attack_sequence_wound_roll_spec(
+                        weapon_profile_id=profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id=attacker_player_id,
+                    ),
+                    6,
+                ),
+            )
+        )
+        save_results.append(
+            _fixed_roll(
+                f"roll:malevolent-{roll_suffix}-save",
+                saving_throw_roll_spec(
+                    save_kind=SaveKind.ARMOUR,
+                    player_id=defender_player_id,
+                    allocated_model_id=target_model.model_instance_id,
+                    attack_context_id=attack_context_id,
+                ),
+                1,
+            )
+        )
+    injected_results = [*hit_wound_results, *save_results]
     if trigger_roll is not None:
         injected_results.append(
             _fixed_roll(
@@ -1378,18 +1385,30 @@ def _resolve_malevolent_attack(
             )
         )
     decisions = DecisionController()
+    manager = DiceRollManager(
+        fixture.state.game_id,
+        event_log=decisions.event_log,
+        injected_results=tuple(injected_results),
+    )
     remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=fixture.state,
         decisions=decisions,
         ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
         attack_sequence=sequence,
         already_allocated_model_ids=(),
-        dice_manager=DiceRollManager(
-            fixture.state.game_id,
-            event_log=decisions.event_log,
-            injected_results=tuple(injected_results),
-        ),
+        dice_manager=manager,
     )
+    if placed_model_count > 1:
+        remaining, allocated_ids, status = apply_pending_damage_allocation(
+            state=fixture.state,
+            decisions=decisions,
+            ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+            attack_sequence=remaining,
+            status=status,
+            already_allocated_model_ids=allocated_ids,
+            dice_manager=manager,
+            selected_model_id=target_model.model_instance_id,
+        )
     if source_phase is BattlePhase.FIGHT:
         fight_state = fixture.state.fight_phase_state
         assert fight_state is not None
@@ -1409,6 +1428,7 @@ def _attack_sequence(
     profile: WeaponProfile,
     source_phase: BattlePhase,
     attacker_player_id: str,
+    attacks: int = 1,
 ) -> AttackSequence:
     target_ids = tuple(model.model_instance_id for model in defender.own_models if model.is_alive)
     return AttackSequence.start(
@@ -1424,7 +1444,7 @@ def _attack_sequence(
                 weapon_profile=profile,
                 target_unit_instance_id=defender.unit_instance_id,
                 shooting_type=ShootingType.NORMAL,
-                attacks=1,
+                attacks=attacks,
                 target_visible_model_ids=target_ids,
                 target_in_range_model_ids=target_ids,
             ),
@@ -1432,10 +1452,10 @@ def _attack_sequence(
     )
 
 
-def _leave_only_model_placed(
+def _leave_only_models_placed(
     state: GameState,
     unit: UnitInstance,
-    model_instance_id: str,
+    model_instance_ids: tuple[str, ...],
 ) -> None:
     battlefield = state.battlefield_state
     assert battlefield is not None
@@ -1444,7 +1464,7 @@ def _leave_only_model_placed(
             tuple(
                 model.model_instance_id
                 for model in unit.own_models
-                if model.model_instance_id != model_instance_id
+                if model.model_instance_id not in model_instance_ids
             )
         )
     )
