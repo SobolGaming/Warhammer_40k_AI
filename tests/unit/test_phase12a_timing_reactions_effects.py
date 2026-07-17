@@ -507,17 +507,46 @@ def test_roll_off_decides_simultaneous_start_or_end_battle_round_rules() -> None
         event_log=decisions.event_log,
         injected_results=injected,
     )
+    participants = _sequencing_participants()
 
     request = create_sequencing_decision_request(
         request_id=request_id,
         context=context,
-        participants=_sequencing_participants(),
+        participants=participants,
         dice_manager=manager,
     )
     roll_payload = cast(dict[str, object], request.payload)["roll_off_result"]
     assert request.actor_id == "player-b"
     assert roll_payload is not None
     assert decisions.event_log.records[-1].event_type == "roll_off_resolved"
+
+    drifted_request = replace(
+        request,
+        actor_id="player-a",
+        options=tuple(
+            replace(
+                option,
+                payload={
+                    **cast(dict[str, JsonValue], option.payload),
+                    "deciding_player_id": "player-a",
+                },
+            )
+            for option in request.options
+        ),
+    )
+    drifted_result = DecisionResult.for_request(
+        result_id="phase12a-sequencing-drifted-winner",
+        request=drifted_request,
+        selected_option_id=drifted_request.options[0].option_id,
+    )
+
+    with pytest.raises(GameLifecycleError, match="authoritative context"):
+        apply_sequencing_decision(
+            request=drifted_request,
+            result=drifted_result,
+            context=context,
+            participants=participants,
+        )
 
 
 def test_persisting_effect_survives_embark_and_disembark() -> None:

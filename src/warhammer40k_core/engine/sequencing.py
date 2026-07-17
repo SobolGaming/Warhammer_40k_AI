@@ -4,16 +4,22 @@ from dataclasses import dataclass
 from itertools import permutations
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.core.dice import RollOffRequest, RollOffResult, RollOffResultPayload
+from warhammer40k_core.core.dice import (
+    DiceRollSpecError,
+    RollOffRequest,
+    RollOffResult,
+    RollOffResultPayload,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
+    DecisionError,
     DecisionOption,
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventLogError, JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
@@ -272,6 +278,82 @@ def create_sequencing_decision_request(
         context=context,
         dice_manager=dice_manager,
     )
+    return _sequencing_decision_request(
+        request_id=request_identifier,
+        context=context,
+        participants=participant_values,
+        roll_off_result=roll_off_result,
+    )
+
+
+def decision_controller_before_pending_sequencing_roll_off(
+    *,
+    decisions: DecisionController,
+    request_id: str,
+) -> DecisionController | None:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Sequencing roll-off rewind requires a DecisionController.")
+    request_identifier = _validate_identifier("request_id", request_id)
+    events = decisions.event_log.records
+    if len(events) < 2:
+        return None
+    issued_event = events[-1]
+    roll_off_event = events[-2]
+    if (
+        issued_event.event_type != "decision_requested"
+        or roll_off_event.event_type != "roll_off_resolved"
+    ):
+        return None
+    if not isinstance(issued_event.payload, dict):
+        raise GameLifecycleError("Sequencing decision_requested payload must be an object.")
+    issued_request_id = issued_event.payload.get("request_id")
+    if issued_request_id != request_identifier:
+        raise GameLifecycleError("Sequencing decision_requested request ID drifted.")
+    if not isinstance(roll_off_event.payload, dict):
+        raise GameLifecycleError("Sequencing roll_off_resolved payload must be an object.")
+    try:
+        roll_off_result = RollOffResult.from_payload(
+            cast(RollOffResultPayload, roll_off_event.payload)
+        )
+    except (KeyError, TypeError, DiceRollSpecError) as exc:
+        raise GameLifecycleError("Sequencing roll_off_resolved payload is invalid.") from exc
+    expected_roll_off_request = RollOffRequest(
+        request_id=f"{request_identifier}:roll-off",
+        purpose="sequencing_conflict",
+        player_ids=roll_off_result.request.player_ids,
+        resolving_decision_id=request_identifier,
+    )
+    if roll_off_result.request != expected_roll_off_request:
+        raise GameLifecycleError("Sequencing roll-off request provenance drifted.")
+    historical_rolls = tuple(
+        player_roll.roll_result
+        for round_result in roll_off_result.rounds
+        for player_roll in round_result.player_rolls
+    )
+    suffix_start = len(events) - len(historical_rolls) - 2
+    if suffix_start < 0:
+        raise GameLifecycleError("Sequencing roll-off event suffix is incomplete.")
+    dice_events = events[suffix_start:-2]
+    if len(dice_events) != len(historical_rolls):
+        raise GameLifecycleError("Sequencing roll-off dice event count drifted.")
+    for event, historical_roll in zip(dice_events, historical_rolls, strict=True):
+        if event.event_type != "dice_rolled" or event.payload != historical_roll.to_payload():
+            raise GameLifecycleError("Sequencing roll-off dice event provenance drifted.")
+    payload = decisions.to_payload()
+    payload["event_log"] = payload["event_log"][:suffix_start]
+    try:
+        return DecisionController.from_payload(payload)
+    except (KeyError, TypeError, DecisionError, EventLogError) as exc:
+        raise GameLifecycleError("Sequencing roll-off event prefix is invalid.") from exc
+
+
+def _sequencing_decision_request(
+    *,
+    request_id: str,
+    context: SequencingConflictContext,
+    participants: tuple[SequencingParticipant, ...],
+    roll_off_result: RollOffResult | None,
+) -> DecisionRequest:
     deciding_player_id = (
         roll_off_result.winner_player_id
         if roll_off_result is not None
@@ -294,17 +376,17 @@ def create_sequencing_decision_request(
             ),
         )
         for ordered in permutations(
-            tuple(participant.participant_id for participant in participant_values)
+            tuple(participant.participant_id for participant in participants)
         )
     )
     return DecisionRequest(
-        request_id=request_identifier,
+        request_id=request_id,
         decision_type=SEQUENCING_DECISION_TYPE,
         actor_id=deciding_player_id,
         payload=validate_json_value(
             {
                 "sequencing_conflict": context.to_payload(),
-                "participants": [participant.to_payload() for participant in participant_values],
+                "participants": [participant.to_payload() for participant in participants],
                 "requires_roll_off": context.requires_roll_off(),
                 "roll_off_result": (
                     None if roll_off_result is None else roll_off_result.to_payload()
@@ -347,6 +429,11 @@ def apply_sequencing_decision(
         raise GameLifecycleError("Sequencing result must be a DecisionResult.")
     if request.decision_type != SEQUENCING_DECISION_TYPE:
         raise GameLifecycleError("Sequencing request has the wrong decision_type.")
+    _validate_sequencing_decision_request(
+        request=request,
+        context=context,
+        participants=participants,
+    )
     result.validate_for_request(request)
     participant_values = _validate_participants(participants, player_ids=context.player_ids)
     participant_ids = {participant.participant_id for participant in participant_values}
@@ -412,6 +499,40 @@ def apply_sequencing_decision_from_request(
         ),
         participants=tuple(participants),
     )
+
+
+def _validate_sequencing_decision_request(
+    *,
+    request: DecisionRequest,
+    context: SequencingConflictContext,
+    participants: tuple[SequencingParticipant, ...],
+) -> None:
+    participant_values = _validate_participants(participants, player_ids=context.player_ids)
+    payload = request.payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Sequencing request payload must be an object.")
+    roll_off_result = _roll_off_from_payload(payload.get("roll_off_result"))
+    if context.requires_roll_off():
+        if roll_off_result is None:
+            raise GameLifecycleError("Sequencing request requires an engine roll-off result.")
+        expected_roll_off_request = RollOffRequest(
+            request_id=f"{request.request_id}:roll-off",
+            purpose="sequencing_conflict",
+            player_ids=context.player_ids,
+            resolving_decision_id=request.request_id,
+        )
+        if roll_off_result.request != expected_roll_off_request:
+            raise GameLifecycleError("Sequencing request roll-off provenance drifted.")
+    elif roll_off_result is not None:
+        raise GameLifecycleError("Sequencing request has an unexpected roll-off result.")
+    expected_request = _sequencing_decision_request(
+        request_id=request.request_id,
+        context=context,
+        participants=participant_values,
+        roll_off_result=roll_off_result,
+    )
+    if request != expected_request:
+        raise GameLifecycleError("Sequencing request does not match its authoritative context.")
 
 
 def _roll_off_result_for_context(

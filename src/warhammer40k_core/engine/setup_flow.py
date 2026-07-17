@@ -77,7 +77,10 @@ from warhammer40k_core.engine.reserve_declarations import (
     reserve_declaration_state_for_state,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
-from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
+from warhammer40k_core.engine.sequencing import (
+    SEQUENCING_DECISION_TYPE,
+    decision_controller_before_pending_sequencing_roll_off,
+)
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.start_battle_hooks import (
     StartBattleHookRegistry,
@@ -134,7 +137,6 @@ class SetupFlow:
                 config=config,
                 pending_request=pending_request,
                 reaction_frame_count=reaction_frame_count,
-                issued_request=issued_request,
             )
         except GameLifecycleError as exc:
             return _invalid_authoritative_setup_request_status(
@@ -177,7 +179,6 @@ class SetupFlow:
         config: GameConfig,
         pending_request: DecisionRequest,
         reaction_frame_count: int,
-        issued_request: DecisionRequest,
     ) -> _AuthoritativeSetupRequest | None:
         state_clone = GameState.from_payload(state.to_payload())
         decisions_clone = DecisionController.from_payload(decisions.to_payload())
@@ -201,6 +202,13 @@ class SetupFlow:
                 request=nested_request,
                 is_start_battle_request=False,
             )
+        decisions_before_roll_off = decision_controller_before_pending_sequencing_roll_off(
+            decisions=decisions_clone,
+            request_id=pending_request.request_id,
+        )
+        rewound_sequencing_roll_off = decisions_before_roll_off is not None
+        if decisions_before_roll_off is not None:
+            decisions_clone = decisions_before_roll_off
         hook_state = GameState.from_payload(state_clone.to_payload())
         hook_decisions = DecisionController.from_payload(decisions_clone.to_payload())
         status = self.advance(
@@ -213,9 +221,14 @@ class SetupFlow:
         if authoritative_request is None:
             return None
         if authoritative_request.decision_type == SEQUENCING_DECISION_TYPE:
-            if issued_request.request_id != authoritative_request.request_id:
-                raise GameLifecycleError("Setup sequencing request ID drifted.")
-            authoritative_request = issued_request
+            if not rewound_sequencing_roll_off:
+                raise GameLifecycleError(
+                    "Setup sequencing request has no authoritative roll-off event suffix."
+                )
+        elif rewound_sequencing_roll_off:
+            raise GameLifecycleError(
+                "Setup roll-off event suffix does not belong to the authoritative request."
+            )
         is_start_battle_request = False
         if is_start_battle_boundary(hook_state):
             hook_request = self.start_battle_hooks.next_request_for(
