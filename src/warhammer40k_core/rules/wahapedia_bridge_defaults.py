@@ -183,6 +183,31 @@ AELDARI_SHROUD_RUNNERS_WRAITHBLADES_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000612",
+        model_name="War Walkers",
+        height=3.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:war-walkers:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (60mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000613",
+        model_name="Wraithlord",
+        height=4.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:wraithlord:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (60mm base)"
+        ),
+    ),
+)
+
 AELDARI_YRIEL_VYPERS_STARFANGS_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004193",

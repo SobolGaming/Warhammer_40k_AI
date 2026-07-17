@@ -86,6 +86,7 @@ from warhammer40k_core.rules.wahapedia_invulnerable_save_bridge import (
 from warhammer40k_core.rules.wahapedia_loadout_bridge import (
     LoadoutAssignments,
     parse_loadout_assignments,
+    uniform_loadout_wargear_count,
 )
 from warhammer40k_core.rules.wahapedia_replacement_option_bridge import (
     append_extended_replacement_rows,
@@ -393,6 +394,7 @@ def _bridge_datasheet(
         context=context,
         datasheet_id=datasheet_id,
         composition_entries=composition_entries,
+        loadout_assignments=loadout_assignments,
         wargear_ids_by_name=wargear_ids_by_name,
         bridged_rows=bridged_rows,
     )
@@ -679,6 +681,18 @@ def _bridge_wargear(
                     ignored_name_keys=non_weapon_keyword_name_keys,
                 ),
                 "default_loadout": "true" if is_default_loadout else "false",
+                "default_wargear_count": (
+                    str(
+                        uniform_loadout_wargear_count(
+                            loadout_assignments=loadout_assignments,
+                            wargear_name=base_name,
+                            model_profile_ids=default_model_profile_ids,
+                            error_type=WahapediaBridgeError,
+                        )
+                    )
+                    if is_default_loadout
+                    else ""
+                ),
                 "source_ids": _joined(_source_ids(row)),
             }
         )
@@ -822,6 +836,7 @@ def _bridge_abilities(
                     "weapon_keywords": "",
                     "weapon_abilities": "",
                     "default_loadout": "true" if default_model_profile_ids else "false",
+                    "default_wargear_count": "1" if default_model_profile_ids else "",
                     "source_ids": _joined(_source_ids(row)),
                 }
             )
@@ -860,6 +875,7 @@ def _bridge_options(
     context: _BridgeContext,
     datasheet_id: str,
     composition_entries: tuple[_CompositionEntry, ...],
+    loadout_assignments: LoadoutAssignments | None,
     wargear_ids_by_name: dict[str, str],
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> None:
@@ -886,6 +902,7 @@ def _bridge_options(
             max_models_by_profile_id=max_models_by_profile_id,
             minimum_unit_models=minimum_unit_models,
             maximum_unit_models=maximum_unit_models,
+            loadout_assignments=loadout_assignments,
             wargear_ids_by_name=wargear_ids_by_name,
             bridged_rows=bridged_rows,
             error_type=WahapediaBridgeError,
@@ -1609,6 +1626,7 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "weapon_keywords",
             "weapon_abilities",
             "default_loadout",
+            "default_wargear_count",
             "source_ids",
         ),
         "Datasheets_options": (

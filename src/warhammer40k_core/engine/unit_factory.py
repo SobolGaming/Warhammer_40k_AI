@@ -696,12 +696,18 @@ def _apply_add_wargear_effect_to_models(
         models=models,
         wargear_by_model_id=wargear_by_model_id,
     )
+    per_model_capacity = _wargear_option_selection_capacity_per_model(option)
+    if per_model_capacity > 1 and effect.model_count != 1:
+        raise UnitFactoryError(
+            "Structured multi-copy wargear option requires one model per selection."
+        )
+    candidate_slots = tuple(model for model in candidates for _index in range(per_model_capacity))
     affected_model_count = effect.model_count * selection_count
-    if len(candidates) < affected_model_count:
+    if len(candidate_slots) < affected_model_count:
         raise UnitFactoryError(
             "Structured wargear option has fewer eligible model bearers than required."
         )
-    for model in candidates[:affected_model_count]:
+    for model in candidate_slots[:affected_model_count]:
         wargear_by_model_id[model.model_instance_id].extend(
             effect.wargear_id for _index in range(effect.wargear_count)
         )
@@ -727,7 +733,9 @@ def _apply_replace_wargear_effect_to_models(
             models=models,
             wargear_by_model_id=wargear_by_model_id,
         )
-        if effect.replaced_wargear_id in wargear_by_model_id[model.model_instance_id]
+        for _index in range(
+            wargear_by_model_id[model.model_instance_id].count(effect.replaced_wargear_id)
+        )
     )
     affected_model_count = effect.model_count * selection_count
     if len(candidates) < affected_model_count:
@@ -760,7 +768,9 @@ def _apply_remove_wargear_effect_from_models(
             models=models,
             wargear_by_model_id=wargear_by_model_id,
         )
-        if effect.replaced_wargear_id in wargear_by_model_id[model.model_instance_id]
+        for _index in range(
+            wargear_by_model_id[model.model_instance_id].count(effect.replaced_wargear_id)
+        )
     )
     affected_model_count = effect.model_count * selection_count
     if len(candidates) < affected_model_count:
@@ -769,6 +779,15 @@ def _apply_remove_wargear_effect_from_models(
         )
     for model in candidates[:affected_model_count]:
         wargear_by_model_id[model.model_instance_id].remove(effect.replaced_wargear_id)
+
+
+def _wargear_option_selection_capacity_per_model(
+    option: DatasheetWargearOption,
+) -> int:
+    limit = option.selection_limit
+    if limit is None or limit.models_per_increment != 1:
+        return 1
+    return limit.max_option_selections_per_increment
 
 
 def _eligible_wargear_effect_models(

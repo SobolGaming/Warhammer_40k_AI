@@ -9,11 +9,13 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     clause_is_fight_start_selected_target_selection,
     clause_is_shooting_start_selected_target_selection,
     fight_start_selected_target_effect_clauses_after,
+    selected_target_selection_condition_is_supported,
     shooting_start_selected_target_effect_clauses_after,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleConditionKind,
     RuleIR,
     RuleParameterValue,
     RuleTargetKind,
@@ -131,7 +133,10 @@ def clause_is_post_shoot_hit_target_selection(clause: RuleClause) -> bool:
     return (
         clause.is_supported
         and clause.template_id == "phase17c:selected-target-constraint"
-        and not clause.conditions
+        and all(
+            selected_target_selection_condition_is_supported(condition)
+            for condition in clause.conditions
+        )
         and not clause.effects
         and clause.duration is None
         and _post_shoot_trigger_parameters_are_supported(parameters)
@@ -143,6 +148,21 @@ def clause_is_post_shoot_hit_target_selection(clause: RuleClause) -> bool:
         and set(target_parameters) == {"allegiance", "target_relationship"}
         and target_parameters.get("allegiance") == "enemy"
         and target_parameters.get("target_relationship") == "hit_by_those_attacks"
+    )
+
+
+def post_shoot_target_once_per_turn(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog post-shoot frequency query requires RuleClause.")
+    return any(
+        condition.kind is RuleConditionKind.FREQUENCY_LIMIT
+        and parameter_payload(condition.parameters)
+        == {
+            "maximum_uses": 1,
+            "scope": "turn",
+            "subject": "selected_target_unit",
+        }
+        for condition in clause.conditions
     )
 
 

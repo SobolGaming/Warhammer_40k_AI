@@ -114,6 +114,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     post_shoot_selected_target_effect_clauses_after as _post_shoot_effect_clauses_after,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    post_shoot_target_once_per_turn as _post_shoot_target_once_per_turn,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     record_has_supported_post_shoot_selected_target_effect as _record_has_supported_post_shoot,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
@@ -953,6 +956,13 @@ def _post_shoot_groups_for_record(
                 selection_clause=selection_clause,
                 explicit_target_unit_ids=hit_target_ids,
             )
+            target_ids = _post_shoot_target_ids_allowed_by_frequency(
+                state=state,
+                decisions=decisions,
+                record=record,
+                selection_clause=selection_clause,
+                target_unit_instance_ids=target_ids,
+            )
             options = _options_for_targets(
                 state=state,
                 record=record,
@@ -988,6 +998,40 @@ def _post_shoot_groups_for_record(
                     )
                 )
     return tuple(groups)
+
+
+def _post_shoot_target_ids_allowed_by_frequency(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    record: AbilityCatalogRecord,
+    selection_clause: RuleClause,
+    target_unit_instance_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    if not _post_shoot_target_once_per_turn(selection_clause):
+        return target_unit_instance_ids
+    if state.active_player_id is None:
+        raise GameLifecycleError("Catalog post-shoot frequency requires an active player.")
+    selected_target_ids: set[str] = set()
+    for event in decisions.event_log.records:
+        if event.event_type != CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT:
+            continue
+        payload = _payload_object(event.payload)
+        if (
+            _payload_int(payload, key="battle_round") != state.battle_round
+            or _payload_string(payload, key="active_player_id") != state.active_player_id
+            or _payload_string(payload, key="source_rule_id") != record.definition.source_id
+        ):
+            continue
+        use_ability = payload.get("use_ability")
+        if type(use_ability) is not bool:
+            raise GameLifecycleError("Catalog post-shoot frequency event is malformed.")
+        if not use_ability:
+            continue
+        selected_target_ids.add(_payload_string(payload, key="target_unit_instance_id"))
+    return tuple(
+        target_id for target_id in target_unit_instance_ids if target_id not in selected_target_ids
+    )
 
 
 def _options_for_targets(

@@ -315,6 +315,17 @@ class CatalogDatasheetRuleRuntime:
             )
             for source in self._sources(clause_is_charge_end_leading_unit_weapon_ability_grant)
         )
+        bindings.extend(
+            WeaponProfileModifierBinding(
+                modifier_id=f"{source.binding_id}:conditional-weapon-characteristic",
+                source_id=source.rule_ir.source_id,
+                handler=self._conditional_proximity_weapon_handler(source, descriptor),
+            )
+            for source, descriptor in self._described_sources(
+                conditional_proximity_effects_descriptor_for_clause
+            )
+            if descriptor.weapon_characteristic_deltas
+        )
         return tuple(bindings)
 
     def hit_roll_modifier_bindings(self) -> tuple[HitRollModifierBinding, ...]:
@@ -345,6 +356,7 @@ class CatalogDatasheetRuleRuntime:
             for source, descriptor in self._described_sources(
                 conditional_proximity_effects_descriptor_for_clause
             )
+            if descriptor.hit_roll_delta is not None
         )
         if self._sources(clause_is_granted_stealth_effect):
             bindings.append(
@@ -596,7 +608,42 @@ class CatalogDatasheetRuleRuntime:
                 state=context.state,
             ) or not _friendly_keyworded_unit_within(source=source, state=context.state):
                 return 0
+            if descriptor.hit_roll_delta is None:
+                raise GameLifecycleError(
+                    "Catalog conditional proximity hit-roll descriptor is malformed."
+                )
             return descriptor.hit_roll_delta
+
+        return handler
+
+    def _conditional_proximity_weapon_handler(
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogConditionalProximityEffectsDescriptor,
+    ) -> Callable[[WeaponProfileModifierContext], WeaponProfile]:
+        def handler(context: WeaponProfileModifierContext) -> WeaponProfile:
+            if (
+                not _source_applies_to_rules_unit(
+                    source=source,
+                    context_unit_id=context.attacking_unit_instance_id,
+                    state=context.state,
+                )
+                or context.attacker_model_instance_id
+                not in _current_source_model_ids(state=context.state, source=source)
+                or not _friendly_keyworded_unit_within(source=source, state=context.state)
+            ):
+                return context.weapon_profile
+            profile = context.weapon_profile
+            for characteristic, delta in descriptor.weapon_characteristic_deltas:
+                profile = rule_ir_modified_weapon_profile(
+                    parameters={
+                        "characteristic": characteristic.value,
+                        "delta": delta,
+                    },
+                    profile=profile,
+                    source_id=source.rule_ir.source_id,
+                )
+            return profile
 
         return handler
 

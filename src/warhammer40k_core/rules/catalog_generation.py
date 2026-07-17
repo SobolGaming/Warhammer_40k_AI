@@ -76,6 +76,21 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.rules import catalog_generation_composition
 from warhammer40k_core.rules.catalog_generation_errors import CatalogGenerationError
+from warhammer40k_core.rules.catalog_generation_fields import (
+    optional_field as _optional_field,
+)
+from warhammer40k_core.rules.catalog_generation_fields import (
+    optional_split_field as _optional_split_field,
+)
+from warhammer40k_core.rules.catalog_generation_fields import (
+    required_field as _required_field,
+)
+from warhammer40k_core.rules.catalog_generation_fields import (
+    required_split_field as _required_split_field,
+)
+from warhammer40k_core.rules.catalog_generation_fields import (
+    split_field_value as _split_field_value,
+)
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRError, RuleIRPayload
@@ -375,27 +390,39 @@ def _default_wargear_options_from_row(
     if default_loadout not in {None, "true"}:
         raise CatalogGenerationError("Wargear default_loadout must be true or false.")
     wargear_id = _required_field(row=row, column_name="wargear_id")
+    default_wargear_count_text = _optional_field(row=row, column_name="default_wargear_count")
+    default_wargear_count = (
+        1
+        if default_wargear_count_text is None
+        else _required_positive_int(row=row, column_name="default_wargear_count")
+    )
     profile_ids = _optional_split_field(row, "model_profile_ids")
     if not profile_ids:
         profile_ids = (_required_field(row=row, column_name="model_profile_id"),)
     options: list[DatasheetWargearOption] = []
     for model_profile_id in profile_ids:
-        option_id = (
-            f"{row.source_row_id}:default"
+        option_stem = (
+            row.source_row_id
             if len(profile_ids) == 1
-            else f"{row.source_row_id}:{model_profile_id}:default"
+            else f"{row.source_row_id}:{model_profile_id}"
         )
-        options.append(
-            DatasheetWargearOption(
-                option_id=option_id,
-                model_profile_id=model_profile_id,
-                default_wargear_ids=(wargear_id,),
-                allowed_wargear_ids=(wargear_id,),
-                min_selections=1,
-                max_selections=1,
-                source_ids=_source_ids_from_row(row),
+        for copy_index in range(1, default_wargear_count + 1):
+            option_id = (
+                f"{option_stem}:default"
+                if default_wargear_count == 1
+                else f"{option_stem}:default-{copy_index}"
             )
-        )
+            options.append(
+                DatasheetWargearOption(
+                    option_id=option_id,
+                    model_profile_id=model_profile_id,
+                    default_wargear_ids=(wargear_id,),
+                    allowed_wargear_ids=(wargear_id,),
+                    min_selections=1,
+                    max_selections=1,
+                    source_ids=_source_ids_from_row(row),
+                )
+            )
     return tuple(options)
 
 
@@ -1318,26 +1345,6 @@ def _review_status_from_field(value: str) -> GeometryReviewStatus:
         raise CatalogGenerationError("Geometry review status is invalid.") from exc
 
 
-def _required_split_field(row: NormalizedSourceRow, column_name: str) -> tuple[str, ...]:
-    value = _required_field(row=row, column_name=column_name)
-    return _split_field_value(value)
-
-
-def _optional_split_field(row: NormalizedSourceRow, column_name: str) -> tuple[str, ...]:
-    value = row.runtime_fields_payload().get(column_name)
-    if value is None or not value.strip():
-        return ()
-    return _split_field_value(value)
-
-
-def _optional_field(*, row: NormalizedSourceRow, column_name: str) -> str | None:
-    value = row.runtime_fields_payload().get(column_name)
-    if value is None:
-        return None
-    stripped = value.strip()
-    return stripped if stripped else None
-
-
 def _source_ids_from_row(row: NormalizedSourceRow) -> tuple[str, ...]:
     explicit_source_ids = _optional_split_field(row, "source_ids")
     return _deduplicated_ids((row.stable_source_id(), *explicit_source_ids))
@@ -1361,20 +1368,6 @@ def _deduplicated_ids(values: tuple[str, ...]) -> tuple[str, ...]:
         seen.add(identifier)
         deduplicated.append(identifier)
     return tuple(deduplicated)
-
-
-def _split_field_value(value: str) -> tuple[str, ...]:
-    items = tuple(item.strip() for item in value.split(",") if item.strip())
-    if not items:
-        raise CatalogGenerationError("Required list field must not be empty.")
-    seen: set[str] = set()
-    unique: list[str] = []
-    for item in items:
-        if item in seen:
-            raise CatalogGenerationError("Required list field must not contain duplicates.")
-        seen.add(item)
-        unique.append(item)
-    return tuple(unique)
 
 
 def _enhancement_subtypes_from_row(
@@ -1464,20 +1457,6 @@ def _optional_int_from_text(value: str) -> int | None:
     if _INTEGER_CHARACTERISTIC_RE.fullmatch(normalized) is None:
         return None
     return int(normalized)
-
-
-def _required_field(*, row: NormalizedSourceRow, column_name: str) -> str:
-    fields = row.runtime_fields_payload()
-    if column_name not in fields:
-        raise CatalogGenerationError(
-            f"Required source column {column_name} is missing from {row.stable_source_id()}."
-        )
-    value = fields[column_name].strip()
-    if not value:
-        raise CatalogGenerationError(
-            f"Required source column {column_name} is empty in {row.stable_source_id()}."
-        )
-    return value
 
 
 def _validate_diagnostics(

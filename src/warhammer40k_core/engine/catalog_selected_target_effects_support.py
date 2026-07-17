@@ -33,6 +33,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
     clause_is_post_shoot_hit_target_selection as clause_is_post_shoot_hit_target_selection,
 )
+from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    post_shoot_target_once_per_turn as post_shoot_target_once_per_turn,
+)
 from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     clause_is_fight_start_selected_target_selection,
     clause_is_shooting_start_selected_target_selection,

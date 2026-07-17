@@ -39,6 +39,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects import (
 from warhammer40k_core.engine.catalog_shadow_form_runtime import (
     catalog_shadow_form_battle_round_start_hook_bindings,
 )
+from warhammer40k_core.engine.catalog_start_battle_keyword_choice import (
+    catalog_start_battle_keyword_choice_bindings,
+)
 from warhammer40k_core.engine.catalog_tracked_target_runtime import (
     catalog_tracked_target_battle_formation_hook_bindings,
     catalog_tracked_target_battle_round_start_hook_bindings,
@@ -72,9 +75,15 @@ def battle_formation_hook_bindings(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
 ) -> tuple[BattleFormationHookBinding, ...]:
-    return catalog_tracked_target_battle_formation_hook_bindings(
-        ability_indexes_by_player_id=ability_indexes_by_player_id,
-        armies=armies,
+    return (
+        *catalog_tracked_target_battle_formation_hook_bindings(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+        ),
+        *catalog_start_battle_keyword_choice_bindings(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+        ),
     )
 
 

@@ -82,6 +82,7 @@ class BattleFormationHookBinding:
     source_id: str
     request_handler: BattleFormationRequestHandler | None = None
     result_handler: BattleFormationResultHandler | None = None
+    request_priority: int = 0
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
@@ -92,6 +93,10 @@ class BattleFormationHookBinding:
             raise GameLifecycleError("BattleFormationHookBinding request_handler must be callable.")
         if self.result_handler is not None and not callable(self.result_handler):
             raise GameLifecycleError("BattleFormationHookBinding result_handler must be callable.")
+        if type(self.request_priority) is not int or self.request_priority < 0:
+            raise GameLifecycleError(
+                "BattleFormationHookBinding request_priority must be a non-negative int."
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -118,7 +123,7 @@ class BattleFormationHookRegistry:
     ) -> DecisionRequest | None:
         if type(context) is not BattleFormationRequestContext:
             raise GameLifecycleError("Battle formation request hooks require a context.")
-        requests: list[DecisionRequest] = []
+        requests: list[tuple[int, DecisionRequest]] = []
         for binding in self.bindings:
             if binding.request_handler is None:
                 continue
@@ -129,14 +134,19 @@ class BattleFormationHookRegistry:
                 raise GameLifecycleError(
                     "Battle formation request handlers must return DecisionRequest or None."
                 )
-            requests.append(request)
-        if len(requests) > 1:
-            raise GameLifecycleError(
-                "Battle formation hooks produced multiple simultaneous requests."
-            )
+            requests.append((binding.request_priority, request))
         if not requests:
             return None
-        return requests[0]
+        selected_priority = min(priority for priority, _request in requests)
+        selected_requests = [
+            request for priority, request in requests if priority == selected_priority
+        ]
+        if len(selected_requests) > 1:
+            raise GameLifecycleError(
+                "Battle formation hooks produced multiple simultaneous requests at the same "
+                "priority."
+            )
+        return selected_requests[0]
 
     def apply_result(
         self,

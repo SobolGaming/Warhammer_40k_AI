@@ -55,6 +55,12 @@ CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID = "catalog-ir:fight-on-death-source
 CATALOG_IR_LEADERSHIP_CHARACTERISTIC_QUERY_CONSUMER_ID = (
     "catalog-ir:leadership-characteristic-query"
 )
+CATALOG_IR_BALLISTIC_SKILL_CHARACTERISTIC_MODIFIER_CONSUMER_ID = (
+    "catalog-ir:ballistic-skill-characteristic-modifier"
+)
+CATALOG_IR_WEAPON_SKILL_CHARACTERISTIC_MODIFIER_CONSUMER_ID = (
+    "catalog-ir:weapon-skill-characteristic-modifier"
+)
 
 
 def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool:
@@ -91,9 +97,14 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID)
     if conditional_invulnerable_save_descriptor_for_clause(clause) is not None:
         consumer_ids.add(CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID)
-    if conditional_proximity_effects_descriptor_for_clause(clause) is not None:
+    proximity_descriptor = conditional_proximity_effects_descriptor_for_clause(clause)
+    if proximity_descriptor is not None:
         consumer_ids.add(CATALOG_IR_LEADERSHIP_CHARACTERISTIC_QUERY_CONSUMER_ID)
-        consumer_ids.add(CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID)
+        if proximity_descriptor.hit_roll_delta is not None:
+            consumer_ids.add(CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID)
+        for characteristic, _delta in proximity_descriptor.weapon_characteristic_deltas:
+            token = characteristic.value.replace("_", "-")
+            consumer_ids.add(f"catalog-ir:{token}-characteristic-modifier")
     if fight_on_death_descriptor_for_clause(clause) is not None:
         consumer_ids.add(CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID)
     if clause_is_fight_selected_weapon_ability_choice(clause):
@@ -140,6 +151,8 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID,
                 CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID,
                 CATALOG_IR_LEADERSHIP_CHARACTERISTIC_QUERY_CONSUMER_ID,
+                CATALOG_IR_BALLISTIC_SKILL_CHARACTERISTIC_MODIFIER_CONSUMER_ID,
+                CATALOG_IR_WEAPON_SKILL_CHARACTERISTIC_MODIFIER_CONSUMER_ID,
             }
         )
     )
