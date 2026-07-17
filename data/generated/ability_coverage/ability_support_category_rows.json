@@ -52,6 +52,14 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/faction/000009894/none",
+        "datasheet_id": "000002533",
+        "datasheet_name": "Shroud Runners",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
         "datasheet_id": "000004195",
         "datasheet_name": "Starfangs",
@@ -71,7 +79,7 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 8,
+    "coverage_row_count": 9,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
@@ -79,6 +87,7 @@
       "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004193/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000592/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000002533/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000605/faction/000009894/none"
     ],
@@ -89,6 +98,7 @@
       "Kharseth",
       "Prince Yriel",
       "Rangers",
+      "Shroud Runners",
       "Starfangs",
       "Vypers"
     ],
@@ -101,7 +111,7 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 8
+      "faction": 9
     },
     "support_stages": [
       "engine_consumed"
@@ -518,22 +528,78 @@
         "datasheet_id": "000001149",
         "datasheet_name": "Daemon Prince of Chaos",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000000592:ranged-invulnerable-save",
+        "ability_name": "Ranged Invulnerable Save",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000592/datasheet/000000592:ranged-invulnerable-save/none",
+        "datasheet_id": "000000592",
+        "datasheet_name": "Rangers",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000002533:ranged-invulnerable-save",
+        "ability_name": "Ranged Invulnerable Save",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/datasheet/000002533:ranged-invulnerable-save/none",
+        "datasheet_id": "000002533",
+        "datasheet_name": "Shroud Runners",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
+      "Ranged Invulnerable Save",
       "Unholy Vigour"
     ],
     "category_id": "datasheet.characteristic_set.invulnerable_save.this_model",
     "category_name": "Datasheet Characteristic Set Invulnerable Save This Model",
-    "coverage_row_count": 1,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:unholy-vigour/none"
+      "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:unholy-vigour/none",
+      "chaos-daemons-bridge-catalog/000000592/datasheet/000000592:ranged-invulnerable-save/none",
+      "chaos-daemons-bridge-catalog/000002533/datasheet/000002533:ranged-invulnerable-save/none"
     ],
     "datasheet_names": [
-      "Daemon Prince of Chaos"
+      "Daemon Prince of Chaos",
+      "Rangers",
+      "Shroud Runners"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query",
       "catalog-ir:once-per-battle-ability"
+    ],
+    "source_kind_counts": {
+      "datasheet": 3
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000598:psychic-guidance",
+        "ability_name": "Psychic Guidance",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:psychic-guidance/none",
+        "datasheet_id": "000000598",
+        "datasheet_name": "Wraithblades",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Psychic Guidance"
+    ],
+    "category_id": "datasheet.characteristic_set.leadership.this_unit",
+    "category_name": "Datasheet Characteristic Set Leadership This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:psychic-guidance/none"
+    ],
+    "datasheet_names": [
+      "Wraithblades"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:leadership-characteristic-query"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -680,6 +746,40 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000598:psychic-guidance",
+        "ability_name": "Psychic Guidance",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:psychic-guidance/none",
+        "datasheet_id": "000000598",
+        "datasheet_name": "Wraithblades",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Psychic Guidance"
+    ],
+    "category_id": "datasheet.roll_modifier.hit.this_unit",
+    "category_name": "Datasheet Roll Modifier Hit This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:psychic-guidance/none"
+    ],
+    "datasheet_names": [
+      "Wraithblades"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:leadership-characteristic-query"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001114:bane-of-cowards",
         "ability_name": "Bane of Cowards",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
@@ -786,25 +886,37 @@
         "datasheet_id": "000001149",
         "datasheet_name": "Daemon Prince of Chaos",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000000598:malevolent-souls",
+        "ability_name": "Malevolent Souls",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none",
+        "datasheet_id": "000000598",
+        "datasheet_name": "Wraithblades",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
-      "Daemonic Lord"
+      "Daemonic Lord",
+      "Malevolent Souls"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_model",
     "category_name": "Datasheet Rule Ir Grant Ability This Model",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none"
+      "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
+      "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none"
     ],
     "datasheet_names": [
-      "Daemon Prince of Chaos"
+      "Daemon Prince of Chaos",
+      "Wraithblades"
     ],
     "runtime_consumer_ids": [
-      "catalog-ir:conditional-ability:lone-operative"
+      "catalog-ir:conditional-ability:lone-operative",
+      "catalog-ir:fight-on-death-source"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -1623,25 +1735,36 @@
         "datasheet_id": "000004209",
         "datasheet_name": "Defiler",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000002533:target-acquisition",
+        "ability_name": "Target Acquisition",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/datasheet/000002533:target-acquisition/none",
+        "datasheet_id": "000002533",
+        "datasheet_name": "Shroud Runners",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
-      "Barrage of Filth"
+      "Barrage of Filth",
+      "Target Acquisition"
     ],
     "category_id": "datasheet.rule_ir.set_contextual_status.enemy_unit",
     "category_name": "Datasheet Rule Ir Set Contextual Status Enemy Unit",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:barrage-of-filth/none"
+      "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:barrage-of-filth/none",
+      "chaos-daemons-bridge-catalog/000002533/datasheet/000002533:target-acquisition/none"
     ],
     "datasheet_names": [
-      "Defiler"
+      "Defiler",
+      "Shroud Runners"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:post-shoot-hit-target-status"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -2605,6 +2728,14 @@
       {
         "ability_id": "000008344",
         "ability_name": "Scouts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/core/000008344/none",
+        "datasheet_id": "000002533",
+        "datasheet_name": "Shroud Runners",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008344",
+        "ability_name": "Scouts",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/core/000008344/none",
         "datasheet_id": "000004195",
         "datasheet_name": "Starfangs",
@@ -2616,13 +2747,14 @@
     ],
     "category_id": "core.scouts",
     "category_name": "Scouts",
-    "coverage_row_count": 6,
+    "coverage_row_count": 7,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/core/000008344/none",
       "chaos-daemons-bridge-catalog/000002531/core/000008344/none",
       "chaos-daemons-bridge-catalog/000002532/core/000008344/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008344/none",
       "chaos-daemons-bridge-catalog/000004193/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000002533/core/000008344/none",
       "chaos-daemons-bridge-catalog/000004195/core/000008344/none"
     ],
     "datasheet_names": [
@@ -2631,13 +2763,14 @@
       "Corsair Voidscarred",
       "Kharseth",
       "Prince Yriel",
+      "Shroud Runners",
       "Starfangs"
     ],
     "runtime_consumer_ids": [
       "descriptor:prebattle:scouts"
     ],
     "source_kind_counts": {
-      "core": 6
+      "core": 7
     },
     "support_stages": [
       "engine_consumed"
@@ -2660,6 +2793,14 @@
         "datasheet_id": "000000592",
         "datasheet_name": "Rangers",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008337",
+        "ability_name": "Stealth",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/core/000008337/none",
+        "datasheet_id": "000002533",
+        "datasheet_name": "Shroud Runners",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -2667,20 +2808,22 @@
     ],
     "category_id": "core.stealth",
     "category_name": "Stealth",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008337/none",
-      "chaos-daemons-bridge-catalog/000000592/core/000008337/none"
+      "chaos-daemons-bridge-catalog/000000592/core/000008337/none",
+      "chaos-daemons-bridge-catalog/000002533/core/000008337/none"
     ],
     "datasheet_names": [
       "Be'lakor",
-      "Rangers"
+      "Rangers",
+      "Shroud Runners"
     ],
     "runtime_consumer_ids": [
       "core:stealth"
     ],
     "source_kind_counts": {
-      "core": 2
+      "core": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -2820,27 +2963,38 @@
         "datasheet_id": "000002532",
         "datasheet_name": "Corsair Voidscarred",
         "source_kind": "wargear"
+      },
+      {
+        "ability_id": "000000598:forceshield",
+        "ability_name": "Forceshield",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000598/wargear/000000598:forceshield/000000598:forceshield",
+        "datasheet_id": "000000598",
+        "datasheet_name": "Wraithblades",
+        "source_kind": "wargear"
       }
     ],
     "ability_names": [
+      "Forceshield",
       "Mistshield"
     ],
     "category_id": "wargear.characteristic_set.invulnerable_save.this_model",
     "category_name": "Wargear Characteristic Set Invulnerable Save This Model",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000002531/wargear/000002531:mistshield/000002531:mistshield",
-      "chaos-daemons-bridge-catalog/000002532/wargear/000002532:mistshield/000002532:mistshield"
+      "chaos-daemons-bridge-catalog/000002532/wargear/000002532:mistshield/000002532:mistshield",
+      "chaos-daemons-bridge-catalog/000000598/wargear/000000598:forceshield/000000598:forceshield"
     ],
     "datasheet_names": [
       "Corsair Voidreavers",
-      "Corsair Voidscarred"
+      "Corsair Voidscarred",
+      "Wraithblades"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:invulnerable-save-characteristic-query"
     ],
     "source_kind_counts": {
-      "wargear": 2
+      "wargear": 3
     },
     "support_stages": [
       "engine_consumed"

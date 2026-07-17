@@ -6805,7 +6805,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Exact ability bridge blocked |"
     ) in aeldari_markdown
     assert (
-        "| Craftworlds / Asuryani | Rangers (`000000592`)<br>Vypers (`000000605`) | Crimson Hunter"
+        "| Craftworlds / Asuryani | Rangers (`000000592`)<br>"
+        "Shroud Runners (`000002533`)<br>Vypers (`000000605`)<br>"
+        "Wraithblades (`000000598`)<br>Wraithguard (`000000597`) | Crimson Hunter"
     ) in aeldari_markdown
     assert "Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)" in aeldari_markdown
     assert "Eldrad Ulthran (`000000568`)<br>Falcon (`000000609`)" in aeldari_markdown
@@ -6859,8 +6861,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "## Runtime Hook Inventory" in generated_markdown
     assert "| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |" in generated_markdown
     assert (
-        "| `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Revel in Desecration |"
-        in generated_markdown
+        "| `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Psychic Guidance"
+        "<br>Revel in Desecration |" in generated_markdown
     )
     assert "| `catalog-ir:wound-roll-modifier` | No current generated rows |" in generated_markdown
     assert (

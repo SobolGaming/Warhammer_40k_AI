@@ -6,7 +6,10 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import WeaponProfileError, weapon_keyword_from_token
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     clause_uses_exact_datasheet_runtime_template,
+    conditional_invulnerable_save_descriptor_for_clause,
+    conditional_proximity_effects_descriptor_for_clause,
     exact_datasheet_runtime_descriptor_for_clause,
+    fight_on_death_descriptor_for_clause,
     first_failed_save_damage_replacement_descriptor_for_clause,
     invulnerable_save_descriptor_for_clause,
     passive_hit_reroll_descriptor_for_clause,
@@ -48,6 +51,10 @@ CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID = "catalog-ir:passive-hit-reroll"
 CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID = (
     "catalog-ir:first-failed-save-damage-replacement"
 )
+CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID = "catalog-ir:fight-on-death-source"
+CATALOG_IR_LEADERSHIP_CHARACTERISTIC_QUERY_CONSUMER_ID = (
+    "catalog-ir:leadership-characteristic-query"
+)
 
 
 def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool:
@@ -82,6 +89,13 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID)
     if clause_is_first_failed_save_damage_replacement(clause):
         consumer_ids.add(CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID)
+    if conditional_invulnerable_save_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID)
+    if conditional_proximity_effects_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_LEADERSHIP_CHARACTERISTIC_QUERY_CONSUMER_ID)
+        consumer_ids.add(CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID)
+    if fight_on_death_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID)
     if clause_is_fight_selected_weapon_ability_choice(clause):
         consumer_ids.add(CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID)
         consumer_ids.add(CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID)
@@ -124,6 +138,8 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,
                 CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID,
                 CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID,
+                CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID,
+                CATALOG_IR_LEADERSHIP_CHARACTERISTIC_QUERY_CONSUMER_ID,
             }
         )
     )
@@ -204,6 +220,7 @@ def clause_is_conditional_lone_operative(clause: RuleClause) -> bool:
     return any(
         condition.kind is RuleConditionKind.DISTANCE_PREDICATE
         and parameter_payload(condition.parameters).get("predicate") == "within"
+        and parameter_payload(condition.parameters).get("object_kind") == "unit"
         and type(parameter_payload(condition.parameters).get("distance_inches")) in {int, float}
         and parameter_payload(condition.parameters).get("allegiance") == "friendly"
         and type(parameter_payload(condition.parameters).get("required_keyword_sequence")) is tuple

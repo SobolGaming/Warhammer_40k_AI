@@ -25,6 +25,7 @@ from warhammer40k_core.engine.attack_sequence import (
     current_legal_damage_allocation_model_ids,
     invalid_destroyed_transport_disembark_proposal_status,
     is_destroyed_transport_disembark_proposal_request,
+    validate_destruction_reaction_context_matches_sequence,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
@@ -33,6 +34,7 @@ from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
     invalid_any_phase_once_per_battle_status,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
     apply_catalog_unit_move_completed_mortal_wounds_target_result,
@@ -2425,6 +2427,10 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
+        CatalogDatasheetRuleRuntime(
+            bundle.ability_indexes_by_player_id,
+            armies,
+        ).record_static_destruction_reaction_sources(state=state)
         self._runtime_content_bundle = bundle
         self._setup_flow = replace(
             self._setup_flow,
@@ -3219,9 +3225,6 @@ def _invalid_destruction_reaction_status(
     destruction_context = request_payload.get("destruction_context")
     if not isinstance(destruction_context, Mapping):
         raise GameLifecycleError("Destruction reaction context must be an object.")
-    attack_context = destruction_context.get("attack_context")
-    if not isinstance(attack_context, Mapping):
-        raise GameLifecycleError("Destruction reaction attack context must be an object.")
     attack_sequence = _active_attack_sequence_for_state(state)
     if attack_sequence is None:
         return LifecycleStatus.invalid(
@@ -3232,23 +3235,21 @@ def _invalid_destruction_reaction_status(
                 "field": "attack_sequence",
             },
         )
-    expected_fields: tuple[tuple[str, object], ...] = (
-        ("sequence_id", attack_sequence.sequence_id),
-        ("attack_context_id", attack_sequence.attack_context_id()),
-        ("pool_index", attack_sequence.pool_index),
-        ("attack_index", attack_sequence.attack_index),
-        ("generated_hit_index", attack_sequence.generated_hit_index),
-    )
-    for field_name, expected_value in expected_fields:
-        if attack_context.get(field_name) != expected_value:
-            return LifecycleStatus.invalid(
-                stage=state.stage,
-                message="Destruction reaction attack context no longer matches state.",
-                payload={
-                    "invalid_reason": "invalid_destruction_reaction_result",
-                    "field": field_name,
-                },
-            )
+    try:
+        validate_destruction_reaction_context_matches_sequence(
+            attack_sequence=attack_sequence,
+            destruction_context=validate_json_value(destruction_context),
+        )
+    except GameLifecycleError as exc:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Destruction reaction context no longer matches state.",
+            payload={
+                "invalid_reason": "invalid_destruction_reaction_result",
+                "field": "destruction_context",
+                "diagnostic": str(exc),
+            },
+        )
     return None
 
 

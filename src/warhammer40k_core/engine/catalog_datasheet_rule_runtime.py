@@ -27,9 +27,15 @@ from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     CatalogAnyPhaseOncePerBattleRuntime,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
+    CatalogConditionalInvulnerableSaveDescriptor,
+    CatalogConditionalProximityEffectsDescriptor,
+    CatalogFightOnDeathDescriptor,
     CatalogFirstFailedSaveDamageReplacementDescriptor,
     CatalogInvulnerableSaveDescriptor,
     CatalogPassiveHitRerollDescriptor,
+    conditional_invulnerable_save_descriptor_for_clause,
+    conditional_proximity_effects_descriptor_for_clause,
+    fight_on_death_descriptor_for_clause,
     first_failed_save_damage_replacement_descriptor_for_clause,
     invulnerable_save_descriptor_for_clause,
     passive_hit_reroll_descriptor_for_clause,
@@ -37,6 +43,7 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
     CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
+    CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID,
     CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
     CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
@@ -55,6 +62,10 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_record_source_matches_unit,
+)
+from warhammer40k_core.engine.damage_allocation import (
+    DestructionReactionKind,
+    DestructionReactionSource,
 )
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
@@ -119,6 +130,10 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     TargetRestriction,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_proximity import (
+    rules_unit_within_friendly_keyworded_models,
+    rules_unit_within_friendly_keyworded_units,
+)
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
@@ -161,7 +176,7 @@ class CatalogDatasheetRuleRuntime:
     def unit_characteristic_modifier_bindings(
         self,
     ) -> tuple[UnitCharacteristicModifierBinding, ...]:
-        return tuple(
+        bindings = tuple(
             UnitCharacteristicModifierBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
@@ -170,6 +185,44 @@ class CatalogDatasheetRuleRuntime:
             for source in self._sources(clause_is_passive_characteristic_modifier)
             if _source_characteristic(source) is Characteristic.TOUGHNESS
         )
+        proximity_bindings = tuple(
+            UnitCharacteristicModifierBinding(
+                modifier_id=f"{source.binding_id}:conditional-characteristic",
+                source_id=source.rule_ir.source_id,
+                handler=self._conditional_proximity_characteristic_handler(source, descriptor),
+            )
+            for source, descriptor in self._described_sources(
+                conditional_proximity_effects_descriptor_for_clause
+            )
+        )
+        return (*bindings, *proximity_bindings)
+
+    def record_static_destruction_reaction_sources(
+        self,
+        *,
+        state: object,
+    ) -> tuple[tuple[str, DestructionReactionSource], ...]:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(state) is not GameState:
+            raise GameLifecycleError(
+                "Catalog destruction-reaction registration requires GameState."
+            )
+        recorded: list[tuple[str, DestructionReactionSource]] = []
+        for source, descriptor in self._described_sources(fight_on_death_descriptor_for_clause):
+            for model_id in _static_source_model_ids(source):
+                reaction = _catalog_fight_on_death_source(
+                    source=source,
+                    descriptor=descriptor,
+                    model_instance_id=model_id,
+                )
+                _record_destruction_reaction_source(
+                    state=state,
+                    model_instance_id=model_id,
+                    source=reaction,
+                )
+                recorded.append((model_id, reaction))
+        return tuple(sorted(recorded, key=lambda item: (item[0], item[1].source_id)))
 
     def event_handler_bindings(self) -> tuple[RuntimeContentEventHandlerBinding, ...]:
         return CatalogAnyPhaseOncePerBattleRuntime(
@@ -193,7 +246,7 @@ class CatalogDatasheetRuleRuntime:
         )
 
     def save_option_modifier_bindings(self) -> tuple[SaveOptionModifierBinding, ...]:
-        return tuple(
+        passive = tuple(
             SaveOptionModifierBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
@@ -203,6 +256,17 @@ class CatalogDatasheetRuleRuntime:
                 invulnerable_save_descriptor_for_clause
             )
         )
+        conditional = tuple(
+            SaveOptionModifierBinding(
+                modifier_id=f"{source.binding_id}:conditional-invulnerable-save",
+                source_id=source.rule_ir.source_id,
+                handler=self._conditional_invulnerable_save_handler(source, descriptor),
+            )
+            for source, descriptor in self._described_sources(
+                conditional_invulnerable_save_descriptor_for_clause
+            )
+        )
+        return (*passive, *conditional)
 
     def attack_reroll_permission_bindings(
         self,
@@ -271,6 +335,16 @@ class CatalogDatasheetRuleRuntime:
                 handler=self._leading_unit_hit_roll_handler(source),
             )
             for source in self._sources(clause_is_leading_unit_hit_roll_modifier)
+        )
+        bindings.extend(
+            HitRollModifierBinding(
+                modifier_id=f"{source.binding_id}:conditional-hit-roll",
+                source_id=source.rule_ir.source_id,
+                handler=self._conditional_proximity_hit_roll_handler(source, descriptor),
+            )
+            for source, descriptor in self._described_sources(
+                conditional_proximity_effects_descriptor_for_clause
+            )
         )
         if self._sources(clause_is_granted_stealth_effect):
             bindings.append(
@@ -447,6 +521,82 @@ class CatalogDatasheetRuleRuntime:
                 ),
                 replacement,
             )
+
+        return handler
+
+    def _conditional_invulnerable_save_handler(
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogConditionalInvulnerableSaveDescriptor,
+    ) -> Callable[[SaveOptionModifierContext], tuple[SaveOption, ...]]:
+        def handler(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
+            allocated_model_id = context.allocated_model_instance_id
+            profile = context.weapon_profile
+            if (
+                allocated_model_id is None
+                or profile is None
+                or profile.range_profile.kind is not RangeProfileKind.DISTANCE
+                or descriptor.attack_kind != "ranged"
+                or not _source_applies_to_rules_unit(
+                    source=source,
+                    context_unit_id=context.target_unit_instance_id,
+                    state=context.state,
+                )
+                or allocated_model_id
+                not in _current_source_model_ids(state=context.state, source=source)
+            ):
+                return context.save_options
+            replacement = SaveOption(
+                save_kind=SaveKind.INVULNERABLE,
+                target_number=descriptor.target_number,
+                characteristic_target_number=descriptor.target_number,
+                armor_penetration=0,
+                source_rule_ids=(source.rule_ir.source_id,),
+            )
+            return (
+                *tuple(
+                    option
+                    for option in context.save_options
+                    if option.save_kind is not SaveKind.INVULNERABLE
+                ),
+                replacement,
+            )
+
+        return handler
+
+    def _conditional_proximity_characteristic_handler(
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogConditionalProximityEffectsDescriptor,
+    ) -> Callable[[UnitCharacteristicModifierContext], int]:
+        def handler(context: UnitCharacteristicModifierContext) -> int:
+            if (
+                context.characteristic is not descriptor.characteristic
+                or not _source_applies_to_rules_unit(
+                    source=source,
+                    context_unit_id=context.unit_instance_id,
+                    state=context.state,
+                )
+                or not _friendly_keyworded_unit_within(source=source, state=context.state)
+            ):
+                return context.current_value
+            return descriptor.characteristic_value
+
+        return handler
+
+    def _conditional_proximity_hit_roll_handler(
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogConditionalProximityEffectsDescriptor,
+    ) -> Callable[[HitRollModifierContext], int]:
+        def handler(context: HitRollModifierContext) -> int:
+            if not _source_applies_to_rules_unit(
+                source=source,
+                context_unit_id=context.attacking_unit_instance_id,
+                state=context.state,
+            ) or not _friendly_keyworded_unit_within(source=source, state=context.state):
+                return 0
+            return descriptor.hit_roll_delta
 
         return handler
 
@@ -908,6 +1058,73 @@ def _current_source_model_ids(*, state: object, source: _CatalogClauseSource) ->
     )
 
 
+def _static_source_model_ids(source: _CatalogClauseSource) -> tuple[str, ...]:
+    model_ids = source.unit.own_model_ids()
+    if source.record.source_kind is not AbilitySourceKind.WARGEAR:
+        return model_ids
+    return catalog_rule_record_current_wargear_bearer_model_ids(
+        record=source.record,
+        unit=source.unit,
+        current_model_instance_ids=model_ids,
+    )
+
+
+def _catalog_fight_on_death_source(
+    *,
+    source: _CatalogClauseSource,
+    descriptor: CatalogFightOnDeathDescriptor,
+    model_instance_id: str,
+) -> DestructionReactionSource:
+    return DestructionReactionSource(
+        source_id=(
+            f"{source.rule_ir.source_id}:{source.clause.clause_id}:"
+            f"{model_instance_id}:fight-on-death"
+        ),
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id=source.rule_ir.source_id,
+        payload={
+            "catalog_record_id": source.record.record_id,
+            "clause_id": source.clause.clause_id,
+            "consumer_id": CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID,
+            "rule_ir_hash": source.rule_ir.ir_hash(),
+            "trigger_roll_threshold": descriptor.trigger_roll_threshold,
+            "trigger_roll_type": descriptor.trigger_roll_type,
+            "requires_destroyed_by_melee_attack": (descriptor.requires_destroyed_by_melee_attack),
+            "requires_not_fought_this_phase": descriptor.requires_not_fought_this_phase,
+            "unit_instance_id": source.unit.unit_instance_id,
+            "model_instance_id": model_instance_id,
+        },
+        optional=True,
+    )
+
+
+def _record_destruction_reaction_source(
+    *,
+    state: object,
+    model_instance_id: str,
+    source: DestructionReactionSource,
+) -> None:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Catalog destruction-reaction registration requires GameState.")
+    existing_sources = state.destruction_reaction_sources_for_model(
+        model_instance_id=model_instance_id
+    )
+    for existing_source in existing_sources:
+        if existing_source.source_id != source.source_id:
+            continue
+        if existing_source != source:
+            raise GameLifecycleError(
+                "Catalog destruction-reaction source conflicts with existing state."
+            )
+        return
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=model_instance_id,
+        sources=(*existing_sources, source),
+    )
+
+
 def _friendly_keyworded_unit_within(*, source: _CatalogClauseSource, state: object) -> bool:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -922,25 +1139,21 @@ def _friendly_keyworded_unit_within(*, source: _CatalogClauseSource, state: obje
     required = parameters.get("required_keyword_sequence")
     if not isinstance(required, tuple) or not all(type(value) is str for value in required):
         raise GameLifecycleError("Catalog conditional ability keyword sequence is malformed.")
-    required_tokens = set(required)
-    seen: set[str] = set()
-    for army in state.army_definitions:
-        if army.player_id != source.player_id:
-            continue
-        for unit in army.units:
-            view = rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id)
-            if view.unit_instance_id in seen:
-                continue
-            seen.add(view.unit_instance_id)
-            keywords = {*view.keywords, *view.faction_keywords}
-            if required_tokens.issubset(keywords) and _rules_units_within(
-                state,
-                source.unit.unit_instance_id,
-                view.unit_instance_id,
-                _clause_distance(source.clause),
-            ):
-                return True
-    return False
+    object_kind = parameters.get("object_kind")
+    if type(object_kind) is not str:
+        raise GameLifecycleError("Catalog conditional ability object kind is unsupported.")
+    proximity_query = {
+        "model": rules_unit_within_friendly_keyworded_models,
+        "unit": rules_unit_within_friendly_keyworded_units,
+    }.get(object_kind)
+    if proximity_query is None:
+        raise GameLifecycleError("Catalog conditional ability object kind is unsupported.")
+    return proximity_query(
+        state=state,
+        source_unit_instance_id=source.unit.unit_instance_id,
+        required_keyword_sequence=required,
+        max_range_inches=_clause_distance(source.clause),
+    )
 
 
 def _rules_unit_has_required_aura_keyword(view: RulesUnitView, clause: RuleClause) -> bool:

@@ -16,6 +16,7 @@
     "tests/unit/test_aeldari_corsair_void_rule_ir_descriptors.py": 89.528,
     "tests/unit/test_aeldari_corsair_void_units_datasheets.py": 85.515,
     "tests/unit/test_aeldari_kharseth_datasheet.py": 13.678,
+    "tests/unit/test_aeldari_shroud_runners_wraithblades_datasheets.py": 8.806,
     "tests/unit/test_aeldari_yriel_vypers_starfangs_datasheets.py": 340.918,
     "tests/unit/test_army_points_mfm.py": 0.898,
     "tests/unit/test_attributes_modifiers.py": 0.115,
@@ -159,26 +160,26 @@
   "shard_count": 4,
   "shards": [
     {
-      "duration_seconds": 623.266,
+      "duration_seconds": 625.461,
       "shard_id": 1,
-      "test_file_count": 37
+      "test_file_count": 36
     },
     {
-      "duration_seconds": 623.264,
+      "duration_seconds": 625.467,
       "shard_id": 2,
       "test_file_count": 39
     },
     {
-      "duration_seconds": 623.265,
+      "duration_seconds": 625.471,
       "shard_id": 3,
-      "test_file_count": 39
+      "test_file_count": 40
     },
     {
-      "duration_seconds": 623.27,
+      "duration_seconds": 625.472,
       "shard_id": 4,
-      "test_file_count": 40
+      "test_file_count": 41
     }
   ],
   "strategy": "largest-processing-time-by-historical-file-duration",
-  "total_test_duration_seconds": 2493.065
+  "total_test_duration_seconds": 2501.871
 }

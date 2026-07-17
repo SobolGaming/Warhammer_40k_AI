@@ -265,6 +265,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
 | `catalog-ir:fight-activation-movement-distance` | No current generated rows |
 | `catalog-ir:fight-end-triggered-movement` | Raid and Run |
+| `catalog-ir:fight-on-death-source` | Malevolent Souls |
 | `catalog-ir:fight-selected-weapon-ability-choice` | Harbinger of Death |
 | `catalog-ir:first-death-return` | No current generated rows |
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
@@ -274,13 +275,13 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:fortification-desperate-escape` | No current generated rows |
 | `catalog-ir:fortification-target-permission` | No current generated rows |
 | `catalog-ir:granted-ability:stealth` | No current generated rows |
-| `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Revel in Desecration |
+| `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Psychic Guidance<br>Revel in Desecration |
 | `catalog-ir:hit-roll-reroll` | Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
-| `catalog-ir:invulnerable-save-characteristic-query` | Mistshield |
+| `catalog-ir:invulnerable-save-characteristic-query` | Forceshield<br>Mistshield<br>Ranged Invulnerable Save |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
-| `catalog-ir:leadership-characteristic-query` | Daemonic Icon |
+| `catalog-ir:leadership-characteristic-query` | Daemonic Icon<br>Psychic Guidance |
 | `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures |
 | `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
@@ -292,7 +293,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:once-per-battle-ability` | Malefic Destruction<br>Unholy Vigour |
 | `catalog-ir:passive-hit-reroll` | Reavers of the Void |
 | `catalog-ir:post-shoot-hit-target-effect` | Fury of the Void (Psychic)<br>Harassment Fire |
-| `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth |
+| `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth<br>Target Acquisition |
 | `catalog-ir:prebattle-redeploy-permission` | Prince of Corsairs |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:range-characteristic-query` | No current generated rows |

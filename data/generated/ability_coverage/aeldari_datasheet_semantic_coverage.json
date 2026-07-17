@@ -1314,6 +1314,7 @@
           "raw_text": "While this unit is within 12\" of one or more friendly Aeldari Psyker models, models in this unit have a Leadership characteristic of 6+ and each time a model in this unit makes an attack, add 1 to the Hit roll.",
           "raw_text_sha256": "c6eff90440253cd6cb9a67f1de08dec706e462f4afb736f1e0d7b54f9d86de6c",
           "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-modifier",
             "catalog-ir:leadership-characteristic-query"
           ],
           "semantic_consumers": [
@@ -1325,7 +1326,9 @@
               "semantic_kind": "set_characteristic"
             },
             {
-              "runtime_consumer_ids": [],
+              "runtime_consumer_ids": [
+                "catalog-ir:hit-roll-modifier"
+              ],
               "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000597:2:description:clause:001:effect:1",
               "semantic_kind": "modify_dice_roll"
             }
@@ -1335,7 +1338,7 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000597:2",
-          "support_stage": "generic_ir_executable"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000597:war-construct",
@@ -1369,7 +1372,7 @@
       "datasheet_name": "Wraithguard",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact IR parsed; host needed",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -1377,21 +1380,29 @@
         {
           "ability_id": "000000598:malevolent-souls",
           "ability_name": "Malevolent Souls",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "d5ed4c90b6b4b86faeb2157916e95ba15feb8cd1ba576184ebe23b45152545c9",
           "raw_text": "Each time a model in this unit is destroyed by a melee attack, if that model has not fought this phase, roll one D6. On a 3+, do not remove it from play; that destroyed model can fight after the attacking unit has finished making its attacks, and is then removed from play.",
           "raw_text_sha256": "d5ed4c90b6b4b86faeb2157916e95ba15feb8cd1ba576184ebe23b45152545c9",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:fight-on-death-source"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:fight-on-death-source"
+              ],
+              "semantic_id": "phase17k:aeldari:shroud-runners-wraithblades:000000598:1:clause:001:effect:0",
+              "semantic_kind": "grant_ability"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:1"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000598:1",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000598:psychic-guidance",
@@ -1402,6 +1413,7 @@
           "raw_text": "While this unit is within 12\" of one or more friendly Aeldari Psyker models, models in this unit have a Leadership characteristic of 6+ and each time a model in this unit makes an attack, add 1 to the Hit roll.",
           "raw_text_sha256": "c6eff90440253cd6cb9a67f1de08dec706e462f4afb736f1e0d7b54f9d86de6c",
           "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-modifier",
             "catalog-ir:leadership-characteristic-query"
           ],
           "semantic_consumers": [
@@ -1413,7 +1425,9 @@
               "semantic_kind": "set_characteristic"
             },
             {
-              "runtime_consumer_ids": [],
+              "runtime_consumer_ids": [
+                "catalog-ir:hit-roll-modifier"
+              ],
               "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:2:description:clause:001:effect:1",
               "semantic_kind": "modify_dice_roll"
             }
@@ -1423,33 +1437,41 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000598:2",
-          "support_stage": "generic_ir_executable"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000598:forceshield",
           "ability_name": "Forceshield",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
           "raw_text": "The bearer has a 4+ invulnerable save.",
           "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:invulnerable-save-characteristic-query"
+              ],
+              "semantic_id": "phase17k:aeldari:shroud-runners-wraithblades:000000598:3:clause:001:effect:0",
+              "semantic_kind": "set_characteristic"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:3"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000598:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000598",
       "datasheet_name": "Wraithblades",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -2279,10 +2301,8 @@
         {
           "ability_id": "000002533:target-acquisition",
           "ability_name": "Target Acquisition",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "c2968e27284a9e0215893019a44477a6eb5f8e3018f73606ea1e6309becc8739",
           "raw_text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks made with a long rifle. Until the end of the phase, that enemy unit cannot have the Benefit of Cover.",
           "raw_text_sha256": "c2968e27284a9e0215893019a44477a6eb5f8e3018f73606ea1e6309becc8739",
@@ -2294,7 +2314,7 @@
               "runtime_consumer_ids": [
                 "catalog-ir:post-shoot-hit-target-status"
               ],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002533:4:description:clause:001:effect:0",
+              "semantic_id": "phase17k:aeldari:shroud-runners-wraithblades:000002533:4:clause:001:effect:0",
               "semantic_kind": "set_contextual_status"
             }
           ],
@@ -2303,14 +2323,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000002533:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000002533",
       "datasheet_name": "Shroud Runners",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -4116,9 +4136,9 @@
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 8,
-    "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 56
+    "All exact abilities consumed": 11,
+    "Exact IR parsed; host needed": 5,
+    "Exact ability IR unsupported": 54
   },
   "source_artifact_hashes": {
     "Abilities": "dd7d779531e88bd2c30ee2405275b41dba0e5d56007c43a7fcf8bb7c105032e0",

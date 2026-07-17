@@ -11,8 +11,6 @@ from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
     MUSTERING_WARLORD_REQUIRED,
     MUSTERING_WARLORD_RULE_KEY,
-    BaseSizeDefinition,
-    BaseSizeKind,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     DamagedEffectDefinition,
@@ -31,14 +29,17 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfileError,
     validate_weapon_ability_descriptor_multiplicity,
 )
+from warhammer40k_core.rules import wahapedia_base_size_bridge as _base_size_bridge
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    event_companion_2026_06 as event_companion_source,
+from warhammer40k_core.rules.wahapedia_base_size_bridge import (
+    EventCompanionBaseSizesByKey,
+    base_size_evidence,
+    event_companion_base_sizes_by_key,
 )
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     DEFAULT_HEIGHT_OVERRIDES,
@@ -78,6 +79,10 @@ from warhammer40k_core.rules.wahapedia_bridge_rows import (
     resolve_bridge_ability_source_row,
 )
 from warhammer40k_core.rules.wahapedia_equipment_choice_bridge import append_choice_rows
+from warhammer40k_core.rules.wahapedia_invulnerable_save_bridge import (
+    ConditionalInvulnerableSaveBridge,
+    conditional_invulnerable_save_bridge_for_model_row,
+)
 from warhammer40k_core.rules.wahapedia_loadout_bridge import (
     LoadoutAssignments,
     parse_loadout_assignments,
@@ -101,6 +106,13 @@ from warhammer40k_core.rules.wahapedia_unit_wargear_option_bridge import (
     append_unit_wargear_option_rows,
 )
 from warhammer40k_core.rules.weapon_profile_names import WEAPON_PROFILE_SUFFIX_RE
+
+EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE = (
+    _base_size_bridge.EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE
+)
+EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID = (
+    _base_size_bridge.EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID
+)
 
 
 class WahapediaBridgeError(ValueError):
@@ -145,7 +157,9 @@ def build_wahapedia_canonical_bridge_artifacts(
         selected_datasheet_ids=frozenset(selected_datasheet_ids),
         corrections_by_datasheet=corrections_by_datasheet,
         height_by_datasheet_and_model=height_by_datasheet_and_model,
-        event_companion_base_sizes_by_key=_event_companion_base_sizes_by_key(),
+        event_companion_base_sizes_by_key=event_companion_base_sizes_by_key(
+            error_type=WahapediaBridgeError
+        ),
     )
     bridged_rows = _empty_bridge_rows()
     for datasheet_id in selected_datasheet_ids:
@@ -162,9 +176,7 @@ class _BridgeContext:
     selected_datasheet_ids: frozenset[str]
     corrections_by_datasheet: dict[str, PdfDatasheetCorrection]
     height_by_datasheet_and_model: dict[tuple[str, str], ModelHeightOverride]
-    event_companion_base_sizes_by_key: dict[
-        tuple[str, str], event_companion_source.BaseSizeSourceRecord
-    ]
+    event_companion_base_sizes_by_key: EventCompanionBaseSizesByKey
 
 
 @dataclass(frozen=True, slots=True)
@@ -196,25 +208,9 @@ class _CompositionEntryAccumulator:
 
 
 @dataclass(frozen=True, slots=True)
-class _BaseSizeEvidence:
-    base_size_text: str
-    source_id: str
-    document_reference: str
-    source_ids: tuple[str, ...]
-
-
-@dataclass(frozen=True, slots=True)
 class _WeaponKeywordEntry:
     keyword: WeaponKeyword | None
     ability: AbilityDescriptor | None = None
-
-
-EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID = (
-    "pdf:warhammer40000-event-companion:2026-06-12:base-size-guide"
-)
-EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE = (
-    "docs/source_rules/eng_12-06_warhammer40000_event_companion-s3bfb5f9s1-ivswuij3fo.pdf"
-)
 
 
 def _bridge_datasheet(
@@ -234,6 +230,10 @@ def _bridge_datasheet(
             "Bridge currently requires one Wahapedia model stat row per datasheet."
         )
     model_source_row = model_source_rows[0]
+    conditional_invulnerable_save = conditional_invulnerable_save_bridge_for_model_row(
+        datasheet_id=datasheet_id,
+        model_source_row=model_source_row,
+    )
     composition_entries = _composition_entries(context=context, datasheet_id=datasheet_id)
     loadout_assignments = parse_loadout_assignments(
         loadout=_normalized_or_field(datasheet_row, "loadout"),
@@ -303,12 +303,13 @@ def _bridge_datasheet(
             datasheet_id=datasheet_id,
             model_name=entry.model_name,
         )
-        base_size = _base_size_evidence(
-            context=context,
+        base_size = base_size_evidence(
             faction_name=_required_field(faction_row, "name"),
             datasheet_name=_required_field(datasheet_row, "name"),
             model_name=entry.model_name,
             model_source_row=model_source_row,
+            event_companion_base_sizes=context.event_companion_base_sizes_by_key,
+            error_type=WahapediaBridgeError,
         )
         bridged_rows["Datasheets_models"].append(
             {
@@ -320,7 +321,11 @@ def _bridge_datasheet(
                 "m": _required_field(model_source_row, "M"),
                 "t": _required_field(model_source_row, "T"),
                 "sv": _required_field(model_source_row, "Sv"),
-                "inv_sv": _required_field(model_source_row, "inv_sv"),
+                "inv_sv": (
+                    _required_field(model_source_row, "inv_sv")
+                    if conditional_invulnerable_save is None
+                    else conditional_invulnerable_save.base_invulnerable_save
+                ),
                 "w": _required_field(model_source_row, "W"),
                 "ld": _required_field(model_source_row, "Ld"),
                 "oc": _required_field(model_source_row, "OC"),
@@ -371,6 +376,12 @@ def _bridge_datasheet(
         wargear_ids_by_name=wargear_ids_by_name,
         bridged_rows=bridged_rows,
     )
+    if conditional_invulnerable_save is not None:
+        _append_conditional_invulnerable_save_ability(
+            datasheet_id=datasheet_id,
+            bridge=conditional_invulnerable_save,
+            bridged_rows=bridged_rows,
+        )
     _bridge_daemonic_allegiance_options(
         context=context,
         datasheet_id=datasheet_id,
@@ -475,84 +486,6 @@ def _composition_max_unit_models(*, context: _BridgeContext, datasheet_id: str) 
     )
 
 
-def _base_size_evidence(
-    *,
-    context: _BridgeContext,
-    faction_name: str,
-    datasheet_name: str,
-    model_name: str,
-    model_source_row: NormalizedSourceRow,
-) -> _BaseSizeEvidence:
-    faction_key = _name_key(faction_name)
-    model_qualified_key = _name_key(f"{datasheet_name}: {model_name}")
-    datasheet_key = _name_key(datasheet_name)
-    record = context.event_companion_base_sizes_by_key.get((faction_key, model_qualified_key))
-    if record is None:
-        record = context.event_companion_base_sizes_by_key.get((faction_key, datasheet_key))
-    if record is not None:
-        return _event_companion_base_size_evidence(record)
-    fallback_source_id = model_source_row.stable_source_id()
-    return _BaseSizeEvidence(
-        base_size_text=_required_field(model_source_row, "base_size"),
-        source_id=fallback_source_id,
-        document_reference=fallback_source_id,
-        source_ids=(fallback_source_id,),
-    )
-
-
-def _event_companion_base_size_evidence(
-    record: event_companion_source.BaseSizeSourceRecord,
-) -> _BaseSizeEvidence:
-    return _BaseSizeEvidence(
-        base_size_text=_bridge_base_size_text_from_event_companion_record(record),
-        source_id=record.source_id,
-        document_reference=EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
-        source_ids=(EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID, record.source_id),
-    )
-
-
-def _bridge_base_size_text_from_event_companion_record(
-    record: event_companion_source.BaseSizeSourceRecord,
-) -> str:
-    if record.canonical_base_size is None:
-        return record.source_base_text
-    return _bridge_base_size_text(record.canonical_base_size)
-
-
-def _bridge_base_size_text(base_size: BaseSizeDefinition) -> str:
-    if base_size.kind is BaseSizeKind.CIRCULAR:
-        diameter = base_size.diameter_mm
-        if diameter is None:
-            raise WahapediaBridgeError("Circular base size record is missing diameter.")
-        return f"{_millimeter_text(diameter)}mm"
-    if base_size.kind is BaseSizeKind.OVAL:
-        length = base_size.length_mm
-        width = base_size.width_mm
-        if length is None or width is None:
-            raise WahapediaBridgeError("Oval base size record is missing dimensions.")
-        return f"{_millimeter_text(length)} x {_millimeter_text(width)}mm"
-    raise WahapediaBridgeError("Unsupported Event Companion canonical base size kind.")
-
-
-def _millimeter_text(value: float) -> str:
-    if value.is_integer():
-        return str(int(value))
-    return f"{value:g}"
-
-
-def _event_companion_base_sizes_by_key() -> dict[
-    tuple[str, str], event_companion_source.BaseSizeSourceRecord
-]:
-    rows_by_key: dict[tuple[str, str], event_companion_source.BaseSizeSourceRecord] = {}
-    for row in event_companion_source.base_size_source_rows():
-        key = (_name_key(row.faction_name), _name_key(row.unit_name))
-        existing = rows_by_key.get(key)
-        if existing is not None:
-            raise WahapediaBridgeError("Duplicate Event Companion base size row key.")
-        rows_by_key[key] = row
-    return rows_by_key
-
-
 def _keywords_for_datasheet(
     *,
     context: _BridgeContext,
@@ -569,7 +502,14 @@ def _keywords_for_datasheet(
     faction_keywords: list[str] = []
     source_rows: list[NormalizedSourceRow] = []
     for row in keyword_rows:
-        keyword = _required_field(row, "keyword")
+        keyword = _raw_or_field(row, "keyword").strip()
+        if not keyword:
+            if _required_field(row, "is_faction_keyword") != "true":
+                raise WahapediaBridgeError(
+                    "Empty datasheet keyword rows must be faction-keyword placeholders."
+                )
+            source_rows.append(row)
+            continue
         if keyword in removed:
             if correction is not None:
                 source_rows.append(row)
@@ -887,6 +827,34 @@ def _bridge_abilities(
             )
 
 
+def _append_conditional_invulnerable_save_ability(
+    *,
+    datasheet_id: str,
+    bridge: ConditionalInvulnerableSaveBridge,
+    bridged_rows: dict[str, list[dict[str, str]]],
+) -> None:
+    bridged_rows["Datasheets_abilities"].append(
+        {
+            "datasheet_id": datasheet_id,
+            "line": "model-invulnerable-save",
+            "ability_id": bridge.ability_id,
+            "name": bridge.ability_name,
+            "description": bridge.normalized_text,
+            "parameter": "",
+            "type": "Datasheet",
+            "support": CatalogAbilitySupport.GENERIC_RULE_IR.value,
+            "source_kind": CatalogAbilitySourceKind.DATASHEET.value,
+            "effect_description": bridge.normalized_text,
+            "source_wargear_id": "",
+            "rule_ir_payload": compact_json(bridge.rule_ir.to_payload()),
+            "rule_ir_diagnostics": compact_json([]),
+            "timing_tags": "passive_query",
+            "parameter_tokens": "",
+            "source_ids": _joined(bridge.source_ids),
+        }
+    )
+
+
 def _bridge_options(
     *,
     context: _BridgeContext,
@@ -906,6 +874,7 @@ def _bridge_options(
     maximum_unit_models = _composition_max_unit_models(
         context=context, datasheet_id=datasheet_id
     ) or sum(entry.max_models for entry in composition_entries)
+    minimum_unit_models = sum(entry.min_models for entry in composition_entries)
     for row in option_rows:
         description = _required_field(row, "description")
         if description == "None":
@@ -915,6 +884,7 @@ def _bridge_options(
             datasheet_id=datasheet_id,
             model_profile_by_name=model_profile_by_name,
             max_models_by_profile_id=max_models_by_profile_id,
+            minimum_unit_models=minimum_unit_models,
             maximum_unit_models=maximum_unit_models,
             wargear_ids_by_name=wargear_ids_by_name,
             bridged_rows=bridged_rows,
