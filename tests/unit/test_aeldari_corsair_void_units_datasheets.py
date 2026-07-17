@@ -42,7 +42,6 @@ from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormati
 from warhammer40k_core.engine.attack_sequence import (
     _source_backed_hit_permission_for_attack,
 )
-from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CatalogWeaponKeywordGrantRuntime,
@@ -61,7 +60,7 @@ from warhammer40k_core.engine.list_validation_errors import (
     ListValidationError,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, SetupStep
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionContext,
@@ -70,6 +69,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.start_battle_hooks import StartBattleRequestContext
 from warhammer40k_core.engine.tracked_targets import (
     TrackedTargetOwnerScope,
     TrackedTargetRole,
@@ -822,7 +822,7 @@ def test_piratical_raiders_uses_setup_decision_and_target_gated_weapon_grants() 
         stage=GameLifecycleStage.SETUP,
         setup_sequence=setup_sequence,
         battle_phase_sequence=tuple(descriptor.battle_phase_sequence.phases),
-        setup_step_index=setup_sequence.index(SetupStep.DECLARE_BATTLE_FORMATIONS),
+        setup_step_index=len(setup_sequence) - 1,
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         tactical_secondary_draw_count=2,
@@ -848,8 +848,8 @@ def test_piratical_raiders_uses_setup_decision_and_target_gated_weapon_grants() 
         for record in indexes["player-a"].all_records()
         if record.definition.name == "Piratical Raiders"
     )
-    request = CatalogTrackedTargetRuntime(indexes, armies).battle_formation_request(
-        BattleFormationRequestContext(state=setup_state, decisions=decisions, config=config)
+    request = CatalogTrackedTargetRuntime(indexes, armies).start_battle_request(
+        StartBattleRequestContext(state=setup_state, decisions=decisions, config=config)
     )
 
     assert request is not None
@@ -1040,7 +1040,7 @@ def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> No
         stage=GameLifecycleStage.SETUP,
         setup_sequence=setup_sequence,
         battle_phase_sequence=tuple(descriptor.battle_phase_sequence.phases),
-        setup_step_index=setup_sequence.index(SetupStep.DECLARE_BATTLE_FORMATIONS),
+        setup_step_index=len(setup_sequence) - 1,
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         tactical_secondary_draw_count=2,
@@ -1061,8 +1061,8 @@ def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> No
         allow_legacy_non_strict_rosters=True,
     )
     decisions = DecisionController()
-    request = CatalogTrackedTargetRuntime(indexes, armies).battle_formation_request(
-        BattleFormationRequestContext(state=setup_state, decisions=decisions, config=config)
+    request = CatalogTrackedTargetRuntime(indexes, armies).start_battle_request(
+        StartBattleRequestContext(state=setup_state, decisions=decisions, config=config)
     )
 
     assert request is not None

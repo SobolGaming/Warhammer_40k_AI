@@ -13,9 +13,6 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
-    BattleFormationHookBinding,
-    BattleFormationRequestContext,
-    BattleFormationResultContext,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
@@ -26,6 +23,7 @@ from warhammer40k_core.engine.catalog_start_battle_keyword_choice_support import
     CatalogStartBattleKeywordChoiceDescriptor,
     start_battle_keyword_choice_descriptor_for_clause,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.effects import (
     EffectExpiration,
@@ -33,11 +31,16 @@ from warhammer40k_core.engine.effects import (
     generic_rule_persisting_effect,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.phase import GameLifecycleError, SetupStep
+from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     generic_rule_effect_payload,
     rule_ir_from_execution_payload,
+)
+from warhammer40k_core.engine.start_battle_hooks import (
+    StartBattleHookBinding,
+    StartBattleRequestContext,
+    StartBattleResultContext,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -48,7 +51,7 @@ from warhammer40k_core.rules.rule_ir import (
 
 CATALOG_START_BATTLE_KEYWORD_SELECTED_EVENT = "catalog_start_battle_keyword_selected"
 CATALOG_START_BATTLE_KEYWORD_CHOICE_SUBMISSION_KIND = "catalog_start_battle_keyword_choice"
-_HOOK_ID = "catalog-ir:start-battle-keyword-choice:setup"
+_HOOK_ID = "catalog-ir:start-battle-keyword-choice:start-battle"
 _REQUEST_PRIORITY = 100
 
 
@@ -103,11 +106,11 @@ class CatalogStartBattleKeywordChoiceRuntime:
             tuple(sorted(self.armies, key=lambda army: (army.player_id, army.army_id))),
         )
 
-    def bindings(self) -> tuple[BattleFormationHookBinding, ...]:
+    def bindings(self) -> tuple[StartBattleHookBinding, ...]:
         if not any(self._sources()):
             return ()
         return (
-            BattleFormationHookBinding(
+            StartBattleHookBinding(
                 hook_id=_HOOK_ID,
                 source_id=CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID,
                 request_handler=self.request_handler,
@@ -116,13 +119,58 @@ class CatalogStartBattleKeywordChoiceRuntime:
             ),
         )
 
-    def request_handler(self, context: BattleFormationRequestContext) -> DecisionRequest | None:
-        if type(context) is not BattleFormationRequestContext:
+    def validate_state(self, state: object, decisions: DecisionController) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(state) is not GameState:
+            raise GameLifecycleError("Catalog keyword choice validation requires GameState.")
+        if type(decisions) is not DecisionController:
             raise GameLifecycleError(
-                "Catalog keyword choice requires a battle-formation request context."
+                "Catalog keyword choice validation requires DecisionController."
             )
+        sources = self._sources()
+        candidate_effects = tuple(
+            effect
+            for effect in state.persisting_effects
+            if _effect_is_keyword_choice_candidate(effect=effect, sources=sources)
+        )
+        effects_by_source_key: dict[str, list[PersistingEffect]] = {
+            source.source_key: [] for source in sources
+        }
+        for effect in candidate_effects:
+            matching_sources = tuple(
+                source
+                for source in sources
+                if effect.source_rule_id == source.rule_ir.source_id
+                and effect.target_unit_instance_ids == (source.unit.unit_instance_id,)
+                and _effect_source_model_id(effect) == source.source_model_instance_id
+            )
+            if len(matching_sources) != 1:
+                raise GameLifecycleError("Catalog keyword choice effect source drifted.")
+            effects_by_source_key[matching_sources[0].source_key].append(effect)
+        for source in sources:
+            resolved = _validate_effect_bundle(
+                source=source,
+                effects=tuple(effects_by_source_key[source.source_key]),
+                game_id=state.game_id,
+                final_setup_step=state.setup_sequence[-1].value,
+                decisions=decisions,
+            )
+            if state.stage is not GameLifecycleStage.SETUP and not resolved:
+                raise GameLifecycleError("Catalog keyword choice effect bundle is missing.")
+
+    def request_handler(self, context: StartBattleRequestContext) -> DecisionRequest | None:
+        if type(context) is not StartBattleRequestContext:
+            raise GameLifecycleError(
+                "Catalog keyword choice requires a start-battle request context."
+            )
+        self.validate_state(context.state, context.decisions)
         for source in self._sources():
-            if _source_is_resolved(state=context.state, source=source):
+            if _source_is_resolved(
+                state=context.state,
+                source=source,
+                decisions=context.decisions,
+            ):
                 continue
             common_payload = _source_payload(context=context, source=source)
             return DecisionRequest(
@@ -141,20 +189,25 @@ class CatalogStartBattleKeywordChoiceRuntime:
             )
         return None
 
-    def result_handler(self, context: BattleFormationResultContext) -> bool:
-        if type(context) is not BattleFormationResultContext:
+    def result_handler(self, context: StartBattleResultContext) -> bool:
+        if type(context) is not StartBattleResultContext:
             raise GameLifecycleError(
-                "Catalog keyword choice requires a battle-formation result context."
+                "Catalog keyword choice requires a start-battle result context."
             )
         if context.request.decision_type != SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
             return False
         request_payload = _payload_object(context.request.payload)
         if request_payload.get("hook_id") != _HOOK_ID:
             return False
+        self.validate_state(context.state, context.decisions)
         result_payload = _payload_object(context.result.payload)
         source = self._source_for_payload(result_payload)
         _validate_result_source_payload(context=context, source=source, payload=result_payload)
-        if _source_is_resolved(state=context.state, source=source):
+        if _source_is_resolved(
+            state=context.state,
+            source=source,
+            decisions=context.decisions,
+        ):
             raise GameLifecycleError("Catalog start-battle keyword choice is already resolved.")
         selected_keyword = _payload_string(result_payload, "selected_keyword")
         if selected_keyword not in source.descriptor.keyword_options:
@@ -230,7 +283,7 @@ def catalog_start_battle_keyword_choice_bindings(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
-) -> tuple[BattleFormationHookBinding, ...]:
+) -> tuple[StartBattleHookBinding, ...]:
     return CatalogStartBattleKeywordChoiceRuntime(
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         armies=armies,
@@ -239,12 +292,16 @@ def catalog_start_battle_keyword_choice_bindings(
 
 def _source_payload(
     *,
-    context: BattleFormationRequestContext | BattleFormationResultContext,
+    context: StartBattleRequestContext | StartBattleResultContext,
     source: _KeywordChoiceSource,
 ) -> dict[str, JsonValue]:
     return {
         "game_id": context.state.game_id,
-        "setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+        "setup_step": (
+            None
+            if context.state.current_setup_step is None
+            else context.state.current_setup_step.value
+        ),
         "submission_kind": CATALOG_START_BATTLE_KEYWORD_CHOICE_SUBMISSION_KIND,
         "hook_id": _HOOK_ID,
         "consumer_id": CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID,
@@ -261,7 +318,7 @@ def _source_payload(
 
 def _validate_result_source_payload(
     *,
-    context: BattleFormationResultContext,
+    context: StartBattleResultContext,
     source: _KeywordChoiceSource,
     payload: Mapping[str, object],
 ) -> None:
@@ -273,7 +330,12 @@ def _validate_result_source_payload(
         raise GameLifecycleError("Catalog start-battle keyword choice payload is malformed.")
 
 
-def _source_is_resolved(*, state: object, source: _KeywordChoiceSource) -> bool:
+def _source_is_resolved(
+    *,
+    state: object,
+    source: _KeywordChoiceSource,
+    decisions: DecisionController,
+) -> bool:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -282,17 +344,199 @@ def _source_is_resolved(*, state: object, source: _KeywordChoiceSource) -> bool:
         effect
         for effect in state.persisting_effects
         if effect.source_rule_id == source.rule_ir.source_id
-        and source.unit.unit_instance_id in effect.target_unit_instance_ids
+        and effect.target_unit_instance_ids == (source.unit.unit_instance_id,)
         and _effect_source_model_id(effect) == source.source_model_instance_id
     )
-    if len(matching) not in {0, len(source.clause.effects)}:
-        raise GameLifecycleError("Catalog keyword choice effects are partially installed.")
-    return bool(matching)
+    return _validate_effect_bundle(
+        source=source,
+        effects=matching,
+        game_id=state.game_id,
+        final_setup_step=state.setup_sequence[-1].value,
+        decisions=decisions,
+    )
+
+
+def _validate_effect_bundle(
+    *,
+    source: _KeywordChoiceSource,
+    effects: tuple[PersistingEffect, ...],
+    game_id: str,
+    final_setup_step: str,
+    decisions: DecisionController,
+) -> bool:
+    if not effects:
+        return False
+    if len(effects) != len(source.clause.effects):
+        raise GameLifecycleError("Catalog keyword choice effect bundle is not atomic.")
+    trigger_payloads: list[dict[str, JsonValue]] = []
+    effect_payloads_by_id: dict[str, dict[str, JsonValue]] = {}
+    for effect in effects:
+        if (
+            effect.source_rule_id != source.rule_ir.source_id
+            or effect.owner_player_id != source.player_id
+            or effect.target_unit_instance_ids != (source.unit.unit_instance_id,)
+            or effect.started_battle_round != 1
+            or effect.started_phase is not None
+            or effect.expiration != EffectExpiration.end_of_battle()
+        ):
+            raise GameLifecycleError("Catalog keyword choice effect envelope drifted.")
+        payload = _payload_object(effect.effect_payload)
+        context_payload = _payload_object(payload.get("context"))
+        trigger_payload = _payload_object(context_payload.get("trigger_payload"))
+        trigger_payloads.append(trigger_payload)
+        effect_payloads_by_id[effect.effect_id] = payload
+    if len(effect_payloads_by_id) != len(effects):
+        raise GameLifecycleError("Catalog keyword choice effect IDs are duplicated.")
+    first_trigger = trigger_payloads[0]
+    if any(trigger != first_trigger for trigger in trigger_payloads[1:]):
+        raise GameLifecycleError("Catalog keyword choice effect bundle selection drifted.")
+    if set(first_trigger) != {"event", "request_id", "result_id", "selected_keyword"}:
+        raise GameLifecycleError("Catalog keyword choice trigger payload is malformed.")
+    if first_trigger.get("event") != CATALOG_START_BATTLE_KEYWORD_SELECTED_EVENT:
+        raise GameLifecycleError("Catalog keyword choice trigger event drifted.")
+    request_id = _payload_string(first_trigger, "request_id")
+    result_id = _payload_string(first_trigger, "result_id")
+    selected_keyword = _payload_string(first_trigger, "selected_keyword")
+    if selected_keyword not in source.descriptor.keyword_options:
+        raise GameLifecycleError("Catalog keyword choice selected keyword is unsupported.")
+    _validate_choice_decision_record(
+        source=source,
+        selected_keyword=selected_keyword,
+        request_id=request_id,
+        result_id=result_id,
+        game_id=game_id,
+        final_setup_step=final_setup_step,
+        decisions=decisions,
+    )
+    expected_context = {
+        "game_id": game_id,
+        "player_id": source.player_id,
+        "battle_round": 1,
+        "phase": None,
+        "active_player_id": None,
+        "timing_window_id": "start_battle",
+        "source_unit_instance_id": source.unit.unit_instance_id,
+        "source_model_instance_id": source.source_model_instance_id,
+        "target_unit_instance_ids": [source.unit.unit_instance_id],
+        "target_player_id": None,
+        "source_keywords": sorted((*source.unit.keywords, *source.unit.faction_keywords)),
+        "trigger_payload": first_trigger,
+        "record_persisting_effects": False,
+    }
+    for index, source_effect in enumerate(source.clause.effects):
+        expected_id = f"{result_id}:catalog-start-battle-keyword:{index:03d}"
+        installed_payload = effect_payloads_by_id.get(expected_id)
+        if installed_payload is None:
+            raise GameLifecycleError("Catalog keyword choice effect identity drifted.")
+        expected_effect = replace(
+            source_effect,
+            parameters=tuple(
+                RuleParameter(
+                    key=parameter.key,
+                    value=(
+                        selected_keyword
+                        if parameter.key == "target_required_keyword"
+                        else parameter.value
+                    ),
+                )
+                for parameter in source_effect.parameters
+            ),
+        )
+        expected_payload = {
+            "effect_kind": "generic_rule_execution",
+            "rule_id": source.rule_ir.rule_id,
+            "source_id": source.rule_ir.source_id,
+            "rule_ir_hash": source.rule_ir.ir_hash(),
+            "clause_id": source.clause.clause_id,
+            "source_span": source.clause.source_span.to_payload(),
+            "target": None if source.clause.target is None else source.clause.target.to_payload(),
+            "target_unit_instance_ids": [source.unit.unit_instance_id],
+            "duration": (
+                None if source.clause.duration is None else source.clause.duration.to_payload()
+            ),
+            "effect": expected_effect.to_payload(),
+            "context": expected_context,
+        }
+        if installed_payload != expected_payload:
+            raise GameLifecycleError("Catalog keyword choice effect payload drifted.")
+    return True
+
+
+def _validate_choice_decision_record(
+    *,
+    source: _KeywordChoiceSource,
+    selected_keyword: str,
+    request_id: str,
+    result_id: str,
+    game_id: str,
+    final_setup_step: str,
+    decisions: DecisionController,
+) -> None:
+    records = tuple(
+        record
+        for record in decisions.records
+        if record.request.request_id == request_id and record.result.result_id == result_id
+    )
+    if len(records) != 1:
+        raise GameLifecycleError("Catalog keyword choice decision provenance drifted.")
+    record = records[0]
+    request_payload = _payload_object(record.request.payload)
+    result_payload = _payload_object(record.result.payload)
+    expected_common = {
+        "game_id": game_id,
+        "setup_step": final_setup_step,
+        "submission_kind": CATALOG_START_BATTLE_KEYWORD_CHOICE_SUBMISSION_KIND,
+        "hook_id": _HOOK_ID,
+        "consumer_id": CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID,
+        "player_id": source.player_id,
+        "catalog_record_id": source.record.record_id,
+        "source_key": source.source_key,
+        "source_rule_id": source.rule_ir.source_id,
+        "source_rule_ir_hash": source.rule_ir.ir_hash(),
+        "source_clause_id": source.clause.clause_id,
+        "source_unit_instance_id": source.unit.unit_instance_id,
+        "source_model_instance_id": source.source_model_instance_id,
+    }
+    expected_result = {**expected_common, "selected_keyword": selected_keyword}
+    expected_option_id = f"{source.clause.clause_id}:keyword:{selected_keyword.casefold()}"
+    if (
+        record.request.decision_type != SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE
+        or record.request.actor_id != source.player_id
+        or request_payload != expected_common
+        or record.result.selected_option_id != expected_option_id
+        or result_payload != expected_result
+    ):
+        raise GameLifecycleError("Catalog keyword choice decision record drifted.")
+
+
+def _effect_is_keyword_choice_candidate(
+    *,
+    effect: PersistingEffect,
+    sources: tuple[_KeywordChoiceSource, ...],
+) -> bool:
+    source_rule_ids = {source.rule_ir.source_id for source in sources}
+    source_unit_ids = {source.unit.unit_instance_id for source in sources}
+    if effect.source_rule_id not in source_rule_ids or not set(
+        effect.target_unit_instance_ids
+    ).intersection(source_unit_ids):
+        return False
+    payload = effect.effect_payload
+    if not isinstance(payload, dict):
+        return False
+    if payload.get("clause_id") in {source.clause.clause_id for source in sources}:
+        return True
+    context = payload.get("context")
+    if not isinstance(context, dict):
+        return False
+    trigger = context.get("trigger_payload")
+    return isinstance(trigger, dict) and trigger.get("event") == (
+        CATALOG_START_BATTLE_KEYWORD_SELECTED_EVENT
+    )
 
 
 def _persisting_effects_for_result(
     *,
-    context: BattleFormationResultContext,
+    context: StartBattleResultContext,
     source: _KeywordChoiceSource,
     selected_keyword: str,
 ) -> tuple[PersistingEffect, ...]:

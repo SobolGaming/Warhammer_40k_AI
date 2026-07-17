@@ -12,6 +12,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 
 class LifecycleHookEvent(StrEnum):
     BATTLE_FORMATION = "battle_formation"
+    START_BATTLE = "start_battle"
     BATTLE_ROUND_START = "battle_round_start"
     TURN_END = "turn_end"
     COMMAND_PHASE_START = "command_phase_start"

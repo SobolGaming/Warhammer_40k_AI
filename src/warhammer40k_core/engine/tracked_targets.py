@@ -13,7 +13,6 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
-    SetupStep,
 )
 from warhammer40k_core.engine.source_backed_rerolls import SourceBackedRerollPermissionContext
 
@@ -498,7 +497,8 @@ def _tracked_target_selection_battle_round(state: GameState) -> int:
         return state.battle_round
     if (
         state.stage is GameLifecycleStage.SETUP
-        and state.current_setup_step is SetupStep.DECLARE_BATTLE_FORMATIONS
+        and state.setup_step_index is not None
+        and state.setup_step_index + 1 == len(state.setup_sequence)
     ):
         return 1
     raise GameLifecycleError("Tracked target selection requires battle round context.")

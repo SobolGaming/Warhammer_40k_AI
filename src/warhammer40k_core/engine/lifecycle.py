@@ -7,6 +7,7 @@ from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine import battle_formation_hooks as _bf
 from warhammer40k_core.engine import battle_round_hooks as _br
+from warhammer40k_core.engine import catalog_start_battle_keyword_choice as _sbkc
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
@@ -2427,14 +2428,17 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
-        CatalogDatasheetRuleRuntime(
-            bundle.ability_indexes_by_player_id,
-            armies,
-        ).record_static_destruction_reaction_sources(state=state)
+        ability_indexes = bundle.ability_indexes_by_player_id
+        _sbkc.CatalogStartBattleKeywordChoiceRuntime(ability_indexes, armies).validate_state(
+            state, self.decision_controller
+        )
+        catalog_rules = CatalogDatasheetRuleRuntime(ability_indexes, armies)
+        catalog_rules.record_static_destruction_reaction_sources(state=state)
         self._runtime_content_bundle = bundle
         self._setup_flow = replace(
             self._setup_flow,
             battle_formation_hooks=bundle.battle_formation_hook_registry,
+            start_battle_hooks=bundle.start_battle_hook_registry,
         )
         runtime_stratagem_index = _combined_runtime_stratagem_index(
             bundle,

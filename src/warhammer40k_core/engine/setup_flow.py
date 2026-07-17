@@ -73,6 +73,11 @@ from warhammer40k_core.engine.reserve_declarations import (
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
+from warhammer40k_core.engine.start_battle_hooks import (
+    StartBattleHookRegistry,
+    StartBattleRequestContext,
+    StartBattleResultContext,
+)
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
@@ -84,10 +89,15 @@ class SetupFlow:
     battle_formation_hooks: BattleFormationHookRegistry = field(
         default_factory=BattleFormationHookRegistry.empty
     )
+    start_battle_hooks: StartBattleHookRegistry = field(
+        default_factory=StartBattleHookRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if type(self.battle_formation_hooks) is not BattleFormationHookRegistry:
             raise GameLifecycleError("SetupFlow battle_formation_hooks must be a registry.")
+        if type(self.start_battle_hooks) is not StartBattleHookRegistry:
+            raise GameLifecycleError("SetupFlow start_battle_hooks must be a registry.")
 
     def advance(
         self,
@@ -163,6 +173,23 @@ class SetupFlow:
             state.setup_sequence
         )
         if final_setup_step:
+            start_battle_request = self.start_battle_hooks.next_request_for(
+                StartBattleRequestContext(
+                    state=state,
+                    decisions=decisions,
+                    config=config,
+                )
+            )
+            if start_battle_request is not None:
+                decisions.request_decision(start_battle_request)
+                return LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.SETUP,
+                    decision_request=start_battle_request,
+                    payload={
+                        "setup_step": current_step.value,
+                        "start_battle_hook_request": start_battle_request.payload,
+                    },
+                )
             setup_completion_gate = SetupCompletionGate()
             invalid_status = setup_completion_gate.invalid_status_if_not_ready(
                 state=state,
@@ -231,12 +258,27 @@ class SetupFlow:
         config: GameConfig,
     ) -> None:
         if result.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
+            request = decisions.record_for_result(result).request
+            if (
+                state.setup_step_index is not None
+                and state.setup_step_index + 1 == len(state.setup_sequence)
+                and self.start_battle_hooks.apply_result(
+                    StartBattleResultContext(
+                        state=state,
+                        decisions=decisions,
+                        config=config,
+                        request=request,
+                        result=result,
+                    )
+                )
+            ):
+                return
             if self.battle_formation_hooks.apply_result(
                 BattleFormationResultContext(
                     state=state,
                     decisions=decisions,
                     config=config,
-                    request=decisions.record_for_result(result).request,
+                    request=request,
                     result=result,
                 )
             ):
