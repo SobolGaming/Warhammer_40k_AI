@@ -1,0 +1,2604 @@
+{
+  "contract_version": "1.0.0",
+  "openapi_operations": [
+    "POST /games",
+    "POST /games/{game_id}/advance",
+    "POST /games/{game_id}/decisions/{request_id}/option",
+    "POST /games/{game_id}/decisions/{request_id}/payload",
+    "GET /games/{game_id}/events",
+    "GET /games/{game_id}/replay",
+    "GET /games/{game_id}/support-profile",
+    "GET /games/{game_id}/view",
+    "GET /rules-catalog"
+  ],
+  "schemas": {
+    "create-session.schema.json": {
+      "$id": "https://warhammer40k-core.local/contracts/v1/create-session.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "config": {
+          "additionalProperties": false,
+          "properties": {
+            "allow_legacy_non_strict_rosters": {
+              "type": "boolean"
+            },
+            "army_catalog": {
+              "minProperties": 1,
+              "type": "object"
+            },
+            "army_muster_requests": {
+              "items": {
+                "minProperties": 1,
+                "type": "object"
+              },
+              "minItems": 2,
+              "type": "array"
+            },
+            "fixed_secondary_mission_ids": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 2,
+              "type": "array"
+            },
+            "game_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "max_lifecycle_transitions": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "mission_setup": {
+              "oneOf": [
+                {
+                  "minProperties": 1,
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "player_ids": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 2,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "reserve_unit_points": {
+              "items": {
+                "minProperties": 1,
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "ruleset_descriptor": {
+              "minProperties": 1,
+              "type": "object"
+            },
+            "tactical_secondary_draw_count": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "turn_order": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 2,
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "game_id",
+            "ruleset_descriptor",
+            "army_catalog",
+            "army_muster_requests",
+            "allow_legacy_non_strict_rosters",
+            "player_ids",
+            "turn_order",
+            "fixed_secondary_mission_ids",
+            "tactical_secondary_draw_count",
+            "max_lifecycle_transitions",
+            "mission_setup",
+            "reserve_unit_points"
+          ],
+          "type": "object"
+        },
+        "schema_version": {
+          "const": "create-session-v1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "config"
+      ],
+      "title": "CORE V2 CreateSessionPayload",
+      "type": "object"
+    },
+    "decision-request-view.schema.json": {
+      "$defs": {
+        "decision_option": {
+          "additionalProperties": false,
+          "properties": {
+            "label": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "option_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "payload": {
+              "$ref": "#/$defs/json_value"
+            }
+          },
+          "required": [
+            "option_id",
+            "label",
+            "payload"
+          ],
+          "type": "object"
+        },
+        "json_value": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "array"
+            },
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/decision-request-view.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decision_type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "is_parameterized": {
+          "type": "boolean"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/$defs/decision_option"
+          },
+          "type": "array"
+        },
+        "payload": {
+          "$ref": "#/$defs/json_value"
+        },
+        "request_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "decision-request-view-v1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "request_id",
+        "decision_type",
+        "actor_id",
+        "payload",
+        "options",
+        "is_parameterized"
+      ],
+      "title": "CORE V2 DecisionRequestViewPayload",
+      "type": "object"
+    },
+    "error-envelope.schema.json": {
+      "$id": "https://warhammer40k-core.local/contracts/v1/error-envelope.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "message": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "type": "object"
+        },
+        "schema_version": {
+          "const": "error-envelope-v1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "error"
+      ],
+      "title": "CORE V2 ErrorEnvelopePayload",
+      "type": "object"
+    },
+    "event-delta.schema.json": {
+      "$defs": {
+        "event_record": {
+          "additionalProperties": false,
+          "properties": {
+            "event_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "event_type": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "payload": {
+              "$ref": "#/$defs/json_value"
+            }
+          },
+          "required": [
+            "event_id",
+            "event_type",
+            "payload"
+          ],
+          "type": "object"
+        },
+        "json_value": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "array"
+            },
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/event-delta.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/event_record"
+          },
+          "type": "array"
+        },
+        "next_cursor": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "event-delta-v1",
+          "type": "string"
+        },
+        "viewer_player_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "viewer_player_id",
+        "cursor",
+        "next_cursor",
+        "events"
+      ],
+      "title": "CORE V2 EventStreamDeltaPayload",
+      "type": "object"
+    },
+    "finite-submission.schema.json": {
+      "$id": "https://warhammer40k-core.local/contracts/v1/finite-submission.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "option_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "result_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "finite-submission-v1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "actor_id",
+        "option_id",
+        "result_id"
+      ],
+      "title": "CORE V2 FiniteOptionSubmissionPayload",
+      "type": "object"
+    },
+    "game-view.schema.json": {
+      "$defs": {
+        "base_size": {
+          "additionalProperties": false,
+          "properties": {
+            "base_size_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "diameter_mm": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "kind": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "length_mm": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "width_mm": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "base_size_id",
+            "kind",
+            "diameter_mm",
+            "length_mm",
+            "width_mm"
+          ],
+          "type": "object"
+        },
+        "characteristic": {
+          "additionalProperties": true,
+          "properties": {
+            "applied_modifier_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "display_value": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "final": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "label": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "redaction": {
+              "$ref": "#/$defs/redaction"
+            }
+          },
+          "required": [
+            "label",
+            "final",
+            "display_value",
+            "applied_modifier_ids",
+            "redaction"
+          ],
+          "type": "object"
+        },
+        "json_value": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "array"
+            },
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "object"
+            }
+          ]
+        },
+        "model_display": {
+          "additionalProperties": true,
+          "properties": {
+            "base_characteristics": {
+              "additionalProperties": {
+                "$ref": "#/$defs/characteristic"
+              },
+              "type": "object"
+            },
+            "base_size": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/base_size"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "current_characteristics": {
+              "additionalProperties": {
+                "$ref": "#/$defs/characteristic"
+              },
+              "type": "object"
+            },
+            "model_instance_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "model_profile_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "redaction": {
+              "$ref": "#/$defs/redaction"
+            },
+            "unit_instance_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "visible_modifiers": {
+              "items": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "array"
+            },
+            "wargear_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "model_instance_id",
+            "unit_instance_id",
+            "model_profile_id",
+            "wargear_ids",
+            "base_size",
+            "base_characteristics",
+            "current_characteristics",
+            "visible_modifiers",
+            "redaction"
+          ],
+          "type": "object"
+        },
+        "redaction": {
+          "additionalProperties": false,
+          "properties": {
+            "hidden": {
+              "type": "boolean"
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "hidden",
+            "reason"
+          ],
+          "type": "object"
+        },
+        "rules_catalog_reference": {
+          "additionalProperties": false,
+          "properties": {
+            "catalog_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "projection_schema": {
+              "const": "rules-catalog-view-v2",
+              "minLength": 1,
+              "type": "string"
+            },
+            "ruleset_id": {
+              "$ref": "#/$defs/json_value"
+            },
+            "source_hash": {
+              "minLength": 64,
+              "type": "string"
+            },
+            "source_package_id": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "projection_schema",
+            "catalog_id",
+            "ruleset_id",
+            "source_package_id",
+            "source_hash"
+          ],
+          "type": "object"
+        },
+        "unit_display": {
+          "additionalProperties": true,
+          "properties": {
+            "datasheet_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "model_instance_ids": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "owner_player_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "redaction": {
+              "$ref": "#/$defs/redaction"
+            },
+            "unit_instance_id": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "unit_instance_id",
+            "owner_player_id",
+            "datasheet_id",
+            "model_instance_ids",
+            "redaction"
+          ],
+          "type": "object"
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/game-view.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "active_player_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "battle_round": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "battlefield_state": {
+          "$ref": "#/$defs/json_value"
+        },
+        "current_battle_phase": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "current_setup_step": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "event_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "game_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mission_setup": {
+          "$ref": "#/$defs/json_value"
+        },
+        "model_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/model_display"
+          },
+          "type": "object"
+        },
+        "pending_decision": {
+          "oneOf": [
+            {
+              "$ref": "decision-request-view.schema.json"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pending_proposal": {
+          "$ref": "#/$defs/json_value"
+        },
+        "player_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "projection_schema": {
+          "const": "game-view-v4-unit-resources",
+          "minLength": 1,
+          "type": "string"
+        },
+        "projection_state_hash": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "public_command_point_ledgers": {
+          "items": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "array"
+        },
+        "public_secondary_mission_card_states": {
+          "items": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "array"
+        },
+        "public_secondary_mission_choices": {
+          "items": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "array"
+        },
+        "public_stratagem_use_records": {
+          "items": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "array"
+        },
+        "public_victory_point_ledgers": {
+          "items": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "array"
+        },
+        "rules_catalog": {
+          "$ref": "#/$defs/rules_catalog_reference"
+        },
+        "stage": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "unit_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/unit_display"
+          },
+          "type": "object"
+        },
+        "viewer_player_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "projection_schema",
+        "projection_state_hash",
+        "rules_catalog",
+        "viewer_player_id",
+        "game_id",
+        "stage",
+        "battle_round",
+        "active_player_id",
+        "current_setup_step",
+        "current_battle_phase",
+        "player_ids",
+        "battlefield_state",
+        "mission_setup",
+        "public_secondary_mission_choices",
+        "public_secondary_mission_card_states",
+        "public_command_point_ledgers",
+        "public_victory_point_ledgers",
+        "public_stratagem_use_records",
+        "unit_display_by_id",
+        "model_display_by_id",
+        "pending_decision",
+        "pending_proposal",
+        "event_count"
+      ],
+      "title": "CORE V2 GameViewPayload",
+      "type": "object"
+    },
+    "lifecycle-status.schema.json": {
+      "$defs": {
+        "json_value": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "array"
+            },
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "object"
+            }
+          ]
+        },
+        "status": {
+          "additionalProperties": false,
+          "properties": {
+            "actor_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "decision_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "payload": {
+              "$ref": "#/$defs/json_value"
+            },
+            "pending_request_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "stage": {
+              "enum": [
+                "setup",
+                "battle",
+                "complete"
+              ],
+              "type": "string"
+            },
+            "status_kind": {
+              "enum": [
+                "advanced",
+                "waiting_for_decision",
+                "terminal",
+                "invalid",
+                "unsupported"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "stage",
+            "status_kind",
+            "message",
+            "payload",
+            "pending_request_id",
+            "decision_type",
+            "actor_id"
+          ],
+          "type": "object"
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/lifecycle-status.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "game_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "lifecycle-status-v1",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        }
+      },
+      "required": [
+        "schema_version",
+        "game_id",
+        "status"
+      ],
+      "title": "CORE V2 ServerGameStatusPayload",
+      "type": "object"
+    },
+    "opportunity-window-example.schema.json": {
+      "$id": "https://warhammer40k-core.local/contracts/v1/opportunity-window-example.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "decision_request": {
+          "type": "object"
+        },
+        "selected_option_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "selected_option_payload": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "decision_request",
+        "selected_option_id",
+        "selected_option_payload"
+      ],
+      "title": "CORE V2 Opportunity Window Example",
+      "type": "object"
+    },
+    "parameterized-submission.schema.json": {
+      "$id": "https://warhammer40k-core.local/contracts/v1/parameterized-submission.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "proposal-payload.schema.json"
+        },
+        "result_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "parameterized-submission-v1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "actor_id",
+        "payload",
+        "result_id"
+      ],
+      "title": "CORE V2 ParameterizedSubmissionPayload",
+      "type": "object"
+    },
+    "proposal-payload.schema.json": {
+      "$defs": {
+        "charge_move": {
+          "additionalProperties": false,
+          "properties": {
+            "charge_target_unit_instance_ids": {
+              "$ref": "#/$defs/identifier_array"
+            },
+            "movement_mode": {
+              "const": "charge",
+              "type": "string"
+            },
+            "movement_phase_action": {
+              "const": "charge_move",
+              "type": "string"
+            },
+            "proposal_kind": {
+              "const": "charge_move",
+              "type": "string"
+            },
+            "proposal_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "witness": {
+              "$ref": "#/$defs/path_witness"
+            }
+          },
+          "required": [
+            "proposal_request_id",
+            "proposal_kind",
+            "unit_instance_id",
+            "movement_phase_action",
+            "movement_mode",
+            "charge_target_unit_instance_ids",
+            "witness"
+          ],
+          "type": "object"
+        },
+        "deployment_placement": {
+          "additionalProperties": false,
+          "properties": {
+            "context": {
+              "$ref": "#/$defs/json_value"
+            },
+            "game_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "model_placements": {
+              "items": {
+                "$ref": "#/$defs/model_placement"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "placement_kind": {
+              "const": "deployment",
+              "type": "string"
+            },
+            "player_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "proposal_kind": {
+              "const": "deployment_placement",
+              "type": "string"
+            },
+            "proposal_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "ruleset_descriptor_hash": {
+              "$ref": "#/$defs/identifier"
+            },
+            "setup_step": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": [
+            "proposal_request_id",
+            "proposal_kind",
+            "game_id",
+            "ruleset_descriptor_hash",
+            "setup_step",
+            "player_id",
+            "unit_instance_id",
+            "placement_kind",
+            "model_placements"
+          ],
+          "type": "object"
+        },
+        "fight_movement": {
+          "additionalProperties": false,
+          "properties": {
+            "consolidate_target_unit_instance_ids": {
+              "$ref": "#/$defs/identifier_array"
+            },
+            "consolidation_mode": {
+              "$ref": "#/$defs/identifier"
+            },
+            "movement_mode": {
+              "enum": [
+                "consolidate",
+                "pile_in"
+              ],
+              "type": "string"
+            },
+            "movement_phase_action": {
+              "enum": [
+                "consolidate",
+                "pile_in"
+              ],
+              "type": "string"
+            },
+            "objective_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pile_in_target_unit_instance_ids": {
+              "$ref": "#/$defs/identifier_array"
+            },
+            "proposal_kind": {
+              "enum": [
+                "consolidate",
+                "pile_in"
+              ],
+              "type": "string"
+            },
+            "proposal_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "witness": {
+              "$ref": "#/$defs/path_witness"
+            }
+          },
+          "required": [
+            "proposal_request_id",
+            "proposal_kind",
+            "unit_instance_id",
+            "movement_phase_action",
+            "movement_mode"
+          ],
+          "type": "object"
+        },
+        "generic_placement": {
+          "additionalProperties": false,
+          "oneOf": [
+            {
+              "required": [
+                "attempted_placement"
+              ]
+            },
+            {
+              "required": [
+                "attempted_rules_unit_placement"
+              ]
+            }
+          ],
+          "properties": {
+            "attempted_placement": {
+              "$ref": "#/$defs/unit_placement"
+            },
+            "attempted_rules_unit_placement": {
+              "type": "object"
+            },
+            "disembark_mode": {
+              "$ref": "#/$defs/identifier"
+            },
+            "large_model_exceptions": {
+              "items": {
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "placement_kind": {
+              "$ref": "#/$defs/identifier"
+            },
+            "proposal_kind": {
+              "enum": [
+                "cult_ambush_placement",
+                "deep_strike_placement",
+                "disembark_placement",
+                "reinforcement_placement",
+                "strategic_reserves_placement"
+              ],
+              "type": "string"
+            },
+            "proposal_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "restriction_overrides": {
+              "items": {
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "transport_movement_status": {
+              "$ref": "#/$defs/identifier"
+            },
+            "transport_unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": [
+            "proposal_request_id",
+            "proposal_kind",
+            "unit_instance_id",
+            "placement_kind"
+          ],
+          "type": "object"
+        },
+        "identifier": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "identifier_array": {
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "type": "array"
+        },
+        "json_value": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "array"
+            },
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "object"
+            }
+          ]
+        },
+        "melee_declaration": {
+          "additionalProperties": false,
+          "properties": {
+            "battle_round": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "declarations": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "attacker_model_instance_id": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "target_allocations": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "attacks": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "target_unit_instance_id": {
+                          "$ref": "#/$defs/identifier"
+                        }
+                      },
+                      "required": [
+                        "target_unit_instance_id"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "wargear_id": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "weapon_profile_id": {
+                    "$ref": "#/$defs/identifier"
+                  }
+                },
+                "required": [
+                  "attacker_model_instance_id",
+                  "wargear_id",
+                  "weapon_profile_id",
+                  "target_allocations"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "player_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "proposal_kind": {
+              "const": "melee_declaration",
+              "type": "string"
+            },
+            "proposal_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_decision_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_decision_result_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": [
+            "proposal_request_id",
+            "proposal_kind",
+            "player_id",
+            "battle_round",
+            "unit_instance_id",
+            "source_decision_request_id",
+            "source_decision_result_id",
+            "declarations"
+          ],
+          "type": "object"
+        },
+        "model_placement": {
+          "additionalProperties": false,
+          "properties": {
+            "army_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "model_instance_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "player_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "pose": {
+              "$ref": "#/$defs/pose"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": [
+            "army_id",
+            "player_id",
+            "unit_instance_id",
+            "model_instance_id",
+            "pose"
+          ],
+          "type": "object"
+        },
+        "movement": {
+          "additionalProperties": false,
+          "properties": {
+            "fall_back_mode": {
+              "$ref": "#/$defs/identifier"
+            },
+            "model_movements": {
+              "items": {
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "movement_mode": {
+              "$ref": "#/$defs/identifier"
+            },
+            "movement_phase_action": {
+              "$ref": "#/$defs/identifier"
+            },
+            "proposal_kind": {
+              "enum": [
+                "advance",
+                "fall_back",
+                "normal_move",
+                "surge_move"
+              ],
+              "type": "string"
+            },
+            "proposal_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "witness": {
+              "$ref": "#/$defs/path_witness"
+            }
+          },
+          "required": [
+            "proposal_request_id",
+            "proposal_kind",
+            "unit_instance_id",
+            "movement_phase_action",
+            "witness"
+          ],
+          "type": "object"
+        },
+        "path_witness": {
+          "additionalProperties": false,
+          "properties": {
+            "model_paths": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "model_id": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "poses": {
+                    "items": {
+                      "$ref": "#/$defs/pose"
+                    },
+                    "minItems": 2,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "model_id",
+                  "poses"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "model_paths"
+          ],
+          "type": "object"
+        },
+        "pose": {
+          "additionalProperties": false,
+          "properties": {
+            "facing": {
+              "additionalProperties": false,
+              "properties": {
+                "degrees": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "degrees"
+              ],
+              "type": "object"
+            },
+            "position": {
+              "additionalProperties": false,
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "z": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "z"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "position",
+            "facing"
+          ],
+          "type": "object"
+        },
+        "prebattle_placement": {
+          "additionalProperties": false,
+          "properties": {
+            "action_kind": {
+              "enum": [
+                "redeploy",
+                "scout_reserve_setup"
+              ],
+              "type": "string"
+            },
+            "context": {
+              "$ref": "#/$defs/json_value"
+            },
+            "game_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "model_placements": {
+              "items": {
+                "$ref": "#/$defs/model_placement"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "placement_kind": {
+              "$ref": "#/$defs/identifier"
+            },
+            "player_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "proposal_kind": {
+              "enum": [
+                "redeploy_placement",
+                "scout_reserve_setup"
+              ],
+              "type": "string"
+            },
+            "proposal_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "ruleset_descriptor_hash": {
+              "$ref": "#/$defs/identifier"
+            },
+            "setup_step": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_rule_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": [
+            "proposal_request_id",
+            "proposal_kind",
+            "game_id",
+            "ruleset_descriptor_hash",
+            "setup_step",
+            "player_id",
+            "unit_instance_id",
+            "action_kind",
+            "source_rule_id",
+            "placement_kind",
+            "model_placements"
+          ],
+          "type": "object"
+        },
+        "scout_move": {
+          "additionalProperties": false,
+          "properties": {
+            "action_kind": {
+              "enum": [
+                "dedicated_transport_scout_move",
+                "scout_move"
+              ],
+              "type": "string"
+            },
+            "context": {
+              "$ref": "#/$defs/json_value"
+            },
+            "game_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "player_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "proposal_kind": {
+              "const": "scout_move",
+              "type": "string"
+            },
+            "proposal_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "ruleset_descriptor_hash": {
+              "$ref": "#/$defs/identifier"
+            },
+            "scout_distance_inches": {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            "setup_step": {
+              "const": "resolve_prebattle_actions",
+              "type": "string"
+            },
+            "source_rule_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "witness": {
+              "$ref": "#/$defs/path_witness"
+            }
+          },
+          "required": [
+            "proposal_request_id",
+            "proposal_kind",
+            "game_id",
+            "ruleset_descriptor_hash",
+            "setup_step",
+            "player_id",
+            "unit_instance_id",
+            "action_kind",
+            "source_rule_id",
+            "scout_distance_inches",
+            "witness"
+          ],
+          "type": "object"
+        },
+        "shooting_declaration": {
+          "additionalProperties": false,
+          "properties": {
+            "battle_round": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "declarations": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "attacker_model_instance_id": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "firing_deck_source_model_instance_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "firing_deck_source_unit_instance_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "selected_weapon_ability_ids": {
+                    "$ref": "#/$defs/identifier_array"
+                  },
+                  "shooting_type": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "target_unit_instance_id": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "wargear_id": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "weapon_profile_id": {
+                    "$ref": "#/$defs/identifier"
+                  }
+                },
+                "required": [
+                  "attacker_model_instance_id",
+                  "wargear_id",
+                  "weapon_profile_id",
+                  "target_unit_instance_id",
+                  "shooting_type",
+                  "firing_deck_source_unit_instance_id",
+                  "firing_deck_source_model_instance_id",
+                  "selected_weapon_ability_ids"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "firing_deck_selection": {
+              "$ref": "#/$defs/json_value"
+            },
+            "player_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "proposal_kind": {
+              "const": "shooting_declaration",
+              "type": "string"
+            },
+            "proposal_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_decision_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_decision_result_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "visibility_cache_key": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": [
+            "proposal_request_id",
+            "proposal_kind",
+            "player_id",
+            "battle_round",
+            "unit_instance_id",
+            "source_decision_request_id",
+            "source_decision_result_id",
+            "visibility_cache_key",
+            "declarations",
+            "firing_deck_selection"
+          ],
+          "type": "object"
+        },
+        "stratagem_target_binding": {
+          "additionalProperties": false,
+          "properties": {
+            "actor_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "catalog_record": {
+              "additionalProperties": false,
+              "properties": {
+                "availability_kind": {
+                  "$ref": "#/$defs/identifier"
+                },
+                "definition": {
+                  "type": "object"
+                },
+                "detachment_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "disabled": {
+                  "type": "boolean"
+                },
+                "record_id": {
+                  "$ref": "#/$defs/identifier"
+                }
+              },
+              "required": [
+                "record_id",
+                "definition",
+                "availability_kind",
+                "detachment_id",
+                "disabled"
+              ],
+              "type": "object"
+            },
+            "context": {
+              "additionalProperties": false,
+              "properties": {
+                "active_player_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "battle_round": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "game_id": {
+                  "$ref": "#/$defs/identifier"
+                },
+                "phase": {
+                  "$ref": "#/$defs/identifier"
+                },
+                "player_id": {
+                  "$ref": "#/$defs/identifier"
+                },
+                "timing_window_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "trigger_kind": {
+                  "$ref": "#/$defs/identifier"
+                },
+                "trigger_payload": {
+                  "$ref": "#/$defs/json_value"
+                }
+              },
+              "required": [
+                "game_id",
+                "player_id",
+                "battle_round",
+                "phase",
+                "active_player_id",
+                "trigger_kind",
+                "timing_window_id"
+              ],
+              "type": "object"
+            },
+            "decision_type": {
+              "$ref": "#/$defs/identifier"
+            },
+            "effect_selection": {
+              "$ref": "#/$defs/json_value"
+            },
+            "proposal_kind": {
+              "const": "stratagem_target_binding",
+              "type": "string"
+            },
+            "request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "target_binding": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "target_kind": {
+                      "$ref": "#/$defs/identifier"
+                    },
+                    "target_player_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "target_secondary_mission_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "target_unit_instance_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "target_kind",
+                    "target_player_id",
+                    "target_unit_instance_id"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          },
+          "required": [
+            "proposal_kind",
+            "context",
+            "catalog_record",
+            "target_binding",
+            "effect_selection"
+          ],
+          "type": "object"
+        },
+        "unit_placement": {
+          "additionalProperties": false,
+          "properties": {
+            "army_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "model_placements": {
+              "items": {
+                "$ref": "#/$defs/model_placement"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "player_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": [
+            "army_id",
+            "player_id",
+            "unit_instance_id",
+            "model_placements"
+          ],
+          "type": "object"
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/proposal-payload.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/movement"
+        },
+        {
+          "$ref": "#/$defs/charge_move"
+        },
+        {
+          "$ref": "#/$defs/fight_movement"
+        },
+        {
+          "$ref": "#/$defs/generic_placement"
+        },
+        {
+          "$ref": "#/$defs/deployment_placement"
+        },
+        {
+          "$ref": "#/$defs/prebattle_placement"
+        },
+        {
+          "$ref": "#/$defs/scout_move"
+        },
+        {
+          "$ref": "#/$defs/shooting_declaration"
+        },
+        {
+          "$ref": "#/$defs/melee_declaration"
+        },
+        {
+          "$ref": "#/$defs/stratagem_target_binding"
+        }
+      ],
+      "title": "CORE V2 ParameterizedProposalPayload"
+    },
+    "replay-metadata.schema.json": {
+      "$defs": {
+        "projection_checkpoint": {
+          "additionalProperties": false,
+          "properties": {
+            "checkpoint_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "decision_record_index": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "event_count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "event_log_hash": {
+              "minLength": 64,
+              "type": "string"
+            },
+            "projection_schema": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "projection_state_hash": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "viewer_player_id": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "checkpoint_id",
+            "decision_record_index",
+            "event_count",
+            "event_log_hash",
+            "viewer_player_id",
+            "projection_schema",
+            "projection_state_hash"
+          ],
+          "type": "object"
+        },
+        "source_identity": {
+          "additionalProperties": false,
+          "properties": {
+            "catalog_hash": {
+              "minLength": 64,
+              "type": "string"
+            },
+            "catalog_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "game_config_hash": {
+              "minLength": 64,
+              "type": "string"
+            },
+            "game_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "ruleset_descriptor_hash": {
+              "minLength": 64,
+              "type": "string"
+            },
+            "source_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "source_package_id": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "game_id",
+            "game_config_hash",
+            "ruleset_descriptor_hash",
+            "catalog_id",
+            "catalog_hash",
+            "source_package_id",
+            "source_ids"
+          ],
+          "type": "object"
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/replay-metadata.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "decision_records": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "event_records": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "initial_lifecycle": {
+          "type": "object"
+        },
+        "initial_rng_state": {
+          "type": "object"
+        },
+        "projection_checkpoints": {
+          "items": {
+            "$ref": "#/$defs/projection_checkpoint"
+          },
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "replay-artifact-v1-phase18b",
+          "type": "string"
+        },
+        "source_identity": {
+          "$ref": "#/$defs/source_identity"
+        }
+      },
+      "required": [
+        "schema_version",
+        "artifact_id",
+        "source_identity",
+        "initial_rng_state",
+        "initial_lifecycle",
+        "decision_records",
+        "event_records",
+        "projection_checkpoints"
+      ],
+      "title": "CORE V2 ReplayArtifactMetadataPayload",
+      "type": "object"
+    },
+    "rules-catalog.schema.json": {
+      "$defs": {
+        "army_rule_display": {
+          "additionalProperties": false,
+          "properties": {
+            "ability_descriptor_ids": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "army_rule_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "content_scope": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "display_name": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "source_id": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "army_rule_id",
+            "display_name",
+            "source_id",
+            "content_scope",
+            "ability_descriptor_ids"
+          ],
+          "type": "object"
+        },
+        "base_size": {
+          "additionalProperties": false,
+          "properties": {
+            "base_size_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "diameter_mm": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "kind": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "length_mm": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "width_mm": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "base_size_id",
+            "kind",
+            "diameter_mm",
+            "length_mm",
+            "width_mm"
+          ],
+          "type": "object"
+        },
+        "display_record": {
+          "additionalProperties": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "object"
+        },
+        "json_value": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "array"
+            },
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/json_value"
+              },
+              "type": "object"
+            }
+          ]
+        },
+        "stratagem_display": {
+          "additionalProperties": false,
+          "properties": {
+            "ability_descriptor_ids": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "command_point_cost": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "content_scope": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "display_name": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "source_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "stratagem_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "timing_tags": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "stratagem_id",
+            "display_name",
+            "source_id",
+            "content_scope",
+            "command_point_cost",
+            "timing_tags",
+            "ability_descriptor_ids"
+          ],
+          "type": "object"
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/rules-catalog.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "army_rule_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/army_rule_display"
+          },
+          "type": "object"
+        },
+        "base_size_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/base_size"
+          },
+          "type": "object"
+        },
+        "catalog_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "datasheet_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/display_record"
+          },
+          "type": "object"
+        },
+        "detachment_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/display_record"
+          },
+          "type": "object"
+        },
+        "enhancement_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/display_record"
+          },
+          "type": "object"
+        },
+        "faction_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/display_record"
+          },
+          "type": "object"
+        },
+        "model_profile_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/display_record"
+          },
+          "type": "object"
+        },
+        "projection_schema": {
+          "const": "rules-catalog-view-v2",
+          "minLength": 1,
+          "type": "string"
+        },
+        "ruleset_id": {
+          "$ref": "#/$defs/json_value"
+        },
+        "source_hash": {
+          "minLength": 64,
+          "type": "string"
+        },
+        "source_package_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "stratagem_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/stratagem_display"
+          },
+          "type": "object"
+        },
+        "wargear_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/display_record"
+          },
+          "type": "object"
+        },
+        "wargear_option_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/display_record"
+          },
+          "type": "object"
+        },
+        "weapon_profile_display_by_id": {
+          "additionalProperties": {
+            "$ref": "#/$defs/display_record"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "projection_schema",
+        "catalog_id",
+        "ruleset_id",
+        "source_package_id",
+        "source_hash",
+        "datasheet_display_by_id",
+        "model_profile_display_by_id",
+        "wargear_display_by_id",
+        "weapon_profile_display_by_id",
+        "faction_display_by_id",
+        "detachment_display_by_id",
+        "army_rule_display_by_id",
+        "stratagem_display_by_id",
+        "enhancement_display_by_id",
+        "wargear_option_display_by_id",
+        "base_size_display_by_id"
+      ],
+      "title": "CORE V2 RulesCatalogViewPayload",
+      "type": "object"
+    },
+    "support-profile.schema.json": {
+      "$defs": {
+        "datasheet_row": {
+          "additionalProperties": false,
+          "properties": {
+            "ability_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "catalog_support": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "datasheet_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "display_name": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "parameter_tokens": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "row_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "source_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "$ref": "#/$defs/support_status"
+            },
+            "timing_tags": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "row_id",
+            "datasheet_id",
+            "ability_id",
+            "display_name",
+            "source_id",
+            "catalog_support",
+            "status",
+            "timing_tags",
+            "parameter_tokens"
+          ],
+          "type": "object"
+        },
+        "mustering_row": {
+          "additionalProperties": false,
+          "properties": {
+            "army_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "datasheet_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "detachment_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "faction_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "legality_status": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "player_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "row_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "$ref": "#/$defs/support_status"
+            },
+            "violation_count": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "row_id",
+            "player_id",
+            "army_id",
+            "faction_id",
+            "detachment_ids",
+            "datasheet_ids",
+            "status",
+            "legality_status",
+            "violation_count"
+          ],
+          "type": "object"
+        },
+        "runtime_row": {
+          "additionalProperties": false,
+          "properties": {
+            "content_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "family": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "owner_detachment_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "owner_faction_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "required_for_matched_play": {
+              "type": "boolean"
+            },
+            "row_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "runtime_support": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "semantic_status": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "source_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "status": {
+              "$ref": "#/$defs/support_status"
+            },
+            "support_reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "unsupported_reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "row_id",
+            "content_id",
+            "family",
+            "source_ids",
+            "owner_faction_id",
+            "owner_detachment_id",
+            "runtime_support",
+            "semantic_status",
+            "status",
+            "support_reason",
+            "unsupported_reason",
+            "required_for_matched_play"
+          ],
+          "type": "object"
+        },
+        "status_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "full": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "playable": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "unsupported": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "unsupported",
+            "playable",
+            "full"
+          ],
+          "type": "object"
+        },
+        "support_status": {
+          "enum": [
+            "unsupported",
+            "playable",
+            "full"
+          ],
+          "type": "string"
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/support-profile.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "catalog_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "datasheet_support_rows": {
+          "items": {
+            "$ref": "#/$defs/datasheet_row"
+          },
+          "type": "array"
+        },
+        "detachment_faction_support_rows": {
+          "items": {
+            "$ref": "#/$defs/runtime_row"
+          },
+          "type": "array"
+        },
+        "eligible_for_headless_self_play_smoke": {
+          "type": "boolean"
+        },
+        "game_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mustering_support_rows": {
+          "items": {
+            "$ref": "#/$defs/mustering_row"
+          },
+          "type": "array"
+        },
+        "overall_status": {
+          "$ref": "#/$defs/support_status"
+        },
+        "ruleset_descriptor_hash": {
+          "minLength": 64,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "support-profile-v2-ws14",
+          "type": "string"
+        },
+        "source_package_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "status_counts": {
+          "$ref": "#/$defs/status_counts"
+        }
+      },
+      "required": [
+        "schema_version",
+        "game_id",
+        "catalog_id",
+        "source_package_id",
+        "ruleset_descriptor_hash",
+        "overall_status",
+        "eligible_for_headless_self_play_smoke",
+        "status_counts",
+        "mustering_support_rows",
+        "datasheet_support_rows",
+        "detachment_faction_support_rows"
+      ],
+      "title": "CORE V2 SupportProfilePayload",
+      "type": "object"
+    }
+  }
+}

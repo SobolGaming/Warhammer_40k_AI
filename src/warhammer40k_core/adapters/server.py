@@ -12,6 +12,14 @@ from urllib.parse import parse_qs, urlparse
 
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.external_contract import (
+    CREATE_SESSION_SCHEMA_VERSION,
+    ERROR_ENVELOPE_SCHEMA_VERSION,
+    FINITE_SUBMISSION_SCHEMA_VERSION,
+    LIFECYCLE_STATUS_SCHEMA_VERSION,
+    PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+    require_schema_version,
+)
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import (
     DecisionRequestViewPayload,
@@ -67,6 +75,7 @@ class ServerLifecycleStatusPayload(TypedDict):
 
 
 class ServerGameStatusPayload(TypedDict):
+    schema_version: str
     game_id: str
     status: ServerLifecycleStatusPayload
 
@@ -105,10 +114,11 @@ class ServerApiError(ValueError):
         return ServerResponse(
             status_code=int(self.status_code),
             payload={
+                "schema_version": ERROR_ENVELOPE_SCHEMA_VERSION,
                 "error": {
                     "code": self.code,
                     "message": str(self),
-                }
+                },
             },
         )
 
@@ -262,7 +272,12 @@ class AdapterGameServer:
 
     def _create_game(self, body: JsonValue) -> ServerResponse:
         payload = _json_object("POST /games body", body)
-        _require_exact_keys(payload, keys=frozenset({"config"}))
+        _require_exact_keys(payload, keys=frozenset({"schema_version", "config"}))
+        _require_external_schema_version(
+            payload,
+            expected=CREATE_SESSION_SCHEMA_VERSION,
+            payload_name="create session payload",
+        )
         config = GameConfig.from_payload(cast(GameConfigPayload, payload["config"]))
         if config.game_id in self._sessions:
             raise ServerApiError(
@@ -289,7 +304,15 @@ class AdapterGameServer:
         body: JsonValue,
     ) -> ServerResponse:
         payload = _json_object("finite option submission body", body)
-        _require_exact_keys(payload, keys=frozenset({"actor_id", "option_id", "result_id"}))
+        _require_exact_keys(
+            payload,
+            keys=frozenset({"schema_version", "actor_id", "option_id", "result_id"}),
+        )
+        _require_external_schema_version(
+            payload,
+            expected=FINITE_SUBMISSION_SCHEMA_VERSION,
+            payload_name="finite option submission",
+        )
         actor_id = _required_string(payload, key="actor_id")
         option_id = _required_string(payload, key="option_id")
         pending = _pending_decision_for_submission(
@@ -319,7 +342,15 @@ class AdapterGameServer:
         body: JsonValue,
     ) -> ServerResponse:
         payload = _json_object("parameterized submission body", body)
-        _require_exact_keys(payload, keys=frozenset({"actor_id", "payload", "result_id"}))
+        _require_exact_keys(
+            payload,
+            keys=frozenset({"schema_version", "actor_id", "payload", "result_id"}),
+        )
+        _require_external_schema_version(
+            payload,
+            expected=PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+            payload_name="parameterized submission",
+        )
         actor_id = _required_string(payload, key="actor_id")
         submitted_payload = validate_json_value(payload["payload"])
         _reject_raw_dice_payload(submitted_payload)
@@ -482,6 +513,7 @@ def _status_response(
     status_code: HTTPStatus = HTTPStatus.OK,
 ) -> ServerResponse:
     payload: ServerGameStatusPayload = {
+        "schema_version": LIFECYCLE_STATUS_SCHEMA_VERSION,
         "game_id": game_id,
         "status": _status_summary(status, viewer_player_id=viewer_player_id),
     }
@@ -537,16 +569,37 @@ def _status_summary(
 
 
 def _error_response(*, status_code: HTTPStatus, code: str, message: str) -> ServerResponse:
-    payload: dict[str, ServerErrorPayload] = {
+    payload: dict[str, JsonValue] = {
+        "schema_version": ERROR_ENVELOPE_SCHEMA_VERSION,
         "error": {
             "code": _validate_identifier("error code", code),
             "message": _validate_identifier("error message", message),
-        }
+        },
     }
     return ServerResponse(
         status_code=int(status_code),
         payload=validate_json_value(cast(JsonValue, payload)),
     )
+
+
+def _require_external_schema_version(
+    payload: dict[str, JsonValue],
+    *,
+    expected: str,
+    payload_name: str,
+) -> None:
+    try:
+        require_schema_version(
+            actual=payload["schema_version"],
+            expected=expected,
+            payload_name=payload_name,
+        )
+    except ValueError as exc:
+        raise ServerApiError(
+            status_code=HTTPStatus.BAD_REQUEST,
+            code="schema_version_mismatch",
+            message=str(exc),
+        ) from exc
 
 
 def _not_found() -> ServerApiError:

@@ -1,0 +1,20 @@
+{
+  "actor_id": "player-a",
+  "decision_type": "select_catalog_post_shoot_hit_target_status",
+  "is_parameterized": false,
+  "options": [
+    {
+      "label": "Example",
+      "option_id": "example-option",
+      "payload": {
+        "contract_fixture": true
+      }
+    }
+  ],
+  "payload": {
+    "contract_fixture": true,
+    "decision_type": "select_catalog_post_shoot_hit_target_status"
+  },
+  "request_id": "contract-decision-request-000013",
+  "schema_version": "decision-request-view-v1"
+}

@@ -1,0 +1,418 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/game-view.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "active_player_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "battle_round": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "battlefield_state": {
+      "$ref": "#/$defs/json_value"
+    },
+    "current_battle_phase": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_setup_step": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "event_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "game_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "mission_setup": {
+      "$ref": "#/$defs/json_value"
+    },
+    "model_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/model_display"
+      },
+      "type": "object"
+    },
+    "pending_decision": {
+      "oneOf": [
+        {
+          "$ref": "decision-request-view.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pending_proposal": {
+      "$ref": "#/$defs/json_value"
+    },
+    "player_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "projection_schema": {
+      "const": "game-view-v4-unit-resources",
+      "minLength": 1,
+      "type": "string"
+    },
+    "projection_state_hash": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "public_command_point_ledgers": {
+      "items": {
+        "$ref": "#/$defs/json_value"
+      },
+      "type": "array"
+    },
+    "public_secondary_mission_card_states": {
+      "items": {
+        "$ref": "#/$defs/json_value"
+      },
+      "type": "array"
+    },
+    "public_secondary_mission_choices": {
+      "items": {
+        "$ref": "#/$defs/json_value"
+      },
+      "type": "array"
+    },
+    "public_stratagem_use_records": {
+      "items": {
+        "$ref": "#/$defs/json_value"
+      },
+      "type": "array"
+    },
+    "public_victory_point_ledgers": {
+      "items": {
+        "$ref": "#/$defs/json_value"
+      },
+      "type": "array"
+    },
+    "rules_catalog": {
+      "$ref": "#/$defs/rules_catalog_reference"
+    },
+    "stage": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "unit_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/unit_display"
+      },
+      "type": "object"
+    },
+    "viewer_player_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "projection_schema",
+    "projection_state_hash",
+    "rules_catalog",
+    "viewer_player_id",
+    "game_id",
+    "stage",
+    "battle_round",
+    "active_player_id",
+    "current_setup_step",
+    "current_battle_phase",
+    "player_ids",
+    "battlefield_state",
+    "mission_setup",
+    "public_secondary_mission_choices",
+    "public_secondary_mission_card_states",
+    "public_command_point_ledgers",
+    "public_victory_point_ledgers",
+    "public_stratagem_use_records",
+    "unit_display_by_id",
+    "model_display_by_id",
+    "pending_decision",
+    "pending_proposal",
+    "event_count"
+  ],
+  "title": "CORE V2 GameViewPayload",
+  "type": "object",
+  "$defs": {
+    "base_size": {
+      "additionalProperties": false,
+      "properties": {
+        "base_size_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "diameter_mm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "length_mm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "width_mm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "base_size_id",
+        "kind",
+        "diameter_mm",
+        "length_mm",
+        "width_mm"
+      ],
+      "type": "object"
+    },
+    "characteristic": {
+      "additionalProperties": true,
+      "properties": {
+        "applied_modifier_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "display_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "final": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "label": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "redaction": {
+          "$ref": "#/$defs/redaction"
+        }
+      },
+      "required": [
+        "label",
+        "final",
+        "display_value",
+        "applied_modifier_ids",
+        "redaction"
+      ],
+      "type": "object"
+    },
+    "json_value": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "model_display": {
+      "additionalProperties": true,
+      "properties": {
+        "base_characteristics": {
+          "additionalProperties": {
+            "$ref": "#/$defs/characteristic"
+          },
+          "type": "object"
+        },
+        "base_size": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/base_size"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "current_characteristics": {
+          "additionalProperties": {
+            "$ref": "#/$defs/characteristic"
+          },
+          "type": "object"
+        },
+        "model_instance_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "model_profile_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "redaction": {
+          "$ref": "#/$defs/redaction"
+        },
+        "unit_instance_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "visible_modifiers": {
+          "items": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "array"
+        },
+        "wargear_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "model_instance_id",
+        "unit_instance_id",
+        "model_profile_id",
+        "wargear_ids",
+        "base_size",
+        "base_characteristics",
+        "current_characteristics",
+        "visible_modifiers",
+        "redaction"
+      ],
+      "type": "object"
+    },
+    "redaction": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "hidden",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "rules_catalog_reference": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "projection_schema": {
+          "const": "rules-catalog-view-v2",
+          "minLength": 1,
+          "type": "string"
+        },
+        "ruleset_id": {
+          "$ref": "#/$defs/json_value"
+        },
+        "source_hash": {
+          "minLength": 64,
+          "type": "string"
+        },
+        "source_package_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "projection_schema",
+        "catalog_id",
+        "ruleset_id",
+        "source_package_id",
+        "source_hash"
+      ],
+      "type": "object"
+    },
+    "unit_display": {
+      "additionalProperties": true,
+      "properties": {
+        "datasheet_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "model_instance_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "owner_player_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "redaction": {
+          "$ref": "#/$defs/redaction"
+        },
+        "unit_instance_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit_instance_id",
+        "owner_player_id",
+        "datasheet_id",
+        "model_instance_ids",
+        "redaction"
+      ],
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "game_id": "phase18d-contract-session",
+  "schema_version": "lifecycle-status-v1",
+  "status": {
+    "actor_id": null,
+    "decision_type": null,
+    "message": "Game complete.",
+    "payload": {
+      "contract_fixture": true
+    },
+    "pending_request_id": null,
+    "stage": "complete",
+    "status_kind": "terminal"
+  }
+}

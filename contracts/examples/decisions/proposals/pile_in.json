@@ -1,0 +1,8 @@
+{
+  "movement_mode": "pile_in",
+  "movement_phase_action": "pile_in",
+  "pile_in_target_unit_instance_ids": [],
+  "proposal_kind": "pile_in",
+  "proposal_request_id": "contract-pile-in-request-000001",
+  "unit_instance_id": "army-alpha:unit-1"
+}

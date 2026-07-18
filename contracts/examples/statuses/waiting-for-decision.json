@@ -1,0 +1,13 @@
+{
+  "game_id": "phase18d-contract-session",
+  "schema_version": "lifecycle-status-v1",
+  "status": {
+    "actor_id": null,
+    "decision_type": "hidden_decision",
+    "message": null,
+    "payload": null,
+    "pending_request_id": null,
+    "stage": "setup",
+    "status_kind": "waiting_for_decision"
+  }
+}

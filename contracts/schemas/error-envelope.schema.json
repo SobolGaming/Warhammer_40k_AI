@@ -1,0 +1,20 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/error-envelope.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "error": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {"minLength": 1, "type": "string"},
+        "message": {"minLength": 1, "type": "string"}
+      },
+      "required": ["code", "message"],
+      "type": "object"
+    },
+    "schema_version": {"const": "error-envelope-v1", "type": "string"}
+  },
+  "required": ["schema_version", "error"],
+  "title": "CORE V2 ErrorEnvelopePayload",
+  "type": "object"
+}

@@ -1,0 +1,19 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/finite-submission.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actor_id": {"minLength": 1, "type": "string"},
+    "option_id": {"minLength": 1, "type": "string"},
+    "result_id": {"minLength": 1, "type": "string"},
+    "schema_version": {"const": "finite-submission-v1", "type": "string"}
+  },
+  "required": [
+    "schema_version",
+    "actor_id",
+    "option_id",
+    "result_id"
+  ],
+  "title": "CORE V2 FiniteOptionSubmissionPayload",
+  "type": "object"
+}

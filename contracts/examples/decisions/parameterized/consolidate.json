@@ -1,0 +1,13 @@
+{
+  "actor_id": "player-a",
+  "payload": {
+    "consolidate_target_unit_instance_ids": [],
+    "movement_mode": "consolidate",
+    "movement_phase_action": "consolidate",
+    "proposal_kind": "consolidate",
+    "proposal_request_id": "contract-consolidate-request-000001",
+    "unit_instance_id": "army-alpha:unit-1"
+  },
+  "result_id": "phase18d-consolidate-result-000001",
+  "schema_version": "parameterized-submission-v1"
+}

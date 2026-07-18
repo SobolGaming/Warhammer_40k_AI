@@ -23,6 +23,10 @@ from warhammer40k_core.adapters.decisions import (
     submit_parameterized_payload,
 )
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.external_contract import (
+    DECISION_REQUEST_VIEW_SCHEMA_VERSION,
+    EVENT_STREAM_DELTA_SCHEMA_VERSION,
+)
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -1254,6 +1258,7 @@ def test_projection_redacts_secret_pending_decisions_for_non_actor_viewers() -> 
     assert request.decision_type == SECONDARY_MISSION_DECISION_TYPE
     assert request.actor_id == "player-a"
     assert redacted_pending == {
+        "schema_version": DECISION_REQUEST_VIEW_SCHEMA_VERSION,
         "request_id": request.request_id,
         "decision_type": "hidden_decision",
         "actor_id": "player-a",
@@ -1443,6 +1448,7 @@ def test_adapter_helpers_and_cursor_reject_invalid_inputs() -> None:
     with pytest.raises(GameLifecycleError, match="ahead of the event log"):
         EventStreamCursor(value=2).events_since(event_log, viewer_player_id="player-a")
     assert EventStreamCursor(value=1).events_since(event_log, viewer_player_id="player-a") == {
+        "schema_version": EVENT_STREAM_DELTA_SCHEMA_VERSION,
         "viewer_player_id": "player-a",
         "cursor": 1,
         "next_cursor": 1,

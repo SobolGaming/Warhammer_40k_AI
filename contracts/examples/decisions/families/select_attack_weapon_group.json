@@ -1,0 +1,20 @@
+{
+  "actor_id": "player-a",
+  "decision_type": "select_attack_weapon_group",
+  "is_parameterized": false,
+  "options": [
+    {
+      "label": "Example",
+      "option_id": "example-option",
+      "payload": {
+        "contract_fixture": true
+      }
+    }
+  ],
+  "payload": {
+    "contract_fixture": true,
+    "decision_type": "select_attack_weapon_group"
+  },
+  "request_id": "contract-decision-request-000010",
+  "schema_version": "decision-request-view-v1"
+}

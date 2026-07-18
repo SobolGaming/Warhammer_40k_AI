@@ -18,6 +18,7 @@ from referencing.jsonschema import (
     SchemaResource,
 )
 from scripts.export_ui_contract_fixtures import (
+    DECISION_EXAMPLE_DIR,
     MODEL_ALPHA_1,
     PLAYER_A,
     PLAYER_B,
@@ -47,10 +48,10 @@ FORBIDDEN_UI_STATE_KEYS = frozenset(
     }
 )
 SCHEMA_FILES = (
-    Path("docs/api/decision_request_view.schema.json"),
-    Path("docs/api/event_stream_delta.schema.json"),
-    Path("docs/api/game_view.schema.json"),
-    Path("docs/api/rules_catalog_view.schema.json"),
+    Path("contracts/schemas/decision-request-view.schema.json"),
+    Path("contracts/schemas/event-delta.schema.json"),
+    Path("contracts/schemas/game-view.schema.json"),
+    Path("contracts/schemas/rules-catalog.schema.json"),
 )
 FIXTURE_FILES = (
     "hidden_secondary_redaction_view.json",
@@ -73,7 +74,6 @@ PROPOSAL_EXAMPLE_FILES = (
     "deployment_placement.json",
     "melee_declaration.json",
     "movement_path_witness.json",
-    "opportunity_window.json",
     "shooting_target_selection.json",
 )
 
@@ -85,8 +85,9 @@ class _PayloadValidator(Protocol):
 def test_ui_contract_artifacts_are_json_safe_and_scrubbed() -> None:
     paths = (
         *SCHEMA_FILES,
-        *(UI_FIXTURE_DIR / name for name in FIXTURE_FILES),
+        *(_fixture_path(name) for name in FIXTURE_FILES),
         *(PROPOSAL_EXAMPLE_DIR / name for name in PROPOSAL_EXAMPLE_FILES),
+        DECISION_EXAMPLE_DIR / "opportunity_window.json",
     )
 
     for path in paths:
@@ -106,29 +107,29 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
         Draft202012Validator.check_schema(schema_payload)
 
     game_view_validator = _schema_validator(
-        "game_view.schema.json",
+        "game-view.schema.json",
         registry=registry,
     )
     for fixture_name in GAME_VIEW_FIXTURE_FILES:
         game_view_validator.validate(_fixture(fixture_name))
 
-    _schema_validator("decision_request_view.schema.json", registry=registry).validate(
+    _schema_validator("decision-request-view.schema.json", registry=registry).validate(
         _fixture("pending_movement_request.json")
     )
 
     session, _status = build_local_session_at_movement_request(
         game_id="ui-contract-schema-validation"
     )
-    rules_catalog_validator = _schema_validator("rules_catalog_view.schema.json", registry=registry)
+    rules_catalog_validator = _schema_validator("rules-catalog.schema.json", registry=registry)
     rules_catalog_validator.validate(_fixture("rules_catalog_view.json"))
     rules_catalog_validator.validate(session.rules_catalog_view())
-    _schema_validator("event_stream_delta.schema.json", registry=registry).validate(
+    _schema_validator("event-delta.schema.json", registry=registry).validate(
         session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)
     )
 
 
 def test_rules_catalog_schema_requires_catalog_card_detail_maps() -> None:
-    schema = _read_json(REPO_ROOT / Path("docs/api/rules_catalog_view.schema.json"))
+    schema = _read_json(REPO_ROOT / Path("contracts/schemas/rules-catalog.schema.json"))
     properties = _json_object(schema["properties"])
     required = {_json_string(value) for value in _json_list(schema["required"])}
 
@@ -151,8 +152,9 @@ def test_exporter_reproduces_committed_ui_contract_payloads(tmp_path: Path) -> N
     export_ui_contract_files(output_root=tmp_path)
 
     paths = (
-        *(UI_FIXTURE_DIR / name for name in FIXTURE_FILES),
+        *(_fixture_path(name) for name in FIXTURE_FILES),
         *(PROPOSAL_EXAMPLE_DIR / name for name in PROPOSAL_EXAMPLE_FILES),
+        DECISION_EXAMPLE_DIR / "opportunity_window.json",
     )
     for path in paths:
         assert _read_json(tmp_path / path) == _read_json(REPO_ROOT / path)
@@ -212,7 +214,7 @@ def test_rules_catalog_card_maps_are_joinable_by_static_ids() -> None:
 
 def test_rules_catalog_stratagem_card_records_expose_stage1_details() -> None:
     catalog_view = project_rules_catalog_view(catalog=_catalog_with_ui_contract_stratagem())
-    _schema_validator("rules_catalog_view.schema.json", registry=_schema_registry()).validate(
+    _schema_validator("rules-catalog.schema.json", registry=_schema_registry()).validate(
         catalog_view
     )
 
@@ -286,7 +288,7 @@ def test_proposal_examples_cover_engine_facing_payload_families() -> None:
     charge = _proposal_example("charge_move.json")
     shooting = _proposal_example("shooting_target_selection.json")
     melee = _proposal_example("melee_declaration.json")
-    opportunity = _proposal_example("opportunity_window.json")
+    opportunity = _read_json(REPO_ROOT / DECISION_EXAMPLE_DIR / "opportunity_window.json")
 
     assert deployment["proposal_kind"] == "deployment_placement"
     assert deployment["unit_instance_id"] == UNIT_BETA
@@ -339,7 +341,13 @@ def test_local_session_dev_server_exposes_read_only_routes() -> None:
 
 
 def _fixture(name: str) -> dict[str, JsonValue]:
-    return _read_json(REPO_ROOT / UI_FIXTURE_DIR / name)
+    return _read_json(REPO_ROOT / _fixture_path(name))
+
+
+def _fixture_path(name: str) -> Path:
+    if name == "pending_movement_request.json":
+        return DECISION_EXAMPLE_DIR / name
+    return UI_FIXTURE_DIR / name
 
 
 def _proposal_example(name: str) -> dict[str, JsonValue]:

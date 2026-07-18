@@ -1,0 +1,38 @@
+{
+  "actor_id": "player-a",
+  "payload": {
+    "action_kind": "scout_reserve_setup",
+    "context": {
+      "contract_fixture": true
+    },
+    "game_id": "phase18d-contract-session",
+    "model_placements": [
+      {
+        "army_id": "army-alpha",
+        "model_instance_id": "army-alpha:unit-1:model-1",
+        "player_id": "player-a",
+        "pose": {
+          "facing": {
+            "degrees": 0.0
+          },
+          "position": {
+            "x": 12.0,
+            "y": 18.0,
+            "z": 0.0
+          }
+        },
+        "unit_instance_id": "army-alpha:unit-1"
+      }
+    ],
+    "placement_kind": "strategic_reserves",
+    "player_id": "player-a",
+    "proposal_kind": "scout_reserve_setup",
+    "proposal_request_id": "contract-scout-reserve-request-000001",
+    "ruleset_descriptor_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "setup_step": "resolve_prebattle_actions",
+    "source_rule_id": "source-rule:scouts",
+    "unit_instance_id": "army-alpha:unit-1"
+  },
+  "result_id": "phase18d-scout_reserve_setup-result-000001",
+  "schema_version": "parameterized-submission-v1"
+}

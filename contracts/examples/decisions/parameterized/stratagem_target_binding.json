@@ -1,0 +1,62 @@
+{
+  "actor_id": "player-a",
+  "payload": {
+    "catalog_record": {
+      "availability_kind": "core",
+      "definition": {
+        "category": "battle_tactic",
+        "command_point_cost": 1,
+        "effect_descriptor": "Contract fixture effect",
+        "effect_payload": null,
+        "eligible_roll_types": [],
+        "handler_id": "record_only",
+        "name": "Phase 18D Parameterized Target",
+        "restriction_policy": {
+          "allow_battle_shocked_targets": false,
+          "once_per_battle": false,
+          "once_per_target_per_phase": false,
+          "once_per_turn": false,
+          "same_stratagem_per_phase": true,
+          "same_unit_target_per_phase": true
+        },
+        "restrictions_descriptor": "Contract fixture restriction",
+        "source_id": "source:phase18d-parameterized-target",
+        "stratagem_id": "phase18d-parameterized-target",
+        "target_descriptor": "One friendly unit",
+        "target_spec": {
+          "enumerable": false,
+          "excluded_faction_keywords": [],
+          "excluded_keywords": [],
+          "required_faction_keywords": [],
+          "required_keywords": [],
+          "required_keywords_any": [],
+          "target_kind": "friendly_unit",
+          "target_policy_id": "contract-friendly-unit"
+        },
+        "timing": {
+          "phase": "movement",
+          "timing_window_id": null,
+          "trigger_kind": "start_phase"
+        },
+        "when_descriptor": "Start of Movement phase"
+      },
+      "detachment_id": null,
+      "disabled": false,
+      "record_id": "phase18d-contract-parameterized-stratagem"
+    },
+    "context": {
+      "active_player_id": "player-a",
+      "battle_round": 1,
+      "game_id": "phase18d-contract-session",
+      "phase": "movement",
+      "player_id": "player-a",
+      "timing_window_id": null,
+      "trigger_kind": "start_phase"
+    },
+    "effect_selection": null,
+    "proposal_kind": "stratagem_target_binding",
+    "target_binding": null
+  },
+  "result_id": "phase18d-stratagem_target_binding-result-000001",
+  "schema_version": "parameterized-submission-v1"
+}

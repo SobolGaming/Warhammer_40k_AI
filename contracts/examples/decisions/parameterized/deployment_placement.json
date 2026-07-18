@@ -1,0 +1,101 @@
+{
+  "actor_id": "player-a",
+  "payload": {
+    "context": {
+      "is_attached_rules_unit": false,
+      "source_rule_id": "core_rules_deploy_armies"
+    },
+    "game_id": "ui-contract-deployment-example",
+    "model_placements": [
+      {
+        "army_id": "army-beta",
+        "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:001",
+        "player_id": "player-b",
+        "pose": {
+          "facing": {
+            "degrees": 180.0
+          },
+          "position": {
+            "x": 57.0,
+            "y": 3.0,
+            "z": 0.0
+          }
+        },
+        "unit_instance_id": "army-beta:intercessor-unit-2"
+      },
+      {
+        "army_id": "army-beta",
+        "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:002",
+        "player_id": "player-b",
+        "pose": {
+          "facing": {
+            "degrees": 180.0
+          },
+          "position": {
+            "x": 57.0,
+            "y": 4.8,
+            "z": 0.0
+          }
+        },
+        "unit_instance_id": "army-beta:intercessor-unit-2"
+      },
+      {
+        "army_id": "army-beta",
+        "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:003",
+        "player_id": "player-b",
+        "pose": {
+          "facing": {
+            "degrees": 180.0
+          },
+          "position": {
+            "x": 57.0,
+            "y": 6.6,
+            "z": 0.0
+          }
+        },
+        "unit_instance_id": "army-beta:intercessor-unit-2"
+      },
+      {
+        "army_id": "army-beta",
+        "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:004",
+        "player_id": "player-b",
+        "pose": {
+          "facing": {
+            "degrees": 180.0
+          },
+          "position": {
+            "x": 55.2,
+            "y": 3.0,
+            "z": 0.0
+          }
+        },
+        "unit_instance_id": "army-beta:intercessor-unit-2"
+      },
+      {
+        "army_id": "army-beta",
+        "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:005",
+        "player_id": "player-b",
+        "pose": {
+          "facing": {
+            "degrees": 180.0
+          },
+          "position": {
+            "x": 55.2,
+            "y": 4.8,
+            "z": 0.0
+          }
+        },
+        "unit_instance_id": "army-beta:intercessor-unit-2"
+      }
+    ],
+    "placement_kind": "deployment",
+    "player_id": "player-b",
+    "proposal_kind": "deployment_placement",
+    "proposal_request_id": "decision-request-000004",
+    "ruleset_descriptor_hash": "322775bf3ce334a27c7e81f32a312f78c61af094e704b0cd57ff64a292f9067d",
+    "setup_step": "deploy_armies",
+    "unit_instance_id": "army-beta:intercessor-unit-2"
+  },
+  "result_id": "phase18d-deployment_placement-result-000001",
+  "schema_version": "parameterized-submission-v1"
+}

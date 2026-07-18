@@ -1,0 +1,20 @@
+{
+  "actor_id": "player-a",
+  "decision_type": "score_tactical_secondary_mission",
+  "is_parameterized": false,
+  "options": [
+    {
+      "label": "Example",
+      "option_id": "example-option",
+      "payload": {
+        "contract_fixture": true
+      }
+    }
+  ],
+  "payload": {
+    "contract_fixture": true,
+    "decision_type": "score_tactical_secondary_mission"
+  },
+  "request_id": "contract-decision-request-000008",
+  "schema_version": "decision-request-view-v1"
+}

@@ -1,0 +1,38 @@
+{
+  "actor_id": "player-a",
+  "payload": {
+    "action_kind": "redeploy",
+    "context": {
+      "contract_fixture": true
+    },
+    "game_id": "phase18d-contract-session",
+    "model_placements": [
+      {
+        "army_id": "army-alpha",
+        "model_instance_id": "army-alpha:unit-1:model-1",
+        "player_id": "player-a",
+        "pose": {
+          "facing": {
+            "degrees": 0.0
+          },
+          "position": {
+            "x": 12.0,
+            "y": 18.0,
+            "z": 0.0
+          }
+        },
+        "unit_instance_id": "army-alpha:unit-1"
+      }
+    ],
+    "placement_kind": "redeploy",
+    "player_id": "player-a",
+    "proposal_kind": "redeploy_placement",
+    "proposal_request_id": "contract-redeploy-request-000001",
+    "ruleset_descriptor_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "setup_step": "redeploy_units",
+    "source_rule_id": "source-rule:redeploy",
+    "unit_instance_id": "army-alpha:unit-1"
+  },
+  "result_id": "phase18d-redeploy_placement-result-000001",
+  "schema_version": "parameterized-submission-v1"
+}

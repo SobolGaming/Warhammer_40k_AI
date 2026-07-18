@@ -20,6 +20,11 @@ from referencing.jsonschema import (
     SchemaResource,
 )
 
+from warhammer40k_core.adapters.external_contract import (
+    CREATE_SESSION_SCHEMA_VERSION,
+    FINITE_SUBMISSION_SCHEMA_VERSION,
+    PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+)
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.server import (
     AdapterGameServer,
@@ -77,7 +82,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     _create_game(server, game_id=game_id)
 
     rules_catalog = _request(server, "GET", "/rules-catalog")
-    _schema_validator("rules_catalog_view.schema.json").validate(rules_catalog)
+    _schema_validator("rules-catalog.schema.json").validate(rules_catalog)
 
     status_payload = _request(server, "POST", f"/games/{game_id}/advance")
     first_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
@@ -95,7 +100,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         f"/games/{game_id}/view",
         query={"viewer_player_id": PLAYER_B},
     )
-    _schema_validator("game_view.schema.json").validate(player_a_view)
+    _schema_validator("game-view.schema.json").validate(player_a_view)
     player_b_pending = _field_object(player_b_view, "pending_decision")
     assert _field_string(player_b_pending, "decision_type") == "hidden_decision"
     assert _field_list(player_b_pending, "options") == []
@@ -107,7 +112,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         f"/games/{game_id}/events",
         query={"viewer_player_id": PLAYER_B, "cursor": "0"},
     )
-    _schema_validator("event_stream_delta.schema.json").validate(initial_events)
+    _schema_validator("event-delta.schema.json").validate(initial_events)
 
     status_payload = _submit_option(
         server,
@@ -162,7 +167,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         },
     )
     assert _field_list(event_delta, "events")
-    _schema_validator("event_stream_delta.schema.json").validate(event_delta)
+    _schema_validator("event-delta.schema.json").validate(event_delta)
 
     replay_payload = _request(server, "GET", f"/games/{game_id}/replay")
     replay_result = ReplayRunner.from_payload(cast(ReplayArtifactPayload, replay_payload)).run()
@@ -303,6 +308,7 @@ def test_phase18e_server_submission_rejections_are_typed() -> None:
         "POST",
         f"/games/{game_id}/decisions/stale-request/option",
         body={
+            "schema_version": FINITE_SUBMISSION_SCHEMA_VERSION,
             "actor_id": _actor(first_request),
             "option_id": FIXED_SECONDARY_OPTION_ID,
             "result_id": "phase18e-stale",
@@ -316,6 +322,7 @@ def test_phase18e_server_submission_rejections_are_typed() -> None:
         "POST",
         f"/games/{game_id}/decisions/{first_request['request_id']}/option",
         body={
+            "schema_version": FINITE_SUBMISSION_SCHEMA_VERSION,
             "actor_id": PLAYER_B,
             "option_id": FIXED_SECONDARY_OPTION_ID,
             "result_id": "phase18e-wrong-actor",
@@ -329,6 +336,7 @@ def test_phase18e_server_submission_rejections_are_typed() -> None:
         "POST",
         f"/games/{game_id}/decisions/{first_request['request_id']}/option",
         body={
+            "schema_version": FINITE_SUBMISSION_SCHEMA_VERSION,
             "actor_id": _actor(first_request),
             "option_id": "client-invented-option",
             "result_id": "phase18e-wrong-option",
@@ -341,7 +349,11 @@ def test_phase18e_server_submission_rejections_are_typed() -> None:
         server,
         "POST",
         f"/games/{game_id}/decisions/{first_request['request_id']}/payload",
-        body={"actor_id": _actor(first_request), "result_id": "phase18e-malformed"},
+        body={
+            "schema_version": PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+            "actor_id": _actor(first_request),
+            "result_id": "phase18e-malformed",
+        },
     )
     assert malformed.status_code == 400
     assert _error_code(malformed) == "malformed_payload"
@@ -351,6 +363,7 @@ def test_phase18e_server_submission_rejections_are_typed() -> None:
         "POST",
         f"/games/{game_id}/decisions/{first_request['request_id']}/payload",
         body={
+            "schema_version": PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
             "actor_id": _actor(first_request),
             "payload": {
                 "roll_id": "roll-000001",
@@ -383,6 +396,7 @@ def test_phase18e_server_submission_rejections_are_typed() -> None:
         "POST",
         f"/games/{game_id}-drift/decisions/{placement_request['request_id']}/payload",
         body={
+            "schema_version": PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
             "actor_id": _actor(placement_request),
             "payload": drifted_payload,
             "result_id": "phase18e-payload-drift",
@@ -398,6 +412,7 @@ def test_phase18e_server_submission_rejections_are_typed() -> None:
         "POST",
         f"/games/{game_id}-not-advanced/decisions/decision-request-000001/option",
         body={
+            "schema_version": FINITE_SUBMISSION_SCHEMA_VERSION,
             "actor_id": PLAYER_A,
             "option_id": FIXED_SECONDARY_OPTION_ID,
             "result_id": "phase18e-no-pending",
@@ -405,6 +420,49 @@ def test_phase18e_server_submission_rejections_are_typed() -> None:
     )
     assert closed.status_code == 409
     assert _error_code(closed) == "closed_or_terminal_session"
+
+
+def test_phase18d_wire_schema_versions_fail_before_mutation() -> None:
+    server = AdapterGameServer()
+    game_id = "phase18d-wire-schema-version"
+    missing_create_version = _request_raw(
+        server,
+        "POST",
+        "/games",
+        body={"config": _game_config_body(game_id=game_id)["config"]},
+    )
+    assert missing_create_version.status_code == 400
+    assert _error_code(missing_create_version) == "malformed_payload"
+
+    _create_game(server, game_id=game_id)
+    first_status = _request(server, "POST", f"/games/{game_id}/advance")
+    first_request = _decision_from_status(server, game_id=game_id, payload=first_status)
+    request_id = _request_id(first_request)
+
+    mismatched = _request_raw(
+        server,
+        "POST",
+        f"/games/{game_id}/decisions/{request_id}/option",
+        body={
+            "schema_version": "finite-submission-v0",
+            "actor_id": _actor(first_request),
+            "option_id": FIXED_SECONDARY_OPTION_ID,
+            "result_id": "phase18d-version-mismatch",
+        },
+    )
+    assert mismatched.status_code == 400
+    assert _error_code(mismatched) == "schema_version_mismatch"
+    assert _json_object(mismatched.payload)["schema_version"] == "error-envelope-v1"
+
+    unchanged = _request(
+        server,
+        "GET",
+        f"/games/{game_id}/view",
+        query={"viewer_player_id": _actor(first_request)},
+    )
+    pending = _field_object(unchanged, "pending_decision")
+    assert _request_id(pending) == request_id
+    assert _first_option_id(pending) == FIXED_SECONDARY_OPTION_ID
 
 
 def test_phase18e_server_route_errors_are_typed() -> None:
@@ -461,6 +519,7 @@ def test_phase18e_server_route_errors_are_typed() -> None:
         "POST",
         "/games/phase18e-server-route-errors/decisions/decision-request-000001/option",
         body={
+            "schema_version": FINITE_SUBMISSION_SCHEMA_VERSION,
             "actor_id": PLAYER_A,
             "option_id": FIXED_SECONDARY_OPTION_ID,
             "result_id": "phase18e-extra",
@@ -496,7 +555,7 @@ def test_phase18e_local_dev_http_server_serves_json_and_rejects_bad_bodies() -> 
             "GET",
             f"{base_url}/games/{game_id}/view?viewer_player_id={PLAYER_A}",
         )
-        _schema_validator("game_view.schema.json").validate(view)
+        _schema_validator("game-view.schema.json").validate(view)
 
         ambiguous_query = _http_error(
             Request(f"{base_url}/rules-catalog?viewer=one&viewer=two", method="GET")
@@ -549,6 +608,7 @@ def test_phase18e_network_client_observes_server_owned_dice_through_events_and_v
     action_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     assert action_request["decision_type"] == SELECT_MOVEMENT_ACTION
     advance_body: dict[str, JsonValue] = {
+        "schema_version": FINITE_SUBMISSION_SCHEMA_VERSION,
         "actor_id": _actor(action_request),
         "option_id": ADVANCE_ACTION_OPTION_ID,
         "result_id": f"{game_id}-advance-action",
@@ -658,9 +718,10 @@ def _game_config_body(
     catalog: ArmyCatalog | None = None,
 ) -> dict[str, JsonValue]:
     return {
+        "schema_version": CREATE_SESSION_SCHEMA_VERSION,
         "config": validate_json_value(
             cast(JsonValue, _config(game_id=game_id, catalog=catalog).to_payload())
-        )
+        ),
     }
 
 
@@ -780,6 +841,7 @@ def _submit_option(
     result_id: str,
 ) -> dict[str, JsonValue]:
     body: dict[str, JsonValue] = {
+        "schema_version": FINITE_SUBMISSION_SCHEMA_VERSION,
         "actor_id": _actor(request),
         "option_id": option_id,
         "result_id": result_id,
@@ -801,6 +863,7 @@ def _submit_payload(
     result_id: str,
 ) -> dict[str, JsonValue]:
     body: dict[str, JsonValue] = {
+        "schema_version": PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
         "actor_id": _actor(request),
         "payload": payload,
         "result_id": result_id,
@@ -1065,12 +1128,14 @@ def _schema_validator(schema_name: str) -> _PayloadValidator:
 
 def _schema_payloads() -> dict[str, Schema]:
     names = (
-        "decision_request_view.schema.json",
-        "event_stream_delta.schema.json",
-        "game_view.schema.json",
-        "rules_catalog_view.schema.json",
+        "decision-request-view.schema.json",
+        "event-delta.schema.json",
+        "game-view.schema.json",
+        "rules-catalog.schema.json",
     )
-    return {name: cast(Schema, _read_json(REPO_ROOT / "docs" / "api" / name)) for name in names}
+    return {
+        name: cast(Schema, _read_json(REPO_ROOT / "contracts" / "schemas" / name)) for name in names
+    }
 
 
 def _schema_registry() -> SchemaRegistry:

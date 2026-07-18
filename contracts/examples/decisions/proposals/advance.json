@@ -1,0 +1,10 @@
+{
+  "movement_mode": "advance",
+  "movement_phase_action": "advance",
+  "proposal_kind": "advance",
+  "proposal_request_id": "contract-advance-request-000001",
+  "unit_instance_id": "army-alpha:unit-1",
+  "witness": {
+    "model_paths": []
+  }
+}

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TypedDict, cast
 
+from warhammer40k_core.adapters.external_contract import EVENT_STREAM_DELTA_SCHEMA_VERSION
 from warhammer40k_core.adapters.redaction import (
     decision_request_payload_hidden_from_viewer,
     redacted_decision_type_for_hidden_viewer,
@@ -17,6 +18,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 
 
 class EventStreamDeltaPayload(TypedDict):
+    schema_version: str
     viewer_player_id: str
     cursor: int
     next_cursor: int
@@ -55,6 +57,7 @@ class EventStreamCursor:
             for record in records[self.value :]
         ]
         return {
+            "schema_version": EVENT_STREAM_DELTA_SCHEMA_VERSION,
             "viewer_player_id": viewer,
             "cursor": self.value,
             "next_cursor": len(records),

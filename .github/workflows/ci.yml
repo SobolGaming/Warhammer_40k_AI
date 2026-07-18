@@ -58,6 +58,9 @@ jobs:
       - name: Verify behavioral shard manifests
         run: uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
 
+      - name: Verify external contract bundle
+        run: uv run --no-sync python scripts/build_external_contract.py --check
+
       - name: Code-quality tests
         run: uv run --no-sync pytest tests/code_quality -q -n0 --no-cov
 

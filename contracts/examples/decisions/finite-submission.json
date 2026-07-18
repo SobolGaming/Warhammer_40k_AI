@@ -1,0 +1,6 @@
+{
+  "actor_id": "player-a",
+  "option_id": "fixed:assassination:bring_it_down",
+  "result_id": "phase18d-finite-result-000001",
+  "schema_version": "finite-submission-v1"
+}

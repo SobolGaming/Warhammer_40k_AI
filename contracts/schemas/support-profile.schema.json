@@ -1,0 +1,142 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/support-profile.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "catalog_id": {"minLength": 1, "type": "string"},
+    "datasheet_support_rows": {
+      "items": {"$ref": "#/$defs/datasheet_row"},
+      "type": "array"
+    },
+    "detachment_faction_support_rows": {
+      "items": {"$ref": "#/$defs/runtime_row"},
+      "type": "array"
+    },
+    "eligible_for_headless_self_play_smoke": {"type": "boolean"},
+    "game_id": {"minLength": 1, "type": "string"},
+    "mustering_support_rows": {
+      "items": {"$ref": "#/$defs/mustering_row"},
+      "type": "array"
+    },
+    "overall_status": {"$ref": "#/$defs/support_status"},
+    "ruleset_descriptor_hash": {"minLength": 64, "type": "string"},
+    "schema_version": {"const": "support-profile-v2-ws14", "type": "string"},
+    "source_package_id": {"minLength": 1, "type": "string"},
+    "status_counts": {"$ref": "#/$defs/status_counts"}
+  },
+  "required": [
+    "schema_version",
+    "game_id",
+    "catalog_id",
+    "source_package_id",
+    "ruleset_descriptor_hash",
+    "overall_status",
+    "eligible_for_headless_self_play_smoke",
+    "status_counts",
+    "mustering_support_rows",
+    "datasheet_support_rows",
+    "detachment_faction_support_rows"
+  ],
+  "title": "CORE V2 SupportProfilePayload",
+  "type": "object",
+  "$defs": {
+    "datasheet_row": {
+      "additionalProperties": false,
+      "properties": {
+        "ability_id": {"minLength": 1, "type": "string"},
+        "catalog_support": {"minLength": 1, "type": "string"},
+        "datasheet_id": {"minLength": 1, "type": "string"},
+        "display_name": {"minLength": 1, "type": "string"},
+        "parameter_tokens": {"items": {"type": "string"}, "type": "array"},
+        "row_id": {"minLength": 1, "type": "string"},
+        "source_id": {"minLength": 1, "type": "string"},
+        "status": {"$ref": "#/$defs/support_status"},
+        "timing_tags": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": [
+        "row_id",
+        "datasheet_id",
+        "ability_id",
+        "display_name",
+        "source_id",
+        "catalog_support",
+        "status",
+        "timing_tags",
+        "parameter_tokens"
+      ],
+      "type": "object"
+    },
+    "mustering_row": {
+      "additionalProperties": false,
+      "properties": {
+        "army_id": {"minLength": 1, "type": "string"},
+        "datasheet_ids": {"items": {"type": "string"}, "type": "array"},
+        "detachment_ids": {"items": {"type": "string"}, "type": "array"},
+        "faction_id": {"minLength": 1, "type": "string"},
+        "legality_status": {"minLength": 1, "type": "string"},
+        "player_id": {"minLength": 1, "type": "string"},
+        "row_id": {"minLength": 1, "type": "string"},
+        "status": {"$ref": "#/$defs/support_status"},
+        "violation_count": {"minimum": 0, "type": "integer"}
+      },
+      "required": [
+        "row_id",
+        "player_id",
+        "army_id",
+        "faction_id",
+        "detachment_ids",
+        "datasheet_ids",
+        "status",
+        "legality_status",
+        "violation_count"
+      ],
+      "type": "object"
+    },
+    "runtime_row": {
+      "additionalProperties": false,
+      "properties": {
+        "content_id": {"minLength": 1, "type": "string"},
+        "family": {"minLength": 1, "type": "string"},
+        "owner_detachment_id": {"type": ["string", "null"]},
+        "owner_faction_id": {"type": ["string", "null"]},
+        "required_for_matched_play": {"type": "boolean"},
+        "row_id": {"minLength": 1, "type": "string"},
+        "runtime_support": {"minLength": 1, "type": "string"},
+        "semantic_status": {"minLength": 1, "type": "string"},
+        "source_ids": {"items": {"type": "string"}, "type": "array"},
+        "status": {"$ref": "#/$defs/support_status"},
+        "support_reason": {"type": ["string", "null"]},
+        "unsupported_reason": {"type": ["string", "null"]}
+      },
+      "required": [
+        "row_id",
+        "content_id",
+        "family",
+        "source_ids",
+        "owner_faction_id",
+        "owner_detachment_id",
+        "runtime_support",
+        "semantic_status",
+        "status",
+        "support_reason",
+        "unsupported_reason",
+        "required_for_matched_play"
+      ],
+      "type": "object"
+    },
+    "status_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "full": {"minimum": 0, "type": "integer"},
+        "playable": {"minimum": 0, "type": "integer"},
+        "unsupported": {"minimum": 0, "type": "integer"}
+      },
+      "required": ["unsupported", "playable", "full"],
+      "type": "object"
+    },
+    "support_status": {
+      "enum": ["unsupported", "playable", "full"],
+      "type": "string"
+    }
+  }
+}
