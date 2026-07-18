@@ -47,9 +47,18 @@ The check fails if schemas are invalid, examples drift, OpenAPI references a
 non-canonical definition, registered decision metadata or proposal coverage
 drifts, a bundle hash changes without regeneration, or a breaking public-shape
 change is made without the required contract-version change. Pull-request CI
-also passes the base commit with `--base-ref` so released compatibility
-baselines cannot be edited or removed in the same change that updates the
-contract.
+also passes the base commit with `--base-ref`. The audit compares the proposed
+schemas and OpenAPI operations with both that exact base contract and the oldest
+supported-major baseline, then separately proves released baselines are
+immutable.
+
+The packaging gate builds and installs the wheel into an isolated environment,
+runs outside the repository, enumerates all packaged schemas, and validates
+representative create-session, finite, and parameterized requests:
+
+```bash
+uv run --no-sync python scripts/smoke_installed_contract_wheel.py
+```
 
 To refresh deterministic fixtures and the manifest after an intentional
 compatible change:
@@ -58,7 +67,8 @@ compatible change:
 uv run python scripts/build_external_contract.py
 ```
 
-`--write-baseline` is reserved for the first baseline of an explicitly reviewed
-new compatibility major. It refuses to overwrite a released baseline or add a
-baseline within the current major. See
+`--write-baseline --base-ref <sha>` writes the first baseline of an explicitly
+reviewed compatibility major. It may refresh that baseline until it appears on
+the base commit, then refuses to overwrite it or add another baseline within
+the same major. See
 [compatibility-policy.md](compatibility-policy.md).

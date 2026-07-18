@@ -123,10 +123,13 @@ network, headless, and replay producers.
 canonical Draft 2020-12 schema/example source, OpenAPI 3.1 references that
 source directly, every external wire family has an explicit version, and CI
 verifies schema/example/OpenAPI/Python-version drift plus immutable,
-base-branch compatibility baselines. The engine registry owns finite versus
-parameterized classification, but only real adapter-session scenarios are
-reported as live decision-family coverage; remaining families are explicitly
-`envelope_only` pending later interaction and conformance work.
+base-branch compatibility baselines and cumulative compatibility against both
+the exact pull-request base contract and the oldest supported-major baseline.
+An isolated installed-wheel smoke validates packaged schema discovery and all
+three request families outside the repository. The engine registry owns finite
+versus parameterized classification, but only real adapter-session scenarios
+are reported as live decision-family coverage; remaining families are
+explicitly `envelope_only` pending later interaction and conformance work.
 **Phase 18E has a partial session/transport baseline**: the reference
 `AdapterGameServer` exposes create, advance, projection, catalog, event,
 decision, replay, and support routes with typed errors and shared redaction,
@@ -5193,7 +5196,11 @@ The former `docs/api/` schemas and test-local UI fixtures have migrated into
 this bundle, leaving exactly one canonical schema/example source. Tests and
 `scripts/build_external_contract.py --check` reject drift between Python payload
 versions, JSON Schema, examples, the manifest, compatibility baseline, and
-OpenAPI.
+OpenAPI. Pull-request CI compares the proposed canonical schemas and OpenAPI
+operations with both the exact base-commit contract and the oldest
+supported-major baseline, keeps released baselines immutable, and installs the
+wheel into an isolated environment to validate packaged schema loading outside
+the repository.
 
 Deliverables:
 
@@ -5214,7 +5221,9 @@ Deliverables:
 - redacted and unredacted view/event examples plus malformed, stale, invalid,
   unsupported, forbidden, conflict, corruption, and terminal examples;
 - contract-diff CI that detects breaking changes, requires explicit approval
-  and version increments, and validates every example against its schema.
+  and version increments, compares cumulative additions against the exact
+  pull-request base contract, validates every example against its schema, and
+  smoke-tests schema resources from an installed wheel outside the repository.
 
 Invariants:
 

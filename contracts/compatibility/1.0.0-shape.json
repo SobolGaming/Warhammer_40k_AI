@@ -124,6 +124,688 @@
       "title": "CORE V2 CreateSessionPayload",
       "type": "object"
     },
+    "decision-family-coverage.schema.json": {
+      "$defs": {
+        "family": {
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "else": {
+                "properties": {
+                  "example_path": {
+                    "type": "null"
+                  }
+                }
+              },
+              "if": {
+                "properties": {
+                  "coverage_status": {
+                    "const": "live_scenario"
+                  }
+                },
+                "required": [
+                  "coverage_status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "example_path": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "registry_scope": {
+                    "const": "redaction"
+                  }
+                },
+                "required": [
+                  "registry_scope"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "coverage_status": {
+                    "const": "redaction_only"
+                  },
+                  "submission_kind": {
+                    "const": "not_submittable"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "coverage_status": {
+              "enum": [
+                "live_scenario",
+                "envelope_only",
+                "redaction_only"
+              ],
+              "type": "string"
+            },
+            "decision_type": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "example_path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "registry_scope": {
+              "enum": [
+                "registered",
+                "nested",
+                "redaction"
+              ],
+              "type": "string"
+            },
+            "submission_kind": {
+              "enum": [
+                "finite",
+                "parameterized",
+                "not_submittable"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "decision_type",
+            "registry_scope",
+            "submission_kind",
+            "coverage_status",
+            "example_path"
+          ],
+          "type": "object"
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/decision-family-coverage.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "families": {
+          "items": {
+            "$ref": "#/$defs/family"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "known_external_token_count": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "live_scenario_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "registered_decision_type_count": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "decision-family-coverage-v1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "registered_decision_type_count",
+        "known_external_token_count",
+        "live_scenario_count",
+        "families"
+      ],
+      "title": "CORE V2 DecisionFamilyCoveragePayload",
+      "type": "object"
+    },
+    "decision-family-live.schema.json": {
+      "$defs": {
+        "fixed_secondary_option": {
+          "additionalProperties": false,
+          "properties": {
+            "label": {
+              "$ref": "#/$defs/identifier"
+            },
+            "option_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "payload": {
+              "additionalProperties": false,
+              "properties": {
+                "fixed_mission_ids": {
+                  "items": {
+                    "$ref": "#/$defs/identifier"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "mode": {
+                  "const": "fixed",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "fixed_mission_ids",
+                "mode"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "option_id",
+            "label",
+            "payload"
+          ],
+          "type": "object"
+        },
+        "identifier": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "movement_action_context": {
+          "additionalProperties": false,
+          "properties": {
+            "active_player_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "battle_round": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "game_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "phase": {
+              "const": "movement"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": [
+            "game_id",
+            "battle_round",
+            "phase",
+            "active_player_id",
+            "unit_instance_id"
+          ],
+          "type": "object"
+        },
+        "movement_context": {
+          "additionalProperties": false,
+          "properties": {
+            "active_player_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "battle_round": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "game_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "phase": {
+              "const": "movement"
+            }
+          },
+          "required": [
+            "game_id",
+            "battle_round",
+            "phase",
+            "active_player_id"
+          ],
+          "type": "object"
+        },
+        "moving_action_option": {
+          "additionalProperties": false,
+          "properties": {
+            "label": {
+              "$ref": "#/$defs/identifier"
+            },
+            "option_id": {
+              "enum": [
+                "advance",
+                "normal_move"
+              ],
+              "type": "string"
+            },
+            "payload": {
+              "additionalProperties": false,
+              "properties": {
+                "movement_mode": {
+                  "enum": [
+                    "advance",
+                    "normal"
+                  ],
+                  "type": "string"
+                },
+                "movement_phase_action": {
+                  "enum": [
+                    "advance",
+                    "normal_move"
+                  ],
+                  "type": "string"
+                },
+                "unit_instance_id": {
+                  "$ref": "#/$defs/identifier"
+                }
+              },
+              "required": [
+                "movement_phase_action",
+                "unit_instance_id",
+                "movement_mode"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "option_id",
+            "label",
+            "payload"
+          ],
+          "type": "object"
+        },
+        "normal_move_proposal_request": {
+          "additionalProperties": false,
+          "properties": {
+            "actor_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "battle_round": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "context": {
+              "additionalProperties": false,
+              "properties": {
+                "movement_mode": {
+                  "const": "normal"
+                },
+                "source_selected_option_id": {
+                  "const": "normal_move"
+                }
+              },
+              "required": [
+                "source_selected_option_id",
+                "movement_mode"
+              ],
+              "type": "object"
+            },
+            "decision_type": {
+              "const": "submit_movement_proposal"
+            },
+            "game_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "movement_phase_action": {
+              "const": "normal_move"
+            },
+            "phase": {
+              "const": "movement"
+            },
+            "placement_kinds": {
+              "maxItems": 0,
+              "type": "array"
+            },
+            "proposal_kind": {
+              "const": "normal_move"
+            },
+            "request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_decision_request_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_decision_result_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "unit_instance_id": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": [
+            "request_id",
+            "decision_type",
+            "actor_id",
+            "game_id",
+            "battle_round",
+            "phase",
+            "unit_instance_id",
+            "proposal_kind",
+            "source_decision_request_id",
+            "source_decision_result_id",
+            "movement_phase_action",
+            "placement_kinds",
+            "context"
+          ],
+          "type": "object"
+        },
+        "parameterized_option": {
+          "additionalProperties": false,
+          "properties": {
+            "label": {
+              "$ref": "#/$defs/identifier"
+            },
+            "option_id": {
+              "const": "submit_parameterized_payload"
+            },
+            "payload": {
+              "additionalProperties": false,
+              "properties": {
+                "submission_kind": {
+                  "const": "parameterized"
+                }
+              },
+              "required": [
+                "submission_kind"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "option_id",
+            "label",
+            "payload"
+          ],
+          "type": "object"
+        },
+        "remain_stationary_option": {
+          "additionalProperties": false,
+          "properties": {
+            "label": {
+              "$ref": "#/$defs/identifier"
+            },
+            "option_id": {
+              "const": "remain_stationary"
+            },
+            "payload": {
+              "additionalProperties": false,
+              "properties": {
+                "model_movements": {
+                  "maxItems": 0,
+                  "type": "array"
+                },
+                "movement_inches": {
+                  "const": 0
+                },
+                "movement_phase_action": {
+                  "const": "remain_stationary"
+                },
+                "unit_instance_id": {
+                  "$ref": "#/$defs/identifier"
+                },
+                "witness": {
+                  "type": "null"
+                }
+              },
+              "required": [
+                "movement_phase_action",
+                "unit_instance_id",
+                "movement_inches",
+                "model_movements",
+                "witness"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "option_id",
+            "label",
+            "payload"
+          ],
+          "type": "object"
+        },
+        "select_movement_action": {
+          "allOf": [
+            {
+              "$ref": "decision-request-view.schema.json"
+            },
+            {
+              "properties": {
+                "decision_type": {
+                  "const": "select_movement_action"
+                },
+                "is_parameterized": {
+                  "const": false
+                },
+                "options": {
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/moving_action_option"
+                      },
+                      {
+                        "$ref": "#/$defs/remain_stationary_option"
+                      }
+                    ]
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "payload": {
+                  "$ref": "#/$defs/movement_action_context"
+                }
+              }
+            }
+          ]
+        },
+        "select_movement_unit": {
+          "allOf": [
+            {
+              "$ref": "decision-request-view.schema.json"
+            },
+            {
+              "properties": {
+                "decision_type": {
+                  "const": "select_movement_unit"
+                },
+                "is_parameterized": {
+                  "const": false
+                },
+                "options": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "label": {
+                        "$ref": "#/$defs/identifier"
+                      },
+                      "option_id": {
+                        "$ref": "#/$defs/identifier"
+                      },
+                      "payload": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "model_instance_ids": {
+                            "items": {
+                              "$ref": "#/$defs/identifier"
+                            },
+                            "minItems": 1,
+                            "type": "array",
+                            "uniqueItems": true
+                          },
+                          "unit_instance_id": {
+                            "$ref": "#/$defs/identifier"
+                          }
+                        },
+                        "required": [
+                          "unit_instance_id",
+                          "model_instance_ids"
+                        ],
+                        "type": "object"
+                      }
+                    },
+                    "required": [
+                      "option_id",
+                      "label",
+                      "payload"
+                    ],
+                    "type": "object"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "payload": {
+                  "$ref": "#/$defs/movement_context"
+                }
+              }
+            }
+          ]
+        },
+        "select_secondary_missions": {
+          "allOf": [
+            {
+              "$ref": "decision-request-view.schema.json"
+            },
+            {
+              "properties": {
+                "decision_type": {
+                  "const": "select_secondary_missions"
+                },
+                "is_parameterized": {
+                  "const": false
+                },
+                "options": {
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/fixed_secondary_option"
+                      },
+                      {
+                        "$ref": "#/$defs/tactical_secondary_option"
+                      }
+                    ]
+                  },
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "payload": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "fixed_choices_required": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "game_id": {
+                      "$ref": "#/$defs/identifier"
+                    },
+                    "secret": {
+                      "const": true
+                    },
+                    "setup_step": {
+                      "const": "select_secondary_missions"
+                    }
+                  },
+                  "required": [
+                    "game_id",
+                    "setup_step",
+                    "secret",
+                    "fixed_choices_required"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          ]
+        },
+        "submit_movement_proposal": {
+          "allOf": [
+            {
+              "$ref": "decision-request-view.schema.json"
+            },
+            {
+              "properties": {
+                "decision_type": {
+                  "const": "submit_movement_proposal"
+                },
+                "is_parameterized": {
+                  "const": true
+                },
+                "options": {
+                  "items": {
+                    "$ref": "#/$defs/parameterized_option"
+                  },
+                  "maxItems": 1,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "payload": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "proposal_request": {
+                      "$ref": "#/$defs/normal_move_proposal_request"
+                    }
+                  },
+                  "required": [
+                    "proposal_request"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          ]
+        },
+        "tactical_secondary_option": {
+          "additionalProperties": false,
+          "properties": {
+            "label": {
+              "$ref": "#/$defs/identifier"
+            },
+            "option_id": {
+              "const": "tactical",
+              "type": "string"
+            },
+            "payload": {
+              "additionalProperties": false,
+              "properties": {
+                "fixed_mission_ids": {
+                  "maxItems": 0,
+                  "type": "array"
+                },
+                "mode": {
+                  "const": "tactical",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "fixed_mission_ids",
+                "mode"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "option_id",
+            "label",
+            "payload"
+          ],
+          "type": "object"
+        }
+      },
+      "$id": "https://warhammer40k-core.local/contracts/v1/decision-family-live.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/select_secondary_missions"
+        },
+        {
+          "$ref": "#/$defs/select_movement_unit"
+        },
+        {
+          "$ref": "#/$defs/select_movement_action"
+        },
+        {
+          "$ref": "#/$defs/submit_movement_proposal"
+        }
+      ],
+      "title": "CORE V2 Live Decision Family Contract"
+    },
     "decision-request-view.schema.json": {
       "$defs": {
         "decision_option": {

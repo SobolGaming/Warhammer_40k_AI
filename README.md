@@ -75,6 +75,7 @@ Verify schema, example, OpenAPI, Python-version, coverage, manifest, and compati
 
 ```bash
 uv run --no-sync python scripts/build_external_contract.py --check
+uv run --no-sync python scripts/smoke_installed_contract_wheel.py
 ```
 
 # CORE V2 Architecture

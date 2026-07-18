@@ -73,9 +73,9 @@
     "examples/support-profile.json": "support-profile.schema.json"
   },
   "file_sha256": {
-    "README.md": "af50ba64e463a9c161d8cf1ed227e841ef9ef8404bff7f0c1e1fe8326c9a9d86",
-    "compatibility-policy.md": "a0c60808015a7d58f53c3dd6a6dd92911d83440c6e5b69ebcdd2ccd187817f28",
-    "compatibility/1.0.0-shape.json": "d98cec76e26b8e59b7eac9485f4d573e50da2269baccda1f3e6214c7414f6732",
+    "README.md": "212765647d949cade4a52bb0897fbd48022296eb3fa0f51a3a862d68faab3a9d",
+    "compatibility-policy.md": "9e7251c5be2b7141a44a2068af83a6b736a6cb1dbf25c6c209d30abef6880352",
+    "compatibility/1.0.0-shape.json": "a2fb7d57f0677dbc1583f4ec5c3bc0b32b3c9db80594cefb55bb90fe3c949d96",
     "conformance-scenarios/README.md": "71302edf847fd03a5e97871887c5a96082b761124c266bd3dcc0f636eb57c2fb",
     "coordinate-system.md": "9f578de720daadc7fdfa7d56685379e21f96c2f24dfc3a9a2838d4a2444115ff",
     "examples/decisions/families/select_movement_action.json": "0aabfa6a45b1ab8c97fc55d024db52e2d404e2339c4bc28df28ea1cac4e848e6",

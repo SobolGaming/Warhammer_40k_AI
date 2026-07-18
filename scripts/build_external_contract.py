@@ -134,10 +134,10 @@ def main() -> int:
         verify_contract_bundle(base_ref=args.base_ref)
         return 0
     if args.write_baseline:
-        _new_compatibility_baseline_target()
+        _new_compatibility_baseline_target(base_ref=args.base_ref)
     write_contract_examples()
     if args.write_baseline:
-        _write_new_compatibility_baseline()
+        _write_new_compatibility_baseline(base_ref=args.base_ref)
     _write_json(MANIFEST_PATH, _contract_manifest())
     verify_contract_bundle(base_ref=args.base_ref)
     return 0
@@ -227,6 +227,7 @@ def verify_contract_bundle(*, base_ref: str | None = None) -> None:
     _verify_decision_and_proposal_coverage()
     _verify_openapi(schemas)
     _verify_compatibility(schemas)
+    _verify_base_contract_compatibility(schemas=schemas, base_ref=base_ref)
     _verify_released_baselines_immutable(base_ref=base_ref)
 
 
@@ -857,27 +858,89 @@ def _verify_compatibility(schemas: dict[str, Schema]) -> None:
     baseline = _json_object(_read_json(baseline_path), "compatibility baseline")
     baseline_version = _required_string(baseline, "contract_version")
     baseline_schemas = _json_object(baseline["schemas"], "baseline schemas")
-    breaking: list[str] = []
     baseline_operations = _string_set(baseline.get("openapi_operations"))
-    current_operations = set(_openapi_operations())
-    for operation in sorted(baseline_operations - current_operations):
-        breaking.append(f"openapi operation removed: {operation}")
-    for name, baseline_schema in sorted(baseline_schemas.items()):
-        current = schemas.get(name)
+    _verify_contract_snapshot_compatibility(
+        reference_label=f"oldest supported-major baseline {baseline_version}",
+        reference_version=baseline_version,
+        reference_schemas=baseline_schemas,
+        reference_operations=baseline_operations,
+        current_version=EXTERNAL_CONTRACT_VERSION,
+        current_schemas=schemas,
+        current_operations=set(_openapi_operations()),
+        require_version_progress=False,
+    )
+
+
+def _verify_base_contract_compatibility(
+    *,
+    schemas: dict[str, Schema],
+    base_ref: str | None,
+) -> None:
+    if base_ref is None:
+        return
+    snapshot = _base_contract_snapshot(_validated_base_ref(base_ref))
+    if snapshot is None:
+        return
+    base_version, base_schemas, base_operations = snapshot
+    _verify_contract_snapshot_compatibility(
+        reference_label="pull request base contract",
+        reference_version=base_version,
+        reference_schemas=base_schemas,
+        reference_operations=base_operations,
+        current_version=EXTERNAL_CONTRACT_VERSION,
+        current_schemas=schemas,
+        current_operations=set(_openapi_operations()),
+        require_version_progress=True,
+    )
+
+
+def _verify_contract_snapshot_compatibility(
+    *,
+    reference_label: str,
+    reference_version: str,
+    reference_schemas: dict[str, JsonValue],
+    reference_operations: set[str],
+    current_version: str,
+    current_schemas: dict[str, Schema],
+    current_operations: set[str],
+    require_version_progress: bool,
+) -> None:
+    breaking = [
+        f"openapi operation removed: {operation}"
+        for operation in sorted(reference_operations - current_operations)
+    ]
+    for name, reference_schema in sorted(reference_schemas.items()):
+        current = current_schemas.get(name)
         if current is None:
             breaking.append(f"schemas.{name}: removed")
             continue
         breaking.extend(
             _breaking_changes(
-                _json_object(baseline_schema, f"baseline {name}"),
+                _json_object(reference_schema, f"{reference_label} {name}"),
                 cast(dict[str, JsonValue], current),
                 path=f"schemas.{name}",
             )
         )
-    if breaking and _major_version(EXTERNAL_CONTRACT_VERSION) <= _major_version(baseline_version):
+    reference_semver = _semantic_version(reference_version)
+    current_semver = _semantic_version(current_version)
+    if current_semver < reference_semver:
+        raise ExternalContractError("External contract version cannot move backwards.")
+    if breaking and current_semver[0] <= reference_semver[0]:
         raise ExternalContractError(
-            "Breaking external contract change requires a major version increment:\n"
+            f"Breaking change from {reference_label} requires a major version increment:\n"
             + "\n".join(breaking)
+        )
+    schemas_changed = set(reference_schemas) != set(current_schemas) or any(
+        reference_schema != current_schemas.get(name)
+        for name, reference_schema in reference_schemas.items()
+    )
+    if (
+        require_version_progress
+        and (schemas_changed or reference_operations != current_operations)
+        and current_semver <= reference_semver
+    ):
+        raise ExternalContractError(
+            f"Changes from {reference_label} require a contract version increment."
         )
 
 
@@ -1020,21 +1083,40 @@ def _compatibility_baseline() -> JsonValue:
     }
 
 
-def _write_new_compatibility_baseline() -> None:
-    target = _new_compatibility_baseline_target()
+def _write_new_compatibility_baseline(*, base_ref: str | None) -> None:
+    target = _new_compatibility_baseline_target(base_ref=base_ref)
     _write_json(target, _compatibility_baseline())
 
 
-def _new_compatibility_baseline_target() -> Path:
+def _new_compatibility_baseline_target(*, base_ref: str | None) -> Path:
     existing_paths = _compatibility_baseline_paths()
     current_version = _semantic_version(EXTERNAL_CONTRACT_VERSION)
+    target = COMPATIBILITY_DIR / f"{EXTERNAL_CONTRACT_VERSION}-shape.json"
+    if base_ref is not None:
+        base_texts = _base_compatibility_baseline_texts(_validated_base_ref(base_ref))
+        if target.name in base_texts:
+            raise ExternalContractError("Released compatibility baselines are immutable.")
+        if base_texts:
+            previous_major = max(
+                _semantic_version(
+                    _required_string(
+                        _json_object(validate_json_value(json.loads(raw)), name),
+                        "contract_version",
+                    )
+                )[0]
+                for name, raw in base_texts.items()
+            )
+            if current_version[0] <= previous_major:
+                raise ExternalContractError(
+                    "A new compatibility baseline requires a new contract major version."
+                )
+        return target
     if existing_paths:
         previous_major = max(_baseline_version(path)[0] for path in existing_paths)
         if current_version[0] <= previous_major:
             raise ExternalContractError(
                 "A new compatibility baseline requires a new contract major version."
             )
-    target = COMPATIBILITY_DIR / f"{EXTERNAL_CONTRACT_VERSION}-shape.json"
     if target.exists():
         raise ExternalContractError("Released compatibility baselines are immutable.")
     return target
@@ -1070,9 +1152,7 @@ def _verify_released_baselines_immutable(*, base_ref: str | None) -> None:
     _baseline_for_current_major()
     if base_ref is None:
         return
-    if type(base_ref) is not str or not base_ref.strip():
-        raise ExternalContractError("Compatibility base ref must be a non-empty string.")
-    base_texts = _base_compatibility_baseline_texts(base_ref.strip())
+    base_texts = _base_compatibility_baseline_texts(_validated_base_ref(base_ref))
     current_by_name = {path.name: path for path in current_paths}
     missing = sorted(set(base_texts) - set(current_by_name))
     if missing:
@@ -1134,6 +1214,51 @@ def _base_compatibility_baseline_texts(base_ref: str) -> dict[str, str]:
     return baseline_texts
 
 
+def _base_contract_snapshot(
+    base_ref: str,
+) -> tuple[str, dict[str, JsonValue], set[str]] | None:
+    listing = set(
+        _git_output("ls-tree", "-r", "--name-only", base_ref, "--", "contracts").splitlines()
+    )
+    if not listing:
+        return None
+    required_paths = {"contracts/manifest.json", "contracts/openapi.yaml"}
+    if not required_paths <= listing:
+        raise ExternalContractError("Pull request base contract snapshot is incomplete.")
+    schema_paths = sorted(
+        path for path in listing if path.startswith("contracts/schemas/") and path.endswith(".json")
+    )
+    if not schema_paths:
+        raise ExternalContractError("Pull request base contract has no canonical schemas.")
+    manifest = _git_json_object(base_ref, "contracts/manifest.json")
+    openapi = _git_json_object(base_ref, "contracts/openapi.yaml")
+    schemas = {
+        Path(path).name: cast(JsonValue, _git_json_object(base_ref, path)) for path in schema_paths
+    }
+    return (
+        _required_string(manifest, "contract_version"),
+        schemas,
+        set(_openapi_operations_from_payload(openapi)),
+    )
+
+
+def _git_json_object(base_ref: str, relative_path: str) -> dict[str, JsonValue]:
+    raw = _git_output("show", f"{base_ref}:{relative_path}")
+    try:
+        payload = validate_json_value(json.loads(raw))
+    except json.JSONDecodeError as exc:
+        raise ExternalContractError(
+            f"Pull request base contract file is not valid JSON: {relative_path}."
+        ) from exc
+    return _json_object(payload, f"pull request base {relative_path}")
+
+
+def _validated_base_ref(base_ref: object) -> str:
+    if type(base_ref) is not str or not base_ref.strip():
+        raise ExternalContractError("Compatibility base ref must be a non-empty string.")
+    return base_ref.strip()
+
+
 def _git_output(*args: str) -> str:
     try:
         result = subprocess.run(
@@ -1168,6 +1293,10 @@ def _semantic_version(value: str) -> tuple[int, int, int]:
 
 def _openapi_operations() -> tuple[str, ...]:
     openapi = _json_object(_read_json(OPENAPI_PATH), "OpenAPI document")
+    return _openapi_operations_from_payload(openapi)
+
+
+def _openapi_operations_from_payload(openapi: dict[str, JsonValue]) -> tuple[str, ...]:
     paths = _json_object(openapi["paths"], "OpenAPI paths")
     operations: list[str] = []
     for path, path_item_value in sorted(paths.items()):
@@ -1327,13 +1456,6 @@ def _object_list(value: JsonValue | None) -> list[dict[str, JsonValue]]:
     if not isinstance(value, list):
         return []
     return [item for item in value if isinstance(item, dict)]
-
-
-def _major_version(value: str) -> int:
-    major, _separator, _rest = value.partition(".")
-    if not major.isdigit():
-        raise ExternalContractError("Contract version must use semantic versioning.")
-    return int(major)
 
 
 def _file_hash(path: Path) -> str:

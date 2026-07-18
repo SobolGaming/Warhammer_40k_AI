@@ -3,12 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import runpy
 import subprocess
 import sys
 from dataclasses import replace
 from pathlib import Path
 from typing import Protocol, cast
 
+import pytest
 from jsonschema import Draft202012Validator
 from referencing import Resource
 from referencing.jsonschema import (
@@ -85,6 +87,21 @@ DECISION_FAMILY_COVERAGE_PATH = Path("contracts/examples/decisions/family-covera
 
 class _PayloadValidator(Protocol):
     def validate(self, instance: object) -> None: ...
+
+
+class _ContractSnapshotVerifier(Protocol):
+    def __call__(
+        self,
+        *,
+        reference_label: str,
+        reference_version: str,
+        reference_schemas: dict[str, JsonValue],
+        reference_operations: set[str],
+        current_version: str,
+        current_schemas: dict[str, Schema],
+        current_operations: set[str],
+        require_version_progress: bool,
+    ) -> None: ...
 
 
 def test_ui_contract_artifacts_are_json_safe_and_scrubbed() -> None:
@@ -374,11 +391,80 @@ def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None
     manifest = _read_json(REPO_ROOT / Path("contracts/manifest.json"))
     hashes = _json_object(manifest["file_sha256"])
     baseline_path = REPO_ROOT / Path("contracts/compatibility/1.0.0-shape.json")
+    baseline = _read_json(baseline_path)
+    baseline_schema_names = set(_json_object(baseline["schemas"]))
+    canonical_schema_names = {
+        path.name for path in (REPO_ROOT / Path("contracts/schemas")).glob("*.json")
+    }
     canonical_hash = hashlib.sha256(
         baseline_path.read_text(encoding="utf-8").encode("utf-8")
     ).hexdigest()
 
+    assert len(canonical_schema_names) == 15
+    assert baseline_schema_names == canonical_schema_names
     assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
+
+
+def test_pr_base_contract_comparison_preserves_cumulative_minor_additions() -> None:
+    verify = _contract_snapshot_verifier()
+    schema_with_minor_addition = cast(
+        JsonValue,
+        {
+            "type": "object",
+            "properties": {"added_in_1_1": {"type": "string"}},
+        },
+    )
+    schema_without_minor_addition = cast(
+        JsonValue,
+        {"type": "object", "properties": {}},
+    )
+
+    with pytest.raises(ValueError, match="major version increment"):
+        verify(
+            reference_label="pull request base contract",
+            reference_version="1.1.0",
+            reference_schemas={"example.schema.json": schema_with_minor_addition},
+            reference_operations={"GET /added-in-1-1"},
+            current_version="1.2.0",
+            current_schemas={"example.schema.json": cast(Schema, schema_without_minor_addition)},
+            current_operations=set(),
+            require_version_progress=True,
+        )
+
+    with pytest.raises(ValueError, match="openapi operation removed"):
+        verify(
+            reference_label="pull request base contract",
+            reference_version="1.1.0",
+            reference_schemas={"example.schema.json": schema_without_minor_addition},
+            reference_operations={"GET /added-in-1-1"},
+            current_version="1.2.0",
+            current_schemas={"example.schema.json": cast(Schema, schema_without_minor_addition)},
+            current_operations=set(),
+            require_version_progress=True,
+        )
+
+    with pytest.raises(ValueError, match="contract version increment"):
+        verify(
+            reference_label="pull request base contract",
+            reference_version="1.0.0",
+            reference_schemas={"example.schema.json": schema_without_minor_addition},
+            reference_operations=set(),
+            current_version="1.0.0",
+            current_schemas={"example.schema.json": cast(Schema, schema_with_minor_addition)},
+            current_operations={"GET /added-in-1-1"},
+            require_version_progress=True,
+        )
+
+    verify(
+        reference_label="pull request base contract",
+        reference_version="1.0.0",
+        reference_schemas={"example.schema.json": schema_without_minor_addition},
+        reference_operations=set(),
+        current_version="1.1.0",
+        current_schemas={"example.schema.json": cast(Schema, schema_with_minor_addition)},
+        current_operations={"GET /added-in-1-1"},
+        require_version_progress=True,
+    )
 
 
 def test_released_contract_baseline_is_fail_closed_and_pr_ci_compares_base() -> None:
@@ -398,6 +484,7 @@ def test_released_contract_baseline_is_fail_closed_and_pr_ci_compares_base() -> 
     assert baseline_path.read_bytes() == baseline_before
     assert "fetch-depth: 0" in workflow
     assert "--base-ref ${{ github.event.pull_request.base.sha }}" in workflow
+    assert "scripts/smoke_installed_contract_wheel.py" in workflow
 
 
 def test_local_session_dev_server_exposes_read_only_routes() -> None:
@@ -471,6 +558,19 @@ def _schema_payloads() -> dict[str, Schema]:
     for path in SCHEMA_FILES:
         payloads[path.name] = cast(Schema, _read_json(REPO_ROOT / path))
     return payloads
+
+
+def _contract_snapshot_verifier() -> _ContractSnapshotVerifier:
+    scripts_directory = REPO_ROOT / Path("scripts")
+    sys.path.insert(0, str(scripts_directory))
+    try:
+        namespace = runpy.run_path(str(scripts_directory / "build_external_contract.py"))
+    finally:
+        sys.path.remove(str(scripts_directory))
+    return cast(
+        _ContractSnapshotVerifier,
+        namespace["_verify_contract_snapshot_compatibility"],
+    )
 
 
 def _schema_registry() -> SchemaRegistry:
