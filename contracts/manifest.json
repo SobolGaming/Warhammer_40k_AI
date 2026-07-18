@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "example_schema_by_path": {
     "examples/decisions/families/select_movement_action.json": "decision-family-live.schema.json",
     "examples/decisions/families/select_movement_unit.json": "decision-family-live.schema.json",
@@ -65,6 +65,9 @@
     "examples/projections/visible_modifier_datacard_view.json": "game-view.schema.json",
     "examples/replay-metadata.json": "replay-metadata.schema.json",
     "examples/sessions/create-session.json": "create-session.schema.json",
+    "examples/sessions/session-command-started.json": "session-command-result.schema.json",
+    "examples/sessions/session-create.json": "session-create.schema.json",
+    "examples/sessions/session-metadata-created.json": "session-metadata.schema.json",
     "examples/statuses/advanced.json": "lifecycle-status.schema.json",
     "examples/statuses/invalid.json": "lifecycle-status.schema.json",
     "examples/statuses/terminal.json": "lifecycle-status.schema.json",
@@ -73,8 +76,8 @@
     "examples/support-profile.json": "support-profile.schema.json"
   },
   "file_sha256": {
-    "README.md": "212765647d949cade4a52bb0897fbd48022296eb3fa0f51a3a862d68faab3a9d",
-    "compatibility-policy.md": "9e7251c5be2b7141a44a2068af83a6b736a6cb1dbf25c6c209d30abef6880352",
+    "README.md": "6a813c392eca0ceaa60c85eee4c67852dc559b8b66165fbcaa25b702c07b2fb9",
+    "compatibility-policy.md": "c6b3379d6236bd31b6d2aff238cf2abb66b6faf0b19da45af32230602baab493",
     "compatibility/1.0.0-shape.json": "a2fb7d57f0677dbc1583f4ec5c3bc0b32b3c9db80594cefb55bb90fe3c949d96",
     "conformance-scenarios/README.md": "71302edf847fd03a5e97871887c5a96082b761124c266bd3dcc0f636eb57c2fb",
     "coordinate-system.md": "9f578de720daadc7fdfa7d56685379e21f96c2f24dfc3a9a2838d4a2444115ff",
@@ -142,14 +145,17 @@
     "examples/projections/visible_modifier_datacard_view.json": "5763509524b01ab259deb0c5545642e72771236fce2d98f81479e7f0b8986c5f",
     "examples/replay-metadata.json": "68d5be7dc99ac4d15d94068f44af6151f8e32a4530f3b47fc4b8d4654dac4a88",
     "examples/sessions/create-session.json": "7d426c2b36b4d8b94a00723eea3e170433c4aa00e4dbd513e947916fde4b938b",
+    "examples/sessions/session-command-started.json": "661011506d19f2a7b4d9783d4e0a8d10b487169309bd30413cc4efadc9eea342",
+    "examples/sessions/session-create.json": "681d4d2bbf814b00bbcab269980c64950f793bb742a7d6adbec0dcd68325b901",
+    "examples/sessions/session-metadata-created.json": "2f1e5729661990c54affcd413568ba2d7a038dd0b7656a49f14078a57fb41965",
     "examples/statuses/advanced.json": "5db7d8f35a681ae9760e96e84f18b778854894f5365ad3aaaf47be5297c3fec2",
     "examples/statuses/invalid.json": "e47473e490d865d271f7bfeb411e50072d457ba3cb13fce6d8533a7aed0eb304",
     "examples/statuses/terminal.json": "d8a4cad732fc2ef74f4a10c804c172f19d4a42f0ef64f2f1a18e43eb924c61df",
     "examples/statuses/unsupported.json": "0e12a83b9b3d9adb81f758c7f9bbbe3e42e8ee036f95ce9e6022c150969deb9d",
     "examples/statuses/waiting-for-decision.json": "0ac3bcfd092d478266c52d1bd7429832649adaa42297472304413f7cdd55e644",
     "examples/support-profile.json": "8cfe2d9eb679059afe443839f6655b3b1965a6c9af523d4f4c0829ecd1e6a771",
-    "openapi.yaml": "902f274b209d7685a754ff69f4b2c9a3935ecff418b5f18d5b318233dd59ae8b",
-    "redaction-policy.md": "ee788981b3cf7d2bbf4354892cb70bb7407bb1ae88b5f7382d70414000b2fcfd",
+    "openapi.yaml": "ee1732b6c1da9883f134e5d158be67ecd9a36e2822ed48b1b9ce66c2bac6a757",
+    "redaction-policy.md": "c9dd0028aa8c682299ae6e479e762f5929e699cbf03180583ffce453bdbddc77",
     "schemas/create-session.schema.json": "ebc46ea4fc65ccacc58ae316dee0e56c5bbbfeb442fe523ec4ff66219341d244",
     "schemas/decision-family-coverage.schema.json": "6e012be0ef04aaf9c8167d039a2dea5870beda62fd5dff09b960fa3a651860b8",
     "schemas/decision-family-live.schema.json": "9b9a553370a396101d578fab166459b05c15f63898d251fbb4f1790322670c7e",
@@ -164,8 +170,11 @@
     "schemas/proposal-payload.schema.json": "ad87970cd162764022efbc6911961a195c78c78e2c4baa2c6b97c32f82ce66d2",
     "schemas/replay-metadata.schema.json": "6fc21d0e6e5217f19bc4126e6b88370cf906fd9c5a0f78d4f98965d225f1d1ae",
     "schemas/rules-catalog.schema.json": "5fcb2ce83d6fc273f51c24b92264f526ae7e37c7f38497c5ad42c228caf1c5ad",
+    "schemas/session-command-result.schema.json": "d2fc01626683f5f8d9984cb301c265db080da53c1ea1831df322bd4e9cb1a8ce",
+    "schemas/session-create.schema.json": "e35a3f4545da9915bdc5a68d780250a1450f52c759e122bab5f05b71b6e8b97f",
+    "schemas/session-metadata.schema.json": "1c7c4f77dbc1397352d411c4260c3f458a0b60a6208e26f0d6fb2052a2cf2a7a",
     "schemas/support-profile.schema.json": "204ad211ec18ba0e38d224c6ac16c5a7df056505d34964be6ba6ee1b1800d07d",
-    "session-semantics.md": "d73fb5ffc32b7411a1f8420e3a8ef7d4230576868703b97e356e3e28415b301d"
+    "session-semantics.md": "202b237fe4f93ac4fde6e3585480351c025975f16734a5e2e3befe416f28f129"
   },
   "known_external_decision_token_count": 69,
   "live_decision_scenario_count": 4,
@@ -186,6 +195,9 @@
     "proposal-payload.schema.json": "https://warhammer40k-core.local/contracts/v1/proposal-payload.schema.json",
     "replay-metadata.schema.json": "https://warhammer40k-core.local/contracts/v1/replay-metadata.schema.json",
     "rules-catalog.schema.json": "https://warhammer40k-core.local/contracts/v1/rules-catalog.schema.json",
+    "session-command-result.schema.json": "https://warhammer40k-core.local/contracts/v1/session-command-result.schema.json",
+    "session-create.schema.json": "https://warhammer40k-core.local/contracts/v1/session-create.schema.json",
+    "session-metadata.schema.json": "https://warhammer40k-core.local/contracts/v1/session-metadata.schema.json",
     "support-profile.schema.json": "https://warhammer40k-core.local/contracts/v1/support-profile.schema.json"
   }
 }

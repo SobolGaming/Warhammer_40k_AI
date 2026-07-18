@@ -94,6 +94,7 @@ def test_local_game_session_satisfies_shared_adapter_session_protocol() -> None:
     assert catalog_view["catalog_id"] == session.lifecycle.config.army_catalog.catalog_id
     assert game_view["viewer_player_id"] == "player-a"
     assert event_delta["viewer_player_id"] == "player-a"
+    assert session.decision_record_count() == 0
     assert validate_json_value(json.loads(json.dumps(catalog_view, sort_keys=True))) == catalog_view
     assert validate_json_value(json.loads(json.dumps(game_view, sort_keys=True))) == game_view
     assert validate_json_value(json.loads(json.dumps(event_delta, sort_keys=True))) == event_delta

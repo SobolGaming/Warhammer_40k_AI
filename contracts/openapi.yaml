@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Warhammer 40,000 CORE V2 Adapter Contract",
-    "version": "1.0.0",
-    "description": "Transport-neutral Phase 18D contract over the shared AdapterGameSession decision path."
+    "version": "1.1.0",
+    "description": "Transport-neutral Phase 18E session protocol over the shared AdapterGameSession decision path."
   },
   "servers": [
     {"url": "http://127.0.0.1:8000"}
@@ -158,6 +158,182 @@
           "default": {"$ref": "#/components/responses/Error"}
         }
       }
+    },
+    "/sessions": {
+      "post": {
+        "operationId": "createAuthoritativeSession",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "./schemas/session-create.schema.json"}}
+          }
+        },
+        "responses": {
+          "201": {"$ref": "#/components/responses/SessionMetadata"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}": {
+      "get": {
+        "operationId": "getSessionMetadata",
+        "parameters": [
+          {"$ref": "#/components/parameters/SessionId"},
+          {"$ref": "#/components/parameters/OptionalViewerPlayerId"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/SessionMetadata"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/start": {
+      "post": {
+        "operationId": "startSession",
+        "parameters": [
+          {"$ref": "#/components/parameters/SessionId"},
+          {"$ref": "#/components/parameters/ViewerPlayerId"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/SessionCommandResult"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/projection": {
+      "get": {
+        "operationId": "getSessionProjection",
+        "parameters": [
+          {"$ref": "#/components/parameters/SessionId"},
+          {"$ref": "#/components/parameters/ViewerPlayerId"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Viewer-scoped game projection.",
+            "content": {
+              "application/json": {"schema": {"$ref": "./schemas/game-view.schema.json"}}
+            }
+          },
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/catalog": {
+      "get": {
+        "operationId": "getSessionCatalog",
+        "parameters": [{"$ref": "#/components/parameters/SessionId"}],
+        "responses": {
+          "200": {
+            "description": "Source-hashed static rules catalog.",
+            "content": {
+              "application/json": {"schema": {"$ref": "./schemas/rules-catalog.schema.json"}}
+            }
+          },
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/events": {
+      "get": {
+        "operationId": "getSessionEvents",
+        "parameters": [
+          {"$ref": "#/components/parameters/SessionId"},
+          {"$ref": "#/components/parameters/ViewerPlayerId"},
+          {"$ref": "#/components/parameters/EventCursor"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Viewer-scoped event delta.",
+            "content": {
+              "application/json": {"schema": {"$ref": "./schemas/event-delta.schema.json"}}
+            }
+          },
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/decisions/{request_id}/option": {
+      "post": {
+        "operationId": "submitSessionFiniteDecision",
+        "parameters": [
+          {"$ref": "#/components/parameters/SessionId"},
+          {"$ref": "#/components/parameters/RequestId"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "./schemas/finite-submission.schema.json"}}
+          }
+        },
+        "responses": {
+          "200": {"$ref": "#/components/responses/SessionCommandResult"},
+          "422": {"$ref": "#/components/responses/SessionCommandResult"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/decisions/{request_id}/payload": {
+      "post": {
+        "operationId": "submitSessionParameterizedDecision",
+        "parameters": [
+          {"$ref": "#/components/parameters/SessionId"},
+          {"$ref": "#/components/parameters/RequestId"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "./schemas/parameterized-submission.schema.json"}
+            }
+          }
+        },
+        "responses": {
+          "200": {"$ref": "#/components/responses/SessionCommandResult"},
+          "422": {"$ref": "#/components/responses/SessionCommandResult"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/advance": {
+      "post": {
+        "operationId": "advanceAuthoritativeSession",
+        "parameters": [
+          {"$ref": "#/components/parameters/SessionId"},
+          {"$ref": "#/components/parameters/ViewerPlayerId"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/SessionCommandResult"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/replay": {
+      "get": {
+        "operationId": "exportSessionReplay",
+        "parameters": [{"$ref": "#/components/parameters/SessionId"}],
+        "responses": {
+          "200": {
+            "description": "Deterministic replay artifact and metadata.",
+            "content": {
+              "application/json": {"schema": {"$ref": "./schemas/replay-metadata.schema.json"}}
+            }
+          },
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/close": {
+      "post": {
+        "operationId": "closeSession",
+        "parameters": [
+          {"$ref": "#/components/parameters/SessionId"},
+          {"$ref": "#/components/parameters/ViewerPlayerId"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/SessionCommandResult"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
     }
   },
   "components": {
@@ -186,6 +362,12 @@
         "required": true,
         "schema": {"type": "string", "minLength": 1}
       },
+      "SessionId": {
+        "name": "session_id",
+        "in": "path",
+        "required": true,
+        "schema": {"type": "string", "minLength": 1}
+      },
       "ViewerPlayerId": {
         "name": "viewer_player_id",
         "in": "query",
@@ -205,6 +387,20 @@
         "content": {
           "application/json": {"schema": {"$ref": "./schemas/lifecycle-status.schema.json"}}
         }
+      },
+      "SessionCommandResult": {
+        "description": "Coherent post-drain session command result.",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "./schemas/session-command-result.schema.json"}
+          }
+        }
+      },
+      "SessionMetadata": {
+        "description": "Authoritative session identity, lifecycle, and checkpoint metadata.",
+        "content": {
+          "application/json": {"schema": {"$ref": "./schemas/session-metadata.schema.json"}}
+        }
       }
     },
     "schemas": {
@@ -219,6 +415,9 @@
       "ProposalPayload": {"$ref": "./schemas/proposal-payload.schema.json"},
       "ReplayMetadata": {"$ref": "./schemas/replay-metadata.schema.json"},
       "RulesCatalog": {"$ref": "./schemas/rules-catalog.schema.json"},
+      "SessionCommandResult": {"$ref": "./schemas/session-command-result.schema.json"},
+      "SessionCreate": {"$ref": "./schemas/session-create.schema.json"},
+      "SessionMetadata": {"$ref": "./schemas/session-metadata.schema.json"},
       "SupportProfile": {"$ref": "./schemas/support-profile.schema.json"}
     }
   }

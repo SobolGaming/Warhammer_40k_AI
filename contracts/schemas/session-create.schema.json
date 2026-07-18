@@ -1,0 +1,61 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/session-create.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "config": {
+      "$ref": "https://warhammer40k-core.local/contracts/v1/create-session.schema.json#/properties/config"
+    },
+    "participant_assignments": {
+      "items": {"$ref": "#/$defs/participant_assignment"},
+      "minItems": 2,
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "session-create-v1",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "config",
+    "participant_assignments"
+  ],
+  "title": "CORE V2 SessionCreatePayload",
+  "type": "object",
+  "$defs": {
+    "participant_assignment": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {"role": {"const": "player"}},
+            "required": ["role"]
+          },
+          "then": {
+            "properties": {"player_id": {"minLength": 1, "type": "string"}}
+          }
+        },
+        {
+          "if": {
+            "properties": {"role": {"enum": ["spectator", "observer"]}},
+            "required": ["role"]
+          },
+          "then": {
+            "properties": {"player_id": {"type": "null"}}
+          }
+        }
+      ],
+      "properties": {
+        "participant_id": {"minLength": 1, "type": "string"},
+        "player_id": {"type": ["string", "null"]},
+        "role": {
+          "enum": ["player", "spectator", "observer"],
+          "type": "string"
+        }
+      },
+      "required": ["participant_id", "role", "player_id"],
+      "type": "object"
+    }
+  }
+}

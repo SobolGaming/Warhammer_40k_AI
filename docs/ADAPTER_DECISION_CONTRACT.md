@@ -1,6 +1,6 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog once-per-battle ability choices, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog charge-end mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, Phase 18C shared adapter session facade requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog once-per-battle ability choices, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog charge-end mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, Phase 18C shared adapter session facade requirements, Phase 18E formal session/transport semantics, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
 This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog charge-end mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, Phase 18C shared adapter session facade requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
@@ -2558,6 +2558,7 @@ class AdapterGameSession(Protocol):
         *,
         viewer_player_id: str,
     ) -> EventStreamDeltaPayload: ...
+    def decision_record_count(self) -> int: ...
     def submit_option(
         self,
         *,
@@ -2599,7 +2600,53 @@ engine-owned replay validation, not producer or transport layers.
 `GameLifecycle` instance, validates viewer IDs for event streams, projects
 viewer-safe views and source-hashed catalog data, and delegates submissions to
 the adapter submission helpers that enforce pending `request_id` matching before
-calling `GameLifecycle.submit_decision(...)`.
+calling `GameLifecycle.submit_decision(...)`. Its monotonic
+`decision_record_count()` checkpoint lets an authoritative transport distinguish
+pre-record invalid results from recorded invalid/retry attempts without reaching
+through the facade to lifecycle internals.
+
+## Formal Session Transport
+
+Phase 18E wraps the shared facade in an authoritative formal session protocol.
+Its required operations are create, metadata, start, projection, catalog,
+events, finite submission, parameterized submission, explicit advance, replay
+export, and close. The transport keeps `session_id` distinct from engine
+`game_id`, validates participant assignments, publishes source/build/contract
+identity, and returns monotonic session revisions plus viewer-scoped projection
+and event checkpoints.
+
+An accepted finite or parameterized command is submitted exactly once through
+`AdapterGameSession`, then the session owner performs a bounded deterministic
+drain to the next decision, terminal result, typed invalid/unsupported result,
+or transition-budget safety boundary. One command therefore returns one
+coherent post-drain `SessionCommandResult`; a client must not guess how many
+internal `advance` calls are needed. Explicit advance remains an operator,
+conformance, recovery, and documented idle-boundary operation.
+
+`SessionCommandResult.committed` and `accepted` are intentionally distinct.
+`committed` means the command was recorded in authoritative history and caused
+exactly one session-revision increment. `accepted` means the proposed gameplay
+action was rule-valid/applied. A well-formed, recorded invalid attempt that emits
+a fresh retry request returns HTTP 422 with `committed: true`, `accepted: false`,
+the incremented revision, and the viewer-scoped event range. Failures rejected
+before the facade call return a typed error envelope. Engine pre-validator
+failures returned by the facade use the command result with `committed: false`,
+`accepted: false` and do not increment the revision.
+The public schema and runtime require `accepted: true` to imply
+`committed: true`. A valid recorded action remains accepted when its
+post-application deterministic advancement reaches the typed
+`transition_budget_exhausted` safety boundary: the result is `committed: true`,
+`accepted: true` with lifecycle `status_kind: "unsupported"`. A directly
+returned recorded `unsupported` result without that typed proof of completed
+application is `committed: true`, `accepted: false`.
+
+Session metadata and command results obey the same viewer redaction policy as
+projections and event deltas. A viewerless metadata response exposes no
+projection hash, and transport errors contain stable public text rather than
+caught engine exception details. Participant roles in Phase 18E are protocol
+metadata, not authentication; Phase 18H owns principal-to-role authorization.
+Phase 18F owns command idempotency and expected-revision concurrency checks,
+while Phase 18G owns durable cursor/reconnect/resynchronization behavior.
 
 ## Suggested Adapter Loop
 

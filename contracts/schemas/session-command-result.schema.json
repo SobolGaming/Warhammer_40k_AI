@@ -1,0 +1,67 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/session-command-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "if": {
+    "properties": {
+      "accepted": {"const": true}
+    }
+  },
+  "properties": {
+    "accepted": {"type": "boolean"},
+    "checkpoint": {"$ref": "#/$defs/checkpoint"},
+    "committed": {"type": "boolean"},
+    "event_range": {"$ref": "#/$defs/event_range"},
+    "operation": {
+      "enum": [
+        "start_session",
+        "advance_session",
+        "submit_finite_decision",
+        "submit_parameterized_decision",
+        "close_session"
+      ],
+      "type": "string"
+    },
+    "schema_version": {"const": "session-command-result-v1", "type": "string"},
+    "session": {
+      "$ref": "https://warhammer40k-core.local/contracts/v1/session-metadata.schema.json"
+    }
+  },
+  "required": [
+    "schema_version",
+    "operation",
+    "committed",
+    "accepted",
+    "session",
+    "checkpoint",
+    "event_range"
+  ],
+  "then": {
+    "properties": {
+      "committed": {"const": true}
+    }
+  },
+  "title": "CORE V2 SessionCommandResultPayload",
+  "type": "object",
+  "$defs": {
+    "checkpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "event_cursor": {"minimum": 0, "type": "integer"},
+        "projection_state_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "viewer_player_id": {"minLength": 1, "type": "string"}
+      },
+      "required": ["viewer_player_id", "projection_state_hash", "event_cursor"],
+      "type": "object"
+    },
+    "event_range": {
+      "additionalProperties": false,
+      "properties": {
+        "from_cursor": {"minimum": 0, "type": "integer"},
+        "to_cursor": {"minimum": 0, "type": "integer"}
+      },
+      "required": ["from_cursor", "to_cursor"],
+      "type": "object"
+    }
+  }
+}

@@ -852,11 +852,17 @@ def test_lifecycle_transition_guard_is_recorded_in_config_provenance() -> None:
     assert GameLifecycle.from_payload(payload).config.max_lifecycle_transitions == 127
 
 
-def test_lifecycle_transition_guard_fails_deterministically_when_config_limit_is_too_low() -> None:
+def test_lifecycle_transition_guard_returns_typed_boundary_when_config_limit_is_too_low() -> None:
     lifecycle = _start_lifecycle(_config(max_lifecycle_transitions=1))
 
-    with pytest.raises(GameLifecycleError, match="exceeded deterministic transition guard"):
-        lifecycle.advance_until_decision_or_terminal()
+    status = lifecycle.advance_until_decision_or_terminal()
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert status.message == "Lifecycle reached its deterministic transition safety boundary."
+    assert status.payload == {
+        "unsupported_reason": "transition_budget_exhausted",
+        "transition_budget": 1,
+    }
 
 
 def test_game_config_rejects_lifecycle_sequence_prerequisite_gaps() -> None:
