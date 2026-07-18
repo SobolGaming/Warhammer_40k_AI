@@ -11,7 +11,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 import pytest
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError
 from referencing import Resource
 from referencing.jsonschema import (
     DRAFT202012,
@@ -543,6 +543,129 @@ def test_phase18e_recorded_invalid_retry_commits_one_session_revision() -> None:
     assert _field_object(uncommitted, "session")["session_revision"] == revision_before + 1
     replay_uncommitted = _request(server, "GET", f"/sessions/{session_id}/replay")
     assert len(_field_list(replay_uncommitted, "decision_records")) == before_record_count + 1
+
+
+def test_phase18e_applied_decision_reaching_transition_budget_is_accepted() -> None:
+    server = AdapterGameServer()
+    game_id = "phase18e-applied-transition-budget"
+    create_body = _session_create_body(game_id=game_id)
+    _field_object(create_body, "config")["max_lifecycle_transitions"] = 1
+    created = _request(
+        server,
+        "POST",
+        "/sessions",
+        body=create_body,
+        expected_status=201,
+    )
+    session_id = _field_string(created, "session_id")
+    boundary_result = _request(
+        server,
+        "POST",
+        f"/sessions/{session_id}/start",
+        query={"viewer_player_id": PLAYER_A},
+    )
+    for _advance_index in range(16):
+        lifecycle_status = _field_object(
+            _field_object(boundary_result, "session"),
+            "lifecycle_status",
+        )
+        if lifecycle_status["status_kind"] == "waiting_for_decision":
+            break
+        assert lifecycle_status["status_kind"] == "unsupported"
+        assert _field_object(lifecycle_status, "payload") == {
+            "unsupported_reason": "transition_budget_exhausted",
+            "transition_budget": 1,
+        }
+        boundary_result = _request(
+            server,
+            "POST",
+            f"/sessions/{session_id}/advance",
+            query={"viewer_player_id": PLAYER_A},
+        )
+    else:
+        raise AssertionError("Constrained protocol session did not reach its first decision.")
+
+    first_request = _protocol_pending_decision_for_any_player(
+        server,
+        session_id=session_id,
+    )
+    assert first_request["decision_type"] == SECONDARY_MISSION_DECISION_TYPE
+    first_result = _protocol_submit_option(
+        server,
+        session_id=session_id,
+        request=first_request,
+        option_id=FIXED_SECONDARY_OPTION_ID,
+        result_id=f"{game_id}-secondary-a",
+    )
+    second_request = _protocol_pending_decision_for_any_player(
+        server,
+        session_id=session_id,
+    )
+    revision_before = _field_int(_field_object(first_result, "session"), "session_revision")
+    replay_before = _request(server, "GET", f"/sessions/{session_id}/replay")
+    record_count_before = len(_field_list(replay_before, "decision_records"))
+    second_result_id = f"{game_id}-secondary-b"
+
+    result = _protocol_submit_option(
+        server,
+        session_id=session_id,
+        request=second_request,
+        option_id=FIXED_SECONDARY_OPTION_ID,
+        result_id=second_result_id,
+    )
+
+    _schema_validator("session-command-result.schema.json").validate(result)
+    assert result["committed"] is True
+    assert result["accepted"] is True
+    result_session = _field_object(result, "session")
+    assert _field_int(result_session, "session_revision") == revision_before + 1
+    lifecycle_status = _field_object(result_session, "lifecycle_status")
+    assert lifecycle_status["status_kind"] == "unsupported"
+    assert _field_object(lifecycle_status, "payload") == {
+        "unsupported_reason": "transition_budget_exhausted",
+        "transition_budget": 1,
+    }
+    event_range = _field_object(result, "event_range")
+    from_cursor = _field_int(event_range, "from_cursor")
+    to_cursor = _field_int(event_range, "to_cursor")
+    assert to_cursor > from_cursor
+    event_delta = _request(
+        server,
+        "GET",
+        f"/sessions/{session_id}/events",
+        query={"viewer_player_id": _actor(second_request), "cursor": str(from_cursor)},
+    )
+    event_types = [
+        _field_string(_json_object(event), "event_type")
+        for event in _field_list(event_delta, "events")
+    ]
+    assert "decision_recorded" in event_types
+    assert "secondary_mission_choice_recorded" in event_types
+    assert "secondary_missions_revealed" in event_types
+    projection = _request(
+        server,
+        "GET",
+        f"/sessions/{session_id}/projection",
+        query={"viewer_player_id": PLAYER_A},
+    )
+    assert len(_field_list(projection, "public_secondary_mission_choices")) == 2
+    replay_after = _request(server, "GET", f"/sessions/{session_id}/replay")
+    records = [_json_object(value) for value in _field_list(replay_after, "decision_records")]
+    assert len(records) == record_count_before + 1
+    assert _field_string(_field_object(records[-1], "result"), "result_id") == second_result_id
+
+
+def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committed() -> None:
+    validator = _schema_validator("session-command-result.schema.json")
+    example = _read_json(
+        REPO_ROOT / "contracts" / "examples" / "sessions" / "session-command-started.json"
+    )
+    for committed, accepted in ((True, True), (True, False), (False, False)):
+        payload = {**example, "committed": committed, "accepted": accepted}
+        validator.validate(payload)
+
+    with pytest.raises(ValidationError):
+        validator.validate({**example, "committed": False, "accepted": True})
 
 
 def test_phase18e_session_create_validation_fails_before_authoritative_creation() -> None:

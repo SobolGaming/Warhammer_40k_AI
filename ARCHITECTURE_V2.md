@@ -5307,6 +5307,11 @@ Advancement semantics:
 - command results distinguish authoritative-history `committed` from gameplay
   `accepted`; recorded invalid/retry attempts increment the revision exactly
   once while returning `committed: true` and `accepted: false`;
+- `accepted: true` requires `committed: true`; a valid recorded action followed
+  by a typed `transition_budget_exhausted` post-application safety boundary
+  remains accepted even though the resulting lifecycle status is `unsupported`,
+  while other directly returned recorded unsupported outcomes remain rejected
+  unless their typed status proves completed application;
 - explicit `AdvanceSession` remains available for session start, recovery,
   operator/conformance use, and documented idle boundaries, not as a client-side
   replacement for post-submission draining.

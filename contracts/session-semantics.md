@@ -43,6 +43,12 @@ rule-valid/applied. A recorded invalid attempt therefore returns
 range, and exposes the fresh retry request through the viewer projection. An
 invalid result rejected by an engine pre-validator before decision recording
 returns `committed: false`, `accepted: false` and leaves the revision unchanged.
+The schema and runtime both require `accepted: true` to imply `committed: true`.
+A recorded valid action whose deterministic post-application advancement reaches
+the typed `transition_budget_exhausted` safety boundary remains accepted; its
+lifecycle status is `unsupported`, but it returns `committed: true`,
+`accepted: true`. Other directly returned recorded `unsupported` outcomes are
+not accepted unless their typed status proves that application completed.
 
 After an accepted finite or parameterized submission, the server performs a
 bounded deterministic drain until the next adapter-visible decision, terminal

@@ -2632,6 +2632,13 @@ the incremented revision, and the viewer-scoped event range. Failures rejected
 before the facade call return a typed error envelope. Engine pre-validator
 failures returned by the facade use the command result with `committed: false`,
 `accepted: false` and do not increment the revision.
+The public schema and runtime require `accepted: true` to imply
+`committed: true`. A valid recorded action remains accepted when its
+post-application deterministic advancement reaches the typed
+`transition_budget_exhausted` safety boundary: the result is `committed: true`,
+`accepted: true` with lifecycle `status_kind: "unsupported"`. A directly
+returned recorded `unsupported` result without that typed proof of completed
+application is `committed: true`, `accepted: false`.
 
 Session metadata and command results obey the same viewer redaction policy as
 projections and event deltas. A viewerless metadata response exposes no

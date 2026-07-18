@@ -170,11 +170,11 @@
     "schemas/proposal-payload.schema.json": "ad87970cd162764022efbc6911961a195c78c78e2c4baa2c6b97c32f82ce66d2",
     "schemas/replay-metadata.schema.json": "6fc21d0e6e5217f19bc4126e6b88370cf906fd9c5a0f78d4f98965d225f1d1ae",
     "schemas/rules-catalog.schema.json": "5fcb2ce83d6fc273f51c24b92264f526ae7e37c7f38497c5ad42c228caf1c5ad",
-    "schemas/session-command-result.schema.json": "e91829d6c57cf3b1cdddfe35fc7051a652820977dbd5d4ce69cb87874e9b234c",
+    "schemas/session-command-result.schema.json": "d2fc01626683f5f8d9984cb301c265db080da53c1ea1831df322bd4e9cb1a8ce",
     "schemas/session-create.schema.json": "e35a3f4545da9915bdc5a68d780250a1450f52c759e122bab5f05b71b6e8b97f",
     "schemas/session-metadata.schema.json": "1c7c4f77dbc1397352d411c4260c3f458a0b60a6208e26f0d6fb2052a2cf2a7a",
     "schemas/support-profile.schema.json": "204ad211ec18ba0e38d224c6ac16c5a7df056505d34964be6ba6ee1b1800d07d",
-    "session-semantics.md": "f6bf256c5c3e0b4d577cdc7de86f254e8cc55011fd1a3ca2ac6e1c71dc561578"
+    "session-semantics.md": "202b237fe4f93ac4fde6e3585480351c025975f16734a5e2e3befe416f28f129"
   },
   "known_external_decision_token_count": 69,
   "live_decision_scenario_count": 4,

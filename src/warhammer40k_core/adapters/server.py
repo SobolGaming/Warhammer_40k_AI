@@ -864,24 +864,36 @@ def _commit_submission_status(
     record_count_before: int,
     timestamp: str,
 ) -> tuple[LifecycleStatus, bool, bool]:
-    accepted = status.status_kind not in {
-        LifecycleStatusKind.INVALID,
-        LifecycleStatusKind.UNSUPPORTED,
-    }
-    committed_status = (
-        _drain_after_submission(session=session, status=status) if accepted else status
-    )
     committed = _decision_history_advanced(
         record=record,
         record_count_before=record_count_before,
     )
-    if accepted and not committed:
-        raise SessionProtocolError("Accepted session submission was not recorded.")
+    accepted = _submission_was_applied(status=status, committed=committed)
+    committed_status = (
+        _drain_after_submission(session=session, status=status) if accepted else status
+    )
     if committed:
         record.commit_status(committed_status, timestamp=timestamp)
     else:
         record.observe_uncommitted_status(committed_status, timestamp=timestamp)
     return committed_status, committed, accepted
+
+
+def _submission_was_applied(*, status: LifecycleStatus, committed: bool) -> bool:
+    if status.status_kind is LifecycleStatusKind.INVALID:
+        return False
+    if status.status_kind is LifecycleStatusKind.UNSUPPORTED:
+        return committed and _is_transition_budget_boundary(status)
+    if not committed:
+        raise SessionProtocolError("Accepted session submission was not recorded.")
+    return True
+
+
+def _is_transition_budget_boundary(status: LifecycleStatus) -> bool:
+    payload = status.payload
+    if not isinstance(payload, dict) or "unsupported_reason" not in payload:
+        return False
+    return payload["unsupported_reason"] == "transition_budget_exhausted"
 
 
 def _decision_record_count(record: AuthoritativeSession) -> int:

@@ -2,6 +2,11 @@
   "$id": "https://warhammer40k-core.local/contracts/v1/session-command-result.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
+  "if": {
+    "properties": {
+      "accepted": {"const": true}
+    }
+  },
   "properties": {
     "accepted": {"type": "boolean"},
     "checkpoint": {"$ref": "#/$defs/checkpoint"},
@@ -31,6 +36,11 @@
     "checkpoint",
     "event_range"
   ],
+  "then": {
+    "properties": {
+      "committed": {"const": true}
+    }
+  },
   "title": "CORE V2 SessionCommandResultPayload",
   "type": "object",
   "$defs": {
