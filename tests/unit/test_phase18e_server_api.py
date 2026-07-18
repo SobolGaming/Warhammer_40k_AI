@@ -20,9 +20,11 @@ from referencing.jsonschema import (
     SchemaRegistry,
     SchemaResource,
 )
+from tests.movement_submission_helpers import straight_line_witness_for_unit
 
 from warhammer40k_core.adapters.external_contract import (
     CREATE_SESSION_SCHEMA_VERSION,
+    EXTERNAL_CONTRACT_VERSION,
     FINITE_SUBMISSION_SCHEMA_VERSION,
     PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_VERSION,
@@ -41,7 +43,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -52,10 +54,16 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    MovementProposalPayload,
+    MovementProposalRequest,
+    MovementProposalRequestPayload,
+)
 from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
 from warhammer40k_core.engine.replay import ReplayArtifactPayload, ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.wargear_selections import (
@@ -72,6 +80,7 @@ SUBMIT_DEPLOYMENT_PLACEMENT = "submit_deployment_placement"
 SELECT_MOVEMENT_UNIT = "select_movement_unit"
 SELECT_MOVEMENT_ACTION = "select_movement_action"
 ADVANCE_ACTION_OPTION_ID = "advance"
+NORMAL_MOVE_ACTION_OPTION_ID = "normal_move"
 
 
 class _PayloadValidator(Protocol):
@@ -214,7 +223,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
     assert created["projection_state_hash"] is None
     assert created["created_at"] == "2026-07-18T20:00:00Z"
     assert created["last_activity_at"] == created["created_at"]
-    assert created["server_contract_version"] == "1.1.0"
+    assert created["server_contract_version"] == EXTERNAL_CONTRACT_VERSION
     assert created["engine_version"] == "0.1.0"
     assert _field_string(created, "engine_build_id")
     assignments = [_json_object(value) for value in _field_list(created, "participant_assignments")]
@@ -233,6 +242,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
     )
     _schema_validator("session-command-result.schema.json").validate(started)
     assert started["operation"] == "start_session"
+    assert started["committed"] is True
     assert started["accepted"] is True
     started_session = _field_object(started, "session")
     assert started_session["session_state"] == "active"
@@ -354,6 +364,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
         },
     )
     assert placement_result["operation"] == "submit_parameterized_decision"
+    assert placement_result["committed"] is True
     assert placement_result["accepted"] is True
     assert _field_object(placement_result, "session")["session_revision"] == 6
 
@@ -376,6 +387,162 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
     )
     assert rejected.status_code == 409
     assert _error_code(rejected) == "session_closed"
+
+
+def test_phase18e_recorded_invalid_retry_commits_one_session_revision() -> None:
+    local_session = LocalGameSession()
+    server = AdapterGameServer(session_factory=lambda: local_session)
+    game_id = "phase18e-recorded-invalid-retry"
+    created = _request(
+        server,
+        "POST",
+        "/sessions",
+        body=_session_create_body(game_id=game_id),
+        expected_status=201,
+    )
+    session_id = _field_string(created, "session_id")
+    _request(
+        server,
+        "POST",
+        f"/sessions/{session_id}/start",
+        query={"viewer_player_id": PLAYER_A},
+    )
+    movement_request = _advance_protocol_to_movement_selection(
+        server,
+        session_id=session_id,
+    )
+    unit_result = _protocol_submit_option(
+        server,
+        session_id=session_id,
+        request=movement_request,
+        option_id=_first_option_id(movement_request),
+        result_id=f"{game_id}-movement-unit",
+    )
+    action_request = _protocol_pending_decision_for_any_player(
+        server,
+        session_id=session_id,
+    )
+    assert action_request["decision_type"] == SELECT_MOVEMENT_ACTION
+    action_result = _protocol_submit_option(
+        server,
+        session_id=session_id,
+        request=action_request,
+        option_id=NORMAL_MOVE_ACTION_OPTION_ID,
+        result_id=f"{game_id}-normal-move",
+    )
+    revision_before = _field_int(_field_object(action_result, "session"), "session_revision")
+    assert revision_before == (
+        _field_int(_field_object(unit_result, "session"), "session_revision") + 1
+    )
+
+    proposal_request = _protocol_pending_decision_for_any_player(
+        server,
+        session_id=session_id,
+    )
+    proposal_view = _request(
+        server,
+        "GET",
+        f"/sessions/{session_id}/projection",
+        query={"viewer_player_id": _actor(proposal_request)},
+    )
+    proposal_context = MovementProposalRequest.from_payload(
+        cast(
+            MovementProposalRequestPayload,
+            _field_object(proposal_view, "pending_proposal"),
+        )
+    )
+    invalid_witness = straight_line_witness_for_unit(
+        local_session.lifecycle,
+        unit_instance_id=proposal_context.unit_instance_id,
+        dx=1000.0,
+    )
+    invalid_result_id = f"{game_id}-invalid-movement"
+    replay_before = _request(server, "GET", f"/sessions/{session_id}/replay")
+    before_record_count = len(_field_list(replay_before, "decision_records"))
+
+    response = _request_raw(
+        server,
+        "POST",
+        f"/sessions/{session_id}/decisions/{_request_id(proposal_request)}/payload",
+        body={
+            "schema_version": PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+            "actor_id": _actor(proposal_request),
+            "payload": validate_json_value(
+                MovementProposalPayload(
+                    proposal_request_id=proposal_context.request_id,
+                    proposal_kind=proposal_context.proposal_kind,
+                    unit_instance_id=proposal_context.unit_instance_id,
+                    movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+                    movement_mode=MovementMode.NORMAL.value,
+                    witness=invalid_witness,
+                ).to_payload()
+            ),
+            "result_id": invalid_result_id,
+        },
+    )
+
+    assert response.status_code == 422
+    result = _json_object(response.payload)
+    _schema_validator("session-command-result.schema.json").validate(result)
+    assert result["committed"] is True
+    assert result["accepted"] is False
+    result_session = _field_object(result, "session")
+    assert _field_int(result_session, "session_revision") == revision_before + 1
+    assert _field_string(_field_object(result_session, "lifecycle_status"), "status_kind") == (
+        "invalid"
+    )
+    event_range = _field_object(result, "event_range")
+    assert _field_int(event_range, "to_cursor") > _field_int(event_range, "from_cursor")
+
+    retry_request = _protocol_pending_decision_for_any_player(
+        server,
+        session_id=session_id,
+    )
+    assert _request_id(retry_request) != _request_id(proposal_request)
+    replay_after = _request(server, "GET", f"/sessions/{session_id}/replay")
+    records = [_json_object(value) for value in _field_list(replay_after, "decision_records")]
+    assert len(records) == before_record_count + 1
+    assert _field_string(_field_object(records[-1], "result"), "result_id") == invalid_result_id
+
+    retry_view = _request(
+        server,
+        "GET",
+        f"/sessions/{session_id}/projection",
+        query={"viewer_player_id": _actor(retry_request)},
+    )
+    retry_context = MovementProposalRequest.from_payload(
+        cast(
+            MovementProposalRequestPayload,
+            _field_object(retry_view, "pending_proposal"),
+        )
+    )
+    drifted_payload = validate_json_value(
+        MovementProposalPayload(
+            proposal_request_id="phase18e-drifted-proposal-request",
+            proposal_kind=retry_context.proposal_kind,
+            unit_instance_id=retry_context.unit_instance_id,
+            movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+            movement_mode=MovementMode.NORMAL.value,
+            witness=invalid_witness,
+        ).to_payload()
+    )
+    uncommitted = _request(
+        server,
+        "POST",
+        f"/sessions/{session_id}/decisions/{_request_id(retry_request)}/payload",
+        body={
+            "schema_version": PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+            "actor_id": _actor(retry_request),
+            "payload": drifted_payload,
+            "result_id": f"{game_id}-uncommitted-drift",
+        },
+        expected_status=422,
+    )
+    assert uncommitted["committed"] is False
+    assert uncommitted["accepted"] is False
+    assert _field_object(uncommitted, "session")["session_revision"] == revision_before + 1
+    replay_uncommitted = _request(server, "GET", f"/sessions/{session_id}/replay")
+    assert len(_field_list(replay_uncommitted, "decision_records")) == before_record_count + 1
 
 
 def test_phase18e_session_create_validation_fails_before_authoritative_creation() -> None:
@@ -849,6 +1016,26 @@ def test_phase18e_server_route_errors_are_typed() -> None:
         create_local_dev_http_server(api=cast(AdapterGameServer, object()))
 
 
+def test_phase18e_formal_session_rejects_undocumented_support_profile_route() -> None:
+    server = AdapterGameServer()
+    created = _request(
+        server,
+        "POST",
+        "/sessions",
+        body=_session_create_body(game_id="phase18e-no-formal-support-profile"),
+        expected_status=201,
+    )
+
+    response = _request_raw(
+        server,
+        "GET",
+        f"/sessions/{_field_string(created, 'session_id')}/support-profile",
+    )
+
+    assert response.status_code == 404
+    assert _error_code(response) == "route_not_found"
+
+
 def test_phase18e_local_dev_http_server_serves_json_and_rejects_bad_bodies() -> None:
     api = AdapterGameServer()
     http_server = create_local_dev_http_server(api=api)
@@ -1228,6 +1415,61 @@ def _advance_to_movement_selection(
             continue
         assert decision_type == SELECT_MOVEMENT_UNIT
         return status_payload
+
+
+def _advance_protocol_to_movement_selection(
+    server: AdapterGameServer,
+    *,
+    session_id: str,
+) -> dict[str, JsonValue]:
+    while True:
+        request = _protocol_pending_decision_for_any_player(
+            server,
+            session_id=session_id,
+        )
+        decision_type = request["decision_type"]
+        result_id = f"{session_id}-{_request_id(request)}"
+        if decision_type == SECONDARY_MISSION_DECISION_TYPE:
+            _protocol_submit_option(
+                server,
+                session_id=session_id,
+                request=request,
+                option_id=FIXED_SECONDARY_OPTION_ID,
+                result_id=f"{result_id}-secondary",
+            )
+            continue
+        if decision_type == SELECT_DEPLOYMENT_UNIT:
+            _protocol_submit_option(
+                server,
+                session_id=session_id,
+                request=request,
+                option_id=_first_option_id(request),
+                result_id=f"{result_id}-deployment-unit",
+            )
+            continue
+        if decision_type == SUBMIT_DEPLOYMENT_PLACEMENT:
+            view = _request(
+                server,
+                "GET",
+                f"/sessions/{session_id}/projection",
+                query={"viewer_player_id": _actor(request)},
+            )
+            _request(
+                server,
+                "POST",
+                f"/sessions/{session_id}/decisions/{_request_id(request)}/payload",
+                body={
+                    "schema_version": PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+                    "actor_id": _actor(request),
+                    "payload": _deployment_payload_from_proposal(
+                        _field_object(view, "pending_proposal")
+                    ),
+                    "result_id": f"{result_id}-deployment-placement",
+                },
+            )
+            continue
+        assert decision_type == SELECT_MOVEMENT_UNIT
+        return request
 
 
 def _submit_option(

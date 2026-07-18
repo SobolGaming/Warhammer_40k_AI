@@ -5,6 +5,7 @@
   "properties": {
     "accepted": {"type": "boolean"},
     "checkpoint": {"$ref": "#/$defs/checkpoint"},
+    "committed": {"type": "boolean"},
     "event_range": {"$ref": "#/$defs/event_range"},
     "operation": {
       "enum": [
@@ -24,6 +25,7 @@
   "required": [
     "schema_version",
     "operation",
+    "committed",
     "accepted",
     "session",
     "checkpoint",

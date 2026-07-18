@@ -26,7 +26,10 @@
     },
     "ruleset_id": {"minProperties": 1, "type": "object"},
     "schema_version": {"const": "session-metadata-v1", "type": "string"},
-    "server_contract_version": {"const": "1.1.0", "type": "string"},
+    "server_contract_version": {
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$",
+      "type": "string"
+    },
     "session_id": {"minLength": 1, "type": "string"},
     "session_revision": {"minimum": 0, "type": "integer"},
     "session_state": {

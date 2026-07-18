@@ -107,6 +107,7 @@ class ServerGameStatusPayload(TypedDict):
 class _MutationOutcome:
     actor_id: str
     status: LifecycleStatus
+    committed: bool
     accepted: bool
     from_cursor: int
 
@@ -257,7 +258,7 @@ class AdapterGameServer:
             _ensure_session_open(record)
             status = session.advance_until_decision_or_terminal()
             record.started = True
-            record.accept_status(status, timestamp=self._timestamp())
+            record.commit_status(status, timestamp=self._timestamp())
             return _status_response(
                 game_id=game_id,
                 status=status,
@@ -401,13 +402,6 @@ class AdapterGameServer:
                 status_code=int(HTTPStatus.OK),
                 payload=validate_json_value(cast(JsonValue, replay)),
             )
-        if method == "GET" and path_segments == (*base, "support-profile"):
-            profile = record.adapter_session.support_profile()
-            record.touch(self._timestamp())
-            return ServerResponse(
-                status_code=int(HTTPStatus.OK),
-                payload=validate_json_value(cast(JsonValue, profile)),
-            )
         if (
             method == "POST"
             and len(path_segments) == 5
@@ -423,6 +417,7 @@ class AdapterGameServer:
             return _session_command_response(
                 record=record,
                 operation="submit_finite_decision",
+                committed=outcome.committed,
                 accepted=outcome.accepted,
                 viewer_player_id=outcome.actor_id,
                 from_cursor=outcome.from_cursor,
@@ -445,6 +440,7 @@ class AdapterGameServer:
             return _session_command_response(
                 record=record,
                 operation="submit_parameterized_decision",
+                committed=outcome.committed,
                 accepted=outcome.accepted,
                 viewer_player_id=outcome.actor_id,
                 from_cursor=outcome.from_cursor,
@@ -566,10 +562,11 @@ class AdapterGameServer:
         before = _session_checkpoint(record=record, viewer_player_id=viewer_player_id)
         status = record.adapter_session.advance_until_decision_or_terminal()
         record.started = True
-        record.accept_status(status, timestamp=self._timestamp())
+        record.commit_status(status, timestamp=self._timestamp())
         return _session_command_response(
             record=record,
             operation="start_session",
+            committed=True,
             accepted=True,
             viewer_player_id=viewer_player_id,
             from_cursor=before["event_cursor"],
@@ -584,10 +581,11 @@ class AdapterGameServer:
         _ensure_session_active(record)
         before = _session_checkpoint(record=record, viewer_player_id=viewer_player_id)
         status = record.adapter_session.advance_until_decision_or_terminal()
-        record.accept_status(status, timestamp=self._timestamp())
+        record.commit_status(status, timestamp=self._timestamp())
         return _session_command_response(
             record=record,
             operation="advance_session",
+            committed=True,
             accepted=True,
             viewer_player_id=viewer_player_id,
             from_cursor=before["event_cursor"],
@@ -605,6 +603,7 @@ class AdapterGameServer:
         return _session_command_response(
             record=record,
             operation="close_session",
+            committed=True,
             accepted=True,
             viewer_player_id=viewer_player_id,
             from_cursor=before["event_cursor"],
@@ -676,20 +675,24 @@ class AdapterGameServer:
                 message="Selected option is not one of the pending engine-emitted options.",
             )
         before = _session_checkpoint(record=record, viewer_player_id=actor_id)
+        record_count_before = _decision_record_count(record)
+        result_id = _required_string(payload, key="result_id")
         status = session.submit_option(
             request_id=request_id,
             option_id=option_id,
-            result_id=_required_string(payload, key="result_id"),
+            result_id=result_id,
         )
-        accepted = status.status_kind is not LifecycleStatusKind.INVALID
-        if accepted:
-            status = _drain_after_submission(session=session, status=status)
-            record.accept_status(status, timestamp=self._timestamp())
-        else:
-            record.reject_status(status, timestamp=self._timestamp())
+        status, committed, accepted = _commit_submission_status(
+            record=record,
+            session=session,
+            status=status,
+            record_count_before=record_count_before,
+            timestamp=self._timestamp(),
+        )
         return _MutationOutcome(
             actor_id=actor_id,
             status=status,
+            committed=committed,
             accepted=accepted,
             from_cursor=before["event_cursor"],
         )
@@ -761,20 +764,24 @@ class AdapterGameServer:
                 message="Pending request does not accept a parameterized payload.",
             )
         before = _session_checkpoint(record=record, viewer_player_id=actor_id)
+        record_count_before = _decision_record_count(record)
+        result_id = _required_string(payload, key="result_id")
         status = session.submit_parameterized_payload(
             request_id=request_id,
             payload=submitted_payload,
-            result_id=_required_string(payload, key="result_id"),
+            result_id=result_id,
         )
-        accepted = status.status_kind is not LifecycleStatusKind.INVALID
-        if accepted:
-            status = _drain_after_submission(session=session, status=status)
-            record.accept_status(status, timestamp=self._timestamp())
-        else:
-            record.reject_status(status, timestamp=self._timestamp())
+        status, committed, accepted = _commit_submission_status(
+            record=record,
+            session=session,
+            status=status,
+            record_count_before=record_count_before,
+            timestamp=self._timestamp(),
+        )
         return _MutationOutcome(
             actor_id=actor_id,
             status=status,
+            committed=committed,
             accepted=accepted,
             from_cursor=before["event_cursor"],
         )
@@ -849,6 +856,52 @@ def _drain_after_submission(
     return drained
 
 
+def _commit_submission_status(
+    *,
+    record: AuthoritativeSession,
+    session: AdapterGameSession,
+    status: LifecycleStatus,
+    record_count_before: int,
+    timestamp: str,
+) -> tuple[LifecycleStatus, bool, bool]:
+    accepted = status.status_kind not in {
+        LifecycleStatusKind.INVALID,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    committed_status = (
+        _drain_after_submission(session=session, status=status) if accepted else status
+    )
+    committed = _decision_history_advanced(
+        record=record,
+        record_count_before=record_count_before,
+    )
+    if accepted and not committed:
+        raise SessionProtocolError("Accepted session submission was not recorded.")
+    if committed:
+        record.commit_status(committed_status, timestamp=timestamp)
+    else:
+        record.observe_uncommitted_status(committed_status, timestamp=timestamp)
+    return committed_status, committed, accepted
+
+
+def _decision_record_count(record: AuthoritativeSession) -> int:
+    count = record.adapter_session.decision_record_count()
+    if type(count) is not int or count < 0:
+        raise SessionProtocolError("Session decision record count is invalid.")
+    return count
+
+
+def _decision_history_advanced(
+    *,
+    record: AuthoritativeSession,
+    record_count_before: int,
+) -> bool:
+    record_count_after = _decision_record_count(record)
+    if record_count_after < record_count_before:
+        raise SessionProtocolError("Session decision history moved backwards.")
+    return record_count_after > record_count_before
+
+
 def _session_checkpoint(
     *,
     record: AuthoritativeSession,
@@ -904,6 +957,7 @@ def _session_command_response(
     *,
     record: AuthoritativeSession,
     operation: str,
+    committed: bool,
     accepted: bool,
     viewer_player_id: str,
     from_cursor: int,
@@ -923,6 +977,7 @@ def _session_command_response(
     )
     payload = session_command_result_payload(
         operation=operation,
+        committed=committed,
         accepted=accepted,
         session=metadata,
         checkpoint=checkpoint,

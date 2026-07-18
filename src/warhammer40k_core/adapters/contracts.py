@@ -51,6 +51,10 @@ class AdapterGameSession(Protocol):
         """Return viewer-filtered event records after the supplied cursor."""
         ...
 
+    def decision_record_count(self) -> int:
+        """Return the monotonic count of authoritative decision records."""
+        ...
+
     def submit_option(
         self,
         *,

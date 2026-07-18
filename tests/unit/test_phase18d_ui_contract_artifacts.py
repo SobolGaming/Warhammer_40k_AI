@@ -12,6 +12,7 @@ from typing import Protocol, cast
 
 import pytest
 from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
 from referencing import Resource
 from referencing.jsonschema import (
     DRAFT202012,
@@ -57,7 +58,9 @@ SCHEMA_FILES = (
     Path("contracts/schemas/decision-request-view.schema.json"),
     Path("contracts/schemas/event-delta.schema.json"),
     Path("contracts/schemas/game-view.schema.json"),
+    Path("contracts/schemas/lifecycle-status.schema.json"),
     Path("contracts/schemas/rules-catalog.schema.json"),
+    Path("contracts/schemas/session-metadata.schema.json"),
 )
 FIXTURE_FILES = (
     "hidden_secondary_redaction_view.json",
@@ -155,6 +158,20 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     _schema_validator("event-delta.schema.json", registry=registry).validate(
         session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)
     )
+
+
+def test_session_metadata_contract_version_accepts_compatible_major_one_releases() -> None:
+    registry = _schema_registry()
+    validator = _schema_validator("session-metadata.schema.json", registry=registry)
+    metadata = _read_json(
+        REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
+    )
+    compatible = {**_json_object(metadata), "server_contract_version": "1.2.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "2.0.0"}
+
+    validator.validate(compatible)
+    with pytest.raises(ValidationError):
+        validator.validate(incompatible)
 
 
 def test_rules_catalog_schema_requires_catalog_card_detail_maps() -> None:

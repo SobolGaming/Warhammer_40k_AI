@@ -20,8 +20,9 @@ binding. A caller-supplied `viewer_player_id` is not authentication.
 
 - The server owns the authoritative session and invokes only the shared
   `AdapterGameSession` facade for engine interaction.
-- `session_revision` begins at `0` and increases once for each accepted start,
-  advance, decision, or close command. Phase 18F owns expected-revision checks,
+- `session_revision` begins at `0` and increases once for each command committed
+  to authoritative history: start, advance, close, an accepted decision, or a
+  recorded rule-invalid retry attempt. Phase 18F owns expected-revision checks,
   idempotency keys, and concurrent command serialization guarantees.
 - `projection_state_hash` identifies a viewer projection state; event cursors
   are monotonically increasing indexes into the viewer-scoped event stream. A
@@ -34,6 +35,14 @@ binding. A caller-supplied `viewer_player_id` is not authentication.
   validated before engine mutation.
 - Retrying the same request after it was consumed is stale/conflicting; clients
   must fetch the current projection rather than guessing a replacement ID.
+
+`SessionCommandResult.committed` reports whether a command entered authoritative
+history, while `accepted` reports whether its proposed gameplay action was
+rule-valid/applied. A recorded invalid attempt therefore returns
+`committed: true`, `accepted: false`, advances the revision, includes its event
+range, and exposes the fresh retry request through the viewer projection. An
+invalid result rejected by an engine pre-validator before decision recording
+returns `committed: false`, `accepted: false` and leaves the revision unchanged.
 
 After an accepted finite or parameterized submission, the server performs a
 bounded deterministic drain until the next adapter-visible decision, terminal

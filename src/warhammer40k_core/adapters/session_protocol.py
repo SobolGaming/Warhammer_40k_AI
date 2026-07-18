@@ -87,6 +87,7 @@ class SessionEventRangePayload(TypedDict):
 class SessionCommandResultPayload(TypedDict):
     schema_version: str
     operation: str
+    committed: bool
     accepted: bool
     session: SessionMetadataPayload
     checkpoint: SessionCheckpointPayload
@@ -244,16 +245,16 @@ class AuthoritativeSession:
             raise SessionProtocolError("Session activity timestamp cannot move backwards.")
         self.last_activity_at = activity
 
-    def accept_status(self, status: LifecycleStatus, *, timestamp: str) -> None:
+    def commit_status(self, status: LifecycleStatus, *, timestamp: str) -> None:
         if type(status) is not LifecycleStatus:
-            raise SessionProtocolError("Accepted session status is invalid.")
+            raise SessionProtocolError("Committed session status is invalid.")
         self.lifecycle_status = status
         self.session_revision += 1
         self.touch(timestamp)
 
-    def reject_status(self, status: LifecycleStatus, *, timestamp: str) -> None:
+    def observe_uncommitted_status(self, status: LifecycleStatus, *, timestamp: str) -> None:
         if type(status) is not LifecycleStatus:
-            raise SessionProtocolError("Rejected session status is invalid.")
+            raise SessionProtocolError("Uncommitted session status is invalid.")
         self.lifecycle_status = status
         self.touch(timestamp)
 
@@ -388,12 +389,15 @@ def validate_participant_assignments(
 def session_command_result_payload(
     *,
     operation: str,
+    committed: bool,
     accepted: bool,
     session: SessionMetadataPayload,
     checkpoint: SessionCheckpointPayload,
     from_cursor: int,
 ) -> SessionCommandResultPayload:
     operation_id = _validate_identifier("operation", operation)
+    if type(committed) is not bool:
+        raise SessionProtocolError("Session command committed flag must be bool.")
     if type(accepted) is not bool:
         raise SessionProtocolError("Session command accepted flag must be bool.")
     to_cursor = checkpoint["event_cursor"]
@@ -402,6 +406,7 @@ def session_command_result_payload(
     payload: SessionCommandResultPayload = {
         "schema_version": SESSION_COMMAND_RESULT_SCHEMA_VERSION,
         "operation": operation_id,
+        "committed": committed,
         "accepted": accepted,
         "session": session,
         "checkpoint": checkpoint,

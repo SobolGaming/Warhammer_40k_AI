@@ -5,6 +5,7 @@
     "projection_state_hash": "ad9e0743a44262b49109646fa176c799879e90f4d83dcc848f4cbd33a9a28ad6",
     "viewer_player_id": "player-a"
   },
+  "committed": true,
   "event_range": {
     "from_cursor": 1,
     "to_cursor": 9

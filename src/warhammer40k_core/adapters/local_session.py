@@ -93,6 +93,9 @@ class LocalGameSession(AdapterGameSession):
             viewer_player_id=viewer,
         )
 
+    def decision_record_count(self) -> int:
+        return len(self.lifecycle.decision_controller.records)
+
     def replay_artifact(self, *, artifact_id: str) -> ReplayArtifactPayload:
         initial_payload = self._initial_replay_lifecycle_payload
         if initial_payload is None:

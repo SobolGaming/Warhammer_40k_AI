@@ -2558,6 +2558,7 @@ class AdapterGameSession(Protocol):
         *,
         viewer_player_id: str,
     ) -> EventStreamDeltaPayload: ...
+    def decision_record_count(self) -> int: ...
     def submit_option(
         self,
         *,
@@ -2599,7 +2600,10 @@ engine-owned replay validation, not producer or transport layers.
 `GameLifecycle` instance, validates viewer IDs for event streams, projects
 viewer-safe views and source-hashed catalog data, and delegates submissions to
 the adapter submission helpers that enforce pending `request_id` matching before
-calling `GameLifecycle.submit_decision(...)`.
+calling `GameLifecycle.submit_decision(...)`. Its monotonic
+`decision_record_count()` checkpoint lets an authoritative transport distinguish
+pre-record invalid results from recorded invalid/retry attempts without reaching
+through the facade to lifecycle internals.
 
 ## Formal Session Transport
 
@@ -2618,6 +2622,16 @@ or transition-budget safety boundary. One command therefore returns one
 coherent post-drain `SessionCommandResult`; a client must not guess how many
 internal `advance` calls are needed. Explicit advance remains an operator,
 conformance, recovery, and documented idle-boundary operation.
+
+`SessionCommandResult.committed` and `accepted` are intentionally distinct.
+`committed` means the command was recorded in authoritative history and caused
+exactly one session-revision increment. `accepted` means the proposed gameplay
+action was rule-valid/applied. A well-formed, recorded invalid attempt that emits
+a fresh retry request returns HTTP 422 with `committed: true`, `accepted: false`,
+the incremented revision, and the viewer-scoped event range. Failures rejected
+before the facade call return a typed error envelope. Engine pre-validator
+failures returned by the facade use the command result with `committed: false`,
+`accepted: false` and do not increment the revision.
 
 Session metadata and command results obey the same viewer redaction policy as
 projections and event deltas. A viewerless metadata response exposes no

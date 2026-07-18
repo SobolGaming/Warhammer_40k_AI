@@ -115,7 +115,7 @@ through `GameLifecycle.submit_decision(...)`, drift diagnostics, projection hash
 checkpoints, human-readable traces, and JSONL `DecisionRecord` corpus export.
 **Phase 18C is complete** for the shared adapter session facade:
 `AdapterGameSession` defines the public `start`, `advance`, `view`,
-`rules_catalog_view`, `events_since`, `submit_option`, and
+`rules_catalog_view`, `events_since`, `decision_record_count`, `submit_option`, and
 `submit_parameterized_payload` operations plus replay export and support-profile
 inspection, implemented by `LocalGameSession` and used by thin CLI, UI,
 network, headless, and replay producers.
@@ -5304,6 +5304,9 @@ Advancement semantics:
   whether a submission caused zero, one, or many deterministic transitions;
 - the submission response identifies the resulting session revision,
   projection checkpoint/reference, and event range;
+- command results distinguish authoritative-history `committed` from gameplay
+  `accepted`; recorded invalid/retry attempts increment the revision exactly
+  once while returning `committed: true` and `accepted: false`;
 - explicit `AdvanceSession` remains available for session start, recovery,
   operator/conformance use, and documented idle boundaries, not as a client-side
   replacement for post-submission draining.
@@ -5331,7 +5334,8 @@ shared facade, perform one bounded server-owned drain, and return a versioned
 `SessionCommandResult` with the resulting revision, viewer projection
 checkpoint, and event range. Focused conformance coverage exercises the full
 create/start/read/submit/advance/export/close operation set and verifies typed
-pre-mutation validation and terminal behavior.
+pre-mutation validation, recorded invalid/retry revision semantics, and terminal
+behavior.
 
 ## Phase 18F: optimistic concurrency, idempotency, and stale-client handling
 

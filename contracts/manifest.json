@@ -145,7 +145,7 @@
     "examples/projections/visible_modifier_datacard_view.json": "5763509524b01ab259deb0c5545642e72771236fce2d98f81479e7f0b8986c5f",
     "examples/replay-metadata.json": "68d5be7dc99ac4d15d94068f44af6151f8e32a4530f3b47fc4b8d4654dac4a88",
     "examples/sessions/create-session.json": "7d426c2b36b4d8b94a00723eea3e170433c4aa00e4dbd513e947916fde4b938b",
-    "examples/sessions/session-command-started.json": "1a533d8fba25a17f2a484449ae8a0418161e93c47eaba6d70a5a2b11bc57378f",
+    "examples/sessions/session-command-started.json": "661011506d19f2a7b4d9783d4e0a8d10b487169309bd30413cc4efadc9eea342",
     "examples/sessions/session-create.json": "681d4d2bbf814b00bbcab269980c64950f793bb742a7d6adbec0dcd68325b901",
     "examples/sessions/session-metadata-created.json": "2f1e5729661990c54affcd413568ba2d7a038dd0b7656a49f14078a57fb41965",
     "examples/statuses/advanced.json": "5db7d8f35a681ae9760e96e84f18b778854894f5365ad3aaaf47be5297c3fec2",
@@ -170,11 +170,11 @@
     "schemas/proposal-payload.schema.json": "ad87970cd162764022efbc6911961a195c78c78e2c4baa2c6b97c32f82ce66d2",
     "schemas/replay-metadata.schema.json": "6fc21d0e6e5217f19bc4126e6b88370cf906fd9c5a0f78d4f98965d225f1d1ae",
     "schemas/rules-catalog.schema.json": "5fcb2ce83d6fc273f51c24b92264f526ae7e37c7f38497c5ad42c228caf1c5ad",
-    "schemas/session-command-result.schema.json": "40d072e404fc6867507623fc7288773bf4d9ecf9facb73d165f8905351aed355",
+    "schemas/session-command-result.schema.json": "e91829d6c57cf3b1cdddfe35fc7051a652820977dbd5d4ce69cb87874e9b234c",
     "schemas/session-create.schema.json": "e35a3f4545da9915bdc5a68d780250a1450f52c759e122bab5f05b71b6e8b97f",
-    "schemas/session-metadata.schema.json": "b7a08fa6becd4270007422958fc5bcd7309b5818bf2f37f703c79c4694e25433",
+    "schemas/session-metadata.schema.json": "1c7c4f77dbc1397352d411c4260c3f458a0b60a6208e26f0d6fb2052a2cf2a7a",
     "schemas/support-profile.schema.json": "204ad211ec18ba0e38d224c6ac16c5a7df056505d34964be6ba6ee1b1800d07d",
-    "session-semantics.md": "0acbf0cde10ed6a45f4efb333689aaf2466cf4e4067d253ae5a62ce85a3af715"
+    "session-semantics.md": "f6bf256c5c3e0b4d577cdc7de86f254e8cc55011fd1a3ca2ac6e1c71dc561578"
   },
   "known_external_decision_token_count": 69,
   "live_decision_scenario_count": 4,
