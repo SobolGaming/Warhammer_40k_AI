@@ -8,6 +8,7 @@ SRC = ROOT / "src" / "warhammer40k_core"
 SERVER_NETWORK_MODULES = (
     SRC / "adapters" / "network.py",
     SRC / "adapters" / "server.py",
+    SRC / "adapters" / "session_protocol.py",
 )
 CLIENT_PRODUCER_MODULES = (
     SRC / "adapters" / "headless.py",
@@ -80,6 +81,37 @@ def test_phase18e_server_network_modules_do_not_bypass_session_facade() -> None:
                     violations.append(f"{path}: calls submit_decision directly")
             if isinstance(node, ast.Name) and node.id == "DiceRollManager":
                 violations.append(f"{path}: references DiceRollManager")
+    assert not violations
+
+
+def test_phase18e_server_does_not_serialize_internal_exception_text() -> None:
+    server_path = SRC / "adapters" / "server.py"
+    tree = ast.parse(server_path.read_text(encoding="utf-8"), filename=str(server_path))
+    internal_exception_types = {
+        "EventLogError",
+        "GameLifecycleError",
+        "ReplayArtifactError",
+        "SessionProtocolError",
+    }
+    violations: list[str] = []
+    for handler in (node for node in ast.walk(tree) if isinstance(node, ast.ExceptHandler)):
+        if (
+            not isinstance(handler.type, ast.Name)
+            or handler.type.id not in internal_exception_types
+        ):
+            continue
+        if handler.name is None:
+            continue
+        for node in ast.walk(handler):
+            if (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == "str"
+                and len(node.args) == 1
+                and isinstance(node.args[0], ast.Name)
+                and node.args[0].id == handler.name
+            ):
+                violations.append(f"{server_path}: serializes {handler.type.id} text")
     assert not violations
 
 

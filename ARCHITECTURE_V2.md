@@ -130,11 +130,13 @@ three request families outside the repository. The engine registry owns finite
 versus parameterized classification, but only real adapter-session scenarios
 are reported as live decision-family coverage; remaining families are
 explicitly `envelope_only` pending later interaction and conformance work.
-**Phase 18E has a partial session/transport baseline**: the reference
-`AdapterGameServer` exposes create, advance, projection, catalog, event,
-decision, replay, and support routes with typed errors and shared redaction,
-but production revisions, idempotency, authenticated participant bindings,
-cursor lifecycle, persistence, and recovery remain Phase 18E-18L work.
+**Phase 18E is complete** for the formal reference session/transport protocol:
+`AdapterGameServer` exposes the eleven required operations with distinct
+session/game identities, participant metadata, start/close lifecycle, monotonic
+session revisions, viewer checkpoints, typed errors, shared redaction, and a
+bounded deterministic post-submission drain behind `AdapterGameSession`.
+Idempotency/concurrency, durable cursor resynchronization, authenticated
+participant bindings, persistence, and recovery remain Phase 18F-18L work.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -371,7 +373,7 @@ Implemented foundation and partial integration baselines:
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
 | 18C | Complete | Shared adapter session facade for CLI, UI, network, headless, and replay producers |
 | 18D | Partial | Canonical versioned JSON Schema/OpenAPI baseline, registry-derived decision inventory with honest live/envelope-only coverage, normative external semantics, runtime request validation, and immutable breaking-change CI gate |
-| 18E | Partial | Reference in-process/HTTP server routes and typed submission errors; production session and transport semantics are not complete |
+| 18E | Complete | Formal reference session protocol, metadata/revisions, start/close, typed errors, viewer checkpoints, and bounded post-submission drain |
 
 Next / planned sequence:
 
@@ -5256,11 +5258,12 @@ baseline shapes are not evidence of a complete strongly typed client contract.
 
 Priority: P0.
 
-Status: Partial. `AdapterGameServer` and its local HTTP wrapper already prove
-that create, advance, view, catalog, event, decision submission, replay export,
-support profile, typed error, redaction, and engine-owned dice paths can remain
-behind `AdapterGameSession`. They are a development/reference baseline, not a
-complete hosted-session contract.
+Status: Complete. `AdapterGameServer` and its local HTTP wrapper expose the
+formal reference session protocol while keeping create, advance, view, catalog,
+event, decision submission, replay export, typed errors, redaction, and
+engine-owned dice paths behind `AdapterGameSession`. Production idempotency,
+durable resynchronization, authentication, and persistence remain assigned to
+Phases 18F-18H and 18L rather than being implied by this phase.
 
 Required operations:
 
@@ -5322,6 +5325,13 @@ Completion gate:
 An external client submits one command and receives one coherent post-drain
 session result without importing lifecycle internals or issuing a guessed series
 of advance calls.
+
+This gate is met. The formal finite and parameterized routes submit through the
+shared facade, perform one bounded server-owned drain, and return a versioned
+`SessionCommandResult` with the resulting revision, viewer projection
+checkpoint, and event range. Focused conformance coverage exercises the full
+create/start/read/submit/advance/export/close operation set and verifies typed
+pre-mutation validation and terminal behavior.
 
 ## Phase 18F: optimistic concurrency, idempotency, and stale-client handling
 

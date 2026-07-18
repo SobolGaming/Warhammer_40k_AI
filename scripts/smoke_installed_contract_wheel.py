@@ -24,6 +24,9 @@ EXPECTED_SCHEMA_NAMES = frozenset(
         "proposal-payload.schema.json",
         "replay-metadata.schema.json",
         "rules-catalog.schema.json",
+        "session-command-result.schema.json",
+        "session-create.schema.json",
+        "session-metadata.schema.json",
         "support-profile.schema.json",
     }
 )
@@ -40,6 +43,8 @@ from warhammer40k_core.adapters.external_contract import (
     FINITE_SUBMISSION_SCHEMA_VERSION,
     PARAMETERIZED_SUBMISSION_SCHEMA_NAME,
     PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+    SESSION_CREATE_SCHEMA_NAME,
+    SESSION_CREATE_SCHEMA_VERSION,
     validate_external_request_payload,
 )
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
@@ -60,6 +65,9 @@ expected_schema_names = {
     "proposal-payload.schema.json",
     "replay-metadata.schema.json",
     "rules-catalog.schema.json",
+    "session-command-result.schema.json",
+    "session-create.schema.json",
+    "session-metadata.schema.json",
     "support-profile.schema.json",
 }
 module_path = Path(external_contract.__file__).resolve()
@@ -106,6 +114,16 @@ parameterized_payload = validate_json_value(
         "result_id": "installed-wheel-parameterized-result",
     }
 )
+session_create_payload = validate_json_value(
+    {
+        "schema_version": SESSION_CREATE_SCHEMA_VERSION,
+        "config": create_payload["config"],
+        "participant_assignments": [
+            {"participant_id": "player-a", "role": "player", "player_id": "player-a"},
+            {"participant_id": "player-b", "role": "player", "player_id": "player-b"},
+        ],
+    }
+)
 for schema_name, payload, payload_name in (
     (CREATE_SESSION_SCHEMA_NAME, create_payload, "installed create session"),
     (FINITE_SUBMISSION_SCHEMA_NAME, finite_payload, "installed finite submission"),
@@ -114,6 +132,7 @@ for schema_name, payload, payload_name in (
         parameterized_payload,
         "installed parameterized submission",
     ),
+    (SESSION_CREATE_SCHEMA_NAME, session_create_payload, "installed session create"),
 ):
     validate_external_request_payload(
         schema_name=schema_name,
@@ -126,7 +145,12 @@ print(
         {
             "package_path": module_path.as_posix(),
             "schema_count": len(schema_names),
-            "validated_request_families": ["create", "finite", "parameterized"],
+            "validated_request_families": [
+                "create",
+                "finite",
+                "parameterized",
+                "session_create",
+            ],
         },
         sort_keys=True,
     )

@@ -12,6 +12,7 @@ from export_ui_contract_fixtures import (
     build_local_session_at_movement_request,
     export_ui_contract_files,
 )
+from external_contract_session_examples import phase18e_session_examples
 from jsonschema import Draft202012Validator
 from referencing import Resource
 from referencing.jsonschema import DRAFT202012, EMPTY_REGISTRY, Schema, SchemaRegistry
@@ -27,6 +28,9 @@ from warhammer40k_core.adapters.external_contract import (
     FINITE_SUBMISSION_SCHEMA_VERSION,
     LIFECYCLE_STATUS_SCHEMA_VERSION,
     PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+    SESSION_COMMAND_RESULT_SCHEMA_VERSION,
+    SESSION_CREATE_SCHEMA_VERSION,
+    SESSION_METADATA_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.projection import (
     PROJECTION_SCHEMA_VERSION,
@@ -86,6 +90,9 @@ PRIMARY_SCHEMA_NAMES = frozenset(
         "replay-metadata.schema.json",
         "rules-catalog.schema.json",
         "support-profile.schema.json",
+        "session-command-result.schema.json",
+        "session-create.schema.json",
+        "session-metadata.schema.json",
     }
 )
 PAYLOAD_SCHEMA_VERSION_BY_NAME = {
@@ -113,6 +120,12 @@ PAYLOAD_SCHEMA_VERSION_BY_NAME = {
         RULES_CATALOG_VIEW_SCHEMA_VERSION,
     ),
     "support-profile.schema.json": ("schema_version", SUPPORT_PROFILE_SCHEMA_VERSION),
+    "session-command-result.schema.json": (
+        "schema_version",
+        SESSION_COMMAND_RESULT_SCHEMA_VERSION,
+    ),
+    "session-create.schema.json": ("schema_version", SESSION_CREATE_SCHEMA_VERSION),
+    "session-metadata.schema.json": ("schema_version", SESSION_METADATA_SCHEMA_VERSION),
 }
 
 
@@ -153,6 +166,8 @@ def write_contract_examples() -> None:
         "config": config.to_payload(),
     }
     _write_json(SESSION_EXAMPLE_DIR / "create-session.json", create_payload)
+    for name, payload in phase18e_session_examples().items():
+        _write_json(SESSION_EXAMPLE_DIR / name, payload)
 
     server = AdapterGameServer()
     created = _successful_response(
@@ -742,6 +757,11 @@ def _example_schema_bindings() -> dict[str, JsonValue]:
     for path in sorted(STATUS_EXAMPLE_DIR.glob("*.json")):
         bindings[path.relative_to(CONTRACT_ROOT).as_posix()] = "lifecycle-status.schema.json"
     bindings["examples/sessions/create-session.json"] = "create-session.schema.json"
+    bindings["examples/sessions/session-create.json"] = "session-create.schema.json"
+    bindings["examples/sessions/session-metadata-created.json"] = "session-metadata.schema.json"
+    bindings["examples/sessions/session-command-started.json"] = (
+        "session-command-result.schema.json"
+    )
     bindings["examples/support-profile.json"] = "support-profile.schema.json"
     bindings["examples/replay-metadata.json"] = "replay-metadata.schema.json"
     return bindings

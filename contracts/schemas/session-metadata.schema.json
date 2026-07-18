@@ -1,0 +1,92 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/session-metadata.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "catalog_id": {"minLength": 1, "type": "string"},
+    "created_at": {"format": "date-time", "type": "string"},
+    "engine_build_id": {"minLength": 1, "type": "string"},
+    "engine_version": {"minLength": 1, "type": "string"},
+    "event_cursor": {"minimum": 0, "type": "integer"},
+    "game_id": {"minLength": 1, "type": "string"},
+    "last_activity_at": {"format": "date-time", "type": "string"},
+    "lifecycle_status": {
+      "$ref": "https://warhammer40k-core.local/contracts/v1/lifecycle-status.schema.json#/$defs/status"
+    },
+    "participant_assignments": {
+      "items": {"$ref": "#/$defs/participant_assignment"},
+      "minItems": 2,
+      "type": "array"
+    },
+    "projection_state_hash": {
+      "oneOf": [
+        {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        {"type": "null"}
+      ]
+    },
+    "ruleset_id": {"minProperties": 1, "type": "object"},
+    "schema_version": {"const": "session-metadata-v1", "type": "string"},
+    "server_contract_version": {"const": "1.1.0", "type": "string"},
+    "session_id": {"minLength": 1, "type": "string"},
+    "session_revision": {"minimum": 0, "type": "integer"},
+    "session_state": {
+      "enum": ["created", "active", "terminal", "closed"],
+      "type": "string"
+    },
+    "source_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "source_package_id": {"minLength": 1, "type": "string"},
+    "terminal_reason": {
+      "oneOf": [
+        {"$ref": "#/$defs/terminal_reason"},
+        {"type": "null"}
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "session_id",
+    "game_id",
+    "session_state",
+    "session_revision",
+    "ruleset_id",
+    "catalog_id",
+    "source_package_id",
+    "source_hash",
+    "projection_state_hash",
+    "event_cursor",
+    "lifecycle_status",
+    "terminal_reason",
+    "created_at",
+    "last_activity_at",
+    "participant_assignments",
+    "server_contract_version",
+    "engine_version",
+    "engine_build_id"
+  ],
+  "title": "CORE V2 SessionMetadataPayload",
+  "type": "object",
+  "$defs": {
+    "participant_assignment": {
+      "additionalProperties": false,
+      "properties": {
+        "participant_id": {"minLength": 1, "type": "string"},
+        "player_id": {"type": ["string", "null"]},
+        "role": {
+          "enum": ["player", "spectator", "observer"],
+          "type": "string"
+        }
+      },
+      "required": ["participant_id", "role", "player_id"],
+      "type": "object"
+    },
+    "terminal_reason": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {"enum": ["game_complete", "session_closed"], "type": "string"},
+        "message": {"minLength": 1, "type": "string"}
+      },
+      "required": ["code", "message"],
+      "type": "object"
+    }
+  }
+}

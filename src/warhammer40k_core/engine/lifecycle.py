@@ -695,7 +695,14 @@ class GameLifecycle:
                 LifecycleStatusKind.UNSUPPORTED,
             ):
                 return status
-        raise GameLifecycleError("GameLifecycle exceeded deterministic transition guard.")
+        return LifecycleStatus.unsupported(
+            stage=self._require_state().stage,
+            message="Lifecycle reached its deterministic transition safety boundary.",
+            payload={
+                "unsupported_reason": "transition_budget_exhausted",
+                "transition_budget": transition_limit,
+            },
+        )
 
     def _advance_once(self) -> LifecycleStatus:
         state = self._require_state()

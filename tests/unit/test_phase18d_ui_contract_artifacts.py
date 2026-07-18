@@ -400,8 +400,9 @@ def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None
         baseline_path.read_text(encoding="utf-8").encode("utf-8")
     ).hexdigest()
 
-    assert len(canonical_schema_names) == 15
-    assert baseline_schema_names == canonical_schema_names
+    assert len(baseline_schema_names) == 15
+    assert len(canonical_schema_names) == 18
+    assert baseline_schema_names < canonical_schema_names
     assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
 
 
