@@ -24,6 +24,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetKeywordSet,
+    DatasheetWargearOption,
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
@@ -37,12 +38,18 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
 )
+from warhammer40k_core.core.wargear import Wargear
+from warhammer40k_core.core.wargear_selection_limits import DatasheetWargearSelectionLimit
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.advance_hooks import (
     DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
     SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE,
 )
-from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.army_mustering import (
+    ArmyMusteringError,
+    ArmyMusterRequest,
+    muster_army,
+)
 from warhammer40k_core.engine.attack_sequence import (
     attack_sequence_hit_roll_spec,
     attack_sequence_wound_roll_spec,
@@ -90,11 +97,12 @@ from warhammer40k_core.engine.fight_resolution import (
     fight_movement_maximum_distance_inches,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
-from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
+from warhammer40k_core.engine.list_validation_errors import ListValidationError
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_end_surge_hooks import MovementEndSurgeContext
 from warhammer40k_core.engine.movement_proposals import (
@@ -104,6 +112,7 @@ from warhammer40k_core.engine.movement_proposals import (
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
+    GameLifecycleError,
     LifecycleStatus,
     LifecycleStatusKind,
 )
@@ -130,12 +139,10 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_starting_total,
     unit_resource_total,
 )
-from warhammer40k_core.engine.unit_resources import (
-    UnitResourceStatus,
-    UnitStartingResourceAllocation,
-)
+from warhammer40k_core.engine.unit_resources import UnitResourceStatus
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
+    WargearSelection,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -145,8 +152,14 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 _AELDARI_UNIT_ID = "army-alpha:aeldari-vehicle"
 _AELDARI_UNIT_SELECTION_ID = "aeldari-vehicle"
 _AELDARI_DATASHEET_ID = "phase17g-aeldari-star-engine-vehicle"
+_AELDARI_ASPECT_DATASHEET_ID = "phase17g-aeldari-aspect-warriors"
+_AELDARI_ASPECT_MODEL_PROFILE_ID = "core-intercessor-like"
 _AELDARI_FIGHT_DATASHEET_ID = "phase17g-aeldari-sudden-strike-fighter"
 _AELDARI_DETACHMENT_ID = "warhost"
+_OTHER_AELDARI_DETACHMENT_ID = "guardian-battlehost"
+_ASPECT_SHRINE_TOKEN_WARGEAR_ID = f"{_AELDARI_ASPECT_DATASHEET_ID}:aspect-shrine-token"
+_ASPECT_SHRINE_TOKEN_OPTION_ID = f"{_AELDARI_ASPECT_DATASHEET_ID}:aspect-shrine-token:option-1"
+_ASPECT_SHRINE_TOKEN_OPTION_SOURCE_ID = "source:aeldari:datasheets-options:aspect-shrine-token"
 _ENEMY_UNIT_SELECTION_ID = "enemy-unit"
 _ENEMY_UNIT_ID = f"army-beta:{_ENEMY_UNIT_SELECTION_ID}"
 
@@ -206,6 +219,131 @@ def test_aspect_shrine_tokens_seed_project_and_round_trip() -> None:
             "remaining_amount": 2,
         }
     ]
+
+
+@pytest.mark.parametrize(("model_count", "token_count"), [(4, 1), (5, 2), (10, 3)])
+def test_aspect_shrine_token_wargear_selection_rejects_excessive_count(
+    model_count: int,
+    token_count: int,
+) -> None:
+    catalog = _aeldari_catalog(include_aspect_shrine_token=True)
+    request = _army_muster_request(
+        catalog=catalog,
+        army_id="army-alpha",
+        player_id="player-a",
+        faction_id=army_rule.AELDARI_FACTION_ID,
+        detachment_id=_AELDARI_DETACHMENT_ID,
+        unit_selection_id=_AELDARI_UNIT_SELECTION_ID,
+        datasheet_id=_AELDARI_ASPECT_DATASHEET_ID,
+        model_profile_id=_AELDARI_ASPECT_MODEL_PROFILE_ID,
+        model_count=model_count,
+        wargear_selections=(
+            WargearSelection(
+                option_id=_ASPECT_SHRINE_TOKEN_OPTION_ID,
+                model_profile_id=_AELDARI_ASPECT_MODEL_PROFILE_ID,
+                wargear_ids=(_ASPECT_SHRINE_TOKEN_WARGEAR_ID,),
+                selection_count=token_count,
+            ),
+        ),
+    )
+
+    with pytest.raises(ArmyMusteringError, match="unit selection is invalid"):
+        muster_army(catalog=catalog, request=request)
+
+
+def test_aspect_shrine_token_allocations_are_per_unit_and_detachment_independent() -> None:
+    catalog = _aeldari_catalog(include_aspect_shrine_token=True)
+    request = _army_muster_request(
+        catalog=catalog,
+        army_id="army-alpha",
+        player_id="player-a",
+        faction_id=army_rule.AELDARI_FACTION_ID,
+        detachment_id=_OTHER_AELDARI_DETACHMENT_ID,
+        unit_selection_id="aspect-unit-1",
+        datasheet_id=_AELDARI_ASPECT_DATASHEET_ID,
+        model_profile_id=_AELDARI_ASPECT_MODEL_PROFILE_ID,
+        model_count=10,
+        wargear_selections=(
+            WargearSelection(
+                option_id=_ASPECT_SHRINE_TOKEN_OPTION_ID,
+                model_profile_id=_AELDARI_ASPECT_MODEL_PROFILE_ID,
+                wargear_ids=(_ASPECT_SHRINE_TOKEN_WARGEAR_ID,),
+                selection_count=2,
+            ),
+        ),
+    )
+    first_selection = request.unit_selections[0]
+    request = replace(
+        request,
+        unit_selections=(
+            first_selection,
+            replace(first_selection, unit_selection_id="aspect-unit-2"),
+        ),
+    )
+
+    army = muster_army(catalog=catalog, request=request)
+
+    assert {
+        unit.unit_instance_id: tuple(
+            (allocation.resource_kind, allocation.amount) for allocation in unit.starting_resources
+        )
+        for unit in army.units
+    } == {
+        "army-alpha:aspect-unit-1": ((ASPECT_SHRINE_TOKEN_RESOURCE_KIND, 2),),
+        "army-alpha:aspect-unit-2": ((ASPECT_SHRINE_TOKEN_RESOURCE_KIND, 2),),
+    }
+
+
+def test_unit_muster_payload_rejects_caller_supplied_starting_resources() -> None:
+    request = _army_muster_request(
+        catalog=_aeldari_catalog(include_aspect_shrine_token=True),
+        army_id="army-alpha",
+        player_id="player-a",
+        faction_id=army_rule.AELDARI_FACTION_ID,
+        detachment_id=_AELDARI_DETACHMENT_ID,
+        unit_selection_id=_AELDARI_UNIT_SELECTION_ID,
+        datasheet_id=_AELDARI_ASPECT_DATASHEET_ID,
+        model_profile_id=_AELDARI_ASPECT_MODEL_PROFILE_ID,
+        model_count=5,
+    )
+    payload = request.to_payload()
+    selection_payload = cast(dict[str, object], payload["unit_selections"][0])
+    selection_payload["starting_resources"] = [
+        {"resource_kind": ASPECT_SHRINE_TOKEN_RESOURCE_KIND, "amount": 1000}
+    ]
+
+    with pytest.raises(ListValidationError, match="engine-derived from wargear choices"):
+        ArmyMusterRequest.from_payload(payload)
+
+
+def test_aspect_shrine_token_rehydration_rejects_resource_allocation_tampering() -> None:
+    lifecycle, _status = _advance_to_movement_unit_selection(
+        _aeldari_config(aspect_shrine_token_count=1)
+    )
+    unit_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload())),
+    )
+    alpha_army = unit_payload["state"]["army_definitions"][0]
+    alpha_unit = next(
+        unit for unit in alpha_army["units"] if unit["unit_instance_id"] == _AELDARI_UNIT_ID
+    )
+    alpha_unit["starting_resources"][0]["amount"] = 1000
+
+    with pytest.raises(GameLifecycleError, match="army definitions do not match config"):
+        GameLifecycle.from_payload(unit_payload)
+
+    ledger_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload())),
+    )
+    ledger = ledger_payload["state"]["unit_resource_ledgers"][0]
+    ledger["starting_resources"][ASPECT_SHRINE_TOKEN_RESOURCE_KIND] = 1000
+    ledger["resources"][ASPECT_SHRINE_TOKEN_RESOURCE_KIND] = 1000
+    ledger["transactions"][0]["amount"] = 1000
+
+    with pytest.raises(GameLifecycleError, match="source-backed roster choices"):
+        GameLifecycle.from_payload(ledger_payload)
 
 
 def test_aspect_shrine_token_engine_decision_spends_and_records_override() -> None:
@@ -1002,6 +1140,12 @@ def _aeldari_config(
     aspect_shrine_token_count: int = 0,
 ) -> GameConfig:
     catalog = _aeldari_catalog(include_aspect_shrine_token=aspect_shrine_token_count > 0)
+    selected_model_count = max(aeldari_model_count, aspect_shrine_token_count * 5)
+    selected_datasheet_id = aeldari_datasheet_id
+    selected_model_profile_id = aeldari_model_profile_id
+    if aspect_shrine_token_count > 0:
+        selected_datasheet_id = _AELDARI_ASPECT_DATASHEET_ID
+        selected_model_profile_id = _AELDARI_ASPECT_MODEL_PROFILE_ID
     return GameConfig(
         game_id="phase17g-aeldari-star-engines",
         allow_legacy_non_strict_rosters=True,
@@ -1017,16 +1161,18 @@ def _aeldari_config(
                 faction_id=army_rule.AELDARI_FACTION_ID,
                 detachment_id=_AELDARI_DETACHMENT_ID,
                 unit_selection_id=_AELDARI_UNIT_SELECTION_ID,
-                datasheet_id=aeldari_datasheet_id,
-                model_profile_id=aeldari_model_profile_id,
-                model_count=aeldari_model_count,
-                starting_resources=(
+                datasheet_id=selected_datasheet_id,
+                model_profile_id=selected_model_profile_id,
+                model_count=selected_model_count,
+                wargear_selections=(
                     ()
                     if aspect_shrine_token_count == 0
                     else (
-                        UnitStartingResourceAllocation(
-                            resource_kind=ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
-                            amount=aspect_shrine_token_count,
+                        WargearSelection(
+                            option_id=_ASPECT_SHRINE_TOKEN_OPTION_ID,
+                            model_profile_id=selected_model_profile_id,
+                            wargear_ids=(_ASPECT_SHRINE_TOKEN_WARGEAR_ID,),
+                            selection_count=aspect_shrine_token_count,
                         ),
                     )
                 ),
@@ -1053,15 +1199,34 @@ def _aeldari_config(
 def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalog:
     base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     aeldari_vehicle = _aeldari_vehicle_datasheet(
-        base_catalog.datasheet_by_id("core-vehicle-monster"),
-        include_aspect_shrine_token=include_aspect_shrine_token,
+        base_catalog.datasheet_by_id("core-vehicle-monster")
     )
     aeldari_fighter = _aeldari_fight_datasheet(
         base_catalog.datasheet_by_id("core-character-leader")
     )
+    aeldari_aspect_warriors = _aeldari_aspect_datasheet(
+        base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    )
     return replace(
         base_catalog,
-        datasheets=(*base_catalog.datasheets, aeldari_vehicle, aeldari_fighter),
+        datasheets=(
+            *base_catalog.datasheets,
+            aeldari_vehicle,
+            aeldari_fighter,
+            *((aeldari_aspect_warriors,) if include_aspect_shrine_token else ()),
+        ),
+        wargear=(
+            (
+                *base_catalog.wargear,
+                Wargear(
+                    wargear_id=_ASPECT_SHRINE_TOKEN_WARGEAR_ID,
+                    name="Aspect Shrine Token",
+                    source_ids=(_ASPECT_SHRINE_TOKEN_OPTION_SOURCE_ID,),
+                ),
+            )
+            if include_aspect_shrine_token
+            else base_catalog.wargear
+        ),
         factions=(
             *base_catalog.factions,
             FactionDefinition(
@@ -1078,9 +1243,28 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
                 name="Warhost",
                 faction_id=army_rule.AELDARI_FACTION_ID,
                 detachment_point_cost=3,
-                unit_datasheet_ids=(_AELDARI_DATASHEET_ID, _AELDARI_FIGHT_DATASHEET_ID),
+                unit_datasheet_ids=(
+                    _AELDARI_DATASHEET_ID,
+                    _AELDARI_FIGHT_DATASHEET_ID,
+                    *((_AELDARI_ASPECT_DATASHEET_ID,) if include_aspect_shrine_token else ()),
+                ),
                 force_disposition_ids=("phase17g-force",),
                 source_ids=("gw-11e-faction-detachments-2026-27:detachment:aeldari:warhost",),
+            ),
+            DetachmentDefinition(
+                detachment_id=_OTHER_AELDARI_DETACHMENT_ID,
+                name="Guardian Battlehost",
+                faction_id=army_rule.AELDARI_FACTION_ID,
+                detachment_point_cost=3,
+                unit_datasheet_ids=(
+                    _AELDARI_DATASHEET_ID,
+                    _AELDARI_FIGHT_DATASHEET_ID,
+                    *((_AELDARI_ASPECT_DATASHEET_ID,) if include_aspect_shrine_token else ()),
+                ),
+                force_disposition_ids=("phase17g-force",),
+                source_ids=(
+                    "gw-11e-faction-detachments-2026-27:detachment:aeldari:guardian-battlehost",
+                ),
             ),
         ),
     )
@@ -1088,8 +1272,6 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
 
 def _aeldari_vehicle_datasheet(
     base_datasheet: DatasheetDefinition,
-    *,
-    include_aspect_shrine_token: bool = False,
 ) -> DatasheetDefinition:
     return replace(
         base_datasheet,
@@ -1100,12 +1282,33 @@ def _aeldari_vehicle_datasheet(
             faction_keywords=("Asuryani",),
         ),
         attachment_eligibilities=(),
-        abilities=(
-            (*base_datasheet.abilities, _aspect_shrine_token_ability())
-            if include_aspect_shrine_token
-            else base_datasheet.abilities
-        ),
         source_ids=("phase17g:test:aeldari:star-engines-vehicle",),
+    )
+
+
+def _aeldari_aspect_datasheet(base_datasheet: DatasheetDefinition) -> DatasheetDefinition:
+    return replace(
+        base_datasheet,
+        datasheet_id=_AELDARI_ASPECT_DATASHEET_ID,
+        name="Aspect Warrior Test Unit",
+        keywords=DatasheetKeywordSet(
+            keywords=("Infantry", "Aspect Warrior"),
+            faction_keywords=("Asuryani",),
+        ),
+        attachment_eligibilities=(),
+        wargear_options=(
+            *(
+                replace(
+                    option,
+                    default_wargear_ids=("core-heavy-cannon",),
+                    allowed_wargear_ids=("core-heavy-cannon",),
+                )
+                for option in base_datasheet.wargear_options
+            ),
+            _aspect_shrine_token_wargear_option(),
+        ),
+        abilities=(*base_datasheet.abilities, _aspect_shrine_token_ability()),
+        source_ids=("phase17g:test:aeldari:aspect-warriors",),
     )
 
 
@@ -1134,7 +1337,7 @@ def _army_muster_request(
     datasheet_id: str,
     model_profile_id: str,
     model_count: int,
-    starting_resources: tuple[UnitStartingResourceAllocation, ...] = (),
+    wargear_selections: tuple[WargearSelection, ...] = (),
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -1159,8 +1362,28 @@ def _army_muster_request(
                         model_count=model_count,
                     ),
                 ),
-                starting_resources=starting_resources,
+                wargear_selections=wargear_selections,
             ),
+        ),
+    )
+
+
+def _aspect_shrine_token_wargear_option() -> DatasheetWargearOption:
+    return DatasheetWargearOption(
+        option_id=_ASPECT_SHRINE_TOKEN_OPTION_ID,
+        model_profile_id=_AELDARI_ASPECT_MODEL_PROFILE_ID,
+        default_wargear_ids=(),
+        allowed_wargear_ids=(_ASPECT_SHRINE_TOKEN_WARGEAR_ID,),
+        min_selections=0,
+        max_selections=1,
+        source_ids=(_ASPECT_SHRINE_TOKEN_OPTION_SOURCE_ID,),
+        selection_limit=DatasheetWargearSelectionLimit(
+            selection_group_id=f"{_AELDARI_ASPECT_DATASHEET_ID}:aspect-shrine-token",
+            models_per_increment=5,
+            max_group_selections_per_increment=1,
+            max_option_selections_per_increment=1,
+            unit_resource_kind=ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+            unit_resource_amount_per_selection=1,
         ),
     )
 
@@ -1182,8 +1405,9 @@ def _aspect_shrine_token_ability() -> DatasheetAbilityDescriptor:
         name="Aspect Shrine Token",
         source_id="source:aeldari:aspect-shrine-token",
         support=CatalogAbilitySupport.GENERIC_RULE_IR,
-        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        source_kind=CatalogAbilitySourceKind.WARGEAR,
         effect_description="Aspect Shrine Token dice result override.",
+        source_wargear_id=_ASPECT_SHRINE_TOKEN_WARGEAR_ID,
         rule_ir_payload=cast(CatalogJsonObject, compiled.rule_ir.to_payload()),
     )
 
@@ -1419,7 +1643,14 @@ def _aeldari_shooting_reachable_deployment_pose(
 ) -> Pose:
     unit_instance_id = model_instance_id.rsplit(":", 2)[0]
     if unit_instance_id == _AELDARI_UNIT_ID:
-        return Pose.at(15.5, 17.0, 0.0, facing_degrees=0.0)
+        if _AELDARI_ASPECT_MODEL_PROFILE_ID not in model_instance_id:
+            return Pose.at(15.5, 17.0, 0.0, facing_degrees=0.0)
+        return Pose.at(
+            15.5 - ((index % 2) * 2.0),
+            17.0 + ((index // 2) * 2.0),
+            0.0,
+            facing_degrees=0.0,
+        )
     if unit_instance_id == f"army-beta:{_ENEMY_UNIT_SELECTION_ID}":
         return Pose.at(43.5, 17.0 + (index * 1.8), 0.0, facing_degrees=180.0)
     if player_id == "player-b":

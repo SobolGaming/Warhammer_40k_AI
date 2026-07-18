@@ -695,6 +695,11 @@ def _wargear_selection_limit_from_row(
         max_option_selections_per_increment=_required_positive_int(
             row, "selection_option_max_per_increment"
         ),
+        unit_resource_kind=_optional_field(row=row, column_name="unit_resource_kind"),
+        unit_resource_amount_per_selection=_optional_positive_int(
+            row=row,
+            column_name="unit_resource_amount_per_selection",
+        ),
     )
 
 

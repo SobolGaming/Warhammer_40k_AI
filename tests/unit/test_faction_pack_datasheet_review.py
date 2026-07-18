@@ -16,6 +16,7 @@ from tools.aeldari_datasheet_semantic_coverage import (
     SEMANTIC_BUCKET_UNSUPPORTED_IR,
     SEMANTIC_BUCKETS,
     SOURCE_ARTIFACT_TABLES,
+    SOURCE_JSON_DIR,
     aeldari_datasheet_semantic_coverage,
     load_aeldari_datasheet_semantic_coverage,
 )
@@ -60,9 +61,11 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari impor
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
 )
+from warhammer40k_core.rules.source_patch import source_row_hash
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_RANGERS_HEIGHT_OVERRIDES,
 )
+from warhammer40k_core.rules.wahapedia_schema import WahapediaJsonArtifact
 
 AELDARI_COMPLETE_IDS = frozenset({"000000605", "000004193", "000004194", "000004195", "000004196"})
 AELDARI_UPDATE_IDS = frozenset(
@@ -517,6 +520,32 @@ def test_aeldari_semantic_coverage_artifacts_are_current() -> None:
     assert json.loads(RELEASE_MANIFEST_PATH.read_text(encoding="utf-8")) == (
         release_manifest.to_payload()
     )
+
+
+def test_aeldari_aspect_shrine_token_wargear_entitlement_rows_are_exact() -> None:
+    artifact = WahapediaJsonArtifact.from_payload(
+        json.loads((SOURCE_JSON_DIR / "Datasheets_options.json").read_text(encoding="utf-8"))
+    )
+    expected_hash_by_row_id = {
+        "000000593:4": "3adc13093b65b07e484909eaef6c98ae7fde0043362f97c449c6a9b301c99877",
+        "000000594:3": "9711b7c40d10a5d05749d1857e3943545debe9f5a573a0e0cf379a11776b1a1e",
+        "000000595:2": "330be3d76f7b8dab17a5a260f6a461d844fc3cba24b92def1cc5ce5452ec0770",
+        "000000596:2": "4bc4a8399f02deab4301de8a9708c96037519a8ee32234a26aa787f24a12edd1",
+        "000000600:2": "333f7ac8c0c369bad3db82b1c35bbebb76fc5135c8de98d2555785d0dc36af82",
+        "000000601:2": "fbeba86bc5545c70693048e6688220fa94d2d54d135f6a32dd51897efe925d62",
+        "000000607:2": "5f3e515ecb9a803f578928cead69c96688b3073b06976da216410f0affa14fb5",
+    }
+    rows = {
+        row.source_row_id: row
+        for row in artifact.rows
+        if "Aspect Shrine token" in row.runtime_fields_payload().get("description", "")
+    }
+
+    assert set(rows) == set(expected_hash_by_row_id)
+    assert {row_id: source_row_hash(row) for row_id, row in rows.items()} == expected_hash_by_row_id
+    assert {row.runtime_fields_payload()["description"] for row in rows.values()} == {
+        "For every 5 models in this unit, it can have 1 Aspect Shrine token."
+    }
 
 
 @pytest.mark.parametrize(

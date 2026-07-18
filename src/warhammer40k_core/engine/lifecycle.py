@@ -13,11 +13,8 @@ from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
-from warhammer40k_core.engine.army_mustering import (
-    ArmyDefinition,
-    ArmyMusteringError,
-    muster_army,
-)
+from warhammer40k_core.engine.army_muster_consistency import validate_mustered_army_consistency
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
@@ -3319,30 +3316,11 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     expected_battle = tuple(config.ruleset_descriptor.battle_phase_sequence.phases)
     if state.battle_phase_sequence != expected_battle:
         raise GameLifecycleError("Lifecycle state battle phase sequence does not match config.")
-    _validate_mustered_army_consistency(state=state, config=config)
-
-
-def _validate_mustered_army_consistency(*, state: GameState, config: GameConfig) -> None:
-    if not state.army_definitions and not _state_requires_mustered_armies(state):
-        return
-    try:
-        expected_armies = tuple(
-            sorted(
-                (
-                    muster_army(catalog=config.army_catalog, request=request)
-                    for request in config.army_muster_requests
-                ),
-                key=lambda army: army.player_id,
-            )
-        )
-    except ArmyMusteringError as exc:
-        raise GameLifecycleError("Lifecycle config army muster requests are invalid.") from exc
-    expected_payloads = [army.to_payload() for army in expected_armies]
-    state_payloads = [army.to_payload() for army in state.army_definitions]
-    if _state_requires_mustered_armies(state) and not state_payloads:
-        raise GameLifecycleError("Lifecycle state is missing mustered army definitions.")
-    if state_payloads and state_payloads != expected_payloads:
-        raise GameLifecycleError("Lifecycle state army definitions do not match config.")
+    validate_mustered_army_consistency(
+        state=state,
+        catalog=config.army_catalog,
+        muster_requests=config.army_muster_requests,
+    )
 
 
 def _validate_battlefield_state_consistency(
@@ -3856,17 +3834,6 @@ def _fully_removed_unit_ids_for_player(*, state: GameState, player_id: str) -> s
             if unit_model_ids and unit_model_ids <= removed_model_ids:
                 fully_removed_unit_ids.add(unit.unit_instance_id)
     return fully_removed_unit_ids
-
-
-def _state_requires_mustered_armies(state: GameState) -> bool:
-    if state.stage is not GameLifecycleStage.SETUP:
-        return True
-    if state.setup_step_index is None:
-        return True
-    muster_step_index = _setup_step_index_or_none(state, SetupStep.MUSTER_ARMIES)
-    if muster_step_index is None:
-        raise GameLifecycleError("Lifecycle state setup sequence must include MUSTER_ARMIES.")
-    return state.setup_step_index > muster_step_index
 
 
 def _state_requires_battlefield_state(state: GameState) -> bool:

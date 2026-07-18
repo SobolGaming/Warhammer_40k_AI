@@ -44,6 +44,10 @@ from warhammer40k_core.engine.list_validation_errors import (
     ListValidationError,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.unit_resource_entitlements import (
+    UnitResourceEntitlementError,
+    derive_starting_resource_allocations,
+)
 from warhammer40k_core.engine.unit_resources import (
     UnitStartingResourceAllocation,
     UnitStartingResourceAllocationPayload,
@@ -443,11 +447,15 @@ class UnitFactory:
                 requested_selections=selection.wargear_selections,
                 model_profile_selections=model_profile_selections,
             )
+            starting_resources = derive_starting_resource_allocations(
+                datasheet=datasheet,
+                wargear_selections=wargear_selections,
+            )
             validate_dice_result_override_starting_resources(
                 abilities=datasheet.abilities,
-                allocations=selection.starting_resources,
+                allocations=starting_resources,
             )
-        except (GameLifecycleError, ListValidationError) as exc:
+        except (GameLifecycleError, ListValidationError, UnitResourceEntitlementError) as exc:
             raise UnitFactoryError("UnitMusterSelection is invalid.") from exc
         own_models: list[ModelInstance] = []
         for profile_selection in model_profile_selections:
@@ -490,7 +498,7 @@ class UnitFactory:
                 MusteringOptionSelection(option_id=option.option_id)
                 for option in selected_mustering_options
             ),
-            starting_resources=selection.starting_resources,
+            starting_resources=starting_resources,
         )
 
     def _catalog_datasheet(self, datasheet: DatasheetDefinition) -> DatasheetDefinition:
@@ -576,6 +584,11 @@ def _model_wargear_ids_by_model_id(
         if option is None:
             raise UnitFactoryError("WargearSelection references an unknown datasheet option.")
         if not selection.wargear_ids:
+            continue
+        if (
+            option.selection_limit is not None
+            and option.selection_limit.unit_resource_kind is not None
+        ):
             continue
         if option.effects:
             structured_selections.append((option, selection))

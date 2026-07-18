@@ -396,6 +396,7 @@ def _bridge_datasheet(
         composition_entries=composition_entries,
         loadout_assignments=loadout_assignments,
         wargear_ids_by_name=wargear_ids_by_name,
+        resource_namespace=_required_field(faction_row, "name"),
         bridged_rows=bridged_rows,
     )
     _bridge_leader_links(context=context, datasheet_id=datasheet_id, bridged_rows=bridged_rows)
@@ -877,6 +878,7 @@ def _bridge_options(
     composition_entries: tuple[_CompositionEntry, ...],
     loadout_assignments: LoadoutAssignments | None,
     wargear_ids_by_name: dict[str, str],
+    resource_namespace: str,
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> None:
     model_profile_by_name = _model_profiles_by_name(composition_entries)
@@ -900,8 +902,12 @@ def _bridge_options(
             datasheet_id=datasheet_id,
             model_profile_by_name=model_profile_by_name,
             max_models_by_profile_id=max_models_by_profile_id,
+            required_model_profile_ids=tuple(
+                entry.model_profile_id for entry in composition_entries if entry.min_models > 0
+            ),
             minimum_unit_models=minimum_unit_models,
             maximum_unit_models=maximum_unit_models,
+            resource_namespace=resource_namespace,
             loadout_assignments=loadout_assignments,
             wargear_ids_by_name=wargear_ids_by_name,
             bridged_rows=bridged_rows,
@@ -1650,6 +1656,8 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "effect_replaced_wargear_id",
             "effect_model_count",
             "effect_wargear_count",
+            "unit_resource_kind",
+            "unit_resource_amount_per_selection",
             "source_ids",
         ),
         "Datasheets_mustering_options": (

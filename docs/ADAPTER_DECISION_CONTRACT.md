@@ -39,6 +39,21 @@ decision path. Adapters normalize the external roster once into a versioned
 `ArmyMusterRequest` is the only roster input passed to `GameConfig` and the
 ordinary setup lifecycle.
 
+Unit-scoped resources obtained through optional wargear are selected through
+the ordinary `UnitMusterSelection.wargear_selections` contract. Adapters submit
+the source-backed wargear option ID, wargear ID, model profile ID, and
+`selection_count`; they do not submit an authoritative resource balance.
+`UnitMusterSelection` therefore has no `starting_resources` field and rejects a
+payload that supplies one. The engine validates the complete selection against
+the datasheet option's scaled selection limit, then derives
+`UnitInstance.starting_resources` and the initial resource ledger. For Aspect
+Shrine Tokens, the source row permits one selected token for every five models
+in that component unit, so a 5-model unit can select at most one and a 10-model
+unit at most two. This datasheet option is independent of detachment choice.
+Lifecycle rehydration remusters from the roster selections and rejects any
+drift between those derived allocations, unit payloads, and initialization
+transactions.
+
 The artifact must carry a selected `force_disposition_id`, Battle Size,
 detachment selection, source IDs, declared points for every unit, declared
 total points, and the exact MFM package identity used to price it. The engine
@@ -2218,8 +2233,9 @@ state:
 
 - `UnitDisplayPayload` records include `unit_instance_id`, `owner_player_id`,
   `unit_display_name`, `datasheet_id`, source metadata, viewer-visible keywords
-  and faction keywords, model instance IDs, selected wargear IDs, visibility
-  status, and redaction metadata.
+  and faction keywords, model instance IDs, selected wargear IDs, visible
+  unit-resource starting and remaining counts, visibility status, and
+  redaction metadata.
 - `ModelDisplayPayload` records include `model_instance_id`,
   `unit_instance_id`, `datasheet_id`, `model_profile_id`, display names,
   manifested model `wargear_ids`, `base_size`, starting/current wounds,
