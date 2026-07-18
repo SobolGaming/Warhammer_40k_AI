@@ -43,6 +43,7 @@ from warhammer40k_core.engine.catalog_prebattle_redeploy import (
     CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
@@ -330,9 +331,9 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 13,
-        SEMANTIC_BUCKET_HOST_NEEDED: 5,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 52,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 14,
+        SEMANTIC_BUCKET_HOST_NEEDED: 6,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 50,
     }
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
@@ -473,6 +474,26 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert 'ends a move within 8"' in rangers_text
     assert "in a turn it disembarked from this TRANSPORT" in starweaver_text
     assert "Designer's Note" not in aspect_token_text
+    aspect_token_rows = tuple(
+        ability
+        for datasheet_id in {
+            "000000593",
+            "000000594",
+            "000000595",
+            "000000596",
+            "000000600",
+            "000000601",
+            "000000607",
+        }
+        for ability in rows_by_id[datasheet_id].abilities
+        if ability.ability_name == "Aspect Shrine Token"
+    )
+    assert len(aspect_token_rows) == 7
+    assert all(row.support_stage.value == "engine_consumed" for row in aspect_token_rows)
+    assert all(
+        row.runtime_consumer_ids == (CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,)
+        for row in aspect_token_rows
+    )
 
 
 def test_aeldari_rangers_catalog_geometry_is_source_reviewed() -> None:

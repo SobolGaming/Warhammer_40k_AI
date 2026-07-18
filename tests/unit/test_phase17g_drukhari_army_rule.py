@@ -1441,7 +1441,7 @@ def test_hatred_eternal_accepted_hit_reroll_resumes_attack_sequence_with_rerolle
     )
     lifecycle, units = shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
-        game_id="drukhari-test-hatred-eternal-consumer",
+        game_id="drukhari-test-hatred-eternal-consumer-v2",
         catalog=catalog_with_replaced_bolt_profiles((hatred_profile,)),
     )
     state = _lifecycle_state(lifecycle)

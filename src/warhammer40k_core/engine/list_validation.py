@@ -26,6 +26,11 @@ from warhammer40k_core.engine.scaled_wargear_limits import (
 from warhammer40k_core.engine.structured_wargear_validation import (
     validate_replace_wargear_effect_count,
 )
+from warhammer40k_core.engine.unit_resources import (
+    UnitStartingResourceAllocation,
+    UnitStartingResourceAllocationPayload,
+    validate_starting_resource_allocations,
+)
 from warhammer40k_core.engine.wargear_bearer_assignment_validation import (
     validate_wargear_bearer_assignments,
 )
@@ -119,6 +124,7 @@ class UnitMusterSelectionPayload(TypedDict):
     model_profile_selections: list[ModelProfileSelectionPayload]
     wargear_selections: list[WargearSelectionPayload]
     mustering_option_selections: list[MusteringOptionSelectionPayload]
+    starting_resources: list[UnitStartingResourceAllocationPayload]
 
 
 class AttachmentDeclarationPayload(TypedDict):
@@ -340,6 +346,7 @@ class UnitMusterSelection:
     model_profile_selections: tuple[ModelProfileSelection, ...]
     wargear_selections: tuple[WargearSelection, ...] = ()
     mustering_option_selections: tuple[MusteringOptionSelection, ...] = ()
+    starting_resources: tuple[UnitStartingResourceAllocation, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -382,6 +389,14 @@ class UnitMusterSelection:
             "mustering_option_selections",
             mustering_option_selections,
         )
+        object.__setattr__(
+            self,
+            "starting_resources",
+            validate_starting_resource_allocations(
+                "UnitMusterSelection starting_resources",
+                self.starting_resources,
+            ),
+        )
 
     def to_payload(self) -> UnitMusterSelectionPayload:
         return {
@@ -393,6 +408,9 @@ class UnitMusterSelection:
             "wargear_selections": [selection.to_payload() for selection in self.wargear_selections],
             "mustering_option_selections": [
                 selection.to_payload() for selection in self.mustering_option_selections
+            ],
+            "starting_resources": [
+                allocation.to_payload() for allocation in self.starting_resources
             ],
         }
 
@@ -412,6 +430,10 @@ class UnitMusterSelection:
             mustering_option_selections=tuple(
                 MusteringOptionSelection.from_payload(selection)
                 for selection in payload["mustering_option_selections"]
+            ),
+            starting_resources=tuple(
+                UnitStartingResourceAllocation.from_payload(allocation)
+                for allocation in payload["starting_resources"]
             ),
         )
 

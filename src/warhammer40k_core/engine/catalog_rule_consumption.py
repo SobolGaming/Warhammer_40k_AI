@@ -181,6 +181,7 @@ CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID = "catalog-ir:feel-no-pain-roll"
 CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID = "catalog-ir:feel-no-pain-source"
 CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-hit-value-modifier"
 CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-wound-value-modifier"
+CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID = "catalog-ir:dice-result-override"
 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
 CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = "catalog-ir:named-weapon-ability-choice"
 CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-status"
@@ -3923,7 +3924,9 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _clause_is_supported_first_death_return(clause):
         consumer_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID)
     for effect in clause.effects:
-        if effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS:
+        if effect.kind is RuleEffectKind.OVERRIDE_DICE_ROLL_RESULT:
+            consumer_ids.add(CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID)
+        elif effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS:
             consumer_ids.add(CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID)
         elif effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
             modifier_consumer_id = _roll_modifier_consumer_id_for_effect(effect)
@@ -5912,6 +5915,8 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     parameters = parameter_payload(effect.parameters)
     if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
         return _catalog_ir_roll_modifier_hook_ids(parameters)
+    if effect.kind is RuleEffectKind.OVERRIDE_DICE_ROLL_RESULT:
+        return (CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,)
     if effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS:
         return (CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,)
     if effect.kind is RuleEffectKind.REROLL_PERMISSION:

@@ -12,11 +12,21 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_movement_proposal,
 )
+from tests.phase13b_shooting_declaration_helpers import proposal_from_request
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    CatalogJsonObject,
+    DatasheetAbilityDescriptor,
+    DatasheetDefinition,
+    DatasheetKeywordSet,
+)
 from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
     ConsolidationModeKind,
@@ -33,6 +43,10 @@ from warhammer40k_core.engine.advance_hooks import (
     SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE,
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.attack_sequence import (
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
     ModelDisplacementKind,
@@ -41,11 +55,22 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.charge_declaration_hooks import ChargeDeclarationContext
+from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice_result_override_descriptors import (
+    ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+)
+from warhammer40k_core.engine.dice_result_overrides import (
+    DICE_RESULT_OVERRIDE_DECISION_TYPE,
+    DICE_RESULT_OVERRIDE_EVENT_TYPE,
+    UNIT_RESOURCE_SPENT_EVENT_TYPE,
+    apply_dice_result_override_decision,
+    request_dice_result_override_if_available,
+)
 from warhammer40k_core.engine.effects import EffectExpirationKind, PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
 from warhammer40k_core.engine.fight_activation_abilities import (
@@ -100,11 +125,22 @@ from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
 )
+from warhammer40k_core.engine.unit_resource_state import (
+    spend_unit_resource,
+    unit_resource_starting_total,
+    unit_resource_total,
+)
+from warhammer40k_core.engine.unit_resources import (
+    UnitResourceStatus,
+    UnitStartingResourceAllocation,
+)
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
 
 _AELDARI_UNIT_ID = "army-alpha:aeldari-vehicle"
 _AELDARI_UNIT_SELECTION_ID = "aeldari-vehicle"
@@ -136,6 +172,178 @@ def test_aeldari_battle_focus_agile_manoeuvres_text_is_source_backed_from_json()
     assert "OPPORTUNITY SEIZED\nTRIGGER: When an enemy unit ends a Fall Back move." in description
     assert "FADE BACK\nTRIGGER: In your opponent" in description
     assert "Shooting phase, just after an enemy unit has shot." in description
+
+
+def test_aspect_shrine_tokens_seed_project_and_round_trip() -> None:
+    config = _aeldari_config(aspect_shrine_token_count=2)
+    lifecycle, _status = _advance_to_movement_unit_selection(config)
+    state = _state(lifecycle)
+
+    assert (
+        unit_resource_starting_total(
+            state=state,
+            unit_instance_id=_AELDARI_UNIT_ID,
+            resource_kind=ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+        )
+        == 2
+    )
+    assert (
+        unit_resource_total(
+            state=state,
+            unit_instance_id=_AELDARI_UNIT_ID,
+            resource_kind=ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+        )
+        == 2
+    )
+    assert GameState.from_payload(state.to_payload()).unit_resource_ledgers == (
+        state.unit_resource_ledgers
+    )
+    view = LocalGameSession(lifecycle=lifecycle).view(viewer_player_id="player-a")
+    assert view["unit_display_by_id"][_AELDARI_UNIT_ID]["resources"] == [
+        {
+            "resource_kind": ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+            "starting_amount": 2,
+            "remaining_amount": 2,
+        }
+    ]
+
+
+def test_aspect_shrine_token_engine_decision_spends_and_records_override() -> None:
+    config = _aeldari_config(aspect_shrine_token_count=2)
+    lifecycle, _status = _advance_to_movement_unit_selection(config)
+    state = _state(lifecycle)
+    source_unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == _AELDARI_UNIT_ID
+    )
+    attacker_model = source_unit.own_models[0]
+    wargear = next(
+        item
+        for item in config.army_catalog.wargear
+        if item.wargear_id in attacker_model.wargear_ids
+    )
+    profile = wargear.weapon_profiles[0]
+    decisions = DecisionController()
+    manager = DiceRollManager("aspect-shrine-token-test", event_log=decisions.event_log)
+    roll_state = manager.roll(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"{profile.profile_id} for Aspect Shrine Token test",
+            roll_type="attack_sequence.hit",
+            actor_id="player-a",
+        )
+    )
+    request = request_dice_result_override_if_available(
+        state=state,
+        decisions=decisions,
+        roll_state=roll_state,
+        roll_type="hit",
+        roll_successful=False,
+        roll_critical=False,
+        source_phase=BattlePhase.SHOOTING.value,
+        sequence_id="aspect-token-sequence",
+        attack_context_id="aspect-token-attack",
+        pool_index=0,
+        attack_index=0,
+        attacking_unit_instance_id=_AELDARI_UNIT_ID,
+        attacker_model_instance_id=attacker_model.model_instance_id,
+        target_unit_instance_id=_ENEMY_UNIT_ID,
+        weapon_profile_id=profile.profile_id,
+        weapon_profile=profile,
+        target_keywords=("INFANTRY",),
+    )
+    assert request is not None
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="aspect-token-result",
+        request=request,
+        selected_option_id="use",
+    )
+    decisions.submit_result(result)
+    apply_dice_result_override_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        result=result,
+    )
+
+    assert (
+        unit_resource_total(
+            state=state,
+            unit_instance_id=_AELDARI_UNIT_ID,
+            resource_kind=ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+        )
+        == 1
+    )
+    assert {event.event_type for event in decisions.event_log.records} >= {
+        UNIT_RESOURCE_SPENT_EVENT_TYPE,
+        DICE_RESULT_OVERRIDE_EVENT_TYPE,
+    }
+
+
+def test_aspect_shrine_token_facade_use_resumes_failed_hit_as_six() -> None:
+    lifecycle, request = _aspect_shrine_lifecycle_override_request()
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="aspect-token-facade-use",
+            request=request,
+            selected_option_id="use",
+        )
+    )
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert (
+        unit_resource_total(
+            state=_state(lifecycle),
+            unit_instance_id=_AELDARI_UNIT_ID,
+            resource_kind=ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+        )
+        == 0
+    )
+    override_payload = _event_payload(lifecycle, DICE_RESULT_OVERRIDE_EVENT_TYPE)
+    updated_state = cast(dict[str, JsonValue], override_payload["updated_roll_state"])
+    assert updated_state["current_values"] == [6]
+    assert updated_state["current_total"] == 6
+
+
+def test_aspect_shrine_token_facade_rejects_resource_drift_without_popping_request() -> None:
+    lifecycle, request = _aspect_shrine_lifecycle_override_request()
+    state = _state(lifecycle)
+    spend = spend_unit_resource(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=_AELDARI_UNIT_ID,
+        resource_kind=ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_rule_id="source:aeldari:aspect-shrine-token",
+        decision_request_id="aspect-token-concurrent-request",
+        decision_result_id="aspect-token-concurrent-result",
+    )
+    assert spend.status is UnitResourceStatus.APPLIED
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="aspect-token-stale-use",
+            request=request,
+            selected_option_id="use",
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    invalid_payload = cast(dict[str, JsonValue], status.payload)
+    assert invalid_payload["field"] == "current_count"
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert (
+        unit_resource_total(
+            state=state,
+            unit_instance_id=_AELDARI_UNIT_ID,
+            resource_kind=ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+        )
+        == 0
+    )
 
 
 def test_aeldari_star_engines_grants_advanced_vehicle_assault_until_end_of_turn() -> None:
@@ -791,8 +999,9 @@ def _aeldari_config(
     aeldari_datasheet_id: str = _AELDARI_DATASHEET_ID,
     aeldari_model_profile_id: str = "core-vehicle-monster",
     aeldari_model_count: int = 1,
+    aspect_shrine_token_count: int = 0,
 ) -> GameConfig:
-    catalog = _aeldari_catalog()
+    catalog = _aeldari_catalog(include_aspect_shrine_token=aspect_shrine_token_count > 0)
     return GameConfig(
         game_id="phase17g-aeldari-star-engines",
         allow_legacy_non_strict_rosters=True,
@@ -811,6 +1020,16 @@ def _aeldari_config(
                 datasheet_id=aeldari_datasheet_id,
                 model_profile_id=aeldari_model_profile_id,
                 model_count=aeldari_model_count,
+                starting_resources=(
+                    ()
+                    if aspect_shrine_token_count == 0
+                    else (
+                        UnitStartingResourceAllocation(
+                            resource_kind=ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+                            amount=aspect_shrine_token_count,
+                        ),
+                    )
+                ),
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -831,10 +1050,11 @@ def _aeldari_config(
     )
 
 
-def _aeldari_catalog() -> ArmyCatalog:
+def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalog:
     base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     aeldari_vehicle = _aeldari_vehicle_datasheet(
-        base_catalog.datasheet_by_id("core-vehicle-monster")
+        base_catalog.datasheet_by_id("core-vehicle-monster"),
+        include_aspect_shrine_token=include_aspect_shrine_token,
     )
     aeldari_fighter = _aeldari_fight_datasheet(
         base_catalog.datasheet_by_id("core-character-leader")
@@ -866,7 +1086,11 @@ def _aeldari_catalog() -> ArmyCatalog:
     )
 
 
-def _aeldari_vehicle_datasheet(base_datasheet: DatasheetDefinition) -> DatasheetDefinition:
+def _aeldari_vehicle_datasheet(
+    base_datasheet: DatasheetDefinition,
+    *,
+    include_aspect_shrine_token: bool = False,
+) -> DatasheetDefinition:
     return replace(
         base_datasheet,
         datasheet_id=_AELDARI_DATASHEET_ID,
@@ -876,6 +1100,11 @@ def _aeldari_vehicle_datasheet(base_datasheet: DatasheetDefinition) -> Datasheet
             faction_keywords=("Asuryani",),
         ),
         attachment_eligibilities=(),
+        abilities=(
+            (*base_datasheet.abilities, _aspect_shrine_token_ability())
+            if include_aspect_shrine_token
+            else base_datasheet.abilities
+        ),
         source_ids=("phase17g:test:aeldari:star-engines-vehicle",),
     )
 
@@ -905,6 +1134,7 @@ def _army_muster_request(
     datasheet_id: str,
     model_profile_id: str,
     model_count: int,
+    starting_resources: tuple[UnitStartingResourceAllocation, ...] = (),
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -929,8 +1159,32 @@ def _army_muster_request(
                         model_count=model_count,
                     ),
                 ),
+                starting_resources=starting_resources,
             ),
         ),
+    )
+
+
+def _aspect_shrine_token_ability() -> DatasheetAbilityDescriptor:
+    compiled = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="source:aeldari:aspect-shrine-token",
+            raw_text=(
+                "Once per battle for each Aspect Shrine token this unit has, you can change "
+                "the result of one Hit roll or one Wound roll made for a model in this unit "
+                "(excluding CHARACTER models) to an unmodified 6."
+            ),
+        ),
+        source_keyword_sequence_parts=("CHARACTER",),
+    )
+    return DatasheetAbilityDescriptor(
+        ability_id="aspect-shrine-token",
+        name="Aspect Shrine Token",
+        source_id="source:aeldari:aspect-shrine-token",
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="Aspect Shrine Token dice result override.",
+        rule_ir_payload=cast(CatalogJsonObject, compiled.rule_ir.to_payload()),
     )
 
 
@@ -1076,6 +1330,86 @@ def _shooting_declaration_request_for_aeldari_vehicle(
     )
     declaration_status = handler.begin_phase(state=shooting_state, decisions=decisions)
     return _decision_request(declaration_status)
+
+
+def _aspect_shrine_lifecycle_override_request() -> tuple[GameLifecycle, DecisionRequest]:
+    lifecycle, _status = _advance_to_movement_unit_selection(
+        _aeldari_config(aspect_shrine_token_count=1)
+    )
+    _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.SHOOTING)
+    lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
+
+    unit_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    assert unit_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
+    type_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="aspect-token-select-shooting-unit",
+            request=unit_request,
+            selected_option_id=_AELDARI_UNIT_ID,
+        )
+    )
+    type_status = _decline_stratagem_window_if_present(
+        lifecycle,
+        type_status,
+        result_id="aspect-token-decline-selected-to-shoot-window",
+    )
+    type_request = _decision_request(type_status)
+    assert type_request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE
+    declaration_request = _decision_request(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="aspect-token-select-shooting-type",
+                request=type_request,
+                selected_option_id=ShootingType.NORMAL.value,
+            )
+        )
+    )
+    assert declaration_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
+    proposal = proposal_from_request(
+        request=declaration_request,
+        target_unit_id=_ENEMY_UNIT_ID,
+    )
+    declaration = proposal.declarations[0]
+    declaration_result_id = "aspect-token-shooting-declaration"
+    attack_context_id = f"attack-sequence:{declaration_result_id}:pool-001:attack-001"
+    manager = DiceRollManager(
+        _state(lifecycle).game_id,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    manager.roll_fixed(
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id=declaration.weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [1],
+    )
+    manager.roll_fixed(
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id=declaration.weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [6],
+    )
+    status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id=declaration_result_id,
+            request_id=declaration_request.request_id,
+            decision_type=declaration_request.decision_type,
+            actor_id=declaration_request.actor_id,
+            selected_option_id="submit_parameterized_payload",
+            payload=validate_json_value(proposal.to_payload()),
+        )
+    )
+    status = _decline_stratagem_window_if_present(
+        lifecycle,
+        status,
+        result_id="aspect-token-decline-hit-command-reroll",
+    )
+    request = _decision_request(status)
+    assert request.decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE
+    return lifecycle, request
 
 
 def _aeldari_shooting_reachable_deployment_pose(

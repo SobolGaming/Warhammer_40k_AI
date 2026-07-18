@@ -1075,21 +1075,29 @@
         {
           "ability_id": "000000593:aspect-shrine-token",
           "ability_name": "Aspect Shrine Token",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
           "raw_text": "Once per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.",
           "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:dice-result-override"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:4:description:clause:001:effect:0",
+              "semantic_kind": "override_dice_roll_result"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:4"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000593:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000593:shimmershield",
@@ -1152,21 +1160,29 @@
         {
           "ability_id": "000000594:aspect-shrine-token",
           "ability_name": "Aspect Shrine Token",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
           "raw_text": "Once per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.",
           "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:dice-result-override"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000594:4:description:clause:001:effect:0",
+              "semantic_kind": "override_dice_roll_result"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000594:4"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000594:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000594",
@@ -1208,28 +1224,36 @@
         {
           "ability_id": "000000595:aspect-shrine-token",
           "ability_name": "Aspect Shrine Token",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
           "raw_text": "Once per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.",
           "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:dice-result-override"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000595:6:description:clause:001:effect:0",
+              "semantic_kind": "override_dice_roll_result"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000595:6"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000595:6",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000595",
       "datasheet_name": "Striking Scorpions",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "rules_update"
     },
     {
@@ -1279,21 +1303,29 @@
         {
           "ability_id": "000000596:aspect-shrine-token",
           "ability_name": "Aspect Shrine Token",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
           "raw_text": "Once per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.",
           "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:dice-result-override"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:3:description:clause:001:effect:0",
+              "semantic_kind": "override_dice_roll_result"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:3"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000596:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000596",
@@ -1531,21 +1563,29 @@
         {
           "ability_id": "000000600:aspect-shrine-token",
           "ability_name": "Aspect Shrine Token",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
           "raw_text": "Once per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.",
           "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:dice-result-override"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000600:4:description:clause:001:effect:0",
+              "semantic_kind": "override_dice_roll_result"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000600:4"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000600:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000600",
@@ -1579,21 +1619,29 @@
         {
           "ability_id": "000000601:aspect-shrine-token",
           "ability_name": "Aspect Shrine Token",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
           "raw_text": "Once per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.",
           "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:dice-result-override"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000601:4:description:clause:001:effect:0",
+              "semantic_kind": "override_dice_roll_result"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000601:4"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000601:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000601",
@@ -1777,28 +1825,36 @@
         {
           "ability_id": "000000607:aspect-shrine-token",
           "ability_name": "Aspect Shrine Token",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
           "raw_text": "Once per battle for each Aspect Shrine token this unit has, you can change the result of one Hit roll or one Wound roll made for a model in this unit (excluding CHARACTER models) to an unmodified 6.",
           "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:dice-result-override"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000607:3:description:clause:001:effect:0",
+              "semantic_kind": "override_dice_roll_result"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000607:3"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000607:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000607",
       "datasheet_name": "Dark Reapers",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "Exact IR parsed; host needed",
       "treatment": "rules_update"
     },
     {
@@ -4161,9 +4217,9 @@
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 13,
-    "Exact IR parsed; host needed": 5,
-    "Exact ability IR unsupported": 52
+    "All exact abilities consumed": 14,
+    "Exact IR parsed; host needed": 6,
+    "Exact ability IR unsupported": 50
   },
   "source_artifact_hashes": {
     "Abilities": "dd7d779531e88bd2c30ee2405275b41dba0e5d56007c43a7fcf8bb7c105032e0",

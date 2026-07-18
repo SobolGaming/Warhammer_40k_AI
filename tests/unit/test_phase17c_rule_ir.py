@@ -59,6 +59,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
+    CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,
     CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
     CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
@@ -86,6 +87,10 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_support import (
     CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID,
+)
+from warhammer40k_core.engine.dice_result_override_descriptors import (
+    ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+    dice_result_override_descriptors_for_abilities,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -4378,6 +4383,44 @@ def _compiled(raw_text: str) -> CompiledRuleSource:
     return compile_rule_source_text(
         RuleSourceText.from_raw(source_id=f"phase17c:test:{source_suffix}", raw_text=raw_text)
     )
+
+
+def test_phase17c_aspect_shrine_token_compiles_to_source_backed_override_ir() -> None:
+    compiled = _compiled(
+        "Once per battle for each Aspect Shrine token this unit has, you can change the "
+        "result of one Hit roll or one Wound roll made for a model in this unit "
+        "(excluding CHARACTER models) to an unmodified 6."
+    )
+
+    assert compiled.rule_ir.diagnostics == ()
+    assert len(compiled.rule_ir.clauses) == 1
+    effect = compiled.rule_ir.clauses[0].effects[0]
+    assert effect.kind is RuleEffectKind.OVERRIDE_DICE_ROLL_RESULT
+    assert parameter_payload(effect.parameters) == {
+        "excluded_model_keywords": ("CHARACTER",),
+        "replacement_value": 6,
+        "resource_cost": 1,
+        "resource_kind": ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+        "roll_types": ("hit", "wound"),
+        "resource_scope": "source_unit",
+    }
+    assert catalog_rule_ir_consumers_for_rule(compiled.rule_ir) == (
+        CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,
+    )
+    ability = DatasheetAbilityDescriptor(
+        ability_id="aspect-shrine-token",
+        name="Aspect Shrine Token",
+        source_id="source:aeldari:aspect-shrine-token",
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="Aspect Shrine Token dice result override.",
+        rule_ir_payload=cast(CatalogJsonObject, compiled.rule_ir.to_payload()),
+    )
+    descriptor = dice_result_override_descriptors_for_abilities((ability,))[0]
+    assert descriptor.source_rule_id == compiled.rule_ir.source_id
+    assert descriptor.resource_kind == ASPECT_SHRINE_TOKEN_RESOURCE_KIND
+    assert descriptor.roll_types == ("hit", "wound")
+    assert descriptor.excluded_model_keywords == ("CHARACTER",)
 
 
 def _effects(rule_ir: RuleIR) -> tuple[RuleEffectSpec, ...]:

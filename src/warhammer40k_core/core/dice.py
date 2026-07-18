@@ -1,27 +1,23 @@
 from __future__ import annotations
 
-import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Literal, Self, TypedDict, cast
 
+from warhammer40k_core.core import dice_validation as _dice_validation
 from warhammer40k_core.core.attributes import Characteristic, characteristic_from_token
+from warhammer40k_core.core.dice_errors import DiceError as DiceError
+from warhammer40k_core.core.dice_errors import DiceRollSpecError as DiceRollSpecError
+from warhammer40k_core.core.dice_result_override import (
+    DiceRollOverrideRecord,
+    DiceRollOverrideRecordPayload,
+)
 from warhammer40k_core.core.modifiers import (
     RollModifier,
     RollModifierPayload,
     apply_roll_modifiers,
 )
-from warhammer40k_core.core.validation import IdentifierValidator
-
-
-class DiceError(ValueError):
-    """Base error for invalid dice domain data."""
-
-
-class DiceRollSpecError(DiceError):
-    """Raised when a dice roll request violates replay-facing invariants."""
-
 
 type DiceRollSource = Literal["rng", "fixed", "injected"]
 
@@ -60,6 +56,7 @@ class DiceRollStatePayload(TypedDict):
     current_values: list[int]
     current_total: int
     rerolls: list[DiceRerollRecordPayload]
+    result_override: DiceRollOverrideRecordPayload | None
 
 
 class DiceRollComponentPayload(TypedDict):
@@ -162,9 +159,6 @@ class RandomCharacteristicRollPayload(TypedDict):
     value: int
 
 
-_LABEL_PARTS = re.compile(r"[\s_]+")
-
-
 class RerollComponentSelectionPolicy(StrEnum):
     WHOLE_ROLL = "whole_roll"
     COMPONENT_SELECTION = "component_selection"
@@ -246,19 +240,23 @@ class DiceRollSpec:
         object.__setattr__(
             self,
             "reason",
-            _validated_replay_label("reason", self.reason, self.expression),
+            _dice_validation.validate_replay_label(
+                "reason", self.reason, self.expression.canonical()
+            ),
         )
         object.__setattr__(
             self,
             "roll_type",
-            _validated_replay_label("roll_type", self.roll_type, self.expression),
+            _dice_validation.validate_replay_label(
+                "roll_type", self.roll_type, self.expression.canonical()
+            ),
         )
         if self.actor_id is not None and not self.actor_id.strip():
             raise DiceRollSpecError("DiceRollSpec actor_id must not be empty when supplied.")
         object.__setattr__(
             self,
             "reroll_forbidden_rule_ids",
-            _validate_identifier_tuple(
+            _dice_validation.validate_identifier_tuple(
                 "DiceRollSpec reroll_forbidden_rule_ids",
                 self.reroll_forbidden_rule_ids,
                 min_length=0,
@@ -356,7 +354,9 @@ class DiceRollComponent:
         object.__setattr__(
             self,
             "component_id",
-            _validate_identifier("DiceRollComponent component_id", self.component_id),
+            _dice_validation.validate_identifier(
+                "DiceRollComponent component_id", self.component_id
+            ),
         )
         if type(self.index) is not int:
             raise DiceRollSpecError("DiceRollComponent index must be an integer.")
@@ -405,7 +405,7 @@ class DiceRollInstance:
         object.__setattr__(
             self,
             "roll_id",
-            _validate_identifier("DiceRollInstance roll_id", self.roll_id),
+            _dice_validation.validate_identifier("DiceRollInstance roll_id", self.roll_id),
         )
         if type(self.spec) is not DiceRollSpec:
             raise DiceRollSpecError("DiceRollInstance spec must be a DiceRollSpec.")
@@ -536,22 +536,22 @@ class RollOffRequest:
         object.__setattr__(
             self,
             "request_id",
-            _validate_identifier("RollOffRequest request_id", self.request_id),
+            _dice_validation.validate_identifier("RollOffRequest request_id", self.request_id),
         )
         object.__setattr__(
             self,
             "purpose",
-            _validate_identifier("RollOffRequest purpose", self.purpose),
+            _dice_validation.validate_identifier("RollOffRequest purpose", self.purpose),
         )
         object.__setattr__(
             self,
             "resolving_decision_id",
-            _validate_identifier(
+            _dice_validation.validate_identifier(
                 "RollOffRequest resolving_decision_id",
                 self.resolving_decision_id,
             ),
         )
-        player_ids = _validate_identifier_tuple(
+        player_ids = _dice_validation.validate_identifier_tuple(
             "RollOffRequest player_ids",
             self.player_ids,
             min_length=2,
@@ -588,7 +588,7 @@ class RollOffPlayerRoll:
         object.__setattr__(
             self,
             "player_id",
-            _validate_identifier("RollOffPlayerRoll player_id", self.player_id),
+            _dice_validation.validate_identifier("RollOffPlayerRoll player_id", self.player_id),
         )
         if type(self.roll_result) is not DiceRollResult:
             raise DiceRollSpecError("RollOffPlayerRoll roll_result must be a DiceRollResult.")
@@ -708,7 +708,9 @@ class RollOffResult:
         object.__setattr__(
             self,
             "winner_player_id",
-            _validate_identifier("RollOffResult winner_player_id", self.winner_player_id),
+            _dice_validation.validate_identifier(
+                "RollOffResult winner_player_id", self.winner_player_id
+            ),
         )
         if self.winner_player_id != final_winner:
             raise DiceRollSpecError("RollOffResult winner_player_id does not match final round.")
@@ -797,22 +799,28 @@ class RerollPermission:
         object.__setattr__(
             self,
             "source_id",
-            _validate_identifier("RerollPermission source_id", self.source_id),
+            _dice_validation.validate_identifier("RerollPermission source_id", self.source_id),
         )
         object.__setattr__(
             self,
             "timing_window",
-            _validate_identifier("RerollPermission timing_window", self.timing_window),
+            _dice_validation.validate_identifier(
+                "RerollPermission timing_window", self.timing_window
+            ),
         )
         object.__setattr__(
             self,
             "owning_player_id",
-            _validate_identifier("RerollPermission owning_player_id", self.owning_player_id),
+            _dice_validation.validate_identifier(
+                "RerollPermission owning_player_id", self.owning_player_id
+            ),
         )
         object.__setattr__(
             self,
             "eligible_roll_type",
-            _validate_identifier("RerollPermission eligible_roll_type", self.eligible_roll_type),
+            _dice_validation.validate_identifier(
+                "RerollPermission eligible_roll_type", self.eligible_roll_type
+            ),
         )
         object.__setattr__(
             self,
@@ -918,12 +926,12 @@ class RerollDecisionRequest:
         object.__setattr__(
             self,
             "roll_id",
-            _validate_identifier("RerollDecisionRequest roll_id", self.roll_id),
+            _dice_validation.validate_identifier("RerollDecisionRequest roll_id", self.roll_id),
         )
         object.__setattr__(
             self,
             "roll_type",
-            _validate_identifier("RerollDecisionRequest roll_type", self.roll_type),
+            _dice_validation.validate_identifier("RerollDecisionRequest roll_type", self.roll_type),
         )
         if type(self.permission) is not RerollPermission:
             raise DiceRollSpecError("RerollDecisionRequest permission must be a RerollPermission.")
@@ -933,7 +941,7 @@ class RerollDecisionRequest:
         )
         if selections != self.allowed_selections:
             object.__setattr__(self, "allowed_selections", selections)
-        values = _validate_int_tuple(
+        values = _dice_validation.validate_int_tuple(
             "RerollDecisionRequest current_values",
             self.current_values,
         )
@@ -978,6 +986,7 @@ class DiceRollState:
     current_values: tuple[int, ...]
     current_total: int
     rerolls: tuple[DiceRerollRecord, ...] = ()
+    result_override: DiceRollOverrideRecord | None = None
 
     def __post_init__(self) -> None:
         if type(self.original_result) is not DiceRollResult:
@@ -997,8 +1006,17 @@ class DiceRollState:
             self.original_result,
             rerolls,
         )
+        if self.result_override is not None:
+            if type(self.result_override) is not DiceRollOverrideRecord:
+                raise DiceRollSpecError("DiceRollState result_override must be typed.")
+            expression = self.original_result.spec.expression
+            if expression.quantity != 1 or expression.sides != 6 or expression.modifier != 0:
+                raise DiceRollSpecError("Dice result override requires one unmodified D6.")
+            if self.result_override.previous_values != expected_values:
+                raise DiceRollSpecError("Dice result override previous values drifted.")
+            expected_values = (self.result_override.replacement_value,)
         if value_tuple != expected_values:
-            raise DiceRollSpecError("DiceRollState current_values drifted from reroll records.")
+            raise DiceRollSpecError("DiceRollState current_values drifted from roll records.")
         expected_total = self.original_result.spec.expression.total(value_tuple)
         if self.current_total != expected_total:
             raise DiceRollSpecError("DiceRollState current_total does not match current_values.")
@@ -1019,6 +1037,8 @@ class DiceRollState:
         selected_indices: Iterable[int],
         replacement_result: DiceRollResult,
     ) -> DiceRollState:
+        if self.result_override is not None:
+            raise DiceRollSpecError("A dice roll cannot be rerolled after a result override.")
         indices = _validate_selected_indices(tuple(selected_indices))
         already_rerolled = set(self.rerolled_indices())
         if any(index in already_rerolled for index in indices):
@@ -1051,6 +1071,34 @@ class DiceRollState:
             rerolls=(*self.rerolls, record),
         )
 
+    def with_result_override(
+        self,
+        *,
+        decision_id: str,
+        request_id: str,
+        source_rule_id: str,
+        replacement_value: int,
+    ) -> DiceRollState:
+        if self.result_override is not None:
+            raise DiceRollSpecError("A dice roll result can be overridden at most once.")
+        expression = self.original_result.spec.expression
+        if expression.quantity != 1 or expression.sides != 6 or expression.modifier != 0:
+            raise DiceRollSpecError("Dice result override requires one unmodified D6.")
+        record = DiceRollOverrideRecord(
+            decision_id=decision_id,
+            request_id=request_id,
+            source_rule_id=source_rule_id,
+            previous_values=self.current_values,
+            replacement_value=replacement_value,
+        )
+        return DiceRollState(
+            original_result=self.original_result,
+            current_values=(record.replacement_value,),
+            current_total=record.replacement_value,
+            rerolls=self.rerolls,
+            result_override=record,
+        )
+
     def rerolled_indices(self) -> tuple[int, ...]:
         rerolled: list[int] = []
         seen: set[int] = set()
@@ -1068,6 +1116,9 @@ class DiceRollState:
             "current_values": list(self.current_values),
             "current_total": self.current_total,
             "rerolls": [record.to_payload() for record in self.rerolls],
+            "result_override": (
+                None if self.result_override is None else self.result_override.to_payload()
+            ),
         }
 
     @classmethod
@@ -1077,6 +1128,11 @@ class DiceRollState:
             current_values=tuple(payload["current_values"]),
             current_total=payload["current_total"],
             rerolls=tuple(DiceRerollRecord.from_payload(record) for record in payload["rerolls"]),
+            result_override=(
+                None
+                if payload["result_override"] is None
+                else DiceRollOverrideRecord.from_payload(payload["result_override"])
+            ),
         )
 
 
@@ -1095,21 +1151,25 @@ class RerollRecord:
         object.__setattr__(
             self,
             "decision_id",
-            _validate_identifier("RerollRecord decision_id", self.decision_id),
+            _dice_validation.validate_identifier("RerollRecord decision_id", self.decision_id),
         )
         object.__setattr__(
             self,
             "request_id",
-            _validate_identifier("RerollRecord request_id", self.request_id),
+            _dice_validation.validate_identifier("RerollRecord request_id", self.request_id),
         )
         if self.permission is not None and type(self.permission) is not RerollPermission:
             raise DiceRollSpecError("RerollRecord permission must be a RerollPermission or None.")
         if type(self.selection) is not RerollSelection:
             raise DiceRollSpecError("RerollRecord selection must be a RerollSelection.")
-        original_values = _validate_int_tuple("RerollRecord original_values", self.original_values)
+        original_values = _dice_validation.validate_int_tuple(
+            "RerollRecord original_values", self.original_values
+        )
         if original_values != self.original_values:
             object.__setattr__(self, "original_values", original_values)
-        final_values = _validate_int_tuple("RerollRecord final_values", self.final_values)
+        final_values = _dice_validation.validate_int_tuple(
+            "RerollRecord final_values", self.final_values
+        )
         if final_values != self.final_values:
             object.__setattr__(self, "final_values", final_values)
         if type(self.replacement_result) is not DiceRollResult:
@@ -1163,16 +1223,16 @@ class UnmodifiedRollResult:
         object.__setattr__(
             self,
             "roll_id",
-            _validate_identifier("UnmodifiedRollResult roll_id", self.roll_id),
+            _dice_validation.validate_identifier("UnmodifiedRollResult roll_id", self.roll_id),
         )
         object.__setattr__(
             self,
             "roll_type",
-            _validate_identifier("UnmodifiedRollResult roll_type", self.roll_type),
+            _dice_validation.validate_identifier("UnmodifiedRollResult roll_type", self.roll_type),
         )
         if type(self.value) is not int:
             raise DiceRollSpecError("UnmodifiedRollResult value must be an integer.")
-        component_values = _validate_int_tuple(
+        component_values = _dice_validation.validate_int_tuple(
             "UnmodifiedRollResult component_values",
             self.component_values,
         )
@@ -1287,12 +1347,18 @@ class RandomCharacteristicRoll:
     value: int
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "characteristic", _validate_characteristic(self.characteristic))
+        object.__setattr__(
+            self,
+            "characteristic",
+            _dice_validation.validate_characteristic(self.characteristic),
+        )
         object.__setattr__(self, "timing", random_characteristic_timing_from_token(self.timing))
         object.__setattr__(
             self,
             "scope_id",
-            _validate_identifier("RandomCharacteristicRoll scope_id", self.scope_id),
+            _dice_validation.validate_identifier(
+                "RandomCharacteristicRoll scope_id", self.scope_id
+            ),
         )
         if type(self.roll_state) is not DiceRollState:
             raise DiceRollSpecError("RandomCharacteristicRoll roll_state must be a DiceRollState.")
@@ -1324,30 +1390,6 @@ class RandomCharacteristicRoll:
             roll_state=DiceRollState.from_payload(payload["roll_state"]),
             value=payload["value"],
         )
-
-
-def _validated_replay_label(
-    field_name: str,
-    label: str,
-    expression: DiceExpression,
-) -> str:
-    stripped = label.strip()
-    if not stripped:
-        raise DiceRollSpecError(f"DiceRollSpec {field_name} must not be empty.")
-
-    normalized = _LABEL_PARTS.sub("", stripped.casefold())
-    expression_label = expression.canonical().casefold()
-    generic_labels = {
-        expression_label,
-        f"roll{expression_label}",
-        f"getroll{expression_label}",
-        f"getroll({expression_label})",
-    }
-    if normalized in generic_labels:
-        raise DiceRollSpecError(
-            f"DiceRollSpec {field_name} must describe the rule reason, not a generic dice label."
-        )
-    return stripped
 
 
 def _validate_selected_indices(indices: tuple[int, ...]) -> tuple[int, ...]:
@@ -1415,50 +1457,6 @@ def random_characteristic_timing_from_token(token: object) -> RandomCharacterist
         raise DiceRollSpecError(
             f"Unsupported random characteristic timing token: {token}."
         ) from exc
-
-
-def _validate_characteristic(characteristic: object) -> Characteristic:
-    if type(characteristic) is not Characteristic:
-        raise DiceRollSpecError("Expected a Characteristic.")
-    return characteristic
-
-
-_validate_identifier = IdentifierValidator(DiceRollSpecError)
-
-
-def _validate_identifier_tuple(
-    field_name: str,
-    values: object,
-    *,
-    min_length: int,
-    sort_values: bool,
-) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise DiceRollSpecError(f"{field_name} must be a tuple.")
-    identifiers: list[str] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise DiceRollSpecError(f"{field_name} must not contain duplicate IDs.")
-        seen.add(identifier)
-        identifiers.append(identifier)
-    if len(identifiers) < min_length:
-        raise DiceRollSpecError(f"{field_name} must contain at least {min_length} values.")
-    if sort_values:
-        return tuple(sorted(identifiers))
-    return tuple(identifiers)
-
-
-def _validate_int_tuple(field_name: str, values: object) -> tuple[int, ...]:
-    if type(values) is not tuple:
-        raise DiceRollSpecError(f"{field_name} must be a tuple.")
-    validated: list[int] = []
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not int:
-            raise DiceRollSpecError(f"{field_name} must contain integers.")
-        validated.append(value)
-    return tuple(validated)
 
 
 def _validate_selection_tuple(

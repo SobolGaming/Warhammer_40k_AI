@@ -26,6 +26,13 @@ from warhammer40k_core.engine.decision import (
     DiceRollManager,
 )
 from warhammer40k_core.engine.event_log import EventLog, EventLogError, EventRecord, JsonValue
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.unit_resources import (
+    UnitResourceLedger,
+    UnitResourceStatus,
+    UnitStartingResourceAllocation,
+    validate_starting_resource_allocations,
+)
 
 
 def _select_unit_request(request_id: str = "decision-request-branch") -> DecisionRequest:
@@ -829,3 +836,137 @@ def test_event_log_tuple_payloads_normalize_to_lists() -> None:
     record = event_log.append("tuple_payload", {"values": (1, 2, 3)})
 
     assert record.payload == {"values": [1, 2, 3]}
+
+
+def test_one_d6_result_override_round_trips_without_consuming_rng() -> None:
+    manager = DiceRollManager("aspect-token-seed")
+    state = manager.roll(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason="Aspect Shrine Token Hit roll",
+            roll_type="attack_sequence.hit",
+            actor_id="player-aeldari",
+        )
+    )
+    event_count = len(manager.event_log.records)
+
+    overridden = state.with_result_override(
+        decision_id="decision-result-aspect-token",
+        request_id="decision-request-aspect-token",
+        source_rule_id="source:aeldari:aspect-shrine-token",
+        replacement_value=6,
+    )
+
+    assert overridden.current_values == (6,)
+    assert overridden.current_total == 6
+    assert overridden.result_override is not None
+    assert overridden.result_override.previous_values == state.current_values
+    assert DiceRollState.from_payload(overridden.to_payload()) == overridden
+    assert len(manager.event_log.records) == event_count
+
+
+def test_result_override_forbids_later_rerolls_and_second_overrides() -> None:
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Aspect Shrine Token Wound roll",
+        roll_type="attack_sequence.wound",
+        actor_id="player-aeldari",
+    )
+    original = DiceRollResult.from_values(
+        roll_id="roll-aspect-token",
+        spec=spec,
+        values=[2],
+        source="rng",
+    )
+    state = DiceRollState.from_result(original).with_result_override(
+        decision_id="decision-result-aspect-token",
+        request_id="decision-request-aspect-token",
+        source_rule_id="source:aeldari:aspect-shrine-token",
+        replacement_value=6,
+    )
+    replacement = DiceRollResult.from_values(
+        roll_id="roll-aspect-token-reroll",
+        spec=spec,
+        values=[4],
+        source="rng",
+    )
+
+    with pytest.raises(DiceRollSpecError, match="cannot be rerolled"):
+        state.with_reroll(
+            decision_id="decision-result-reroll",
+            request_id="decision-request-reroll",
+            selected_indices=(0,),
+            replacement_result=replacement,
+        )
+    with pytest.raises(DiceRollSpecError, match="at most once"):
+        state.with_result_override(
+            decision_id="decision-result-second",
+            request_id="decision-request-second",
+            source_rule_id="source:aeldari:aspect-shrine-token",
+            replacement_value=6,
+        )
+
+
+def test_unit_resource_ledger_tracks_deterministic_initialization_and_spends() -> None:
+    initialized = UnitResourceLedger.empty_for_unit(
+        player_id="player-aeldari",
+        unit_instance_id="army-aeldari:dire-avengers",
+    ).initialize(
+        resource_kind="aeldari:aspect-shrine-token",
+        amount=2,
+        source_rule_id="source:aeldari:aspect-shrine-token",
+    )
+    after_first, first = initialized.spend(
+        battle_round=1,
+        resource_kind="aeldari:aspect-shrine-token",
+        amount=1,
+        source_rule_id="source:aeldari:aspect-shrine-token",
+        decision_request_id="decision-request-first-token",
+        decision_result_id="decision-result-first-token",
+    )
+    exhausted, second = after_first.spend(
+        battle_round=2,
+        resource_kind="aeldari:aspect-shrine-token",
+        amount=1,
+        source_rule_id="source:aeldari:aspect-shrine-token",
+        decision_request_id="decision-request-second-token",
+        decision_result_id="decision-result-second-token",
+    )
+    unchanged, rejected = exhausted.spend(
+        battle_round=3,
+        resource_kind="aeldari:aspect-shrine-token",
+        amount=1,
+        source_rule_id="source:aeldari:aspect-shrine-token",
+        decision_request_id="decision-request-overspend",
+        decision_result_id="decision-result-overspend",
+    )
+
+    assert first.status is UnitResourceStatus.APPLIED
+    assert second.status is UnitResourceStatus.APPLIED
+    assert rejected.status is UnitResourceStatus.INSUFFICIENT
+    assert unchanged is exhausted
+    assert exhausted.starting_total("aeldari:aspect-shrine-token") == 2
+    assert exhausted.total("aeldari:aspect-shrine-token") == 0
+    assert [transaction.transaction_id for transaction in exhausted.transactions] == [
+        "player-aeldari:army-aeldari:dire-avengers:aeldari:aspect-shrine-token:transaction-000001",
+        "player-aeldari:army-aeldari:dire-avengers:aeldari:aspect-shrine-token:transaction-000002",
+        "player-aeldari:army-aeldari:dire-avengers:aeldari:aspect-shrine-token:transaction-000003",
+    ]
+    assert UnitResourceLedger.from_payload(exhausted.to_payload()) == exhausted
+
+
+def test_starting_unit_resources_reject_non_positive_and_duplicate_entries() -> None:
+    with pytest.raises(GameLifecycleError, match="positive"):
+        UnitStartingResourceAllocation(
+            resource_kind="aeldari:aspect-shrine-token",
+            amount=0,
+        )
+    allocation = UnitStartingResourceAllocation(
+        resource_kind="aeldari:aspect-shrine-token",
+        amount=1,
+    )
+    with pytest.raises(GameLifecycleError, match="duplicate"):
+        validate_starting_resource_allocations(
+            "starting_resources",
+            (allocation, allocation),
+        )

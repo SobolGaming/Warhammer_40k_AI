@@ -643,6 +643,18 @@ class SetupFlow:
                     "roster_legality_report": army_definition.roster_legality_report.to_payload(),
                 },
             )
+            for ledger in state.unit_resource_ledgers:
+                if ledger.player_id != army_definition.player_id:
+                    continue
+                for transaction in ledger.transactions:
+                    decisions.event_log.append(
+                        "unit_resource_initialized",
+                        {
+                            "game_id": state.game_id,
+                            "setup_step": SetupStep.MUSTER_ARMIES.value,
+                            "transaction": transaction.to_payload(),
+                        },
+                    )
             for cargo_state in cargo_states:
                 decisions.event_log.append(
                     "battle_formation_transport_manifest_recorded",

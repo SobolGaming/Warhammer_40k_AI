@@ -29,6 +29,9 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
+from warhammer40k_core.engine.dice_result_override_descriptors import (
+    validate_dice_result_override_starting_resources,
+)
 from warhammer40k_core.engine.list_validation import (
     MusteringOptionSelection,
     MusteringOptionSelectionPayload,
@@ -39,6 +42,12 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.list_validation_errors import (
     ListValidationError,
+)
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.unit_resources import (
+    UnitStartingResourceAllocation,
+    UnitStartingResourceAllocationPayload,
+    validate_starting_resource_allocations,
 )
 from warhammer40k_core.engine.wargear_selections import (
     WargearSelection,
@@ -82,6 +91,7 @@ class UnitInstancePayload(TypedDict):
     own_models: list[ModelInstancePayload]
     wargear_selections: list[WargearSelectionPayload]
     mustering_option_selections: list[MusteringOptionSelectionPayload]
+    starting_resources: list[UnitStartingResourceAllocationPayload]
 
 
 @dataclass(frozen=True, slots=True)
@@ -228,6 +238,7 @@ class UnitInstance:
     wargear_selections: tuple[WargearSelection, ...]
     mustering_option_selections: tuple[MusteringOptionSelection, ...] = ()
     damaged_effects: tuple[DamagedEffectDefinition, ...] = ()
+    starting_resources: tuple[UnitStartingResourceAllocation, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -312,6 +323,15 @@ class UnitInstance:
             "mustering_option_selections",
             mustering_option_selections,
         )
+        starting_resources = validate_starting_resource_allocations(
+            "UnitInstance starting_resources",
+            self.starting_resources,
+        )
+        validate_dice_result_override_starting_resources(
+            abilities=self.datasheet_abilities,
+            allocations=starting_resources,
+        )
+        object.__setattr__(self, "starting_resources", starting_resources)
 
     def stable_identity(self) -> str:
         return f"unit:{self.unit_instance_id}"
@@ -336,6 +356,9 @@ class UnitInstance:
             "wargear_selections": [selection.to_payload() for selection in self.wargear_selections],
             "mustering_option_selections": [
                 selection.to_payload() for selection in self.mustering_option_selections
+            ],
+            "starting_resources": [
+                allocation.to_payload() for allocation in self.starting_resources
             ],
         }
 
@@ -364,6 +387,10 @@ class UnitInstance:
             mustering_option_selections=tuple(
                 MusteringOptionSelection.from_payload(selection)
                 for selection in payload["mustering_option_selections"]
+            ),
+            starting_resources=tuple(
+                UnitStartingResourceAllocation.from_payload(allocation)
+                for allocation in payload["starting_resources"]
             ),
         )
 
@@ -416,7 +443,11 @@ class UnitFactory:
                 requested_selections=selection.wargear_selections,
                 model_profile_selections=model_profile_selections,
             )
-        except ListValidationError as exc:
+            validate_dice_result_override_starting_resources(
+                abilities=datasheet.abilities,
+                allocations=selection.starting_resources,
+            )
+        except (GameLifecycleError, ListValidationError) as exc:
             raise UnitFactoryError("UnitMusterSelection is invalid.") from exc
         own_models: list[ModelInstance] = []
         for profile_selection in model_profile_selections:
@@ -459,6 +490,7 @@ class UnitFactory:
                 MusteringOptionSelection(option_id=option.option_id)
                 for option in selected_mustering_options
             ),
+            starting_resources=selection.starting_resources,
         )
 
     def _catalog_datasheet(self, datasheet: DatasheetDefinition) -> DatasheetDefinition:

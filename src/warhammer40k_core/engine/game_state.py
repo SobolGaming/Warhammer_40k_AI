@@ -68,6 +68,7 @@ from warhammer40k_core.engine.faction_resources import (
     FactionResourceLedger,
     FactionResourceResult,
     initial_faction_resource_ledgers,
+    validate_faction_resource_ledgers,
 )
 from warhammer40k_core.engine.faction_rule_states import (
     FactionRuleState,
@@ -210,6 +211,18 @@ from warhammer40k_core.engine.turn_cleanup import (
     resolve_end_turn_cleanup,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_keyword_queries import (
+    unit_has_aircraft_hover_keywords as _unit_has_aircraft_hover_keywords,
+)
+from warhammer40k_core.engine.unit_keyword_queries import (
+    unit_has_keyword as _unit_has_keyword,
+)
+from warhammer40k_core.engine.unit_resource_state import (
+    seed_unit_resources,
+    unit_resource_initializations_for_army,
+    validate_unit_resource_ledgers,
+)
+from warhammer40k_core.engine.unit_resources import UnitResourceLedger
 from warhammer40k_core.engine.unit_state import (
     StartingStrengthRecord,
 )
@@ -385,6 +398,10 @@ def _new_victory_point_ledgers() -> list[VictoryPointLedger]:
 
 
 def _new_faction_resource_ledgers() -> list[FactionResourceLedger]:
+    return []
+
+
+def _new_unit_resource_ledgers() -> list[UnitResourceLedger]:
     return []
 
 
@@ -1060,6 +1077,9 @@ class GameState:
     faction_resource_ledgers: list[FactionResourceLedger] = field(
         default_factory=_new_faction_resource_ledgers
     )
+    unit_resource_ledgers: list[UnitResourceLedger] = field(
+        default_factory=_new_unit_resource_ledgers
+    )
     stratagem_use_records: list[StratagemUseRecord] = field(
         default_factory=_new_stratagem_use_records
     )
@@ -1232,7 +1252,7 @@ class GameState:
             self.victory_point_ledgers,
             player_ids=self.player_ids,
         )
-        self.faction_resource_ledgers = _validate_faction_resource_ledgers(
+        self.faction_resource_ledgers = validate_faction_resource_ledgers(
             self.faction_resource_ledgers,
             player_ids=self.player_ids,
         )
@@ -1247,6 +1267,11 @@ class GameState:
         self.army_definitions = _validate_army_definitions(
             self.army_definitions,
             player_ids=self.player_ids,
+        )
+        self.unit_resource_ledgers = validate_unit_resource_ledgers(
+            self.unit_resource_ledgers,
+            player_ids=self.player_ids,
+            army_definitions=self.army_definitions,
         )
         self.starting_strength_records = _validate_starting_strength_records(
             self.starting_strength_records,
@@ -1494,6 +1519,7 @@ class GameState:
             command_point_ledgers=initial_command_point_ledgers(config.player_ids),
             victory_point_ledgers=initial_victory_point_ledgers(config.player_ids),
             faction_resource_ledgers=initial_faction_resource_ledgers(config.player_ids),
+            unit_resource_ledgers=[],
             mission_setup=config.mission_setup,
         )
 
@@ -1944,8 +1970,14 @@ class GameState:
             raise GameLifecycleError("ArmyDefinition player_id is not in this game.")
         if self.army_definition_for_player(army_definition.player_id) is not None:
             raise GameLifecycleError("ArmyDefinition already exists for player.")
+        resource_initializations = unit_resource_initializations_for_army(army_definition)
         self.army_definitions.append(army_definition)
         self.army_definitions.sort(key=lambda stored: stored.player_id)
+        seed_unit_resources(
+            state=self,
+            player_id=army_definition.player_id,
+            initializations=resource_initializations,
+        )
         self._record_starting_strength_records_for_army(army_definition)
         self._record_starting_attached_unit_records_for_army(army_definition)
         self._record_static_core_ability_sources_for_army(army_definition)
@@ -1954,6 +1986,13 @@ class GameState:
         self.army_definitions = _validate_army_definitions(
             army_definitions,
             player_ids=self.player_ids,
+        )
+
+    def replace_unit_resource_ledgers(self, ledgers: list[UnitResourceLedger]) -> None:
+        self.unit_resource_ledgers = validate_unit_resource_ledgers(
+            ledgers,
+            player_ids=self.player_ids,
+            army_definitions=self.army_definitions,
         )
 
     def replace_command_step_state(self, command_step_state: CommandStepState | None) -> None:
@@ -4484,6 +4523,7 @@ class GameState:
             "faction_resource_ledgers": [
                 ledger.to_payload() for ledger in self.faction_resource_ledgers
             ],
+            "unit_resource_ledgers": [ledger.to_payload() for ledger in self.unit_resource_ledgers],
             "stratagem_use_records": [record.to_payload() for record in self.stratagem_use_records],
             "faction_rule_states": [state.to_payload() for state in self.faction_rule_states],
             "army_definitions": [army.to_payload() for army in self.army_definitions],
@@ -4652,6 +4692,7 @@ class GameState:
         payload["faction_resource_ledgers"] = [
             cast(JsonValue, ledger.to_payload()) for ledger in self.faction_resource_ledgers
         ]
+        payload["unit_resource_ledgers"] = []
         payload["stratagem_use_records"] = [
             cast(JsonValue, record.to_payload()) for record in self.stratagem_use_records
         ]
@@ -4775,6 +4816,10 @@ class GameState:
             faction_resource_ledgers=[
                 FactionResourceLedger.from_payload(ledger)
                 for ledger in payload["faction_resource_ledgers"]
+            ],
+            unit_resource_ledgers=[
+                UnitResourceLedger.from_payload(ledger)
+                for ledger in payload["unit_resource_ledgers"]
             ],
             stratagem_use_records=[
                 StratagemUseRecord.from_payload(record)
@@ -5886,33 +5931,6 @@ def _validate_victory_point_ledgers(
     return sorted(validated, key=lambda ledger: ledger.player_id)
 
 
-def _validate_faction_resource_ledgers(
-    values: object,
-    *,
-    player_ids: tuple[str, ...],
-) -> list[FactionResourceLedger]:
-    if not isinstance(values, list):
-        raise GameLifecycleError("GameState faction_resource_ledgers must be a list.")
-    if not values:
-        return initial_faction_resource_ledgers(player_ids)
-    validated: list[FactionResourceLedger] = []
-    seen: set[str] = set()
-    for value in cast(list[object], values):
-        if type(value) is not FactionResourceLedger:
-            raise GameLifecycleError(
-                "GameState faction_resource_ledgers must contain FactionResourceLedger values."
-            )
-        if value.player_id not in player_ids:
-            raise GameLifecycleError("FactionResourceLedger player_id is not in this game.")
-        if value.player_id in seen:
-            raise GameLifecycleError("GameState faction_resource_ledgers must be unique.")
-        seen.add(value.player_id)
-        validated.append(value)
-    if set(seen) != set(player_ids):
-        raise GameLifecycleError("GameState faction_resource_ledgers must include every player.")
-    return sorted(validated, key=lambda ledger: ledger.player_id)
-
-
 def _validate_stratagem_use_records(
     values: object,
     *,
@@ -6459,33 +6477,6 @@ def _validate_battle_shocked_unit_states(
             "GameState battle_shocked_unit_ids must match BattleShockedUnitState records."
         )
     return sorted(validated, key=lambda state: state.unit_instance_id)
-
-
-def _unit_has_aircraft_hover_keywords(keywords: tuple[str, ...]) -> bool:
-    keyword_set = {
-        _validate_identifier("unit keyword", keyword).upper().replace(" ", "_").replace("-", "_")
-        for keyword in keywords
-    }
-    return "AIRCRAFT" in keyword_set and "HOVER" in keyword_set
-
-
-def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("unit keyword check requires a UnitInstance.")
-    requested_keyword = (
-        _validate_identifier("unit keyword", keyword)
-        .upper()
-        .replace(
-            " ",
-            "_",
-        )
-        .replace("-", "_")
-    )
-    unit_keywords = {
-        _validate_identifier("unit keyword", value).upper().replace(" ", "_").replace("-", "_")
-        for value in unit.keywords
-    }
-    return requested_keyword in unit_keywords
 
 
 def _validate_state_stage_indexes(state: GameState) -> None:

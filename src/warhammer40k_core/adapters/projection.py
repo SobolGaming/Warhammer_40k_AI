@@ -16,14 +16,21 @@ from warhammer40k_core.engine.decision_request import (
     DecisionOptionPayload,
     DecisionRequest,
 )
+from warhammer40k_core.engine.dice_result_override_descriptors import (
+    dice_result_override_descriptors_for_abilities,
+)
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_resource_state import (
+    unit_resource_starting_total,
+    unit_resource_total,
+)
 
-PROJECTION_SCHEMA_VERSION = "game-view-v3-phase18a"
+PROJECTION_SCHEMA_VERSION = "game-view-v4-unit-resources"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -223,6 +230,12 @@ class VisibleModifierDisplayPayload(TypedDict):
     operation_text: str
 
 
+class UnitResourceDisplayPayload(TypedDict):
+    resource_kind: str
+    starting_amount: int
+    remaining_amount: int
+
+
 class UnitDisplayPayload(TypedDict):
     unit_instance_id: str
     owner_player_id: str | None
@@ -234,6 +247,7 @@ class UnitDisplayPayload(TypedDict):
     faction_keywords: list[str]
     model_instance_ids: list[str]
     selected_wargear_ids: list[str]
+    resources: list[UnitResourceDisplayPayload]
     redaction: RedactionDisplayPayload
 
 
@@ -596,6 +610,7 @@ def _unit_display_payload(
             "faction_keywords": [],
             "model_instance_ids": [],
             "selected_wargear_ids": [],
+            "resources": [],
             "redaction": _redaction(reason="not_visible_to_viewer"),
         }
     return {
@@ -617,8 +632,37 @@ def _unit_display_payload(
             for selection in unit.wargear_selections
             for wargear_id in selection.wargear_ids
         ],
+        "resources": _unit_resource_display_payloads(state=state, unit=unit),
         "redaction": _visible_redaction(),
     }
+
+
+def _unit_resource_display_payloads(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> list[UnitResourceDisplayPayload]:
+    resource_kinds = {
+        descriptor.resource_kind
+        for descriptor in dice_result_override_descriptors_for_abilities(unit.datasheet_abilities)
+    }
+    resource_kinds.update(allocation.resource_kind for allocation in unit.starting_resources)
+    return [
+        {
+            "resource_kind": resource_kind,
+            "starting_amount": unit_resource_starting_total(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                resource_kind=resource_kind,
+            ),
+            "remaining_amount": unit_resource_total(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                resource_kind=resource_kind,
+            ),
+        }
+        for resource_kind in sorted(resource_kinds)
+    ]
 
 
 def _model_display_payload(

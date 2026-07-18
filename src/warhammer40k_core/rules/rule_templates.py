@@ -19,6 +19,7 @@ class RuleTemplateFamily(StrEnum):
     CONTEXTUAL_STATUS = "contextual_status"
     DESPERATE_ESCAPE_REQUIREMENT = "desperate_escape_requirement"
     DICE_ROLL_MODIFICATION = "dice_roll_modification"
+    DICE_ROLL_OVERRIDE = "dice_roll_override"
     DISTANCE_PREDICATE = "distance_predicate"
     GRANT_ABILITY = "grant_ability"
     KEYWORD_GATE = "keyword_gate"
@@ -89,6 +90,7 @@ DISTANCE_PREDICATE_TEMPLATE_ID = "phase17c:distance-predicate"
 SELECTED_TARGET_TEMPLATE_ID = "phase17c:selected-target-constraint"
 TRACKED_TARGET_SELECTION_TEMPLATE_ID = "phase17c:tracked-target-selection"
 DICE_ROLL_MODIFIER_TEMPLATE_ID = "phase17c:dice-roll-modifier"
+DICE_ROLL_OVERRIDE_TEMPLATE_ID = "phase17c:dice-roll-override"
 REROLL_PERMISSION_TEMPLATE_ID = "phase17c:reroll-permission"
 CHARACTERISTIC_MODIFIER_TEMPLATE_ID = "phase17c:characteristic-modifier"
 CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:characteristic-set"
@@ -183,6 +185,12 @@ INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
         family=RuleTemplateFamily.DICE_ROLL_MODIFICATION,
         description="Additive or subtractive dice-roll modifier clauses.",
         canonical_patterns=("add <n> to <roll> rolls", "-<n> to <roll> rolls"),
+    ),
+    RuleTemplate(
+        template_id=DICE_ROLL_OVERRIDE_TEMPLATE_ID,
+        family=RuleTemplateFamily.DICE_ROLL_OVERRIDE,
+        description="Replace an eligible unmodified dice-roll result with a fixed value.",
+        canonical_patterns=("change the result of one <roll> roll to an unmodified <value>",),
     ),
     RuleTemplate(
         template_id=REROLL_PERMISSION_TEMPLATE_ID,
