@@ -202,13 +202,13 @@ class SetupFlow:
                 request=nested_request,
                 is_start_battle_request=False,
             )
-        decisions_before_roll_off = decision_controller_before_pending_sequencing_roll_off(
+        sequencing_roll_off_rewind = decision_controller_before_pending_sequencing_roll_off(
             decisions=decisions_clone,
-            request_id=pending_request.request_id,
+            request=pending_request,
         )
-        rewound_sequencing_roll_off = decisions_before_roll_off is not None
-        if decisions_before_roll_off is not None:
-            decisions_clone = decisions_before_roll_off
+        if sequencing_roll_off_rewind is not None:
+            decisions_clone = sequencing_roll_off_rewind.decisions
+        regenerated_suffix_start = len(decisions_clone.event_log.records)
         hook_state = GameState.from_payload(state_clone.to_payload())
         hook_decisions = DecisionController.from_payload(decisions_clone.to_payload())
         status = self.advance(
@@ -221,11 +221,16 @@ class SetupFlow:
         if authoritative_request is None:
             return None
         if authoritative_request.decision_type == SEQUENCING_DECISION_TYPE:
-            if not rewound_sequencing_roll_off:
+            if sequencing_roll_off_rewind is None:
                 raise GameLifecycleError(
                     "Setup sequencing request has no authoritative roll-off event suffix."
                 )
-        elif rewound_sequencing_roll_off:
+            regenerated_suffix = decisions_clone.event_log.records[regenerated_suffix_start:]
+            if regenerated_suffix != sequencing_roll_off_rewind.removed_events:
+                raise GameLifecycleError(
+                    "Setup sequencing event suffix drifted from authoritative regeneration."
+                )
+        elif sequencing_roll_off_rewind is not None:
             raise GameLifecycleError(
                 "Setup roll-off event suffix does not belong to the authoritative request."
             )
