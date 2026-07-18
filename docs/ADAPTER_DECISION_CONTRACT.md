@@ -255,11 +255,14 @@ The lifecycle should not care whether a result came from a person, AI, CLI, netw
 
 ## Phase 18D External Contract
 
-The canonical language-neutral contract lives in `contracts/`. Its OpenAPI 3.1
-document references the canonical Draft 2020-12 schemas directly, and its
-committed examples cover every registered finite decision family and every
-supported parameterized proposal kind. `docs/api/` and test-local fixture
-directories are not alternate schema authorities.
+The canonical language-neutral contract baseline lives in `contracts/`. Its
+OpenAPI 3.1 document references the canonical Draft 2020-12 schemas directly.
+Its decision-family inventory is derived from the engine dispatch registry and
+marks real adapter-session examples as `live_scenario`; remaining registered or
+nested families are explicitly `envelope_only` and are not claimed as
+executable external coverage. Parameterized proposal-kind examples remain
+schema coverage. `docs/api/` and test-local fixture directories are not
+alternate schema authorities.
 
 Every external request or response declares its payload-family version. The
 reference server currently requires:

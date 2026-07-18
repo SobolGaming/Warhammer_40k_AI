@@ -4,17 +4,53 @@
   "is_parameterized": false,
   "options": [
     {
-      "label": "Example",
-      "option_id": "example-option",
+      "label": "Fixed assassination bring_it_down",
+      "option_id": "fixed:assassination:bring_it_down",
       "payload": {
-        "contract_fixture": true
+        "fixed_mission_ids": [
+          "assassination",
+          "bring_it_down"
+        ],
+        "mode": "fixed"
+      }
+    },
+    {
+      "label": "Fixed assassination cleanse",
+      "option_id": "fixed:assassination:cleanse",
+      "payload": {
+        "fixed_mission_ids": [
+          "assassination",
+          "cleanse"
+        ],
+        "mode": "fixed"
+      }
+    },
+    {
+      "label": "Fixed bring_it_down cleanse",
+      "option_id": "fixed:bring_it_down:cleanse",
+      "payload": {
+        "fixed_mission_ids": [
+          "bring_it_down",
+          "cleanse"
+        ],
+        "mode": "fixed"
+      }
+    },
+    {
+      "label": "Tactical",
+      "option_id": "tactical",
+      "payload": {
+        "fixed_mission_ids": [],
+        "mode": "tactical"
       }
     }
   ],
   "payload": {
-    "contract_fixture": true,
-    "decision_type": "select_secondary_missions"
+    "fixed_choices_required": 2,
+    "game_id": "ui-contract-initial",
+    "secret": true,
+    "setup_step": "select_secondary_missions"
   },
-  "request_id": "contract-decision-request-000049",
+  "request_id": "decision-request-000001",
   "schema_version": "decision-request-view-v1"
 }

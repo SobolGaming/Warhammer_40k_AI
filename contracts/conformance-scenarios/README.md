@@ -7,8 +7,10 @@ schemas and the ordinary `AdapterGameSession` path.
    returned `game_id`.
 2. Retrieve and cache the source-hashed rules catalog; retrieve a player-scoped
    game projection and verify its projection schema/hash.
-3. Render every generated finite decision-family fixture and submit only one of
-   the emitted option IDs with a unique deterministic/replay-safe `result_id`.
+3. Render every decision family marked `live_scenario` in
+   `examples/decisions/family-coverage.json` and submit only one of the emitted
+   option IDs with a unique deterministic/replay-safe `result_id`. Treat
+   `envelope_only` rows as inventory, not conformance evidence.
 4. Render every generated proposal-kind fixture, preserve its request/source
    context, and submit the corresponding typed proposal without applying it
    locally.
@@ -28,10 +30,14 @@ schemas and the ordinary `AdapterGameSession` path.
 
 The generated coverage directories are:
 
-- `examples/decisions/families/` for every registered engine decision type;
+- `examples/decisions/family-coverage.json` for every registered, nested, or
+  redaction-only external decision token and its honest coverage status;
+- `examples/decisions/families/` for real session-derived decision scenarios;
 - `examples/decisions/parameterized/` for every supported proposal kind;
 - `examples/projections/`, `examples/events/`, `examples/statuses/`, and
   `examples/errors/` for read, lifecycle, and failure behavior.
 
-The repository contract check validates that these sets remain complete as new
-decision constants or proposal kinds are added.
+The repository contract check validates that the inventory and proposal sets
+remain complete as new registered decision metadata or proposal kinds are
+added. A decision row advances from `envelope_only` to `live_scenario` only when
+its committed example is captured through the ordinary adapter session path.

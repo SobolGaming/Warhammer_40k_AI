@@ -13,12 +13,17 @@ from urllib.parse import parse_qs, urlparse
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.external_contract import (
+    CREATE_SESSION_SCHEMA_NAME,
     CREATE_SESSION_SCHEMA_VERSION,
     ERROR_ENVELOPE_SCHEMA_VERSION,
+    FINITE_SUBMISSION_SCHEMA_NAME,
     FINITE_SUBMISSION_SCHEMA_VERSION,
     LIFECYCLE_STATUS_SCHEMA_VERSION,
+    PARAMETERIZED_SUBMISSION_SCHEMA_NAME,
     PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+    ExternalContractValidationError,
     require_schema_version,
+    validate_external_request_payload,
 )
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import (
@@ -278,6 +283,11 @@ class AdapterGameServer:
             expected=CREATE_SESSION_SCHEMA_VERSION,
             payload_name="create session payload",
         )
+        _require_canonical_request_schema(
+            payload,
+            schema_name=CREATE_SESSION_SCHEMA_NAME,
+            payload_name="create session payload",
+        )
         config = GameConfig.from_payload(cast(GameConfigPayload, payload["config"]))
         if config.game_id in self._sessions:
             raise ServerApiError(
@@ -311,6 +321,11 @@ class AdapterGameServer:
         _require_external_schema_version(
             payload,
             expected=FINITE_SUBMISSION_SCHEMA_VERSION,
+            payload_name="finite option submission",
+        )
+        _require_canonical_request_schema(
+            payload,
+            schema_name=FINITE_SUBMISSION_SCHEMA_NAME,
             payload_name="finite option submission",
         )
         actor_id = _required_string(payload, key="actor_id")
@@ -354,6 +369,11 @@ class AdapterGameServer:
         actor_id = _required_string(payload, key="actor_id")
         submitted_payload = validate_json_value(payload["payload"])
         _reject_raw_dice_payload(submitted_payload)
+        _require_canonical_request_schema(
+            payload,
+            schema_name=PARAMETERIZED_SUBMISSION_SCHEMA_NAME,
+            payload_name="parameterized submission",
+        )
         pending = _pending_decision_for_submission(
             session=session,
             request_id=request_id,
@@ -391,6 +411,26 @@ class AdapterGameServer:
                 message="Game was not found.",
             )
         return session
+
+
+def _require_canonical_request_schema(
+    payload: dict[str, JsonValue],
+    *,
+    schema_name: str,
+    payload_name: str,
+) -> None:
+    try:
+        validate_external_request_payload(
+            schema_name=schema_name,
+            payload=payload,
+            payload_name=payload_name,
+        )
+    except ExternalContractValidationError as exc:
+        raise ServerApiError(
+            status_code=HTTPStatus.BAD_REQUEST,
+            code="canonical_schema_invalid",
+            message=str(exc),
+        ) from exc
 
 
 def create_local_dev_http_server(

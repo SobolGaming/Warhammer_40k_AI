@@ -67,9 +67,10 @@ encoding matrix shard names in the protection rule.
 
 ## External adapter contract
 
-The canonical Phase 18D language-neutral handoff is in [`contracts/`](contracts/README.md).
-It includes Draft 2020-12 schemas, OpenAPI 3.1, deterministic examples for every decision and
-proposal family, compatibility/redaction/session/coordinate semantics, and conformance scenarios.
+The canonical Phase 18D language-neutral baseline is in [`contracts/`](contracts/README.md).
+It includes Draft 2020-12 schemas, OpenAPI 3.1, real session-derived examples with explicit
+decision-family coverage status, proposal examples, compatibility/redaction/session/coordinate
+semantics, and conformance scenarios.
 Verify schema, example, OpenAPI, Python-version, coverage, manifest, and compatibility drift with:
 
 ```bash

@@ -1,0 +1,491 @@
+{
+  "families": [
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "discard_tactical_secondary_mission",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "draw_tactical_secondary_missions",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "redaction_only",
+      "decision_type": "hidden_decision",
+      "example_path": null,
+      "registry_scope": "redaction",
+      "submission_kind": "not_submittable"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "replace_tactical_secondary_mission",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "resolve_fight_interrupt",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "resolve_reaction_window",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "resolve_sequencing_order",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "score_tactical_secondary_mission",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_allocation_order",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_attack_weapon_group",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_catalog_any_phase_once_per_battle_ability",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_catalog_post_shoot_hit_target_effect",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_catalog_post_shoot_hit_target_status",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_catalog_setup_reactive_shoot_charge",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_catalog_unit_move_completed_mortal_wounds_target",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_charge_declaration_grant",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_charging_unit",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_cult_ambush_resurgence",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_damage_allocation_model",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_deployment_unit",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_desperate_escape_model",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_destruction_reaction",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_dice_reroll",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_dice_result_override",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_disembark_unit",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_embark_transport",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_faction_rule_battle_round_option",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_faction_rule_command_phase_start_option",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_faction_rule_fight_phase_end_option",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_faction_rule_fight_phase_start_option",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_faction_rule_setup_option",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_faction_rule_shooting_phase_start_option",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_faction_rule_turn_end_option",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_feel_no_pain",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_fight_activation",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_fight_activation_ability",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_fight_unit_grant",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_healing_model",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "live_scenario",
+      "decision_type": "select_movement_action",
+      "example_path": "examples/decisions/families/select_movement_action.json",
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_movement_action_grant",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "live_scenario",
+      "decision_type": "select_movement_unit",
+      "example_path": "examples/decisions/families/select_movement_unit.json",
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_prebattle_action",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_precision_allocation",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_psychic_attack_modifier_ignores",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_redeploy_unit",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_reinforcement_unit",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_reserve_declaration",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_resolve_target_unit",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "live_scenario",
+      "decision_type": "select_secondary_missions",
+      "example_path": "examples/decisions/families/select_secondary_missions.json",
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_shooting_type",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_shooting_unit",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_shooting_unit_grant",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_stratagem_cost_modifier_option",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_tracked_target",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_triggered_movement",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_weapon_ability_instance",
+      "example_path": null,
+      "registry_scope": "nested",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "start_mission_action",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_cult_ambush_marker_placement",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_deployment_placement",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_melee_declaration",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "live_scenario",
+      "decision_type": "submit_movement_proposal",
+      "example_path": "examples/decisions/families/submit_movement_proposal.json",
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_placement_proposal",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_redeploy_placement",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_return_on_death_placement",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_scout_move",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_scout_reserve_setup",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_shooting_declaration",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "submit_stratagem_target_proposal",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "use_stratagem",
+      "example_path": null,
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    }
+  ],
+  "known_external_token_count": 69,
+  "live_scenario_count": 4,
+  "registered_decision_type_count": 67,
+  "schema_version": "decision-family-coverage-v1"
+}

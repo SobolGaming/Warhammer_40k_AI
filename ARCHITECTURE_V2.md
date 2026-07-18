@@ -119,11 +119,14 @@ checkpoints, human-readable traces, and JSONL `DecisionRecord` corpus export.
 `submit_parameterized_payload` operations plus replay export and support-profile
 inspection, implemented by `LocalGameSession` and used by thin CLI, UI,
 network, headless, and replay producers.
-**Phase 18D is complete** for the external-contract baseline: `contracts/` is
-the one canonical Draft 2020-12 schema/example source, OpenAPI 3.1 references
-that source directly, every external wire family has an explicit version,
-finite-decision and proposal-kind fixtures are exhaustive, and CI verifies
-schema/example/OpenAPI/Python-version drift plus breaking compatibility changes.
+**Phase 18D has a partial external-contract baseline**: `contracts/` is the one
+canonical Draft 2020-12 schema/example source, OpenAPI 3.1 references that
+source directly, every external wire family has an explicit version, and CI
+verifies schema/example/OpenAPI/Python-version drift plus immutable,
+base-branch compatibility baselines. The engine registry owns finite versus
+parameterized classification, but only real adapter-session scenarios are
+reported as live decision-family coverage; remaining families are explicitly
+`envelope_only` pending later interaction and conformance work.
 **Phase 18E has a partial session/transport baseline**: the reference
 `AdapterGameServer` exposes create, advance, projection, catalog, event,
 decision, replay, and support routes with typed errors and shared redaction,
@@ -364,7 +367,7 @@ Implemented foundation and partial integration baselines:
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
 | 18C | Complete | Shared adapter session facade for CLI, UI, network, headless, and replay producers |
-| 18D | Complete | Canonical versioned JSON Schema/OpenAPI bundle, exhaustive decision/proposal examples, normative external semantics, and breaking-change CI gate |
+| 18D | Partial | Canonical versioned JSON Schema/OpenAPI baseline, registry-derived decision inventory with honest live/envelope-only coverage, normative external semantics, runtime request validation, and immutable breaking-change CI gate |
 | 18E | Partial | Reference in-process/HTTP server routes and typed submission errors; production session and transport semantics are not complete |
 
 Next / planned sequence:
@@ -5144,12 +5147,17 @@ Required tests:
 Priority: P0, before an independent UI/backend team commits to endpoint or
 payload assumptions.
 
-Status: Complete. `contracts/` is the canonical language-neutral handoff
-package. It contains the versioned Draft 2020-12 schemas, OpenAPI 3.1 transport
-description, deterministic examples, normative compatibility/coordinate/
-session/redaction semantics, conformance scenarios, manifest hashes, and the
-committed public-shape compatibility baseline. The reference server rejects
-mismatched request schema versions before queue consumption or engine mutation.
+Status: Partial baseline. `contracts/` is the canonical language-neutral
+handoff package. It contains the versioned Draft 2020-12 schemas, OpenAPI 3.1
+transport description, deterministic examples, normative compatibility/
+coordinate/session/redaction semantics, conformance scenarios, manifest
+hashes, and immutable public-shape compatibility baselines. The reference
+server validates create-session, finite-submission, and parameterized-submission
+payloads against these canonical schemas before calling the session facade.
+The registry-derived inventory records every registered, nested, and redaction
+decision token, but only adapter-session-derived requests are marked
+`live_scenario`; all other rows are `envelope_only` rather than claimed as
+complete external coverage.
 
 Target handoff package:
 
@@ -5199,7 +5207,9 @@ Deliverables:
   while renames, removals, and semantic changes require a major version and a
   documented old-client support window;
 - an explicit schema/contract version on every external payload;
-- canonical fixtures for every finite decision family and every parameterized
+- a registry-derived decision-family inventory with explicit `live_scenario`,
+  `envelope_only`, or `redaction_only` status, plus canonical real-session
+  fixtures for each live row and schema fixtures for every parameterized
   proposal kind;
 - redacted and unredacted view/event examples plus malformed, stale, invalid,
   unsupported, forbidden, conflict, corruption, and terminal examples;
@@ -5225,6 +5235,13 @@ session, retrieve projections/catalog data, render every pending interaction,
 submit every supported decision category, consume viewer-scoped events, and
 distinguish stale, invalid, unsupported, forbidden, conflict, corruption, and
 terminal responses without importing Python or engine internals.
+
+This gate is not yet met. Phase 18I owns neutral interaction metadata and the
+remaining decision-family live scenarios, Phase 18J owns fully typed
+battlefield interaction/coordinate shapes, and Phase 18M owns generated-client
+conformance against the reference server. Phase 18E-18H continue to own hosted
+session, command, cursor, and viewer-authorization envelopes; their generic
+baseline shapes are not evidence of a complete strongly typed client contract.
 
 ## Phase 18E: session and transport semantics
 

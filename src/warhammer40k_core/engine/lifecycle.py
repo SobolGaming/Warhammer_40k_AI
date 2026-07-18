@@ -66,8 +66,10 @@ from warhammer40k_core.engine.decision_controller import (
     DecisionControllerPayload,
 )
 from warhammer40k_core.engine.decision_dispatch import (
+    DecisionDispatchContract,
     DecisionDispatchHandler,
     DecisionDispatchRegistry,
+    build_decision_dispatch_registry,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -471,6 +473,21 @@ _BATTLE_ROUND_DECISION_TYPES = frozenset(
         SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     )
 )
+_PARAMETERIZED_DISPATCH_DECISION_TYPES = frozenset(
+    (
+        SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE,
+        SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
+        SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+        MOVEMENT_PROPOSAL_DECISION_TYPE,
+        PLACEMENT_PROPOSAL_DECISION_TYPE,
+        SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE,
+        SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+        SUBMIT_SCOUT_MOVE_DECISION_TYPE,
+        SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
+        SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+        STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    )
+)
 
 
 def _new_decision_controller() -> DecisionController:
@@ -866,7 +883,7 @@ class GameLifecycle:
         }
 
     def _build_decision_dispatch_registry(self) -> DecisionDispatchRegistry:
-        return DecisionDispatchRegistry.from_handlers(
+        return build_decision_dispatch_registry(
             (
                 *(
                     DecisionDispatchHandler(
@@ -1008,7 +1025,8 @@ class GameLifecycle:
                     pre_validator=self._pre_validate_sequencing_decision,
                     applier=self._apply_sequencing_decision,
                 ),
-            )
+            ),
+            parameterized_decision_types=_PARAMETERIZED_DISPATCH_DECISION_TYPES,
         )
 
     def _pre_validate_setup_decision(
@@ -2428,11 +2446,17 @@ class GameLifecycle:
     def pending_decision_request(self) -> DecisionRequest | None:
         return self._pending_decision_request()
 
+    @property
+    def decision_dispatch_contracts(self) -> tuple[DecisionDispatchContract, ...]:
+        return self._decision_dispatch_registry.registered_contracts()
+
     def _pending_decision_request(self) -> DecisionRequest | None:
         pending_requests = self.decision_controller.queue.pending_requests
         if not pending_requests:
             return None
-        return pending_requests[0]
+        pending_request = pending_requests[0]
+        self._decision_dispatch_registry.validate_request_submission_kind(pending_request)
+        return pending_request
 
     def _require_state(self) -> GameState:
         if self.state is None:

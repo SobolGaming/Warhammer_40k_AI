@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import subprocess
@@ -35,6 +36,7 @@ from warhammer40k_core.adapters.projection import project_rules_catalog_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.detachment import StratagemDefinition
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MEMORY_REPR_PATTERN = re.compile(r"<[^>\n]+ object at 0x[0-9a-fA-F]+>")
@@ -48,6 +50,8 @@ FORBIDDEN_UI_STATE_KEYS = frozenset(
     }
 )
 SCHEMA_FILES = (
+    Path("contracts/schemas/decision-family-coverage.schema.json"),
+    Path("contracts/schemas/decision-family-live.schema.json"),
     Path("contracts/schemas/decision-request-view.schema.json"),
     Path("contracts/schemas/event-delta.schema.json"),
     Path("contracts/schemas/game-view.schema.json"),
@@ -76,6 +80,7 @@ PROPOSAL_EXAMPLE_FILES = (
     "movement_path_witness.json",
     "shooting_target_selection.json",
 )
+DECISION_FAMILY_COVERAGE_PATH = Path("contracts/examples/decisions/family-coverage.json")
 
 
 class _PayloadValidator(Protocol):
@@ -88,6 +93,8 @@ def test_ui_contract_artifacts_are_json_safe_and_scrubbed() -> None:
         *(_fixture_path(name) for name in FIXTURE_FILES),
         *(PROPOSAL_EXAMPLE_DIR / name for name in PROPOSAL_EXAMPLE_FILES),
         DECISION_EXAMPLE_DIR / "opportunity_window.json",
+        DECISION_FAMILY_COVERAGE_PATH,
+        *sorted((REPO_ROOT / DECISION_EXAMPLE_DIR / "families").glob("*.json")),
     )
 
     for path in paths:
@@ -116,6 +123,11 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     _schema_validator("decision-request-view.schema.json", registry=registry).validate(
         _fixture("pending_movement_request.json")
     )
+    coverage = _read_json(REPO_ROOT / DECISION_FAMILY_COVERAGE_PATH)
+    _schema_validator("decision-family-coverage.schema.json", registry=registry).validate(coverage)
+    live_validator = _schema_validator("decision-family-live.schema.json", registry=registry)
+    for path in sorted((REPO_ROOT / DECISION_EXAMPLE_DIR / "families").glob("*.json")):
+        live_validator.validate(_read_json(path))
 
     session, _status = build_local_session_at_movement_request(
         game_id="ui-contract-schema-validation"
@@ -321,6 +333,71 @@ def test_proposal_examples_cover_engine_facing_payload_families() -> None:
     assert _json_object(opportunity["selected_option_payload"])["submission_kind"] == (
         "opportunity_action"
     )
+
+
+def test_decision_family_coverage_uses_registry_metadata_and_real_scenarios() -> None:
+    coverage = _read_json(REPO_ROOT / DECISION_FAMILY_COVERAGE_PATH)
+    rows = [_json_object(row) for row in _json_list(coverage["families"])]
+    rows_by_type = {_json_string(row["decision_type"]): row for row in rows}
+    registered = {
+        contract.decision_type: contract.submission_kind.value
+        for contract in GameLifecycle().decision_dispatch_contracts
+    }
+    live_paths = {
+        path.relative_to(REPO_ROOT / Path("contracts")).as_posix(): path
+        for path in sorted((REPO_ROOT / DECISION_EXAMPLE_DIR / "families").glob("*.json"))
+    }
+
+    assert coverage["registered_decision_type_count"] == len(registered)
+    assert coverage["known_external_token_count"] == len(registered) + 2
+    assert coverage["live_scenario_count"] == len(live_paths)
+    assert set(registered).issubset(rows_by_type)
+    for decision_type, submission_kind in registered.items():
+        row = rows_by_type[decision_type]
+        assert row["registry_scope"] == "registered"
+        assert row["submission_kind"] == submission_kind
+
+    for row in rows:
+        status = row["coverage_status"]
+        example_path = row["example_path"]
+        if status == "live_scenario":
+            assert type(example_path) is str
+            example = _read_json(live_paths[example_path])
+            assert example["decision_type"] == row["decision_type"]
+            assert example["is_parameterized"] is (row["submission_kind"] == "parameterized")
+            assert '"contract_fixture"' not in json.dumps(example, sort_keys=True)
+        else:
+            assert example_path is None
+
+
+def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None:
+    manifest = _read_json(REPO_ROOT / Path("contracts/manifest.json"))
+    hashes = _json_object(manifest["file_sha256"])
+    baseline_path = REPO_ROOT / Path("contracts/compatibility/1.0.0-shape.json")
+    canonical_hash = hashlib.sha256(
+        baseline_path.read_text(encoding="utf-8").encode("utf-8")
+    ).hexdigest()
+
+    assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
+
+
+def test_released_contract_baseline_is_fail_closed_and_pr_ci_compares_base() -> None:
+    baseline_path = REPO_ROOT / Path("contracts/compatibility/1.0.0-shape.json")
+    baseline_before = baseline_path.read_bytes()
+    completed = subprocess.run(
+        [sys.executable, "scripts/build_external_contract.py", "--write-baseline"],
+        cwd=REPO_ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    workflow = (REPO_ROOT / Path(".github/workflows/ci.yml")).read_text(encoding="utf-8")
+
+    assert completed.returncode != 0
+    assert "requires a new contract major version" in completed.stderr
+    assert baseline_path.read_bytes() == baseline_before
+    assert "fetch-depth: 0" in workflow
+    assert "--base-ref ${{ github.event.pull_request.base.sha }}" in workflow
 
 
 def test_local_session_dev_server_exposes_read_only_routes() -> None:

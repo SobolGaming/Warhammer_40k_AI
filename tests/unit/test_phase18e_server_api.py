@@ -465,6 +465,85 @@ def test_phase18d_wire_schema_versions_fail_before_mutation() -> None:
     assert _first_option_id(pending) == FIXED_SECONDARY_OPTION_ID
 
 
+def test_phase18d_canonical_request_schemas_fail_before_session_mutation() -> None:
+    server = AdapterGameServer()
+    create_game_id = "phase18d-canonical-create"
+    invalid_create = _game_config_body(game_id=create_game_id)
+    invalid_config = _field_object(invalid_create, "config")
+    invalid_config["player_ids"] = [PLAYER_A, PLAYER_A]
+    create_response = _request_raw(server, "POST", "/games", body=invalid_create)
+
+    assert create_response.status_code == 400
+    assert _error_code(create_response) == "canonical_schema_invalid"
+    _create_game(server, game_id=create_game_id)
+
+    first_status = _request(server, "POST", f"/games/{create_game_id}/advance")
+    first_request = _decision_from_status(
+        server,
+        game_id=create_game_id,
+        payload=first_status,
+    )
+    finite_response = _request_raw(
+        server,
+        "POST",
+        f"/games/{create_game_id}/decisions/{_request_id(first_request)}/option",
+        body={
+            "schema_version": FINITE_SUBMISSION_SCHEMA_VERSION,
+            "actor_id": "",
+            "option_id": FIXED_SECONDARY_OPTION_ID,
+            "result_id": "phase18d-canonical-finite",
+        },
+    )
+    assert finite_response.status_code == 400
+    assert _error_code(finite_response) == "canonical_schema_invalid"
+    finite_view = _request(
+        server,
+        "GET",
+        f"/games/{create_game_id}/view",
+        query={"viewer_player_id": _actor(first_request)},
+    )
+    assert _request_id(_field_object(finite_view, "pending_decision")) == _request_id(first_request)
+
+    payload_game_id = "phase18d-canonical-payload"
+    _create_game(server, game_id=payload_game_id)
+    placement_request = _advance_to_first_deployment_placement(
+        server,
+        game_id=payload_game_id,
+    )
+    placement_view = _request(
+        server,
+        "GET",
+        f"/games/{payload_game_id}/view",
+        query={"viewer_player_id": _actor(placement_request)},
+    )
+    invalid_placement = _deployment_payload_from_proposal(
+        _field_object(placement_view, "pending_proposal")
+    )
+    invalid_placement.pop("model_placements")
+    payload_response = _request_raw(
+        server,
+        "POST",
+        f"/games/{payload_game_id}/decisions/{_request_id(placement_request)}/payload",
+        body={
+            "schema_version": PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+            "actor_id": _actor(placement_request),
+            "payload": invalid_placement,
+            "result_id": "phase18d-canonical-payload",
+        },
+    )
+    assert payload_response.status_code == 400
+    assert _error_code(payload_response) == "canonical_schema_invalid"
+    unchanged_payload_view = _request(
+        server,
+        "GET",
+        f"/games/{payload_game_id}/view",
+        query={"viewer_player_id": _actor(placement_request)},
+    )
+    assert _request_id(_field_object(unchanged_payload_view, "pending_decision")) == _request_id(
+        placement_request
+    )
+
+
 def test_phase18e_server_route_errors_are_typed() -> None:
     server = AdapterGameServer()
     game_id = "phase18e-server-route-errors"

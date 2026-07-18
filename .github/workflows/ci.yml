@@ -31,6 +31,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -58,7 +60,14 @@ jobs:
       - name: Verify behavioral shard manifests
         run: uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
 
+      - name: Verify external contract bundle against pull request base
+        if: github.event_name == 'pull_request'
+        run: >-
+          uv run --no-sync python scripts/build_external_contract.py --check
+          --base-ref ${{ github.event.pull_request.base.sha }}
+
       - name: Verify external contract bundle
+        if: github.event_name != 'pull_request'
         run: uv run --no-sync python scripts/build_external_contract.py --check
 
       - name: Code-quality tests

@@ -4,16 +4,22 @@ import argparse
 import ast
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 from typing import cast
 
-from export_ui_contract_fixtures import export_ui_contract_files
+from export_ui_contract_fixtures import (
+    build_local_session_at_movement_request,
+    export_ui_contract_files,
+)
 from jsonschema import Draft202012Validator
 from referencing import Resource
 from referencing.jsonschema import DRAFT202012, EMPTY_REGISTRY, Schema, SchemaRegistry
 
+from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.external_contract import (
     CREATE_SESSION_SCHEMA_VERSION,
+    DECISION_FAMILY_COVERAGE_SCHEMA_VERSION,
     DECISION_REQUEST_VIEW_SCHEMA_VERSION,
     ERROR_ENVELOPE_SCHEMA_VERSION,
     EVENT_STREAM_DELTA_SCHEMA_VERSION,
@@ -26,11 +32,14 @@ from warhammer40k_core.adapters.projection import (
     PROJECTION_SCHEMA_VERSION,
     RULES_CATALOG_VIEW_SCHEMA_VERSION,
 )
+from warhammer40k_core.adapters.redaction import HIDDEN_DECISION_TYPE
 from warhammer40k_core.adapters.server import AdapterGameServer, ServerResponse
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.adapters.support_profile import SUPPORT_PROFILE_SCHEMA_VERSION
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.replay import REPLAY_ARTIFACT_SCHEMA_VERSION
 from warhammer40k_core.engine.stratagems import (
     StratagemCatalogRecord,
@@ -43,6 +52,7 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTimingDescriptor,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.weapon_abilities import WEAPON_ABILITY_SELECTION_DECISION_TYPE
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_ROOT = ROOT / "contracts"
@@ -57,7 +67,7 @@ EVENT_EXAMPLE_DIR = EXAMPLE_DIR / "events"
 ERROR_EXAMPLE_DIR = EXAMPLE_DIR / "errors"
 STATUS_EXAMPLE_DIR = EXAMPLE_DIR / "statuses"
 SESSION_EXAMPLE_DIR = EXAMPLE_DIR / "sessions"
-BASELINE_PATH = CONTRACT_ROOT / "compatibility" / "1.0.0-shape.json"
+COMPATIBILITY_DIR = CONTRACT_ROOT / "compatibility"
 MANIFEST_PATH = CONTRACT_ROOT / "manifest.json"
 OPENAPI_PATH = CONTRACT_ROOT / "openapi.yaml"
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
@@ -80,6 +90,10 @@ PRIMARY_SCHEMA_NAMES = frozenset(
 )
 PAYLOAD_SCHEMA_VERSION_BY_NAME = {
     "create-session.schema.json": ("schema_version", CREATE_SESSION_SCHEMA_VERSION),
+    "decision-family-coverage.schema.json": (
+        "schema_version",
+        DECISION_FAMILY_COVERAGE_SCHEMA_VERSION,
+    ),
     "decision-request-view.schema.json": (
         "schema_version",
         DECISION_REQUEST_VIEW_SCHEMA_VERSION,
@@ -112,17 +126,20 @@ def main() -> int:
     )
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--write-baseline", action="store_true")
+    parser.add_argument("--base-ref")
     args = parser.parse_args()
     if args.check and args.write_baseline:
         raise ExternalContractError("--check and --write-baseline are mutually exclusive.")
     if args.check:
-        verify_contract_bundle()
+        verify_contract_bundle(base_ref=args.base_ref)
         return 0
+    if args.write_baseline:
+        _new_compatibility_baseline_target()
     write_contract_examples()
     if args.write_baseline:
-        _write_json(BASELINE_PATH, _compatibility_baseline())
+        _write_new_compatibility_baseline()
     _write_json(MANIFEST_PATH, _contract_manifest())
-    verify_contract_bundle()
+    verify_contract_bundle(base_ref=args.base_ref)
     return 0
 
 
@@ -175,7 +192,7 @@ def write_contract_examples() -> None:
     _write_error_examples()
 
 
-def verify_contract_bundle() -> None:
+def verify_contract_bundle(*, base_ref: str | None = None) -> None:
     schemas = _schema_payloads()
     if set(schemas) != set(_schema_file_names()):
         raise ExternalContractError("External contract schema discovery drifted.")
@@ -210,6 +227,7 @@ def verify_contract_bundle() -> None:
     _verify_decision_and_proposal_coverage()
     _verify_openapi(schemas)
     _verify_compatibility(schemas)
+    _verify_released_baselines_immutable(base_ref=base_ref)
 
 
 def _verify_python_schema_versions(schemas: dict[str, Schema]) -> None:
@@ -254,28 +272,133 @@ def _write_server_read_examples(*, server: AdapterGameServer, game_id: str) -> N
 
 
 def _write_decision_family_examples() -> None:
-    for index, decision_type in enumerate(_decision_type_tokens(), start=1):
-        is_parameterized = decision_type.startswith("submit_")
-        option_id = "submit_parameterized_payload" if is_parameterized else "example-option"
-        payload: JsonValue = {
-            "schema_version": DECISION_REQUEST_VIEW_SCHEMA_VERSION,
-            "request_id": f"contract-decision-request-{index:06d}",
-            "decision_type": decision_type,
-            "actor_id": "player-a",
-            "payload": {
-                "contract_fixture": True,
-                "decision_type": decision_type,
-            },
-            "options": [
-                {
-                    "option_id": option_id,
-                    "label": "Submit parameterized payload" if is_parameterized else "Example",
-                    "payload": {"contract_fixture": True},
-                }
-            ],
-            "is_parameterized": is_parameterized,
+    for path in DECISION_FAMILY_EXAMPLE_DIR.glob("*.json"):
+        path.unlink()
+
+    initial_view = _read_json(PROJECTION_EXAMPLE_DIR / "initial_setup_view_player1.json")
+    initial_pending = _json_object(initial_view["pending_decision"], "initial pending decision")
+    live_examples: dict[str, JsonValue] = {
+        _required_string(initial_pending, "decision_type"): initial_pending,
+    }
+
+    session, status = build_local_session_at_movement_request(
+        game_id="phase18d-decision-family-contract"
+    )
+    movement_unit_request = status.decision_request
+    if movement_unit_request is None:
+        raise ExternalContractError("Movement contract scenario requires a pending request.")
+    live_examples[movement_unit_request.decision_type] = _pending_decision_view(
+        session=session,
+        actor_id=_required_actor_id(movement_unit_request.actor_id),
+    )
+    status = session.submit_option(
+        request_id=movement_unit_request.request_id,
+        option_id=movement_unit_request.options[0].option_id,
+        result_id="phase18d-family-select-movement-unit",
+    )
+    movement_action_request = status.decision_request
+    if movement_action_request is None:
+        raise ExternalContractError("Movement action contract scenario requires a request.")
+    live_examples[movement_action_request.decision_type] = _pending_decision_view(
+        session=session,
+        actor_id=_required_actor_id(movement_action_request.actor_id),
+    )
+    normal_move_option_id = _movement_action_option_id(
+        request=movement_action_request,
+        movement_phase_action="normal_move",
+    )
+    status = session.submit_option(
+        request_id=movement_action_request.request_id,
+        option_id=normal_move_option_id,
+        result_id="phase18d-family-select-normal-move",
+    )
+    movement_proposal_request = status.decision_request
+    if movement_proposal_request is None:
+        raise ExternalContractError("Movement proposal contract scenario requires a request.")
+    live_examples[movement_proposal_request.decision_type] = _pending_decision_view(
+        session=session,
+        actor_id=_required_actor_id(movement_proposal_request.actor_id),
+    )
+
+    live_paths: dict[str, str] = {}
+    for decision_type, payload in sorted(live_examples.items()):
+        path = DECISION_FAMILY_EXAMPLE_DIR / f"{decision_type}.json"
+        _write_json(path, payload)
+        live_paths[decision_type] = path.relative_to(CONTRACT_ROOT).as_posix()
+    _write_json(
+        DECISION_EXAMPLE_DIR / "family-coverage.json",
+        _decision_family_coverage_payload(live_paths=live_paths),
+    )
+
+
+def _pending_decision_view(*, session: AdapterGameSession, actor_id: str) -> dict[str, JsonValue]:
+    view_payload = session.view(viewer_player_id=actor_id)
+    return _json_object(view_payload["pending_decision"], "pending decision view")
+
+
+def _required_actor_id(actor_id: str | None) -> str:
+    if actor_id is None:
+        raise ExternalContractError("Live decision family request requires an actor.")
+    return actor_id
+
+
+def _movement_action_option_id(*, request: DecisionRequest, movement_phase_action: str) -> str:
+    for option in request.options:
+        if not isinstance(option.payload, dict):
+            continue
+        if option.payload.get("movement_phase_action") == movement_phase_action:
+            return option.option_id
+    raise ExternalContractError("Movement action contract scenario is missing its option.")
+
+
+def _decision_family_coverage_payload(*, live_paths: dict[str, str]) -> JsonValue:
+    rows: list[JsonValue] = []
+    registered_contracts = GameLifecycle().decision_dispatch_contracts
+    for contract in registered_contracts:
+        live_path = live_paths.get(contract.decision_type)
+        rows.append(
+            {
+                "decision_type": contract.decision_type,
+                "registry_scope": "registered",
+                "submission_kind": contract.submission_kind.value,
+                "coverage_status": "live_scenario" if live_path is not None else "envelope_only",
+                "example_path": live_path,
+            }
+        )
+    rows.append(
+        {
+            "decision_type": WEAPON_ABILITY_SELECTION_DECISION_TYPE,
+            "registry_scope": "nested",
+            "submission_kind": "finite",
+            "coverage_status": "envelope_only",
+            "example_path": None,
         }
-        _write_json(DECISION_FAMILY_EXAMPLE_DIR / f"{decision_type}.json", payload)
+    )
+    rows.append(
+        {
+            "decision_type": HIDDEN_DECISION_TYPE,
+            "registry_scope": "redaction",
+            "submission_kind": "not_submittable",
+            "coverage_status": "redaction_only",
+            "example_path": None,
+        }
+    )
+    sorted_rows = sorted(
+        rows,
+        key=lambda row: _required_string(_json_object(row, "row"), "decision_type"),
+    )
+    decision_types = {
+        _required_string(_json_object(row, "row"), "decision_type") for row in sorted_rows
+    }
+    if len(decision_types) != len(sorted_rows):
+        raise ExternalContractError("Decision family coverage types must be unique.")
+    return {
+        "schema_version": DECISION_FAMILY_COVERAGE_SCHEMA_VERSION,
+        "registered_decision_type_count": len(registered_contracts),
+        "known_external_token_count": len(sorted_rows),
+        "live_scenario_count": len(live_paths),
+        "families": sorted_rows,
+    }
 
 
 def _write_parameterized_submission_examples() -> None:
@@ -549,6 +672,10 @@ def _write_error_examples() -> None:
 def _contract_manifest() -> JsonValue:
     schemas = _schema_payloads()
     example_bindings = _example_schema_bindings()
+    family_coverage = _json_object(
+        _read_json(DECISION_EXAMPLE_DIR / "family-coverage.json"),
+        "decision family coverage",
+    )
     hashes: dict[str, str] = {}
     for path in sorted(
         (
@@ -556,15 +683,18 @@ def _contract_manifest() -> JsonValue:
             *(CONTRACT_ROOT.rglob("*.md")),
             OPENAPI_PATH,
             *(CONTRACT_ROOT.glob("*.json")),
+            *(COMPATIBILITY_DIR.glob("*-shape.json")),
             *(EXAMPLE_DIR.rglob("*.json")),
         )
     ):
-        if path in {MANIFEST_PATH, BASELINE_PATH} or not path.is_file():
+        if path == MANIFEST_PATH or not path.is_file():
             continue
         hashes[path.relative_to(CONTRACT_ROOT).as_posix()] = _file_hash(path)
     return {
         "contract_version": EXTERNAL_CONTRACT_VERSION,
-        "decision_type_count": len(_decision_type_tokens()),
+        "known_external_decision_token_count": family_coverage["known_external_token_count"],
+        "live_decision_scenario_count": family_coverage["live_scenario_count"],
+        "registered_decision_type_count": family_coverage["registered_decision_type_count"],
         "example_schema_by_path": example_bindings,
         "file_sha256": hashes,
         "proposal_kind_count": len(_proposal_kind_tokens()),
@@ -593,7 +723,8 @@ def _example_schema_bindings() -> dict[str, JsonValue]:
         (DECISION_EXAMPLE_DIR / "finite-submission.json").relative_to(CONTRACT_ROOT).as_posix()
     ] = "finite-submission.schema.json"
     for path in sorted(DECISION_FAMILY_EXAMPLE_DIR.glob("*.json")):
-        bindings[path.relative_to(CONTRACT_ROOT).as_posix()] = "decision-request-view.schema.json"
+        bindings[path.relative_to(CONTRACT_ROOT).as_posix()] = "decision-family-live.schema.json"
+    bindings["examples/decisions/family-coverage.json"] = "decision-family-coverage.schema.json"
     for path in sorted(PARAMETERIZED_EXAMPLE_DIR.glob("*.json")):
         bindings[path.relative_to(CONTRACT_ROOT).as_posix()] = (
             "parameterized-submission.schema.json"
@@ -616,10 +747,87 @@ def _example_schema_bindings() -> dict[str, JsonValue]:
 
 
 def _verify_decision_and_proposal_coverage() -> None:
-    expected_decisions = set(_decision_type_tokens())
-    actual_decisions = {path.stem for path in DECISION_FAMILY_EXAMPLE_DIR.glob("*.json")}
-    if actual_decisions != expected_decisions:
-        raise ExternalContractError("Decision-family example coverage drifted.")
+    coverage = _json_object(
+        _read_json(DECISION_EXAMPLE_DIR / "family-coverage.json"),
+        "decision family coverage",
+    )
+    rows = tuple(
+        _json_object(row, "decision family coverage row")
+        for row in _json_list(coverage["families"], "decision family coverage families")
+    )
+    rows_by_type = {_required_string(row, "decision_type"): row for row in rows}
+    if len(rows_by_type) != len(rows):
+        raise ExternalContractError("Decision family coverage rows must be unique.")
+
+    registered_contracts = GameLifecycle().decision_dispatch_contracts
+    registered_kind_by_type = {
+        contract.decision_type: contract.submission_kind.value for contract in registered_contracts
+    }
+    expected_types = {
+        *registered_kind_by_type,
+        WEAPON_ABILITY_SELECTION_DECISION_TYPE,
+        HIDDEN_DECISION_TYPE,
+    }
+    if set(rows_by_type) != expected_types:
+        raise ExternalContractError("Decision family coverage inventory drifted.")
+    for decision_type, submission_kind in registered_kind_by_type.items():
+        row = rows_by_type[decision_type]
+        if row.get("registry_scope") != "registered":
+            raise ExternalContractError("Registered decision coverage scope drifted.")
+        if row.get("submission_kind") != submission_kind:
+            raise ExternalContractError("Registered decision submission metadata drifted.")
+
+    nested_row = rows_by_type[WEAPON_ABILITY_SELECTION_DECISION_TYPE]
+    if (
+        nested_row.get("registry_scope") != "nested"
+        or nested_row.get("submission_kind") != "finite"
+        or nested_row.get("coverage_status") != "envelope_only"
+    ):
+        raise ExternalContractError("Nested decision coverage metadata drifted.")
+    redaction_row = rows_by_type[HIDDEN_DECISION_TYPE]
+    if (
+        redaction_row.get("registry_scope") != "redaction"
+        or redaction_row.get("submission_kind") != "not_submittable"
+        or redaction_row.get("coverage_status") != "redaction_only"
+    ):
+        raise ExternalContractError("Hidden decision redaction metadata drifted.")
+
+    actual_live_types = {path.stem for path in DECISION_FAMILY_EXAMPLE_DIR.glob("*.json")}
+    declared_live_types = {
+        decision_type
+        for decision_type, row in rows_by_type.items()
+        if row.get("coverage_status") == "live_scenario"
+    }
+    if actual_live_types != declared_live_types:
+        raise ExternalContractError("Live decision-family example coverage drifted.")
+    for decision_type, row in rows_by_type.items():
+        coverage_status = row.get("coverage_status")
+        example_path = row.get("example_path")
+        if coverage_status == "live_scenario":
+            expected_path = f"examples/decisions/families/{decision_type}.json"
+            if example_path != expected_path:
+                raise ExternalContractError("Live decision family example path drifted.")
+            example = _json_object(
+                _read_json(CONTRACT_ROOT / expected_path),
+                "live decision family example",
+            )
+            if example.get("decision_type") != decision_type:
+                raise ExternalContractError("Live decision family type drifted.")
+            expected_parameterized = row.get("submission_kind") == "parameterized"
+            if example.get("is_parameterized") is not expected_parameterized:
+                raise ExternalContractError("Live decision family submission kind drifted.")
+            if _contains_key(example, "contract_fixture"):
+                raise ExternalContractError("Live decision fixtures must come from real scenarios.")
+        elif example_path is not None:
+            raise ExternalContractError("Envelope-only decision families cannot claim fixtures.")
+
+    if coverage.get("registered_decision_type_count") != len(registered_contracts):
+        raise ExternalContractError("Registered decision coverage count drifted.")
+    if coverage.get("known_external_token_count") != len(expected_types):
+        raise ExternalContractError("Known decision token count drifted.")
+    if coverage.get("live_scenario_count") != len(actual_live_types):
+        raise ExternalContractError("Live decision scenario count drifted.")
+
     expected_proposals = set(_proposal_kind_tokens())
     actual_proposals = {path.stem for path in PARAMETERIZED_EXAMPLE_DIR.glob("*.json")}
     if actual_proposals != expected_proposals:
@@ -645,7 +853,8 @@ def _verify_openapi(schemas: dict[str, Schema]) -> None:
 
 
 def _verify_compatibility(schemas: dict[str, Schema]) -> None:
-    baseline = _json_object(_read_json(BASELINE_PATH), "compatibility baseline")
+    baseline_path = _baseline_for_current_major()
+    baseline = _json_object(_read_json(baseline_path), "compatibility baseline")
     baseline_version = _required_string(baseline, "contract_version")
     baseline_schemas = _json_object(baseline["schemas"], "baseline schemas")
     breaking: list[str] = []
@@ -811,6 +1020,152 @@ def _compatibility_baseline() -> JsonValue:
     }
 
 
+def _write_new_compatibility_baseline() -> None:
+    target = _new_compatibility_baseline_target()
+    _write_json(target, _compatibility_baseline())
+
+
+def _new_compatibility_baseline_target() -> Path:
+    existing_paths = _compatibility_baseline_paths()
+    current_version = _semantic_version(EXTERNAL_CONTRACT_VERSION)
+    if existing_paths:
+        previous_major = max(_baseline_version(path)[0] for path in existing_paths)
+        if current_version[0] <= previous_major:
+            raise ExternalContractError(
+                "A new compatibility baseline requires a new contract major version."
+            )
+    target = COMPATIBILITY_DIR / f"{EXTERNAL_CONTRACT_VERSION}-shape.json"
+    if target.exists():
+        raise ExternalContractError("Released compatibility baselines are immutable.")
+    return target
+
+
+def _baseline_for_current_major() -> Path:
+    current_major = _semantic_version(EXTERNAL_CONTRACT_VERSION)[0]
+    candidates = tuple(
+        path
+        for path in _compatibility_baseline_paths()
+        if _baseline_version(path)[0] == current_major
+    )
+    if not candidates:
+        raise ExternalContractError(
+            "Current contract major requires a committed compatibility baseline."
+        )
+    return min(candidates, key=_baseline_version)
+
+
+def _compatibility_baseline_paths() -> tuple[Path, ...]:
+    paths = tuple(sorted(COMPATIBILITY_DIR.glob("*-shape.json"), key=_baseline_version))
+    for path in paths:
+        payload = _json_object(_read_json(path), "compatibility baseline")
+        if _required_string(payload, "contract_version") != _baseline_version_text(path):
+            raise ExternalContractError(
+                "Compatibility baseline filename and contract_version must match."
+            )
+    return paths
+
+
+def _verify_released_baselines_immutable(*, base_ref: str | None) -> None:
+    current_paths = _compatibility_baseline_paths()
+    _baseline_for_current_major()
+    if base_ref is None:
+        return
+    if type(base_ref) is not str or not base_ref.strip():
+        raise ExternalContractError("Compatibility base ref must be a non-empty string.")
+    base_texts = _base_compatibility_baseline_texts(base_ref.strip())
+    current_by_name = {path.name: path for path in current_paths}
+    missing = sorted(set(base_texts) - set(current_by_name))
+    if missing:
+        raise ExternalContractError(
+            "Released compatibility baselines cannot be removed: " + ", ".join(missing)
+        )
+    for name, base_text in sorted(base_texts.items()):
+        if current_by_name[name].read_text(encoding="utf-8") != base_text:
+            raise ExternalContractError(f"Released compatibility baseline changed: {name}.")
+
+    new_names = set(current_by_name) - set(base_texts)
+    current_major = _semantic_version(EXTERNAL_CONTRACT_VERSION)[0]
+    if base_texts:
+        previous_major = max(
+            _semantic_version(
+                _required_string(
+                    _json_object(validate_json_value(json.loads(raw)), name),
+                    "contract_version",
+                )
+            )[0]
+            for name, raw in base_texts.items()
+        )
+        if new_names and current_major <= previous_major:
+            raise ExternalContractError(
+                "A new compatibility baseline requires a contract major increment."
+            )
+    expected_new_name = f"{EXTERNAL_CONTRACT_VERSION}-shape.json"
+    if new_names and new_names != {expected_new_name}:
+        raise ExternalContractError(
+            "A new compatibility baseline must use the current contract version filename."
+        )
+
+
+def _base_compatibility_baseline_texts(base_ref: str) -> dict[str, str]:
+    listing = _git_output(
+        "ls-tree",
+        "-r",
+        "--name-only",
+        base_ref,
+        "--",
+        "contracts/compatibility",
+    )
+    relative_paths = tuple(
+        line
+        for line in listing.splitlines()
+        if line.startswith("contracts/compatibility/") and line.endswith("-shape.json")
+    )
+    baseline_texts: dict[str, str] = {}
+    for relative_path in relative_paths:
+        name = Path(relative_path).name
+        raw = _git_output("show", f"{base_ref}:{relative_path}")
+        try:
+            validate_json_value(json.loads(raw))
+        except json.JSONDecodeError as exc:
+            raise ExternalContractError(
+                f"Base compatibility baseline is not valid JSON: {relative_path}."
+            ) from exc
+        baseline_texts[name] = raw
+    return baseline_texts
+
+
+def _git_output(*args: str) -> str:
+    try:
+        result = subprocess.run(
+            ("git", *args),
+            check=True,
+            capture_output=True,
+            cwd=ROOT,
+            encoding="utf-8",
+        )
+    except subprocess.CalledProcessError as exc:
+        raise ExternalContractError("Compatibility baseline Git audit failed.") from exc
+    return result.stdout
+
+
+def _baseline_version(path: Path) -> tuple[int, int, int]:
+    return _semantic_version(_baseline_version_text(path))
+
+
+def _baseline_version_text(path: Path) -> str:
+    suffix = "-shape.json"
+    if not path.name.endswith(suffix):
+        raise ExternalContractError("Compatibility baseline filename is invalid.")
+    return path.name.removesuffix(suffix)
+
+
+def _semantic_version(value: str) -> tuple[int, int, int]:
+    parts = value.split(".")
+    if len(parts) != 3 or any(not part.isdigit() for part in parts):
+        raise ExternalContractError("Contract version must use numeric semantic versioning.")
+    return int(parts[0]), int(parts[1]), int(parts[2])
+
+
 def _openapi_operations() -> tuple[str, ...]:
     openapi = _json_object(_read_json(OPENAPI_PATH), "OpenAPI document")
     paths = _json_object(openapi["paths"], "OpenAPI paths")
@@ -838,29 +1193,6 @@ def _schema_registry(schemas: dict[str, Schema]) -> SchemaRegistry:
             Resource.from_contents(schema, default_specification=DRAFT202012),
         )
     return registry
-
-
-def _decision_type_tokens() -> tuple[str, ...]:
-    values: set[str] = set()
-    for path in _source_paths():
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        for node in tree.body:
-            if isinstance(node, ast.Assign):
-                value = _string_constant(node.value)
-                if value is None:
-                    continue
-                for target in node.targets:
-                    if isinstance(target, ast.Name) and target.id.endswith("DECISION_TYPE"):
-                        values.add(value)
-            if isinstance(node, ast.AnnAssign):
-                value = _string_constant(node.value)
-                if (
-                    value is not None
-                    and isinstance(node.target, ast.Name)
-                    and node.target.id.endswith("DECISION_TYPE")
-                ):
-                    values.add(value)
-    return tuple(sorted(values))
 
 
 def _proposal_kind_tokens() -> tuple[str, ...]:
@@ -902,6 +1234,14 @@ def _schema_refs(value: JsonValue) -> set[str]:
         for nested in value:
             refs.update(_schema_refs(nested))
     return refs
+
+
+def _contains_key(value: JsonValue, key: str) -> bool:
+    if isinstance(value, dict):
+        return key in value or any(_contains_key(nested, key) for nested in value.values())
+    if isinstance(value, list):
+        return any(_contains_key(nested, key) for nested in value)
+    return False
 
 
 def _schema_file_names() -> tuple[str, ...]:
@@ -997,7 +1337,8 @@ def _major_version(value: str) -> int:
 
 
 def _file_hash(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    canonical_text = path.read_text(encoding="utf-8")
+    return hashlib.sha256(canonical_text.encode("utf-8")).hexdigest()
 
 
 if __name__ == "__main__":

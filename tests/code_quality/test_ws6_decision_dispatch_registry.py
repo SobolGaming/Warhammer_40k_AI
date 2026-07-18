@@ -9,12 +9,17 @@ import pytest
 from warhammer40k_core.engine.decision_dispatch import (
     DecisionDispatchHandler,
     DecisionDispatchRegistry,
+    DecisionSubmissionKind,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    DecisionOption,
+    DecisionRequest,
+    parameterized_decision_option,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.lifecycle import GameLifecycle
-from warhammer40k_core.engine.phase import LifecycleStatus
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.weapon_abilities import WEAPON_ABILITY_SELECTION_DECISION_TYPE
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -75,7 +80,10 @@ def test_decision_dispatch_registry_internal_mapping_is_immutable() -> None:
         pre_validator=_always_valid,
         applier=_unused_applier,
     )
-    registry = DecisionDispatchRegistry.from_handlers((handler,))
+    registry = DecisionDispatchRegistry.from_handlers(
+        (handler,),
+        submission_kinds_by_decision_type={handler.decision_type: DecisionSubmissionKind.FINITE},
+    )
     handlers = cast(
         dict[str, DecisionDispatchHandler],
         object.__getattribute__(registry, "_handlers_by_decision_type"),
@@ -83,6 +91,42 @@ def test_decision_dispatch_registry_internal_mapping_is_immutable() -> None:
 
     with pytest.raises(TypeError):
         handlers["other_decision"] = handler
+
+
+def test_decision_dispatch_registry_rejects_incomplete_or_drifted_submission_metadata() -> None:
+    handler = DecisionDispatchHandler(
+        decision_type="submission_metadata_test_decision",
+        pre_validator=_always_valid,
+        applier=_unused_applier,
+    )
+    with pytest.raises(GameLifecycleError, match="must exactly cover"):
+        DecisionDispatchRegistry.from_handlers(
+            (handler,),
+            submission_kinds_by_decision_type={},
+        )
+
+    registry = DecisionDispatchRegistry.from_handlers(
+        (handler,),
+        submission_kinds_by_decision_type={handler.decision_type: DecisionSubmissionKind.FINITE},
+    )
+    parameterized_request = DecisionRequest(
+        request_id="submission-metadata-request",
+        decision_type=handler.decision_type,
+        actor_id="player-a",
+        payload={},
+        options=(parameterized_decision_option(),),
+    )
+    with pytest.raises(GameLifecycleError, match="submission kind drifted"):
+        registry.validate_request_submission_kind(parameterized_request)
+
+    finite_request = DecisionRequest(
+        request_id="submission-metadata-finite-request",
+        decision_type=handler.decision_type,
+        actor_id="player-a",
+        payload={},
+        options=(DecisionOption(option_id="finite", label="Finite"),),
+    )
+    registry.validate_request_submission_kind(finite_request)
 
 
 def _engine_decision_type_constants() -> set[str]:

@@ -19,11 +19,18 @@ any public family, operation, or normative semantic changes.
   type or enum narrowing, changed identifiers/units/coordinate semantics,
   changed redaction or mutation semantics, or any other old-client break.
 
-The contract audit compares the canonical schemas with
-`compatibility/1.0.0-shape.json`. Breaking changes are rejected while the
-bundle major remains `1`. Updating that baseline requires explicit review and
-`--write-baseline`; it must accompany the appropriate contract and payload
-version increment.
+The contract audit compares the canonical schemas with the oldest committed
+baseline for the current major, currently `compatibility/1.0.0-shape.json`.
+Breaking changes are rejected while the bundle major remains `1`.
+
+Released baselines are immutable, remain committed when later majors are
+introduced, and are included in `manifest.json` hashes. Pull-request CI compares
+every baseline present on the base commit with the proposed tree and rejects a
+changed or removed baseline. `--write-baseline` only creates the baseline named
+for a new `EXTERNAL_CONTRACT_VERSION` major; it refuses an existing path or a
+version whose major is not newer than every committed baseline. The new major,
+payload-family version changes, migration notes, and old-client support window
+must be reviewed in the same change.
 
 ## Support window
 

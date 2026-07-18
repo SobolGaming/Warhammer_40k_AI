@@ -4,17 +4,26 @@
   "is_parameterized": false,
   "options": [
     {
-      "label": "Example",
-      "option_id": "example-option",
+      "label": "CORE Intercessor-like Infantry",
+      "option_id": "army-alpha:intercessor-unit-1",
       "payload": {
-        "contract_fixture": true
+        "model_instance_ids": [
+          "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+          "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+          "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+          "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+          "army-alpha:intercessor-unit-1:core-intercessor-like:005"
+        ],
+        "unit_instance_id": "army-alpha:intercessor-unit-1"
       }
     }
   ],
   "payload": {
-    "contract_fixture": true,
-    "decision_type": "select_movement_unit"
+    "active_player_id": "player-a",
+    "battle_round": 1,
+    "game_id": "phase18d-decision-family-contract",
+    "phase": "movement"
   },
-  "request_id": "contract-decision-request-000041",
+  "request_id": "decision-request-000007",
   "schema_version": "decision-request-view-v1"
 }
