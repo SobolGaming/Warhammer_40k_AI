@@ -1,0 +1,114 @@
+{
+  "catalog_id": "phase9a-canonical",
+  "datasheet_support_rows": [
+    {
+      "ability_id": "core-deep-strike",
+      "catalog_support": "unsupported",
+      "datasheet_id": "core-deep-strike-unit",
+      "display_name": "CORE Deep Strike",
+      "parameter_tokens": [],
+      "row_id": "datasheet:core-deep-strike-unit:ability:core-deep-strike",
+      "source_id": "datasheet:core-deep-strike-unit:ability:deep-strike",
+      "status": "unsupported",
+      "timing_tags": [
+        "deployment",
+        "reserves"
+      ]
+    },
+    {
+      "ability_id": "core-scouts",
+      "catalog_support": "descriptor_only",
+      "datasheet_id": "core-intercessor-like-infantry",
+      "display_name": "CORE Scouts 6",
+      "parameter_tokens": [
+        "6"
+      ],
+      "row_id": "datasheet:core-intercessor-like-infantry:ability:core-scouts",
+      "source_id": "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6",
+      "status": "playable",
+      "timing_tags": [
+        "before_battle",
+        "scouts"
+      ]
+    }
+  ],
+  "detachment_faction_support_rows": [
+    {
+      "content_id": "core-combined-arms",
+      "family": "detachment",
+      "owner_detachment_id": "core-combined-arms",
+      "owner_faction_id": "core-marine-force",
+      "required_for_matched_play": true,
+      "row_id": "runtime:detachment:core-combined-arms",
+      "runtime_support": "source_only",
+      "semantic_status": "placeholder",
+      "source_ids": [
+        "detachment:core-combined-arms"
+      ],
+      "status": "playable",
+      "support_reason": null,
+      "unsupported_reason": null
+    },
+    {
+      "content_id": "core-marine-force",
+      "family": "faction",
+      "owner_detachment_id": null,
+      "owner_faction_id": "core-marine-force",
+      "required_for_matched_play": true,
+      "row_id": "runtime:faction:core-marine-force",
+      "runtime_support": "source_only",
+      "semantic_status": "placeholder",
+      "source_ids": [
+        "faction:core-marine-force"
+      ],
+      "status": "playable",
+      "support_reason": null,
+      "unsupported_reason": null
+    }
+  ],
+  "eligible_for_headless_self_play_smoke": false,
+  "game_id": "phase18d-contract-session",
+  "mustering_support_rows": [
+    {
+      "army_id": "army-alpha",
+      "datasheet_ids": [
+        "core-intercessor-like-infantry",
+        "core-vehicle-monster",
+        "core-deep-strike-unit"
+      ],
+      "detachment_ids": [
+        "core-combined-arms"
+      ],
+      "faction_id": "core-marine-force",
+      "legality_status": "invalid",
+      "player_id": "player-a",
+      "row_id": "mustering:player-a:army-alpha",
+      "status": "unsupported",
+      "violation_count": 4
+    },
+    {
+      "army_id": "army-beta",
+      "datasheet_ids": [
+        "core-intercessor-like-infantry"
+      ],
+      "detachment_ids": [
+        "core-combined-arms"
+      ],
+      "faction_id": "core-marine-force",
+      "legality_status": "invalid",
+      "player_id": "player-b",
+      "row_id": "mustering:player-b:army-beta",
+      "status": "playable",
+      "violation_count": 2
+    }
+  ],
+  "overall_status": "unsupported",
+  "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
+  "schema_version": "support-profile-v2-ws14",
+  "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+  "status_counts": {
+    "full": 0,
+    "playable": 4,
+    "unsupported": 2
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/lifecycle-status.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "game_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "lifecycle-status-v1",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/status"
+    }
+  },
+  "required": [
+    "schema_version",
+    "game_id",
+    "status"
+  ],
+  "title": "CORE V2 ServerGameStatusPayload",
+  "type": "object",
+  "$defs": {
+    "json_value": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "boolean"},
+        {"type": "number"},
+        {"type": "string"},
+        {"items": {"$ref": "#/$defs/json_value"}, "type": "array"},
+        {
+          "additionalProperties": {"$ref": "#/$defs/json_value"},
+          "type": "object"
+        }
+      ]
+    },
+    "status": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {"type": ["string", "null"]},
+        "decision_type": {"type": ["string", "null"]},
+        "message": {"type": ["string", "null"]},
+        "payload": {"$ref": "#/$defs/json_value"},
+        "pending_request_id": {"type": ["string", "null"]},
+        "stage": {"enum": ["setup", "battle", "complete"], "type": "string"},
+        "status_kind": {
+          "enum": [
+            "advanced",
+            "waiting_for_decision",
+            "terminal",
+            "invalid",
+            "unsupported"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "stage",
+        "status_kind",
+        "message",
+        "payload",
+        "pending_request_id",
+        "decision_type",
+        "actor_id"
+      ],
+      "type": "object"
+    }
+  }
+}

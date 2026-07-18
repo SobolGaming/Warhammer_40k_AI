@@ -1,0 +1,18 @@
+{
+  "action_kind": "scout_move",
+  "context": {
+    "contract_fixture": true
+  },
+  "game_id": "phase18d-contract-session",
+  "player_id": "player-a",
+  "proposal_kind": "scout_move",
+  "proposal_request_id": "contract-scout-move-request-000001",
+  "ruleset_descriptor_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "scout_distance_inches": 6,
+  "setup_step": "resolve_prebattle_actions",
+  "source_rule_id": "source-rule:scouts",
+  "unit_instance_id": "army-alpha:unit-1",
+  "witness": {
+    "model_paths": []
+  }
+}

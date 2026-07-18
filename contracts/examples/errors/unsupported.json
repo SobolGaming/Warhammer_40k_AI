@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "rule_path_unsupported",
+    "message": "Rule path is unsupported."
+  },
+  "schema_version": "error-envelope-v1"
+}

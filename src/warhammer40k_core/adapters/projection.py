@@ -3,6 +3,9 @@ from __future__ import annotations
 import hashlib
 from typing import TypedDict
 
+from warhammer40k_core.adapters.external_contract import (
+    DECISION_REQUEST_VIEW_SCHEMA_VERSION,
+)
 from warhammer40k_core.adapters.redaction import (
     decision_request_hidden_from_viewer,
     redacted_decision_type_for_hidden_viewer,
@@ -45,6 +48,7 @@ _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
 
 
 class DecisionRequestViewPayload(TypedDict):
+    schema_version: str
     request_id: str
     decision_type: str
     actor_id: str | None
@@ -1026,6 +1030,7 @@ def _decision_request_view(
 ) -> DecisionRequestViewPayload:
     if decision_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
         return {
+            "schema_version": DECISION_REQUEST_VIEW_SCHEMA_VERSION,
             "request_id": request.request_id,
             "decision_type": redacted_decision_type_for_hidden_viewer(),
             "actor_id": request.actor_id,
@@ -1037,6 +1042,7 @@ def _decision_request_view(
             "is_parameterized": False,
         }
     return {
+        "schema_version": DECISION_REQUEST_VIEW_SCHEMA_VERSION,
         "request_id": request.request_id,
         "decision_type": request.decision_type,
         "actor_id": request.actor_id,

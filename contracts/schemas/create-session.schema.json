@@ -1,0 +1,75 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/create-session.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "config": {
+      "additionalProperties": false,
+      "properties": {
+        "allow_legacy_non_strict_rosters": {"type": "boolean"},
+        "army_catalog": {"minProperties": 1, "type": "object"},
+        "army_muster_requests": {
+          "items": {"minProperties": 1, "type": "object"},
+          "minItems": 2,
+          "type": "array"
+        },
+        "fixed_secondary_mission_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 2,
+          "type": "array"
+        },
+        "game_id": {"minLength": 1, "type": "string"},
+        "max_lifecycle_transitions": {"minimum": 1, "type": "integer"},
+        "mission_setup": {
+          "oneOf": [
+            {"minProperties": 1, "type": "object"},
+            {"type": "null"}
+          ]
+        },
+        "player_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 2,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "reserve_unit_points": {
+          "items": {"minProperties": 1, "type": "object"},
+          "type": "array"
+        },
+        "ruleset_descriptor": {"minProperties": 1, "type": "object"},
+        "tactical_secondary_draw_count": {"minimum": 1, "type": "integer"},
+        "turn_order": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 2,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "game_id",
+        "ruleset_descriptor",
+        "army_catalog",
+        "army_muster_requests",
+        "allow_legacy_non_strict_rosters",
+        "player_ids",
+        "turn_order",
+        "fixed_secondary_mission_ids",
+        "tactical_secondary_draw_count",
+        "max_lifecycle_transitions",
+        "mission_setup",
+        "reserve_unit_points"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "create-session-v1",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "config"
+  ],
+  "title": "CORE V2 CreateSessionPayload",
+  "type": "object"
+}

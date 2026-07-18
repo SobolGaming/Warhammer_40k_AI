@@ -1,0 +1,141 @@
+{
+  "actor_id": "player-a",
+  "payload": {
+    "movement_mode": "normal",
+    "movement_phase_action": "normal_move",
+    "proposal_kind": "normal_move",
+    "proposal_request_id": "decision-request-000009",
+    "unit_instance_id": "army-alpha:intercessor-unit-1",
+    "witness": {
+      "model_paths": [
+        {
+          "model_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+          "poses": [
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 3.0,
+                "y": 24.0,
+                "z": 0.0
+              }
+            },
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 4.0,
+                "y": 24.0,
+                "z": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "model_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+          "poses": [
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 3.0,
+                "y": 25.8,
+                "z": 0.0
+              }
+            },
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 4.0,
+                "y": 25.8,
+                "z": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "model_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+          "poses": [
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 3.0,
+                "y": 27.6,
+                "z": 0.0
+              }
+            },
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 4.0,
+                "y": 27.6,
+                "z": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "model_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+          "poses": [
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 4.8,
+                "y": 24.0,
+                "z": 0.0
+              }
+            },
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 5.8,
+                "y": 24.0,
+                "z": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "model_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
+          "poses": [
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 4.8,
+                "y": 25.8,
+                "z": 0.0
+              }
+            },
+            {
+              "facing": {
+                "degrees": 0.0
+              },
+              "position": {
+                "x": 5.8,
+                "y": 25.8,
+                "z": 0.0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "result_id": "phase18d-normal_move-result-000001",
+  "schema_version": "parameterized-submission-v1"
+}

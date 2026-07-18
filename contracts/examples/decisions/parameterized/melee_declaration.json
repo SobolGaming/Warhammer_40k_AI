@@ -1,0 +1,26 @@
+{
+  "actor_id": "player-a",
+  "payload": {
+    "battle_round": 1,
+    "declarations": [
+      {
+        "attacker_model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+        "target_allocations": [
+          {
+            "target_unit_instance_id": "army-beta:intercessor-unit-2"
+          }
+        ],
+        "wargear_id": "core-close-combat-weapon",
+        "weapon_profile_id": "core-close-combat-weapon:standard"
+      }
+    ],
+    "player_id": "player-a",
+    "proposal_kind": "melee_declaration",
+    "proposal_request_id": "ui-contract-melee-declaration-request-000001",
+    "source_decision_request_id": "ui-contract-fight-activation-request-000001",
+    "source_decision_result_id": "ui-contract-fight-activation-result-000001",
+    "unit_instance_id": "army-alpha:intercessor-unit-1"
+  },
+  "result_id": "phase18d-melee_declaration-result-000001",
+  "schema_version": "parameterized-submission-v1"
+}

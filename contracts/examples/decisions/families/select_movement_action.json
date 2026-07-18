@@ -1,0 +1,45 @@
+{
+  "actor_id": "player-a",
+  "decision_type": "select_movement_action",
+  "is_parameterized": false,
+  "options": [
+    {
+      "label": "Advance",
+      "option_id": "advance",
+      "payload": {
+        "movement_mode": "advance",
+        "movement_phase_action": "advance",
+        "unit_instance_id": "army-alpha:intercessor-unit-1"
+      }
+    },
+    {
+      "label": "Normal Move",
+      "option_id": "normal_move",
+      "payload": {
+        "movement_mode": "normal",
+        "movement_phase_action": "normal_move",
+        "unit_instance_id": "army-alpha:intercessor-unit-1"
+      }
+    },
+    {
+      "label": "Remain Stationary",
+      "option_id": "remain_stationary",
+      "payload": {
+        "model_movements": [],
+        "movement_inches": 0,
+        "movement_phase_action": "remain_stationary",
+        "unit_instance_id": "army-alpha:intercessor-unit-1",
+        "witness": null
+      }
+    }
+  ],
+  "payload": {
+    "active_player_id": "player-a",
+    "battle_round": 1,
+    "game_id": "phase18d-decision-family-contract",
+    "phase": "movement",
+    "unit_instance_id": "army-alpha:intercessor-unit-1"
+  },
+  "request_id": "decision-request-000008",
+  "schema_version": "decision-request-view-v1"
+}

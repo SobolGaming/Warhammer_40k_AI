@@ -16,6 +16,10 @@ _FORBIDDEN_TRACKED_SOURCE_PATTERNS = (
 )
 _TRACKED_FACTION_PACK_PDF_PATTERN = "data/raw/faction_packs/*.pdf"
 _ROOT = Path(__file__).resolve().parents[2]
+_FACTION_PACK_MANIFEST_PATHS = (
+    _ROOT / "data" / "source_manifests" / "gw_11e_faction_packs.yaml",
+    _ROOT / "data" / "source_manifests" / "gw_11e_supplemental_faction_packs.yaml",
+)
 _OFFICIAL_WARHAMMER_40000_DOWNLOADS_PAGE = (
     "https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/"
 )
@@ -59,6 +63,17 @@ def test_official_gw_faction_pack_manifest_uses_tracked_pdf_policy() -> None:
     assert all("tracked as source evidence" in entry.license_note for entry in entries)
 
 
+def test_official_gw_supplemental_faction_pack_manifest_uses_evidence_only_policy() -> None:
+    entries = load_official_source_manifest(_FACTION_PACK_MANIFEST_PATHS[1])
+
+    assert len(entries) == 2
+    assert all(
+        entry.source_page_url == _OFFICIAL_WARHAMMER_40000_DOWNLOADS_PAGE for entry in entries
+    )
+    assert all(entry.local_cache_path is not None for entry in entries)
+    assert all("not a semantic-support claim" in entry.license_note for entry in entries)
+
+
 def _assert_tracked_faction_pack_pdfs_match_manifest(tracked_files: tuple[str, ...]) -> None:
     tracked_pdf_paths = tuple(
         path
@@ -69,9 +84,8 @@ def _assert_tracked_faction_pack_pdfs_match_manifest(tracked_files: tuple[str, .
         return
     entries_by_path = {
         entry.local_cache_path: entry
-        for entry in load_official_source_manifest(
-            _ROOT / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
-        )
+        for manifest_path in _FACTION_PACK_MANIFEST_PATHS
+        for entry in load_official_source_manifest(manifest_path)
         if entry.local_cache_path is not None
     }
     missing_from_manifest = tuple(path for path in tracked_pdf_paths if path not in entries_by_path)

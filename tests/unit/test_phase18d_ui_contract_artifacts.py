@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+import runpy
 import subprocess
 import sys
 from dataclasses import replace
 from pathlib import Path
 from typing import Protocol, cast
 
+import pytest
 from jsonschema import Draft202012Validator
 from referencing import Resource
 from referencing.jsonschema import (
@@ -18,6 +21,7 @@ from referencing.jsonschema import (
     SchemaResource,
 )
 from scripts.export_ui_contract_fixtures import (
+    DECISION_EXAMPLE_DIR,
     MODEL_ALPHA_1,
     PLAYER_A,
     PLAYER_B,
@@ -34,6 +38,7 @@ from warhammer40k_core.adapters.projection import project_rules_catalog_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.detachment import StratagemDefinition
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MEMORY_REPR_PATTERN = re.compile(r"<[^>\n]+ object at 0x[0-9a-fA-F]+>")
@@ -47,10 +52,12 @@ FORBIDDEN_UI_STATE_KEYS = frozenset(
     }
 )
 SCHEMA_FILES = (
-    Path("docs/api/decision_request_view.schema.json"),
-    Path("docs/api/event_stream_delta.schema.json"),
-    Path("docs/api/game_view.schema.json"),
-    Path("docs/api/rules_catalog_view.schema.json"),
+    Path("contracts/schemas/decision-family-coverage.schema.json"),
+    Path("contracts/schemas/decision-family-live.schema.json"),
+    Path("contracts/schemas/decision-request-view.schema.json"),
+    Path("contracts/schemas/event-delta.schema.json"),
+    Path("contracts/schemas/game-view.schema.json"),
+    Path("contracts/schemas/rules-catalog.schema.json"),
 )
 FIXTURE_FILES = (
     "hidden_secondary_redaction_view.json",
@@ -73,20 +80,38 @@ PROPOSAL_EXAMPLE_FILES = (
     "deployment_placement.json",
     "melee_declaration.json",
     "movement_path_witness.json",
-    "opportunity_window.json",
     "shooting_target_selection.json",
 )
+DECISION_FAMILY_COVERAGE_PATH = Path("contracts/examples/decisions/family-coverage.json")
 
 
 class _PayloadValidator(Protocol):
     def validate(self, instance: object) -> None: ...
 
 
+class _ContractSnapshotVerifier(Protocol):
+    def __call__(
+        self,
+        *,
+        reference_label: str,
+        reference_version: str,
+        reference_schemas: dict[str, JsonValue],
+        reference_operations: set[str],
+        current_version: str,
+        current_schemas: dict[str, Schema],
+        current_operations: set[str],
+        require_version_progress: bool,
+    ) -> None: ...
+
+
 def test_ui_contract_artifacts_are_json_safe_and_scrubbed() -> None:
     paths = (
         *SCHEMA_FILES,
-        *(UI_FIXTURE_DIR / name for name in FIXTURE_FILES),
+        *(_fixture_path(name) for name in FIXTURE_FILES),
         *(PROPOSAL_EXAMPLE_DIR / name for name in PROPOSAL_EXAMPLE_FILES),
+        DECISION_EXAMPLE_DIR / "opportunity_window.json",
+        DECISION_FAMILY_COVERAGE_PATH,
+        *sorted((REPO_ROOT / DECISION_EXAMPLE_DIR / "families").glob("*.json")),
     )
 
     for path in paths:
@@ -106,29 +131,34 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
         Draft202012Validator.check_schema(schema_payload)
 
     game_view_validator = _schema_validator(
-        "game_view.schema.json",
+        "game-view.schema.json",
         registry=registry,
     )
     for fixture_name in GAME_VIEW_FIXTURE_FILES:
         game_view_validator.validate(_fixture(fixture_name))
 
-    _schema_validator("decision_request_view.schema.json", registry=registry).validate(
+    _schema_validator("decision-request-view.schema.json", registry=registry).validate(
         _fixture("pending_movement_request.json")
     )
+    coverage = _read_json(REPO_ROOT / DECISION_FAMILY_COVERAGE_PATH)
+    _schema_validator("decision-family-coverage.schema.json", registry=registry).validate(coverage)
+    live_validator = _schema_validator("decision-family-live.schema.json", registry=registry)
+    for path in sorted((REPO_ROOT / DECISION_EXAMPLE_DIR / "families").glob("*.json")):
+        live_validator.validate(_read_json(path))
 
     session, _status = build_local_session_at_movement_request(
         game_id="ui-contract-schema-validation"
     )
-    rules_catalog_validator = _schema_validator("rules_catalog_view.schema.json", registry=registry)
+    rules_catalog_validator = _schema_validator("rules-catalog.schema.json", registry=registry)
     rules_catalog_validator.validate(_fixture("rules_catalog_view.json"))
     rules_catalog_validator.validate(session.rules_catalog_view())
-    _schema_validator("event_stream_delta.schema.json", registry=registry).validate(
+    _schema_validator("event-delta.schema.json", registry=registry).validate(
         session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)
     )
 
 
 def test_rules_catalog_schema_requires_catalog_card_detail_maps() -> None:
-    schema = _read_json(REPO_ROOT / Path("docs/api/rules_catalog_view.schema.json"))
+    schema = _read_json(REPO_ROOT / Path("contracts/schemas/rules-catalog.schema.json"))
     properties = _json_object(schema["properties"])
     required = {_json_string(value) for value in _json_list(schema["required"])}
 
@@ -151,8 +181,9 @@ def test_exporter_reproduces_committed_ui_contract_payloads(tmp_path: Path) -> N
     export_ui_contract_files(output_root=tmp_path)
 
     paths = (
-        *(UI_FIXTURE_DIR / name for name in FIXTURE_FILES),
+        *(_fixture_path(name) for name in FIXTURE_FILES),
         *(PROPOSAL_EXAMPLE_DIR / name for name in PROPOSAL_EXAMPLE_FILES),
+        DECISION_EXAMPLE_DIR / "opportunity_window.json",
     )
     for path in paths:
         assert _read_json(tmp_path / path) == _read_json(REPO_ROOT / path)
@@ -212,7 +243,7 @@ def test_rules_catalog_card_maps_are_joinable_by_static_ids() -> None:
 
 def test_rules_catalog_stratagem_card_records_expose_stage1_details() -> None:
     catalog_view = project_rules_catalog_view(catalog=_catalog_with_ui_contract_stratagem())
-    _schema_validator("rules_catalog_view.schema.json", registry=_schema_registry()).validate(
+    _schema_validator("rules-catalog.schema.json", registry=_schema_registry()).validate(
         catalog_view
     )
 
@@ -286,7 +317,7 @@ def test_proposal_examples_cover_engine_facing_payload_families() -> None:
     charge = _proposal_example("charge_move.json")
     shooting = _proposal_example("shooting_target_selection.json")
     melee = _proposal_example("melee_declaration.json")
-    opportunity = _proposal_example("opportunity_window.json")
+    opportunity = _read_json(REPO_ROOT / DECISION_EXAMPLE_DIR / "opportunity_window.json")
 
     assert deployment["proposal_kind"] == "deployment_placement"
     assert deployment["unit_instance_id"] == UNIT_BETA
@@ -321,6 +352,141 @@ def test_proposal_examples_cover_engine_facing_payload_families() -> None:
     )
 
 
+def test_decision_family_coverage_uses_registry_metadata_and_real_scenarios() -> None:
+    coverage = _read_json(REPO_ROOT / DECISION_FAMILY_COVERAGE_PATH)
+    rows = [_json_object(row) for row in _json_list(coverage["families"])]
+    rows_by_type = {_json_string(row["decision_type"]): row for row in rows}
+    registered = {
+        contract.decision_type: contract.submission_kind.value
+        for contract in GameLifecycle().decision_dispatch_contracts
+    }
+    live_paths = {
+        path.relative_to(REPO_ROOT / Path("contracts")).as_posix(): path
+        for path in sorted((REPO_ROOT / DECISION_EXAMPLE_DIR / "families").glob("*.json"))
+    }
+
+    assert coverage["registered_decision_type_count"] == len(registered)
+    assert coverage["known_external_token_count"] == len(registered) + 2
+    assert coverage["live_scenario_count"] == len(live_paths)
+    assert set(registered).issubset(rows_by_type)
+    for decision_type, submission_kind in registered.items():
+        row = rows_by_type[decision_type]
+        assert row["registry_scope"] == "registered"
+        assert row["submission_kind"] == submission_kind
+
+    for row in rows:
+        status = row["coverage_status"]
+        example_path = row["example_path"]
+        if status == "live_scenario":
+            assert type(example_path) is str
+            example = _read_json(live_paths[example_path])
+            assert example["decision_type"] == row["decision_type"]
+            assert example["is_parameterized"] is (row["submission_kind"] == "parameterized")
+            assert '"contract_fixture"' not in json.dumps(example, sort_keys=True)
+        else:
+            assert example_path is None
+
+
+def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None:
+    manifest = _read_json(REPO_ROOT / Path("contracts/manifest.json"))
+    hashes = _json_object(manifest["file_sha256"])
+    baseline_path = REPO_ROOT / Path("contracts/compatibility/1.0.0-shape.json")
+    baseline = _read_json(baseline_path)
+    baseline_schema_names = set(_json_object(baseline["schemas"]))
+    canonical_schema_names = {
+        path.name for path in (REPO_ROOT / Path("contracts/schemas")).glob("*.json")
+    }
+    canonical_hash = hashlib.sha256(
+        baseline_path.read_text(encoding="utf-8").encode("utf-8")
+    ).hexdigest()
+
+    assert len(canonical_schema_names) == 15
+    assert baseline_schema_names == canonical_schema_names
+    assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
+
+
+def test_pr_base_contract_comparison_preserves_cumulative_minor_additions() -> None:
+    verify = _contract_snapshot_verifier()
+    schema_with_minor_addition = cast(
+        JsonValue,
+        {
+            "type": "object",
+            "properties": {"added_in_1_1": {"type": "string"}},
+        },
+    )
+    schema_without_minor_addition = cast(
+        JsonValue,
+        {"type": "object", "properties": {}},
+    )
+
+    with pytest.raises(ValueError, match="major version increment"):
+        verify(
+            reference_label="pull request base contract",
+            reference_version="1.1.0",
+            reference_schemas={"example.schema.json": schema_with_minor_addition},
+            reference_operations={"GET /added-in-1-1"},
+            current_version="1.2.0",
+            current_schemas={"example.schema.json": cast(Schema, schema_without_minor_addition)},
+            current_operations=set(),
+            require_version_progress=True,
+        )
+
+    with pytest.raises(ValueError, match="openapi operation removed"):
+        verify(
+            reference_label="pull request base contract",
+            reference_version="1.1.0",
+            reference_schemas={"example.schema.json": schema_without_minor_addition},
+            reference_operations={"GET /added-in-1-1"},
+            current_version="1.2.0",
+            current_schemas={"example.schema.json": cast(Schema, schema_without_minor_addition)},
+            current_operations=set(),
+            require_version_progress=True,
+        )
+
+    with pytest.raises(ValueError, match="contract version increment"):
+        verify(
+            reference_label="pull request base contract",
+            reference_version="1.0.0",
+            reference_schemas={"example.schema.json": schema_without_minor_addition},
+            reference_operations=set(),
+            current_version="1.0.0",
+            current_schemas={"example.schema.json": cast(Schema, schema_with_minor_addition)},
+            current_operations={"GET /added-in-1-1"},
+            require_version_progress=True,
+        )
+
+    verify(
+        reference_label="pull request base contract",
+        reference_version="1.0.0",
+        reference_schemas={"example.schema.json": schema_without_minor_addition},
+        reference_operations=set(),
+        current_version="1.1.0",
+        current_schemas={"example.schema.json": cast(Schema, schema_with_minor_addition)},
+        current_operations={"GET /added-in-1-1"},
+        require_version_progress=True,
+    )
+
+
+def test_released_contract_baseline_is_fail_closed_and_pr_ci_compares_base() -> None:
+    baseline_path = REPO_ROOT / Path("contracts/compatibility/1.0.0-shape.json")
+    baseline_before = baseline_path.read_bytes()
+    completed = subprocess.run(
+        [sys.executable, "scripts/build_external_contract.py", "--write-baseline"],
+        cwd=REPO_ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    workflow = (REPO_ROOT / Path(".github/workflows/ci.yml")).read_text(encoding="utf-8")
+
+    assert completed.returncode != 0
+    assert "requires a new contract major version" in completed.stderr
+    assert baseline_path.read_bytes() == baseline_before
+    assert "fetch-depth: 0" in workflow
+    assert "--base-ref ${{ github.event.pull_request.base.sha }}" in workflow
+    assert "scripts/smoke_installed_contract_wheel.py" in workflow
+
+
 def test_local_session_dev_server_exposes_read_only_routes() -> None:
     completed = subprocess.run(
         [sys.executable, "scripts/run_local_session_dev_server.py", "--dump-routes"],
@@ -339,7 +505,13 @@ def test_local_session_dev_server_exposes_read_only_routes() -> None:
 
 
 def _fixture(name: str) -> dict[str, JsonValue]:
-    return _read_json(REPO_ROOT / UI_FIXTURE_DIR / name)
+    return _read_json(REPO_ROOT / _fixture_path(name))
+
+
+def _fixture_path(name: str) -> Path:
+    if name == "pending_movement_request.json":
+        return DECISION_EXAMPLE_DIR / name
+    return UI_FIXTURE_DIR / name
 
 
 def _proposal_example(name: str) -> dict[str, JsonValue]:
@@ -386,6 +558,19 @@ def _schema_payloads() -> dict[str, Schema]:
     for path in SCHEMA_FILES:
         payloads[path.name] = cast(Schema, _read_json(REPO_ROOT / path))
     return payloads
+
+
+def _contract_snapshot_verifier() -> _ContractSnapshotVerifier:
+    scripts_directory = REPO_ROOT / Path("scripts")
+    sys.path.insert(0, str(scripts_directory))
+    try:
+        namespace = runpy.run_path(str(scripts_directory / "build_external_contract.py"))
+    finally:
+        sys.path.remove(str(scripts_directory))
+    return cast(
+        _ContractSnapshotVerifier,
+        namespace["_verify_contract_snapshot_compatibility"],
+    )
 
 
 def _schema_registry() -> SchemaRegistry:

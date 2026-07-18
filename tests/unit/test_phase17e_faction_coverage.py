@@ -51,6 +51,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_covera
 
 ROOT = Path(__file__).resolve().parents[2]
 FACTION_PACK_MANIFEST = ROOT / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
+SUPPLEMENTAL_FACTION_PACK_MANIFEST = (
+    ROOT / "data" / "source_manifests" / "gw_11e_supplemental_faction_packs.yaml"
+)
 RAW_FACTION_PDF_DIR = ROOT / "data" / "raw" / "faction_packs"
 BRIDGE_JSON_DIR = (
     ROOT
@@ -1633,16 +1636,31 @@ def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:
     records_by_filename = {
         record.pdf_filename: record for record in faction_coverage_source.faction_pdf_records()
     }
-    unknown_pdf_filenames = present_pdf_filenames.difference(records_by_filename)
+    supplemental_entries_by_filename = {
+        PurePosixPath(entry.local_cache_path).name: entry
+        for entry in load_official_source_manifest(SUPPLEMENTAL_FACTION_PACK_MANIFEST)
+        if entry.local_cache_path is not None
+    }
+    declared_pdf_filenames = records_by_filename.keys() | supplemental_entries_by_filename.keys()
+    unknown_pdf_filenames = present_pdf_filenames.difference(declared_pdf_filenames)
     assert not unknown_pdf_filenames
 
     for pdf_filename in sorted(present_pdf_filenames):
-        record = records_by_filename[pdf_filename]
-        pdf_path = RAW_FACTION_PDF_DIR / record.pdf_filename
+        record = records_by_filename.get(pdf_filename)
+        if record is not None:
+            expected_bytes = record.bytes
+            expected_sha256 = record.sha256
+        else:
+            supplemental_entry = supplemental_entries_by_filename[pdf_filename]
+            if supplemental_entry.expected_bytes is None:
+                raise AssertionError("Supplemental faction-pack source must declare bytes.")
+            expected_bytes = supplemental_entry.expected_bytes
+            expected_sha256 = supplemental_entry.sha256
+        pdf_path = RAW_FACTION_PDF_DIR / pdf_filename
         assert pdf_path.is_file()
         pdf_data = pdf_path.read_bytes()
-        assert len(pdf_data) == record.bytes
-        assert hashlib.sha256(pdf_data).hexdigest() == record.sha256
+        assert len(pdf_data) == expected_bytes
+        assert hashlib.sha256(pdf_data).hexdigest() == expected_sha256
 
 
 def _bridge_source_row_ids(table: str) -> set[str]:

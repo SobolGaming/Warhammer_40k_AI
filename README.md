@@ -65,6 +65,19 @@ combines all four coverage artifacts and enforces the branch-coverage threshold.
 enable branch protection can require `quality-fast`, `mypy`, `pyright`, and `coverage-gate` without
 encoding matrix shard names in the protection rule.
 
+## External adapter contract
+
+The canonical Phase 18D language-neutral baseline is in [`contracts/`](contracts/README.md).
+It includes Draft 2020-12 schemas, OpenAPI 3.1, real session-derived examples with explicit
+decision-family coverage status, proposal examples, compatibility/redaction/session/coordinate
+semantics, and conformance scenarios.
+Verify schema, example, OpenAPI, Python-version, coverage, manifest, and compatibility drift with:
+
+```bash
+uv run --no-sync python scripts/build_external_contract.py --check
+uv run --no-sync python scripts/smoke_installed_contract_wheel.py
+```
+
 # CORE V2 Architecture
 
 ## 1. Purpose

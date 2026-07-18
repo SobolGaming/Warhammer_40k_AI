@@ -1,0 +1,36 @@
+{
+  "actor_id": "player-a",
+  "decision_type": "submit_movement_proposal",
+  "is_parameterized": true,
+  "options": [
+    {
+      "label": "Submit Parameterized Payload",
+      "option_id": "submit_parameterized_payload",
+      "payload": {
+        "submission_kind": "parameterized"
+      }
+    }
+  ],
+  "payload": {
+    "proposal_request": {
+      "actor_id": "player-a",
+      "battle_round": 1,
+      "context": {
+        "movement_mode": "normal",
+        "source_selected_option_id": "normal_move"
+      },
+      "decision_type": "submit_movement_proposal",
+      "game_id": "phase18d-decision-family-contract",
+      "movement_phase_action": "normal_move",
+      "phase": "movement",
+      "placement_kinds": [],
+      "proposal_kind": "normal_move",
+      "request_id": "decision-request-000009",
+      "source_decision_request_id": "decision-request-000008",
+      "source_decision_result_id": "phase18d-family-select-normal-move",
+      "unit_instance_id": "army-alpha:intercessor-unit-1"
+    }
+  },
+  "request_id": "decision-request-000009",
+  "schema_version": "decision-request-view-v1"
+}

@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "session_revision_conflict",
+    "message": "Session revision conflicted."
+  },
+  "schema_version": "error-envelope-v1"
+}

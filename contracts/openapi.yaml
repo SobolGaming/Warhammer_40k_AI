@@ -1,0 +1,225 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Warhammer 40,000 CORE V2 Adapter Contract",
+    "version": "1.0.0",
+    "description": "Transport-neutral Phase 18D contract over the shared AdapterGameSession decision path."
+  },
+  "servers": [
+    {"url": "http://127.0.0.1:8000"}
+  ],
+  "paths": {
+    "/rules-catalog": {
+      "get": {
+        "operationId": "getRulesCatalog",
+        "responses": {
+          "200": {
+            "description": "Source-hashed rules catalog projection.",
+            "content": {
+              "application/json": {"schema": {"$ref": "./schemas/rules-catalog.schema.json"}}
+            }
+          },
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/games": {
+      "post": {
+        "operationId": "createSession",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "./schemas/create-session.schema.json"}}
+          }
+        },
+        "responses": {
+          "201": {"$ref": "#/components/responses/LifecycleStatus"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/games/{game_id}/advance": {
+      "post": {
+        "operationId": "advanceSession",
+        "parameters": [
+          {"$ref": "#/components/parameters/GameId"},
+          {"$ref": "#/components/parameters/OptionalViewerPlayerId"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/LifecycleStatus"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/games/{game_id}/view": {
+      "get": {
+        "operationId": "getProjection",
+        "parameters": [
+          {"$ref": "#/components/parameters/GameId"},
+          {"$ref": "#/components/parameters/ViewerPlayerId"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Viewer-scoped game projection.",
+            "content": {
+              "application/json": {"schema": {"$ref": "./schemas/game-view.schema.json"}}
+            }
+          },
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/games/{game_id}/events": {
+      "get": {
+        "operationId": "getEvents",
+        "parameters": [
+          {"$ref": "#/components/parameters/GameId"},
+          {"$ref": "#/components/parameters/ViewerPlayerId"},
+          {"$ref": "#/components/parameters/EventCursor"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Viewer-scoped event delta.",
+            "content": {
+              "application/json": {"schema": {"$ref": "./schemas/event-delta.schema.json"}}
+            }
+          },
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/games/{game_id}/replay": {
+      "get": {
+        "operationId": "exportReplay",
+        "parameters": [{"$ref": "#/components/parameters/GameId"}],
+        "responses": {
+          "200": {
+            "description": "Deterministic replay artifact and metadata.",
+            "content": {
+              "application/json": {"schema": {"$ref": "./schemas/replay-metadata.schema.json"}}
+            }
+          },
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/games/{game_id}/support-profile": {
+      "get": {
+        "operationId": "getSupportProfile",
+        "parameters": [{"$ref": "#/components/parameters/GameId"}],
+        "responses": {
+          "200": {
+            "description": "Selected roster and runtime support profile.",
+            "content": {
+              "application/json": {"schema": {"$ref": "./schemas/support-profile.schema.json"}}
+            }
+          },
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/games/{game_id}/decisions/{request_id}/option": {
+      "post": {
+        "operationId": "submitFiniteDecision",
+        "parameters": [
+          {"$ref": "#/components/parameters/GameId"},
+          {"$ref": "#/components/parameters/RequestId"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "./schemas/finite-submission.schema.json"}}
+          }
+        },
+        "responses": {
+          "200": {"$ref": "#/components/responses/LifecycleStatus"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/games/{game_id}/decisions/{request_id}/payload": {
+      "post": {
+        "operationId": "submitParameterizedDecision",
+        "parameters": [
+          {"$ref": "#/components/parameters/GameId"},
+          {"$ref": "#/components/parameters/RequestId"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "./schemas/parameterized-submission.schema.json"}
+            }
+          }
+        },
+        "responses": {
+          "200": {"$ref": "#/components/responses/LifecycleStatus"},
+          "422": {"$ref": "#/components/responses/LifecycleStatus"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "EventCursor": {
+        "name": "cursor",
+        "in": "query",
+        "required": true,
+        "schema": {"type": "integer", "minimum": 0}
+      },
+      "GameId": {
+        "name": "game_id",
+        "in": "path",
+        "required": true,
+        "schema": {"type": "string", "minLength": 1}
+      },
+      "OptionalViewerPlayerId": {
+        "name": "viewer_player_id",
+        "in": "query",
+        "required": false,
+        "schema": {"type": "string", "minLength": 1}
+      },
+      "RequestId": {
+        "name": "request_id",
+        "in": "path",
+        "required": true,
+        "schema": {"type": "string", "minLength": 1}
+      },
+      "ViewerPlayerId": {
+        "name": "viewer_player_id",
+        "in": "query",
+        "required": true,
+        "schema": {"type": "string", "minLength": 1}
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "Typed external contract error.",
+        "content": {
+          "application/json": {"schema": {"$ref": "./schemas/error-envelope.schema.json"}}
+        }
+      },
+      "LifecycleStatus": {
+        "description": "Viewer-scoped lifecycle status.",
+        "content": {
+          "application/json": {"schema": {"$ref": "./schemas/lifecycle-status.schema.json"}}
+        }
+      }
+    },
+    "schemas": {
+      "CreateSession": {"$ref": "./schemas/create-session.schema.json"},
+      "DecisionRequestView": {"$ref": "./schemas/decision-request-view.schema.json"},
+      "ErrorEnvelope": {"$ref": "./schemas/error-envelope.schema.json"},
+      "EventDelta": {"$ref": "./schemas/event-delta.schema.json"},
+      "FiniteSubmission": {"$ref": "./schemas/finite-submission.schema.json"},
+      "GameView": {"$ref": "./schemas/game-view.schema.json"},
+      "LifecycleStatus": {"$ref": "./schemas/lifecycle-status.schema.json"},
+      "ParameterizedSubmission": {"$ref": "./schemas/parameterized-submission.schema.json"},
+      "ProposalPayload": {"$ref": "./schemas/proposal-payload.schema.json"},
+      "ReplayMetadata": {"$ref": "./schemas/replay-metadata.schema.json"},
+      "RulesCatalog": {"$ref": "./schemas/rules-catalog.schema.json"},
+      "SupportProfile": {"$ref": "./schemas/support-profile.schema.json"}
+    }
+  }
+}

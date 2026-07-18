@@ -116,8 +116,25 @@ checkpoints, human-readable traces, and JSONL `DecisionRecord` corpus export.
 **Phase 18C is complete** for the shared adapter session facade:
 `AdapterGameSession` defines the public `start`, `advance`, `view`,
 `rules_catalog_view`, `events_since`, `submit_option`, and
-`submit_parameterized_payload` protocol implemented by `LocalGameSession` and
-used by thin CLI, UI, network, headless, and replay producers.
+`submit_parameterized_payload` operations plus replay export and support-profile
+inspection, implemented by `LocalGameSession` and used by thin CLI, UI,
+network, headless, and replay producers.
+**Phase 18D has a partial external-contract baseline**: `contracts/` is the one
+canonical Draft 2020-12 schema/example source, OpenAPI 3.1 references that
+source directly, every external wire family has an explicit version, and CI
+verifies schema/example/OpenAPI/Python-version drift plus immutable,
+base-branch compatibility baselines and cumulative compatibility against both
+the exact pull-request base contract and the oldest supported-major baseline.
+An isolated installed-wheel smoke validates packaged schema discovery and all
+three request families outside the repository. The engine registry owns finite
+versus parameterized classification, but only real adapter-session scenarios
+are reported as live decision-family coverage; remaining families are
+explicitly `envelope_only` pending later interaction and conformance work.
+**Phase 18E has a partial session/transport baseline**: the reference
+`AdapterGameServer` exposes create, advance, projection, catalog, event,
+decision, replay, and support routes with typed errors and shared redaction,
+but production revisions, idempotency, authenticated participant bindings,
+cursor lifecycle, persistence, and recovery remain Phase 18E-18L work.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -259,7 +276,7 @@ named handler actually runs, so APPLIED is never produced by status alone.
 Phase 17F is not semantic execution for those faction rules; that engine support
 is planned explicitly in Phase 17G.
 
-Completed / implemented foundation:
+Implemented foundation and partial integration baselines:
 
 | Phase | Status | Purpose |
 |---|---:|---|
@@ -353,6 +370,8 @@ Completed / implemented foundation:
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
 | 18C | Complete | Shared adapter session facade for CLI, UI, network, headless, and replay producers |
+| 18D | Partial | Canonical versioned JSON Schema/OpenAPI baseline, registry-derived decision inventory with honest live/envelope-only coverage, normative external semantics, runtime request validation, and immutable breaking-change CI gate |
+| 18E | Partial | Reference in-process/HTTP server routes and typed submission errors; production session and transport semantics are not complete |
 
 Next / planned sequence:
 
@@ -361,9 +380,64 @@ Next / planned sequence:
 | 17G | In progress | Incremental faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
-| 18D-18E | Planned | Local visual UI and network play |
-| 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
-| 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
+| 17M | Planned | Source-backed generic semantic completion organized by reusable mechanic family |
+| 17N | Planned | Mission, terrain, deployment, objective, and battlefield package completion |
+| 17O | Planned | Multi-axis engine capability and support manifest |
+| 18E-18H | Partial / planned | Session semantics, concurrency, event resynchronization, and viewer authorization |
+| 18I-18M | Planned | UI interaction/coordinate contracts, interface intent, persistence, and backend conformance |
+| 19A-19F | Planned | Performance, AI orchestration, self-play, training corpus generation, and observability |
+| 20A-20D | Planned | Certified vertical slice, full-game regression, adversarial soak, and release gates |
+
+### UI/backend integration review mapping
+
+The adapter integration review is mapped into this roadmap as follows. Existing
+phase identities are preserved where the review's suggested numbering would
+otherwise collide with an established owner.
+
+The Phase 17M-17O labels also leave Phase 17K content work already referenced
+by the adapter decision contract untouched. This review does not assign Phase
+17L.
+
+| Review recommendation | Roadmap owner | Mapping decision |
+|---|---|---|
+| External contract baseline | Phase 18D | Expands the existing schema/fixture baseline into the canonical language-neutral contract package. |
+| Session and transport semantics | Phase 18E | Expands the existing reference server into a formal session protocol. |
+| Optimistic concurrency and idempotency | Phase 18F | New production network command envelope and atomicity gate. |
+| Event stream and resynchronization | Phase 18G | New cursor lifecycle and canonical resync contract. |
+| Viewer identity and hidden-information security | Phase 18H | New authenticated principal/role binding and differential security gate. |
+| UI interaction metadata | Phase 18I | Replaces decision-type-specific UI inference with neutral engine-authored interaction requirements. |
+| Battlefield rendering/coordinates | Phase 18J | Separates authoritative, interaction, and render geometry contracts. |
+| Interface intent/opportunity UX | Phase 18K | Owns the deferred adapter capture/materialization surface; the existing engine `InterfaceIntent` type is not itself an adapter capture implementation. |
+| Persistence and recovery | Phase 18L | New single-authority persistence, checkpoint, replay, and recovery contract. |
+| Backend conformance/reference server | Phase 18M | Promotes the current development server into a contract proof and backend handoff boundary. |
+| Generic semantic mechanic families | Phase 17M | Adds a source-backed, generic-first completion track without authorizing speculative hooks. |
+| Mission/terrain/battlefield completion | Phase 17N | Completes the source inventories and pending geometry/scoring execution needed by a visual product. |
+| Capability/support manifest | Phase 17O | Replaces a single support answer with distinct load, display, muster, physical, semantic, full-game, network, and replay capabilities. |
+| Interactive/headless performance budgets | Phase 19A | Extends the existing performance owner rather than creating a duplicate phase. |
+| Observability and rule tracing | Phase 19F | Phase 19B already owns legal-candidate generation, so tracing receives a new non-conflicting owner. |
+| Certified full-game vertical slice | Phase 20A | Becomes the first constrained certification row in the existing compliance matrix. |
+| Long-running/adversarial testing | Phase 20C | Extends the existing soak owner; Phase 20B remains the deterministic regression suite. |
+
+The recommended implementation order is:
+
+1. Phase 18D external contract baseline.
+2. Phase 18E session and transport semantics.
+3. Phase 18F concurrency and idempotency.
+4. Phase 18H viewer identity and redaction security.
+5. Phase 18G event stream and resynchronization.
+6. Phase 18M conformance harness and reference server.
+7. Phase 18I UI interaction metadata.
+8. Phase 18J battlefield rendering and coordinate contract.
+9. Phase 17N mission, terrain, and battlefield completion.
+10. Phase 18L persistence and recovery.
+11. Phase 18K interface intent and opportunity UX.
+12. Phase 19A performance budgets and Phase 19F observability.
+13. Phase 20A certified full-game slice.
+14. Phase 20C long-running and adversarial soak.
+
+Phase 17M and Phase 17O proceed as source-backed engine work alongside this
+sequence. They do not authorize UI/backend code to treat loadable content as
+semantically executable or to bypass typed unsupported results.
 
 ## Cross-cutting architectural rules
 
@@ -374,6 +448,10 @@ Next / planned sequence:
 5. **No broad imports from CORE V1.** CORE V1 is a reference for invariants, algorithms, edge cases, and tests. Port only the smallest needed behavior.
 6. **Every state change is replay-facing.** Dice, decisions, placement/removal/displacement, scoring, CP changes, Battle-shock, Stratagem use, attack resolution, model destruction, and mission actions must serialize deterministically.
 7. **Headless performance is a product requirement.** The engine must support fast large-corpus self-play for hierarchical AI orchestration.
+8. **The service contract is transport-neutral and versioned.** Python protocols remain the engine-side implementation boundary, while language-neutral schemas and examples define the backend/frontend handoff. HTTP, long polling, SSE, and WebSocket delivery must not create different command or event semantics.
+9. **Viewer identity is server-derived.** A transport must authenticate a principal and derive the player/viewer role from a server-owned participant binding. Client-supplied `viewer_player_id` or `actor_id` values are never authorization evidence.
+10. **Network commands are ordered and idempotent.** Every mutating command carries a client-generated command ID and expected monotonic session revision; acceptance atomically persists the command result, authoritative state, projection checkpoint, and event cursor.
+11. **Wall-clock data is operational metadata only.** Simulation order is determined by deterministic decision, action, event, and session-revision records, never by transport timestamps.
 
 ## CORE V1 investigation and reuse policy
 
@@ -4712,15 +4790,161 @@ guidance, not battle-engine rules. Future support belongs outside
 `event_ops/rankings.py`, consuming completed game results and VP ledgers without
 affecting in-game legality, scoring, or replay state.
 
+## Phase 17M: source-backed generic semantic coverage by mechanic family
+
+Priority: parallel engine-completion track.
+
+Phase 17M organizes remaining reusable rule execution by mechanic family rather
+than by faction, datasheet display name, or source-text token. It does not
+pre-authorize a generic hook or registry. Every new semantic surface must be
+required by a real source-backed rule in the same implementation change, carry
+stable source/execution IDs, be loaded through the normal lifecycle/catalog
+path, and have at least one real consumer-path regression.
+
+Mechanic-family inventory:
+
+- generalized resource ledgers;
+- selected-target and replacement effects;
+- damage prevention, conversion, and routing;
+- model return and resurrection;
+- reserve, redeployment, and repositioning manipulation;
+- unit splitting and merging;
+- copy, steal, suppress, and temporary ability semantics;
+- attacks-again and fights-again;
+- generated extra attacks;
+- indirect ownership and borrowed-unit control;
+- objective replacement and movable objectives;
+- deployment and battlefield-map mutation;
+- temporary model/unit creation;
+- persistent cross-round selections.
+
+Invariants:
+
+- generic lifecycle and runtime modules remain content-neutral;
+- reusable effects route through RuleIR, generic semantic handlers, or approved
+  source-backed hooks before any named handler is considered;
+- faction-specific builders remain behind source/provider registry entries and
+  do not accumulate in generic defaults modules;
+- named handlers remain limited to the bespoke-subsystem rubric in `AGENTS.md`;
+- no mechanic family is marked supported from load status alone;
+- state-changing semantics emit deterministic source-linked decision, event,
+  and replay evidence.
+
+Completion gate:
+
+- every implemented family has a source-backed consumer, lifecycle loading,
+  valid and unsupported/invalid tests, replay/audit coverage, and execution
+  status reflected in Phase 17O;
+- unsupported shapes remain explicit and do not trigger silent no-op behavior;
+- static audits prevent display-name, source-text-token, faction, detachment,
+  Enhancement, or Stratagem branching in generic runtime dispatch.
+
+## Phase 17N: mission, terrain, and battlefield package completion
+
+Priority: required before certifying a visual matched-play slice.
+
+Phase 17N converts the Phase 17J source inventory into complete, executable,
+source-hashed battlefield packages. A client must be able to display a standard
+supported game without parsing source PDFs, extracting coordinates from page
+images, inventing deployment geometry, or recalculating scoring rules.
+
+Required outputs:
+
+- exact terrain layout coordinates and terrain feature classification;
+- deployment-zone, territory, and No Man's Land polygons;
+- typed objective coordinates and objective kinds;
+- executable Primary Mission scoring text;
+- complete supported Fixed/Tactical Secondary deck data and procedure;
+- mission-specific actions, timing, and state;
+- source-linked FAQ/errata application;
+- deterministic mission, terrain, deployment, objective, and battlefield
+  package hashes;
+- explicit unsupported geometry rows where accepted source evidence remains
+  unavailable.
+
+Invariants:
+
+- runtime code consumes committed structured packages, never raw PDFs, page
+  images, HTML, CSV, or prose;
+- render assets and source-page images are not authoritative measurement or
+  collision geometry;
+- incomplete layouts, scoring paths, or model geometry fail closed and remain
+  distinguishable from fully executable support;
+- all physical operations continue to use explicit group-aware model APIs and
+  accepted model geometry;
+- out-of-scope Forge World, Crusade, Boarding Actions, Kill Team, Legends, and
+  Warhammer Legends content is not ingested or exposed.
+
+Completion gate:
+
+- the selected Phase 20A certification matrix has no pending coordinate,
+  scoring, objective, deployment-zone, or terrain-classification rows;
+- every package round-trips with stable hashes and instantiates through the
+  ordinary setup and adapter decision path;
+- geometry, setup, scoring, replay, and viewer-projection regressions use real
+  domain objects and canonical fixtures.
+
+## Phase 17O: engine capability and support manifest
+
+Priority: required for external contract and certification claims.
+
+Phase 17O evolves the existing `support_profile()` baseline into a versioned,
+client-readable capability manifest. It must answer whether the selected
+ruleset, mission, battlefield, roster, physical models, and executable rules can
+complete the requested mode without collapsing distinct support dimensions
+into one boolean or one overloaded status.
+
+Required capability dimensions:
+
+- `LOADABLE`;
+- `DISPLAYABLE`;
+- `MUSTERABLE`;
+- `PHYSICALLY_PLAYABLE`;
+- `SEMANTICALLY_EXECUTABLE`;
+- `FULL_GAME_SUPPORTED`;
+- `NETWORK_SAFE`;
+- `REPLAY_VERIFIED`.
+
+Required manifest content:
+
+- ruleset, catalog, source-package, mission-pack, terrain-layout, engine-build,
+  and contract-schema identities/hashes;
+- per-roster, per-unit, per-rule, per-mission, and per-geometry capability rows;
+- explicit unsupported effects with stable source-linked reasons;
+- decision families and neutral Phase 18I interaction kinds that may occur;
+- hidden-information/network-safety status;
+- replay and certified-scenario evidence references.
+
+Invariants:
+
+- load support and semantic execution support remain separate recorded fields;
+- one capability result is never inferred solely from another; prerequisite
+  evidence must be recorded explicitly for every claimed dimension;
+- a placeholder, descriptor-only, or load-only module is never reported as
+  executable gameplay support;
+- capability payloads and failures are viewer-scoped and cannot reveal hidden
+  opponent selections through row presence, counts, reasons, or derived fields;
+- clients may use the manifest to gate UX, but never to grant legality or mutate
+  state.
+
+Completion gate:
+
+- the manifest has a language-neutral schema and redacted/unredacted fixtures
+  under Phase 18D;
+- selected-roster support is deterministic, JSON-safe, source-linked, and
+  consistent with catalog and runtime execution records;
+- Phase 20A certification and Phase 20D release claims are mechanically derived
+  from capability evidence rather than prose or a single `supported` flag.
+
 ---
 
 # Human UI, replay, and network
 
 ## Phase 18A: local CLI/human DecisionRecord entry
 
-Status: Complete. The implemented adapter contract uses
-`RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v1"` for the static
-catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v2-phase18a"`
+Status: Complete. The implemented adapter contract currently uses
+`RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"` for the static
+catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v4-unit-resources"`
 for live game views. Live views expose `rules_catalog`,
 `projection_state_hash`, `unit_display_by_id`, and `model_display_by_id`.
 
@@ -4921,36 +5145,580 @@ Required tests:
 - static audit prevents thin producer modules from importing lifecycle internals,
   reaching through `.lifecycle`, or bypassing `AdapterGameSession`.
 
-## Phase 18D: local visual game UI
+## Phase 18D: external contract baseline
+
+Priority: P0, before an independent UI/backend team commits to endpoint or
+payload assumptions.
+
+Status: Partial baseline. `contracts/` is the canonical language-neutral
+handoff package. It contains the versioned Draft 2020-12 schemas, OpenAPI 3.1
+transport description, deterministic examples, normative compatibility/
+coordinate/session/redaction semantics, conformance scenarios, manifest
+hashes, and immutable public-shape compatibility baselines. The reference
+server validates create-session, finite-submission, and parameterized-submission
+payloads against these canonical schemas before calling the session facade.
+The registry-derived inventory records every registered, nested, and redaction
+decision token, but only adapter-session-derived requests are marked
+`live_scenario`; all other rows are `envelope_only` rather than claimed as
+complete external coverage.
+
+Target handoff package:
+
+```text
+contracts/
+  openapi.yaml
+  schemas/
+    create-session.schema.json
+    game-view.schema.json
+    rules-catalog.schema.json
+    decision-request-view.schema.json
+    event-delta.schema.json
+    lifecycle-status.schema.json
+    finite-submission.schema.json
+    parameterized-submission.schema.json
+    proposal-payload.schema.json
+    error-envelope.schema.json
+    support-profile.schema.json
+    replay-metadata.schema.json
+  examples/
+    decisions/
+    projections/
+    events/
+    errors/
+  compatibility-policy.md
+  coordinate-system.md
+  session-semantics.md
+  redaction-policy.md
+  conformance-scenarios/
+```
+
+The former `docs/api/` schemas and test-local UI fixtures have migrated into
+this bundle, leaving exactly one canonical schema/example source. Tests and
+`scripts/build_external_contract.py --check` reject drift between Python payload
+versions, JSON Schema, examples, the manifest, compatibility baseline, and
+OpenAPI. Pull-request CI compares the proposed canonical schemas and OpenAPI
+operations with both the exact base-commit contract and the oldest
+supported-major baseline, keeps released baselines immutable, and installs the
+wheel into an isolated environment to validate packaged schema loading outside
+the repository.
+
+Deliverables:
+
+- a versioned JSON Schema bundle for `GameViewPayload`,
+  `RulesCatalogViewPayload`, `DecisionRequestViewPayload`,
+  `EventStreamDeltaPayload`, lifecycle status, finite and parameterized
+  submissions, Phase 17O support manifests, replay metadata, and typed errors;
+- an OpenAPI document generated from, or mechanically checked against, the
+  canonical schema package;
+- an explicit compatibility policy: additive changes may use a minor version,
+  while renames, removals, and semantic changes require a major version and a
+  documented old-client support window;
+- an explicit schema/contract version on every external payload;
+- a registry-derived decision-family inventory with explicit `live_scenario`,
+  `envelope_only`, or `redaction_only` status, plus canonical real-session
+  fixtures for each live row and schema fixtures for every parameterized
+  proposal kind;
+- redacted and unredacted view/event examples plus malformed, stale, invalid,
+  unsupported, forbidden, conflict, corruption, and terminal examples;
+- contract-diff CI that detects breaking changes, requires explicit approval
+  and version increments, compares cumulative additions against the exact
+  pull-request base contract, validates every example against its schema, and
+  smoke-tests schema resources from an installed wheel outside the repository.
 
 Invariants:
 
-- UI displays battlefield, terrain, units, objectives, phase state, and pending decisions;
-- UI submits only `DecisionResult`s;
-- UI can visualize movement paths, LoS witnesses, attack allocation, scoring, and Stratagem windows;
-- UI never owns authoritative state progression.
-- UI consumes the Phase 18A hybrid catalog/live projection and Phase 18C
-  session facade: it may cache static
-  catalog display data and render live `current_characteristics` plus
-  `visible_modifiers`, but it never computes rules-effective datacard values;
-- UI explains visible characteristic changes from modifier display traces and
-  treats hidden/unknown fields as explicit viewer-scoped presentation states.
+- the language-neutral package describes the existing Phase 18C session and
+  decision path; it does not introduce a second validation or mutation path;
+- generated API models do not become a parallel rules model;
+- broad `JsonValue` fields are replaced by explicit external schemas before a
+  client is required to construct, inspect, or safely cache them;
+- hidden-information rules apply to errors, status, metadata, support rows, and
+  counts as well as projections and events;
+- contract artifacts are committed deterministic data, not runtime-generated
+  Python modules.
 
-## Phase 18E: network/server-authoritative play
+Completion gate:
+
+A TypeScript client generated from the published contract can create or join a
+session, retrieve projections/catalog data, render every pending interaction,
+submit every supported decision category, consume viewer-scoped events, and
+distinguish stale, invalid, unsupported, forbidden, conflict, corruption, and
+terminal responses without importing Python or engine internals.
+
+This gate is not yet met. Phase 18I owns neutral interaction metadata and the
+remaining decision-family live scenarios, Phase 18J owns fully typed
+battlefield interaction/coordinate shapes, and Phase 18M owns generated-client
+conformance against the reference server. Phase 18E-18H continue to own hosted
+session, command, cursor, and viewer-authorization envelopes; their generic
+baseline shapes are not evidence of a complete strongly typed client contract.
+
+## Phase 18E: session and transport semantics
+
+Priority: P0.
+
+Status: Partial. `AdapterGameServer` and its local HTTP wrapper already prove
+that create, advance, view, catalog, event, decision submission, replay export,
+support profile, typed error, redaction, and engine-owned dice paths can remain
+behind `AdapterGameSession`. They are a development/reference baseline, not a
+complete hosted-session contract.
+
+Required operations:
+
+- `CreateSession`;
+- `GetSessionMetadata`;
+- `StartSession`;
+- `GetProjection`;
+- `GetCatalog`;
+- `GetEvents`;
+- `SubmitFiniteDecision`;
+- `SubmitParameterizedDecision`;
+- `AdvanceSession`;
+- `ExportReplay`;
+- `CloseSession`.
+
+The exact HTTP resources may vary, but the operation semantics and external
+schemas are fixed by Phase 18D.
+
+Required session fields:
+
+- `session_id` and engine `game_id` as distinct identities;
+- `ruleset_id`, `catalog_id`, and source package/hash;
+- monotonic `session_revision` and `projection_state_hash`;
+- viewer-scoped `event_cursor`;
+- lifecycle status and typed terminal reason;
+- operational `created_at` and `last_activity_at` timestamps that do not affect
+  simulation ordering;
+- participant-to-player assignments and spectator/observer roles;
+- server contract version and engine build/version identity.
+
+Advancement semantics:
+
+- after every accepted finite or parameterized submission, the authoritative
+  session owner performs a bounded deterministic drain until the next
+  adapter-visible decision, terminal state, typed invalid/unsupported boundary,
+  or configured safety-budget boundary;
+- clients do not coordinate internal engine advancement and do not need to know
+  whether a submission caused zero, one, or many deterministic transitions;
+- the submission response identifies the resulting session revision,
+  projection checkpoint/reference, and event range;
+- explicit `AdvanceSession` remains available for session start, recovery,
+  operator/conformance use, and documented idle boundaries, not as a client-side
+  replacement for post-submission draining.
 
 Invariants:
 
-- server owns authoritative lifecycle and validation;
-- clients render public state and submit decisions;
-- hidden information remains hidden from opponent clients;
-- network resync preserves replay hash/state hash.
-- clients may synchronize/cache static catalog display data by catalog
-  version/hash, but live unit/model presentation comes from server-authored
-  viewer-scoped projections and event deltas;
-- clients do not recompute current datacard characteristics, visible modifiers,
-  hidden/revealed state, or unit/model visibility from static catalog data.
+- the server owns the authoritative session and calls only the Phase 18C
+  `AdapterGameSession` facade for engine interaction;
+- clients render projections and submit ordinary finite/parameterized answers;
+- the transport cannot mutate lifecycle state, queue state, dice, CP, VP,
+  placement, or rules state directly;
+- transport errors are typed, JSON-safe, viewer-scoped, and contain no internal
+  exception text or object reprs;
+- static catalog data is cacheable by version/hash, while live characteristics,
+  modifiers, visibility, and hidden/revealed state remain server-authored.
 
-Event Companion adapter/replay/UI requirements:
+Completion gate:
+
+An external client submits one command and receives one coherent post-drain
+session result without importing lifecycle internals or issuing a guessed series
+of advance calls.
+
+## Phase 18F: optimistic concurrency, idempotency, and stale-client handling
+
+Priority: P0 for multiplayer and P1 for a single-device prototype.
+
+Every mutating request uses a transport command envelope equivalent to:
+
+```json
+{
+  "command_id": "client-generated-idempotency-key",
+  "session_id": "session-17",
+  "expected_session_revision": 137,
+  "request_id": "decision-request-000417",
+  "result_id": "decision-result-000417",
+  "submission": {}
+}
+```
+
+Viewer and actor authority are not accepted from this envelope. Phase 18H binds
+the authenticated principal to a player/role, and the server checks that binding
+against the pending engine request.
+
+Required behavior:
+
+- a duplicate `command_id` returns the originally committed result without
+  applying the decision twice;
+- a wrong `expected_session_revision` returns typed
+  `session_revision_conflict` (HTTP 409 where HTTP is used);
+- a wrong pending `request_id` returns typed `stale_decision_request` (409);
+- a well-formed but illegal proposal returns typed `proposal_invalid` (422),
+  subject to the owning adapter contract's explicit rejected-attempt policy;
+- a principal that does not control the acting player receives
+  `actor_not_authorized` (403) without hidden request details;
+- a terminal session returns a typed terminal response;
+- a failure before commit leaves no partial authoritative mutation;
+- an accepted command atomically persists the idempotency result, authoritative
+  state/checkpoint, session revision, projection checkpoint, and event cursor.
+
+The monotonic revision is required even when projection hashes exist: hashes
+detect state equality/drift, while revisions record accepted command ordering.
+
+Required tests:
+
+- simultaneous valid submissions for one revision commit at most one result;
+- duplicate commands before and after reconnect return byte-equivalent public
+  outcomes for the same principal/visibility context;
+- stale revision, stale request, wrong actor, malformed envelope, illegal
+  proposal, terminal session, and injected pre-commit failure preserve state;
+- replay from accepted commands reproduces the same decision/event/projection
+  hashes.
+
+## Phase 18G: event stream and resynchronization contract
+
+Priority: P0 for network play.
+
+The current viewer-scoped integer cursor advances against the authoritative
+event-log length even when records are redacted. Phase 18G preserves and
+documents that security-sensitive invariant while adding production cursor,
+revision, compaction, and resynchronization semantics.
+
+Required event-delta fields:
+
+- event schema version, `session_id`, and `game_id`;
+- `from_revision` and `to_revision`;
+- projection state hash;
+- supplied and next cursor;
+- `has_more` and `resync_required`;
+- optional correlation `command_id`;
+- deterministic event sequence number;
+- optional operational/display timestamp that never determines simulation
+  ordering.
+
+Cursor contract:
+
+- cursors are bound to a session and viewer visibility role, not freely reusable
+  between players or roles;
+- the cursor position is an authoritative-log offset, not a visible-event count;
+- retention and compaction windows are explicit;
+- an expired, ahead-of-log, wrong-session, or wrong-viewer cursor returns a
+  typed resynchronization response without leaking hidden event counts or types;
+- pagination and `has_more` preserve deterministic sequence order;
+- a role change invalidates or explicitly rebinds the cursor under a documented
+  policy.
+
+Canonical resynchronization algorithm:
+
+1. Request `events_since(cursor)`.
+2. If the cursor is valid, apply the viewer-scoped delta in sequence.
+3. If the cursor expired or the revision/hash diverged, fetch a full
+   viewer-scoped projection.
+4. Replace client-derived state and resume from the projection's event cursor.
+
+HTTP polling or long polling is the normative delivery contract. SSE or
+WebSocket delivery may optimize transport, but it consumes the same event-delta
+schema and cannot introduce a second event model.
+
+Required tests:
+
+- reconnect with current, expired, ahead, wrong-session, and wrong-viewer
+  cursors;
+- hidden-event redaction with authoritative cursor advancement;
+- pagination followed by full resynchronization;
+- projection hash/revision mismatch recovery;
+- polling, SSE, and WebSocket implementations, when present, produce equivalent
+  deltas.
+
+## Phase 18H: viewer identity, authorization, and hidden-information security
+
+Priority: P0.
+
+The backend authenticates a principal and binds it server-side to one of:
+
+- player 1 or player 2;
+- authorized coach;
+- delayed spectator;
+- omniscient administrator;
+- replay viewer.
+
+The binding derives the engine `viewer_player_id` and visibility policy. A
+query/body `viewer_player_id` or `actor_id` is routing input at most and is never
+trusted as authorization evidence.
+
+Invariants:
+
+- unauthorized consumers receive only the same public/hidden shape available
+  from the shared adapter redaction path, never a richer object that a frontend
+  is expected not to display;
+- projection, event-stream, server status, error, support-profile, and metadata
+  code consume the single shared adapters redaction module;
+- no web-service-local hidden decision type set or visibility rule is allowed;
+- authorization failures do not reveal request IDs, actor identity, option
+  counts, target counts, source IDs, support status, or terminal details that
+  are hidden from the principal's role;
+- coach, spectator, administrator, and replay roles have explicit visibility,
+  delay, mutation, and cursor policies.
+
+Security tests compare complete serialized responses between roles for every
+hidden-information feature, including:
+
+- field names and object/option/event counts;
+- error/status descriptions and pending-decision metadata;
+- event cursor movement and resynchronization responses;
+- catalog/live references and support rows;
+- payload sizes where practical and useful for detecting structural leaks.
+
+Completion gate:
+
+No route accepts arbitrary viewer identity as authority, and differential
+viewer tests prove that hidden information cannot leak through primary payloads
+or transport metadata.
+
+## Phase 18I: UI interaction metadata and affordance contract
+
+Priority: P1, designed alongside Phase 18D.
+
+Finite options and generic parameterized payloads are semantically sufficient
+for the engine but not sufficient for a backend-agnostic visual client. Every
+adapter-visible decision therefore exposes a neutral interaction descriptor
+that states what input is required without naming a framework widget or moving
+rule validation into the client.
+
+Example shape:
+
+```json
+{
+  "interaction_kind": "path_editor",
+  "proposal_kind": "normal_move",
+  "selected_entity_ids": ["unit-17"],
+  "required_inputs": ["model_paths", "final_poses"],
+  "constraints": {
+    "maximum_distance_in": 7,
+    "must_preserve_coherency": true,
+    "may_enter_engagement_range": false
+  },
+  "display_hints": {
+    "confirm_label": "Complete Normal Move"
+  }
+}
+```
+
+`constraints` and `display_hints` explain/assist input. They are never a client
+authorization to bypass the engine validator, and stale values are rejected by
+the ordinary request/proposal contract.
+
+Standard interaction kinds:
+
+- finite option list;
+- unit/model/target selection;
+- weapon allocation matrix and grouped attack allocation;
+- dice reroll selection and ordered sequencing;
+- battlefield point and model-pose placement;
+- multi-model deployment placement;
+- movement, Charge, Pile In, and Consolidate path editors;
+- roster construction;
+- confirmation/decline and quantity selection;
+- opportunity/reaction window.
+
+Invariants:
+
+- clients select an engine-emitted finite option or submit the exact typed
+  proposal required by the pending request;
+- adapters do not infer interaction requirements by parsing rule text, display
+  names, or arbitrary payload internals;
+- interaction kinds are presentation-neutral and never contain React, native,
+  canvas, or other component identifiers;
+- any new interaction kind or payload shape updates
+  `docs/ADAPTER_DECISION_CONTRACT.md`, the Phase 18D schemas/examples, replay
+  fixtures, and viewer-redaction tests in the same implementation change.
+
+Completion gate:
+
+A generic client can choose an interaction renderer from the descriptor and
+construct every supported finite/parameterized submission without importing
+engine code or hard-coding rules mutations by `decision_type`.
+
+## Phase 18J: battlefield rendering and coordinate contract
+
+Priority: P1 and a dependency of the visual play surface.
+
+Publish one explicit, versioned coordinate specification covering:
+
+- inches internally and over the wire;
+- coordinate handedness, X/Y board plane, and positive Z direction;
+- angle units, zero orientation, and rotation direction;
+- model/base origin and support/base representation;
+- hull and non-base geometry;
+- terrain coordinate frames and board bounds;
+- polygon winding and epsilon/tolerance policy;
+- camera-independent world coordinates;
+- typed path-segment representation.
+
+The contract separates three geometry classes:
+
+1. Authoritative collision/measurement geometry owned by the engine and source
+   packages.
+2. Interaction geometry such as selectable regions, handles, and projected
+   legal-placement envelopes.
+3. Render geometry such as asset IDs, sprites, meshes, textures, and other
+   non-authoritative presentation data.
+
+The frontend never derives legal movement, visibility, range, engagement,
+coherency, placement, or collision from interaction/render geometry.
+
+Normalize at least terrain features, objective markers, deployment zones,
+model poses, destroyed/embarked/reserve state, measurement overlays,
+selected/acting entities, and legal candidate references into stable external
+entities or documented battlefield deltas.
+
+Required tests:
+
+- coordinate and angle round-trip fixtures across engine and generated client;
+- round, oval, hull, support, terrain, objective, deployment-zone, and path
+  examples for every supported geometry kind;
+- render/interaction geometry changes cannot alter authoritative validation;
+- source geometry drift changes package/projection hashes and fails stale
+  proposals;
+- viewer-scoped battlefield entities do not expose hidden model/unit presence.
+
+## Phase 18K: interface intent and opportunity UX
+
+Priority: P1 after basic interactions work.
+
+The engine already defines `InterfaceIntent` and opportunity-window
+materialization rules. Phase 18K owns the deferred human-facing adapter capture,
+storage, expiration, explanation, and submission UX. It supersedes older roadmap
+references that assign adapter intent capture to the former broad Phase 18D
+"local UI" bucket; implementation must update
+`docs/ADAPTER_DECISION_CONTRACT.md` and
+`docs/TRIGGER_OPPORTUNITY_WINDOWS.md` accordingly.
+
+Use cases include:
+
+- use a Stratagem at the next legal opportunity;
+- automatically pass a reaction until legal actions change;
+- reroll failed saves for a selected unit;
+- ask before a once-per-battle ability;
+- automatically decline a class of optional triggers for a bounded scope.
+
+Required intent fields/behavior:
+
+- authenticated player binding;
+- stable source/action ID and target constraints;
+- timing scope and expiration;
+- state hash/session revision constraints;
+- priority and confirmation mode;
+- deterministic materialization record;
+- explicit rejection/expiration reason;
+- no direct CP, resource, queue, or game-state mutation.
+
+An intent may materialize only into an option on the current engine-owned
+opportunity window with the matching legal-action fingerprint and priority
+rules. The resulting answer is an ordinary `DecisionResult` submitted through
+the Phase 18C facade and recorded/replayed normally. Clients do not poll for
+legality or send direct action commands.
+
+Required tests:
+
+- valid, stale, expired, wrong-player, wrong-source, wrong-target, changed
+  fingerprint, already-consumed, and insufficient-resource materialization;
+- deterministic priority/confirmation behavior for competing intents;
+- replay and event evidence for materialization, decline, rejection, and
+  expiration;
+- no mutation occurs until the engine accepts the materialized decision.
+
+## Phase 18L: persistence, recovery, and deployment topology
+
+Priority: P1 for hosted backends.
+
+Persist:
+
+- normalized game configuration and exact ruleset/catalog/source identities;
+- RNG seed and deterministic RNG state;
+- accepted command and decision records;
+- authoritative event records;
+- session revision and idempotency results;
+- latest replay inputs/artifact and periodic verified state checkpoint;
+- participant/role bindings and cursor policy state;
+- server/engine/contract versions and terminal status.
+
+Recovery procedure:
+
+1. Load the latest verified checkpoint.
+2. Replay subsequent accepted decisions through
+   `GameLifecycle.submit_decision(...)` via the session owner.
+3. Verify decision, event, projection, RNG, and package hashes plus deterministic
+   event sequence/revision.
+4. Resume service only on exact agreement; otherwise return typed corruption or
+   drift diagnostics.
+
+Do not silently continue from partially reconstructed state.
+
+Initial deployment topology:
+
+- one authoritative process/actor owns engine mutation for a session;
+- commands for that session are serialized;
+- reads may be served from immutable viewer-scoped projections;
+- no distributed writers mutate one game;
+- failover transfers ownership only through a verified checkpoint/replay
+  boundary.
+
+Required tests:
+
+- restart from checkpoints at setup and each major phase boundary;
+- crash before and after atomic command commit;
+- replay tail recovery with exact projection/event/RNG hashes;
+- package, engine, schema, and checkpoint drift fail closed;
+- participant roles and viewer cursors restore without visibility widening.
+
+## Phase 18M: backend conformance harness and reference server
+
+Priority: P0/P1 boundary. Implement the first conformance slice after the P0
+contract, session, concurrency, authorization, and event semantics are fixed;
+expand it with Phase 18I-18L.
+
+The existing development server becomes a small reference implementation of the
+canonical contract, not necessarily the production service. It proves that an
+independent backend can remain thin and that the contract is sufficient without
+direct lifecycle, queue, dice, or authoritative-state access.
+
+Any backend implementation must pass conformance for:
+
+- every finite decision and parameterized proposal round-trip;
+- stale request/revision rejection and command idempotency;
+- reconnect, cursor expiration, and projection resynchronization;
+- principal/player binding and viewer-specific redaction;
+- hidden-event cursor behavior;
+- terminal-game handling and replay equivalence;
+- schema compatibility and catalog caching;
+- concurrent-submission races;
+- malformed payload and unsupported-path reporting;
+- persistence/recovery when that capability is claimed.
+
+Golden scenario corpus:
+
+- setup, deployment, and hidden battle formations;
+- attached units, reserves, transports, and reactive movement;
+- movement paths and physical placement;
+- shooting declarations, attack grouping, save/damage allocation;
+- Charge and Fight movement/activation;
+- reaction/opportunity windows and simultaneous sequencing;
+- hidden Secondary Missions, scoring, game completion, reconnect, and replay.
+
+The conformance package is the integration boundary between this engine
+repository and a separate backend repository. A backend may choose its language,
+framework, storage, and delivery transport, but it may not change engine command,
+decision, validation, redaction, event, replay, or advancement semantics.
+
+Completion gate:
+
+- the reference server passes the complete conformance suite;
+- at least one generated non-Python client completes the certified Phase 20A
+  scenario through only the published contract;
+- no conformance test imports engine internals from the client side;
+- schema examples, replay artifacts, and viewer-scoped event deltas are stable
+  golden artifacts.
+
+Event Companion adapter/replay/UI requirements across Phase 18:
 
 - hidden Tactical/Fixed selection and Fixed Mission choices remain viewer-scoped
   until reveal;
@@ -4963,7 +5731,7 @@ Event Companion adapter/replay/UI requirements:
   from replay-safe state;
 - VP source caps and final scoring audit are displayed without adapter-side
   recalculation;
-- layout visualizers consume source descriptors, not page images.
+- layout visualizers consume Phase 17N descriptors, never page images.
 
 ---
 
@@ -4985,6 +5753,27 @@ Objects:
 - `HotspotReport`
 - `PerformanceBudget`
 
+Required budget families:
+
+Interactive budgets:
+
+- viewer projection generation latency;
+- legal-option enumeration latency;
+- movement/placement proposal validation latency;
+- Shooting declaration candidate latency;
+- post-command deterministic drain latency;
+- event-delta serialization size and latency;
+- full projection size and serialization latency.
+
+Headless budgets:
+
+- complete-game throughput;
+- decisions per second;
+- deterministic clone/fork cost;
+- candidate-evaluation cost;
+- memory per game;
+- replay export and verification cost.
+
 Invariants:
 
 - headless games are fast enough for large DecisionRecord corpora;
@@ -4992,6 +5781,10 @@ Invariants:
 - same seed and same scenario produce deterministic results modulo timing values;
 - CI runs small smoke benchmarks;
 - nightly/manual profiling runs larger battlefield and full-game workloads;
+- interactive and headless budgets are reported separately and carry scenario,
+  ruleset, catalog, engine-build, and machine-profile identity;
+- transport/backend teams receive bounded post-command and projection budgets
+  before building UX around latency assumptions;
 - performance optimization cannot change authoritative replay output.
 
 Required tests / scripts:
@@ -5135,11 +5928,73 @@ Event Companion scenario coverage:
   proxy, because Event Companion event rankings prioritize record and opponent
   win records before total VP.
 
+## Phase 19F: observability and rule execution tracing
+
+Phase 19B already owns legal-candidate generation, so the UI/backend review's
+proposed observability work is assigned to Phase 19F without renumbering the AI
+roadmap.
+
+Required trace domains:
+
+- decision request enumeration and candidate filtering;
+- validator failures and typed invalid/unsupported outcomes;
+- source rule, descriptor, IR clause, hook, and handler IDs;
+- event production and deterministic sequence numbers;
+- state, projection, package, and replay hash changes;
+- projection generation and shared redaction decisions;
+- replay verification and drift diagnostics;
+- Phase 18 command/session correlation IDs and revisions.
+
+Maintain two distinct outputs:
+
+1. Viewer-safe explanation payloads suitable for clients and replay inspection.
+2. Privileged diagnostic traces for operators/developers.
+
+Invariants:
+
+- tracing is observational and cannot influence candidate ordering, RNG,
+  validation, mutation, or deterministic replay;
+- ordinary clients never receive hidden state, internal exception text, private
+  rule evidence, or privileged trace identifiers;
+- diagnostic traces carry source/build/schema identity and deterministic
+  correlation fields, while operational timestamps remain non-authoritative;
+- redaction traces use the shared adapter visibility policy and do not implement
+  a second hidden-information ruleset;
+- trace serialization has explicit Phase 19A overhead budgets and can be
+  disabled without changing logical output.
+
+Required tests:
+
+- viewer-safe explanations are stable and contain only viewer-visible facts;
+- privileged traces correlate command -> decision -> handler -> event -> state
+  hash without changing replay output;
+- differential viewer tests cover trace/explanation payloads;
+- tracing enabled/disabled produces identical authoritative records and state;
+- malformed or unsupported execution emits typed diagnostics without leaking
+  Python reprs, memory addresses, or internal exception strings.
+
 ---
 
 # Full-game gates
 
-## Phase 20A: full-game rules-compliance matrix
+## Phase 20A: certified vertical slice and full-game rules-compliance matrix
+
+Before broad product-readiness claims, certify one constrained setup-to-terminal
+matrix containing:
+
+- one source-backed mission pack;
+- a defined set of fully extracted terrain/deployment layouts;
+- a small declared set of factions and detachments;
+- explicit roster and geometry restrictions;
+- no selected unsupported descriptors or unresolved physical rows;
+- local and network play through the same adapter decision path;
+- complete setup, five-round lifecycle, scoring, terminal state, reconnect, and
+  replay verification.
+
+Certification is capability-based: Phase 17O must report the selected scenario
+as `FULL_GAME_SUPPORTED`, `NETWORK_SAFE`, and `REPLAY_VERIFIED`. The constrained
+slice is expanded only when the additional mission/content/geometry rows meet
+the same gate.
 
 Create a machine-readable coverage matrix mapping 11th Edition Core Rules sections to implementation modules and tests.
 
@@ -5186,6 +6041,10 @@ Required tests:
 - replay round-trip at multiple battle rounds;
 - no hidden information leaks;
 - deterministic same-seed replay;
+- local and network execution of the Phase 20A certified slice produce the same
+  engine decision/event/replay results;
+- disconnect/reconnect and full projection resynchronization preserve the
+  certified scenario;
 - all source-page Event Companion layout identities and coordinate-extraction
   coverage for each Force Disposition/Primary Mission combination;
 - multiple army archetypes;
@@ -5199,7 +6058,20 @@ Required runs:
 - long-running replay validation;
 - profiling hotspot report;
 - unsupported descriptor report;
-- crash/failure triage report.
+- crash/failure triage report;
+- randomized legal-decision games;
+- malformed proposal and command-envelope fuzzing;
+- repeated disconnect/reconnect and cursor-expiration recovery;
+- duplicate, concurrent, and reordered network submissions;
+- checkpoint/recovery cycles at every lifecycle boundary;
+- hidden-information differential tests across every viewer role;
+- replay from every major lifecycle boundary;
+- deterministic execution across worker/process restarts.
+
+Soak failures preserve the exact seed, ruleset/catalog/source hashes, command
+stream, decision/event records, checkpoint identity, viewer role, and replay
+artifact needed for deterministic triage. No soak harness may recover by
+silently skipping an invalid/unsupported engine path.
 
 ## Phase 20D: release gate for complete 11th Edition CORE V2
 
@@ -5214,6 +6086,10 @@ Exit criteria:
 - headless throughput budget passes;
 - replay determinism passes;
 - source-content coverage report is generated;
+- Phase 17O capability evidence reports the release matrix as
+  `FULL_GAME_SUPPORTED`, `NETWORK_SAFE`, and `REPLAY_VERIFIED`;
+- the Phase 18M reference server and generated non-Python client pass the
+  published conformance suite;
 - human CLI can complete a game;
 - AI self-play can complete many games;
 - UI can inspect and play a local game;
@@ -5234,27 +6110,30 @@ Exit criteria:
 | Engagement Range | 10G, 10M, 10N, 10O, 15B, 14C, 14G |
 | Unit Coherency | 10G/10H descriptors, 10L runtime, 11E cleanup, 14C |
 | Terrain movement | 10F, 10H, 10I, 14D |
-| Terrain visibility/cover, including Hidden, Obscuring, Solid, Benefit of Cover, Plunging Fire, and Event Companion layout identity/geometry coverage | 13A, 13C, 14D, 14E, 17J |
+| Terrain visibility/cover, including Hidden, Obscuring, Solid, Benefit of Cover, Plunging Fire, and Event Companion layout identity/geometry coverage | 13A, 13C, 14D, 14E, 17J, 17N |
 | Movement phase Move Units | 10B-10T, 14D |
 | Movement phase reserve arrivals and Ingress Moves | 10P, 14D, 14H |
 | Transports | 10Q, 14H |
 | Aircraft | 10R, 14H |
 | Command phase | 11C, 14B, 14C |
 | Battle-shock | 11C, 12B, 14C |
-| Mission scoring | 11A-11C, 11E-11F, 14J, 17J |
+| Mission scoring | 11A-11C, 11E-11F, 14J, 17J, 17N |
 | Stratagems | 12B, 12C, 13D, 15E, 17E-17G, 14I |
 | Shooting phase | 13A-13F, 14E, 14F |
 | Weapon abilities | 8D, 13D, 17H, 14I |
-| Aura abilities | 17C, 17D, 17G-17H |
+| Aura abilities | 17C, 17D, 17G-17H, 17M |
 | Charge phase | 15A, 15B, 14G |
 | Fight phase | 15C, 15D, 15E, 15F, 14G |
 | Leader/attached units | 6, 16D, 17A, 14H |
-| Faction/detachment/enhancement rules | 17C-17G, 14J |
-| Mission packs | 11A, 11E, 11F, 16A, 17J, 20A, 14J |
-| Adapter/UI contract | 11D, 12B, 14D-14I, 17J, 18C |
-| Human CLI/UI | 18A, 18D |
-| Network play | 18E |
+| Faction/detachment/enhancement rules | 17C-17G, 17M, 14J |
+| Mission packs | 11A, 11E, 11F, 16A, 17J, 17N, 20A, 14J |
+| Capability/support manifest | 17I, 17O, 18D |
+| Adapter/UI contract | 11D, 12B, 14D-14I, 17J, 18A-18M |
+| Human CLI/UI | 18A, 18C, 18D, 18I-18K, 18M |
+| Network play | 18C, 18D-18H, 18L-18M |
 | Replay | 18B, all state-changing phases |
 | AI/headless self-play | 19B-19E |
 | Performance budgets | 10U, 19A |
+| Observability and rule tracing | 19F |
+| Full-game certification and adversarial soak | 20A-20D |
 | 11th Edition migration/revalidation | 14A-14K, 17J |

@@ -1,0 +1,17 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/opportunity-window-example.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "decision_request": {"type": "object"},
+    "selected_option_id": {"minLength": 1, "type": "string"},
+    "selected_option_payload": {"type": "object"}
+  },
+  "required": [
+    "decision_request",
+    "selected_option_id",
+    "selected_option_payload"
+  ],
+  "title": "CORE V2 Opportunity Window Example",
+  "type": "object"
+}

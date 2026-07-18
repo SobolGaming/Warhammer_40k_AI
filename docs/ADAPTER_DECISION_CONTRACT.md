@@ -183,8 +183,8 @@ The shared contract uses these objects and payloads:
   player, revision, and legal-action fingerprint. A matching pass can suppress
   another prompt only while the legal action fingerprint is unchanged.
 - `InterfaceIntent`: adapter-captured proactive intent. This adapter capture
-  surface is deferred to Phase 18D and is not implemented by current adapters.
-  It is not a mutation and not a decision record. When Phase 18D implements the
+  surface is deferred to Phase 18K and is not implemented by current adapters.
+  It is not a mutation and not a decision record. When Phase 18K implements the
   adapter surface, an intent may materialize into a normal `DecisionResult` only
   when the current pending request matches its window timing, state hash, source,
   action, targets, and expiration.
@@ -253,6 +253,41 @@ Those producers still converge on the same engine-facing objects:
 
 The lifecycle should not care whether a result came from a person, AI, CLI, network client, or replay driver. It should care only whether the current pending request accepts that result and whether engine validators accept the proposed rule outcome.
 
+## Phase 18D External Contract
+
+The canonical language-neutral contract baseline lives in `contracts/`. Its
+OpenAPI 3.1 document references the canonical Draft 2020-12 schemas directly.
+Its decision-family inventory is derived from the engine dispatch registry and
+marks real adapter-session examples as `live_scenario`; remaining registered or
+nested families are explicitly `envelope_only` and are not claimed as
+executable external coverage. Parameterized proposal-kind examples remain
+schema coverage. `docs/api/` and test-local fixture directories are not
+alternate schema authorities.
+
+Every external request or response declares its payload-family version. The
+reference server currently requires:
+
+- `create-session-v1` for create-session requests;
+- `finite-submission-v1` for finite option submissions;
+- `parameterized-submission-v1` for proposal submissions;
+- `lifecycle-status-v1` for server lifecycle responses;
+- `decision-request-view-v1` for visible or redacted pending decisions;
+- `event-delta-v1` for viewer event deltas;
+- `error-envelope-v1` for typed transport errors.
+
+Game views, rules catalogs, support profiles, and replay artifacts retain their
+existing explicit projection/artifact schema fields. A mismatched request
+version fails before queue consumption or engine mutation. External error and
+status payloads are viewer-scoped by the same shared redaction policy as game
+projections and events.
+
+Compatibility, coordinate, session, and redaction semantics are normative in
+`contracts/compatibility-policy.md`, `contracts/coordinate-system.md`,
+`contracts/session-semantics.md`, and `contracts/redaction-policy.md`. Any new
+decision type, proposal kind, adapter-visible field, status, error, or visibility
+behavior must update the canonical schema/examples in the same change and pass
+`scripts/build_external_contract.py --check`.
+
 ## Trigger Opportunity Windows
 
 Optional trigger-based rules use synchronous engine-owned opportunity windows,
@@ -270,8 +305,8 @@ host's parameterized payload. They must not apply the action, spend resources,
 move models, reveal hidden data, or suppress replay events locally.
 
 Human-facing adapter capture of proactive declarations as `InterfaceIntent`
-records is deferred to Phase 18D. Current adapters must not expose an
-`InterfaceIntent` capture surface. When Phase 18D implements that surface, an
+records is deferred to Phase 18K. Current adapters must not expose an
+`InterfaceIntent` capture surface. When Phase 18K implements that surface, an
 intent may be queued by the adapter while no matching engine window is open, but
 it remains advisory only. It materializes into a `DecisionResult` only if the
 current pending request matches the intended timing, player, state hash, source,

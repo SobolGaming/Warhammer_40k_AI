@@ -82,8 +82,9 @@ from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
 )
 
-UI_FIXTURE_DIR = Path("tests/fixtures/ui_contract")
-PROPOSAL_EXAMPLE_DIR = Path("docs/api/proposal_payload_examples")
+UI_FIXTURE_DIR = Path("contracts/examples/projections")
+DECISION_EXAMPLE_DIR = Path("contracts/examples/decisions")
+PROPOSAL_EXAMPLE_DIR = DECISION_EXAMPLE_DIR / "proposals"
 
 FIXED_SECONDARY_OPTION_ID = "fixed:assassination:bring_it_down"
 PLAYER_A = "player-a"
@@ -110,7 +111,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--output-root",
         type=Path,
         default=Path.cwd(),
-        help="Repository root to write docs/api and tests/fixtures payloads under.",
+        help="Repository root to write canonical contracts/examples payloads under.",
     )
     args = parser.parse_args(argv)
 
@@ -124,11 +125,17 @@ def export_ui_contract_files(*, output_root: Path) -> tuple[Path, ...]:
     bundle = build_ui_contract_bundle()
     written: list[Path] = []
     for name, payload in sorted(bundle.fixtures.items()):
-        path = output_root / UI_FIXTURE_DIR / name
+        fixture_directory = (
+            DECISION_EXAMPLE_DIR if name == "pending_movement_request.json" else UI_FIXTURE_DIR
+        )
+        path = output_root / fixture_directory / name
         _write_json(path, payload)
         written.append(path)
     for name, payload in sorted(bundle.proposal_payload_examples.items()):
-        path = output_root / PROPOSAL_EXAMPLE_DIR / name
+        example_directory = (
+            DECISION_EXAMPLE_DIR if name == "opportunity_window.json" else PROPOSAL_EXAMPLE_DIR
+        )
+        path = output_root / example_directory / name
         _write_json(path, payload)
         written.append(path)
     return tuple(written)

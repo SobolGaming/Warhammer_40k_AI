@@ -1,0 +1,100 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/decision-request-view.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "decision-request-view-v1",
+      "type": "string"
+    },
+    "actor_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decision_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "is_parameterized": {
+      "type": "boolean"
+    },
+    "options": {
+      "items": {
+        "$ref": "#/$defs/decision_option"
+      },
+      "type": "array"
+    },
+    "payload": {
+      "$ref": "#/$defs/json_value"
+    },
+    "request_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "request_id",
+    "decision_type",
+    "actor_id",
+    "payload",
+    "options",
+    "is_parameterized"
+  ],
+  "title": "CORE V2 DecisionRequestViewPayload",
+  "type": "object",
+  "$defs": {
+    "decision_option": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "option_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/json_value"
+        }
+      },
+      "required": [
+        "option_id",
+        "label",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "json_value": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "object"
+        }
+      ]
+    }
+  }
+}

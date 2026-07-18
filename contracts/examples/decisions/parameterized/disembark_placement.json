@@ -1,0 +1,36 @@
+{
+  "actor_id": "player-a",
+  "payload": {
+    "attempted_placement": {
+      "army_id": "army-alpha",
+      "model_placements": [
+        {
+          "army_id": "army-alpha",
+          "model_instance_id": "army-alpha:unit-1:model-1",
+          "player_id": "player-a",
+          "pose": {
+            "facing": {
+              "degrees": 0.0
+            },
+            "position": {
+              "x": 12.0,
+              "y": 18.0,
+              "z": 0.0
+            }
+          },
+          "unit_instance_id": "army-alpha:unit-1"
+        }
+      ],
+      "player_id": "player-a",
+      "unit_instance_id": "army-alpha:unit-1"
+    },
+    "disembark_mode": "tactical_disembark",
+    "placement_kind": "disembark",
+    "proposal_kind": "disembark_placement",
+    "proposal_request_id": "contract-disembark-request-000001",
+    "transport_unit_instance_id": "army-alpha:transport-1",
+    "unit_instance_id": "army-alpha:unit-1"
+  },
+  "result_id": "phase18d-disembark_placement-result-000001",
+  "schema_version": "parameterized-submission-v1"
+}

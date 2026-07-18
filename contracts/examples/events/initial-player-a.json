@@ -1,0 +1,230 @@
+{
+  "cursor": 0,
+  "events": [
+    {
+      "event_id": "event-000001",
+      "event_type": "lifecycle_started",
+      "payload": {
+        "battle_phase_sequence": [
+          "command",
+          "movement",
+          "shooting",
+          "charge",
+          "fight"
+        ],
+        "game_id": "phase18d-contract-session",
+        "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
+        "setup_sequence": [
+          "muster_armies",
+          "select_mission",
+          "create_battlefield",
+          "determine_attacker_defender",
+          "select_secondary_missions",
+          "declare_battle_formations",
+          "deploy_armies",
+          "redeploy_units",
+          "determine_first_turn",
+          "resolve_prebattle_actions"
+        ]
+      }
+    },
+    {
+      "event_id": "event-000002",
+      "event_type": "army_mustered",
+      "payload": {
+        "army_id": "army-alpha",
+        "game_id": "phase18d-contract-session",
+        "player_id": "player-a",
+        "roster_legality_report": {
+          "battle_size": "strike_force",
+          "is_legal": false,
+          "violations": [
+            {
+              "message": "Roster requires one selected Warlord.",
+              "source_id": "phase16d:warlord",
+              "unit_selection_id": null,
+              "violation_code": "missing_warlord_selection"
+            },
+            {
+              "message": "Roster path requires source-backed unit points.",
+              "source_id": "phase16d:unit-points",
+              "unit_selection_id": "deep-strike-unit",
+              "violation_code": "source_awaiting_unit_points"
+            },
+            {
+              "message": "Roster path requires source-backed unit points.",
+              "source_id": "phase16d:unit-points",
+              "unit_selection_id": "scout-redeploy-unit",
+              "violation_code": "source_awaiting_unit_points"
+            },
+            {
+              "message": "Roster path requires source-backed unit points.",
+              "source_id": "phase16d:unit-points",
+              "unit_selection_id": "strategic-reserve-unit",
+              "violation_code": "source_awaiting_unit_points"
+            }
+          ]
+        },
+        "setup_step": "muster_armies",
+        "unit_count": 3
+      }
+    },
+    {
+      "event_id": "event-000003",
+      "event_type": "army_mustered",
+      "payload": {
+        "army_id": "army-beta",
+        "game_id": "phase18d-contract-session",
+        "player_id": "player-b",
+        "roster_legality_report": {
+          "battle_size": "strike_force",
+          "is_legal": false,
+          "violations": [
+            {
+              "message": "Roster requires one selected Warlord.",
+              "source_id": "phase16d:warlord",
+              "unit_selection_id": null,
+              "violation_code": "missing_warlord_selection"
+            },
+            {
+              "message": "Roster path requires source-backed unit points.",
+              "source_id": "phase16d:unit-points",
+              "unit_selection_id": "scout-redeploy-unit",
+              "violation_code": "source_awaiting_unit_points"
+            }
+          ]
+        },
+        "setup_step": "muster_armies",
+        "unit_count": 1
+      }
+    },
+    {
+      "event_id": "event-000004",
+      "event_type": "setup_step_completed",
+      "payload": {
+        "active_player_id": null,
+        "battle_phase": null,
+        "battle_round": 0,
+        "game_id": "phase18d-contract-session",
+        "next_setup_step": "select_mission",
+        "stage": "setup",
+        "step": "muster_armies"
+      }
+    },
+    {
+      "event_id": "event-000005",
+      "event_type": "setup_step_completed",
+      "payload": {
+        "active_player_id": null,
+        "battle_phase": null,
+        "battle_round": 0,
+        "game_id": "phase18d-contract-session",
+        "next_setup_step": "create_battlefield",
+        "stage": "setup",
+        "step": "select_mission"
+      }
+    },
+    {
+      "event_id": "event-000006",
+      "event_type": "battlefield_created",
+      "payload": {
+        "battlefield_id": "phase18d-contract-session:take-and-hold-vs-take-and-hold-layout-3-deployment:battlefield",
+        "deployment_map_id": "take-and-hold-vs-take-and-hold-layout-3-deployment",
+        "game_id": "phase18d-contract-session",
+        "mission_pack_id": "11e-chapter-approved-2026-27",
+        "objective_marker_count": 5,
+        "placed_model_count": 0,
+        "setup_step": "create_battlefield",
+        "terrain_feature_count": 0,
+        "terrain_layout_id": "take-and-hold-vs-take-and-hold-layout-3"
+      }
+    },
+    {
+      "event_id": "event-000007",
+      "event_type": "setup_step_completed",
+      "payload": {
+        "active_player_id": null,
+        "battle_phase": null,
+        "battle_round": 0,
+        "game_id": "phase18d-contract-session",
+        "next_setup_step": "determine_attacker_defender",
+        "stage": "setup",
+        "step": "create_battlefield"
+      }
+    },
+    {
+      "event_id": "event-000008",
+      "event_type": "setup_step_completed",
+      "payload": {
+        "active_player_id": null,
+        "battle_phase": null,
+        "battle_round": 0,
+        "game_id": "phase18d-contract-session",
+        "next_setup_step": "select_secondary_missions",
+        "stage": "setup",
+        "step": "determine_attacker_defender"
+      }
+    },
+    {
+      "event_id": "event-000009",
+      "event_type": "decision_requested",
+      "payload": {
+        "actor_id": "player-a",
+        "decision_type": "select_secondary_missions",
+        "options": [
+          {
+            "label": "Fixed assassination bring_it_down",
+            "option_id": "fixed:assassination:bring_it_down",
+            "payload": {
+              "fixed_mission_ids": [
+                "assassination",
+                "bring_it_down"
+              ],
+              "mode": "fixed"
+            }
+          },
+          {
+            "label": "Fixed assassination cleanse",
+            "option_id": "fixed:assassination:cleanse",
+            "payload": {
+              "fixed_mission_ids": [
+                "assassination",
+                "cleanse"
+              ],
+              "mode": "fixed"
+            }
+          },
+          {
+            "label": "Fixed bring_it_down cleanse",
+            "option_id": "fixed:bring_it_down:cleanse",
+            "payload": {
+              "fixed_mission_ids": [
+                "bring_it_down",
+                "cleanse"
+              ],
+              "mode": "fixed"
+            }
+          },
+          {
+            "label": "Tactical",
+            "option_id": "tactical",
+            "payload": {
+              "fixed_mission_ids": [],
+              "mode": "tactical"
+            }
+          }
+        ],
+        "payload": {
+          "fixed_choices_required": 2,
+          "game_id": "phase18d-contract-session",
+          "secret": true,
+          "setup_step": "select_secondary_missions"
+        },
+        "request_id": "decision-request-000001"
+      }
+    }
+  ],
+  "next_cursor": 9,
+  "schema_version": "event-delta-v1",
+  "viewer_player_id": "player-a"
+}
