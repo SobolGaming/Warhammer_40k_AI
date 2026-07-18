@@ -50,7 +50,8 @@ class CatalogConditionalProximityEffectsDescriptor:
     required_keyword_sequence: tuple[str, ...]
     characteristic: Characteristic
     characteristic_value: int
-    hit_roll_delta: int
+    hit_roll_delta: int | None
+    weapon_characteristic_deltas: tuple[tuple[Characteristic, int], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,6 +102,15 @@ def exact_datasheet_runtime_descriptor_for_clause(
 
 
 def conditional_proximity_effects_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogConditionalProximityEffectsDescriptor | None:
+    descriptor = _unit_proximity_roll_descriptor_for_clause(clause)
+    if descriptor is not None:
+        return descriptor
+    return _model_proximity_weapon_descriptor_for_clause(clause)
+
+
+def _unit_proximity_roll_descriptor_for_clause(
     clause: RuleClause,
 ) -> CatalogConditionalProximityEffectsDescriptor | None:
     if (
@@ -162,6 +172,88 @@ def conditional_proximity_effects_descriptor_for_clause(
         characteristic=Characteristic.LEADERSHIP,
         characteristic_value=value,
         hit_roll_delta=hit_roll_delta,
+    )
+
+
+def _model_proximity_weapon_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogConditionalProximityEffectsDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != "phase17c:characteristic-set"
+        or clause.trigger is not None
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or clause.target.parameters
+        or clause.duration is not None
+        or len(clause.conditions) != 1
+        or len(clause.effects) != 3
+    ):
+        return None
+    condition = clause.conditions[0]
+    condition_parameters = parameter_payload(condition.parameters)
+    required_keywords = condition_parameters.get("required_keyword_sequence")
+    distance = condition_parameters.get("distance_inches")
+    if (
+        condition.kind is not RuleConditionKind.DISTANCE_PREDICATE
+        or condition_parameters.get("predicate") != "within"
+        or condition_parameters.get("negated") is not False
+        or condition_parameters.get("object_allegiance") != "friendly"
+        or condition_parameters.get("object_kind") != "model"
+        or condition_parameters.get("object_quantity") != "one_or_more"
+        or condition_parameters.get("subject") != "this_model"
+        or not isinstance(distance, int | float)
+        or type(distance) is bool
+        or distance <= 0
+        or not isinstance(required_keywords, tuple)
+        or not required_keywords
+        or not all(type(keyword) is str and bool(keyword) for keyword in required_keywords)
+    ):
+        return None
+    weapon_deltas: list[tuple[Characteristic, int]] = []
+    characteristic_value: int | None = None
+    for effect in clause.effects:
+        parameters = parameter_payload(effect.parameters)
+        if effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:
+            characteristic_token = parameters.get("characteristic")
+            delta = parameters.get("delta")
+            if (
+                parameters.get("target_scope") != "weapons_equipped_by_this_model"
+                or characteristic_token
+                not in {
+                    Characteristic.BALLISTIC_SKILL.value,
+                    Characteristic.WEAPON_SKILL.value,
+                }
+                or type(delta) is not int
+                or delta == 0
+            ):
+                return None
+            weapon_deltas.append((Characteristic(str(characteristic_token)), delta))
+            continue
+        raw_value = parameters.get("value")
+        if (
+            effect.kind is not RuleEffectKind.SET_CHARACTERISTIC
+            or parameters.get("characteristic") != Characteristic.LEADERSHIP.value
+            or type(raw_value) is not str
+            or not raw_value.endswith("+")
+            or not raw_value[:-1].isdigit()
+        ):
+            return None
+        characteristic_value = int(raw_value[:-1])
+    if (
+        characteristic_value is None
+        or not 2 <= characteristic_value <= 8
+        or tuple(characteristic for characteristic, _delta in weapon_deltas)
+        != (Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL)
+    ):
+        return None
+    return CatalogConditionalProximityEffectsDescriptor(
+        distance_inches=float(distance),
+        required_keyword_sequence=required_keywords,
+        characteristic=Characteristic.LEADERSHIP,
+        characteristic_value=characteristic_value,
+        hit_roll_delta=None,
+        weapon_characteristic_deltas=tuple(weapon_deltas),
     )
 
 

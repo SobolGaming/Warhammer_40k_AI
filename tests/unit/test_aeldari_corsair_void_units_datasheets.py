@@ -3,9 +3,11 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import replace
+from functools import cache
 from typing import Any, cast
 
 import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tools.generate_ability_support_matrix import (
     DEFAULT_SOURCE_JSON_DIR,
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
@@ -15,6 +17,8 @@ from tools.generate_aeldari_corsair_void_units_rule_ir import (
     generated_artifact_payload,
 )
 
+from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
@@ -24,12 +28,14 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionEffectKind,
 )
 from warhammer40k_core.core.datasheet_composition import validate_unit_composition_counts
+from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollResult,
     DiceRollSpec,
     DiceRollState,
 )
+from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
@@ -42,7 +48,6 @@ from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormati
 from warhammer40k_core.engine.attack_sequence import (
     _source_backed_hit_permission_for_attack,
 )
-from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CatalogWeaponKeywordGrantRuntime,
@@ -52,6 +57,7 @@ from warhammer40k_core.engine.catalog_tracked_target_runtime import CatalogTrack
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
@@ -61,7 +67,11 @@ from warhammer40k_core.engine.list_validation_errors import (
     ListValidationError,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, SetupStep
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionContext,
@@ -70,6 +80,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.start_battle_hooks import StartBattleRequestContext
 from warhammer40k_core.engine.tracked_targets import (
     TrackedTargetOwnerScope,
     TrackedTargetRole,
@@ -111,6 +122,8 @@ VOIDREAVER_PROFILE_ID = f"{VOIDREAVERS_ID}:corsair-voidreavers"
 VOIDREAVER_FELARCH_PROFILE_ID = f"{VOIDREAVERS_ID}:voidreaver-felarch"
 VOIDSCARRED_PROFILE_ID = f"{VOIDSCARRED_ID}:corsair-voidscarred"
 VOIDSCARRED_FELARCH_PROFILE_ID = f"{VOIDSCARRED_ID}:voidscarred-felarch"
+CORE_ENEMY_ID = "core-intercessor-like-infantry"
+PIRATICAL_TEST_DETACHMENT_ID = "aeldari-piratical-raiders-test"
 
 
 def _composition_source_row(fields: dict[str, str]) -> NormalizedSourceRow:
@@ -822,7 +835,7 @@ def test_piratical_raiders_uses_setup_decision_and_target_gated_weapon_grants() 
         stage=GameLifecycleStage.SETUP,
         setup_sequence=setup_sequence,
         battle_phase_sequence=tuple(descriptor.battle_phase_sequence.phases),
-        setup_step_index=setup_sequence.index(SetupStep.DECLARE_BATTLE_FORMATIONS),
+        setup_step_index=len(setup_sequence) - 1,
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         tactical_secondary_draw_count=2,
@@ -848,8 +861,8 @@ def test_piratical_raiders_uses_setup_decision_and_target_gated_weapon_grants() 
         for record in indexes["player-a"].all_records()
         if record.definition.name == "Piratical Raiders"
     )
-    request = CatalogTrackedTargetRuntime(indexes, armies).battle_formation_request(
-        BattleFormationRequestContext(state=setup_state, decisions=decisions, config=config)
+    request = CatalogTrackedTargetRuntime(indexes, armies).start_battle_request(
+        StartBattleRequestContext(state=setup_state, decisions=decisions, config=config)
     )
 
     assert request is not None
@@ -962,6 +975,206 @@ def test_piratical_raiders_uses_setup_decision_and_target_gated_weapon_grants() 
     assert expiration_decisions.queue.pending_requests == ()
 
 
+@pytest.fixture(scope="module")
+def pending_piratical_raiders_lifecycle_payload() -> dict[str, Any]:
+    lifecycle = GameLifecycle()
+    request = _advance_to_piratical_raiders_request(
+        lifecycle,
+        lifecycle.start(_piratical_raiders_config()),
+    )
+    assert request.decision_type == "select_tracked_target"
+    payload = cast(dict[str, Any], json.loads(json.dumps(lifecycle.to_payload())))
+    restored = GameLifecycle.from_payload(cast(Any, payload))
+    assert restored.to_payload() == lifecycle.to_payload()
+    return payload
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "source_rule_clause",
+        "source_unit_model",
+        "supported_attack_roll_pairs",
+        "owner_scope",
+        "legal_target_inventory",
+        "malformed_source_metadata",
+    ],
+)
+def test_piratical_raiders_rejects_authoritative_request_drift_without_mutation(
+    pending_piratical_raiders_lifecycle_payload: dict[str, Any],
+    mutation: str,
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(pending_piratical_raiders_lifecycle_payload)),
+    )
+    _mutate_piratical_raiders_pending_request(payload, mutation=mutation)
+    lifecycle = GameLifecycle.from_payload(cast(Any, payload))
+    request = lifecycle.decision_controller.queue.peek_next()
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=request.options[0].option_id,
+        result_id=f"result:piratical-raiders-authority:{mutation}",
+    ).to_result(request)
+    before = json.loads(json.dumps(lifecycle.to_payload()))
+    state = lifecycle.state
+    assert state is not None
+    before_record_count = len(lifecycle.decision_controller.records)
+    before_event_count = len(lifecycle.decision_controller.event_log.records)
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, Any], status.payload) == {
+        "invalid_reason": "invalid_tracked_target_result",
+        "field": "authoritative_request",
+        "detail": "Start-battle pending request drifted.",
+    }
+    assert lifecycle.to_payload() == before
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert len(lifecycle.decision_controller.event_log.records) == before_event_count
+    assert state.tracked_target_records == []
+
+
+def test_piratical_raiders_rejects_setup_boundary_drift_without_mutation(
+    pending_piratical_raiders_lifecycle_payload: dict[str, Any],
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(pending_piratical_raiders_lifecycle_payload)),
+    )
+    payload["state"]["setup_step_index"] -= 1
+    lifecycle = GameLifecycle.from_payload(cast(Any, payload))
+    request = lifecycle.decision_controller.queue.peek_next()
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=request.options[0].option_id,
+        result_id="result:piratical-raiders-setup-boundary-drift",
+    ).to_result(request)
+    before = json.loads(json.dumps(lifecycle.to_payload()))
+    state = lifecycle.state
+    assert state is not None
+    before_record_count = len(lifecycle.decision_controller.records)
+    before_event_count = len(lifecycle.decision_controller.event_log.records)
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, Any], status.payload)["invalid_reason"] == (
+        "invalid_tracked_target_result"
+    )
+    assert cast(dict[str, Any], status.payload)["field"] == "authoritative_request"
+    assert lifecycle.to_payload() == before
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert len(lifecycle.decision_controller.event_log.records) == before_event_count
+    assert state.tracked_target_records == []
+
+
+@pytest.mark.parametrize(
+    "drifted_decision_type",
+    ["select_secondary_missions", "select_deployment_unit"],
+)
+def test_piratical_raiders_rejects_decision_type_drift_before_dispatch(
+    pending_piratical_raiders_lifecycle_payload: dict[str, Any],
+    drifted_decision_type: str,
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(pending_piratical_raiders_lifecycle_payload)),
+    )
+    payload["decisions"]["queue"]["pending_requests"][0]["decision_type"] = drifted_decision_type
+    lifecycle = GameLifecycle.from_payload(cast(Any, payload))
+    request = lifecycle.decision_controller.queue.peek_next()
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=request.options[0].option_id,
+        result_id=f"result:piratical-raiders-decision-type-drift:{drifted_decision_type}",
+    ).to_result(request)
+    before = json.loads(json.dumps(lifecycle.to_payload()))
+    state = lifecycle.state
+    assert state is not None
+    before_record_count = len(lifecycle.decision_controller.records)
+    before_event_count = len(lifecycle.decision_controller.event_log.records)
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, Any], status.payload)["invalid_reason"] == (
+        "invalid_tracked_target_result"
+    )
+    assert cast(dict[str, Any], status.payload)["field"] == "authoritative_request"
+    assert lifecycle.to_payload() == before
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert len(lifecycle.decision_controller.event_log.records) == before_event_count
+    assert state.tracked_target_records == []
+
+
+def test_final_setup_prebattle_request_is_not_misclassified_as_start_battle() -> None:
+    lifecycle = GameLifecycle()
+    request = _advance_to_piratical_prebattle_request(
+        lifecycle,
+        lifecycle.start(_piratical_raiders_config()),
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.setup_step_index is not None
+    assert state.setup_step_index + 1 == len(state.setup_sequence)
+    restored = GameLifecycle.from_payload(json.loads(json.dumps(lifecycle.to_payload())))
+    restored_request = restored.decision_controller.queue.peek_next()
+    complete_option = next(
+        option
+        for option in restored_request.options
+        if option.option_id == "complete_prebattle_actions"
+    )
+
+    status = restored.submit_decision(
+        FiniteOptionSubmission(
+            request_id=restored_request.request_id,
+            selected_option_id=complete_option.option_id,
+            result_id="result:complete-authoritative-final-prebattle",
+        ).to_result(restored_request)
+    )
+
+    assert request.decision_type == "select_prebattle_action"
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "select_tracked_target"
+
+
+def test_piratical_raiders_accepts_unchanged_round_tripped_authoritative_request(
+    pending_piratical_raiders_lifecycle_payload: dict[str, Any],
+) -> None:
+    lifecycle = GameLifecycle.from_payload(
+        json.loads(json.dumps(pending_piratical_raiders_lifecycle_payload))
+    )
+    request = lifecycle.decision_controller.queue.peek_next()
+    selected_target_id = request.options[0].option_id
+    before_record_count = len(lifecycle.decision_controller.records)
+    before_event_count = len(lifecycle.decision_controller.event_log.records)
+
+    status = lifecycle.submit_decision(
+        FiniteOptionSubmission(
+            request_id=request.request_id,
+            selected_option_id=selected_target_id,
+            result_id="result:piratical-raiders-authoritative",
+        ).to_result(request)
+    )
+
+    state = lifecycle.state
+    assert state is not None
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert len(lifecycle.decision_controller.records) == before_record_count + 1
+    assert len(lifecycle.decision_controller.event_log.records) > before_event_count
+    assert len(state.tracked_target_records) == 1
+    assert state.tracked_target_records[0].target_unit_instance_id == selected_target_id
+    assert any(
+        event.event_type == "tracked_target_selected"
+        for event in lifecycle.decision_controller.event_log.records[before_event_count:]
+    )
+
+
 def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> None:
     package = _ability_support_catalog_package()
     catalog = package.army_catalog
@@ -1040,7 +1253,7 @@ def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> No
         stage=GameLifecycleStage.SETUP,
         setup_sequence=setup_sequence,
         battle_phase_sequence=tuple(descriptor.battle_phase_sequence.phases),
-        setup_step_index=setup_sequence.index(SetupStep.DECLARE_BATTLE_FORMATIONS),
+        setup_step_index=len(setup_sequence) - 1,
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         tactical_secondary_draw_count=2,
@@ -1061,8 +1274,8 @@ def test_piratical_raiders_uses_canonical_attached_rules_unit_identities() -> No
         allow_legacy_non_strict_rosters=True,
     )
     decisions = DecisionController()
-    request = CatalogTrackedTargetRuntime(indexes, armies).battle_formation_request(
-        BattleFormationRequestContext(state=setup_state, decisions=decisions, config=config)
+    request = CatalogTrackedTargetRuntime(indexes, armies).start_battle_request(
+        StartBattleRequestContext(state=setup_state, decisions=decisions, config=config)
     )
 
     assert request is not None
@@ -1519,6 +1732,274 @@ def _muster_request(
         force_disposition_id="purge-the-foe",
         unit_selections=(selection,),
     )
+
+
+def _piratical_raiders_config() -> GameConfig:
+    catalog = _piratical_raiders_lifecycle_catalog()
+    voidscarred_selection = _voidscarred_selection(regular_count=4, optional_count=0)
+    support_selection = _voidreavers_selection(unit_selection_id="voidreavers-support")
+    enemy_datasheet = catalog.datasheet_by_id(CORE_ENEMY_ID)
+    enemy_profile_id = enemy_datasheet.model_profiles[0].model_profile_id
+    enemy_selections = tuple(
+        UnitMusterSelection(
+            unit_selection_id=f"enemy-infantry-{ordinal}",
+            datasheet_id=CORE_ENEMY_ID,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    enemy_profile_id,
+                    enemy_datasheet.composition[0].min_models,
+                ),
+            ),
+        )
+        for ordinal in (1, 2)
+    )
+    return GameConfig(
+        game_id="aeldari-piratical-raiders-lifecycle",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="core-v2-aeldari-piratical-raiders-test"
+        ),
+        army_catalog=catalog,
+        army_muster_requests=(
+            ArmyMusterRequest(
+                army_id="army-a",
+                player_id="player-a",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="AE",
+                    detachment_ids=(PIRATICAL_TEST_DETACHMENT_ID,),
+                ),
+                force_disposition_id="purge-the-foe",
+                unit_selections=(voidscarred_selection, support_selection),
+            ),
+            ArmyMusterRequest(
+                army_id="army-b",
+                player_id="player-b",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="core-marine-force",
+                    detachment_ids=("core-combined-arms",),
+                ),
+                force_disposition_id="purge-the-foe",
+                unit_selections=enemy_selections,
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down"),
+        mission_setup=MissionSetup.from_mission_pack(
+            mission_pack=chapter_approved_2026_27_mission_pack(),
+            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+            attacker_player_id="player-a",
+            defender_player_id="player-b",
+        ),
+    )
+
+
+@cache
+def _piratical_raiders_lifecycle_catalog() -> ArmyCatalog:
+    generated = _ability_support_catalog_package().army_catalog
+    base = ArmyCatalog.phase9a_canonical_content_pack()
+    datasheets = tuple(
+        generated.datasheet_by_id(datasheet_id) for datasheet_id in (VOIDREAVERS_ID, VOIDSCARRED_ID)
+    )
+    linked_wargear_ids = {
+        wargear_id
+        for datasheet in datasheets
+        for option in datasheet.wargear_options
+        for wargear_id in (*option.default_wargear_ids, *option.allowed_wargear_ids)
+    }
+    linked_wargear = tuple(
+        wargear for wargear in generated.wargear if wargear.wargear_id in linked_wargear_ids
+    )
+    return ArmyCatalog(
+        catalog_id="aeldari-piratical-raiders-lifecycle-test",
+        ruleset_id=base.ruleset_id,
+        source_package_id="data-package:core-v2:aeldari-piratical-raiders-test",
+        datasheets=(*base.datasheets, *datasheets),
+        wargear=(*base.wargear, *linked_wargear),
+        factions=(
+            *base.factions,
+            FactionDefinition(
+                faction_id="AE",
+                name="Aeldari",
+                faction_keywords=("ASURYANI",),
+                source_ids=("source:aeldari-piratical-raiders-test",),
+            ),
+        ),
+        army_rules=base.army_rules,
+        detachments=(
+            *base.detachments,
+            DetachmentDefinition(
+                detachment_id=PIRATICAL_TEST_DETACHMENT_ID,
+                name="Piratical Raiders Test",
+                faction_id="AE",
+                detachment_point_cost=1,
+                unit_datasheet_ids=(VOIDREAVERS_ID, VOIDSCARRED_ID),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("source:aeldari-piratical-raiders-test",),
+            ),
+        ),
+        enhancements=base.enhancements,
+        stratagems=base.stratagems,
+        source_ids=(generated.source_package_id,),
+    )
+
+
+def _advance_to_piratical_raiders_request(lifecycle: GameLifecycle, status: Any) -> Any:
+    return _advance_to_piratical_setup_request(
+        lifecycle,
+        status,
+        expected_decision_type="select_tracked_target",
+    )
+
+
+def _advance_to_piratical_prebattle_request(lifecycle: GameLifecycle, status: Any) -> Any:
+    return _advance_to_piratical_setup_request(
+        lifecycle,
+        status,
+        expected_decision_type="select_prebattle_action",
+    )
+
+
+def _advance_to_piratical_setup_request(
+    lifecycle: GameLifecycle,
+    status: Any,
+    *,
+    expected_decision_type: str,
+) -> Any:
+    while True:
+        request = status.decision_request
+        if request is not None:
+            if request.decision_type == expected_decision_type:
+                return request
+            if request.decision_type == "select_secondary_missions":
+                status = lifecycle.submit_decision(
+                    DecisionResult.for_request(
+                        result_id=f"result:{request.actor_id}:fixed-secondaries",
+                        request=request,
+                        selected_option_id="fixed:assassination:bring_it_down",
+                    )
+                )
+                continue
+            if request.decision_type in {
+                "select_deployment_unit",
+                "submit_deployment_placement",
+            }:
+                status = submit_all_deployments_if_pending(
+                    lifecycle,
+                    status,
+                    result_id_prefix="aeldari-piratical-raiders-deployment",
+                    pose_factory=_piratical_raiders_deployment_pose,
+                )
+                continue
+            if request.decision_type == "select_prebattle_action":
+                status = lifecycle.submit_decision(
+                    DecisionResult.for_request(
+                        result_id=f"result:{request.actor_id}:complete-prebattle",
+                        request=request,
+                        selected_option_id="complete_prebattle_actions",
+                    )
+                )
+                continue
+            raise AssertionError(f"Unexpected setup decision: {request.decision_type}")
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status.payload
+        status = lifecycle.advance_until_decision_or_terminal()
+
+
+def _piratical_raiders_deployment_pose(
+    index: int,
+    player_id: str,
+    model_instance_id: str,
+) -> Pose:
+    row = index // 3
+    column = index % 3
+    base_y = (
+        3.0
+        if ("voidscarred" in model_instance_id or "enemy-infantry-1" in model_instance_id)
+        else 13.5
+    )
+    if player_id == "player-b":
+        return Pose.at(
+            57.0 - (row * 1.8),
+            base_y + (column * 1.8),
+            0.0,
+            facing_degrees=180.0,
+        )
+    return Pose.at(
+        3.0 + (row * 1.8),
+        base_y + (column * 1.8),
+        0.0,
+        facing_degrees=0.0,
+    )
+
+
+def _mutate_piratical_raiders_pending_request(
+    payload: dict[str, Any],
+    *,
+    mutation: str,
+) -> None:
+    request = payload["decisions"]["queue"]["pending_requests"][0]
+    request_payload = request["payload"]
+    options = request["options"]
+
+    def update_common(key: str, value: Any) -> None:
+        request_payload[key] = value
+        for option in options:
+            option["payload"][key] = value
+
+    if mutation == "source_rule_clause":
+        update_common("source_rule_id", "source:piratical-raiders:drift")
+        update_common("source_clause_id", "source:piratical-raiders:clause:drift")
+    elif mutation == "source_unit_model":
+        state = GameState.from_payload(payload["state"])
+        source_army = next(army for army in state.army_definitions if army.player_id == "player-a")
+        support_unit = next(
+            unit for unit in source_army.units if unit.datasheet_id == VOIDREAVERS_ID
+        )
+        update_common("source_unit_instance_id", support_unit.unit_instance_id)
+        update_common("source_model_instance_id", support_unit.own_models[0].model_instance_id)
+        update_common("owner_scope", "this_model")
+    elif mutation == "supported_attack_roll_pairs":
+        update_common(
+            "supported_attack_roll_pairs",
+            [
+                {"attack_kind": "melee", "roll_type": "attack_sequence.hit"},
+                {"attack_kind": "melee", "roll_type": "attack_sequence.wound"},
+                {"attack_kind": "ranged", "roll_type": "attack_sequence.hit"},
+                {"attack_kind": "ranged", "roll_type": "attack_sequence.wound"},
+            ],
+        )
+        update_common(
+            "supported_roll_types",
+            ["attack_sequence.hit", "attack_sequence.wound"],
+        )
+    elif mutation == "owner_scope":
+        state = GameState.from_payload(payload["state"])
+        source_army = next(army for army in state.army_definitions if army.player_id == "player-a")
+        source_unit = next(
+            unit for unit in source_army.units if unit.datasheet_id == VOIDSCARRED_ID
+        )
+        update_common("owner_scope", "this_model")
+        update_common("source_model_instance_id", source_unit.own_models[0].model_instance_id)
+    elif mutation == "legal_target_inventory":
+        options.pop()
+        legal_target_ids = [option["option_id"] for option in options]
+        update_common("legal_target_unit_ids", legal_target_ids)
+    elif mutation == "malformed_source_metadata":
+        update_common("source_rule_id", {"malformed": True})
+        update_common("source_ability_id", None)
+        update_common("source_clause_id", ["malformed"])
+        update_common("source_effect_index", "malformed")
+        update_common("source_unit_instance_id", 999)
+        update_common("source_model_instance_id", {"malformed": True})
+    else:
+        raise AssertionError(f"Unhandled mutation: {mutation}")
 
 
 def _battle_state(armies: tuple[ArmyDefinition, ...]) -> GameState:

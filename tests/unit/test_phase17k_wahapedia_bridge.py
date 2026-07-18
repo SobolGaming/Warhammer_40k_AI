@@ -6807,7 +6807,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         "| Craftworlds / Asuryani | Rangers (`000000592`)<br>"
         "Shroud Runners (`000002533`)<br>Vypers (`000000605`)<br>"
-        "Wraithblades (`000000598`)<br>Wraithguard (`000000597`) | Crimson Hunter"
+        "War Walkers (`000000612`)<br>Wraithblades (`000000598`)<br>"
+        "Wraithguard (`000000597`)<br>Wraithlord (`000000613`) | Crimson Hunter"
     ) in aeldari_markdown
     assert "Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)" in aeldari_markdown
     assert "Eldrad Ulthran (`000000568`)<br>Falcon (`000000609`)" in aeldari_markdown

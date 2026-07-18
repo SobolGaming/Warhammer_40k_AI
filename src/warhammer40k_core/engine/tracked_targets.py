@@ -13,7 +13,6 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
-    SetupStep,
 )
 from warhammer40k_core.engine.source_backed_rerolls import SourceBackedRerollPermissionContext
 
@@ -262,6 +261,7 @@ class TrackedTargetRecord:
 def build_select_tracked_target_request(
     *,
     state: GameState,
+    request_id: str | None = None,
     actor_player_id: str,
     source_rule_id: str,
     source_ability_id: str,
@@ -358,7 +358,7 @@ def build_select_tracked_target_request(
         }
     )
     return DecisionRequest(
-        request_id=state.next_decision_request_id(),
+        request_id=(state.next_decision_request_id() if request_id is None else request_id),
         decision_type=SELECT_TRACKED_TARGET_DECISION_TYPE,
         actor_id=player_id,
         payload=common_payload,
@@ -498,7 +498,8 @@ def _tracked_target_selection_battle_round(state: GameState) -> int:
         return state.battle_round
     if (
         state.stage is GameLifecycleStage.SETUP
-        and state.current_setup_step is SetupStep.DECLARE_BATTLE_FORMATIONS
+        and state.setup_step_index is not None
+        and state.setup_step_index + 1 == len(state.setup_sequence)
     ):
         return 1
     raise GameLifecycleError("Tracked target selection requires battle round context.")
@@ -517,6 +518,7 @@ def invalid_select_tracked_target_status(
     if type(request) is not DecisionRequest or type(result) is not DecisionResult:
         raise GameLifecycleError("Tracked target invalid status requires request/result.")
     try:
+        _tracked_target_selection_battle_round(state)
         result.validate_for_request(request)
         request_payload = _payload_object(request.payload)
         result_payload = _payload_object(result.payload)

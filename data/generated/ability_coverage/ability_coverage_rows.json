@@ -222,6 +222,131 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008344",
+    "ability_name": "Scouts",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000612/core/000008344/none",
+    "datasheet_id": "000000612",
+    "datasheet_name": "War Walkers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:scouts"
+    ],
+    "semantic_categories": [
+      "core.scouts"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000612:crystalline-targeting",
+    "ability_name": "Crystalline Targeting",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000612/datasheet/000000612:crystalline-targeting/none",
+    "datasheet_id": "000000612",
+    "datasheet_name": "War Walkers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-effect"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.friendly_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000612/faction/000009894/none",
+    "datasheet_id": "000000612",
+    "datasheet_name": "War Walkers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000613/core/000008339/none",
+    "datasheet_id": "000000613",
+    "datasheet_name": "Wraithlord",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000613:fated-hero",
+    "ability_name": "Fated Hero",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:fated-hero/none",
+    "datasheet_id": "000000613",
+    "datasheet_name": "Wraithlord",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-reroll",
+      "catalog-ir:start-battle-keyword-choice",
+      "catalog-ir:wound-roll-reroll"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.reroll_permission.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000613:psychic-guidance",
+    "ability_name": "Psychic Guidance",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:psychic-guidance/none",
+    "datasheet_id": "000000613",
+    "datasheet_name": "Wraithlord",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:ballistic-skill-characteristic-modifier",
+      "catalog-ir:leadership-characteristic-query",
+      "catalog-ir:weapon-skill-characteristic-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.characteristic_set.leadership.this_model",
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008339",
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",

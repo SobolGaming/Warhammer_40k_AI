@@ -221,6 +221,8 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("aeldari", "000000592", "Playable"),
         ("aeldari", "000000598", "Playable"),
         ("aeldari", "000000605", "Playable"),
+        ("aeldari", "000000612", "Playable"),
+        ("aeldari", "000000613", "Playable"),
         ("aeldari", "000002531", "Playable"),
         ("aeldari", "000002532", "Playable"),
         ("aeldari", "000002533", "Playable"),
@@ -328,9 +330,9 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 11,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 13,
         SEMANTIC_BUCKET_HOST_NEEDED: 5,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 54,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 52,
     }
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED

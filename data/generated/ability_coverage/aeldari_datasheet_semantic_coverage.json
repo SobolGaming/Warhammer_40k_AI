@@ -1922,28 +1922,36 @@
         {
           "ability_id": "000000612:crystalline-targeting",
           "ability_name": "Crystalline Targeting",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "2ae2949671cf7b853c5cf7786affa9cddf32c1a31c18efaf7909be023a69b89f",
           "raw_text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks. Until the end of the phase, each time a friendly AELDARI unit makes an attack that targets that enemy unit, improve the Armour Penetration characteristic of that attack by 1. Each unit can only be selected for this ability once per turn.",
           "raw_text_sha256": "2ae2949671cf7b853c5cf7786affa9cddf32c1a31c18efaf7909be023a69b89f",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-effect"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:post-shoot-hit-target-effect"
+              ],
+              "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000612:3:clause:002:effect:0",
+              "semantic_kind": "modify_characteristic"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000612:3"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000612:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000612",
       "datasheet_name": "War Walkers",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -1951,15 +1959,14 @@
         {
           "ability_id": "000000613:fated-hero",
           "ability_name": "Fated Hero",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "6b9ca020806a9dd8524e29e5e2797480bd90c7d6bad50c4699202009aab0917f",
           "raw_text": "At the start of the battle, select one of the following keywords: INFANTRY; MONSTER; MOUNTED; VEHICLE. Each time this model makes an attack that targets a unit with the selected keyword, re-roll a Hit roll of 1 and re-roll a Wound roll of 1.",
           "raw_text_sha256": "6b9ca020806a9dd8524e29e5e2797480bd90c7d6bad50c4699202009aab0917f",
           "runtime_consumer_ids": [
             "catalog-ir:hit-roll-reroll",
+            "catalog-ir:start-battle-keyword-choice",
             "catalog-ir:wound-roll-reroll"
           ],
           "semantic_consumers": [
@@ -1967,14 +1974,14 @@
               "runtime_consumer_ids": [
                 "catalog-ir:hit-roll-reroll"
               ],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000613:2:description:clause:005:effect:0",
+              "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:2:clause:001:effect:0",
               "semantic_kind": "reroll_permission"
             },
             {
               "runtime_consumer_ids": [
                 "catalog-ir:wound-roll-reroll"
               ],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000613:2:description:clause:005:effect:1",
+              "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:2:clause:001:effect:1",
               "semantic_kind": "reroll_permission"
             }
           ],
@@ -1983,23 +1990,41 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000613:2",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000613:psychic-guidance",
           "ability_name": "Psychic Guidance",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "a7b5a2feb92f0b0f759d3b1dd55709b9413bd9fc916dc4a483be785a10ed4290",
           "raw_text": "While this model is within 12\" of one or more friendly Aeldari Psyker models, improve the Ballistic Skill and Weapon Skill characteristics of weapons equipped by this model by 1 and it has a Leadership characteristic of 6+.",
           "raw_text_sha256": "a7b5a2feb92f0b0f759d3b1dd55709b9413bd9fc916dc4a483be785a10ed4290",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:ballistic-skill-characteristic-modifier",
+            "catalog-ir:leadership-characteristic-query",
+            "catalog-ir:weapon-skill-characteristic-modifier"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000613:3:description:clause:001:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:ballistic-skill-characteristic-modifier"
+              ],
+              "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:3:clause:001:effect:0",
+              "semantic_kind": "modify_characteristic"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:weapon-skill-characteristic-modifier"
+              ],
+              "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:3:clause:001:effect:1",
+              "semantic_kind": "modify_characteristic"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:leadership-characteristic-query"
+              ],
+              "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:3:clause:001:effect:2",
               "semantic_kind": "set_characteristic"
             }
           ],
@@ -2008,14 +2033,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000613:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000613",
       "datasheet_name": "Wraithlord",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -4136,9 +4161,9 @@
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 11,
+    "All exact abilities consumed": 13,
     "Exact IR parsed; host needed": 5,
-    "Exact ability IR unsupported": 54
+    "Exact ability IR unsupported": 52
   },
   "source_artifact_hashes": {
     "Abilities": "dd7d779531e88bd2c30ee2405275b41dba0e5d56007c43a7fcf8bb7c105032e0",

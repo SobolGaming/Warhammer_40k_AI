@@ -16,6 +16,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_shroud_runners_wraithblades_2026_06 as aeldari_shroud_wraith_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_war_walkers_wraithlord_2026_06 as aeldari_war_walkers_wraithlord_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_yriel_vypers_starfangs_2026_06 as aeldari_yriel_vypers_starfangs_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -39,6 +42,9 @@ def datasheet_rule_ir_payload_by_source_row_id(source_row_id: str) -> RuleIRPayl
             ),
             aeldari_kharseth_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
             aeldari_shroud_wraith_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
+            aeldari_war_walkers_wraithlord_source.datasheet_rule_ir_payload_by_source_row_id(
+                source_row_id
+            ),
             aeldari_yriel_vypers_starfangs_source.datasheet_rule_ir_payload_by_source_row_id(
                 source_row_id
             ),

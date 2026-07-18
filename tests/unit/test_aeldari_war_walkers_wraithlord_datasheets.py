@@ -1,0 +1,1759 @@
+from __future__ import annotations
+
+import json
+from dataclasses import replace
+from functools import cache
+from typing import Any, cast
+
+import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tools.generate_ability_support_matrix import (
+    _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
+)
+from tools.generate_aeldari_war_walkers_wraithlord_rule_ir import (
+    CRYSTALLINE_TARGETING_ROW_ID,
+    FATED_HERO_ROW_ID,
+    OUTPUT_PATH,
+    PSYCHIC_GUIDANCE_ROW_ID,
+    generated_artifact_payload,
+)
+
+from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    BattlePhaseSequenceDescriptor,
+    RulesetDescriptor,
+)
+from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
+from warhammer40k_core.engine.ability_catalog import (
+    build_player_ability_index,
+    catalog_ability_records_from_catalog,
+)
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusterRequest,
+)
+from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedContext,
+)
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+    CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+    catalog_rule_ir_consumers_for_rule,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects import (
+    CatalogSelectedTargetEffectRuntime,
+    apply_catalog_post_shoot_hit_target_effect_result,
+)
+from warhammer40k_core.engine.catalog_start_battle_keyword_choice import (
+    CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID,
+    CATALOG_START_BATTLE_KEYWORD_SELECTED_EVENT,
+    CatalogStartBattleKeywordChoiceRuntime,
+)
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import PersistingEffect
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    GameStatePayload,
+)
+from warhammer40k_core.engine.generic_rule_attack_hooks import (
+    generic_rule_reroll_permission_context_for_unit,
+)
+from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.list_validation import (
+    DetachmentSelection,
+    UnitMusterSelection,
+    resolve_wargear_selections,
+)
+from warhammer40k_core.engine.list_validation_errors import ListValidationError
+from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+    SetupStep,
+)
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    UnitCharacteristicModifierContext,
+    WeaponProfileModifierContext,
+)
+from warhammer40k_core.engine.shooting_types import ShootingType
+from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearBearerAssignment,
+    WargearSelection,
+)
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.rule_ir import (
+    RuleConditionKind,
+    RuleDurationKind,
+    RuleEffectKind,
+    RuleIR,
+    RuleTargetKind,
+    RuleTriggerKind,
+    parameter_payload,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_war_walkers_wraithlord_2026_06 as source_package,
+)
+from warhammer40k_core.rules.wahapedia_bridge_defaults import (
+    AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES,
+)
+
+WAR_WALKERS_ID = "000000612"
+WRAITHLORD_ID = "000000613"
+KHARSETH_ID = "000004194"
+CORE_ENEMY_ID = "core-intercessor-like-infantry"
+TEST_DETACHMENT_ID = "aeldari-war-walkers-wraithlord-test"
+
+
+@cache
+def _package() -> CanonicalCatalogPackage:
+    return _ability_support_catalog_package()
+
+
+def test_generated_rule_ir_artifact_is_current_source_bound_and_fail_fast() -> None:
+    committed = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+
+    assert committed == generated_artifact_payload()
+    assert source_package.supported_datasheet_source_row_ids() == (
+        CRYSTALLINE_TARGETING_ROW_ID,
+        FATED_HERO_ROW_ID,
+        PSYCHIC_GUIDANCE_ROW_ID,
+    )
+    assert committed["package_hash"] == source_package.PACKAGE_HASH
+
+    committed["package_hash"] = "0" * 64
+    with pytest.raises(
+        source_package.AeldariWarWalkersWraithlordRuleIrArtifactError,
+        match="hash is stale",
+    ):
+        source_package.validate_generated_artifact_bytes(json.dumps(committed).encode())
+
+
+def test_exact_rules_have_source_linked_generic_consumers() -> None:
+    crystalline = _rule_ir(CRYSTALLINE_TARGETING_ROW_ID)
+    fated = _rule_ir(FATED_HERO_ROW_ID)
+    psychic = _rule_ir(PSYCHIC_GUIDANCE_ROW_ID)
+
+    assert catalog_rule_ir_consumers_for_rule(crystalline) == (
+        "catalog-ir:post-shoot-hit-target-effect",
+    )
+    assert catalog_rule_ir_consumers_for_rule(fated) == (
+        CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID,
+        CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_consumers_for_rule(psychic) == (
+        "catalog-ir:ballistic-skill-characteristic-modifier",
+        "catalog-ir:leadership-characteristic-query",
+        "catalog-ir:weapon-skill-characteristic-modifier",
+    )
+
+    selection, effect = crystalline.clauses
+    assert selection.trigger is not None
+    assert selection.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert selection.target is not None
+    assert selection.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert len(selection.conditions) == 1
+    assert selection.conditions[0].kind is RuleConditionKind.FREQUENCY_LIMIT
+    assert parameter_payload(selection.conditions[0].parameters) == {
+        "maximum_uses": 1,
+        "scope": "turn",
+        "subject": "selected_target_unit",
+    }
+    assert effect.target is not None
+    assert effect.target.kind is RuleTargetKind.FRIENDLY_UNIT
+    assert parameter_payload(effect.target.parameters) == {
+        "allegiance": "friendly",
+        "required_keyword": "AELDARI",
+    }
+    assert effect.conditions[0].kind is RuleConditionKind.TARGET_CONSTRAINT
+    assert parameter_payload(effect.effects[0].parameters) == {
+        "attack_role": "attacker",
+        "characteristic": Characteristic.ARMOR_PENETRATION.value,
+        "delta": -1,
+    }
+    assert effect.duration is not None
+    assert effect.duration.kind is RuleDurationKind.UNTIL_TIMING_ENDPOINT
+
+    fated_clause = fated.clauses[0]
+    assert fated_clause.trigger is not None
+    assert parameter_payload(fated_clause.trigger.parameters)["keyword_options"] == (
+        "INFANTRY",
+        "MONSTER",
+        "MOUNTED",
+        "VEHICLE",
+    )
+    assert tuple(effect.kind for effect in fated_clause.effects) == (
+        RuleEffectKind.REROLL_PERMISSION,
+        RuleEffectKind.REROLL_PERMISSION,
+    )
+    assert fated_clause.duration is not None
+    assert fated_clause.duration.kind is RuleDurationKind.PERMANENT
+
+
+def test_catalog_preserves_stats_geometry_abilities_and_wargear() -> None:
+    catalog = _package().army_catalog
+    walkers = catalog.datasheet_by_id(WAR_WALKERS_ID)
+    wraithlord = catalog.datasheet_by_id(WRAITHLORD_ID)
+
+    assert _characteristics(walkers) == (10, 7, 3, 6, 7, 2, 5)
+    assert walkers.model_profiles[0].base_size.diameter_mm == 60.0
+    assert walkers.keywords.keywords == ("AELDARI", "VEHICLE", "WALKER", "WAR WALKERS")
+    assert (walkers.composition[0].min_models, walkers.composition[0].max_models) == (1, 2)
+    assert {ability.name for ability in walkers.abilities} == {
+        "Battle Focus",
+        "Crystalline Targeting",
+        "Scouts",
+    }
+    assert _weapon_names(WAR_WALKERS_ID) == {
+        "Bright lance",
+        "Missile launcher - starshot",
+        "Missile launcher - sunburst",
+        "Scatter laser",
+        "Shuriken cannon",
+        "Starcannon",
+        "War Walker feet",
+    }
+
+    assert _characteristics(wraithlord) == (8, 10, 2, 10, 8, 3, 0)
+    assert wraithlord.model_profiles[0].base_size.diameter_mm == 60.0
+    assert wraithlord.keywords.keywords == (
+        "AELDARI",
+        "MONSTER",
+        "WALKER",
+        "WRAITH CONSTRUCT",
+        "WRAITHLORD",
+    )
+    assert (wraithlord.composition[0].min_models, wraithlord.composition[0].max_models) == (1, 1)
+    assert {ability.name for ability in wraithlord.abilities} == {
+        "Deadly Demise",
+        "Fated Hero",
+        "Psychic Guidance",
+    }
+    assert _weapon_names(WRAITHLORD_ID) == {
+        "Bright lance",
+        "Flamer",
+        "Ghostglaive - strike",
+        "Ghostglaive - sweep",
+        "Missile launcher - starshot",
+        "Missile launcher - sunburst",
+        "Scatter laser",
+        "Shuriken cannon",
+        "Shuriken catapult",
+        "Starcannon",
+        "Wraithbone fists",
+    }
+    assert {
+        (row.datasheet_id, row.model_name, row.height)
+        for row in AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES
+    } == {
+        (WAR_WALKERS_ID, "War Walkers", 3.25),
+        (WRAITHLORD_ID, "Wraithlord", 4.75),
+    }
+
+
+@pytest.mark.parametrize(
+    ("selection_specs", "expected_weapon_counts"),
+    [
+        (
+            (("bright-lance", 2, ((1, 1), (2, 1))),),
+            ((1, 0), (1, 0)),
+        ),
+        (
+            (("bright-lance", 2, ((1, 2),)),),
+            ((2, 0), (0, 0)),
+        ),
+        (
+            (
+                ("bright-lance", 1, ((1, 1),)),
+                ("starcannon", 1, ((1, 1),)),
+            ),
+            ((1, 1), (0, 0)),
+        ),
+        (
+            (
+                ("bright-lance", 1, ((1, 1),)),
+                ("starcannon", 1, ((2, 1),)),
+            ),
+            ((1, 0), (0, 1)),
+        ),
+    ],
+)
+def test_war_walker_wargear_assignments_are_explicit_and_survive_model_loss(
+    selection_specs: tuple[tuple[str, int, tuple[tuple[int, int], ...]], ...],
+    expected_weapon_counts: tuple[tuple[int, int], tuple[int, int]],
+) -> None:
+    package = _package()
+    factory = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    )
+    walkers_datasheet = package.army_catalog.datasheet_by_id(WAR_WALKERS_ID)
+    walkers_profile_id = walkers_datasheet.model_profiles[0].model_profile_id
+    walkers = factory.instantiate_unit(
+        army_id="army-wargear",
+        datasheet=walkers_datasheet,
+        selection=UnitMusterSelection(
+            unit_selection_id="walkers-bright-lances",
+            datasheet_id=WAR_WALKERS_ID,
+            model_profile_selections=(ModelProfileSelection(walkers_profile_id, 2),),
+            wargear_selections=tuple(
+                WargearSelection(
+                    option_id=(f"{WAR_WALKERS_ID}:shuriken-cannon-{weapon_name}:option-1"),
+                    model_profile_id=walkers_profile_id,
+                    wargear_ids=(f"{WAR_WALKERS_ID}:{weapon_name}",),
+                    selection_count=selection_count,
+                    bearer_assignments=tuple(
+                        WargearBearerAssignment(
+                            wargear_id=f"{WAR_WALKERS_ID}:{weapon_name}",
+                            model_ordinal=model_ordinal,
+                            selection_count=bearer_count,
+                        )
+                        for model_ordinal, bearer_count in assignments
+                    ),
+                )
+                for weapon_name, selection_count, assignments in selection_specs
+            ),
+        ),
+    )
+    restored = UnitInstance.from_payload(json.loads(json.dumps(walkers.to_payload())))
+    assert restored.to_payload() == walkers.to_payload()
+    for model, (bright_count, star_count) in zip(
+        restored.own_models,
+        expected_weapon_counts,
+        strict=True,
+    ):
+        assert model.wargear_ids.count(f"{WAR_WALKERS_ID}:bright-lance") == bright_count
+        assert model.wargear_ids.count(f"{WAR_WALKERS_ID}:starcannon") == star_count
+        assert model.wargear_ids.count(f"{WAR_WALKERS_ID}:shuriken-cannon") == (
+            2 - bright_count - star_count
+        )
+    for destroyed_ordinal in (1, 2):
+        damaged = replace(
+            restored,
+            own_models=tuple(
+                replace(model, wounds_remaining=0) if ordinal == destroyed_ordinal else model
+                for ordinal, model in enumerate(restored.own_models, start=1)
+            ),
+        )
+        surviving_model = damaged.alive_own_models()[0]
+        expected_bright, expected_star = expected_weapon_counts[2 - destroyed_ordinal]
+        assert (
+            surviving_model.wargear_ids.count(f"{WAR_WALKERS_ID}:bright-lance") == expected_bright
+        )
+        assert surviving_model.wargear_ids.count(f"{WAR_WALKERS_ID}:starcannon") == expected_star
+
+
+def test_wraithlord_repeated_defaults_and_all_source_options_resolve_per_model() -> None:
+    package = _package()
+    factory = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    )
+
+    wraithlord_datasheet = package.army_catalog.datasheet_by_id(WRAITHLORD_ID)
+    wraithlord_profile_id = wraithlord_datasheet.model_profiles[0].model_profile_id
+    wraithlord = factory.instantiate_unit(
+        army_id="army-wargear",
+        datasheet=wraithlord_datasheet,
+        selection=UnitMusterSelection(
+            unit_selection_id="wraithlord-options",
+            datasheet_id=WRAITHLORD_ID,
+            model_profile_selections=(ModelProfileSelection(wraithlord_profile_id, 1),),
+            wargear_selections=(
+                WargearSelection(
+                    option_id=(f"{WRAITHLORD_ID}:shuriken-catapults-flamer:option-1"),
+                    model_profile_id=wraithlord_profile_id,
+                    wargear_ids=(f"{WRAITHLORD_ID}:flamer",),
+                    selection_count=2,
+                    bearer_assignments=(
+                        WargearBearerAssignment(
+                            wargear_id=f"{WRAITHLORD_ID}:flamer",
+                            model_ordinal=1,
+                            selection_count=2,
+                        ),
+                    ),
+                ),
+                WargearSelection(
+                    option_id=f"{WRAITHLORD_ID}:ghostglaive:option-2",
+                    model_profile_id=wraithlord_profile_id,
+                    wargear_ids=(f"{WRAITHLORD_ID}:ghostglaive",),
+                ),
+                WargearSelection(
+                    option_id=f"{WRAITHLORD_ID}:additive-choice:option-3",
+                    model_profile_id=wraithlord_profile_id,
+                    wargear_ids=(
+                        f"{WRAITHLORD_ID}:bright-lance",
+                        f"{WRAITHLORD_ID}:starcannon",
+                    ),
+                    bearer_assignments=(
+                        WargearBearerAssignment(
+                            wargear_id=f"{WRAITHLORD_ID}:bright-lance",
+                            model_ordinal=1,
+                            selection_count=1,
+                        ),
+                        WargearBearerAssignment(
+                            wargear_id=f"{WRAITHLORD_ID}:starcannon",
+                            model_ordinal=1,
+                            selection_count=1,
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+    equipped = wraithlord.own_models[0].wargear_ids
+    assert equipped.count(f"{WRAITHLORD_ID}:flamer") == 2
+    assert f"{WRAITHLORD_ID}:shuriken-catapult" not in equipped
+    assert {
+        f"{WRAITHLORD_ID}:ghostglaive",
+        f"{WRAITHLORD_ID}:bright-lance",
+        f"{WRAITHLORD_ID}:starcannon",
+    }.issubset(equipped)
+
+
+def test_wraithlord_additive_multiplicity_round_trips_per_wargear_choice() -> None:
+    package = _package()
+    datasheet = package.army_catalog.datasheet_by_id(WRAITHLORD_ID)
+    profile_id = datasheet.model_profiles[0].model_profile_id
+    bright_lance = f"{WRAITHLORD_ID}:bright-lance"
+    mixed = _wraithlord_additive_selection((bright_lance, f"{WRAITHLORD_ID}:starcannon"))
+    muster_selection = UnitMusterSelection(
+        unit_selection_id="wraithlord-mixed-additive",
+        datasheet_id=WRAITHLORD_ID,
+        model_profile_selections=(ModelProfileSelection(profile_id, 1),),
+        wargear_selections=(mixed,),
+    )
+    restored_selection = UnitMusterSelection.from_payload(
+        json.loads(json.dumps(muster_selection.to_payload()))
+    )
+    assert restored_selection == muster_selection
+
+    config = _fated_hero_config(wargear_selections=(mixed,))
+    restored_config = GameConfig.from_payload(json.loads(json.dumps(config.to_payload())))
+    assert restored_config.to_payload() == config.to_payload()
+    lifecycle = GameLifecycle()
+    _advance_to_fated_hero_request(lifecycle, lifecycle.start(restored_config))
+    restored_lifecycle = GameLifecycle.from_payload(json.loads(json.dumps(lifecycle.to_payload())))
+    assert restored_lifecycle.to_payload() == lifecycle.to_payload()
+    assert restored_lifecycle.state is not None
+    unit = next(
+        unit
+        for army in restored_lifecycle.state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == "army-a:fated-wraithlord"
+    )
+    assert unit.own_models[0].wargear_ids.count(bright_lance) == 1
+    assert unit.own_models[0].wargear_ids.count(f"{WRAITHLORD_ID}:starcannon") == 1
+
+    two_bright = _wraithlord_additive_selection((bright_lance, bright_lance))
+    double_unit = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-wargear",
+        datasheet=datasheet,
+        selection=replace(muster_selection, wargear_selections=(two_bright,)),
+    )
+    assert double_unit.own_models[0].wargear_ids.count(bright_lance) == 2
+
+
+def test_wraithlord_additive_multiplicity_rejects_four_choices_after_round_trip() -> None:
+    package = _package()
+    datasheet = package.army_catalog.datasheet_by_id(WRAITHLORD_ID)
+    selection = _wraithlord_additive_selection(
+        (
+            f"{WRAITHLORD_ID}:bright-lance",
+            f"{WRAITHLORD_ID}:bright-lance",
+            f"{WRAITHLORD_ID}:starcannon",
+            f"{WRAITHLORD_ID}:starcannon",
+        )
+    )
+    restored = WargearSelection.from_payload(json.loads(json.dumps(selection.to_payload())))
+    with pytest.raises(ListValidationError, match="per-model option limit"):
+        resolve_wargear_selections(
+            catalog=package.army_catalog,
+            datasheet=datasheet,
+            requested_selections=(restored,),
+            model_profile_selections=(
+                ModelProfileSelection(datasheet.model_profiles[0].model_profile_id, 1),
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    ("selections", "message"),
+    [
+        (
+            (
+                WargearSelection(
+                    option_id=f"{WAR_WALKERS_ID}:shuriken-cannon-bright-lance:option-1",
+                    model_profile_id=f"{WAR_WALKERS_ID}:war-walkers",
+                    wargear_ids=(f"{WAR_WALKERS_ID}:bright-lance",),
+                    selection_count=2,
+                ),
+            ),
+            "requires bearer assignments",
+        ),
+        (
+            (
+                WargearSelection(
+                    option_id=f"{WAR_WALKERS_ID}:shuriken-cannon-bright-lance:option-1",
+                    model_profile_id=f"{WAR_WALKERS_ID}:war-walkers",
+                    wargear_ids=(f"{WAR_WALKERS_ID}:bright-lance",),
+                    bearer_assignments=(
+                        WargearBearerAssignment(
+                            wargear_id=f"{WAR_WALKERS_ID}:bright-lance",
+                            model_ordinal=3,
+                            selection_count=1,
+                        ),
+                    ),
+                ),
+            ),
+            "missing model ordinal",
+        ),
+        (
+            (
+                WargearSelection(
+                    option_id=f"{WAR_WALKERS_ID}:shuriken-cannon-bright-lance:option-1",
+                    model_profile_id=f"{WAR_WALKERS_ID}:war-walkers",
+                    wargear_ids=(f"{WAR_WALKERS_ID}:bright-lance",),
+                    selection_count=2,
+                    bearer_assignments=(
+                        WargearBearerAssignment(
+                            wargear_id=f"{WAR_WALKERS_ID}:bright-lance",
+                            model_ordinal=1,
+                            selection_count=2,
+                        ),
+                    ),
+                ),
+                WargearSelection(
+                    option_id=f"{WAR_WALKERS_ID}:shuriken-cannon-starcannon:option-1",
+                    model_profile_id=f"{WAR_WALKERS_ID}:war-walkers",
+                    wargear_ids=(f"{WAR_WALKERS_ID}:starcannon",),
+                    bearer_assignments=(
+                        WargearBearerAssignment(
+                            wargear_id=f"{WAR_WALKERS_ID}:starcannon",
+                            model_ordinal=1,
+                            selection_count=1,
+                        ),
+                    ),
+                ),
+            ),
+            "per-model group limit",
+        ),
+    ],
+)
+def test_war_walker_wargear_assignments_fail_closed(
+    selections: tuple[WargearSelection, ...],
+    message: str,
+) -> None:
+    package = _package()
+    datasheet = package.army_catalog.datasheet_by_id(WAR_WALKERS_ID)
+    restored_selections = tuple(
+        WargearSelection.from_payload(json.loads(json.dumps(selection.to_payload())))
+        for selection in selections
+    )
+    with pytest.raises(ListValidationError, match=message):
+        resolve_wargear_selections(
+            catalog=package.army_catalog,
+            datasheet=datasheet,
+            requested_selections=restored_selections,
+            model_profile_selections=(
+                ModelProfileSelection(datasheet.model_profiles[0].model_profile_id, 2),
+            ),
+        )
+
+
+def test_crystalline_targeting_uses_hit_target_choice_and_scopes_ap_modifier() -> None:
+    fixture = _runtime_fixture()
+    decisions = DecisionController()
+    attacker = fixture.walkers.own_models[0]
+    profile = _profile(WAR_WALKERS_ID, "Bright lance")
+    sequence = AttackSequence(
+        sequence_id="attack-sequence:crystalline-targeting",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=fixture.walkers.unit_instance_id,
+        source_phase=BattlePhase.SHOOTING,
+        attack_pools=(
+            _ranged_pool(attacker, fixture.enemy_one, profile),
+            _ranged_pool(attacker, fixture.enemy_two, profile),
+        ),
+    )
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 1,
+            "payload": {"successful": False},
+        },
+    )
+
+    status = CatalogSelectedTargetEffectRuntime(
+        fixture.indexes,
+        fixture.armies,
+    ).post_shoot_hit_target_request(
+        AttackSequenceCompletedContext(
+            state=fixture.state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(fixture.state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=sequence,
+            attack_sequence_completed_event_id="event:crystalline-targeting",
+        )
+    )
+
+    assert status is not None
+    request = decisions.queue.peek_next()
+    assert len(request.options) == 1
+    assert cast(dict[str, Any], request.payload)["available_target_unit_instance_ids"] == [
+        fixture.enemy_one.unit_instance_id
+    ]
+    result = DecisionResult.for_request(
+        result_id="result:crystalline-targeting",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    decisions.submit_result(result)
+    assert (
+        apply_catalog_post_shoot_hit_target_effect_result(
+            state=fixture.state,
+            decisions=decisions,
+            result=result,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id=fixture.indexes,
+        )
+        is None
+    )
+
+    registry = RuntimeModifierRegistry.empty()
+    friendly_profile = _profile(WRAITHLORD_ID, "Bright lance")
+    selected = registry.modified_weapon_profile(
+        _weapon_context(
+            fixture,
+            profile=friendly_profile,
+            target=fixture.enemy_one,
+        )
+    )
+    unselected = registry.modified_weapon_profile(
+        _weapon_context(
+            fixture,
+            profile=friendly_profile,
+            target=fixture.enemy_two,
+        )
+    )
+    assert selected.armor_penetration.final == friendly_profile.armor_penetration.final - 1
+    assert unselected.armor_penetration.final == friendly_profile.armor_penetration.final
+
+    repeat_sequence = AttackSequence(
+        sequence_id="attack-sequence:crystalline-targeting-repeat",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=fixture.walkers.unit_instance_id,
+        source_phase=BattlePhase.SHOOTING,
+        attack_pools=(_ranged_pool(attacker, fixture.enemy_one, profile),),
+    )
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": repeat_sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+    assert (
+        CatalogSelectedTargetEffectRuntime(
+            fixture.indexes,
+            fixture.armies,
+        ).post_shoot_hit_target_request(
+            AttackSequenceCompletedContext(
+                state=fixture.state,
+                decisions=decisions,
+                dice_manager=DiceRollManager(
+                    fixture.state.game_id,
+                    event_log=decisions.event_log,
+                ),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+                source_phase=BattlePhase.SHOOTING,
+                attack_sequence=repeat_sequence,
+                attack_sequence_completed_event_id="event:crystalline-targeting-repeat",
+            )
+        )
+        is None
+    )
+
+
+def test_wraithlord_psychic_guidance_modifies_live_weapon_skills_and_leadership() -> None:
+    fixture = _runtime_fixture()
+    runtime = CatalogDatasheetRuleRuntime(fixture.indexes, fixture.armies)
+    registry = RuntimeModifierRegistry.from_bindings(
+        unit_characteristic_modifier_bindings=runtime.unit_characteristic_modifier_bindings(),
+        weapon_profile_modifier_bindings=runtime.weapon_profile_modifier_bindings(),
+    )
+    _move_unit(fixture.state, fixture.wraithlord.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(fixture.state, fixture.psyker.unit_instance_id, x=20.0, y=10.0)
+
+    assert (
+        registry.modified_unit_characteristic(
+            UnitCharacteristicModifierContext(
+                state=fixture.state,
+                unit_instance_id=fixture.wraithlord.unit_instance_id,
+                characteristic=Characteristic.LEADERSHIP,
+                base_value=8,
+                current_value=8,
+            )
+        )
+        == 6
+    )
+    bright_lance = _profile(WRAITHLORD_ID, "Bright lance")
+    fists = _profile(WRAITHLORD_ID, "Wraithbone fists")
+    assert (
+        registry.modified_weapon_profile(
+            _weapon_context(fixture, profile=bright_lance, target=fixture.enemy_one)
+        ).skill.final
+        == 3
+    )
+    assert (
+        registry.modified_weapon_profile(
+            _weapon_context(fixture, profile=fists, target=fixture.enemy_one)
+        ).skill.final
+        == 3
+    )
+
+    _move_unit(fixture.state, fixture.psyker.unit_instance_id, x=30.0, y=10.0)
+    assert (
+        registry.modified_unit_characteristic(
+            UnitCharacteristicModifierContext(
+                state=fixture.state,
+                unit_instance_id=fixture.wraithlord.unit_instance_id,
+                characteristic=Characteristic.LEADERSHIP,
+                base_value=8,
+                current_value=8,
+            )
+        )
+        == 8
+    )
+    assert (
+        registry.modified_weapon_profile(
+            _weapon_context(fixture, profile=bright_lance, target=fixture.enemy_one)
+        ).skill.final
+        == 4
+    )
+
+
+def test_fated_hero_finite_setup_choice_round_trips_and_gates_both_rerolls() -> None:
+    lifecycle = GameLifecycle()
+    status = lifecycle.start(_fated_hero_config())
+    request = _advance_to_fated_hero_request(lifecycle, status)
+    assert request.decision_type == "select_faction_rule_setup_option"
+    assert cast(dict[str, Any], request.payload)["submission_kind"] == (
+        "catalog_start_battle_keyword_choice"
+    )
+    assert lifecycle.state is not None
+    assert lifecycle.state.current_setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS
+    assert not any(
+        event.event_type == "battle_started"
+        for event in lifecycle.decision_controller.event_log.records
+    )
+    completed_setup_steps = {
+        cast(dict[str, Any], event.payload)["step"]
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "setup_step_completed"
+    }
+    assert {
+        SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+        SetupStep.DEPLOY_ARMIES.value,
+        SetupStep.REDEPLOY_UNITS.value,
+    }.issubset(completed_setup_steps)
+    infantry_option = next(
+        option
+        for option in request.options
+        if cast(dict[str, Any], option.payload)["selected_keyword"] == "INFANTRY"
+    )
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=infantry_option.option_id,
+        result_id="result:fated-hero-infantry",
+    ).to_result(request)
+    lifecycle.submit_decision(result)
+
+    state = lifecycle.state
+    assert state is not None
+    selected_events = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == CATALOG_START_BATTLE_KEYWORD_SELECTED_EVENT
+    )
+    assert len(selected_events) == 1
+    battle_started_index = next(
+        index
+        for index, event in enumerate(lifecycle.decision_controller.event_log.records)
+        if event.event_type == "battle_started"
+    )
+    selected_index = next(
+        index
+        for index, event in enumerate(lifecycle.decision_controller.event_log.records)
+        if event.event_type == CATALOG_START_BATTLE_KEYWORD_SELECTED_EVENT
+    )
+    assert selected_index < battle_started_index
+    assert state.stage is GameLifecycleStage.BATTLE
+    command_phase_completed_index = next(
+        index
+        for index, event in enumerate(lifecycle.decision_controller.event_log.records)
+        if event.event_type == "battle_phase_completed"
+        and cast(dict[str, Any], event.payload)["completed_phase"] == BattlePhase.COMMAND.value
+    )
+    assert battle_started_index < command_phase_completed_index
+    restored = GameState.from_payload(
+        cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
+    )
+    assert restored.to_payload() == state.to_payload()
+    restored_lifecycle = GameLifecycle.from_payload(json.loads(json.dumps(lifecycle.to_payload())))
+    assert restored_lifecycle.to_payload() == lifecycle.to_payload()
+    restored_state = restored_lifecycle.state
+    assert restored_state is not None
+    assert (
+        len(
+            tuple(
+                effect
+                for effect in restored_state.persisting_effects
+                if _is_fated_hero_effect_payload(cast(dict[str, Any], effect.to_payload()))
+            )
+        )
+        == 2
+    )
+    army = next(army for army in restored_state.army_definitions if army.player_id == "player-a")
+    wraithlord = next(unit for unit in army.units if unit.datasheet_id == WRAITHLORD_ID)
+    enemy_army = next(
+        army for army in restored_state.army_definitions if army.player_id == "player-b"
+    )
+    infantry = enemy_army.units[0]
+    model_id = wraithlord.own_models[0].model_instance_id
+    for roll_type in ("attack_sequence.hit", "attack_sequence.wound"):
+        permission = generic_rule_reroll_permission_context_for_unit(
+            state=restored_state,
+            player_id="player-a",
+            unit_instance_id=wraithlord.unit_instance_id,
+            model_instance_id=model_id,
+            roll_type=roll_type,
+            timing_window=roll_type,
+            target_unit_instance_id=infantry.unit_instance_id,
+        )
+        assert permission is not None
+        conditional_key = (
+            "conditional_hit_reroll" if roll_type.endswith("hit") else "conditional_wound_reroll"
+        )
+        assert cast(dict[str, Any], permission.source_payload)[conditional_key] == {
+            "reroll_unmodified_values": [1]
+        }
+
+
+def test_fated_hero_rejects_option_payload_drift_before_state_mutation() -> None:
+    lifecycle = GameLifecycle()
+    status = lifecycle.start(_fated_hero_config())
+    request = _advance_to_fated_hero_request(lifecycle, status)
+    option = request.options[0]
+    drifted_payload = dict(cast(dict[str, Any], option.payload))
+    drifted_payload["selected_keyword"] = "TITANIC"
+    invalid = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="result:fated-hero-drift",
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=option.option_id,
+            payload=drifted_payload,
+        )
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(invalid.payload, dict)
+    assert invalid.payload["invalid_reason"] == "invalid_faction_rule_setup_option_result"
+    assert invalid.payload["field"] == "payload"
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert lifecycle.state is not None
+    assert lifecycle.state.persisting_effects == []
+
+
+@pytest.fixture(scope="module")
+def pending_fated_hero_lifecycle_payload() -> dict[str, Any]:
+    lifecycle = GameLifecycle()
+    _advance_to_fated_hero_request(lifecycle, lifecycle.start(_fated_hero_config()))
+    return cast(dict[str, Any], json.loads(json.dumps(lifecycle.to_payload())))
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["duplicate_resolved", "source_identity", "wrong_setup_step", "option_inventory"],
+)
+def test_fated_hero_stale_requests_reject_before_any_lifecycle_mutation(
+    pending_fated_hero_lifecycle_payload: dict[str, Any],
+    mutation: str,
+) -> None:
+    if mutation == "duplicate_resolved":
+        source_lifecycle = GameLifecycle()
+        first_request = _advance_to_fated_hero_request(
+            source_lifecycle,
+            source_lifecycle.start(_fated_hero_config(additional_fated_source=True)),
+        )
+        status = source_lifecycle.submit_decision(
+            FiniteOptionSubmission(
+                request_id=first_request.request_id,
+                selected_option_id=first_request.options[0].option_id,
+                result_id="result:fated-hero:first-source",
+            ).to_result(first_request)
+        )
+        assert status.decision_request is not None
+        payload = cast(dict[str, Any], json.loads(json.dumps(source_lifecycle.to_payload())))
+        record = next(
+            record
+            for record in payload["decisions"]["records"]
+            if record["request"]["payload"].get("submission_kind")
+            == "catalog_start_battle_keyword_choice"
+        )
+        payload["decisions"]["queue"]["pending_requests"] = [record["request"]]
+    else:
+        payload = cast(dict[str, Any], json.loads(json.dumps(pending_fated_hero_lifecycle_payload)))
+        request_payload = payload["decisions"]["queue"]["pending_requests"][0]
+        if mutation == "source_identity":
+            request_payload["payload"]["source_key"] = "source-key:drift"
+            for option in request_payload["options"]:
+                option["payload"]["source_key"] = "source-key:drift"
+        elif mutation == "wrong_setup_step":
+            payload["state"]["setup_step_index"] -= 1
+        elif mutation == "option_inventory":
+            request_payload["options"].pop()
+        else:
+            raise AssertionError(f"Unhandled mutation: {mutation}")
+    lifecycle = GameLifecycle.from_payload(cast(Any, payload))
+    request = lifecycle.decision_controller.queue.peek_next()
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=request.options[0].option_id,
+        result_id=f"result:fated-hero-stale:{mutation}",
+    ).to_result(request)
+    before = json.loads(json.dumps(lifecycle.to_payload()))
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, Any], status.payload)["field"] == "authoritative_request"
+    assert lifecycle.to_payload() == before
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "changed_submission_kind",
+        "missing_submission_kind",
+        "changed_hook_id",
+        "conflicting_hook_and_submission_kind",
+        "non_object_request_payload",
+        "fully_malformed_final_boundary_request",
+    ],
+)
+def test_fated_hero_malformed_dispatch_signatures_reject_without_mutation(
+    pending_fated_hero_lifecycle_payload: dict[str, Any],
+    mutation: str,
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(pending_fated_hero_lifecycle_payload)),
+    )
+    request_payload = payload["decisions"]["queue"]["pending_requests"][0]
+    if mutation == "changed_submission_kind":
+        request_payload["payload"]["submission_kind"] = "catalog_keyword_choice:drift"
+        for option in request_payload["options"]:
+            option["payload"]["submission_kind"] = "catalog_keyword_choice:drift"
+    elif mutation == "missing_submission_kind":
+        request_payload["payload"].pop("submission_kind")
+        for option in request_payload["options"]:
+            option["payload"].pop("submission_kind")
+    elif mutation == "changed_hook_id":
+        request_payload["payload"]["hook_id"] = "catalog-ir:tracked-target:start-battle"
+        for option in request_payload["options"]:
+            option["payload"]["hook_id"] = "catalog-ir:tracked-target:start-battle"
+    elif mutation == "conflicting_hook_and_submission_kind":
+        request_payload["payload"]["submission_kind"] = "select_tracked_target"
+        for option in request_payload["options"]:
+            option["payload"]["submission_kind"] = "select_tracked_target"
+    elif mutation == "non_object_request_payload":
+        request_payload["payload"] = ["malformed-final-boundary-request"]
+    elif mutation == "fully_malformed_final_boundary_request":
+        request_payload["actor_id"] = "player-b"
+        request_payload["payload"] = {"malformed": True}
+        for option in request_payload["options"]:
+            option["payload"] = {"malformed": True}
+    else:
+        raise AssertionError(f"Unhandled mutation: {mutation}")
+    lifecycle = GameLifecycle.from_payload(cast(Any, payload))
+    request = lifecycle.decision_controller.queue.peek_next()
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=request.options[0].option_id,
+        result_id=f"result:fated-hero-malformed:{mutation}",
+    ).to_result(request)
+    before = json.loads(json.dumps(lifecycle.to_payload()))
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, Any], status.payload)["field"] == "authoritative_request"
+    assert lifecycle.to_payload() == before
+
+
+@pytest.fixture(scope="module")
+def resolved_fated_hero_lifecycle_payload() -> dict[str, Any]:
+    lifecycle = GameLifecycle()
+    request = _advance_to_fated_hero_request(
+        lifecycle,
+        lifecycle.start(_fated_hero_config()),
+    )
+    infantry_option = next(
+        option
+        for option in request.options
+        if cast(dict[str, Any], option.payload)["selected_keyword"] == "INFANTRY"
+    )
+    lifecycle.submit_decision(
+        FiniteOptionSubmission(
+            request_id=request.request_id,
+            selected_option_id=infantry_option.option_id,
+            result_id="result:fated-hero-replay-validation",
+        ).to_result(request)
+    )
+    return cast(dict[str, Any], json.loads(json.dumps(lifecycle.to_payload())))
+
+
+@pytest.fixture(scope="module")
+def completed_fated_hero_lifecycle_payload() -> dict[str, Any]:
+    config = _compact_fated_hero_config()
+    lifecycle = GameLifecycle()
+    request = _advance_to_fated_hero_request(lifecycle, lifecycle.start(config))
+    status = lifecycle.submit_decision(
+        FiniteOptionSubmission(
+            request_id=request.request_id,
+            selected_option_id=request.options[0].option_id,
+            result_id="result:fated-hero-complete-game",
+        ).to_result(request)
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert status.status_kind is LifecycleStatusKind.TERMINAL
+    assert state.stage is GameLifecycleStage.COMPLETE
+    assert not any(
+        _is_fated_hero_effect_payload(cast(dict[str, Any], effect.to_payload()))
+        for effect in state.persisting_effects
+    )
+    return cast(dict[str, Any], json.loads(json.dumps(lifecycle.to_payload())))
+
+
+def test_fated_hero_completed_game_round_trips_after_effect_expiration(
+    completed_fated_hero_lifecycle_payload: dict[str, Any],
+) -> None:
+    restored = GameLifecycle.from_payload(cast(Any, completed_fated_hero_lifecycle_payload))
+
+    assert restored.to_payload() == completed_fated_hero_lifecycle_payload
+    assert restored.state is not None
+    assert restored.state.stage is GameLifecycleStage.COMPLETE
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["tampered_decision_record", "missing_decision_record", "tampered_selected_event"],
+)
+def test_fated_hero_completed_game_rejects_historical_provenance_drift(
+    completed_fated_hero_lifecycle_payload: dict[str, Any],
+    mutation: str,
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(completed_fated_hero_lifecycle_payload)),
+    )
+    records = payload["decisions"]["records"]
+    fated_record = next(
+        record
+        for record in records
+        if record["request"]["payload"].get("submission_kind")
+        == "catalog_start_battle_keyword_choice"
+    )
+    selected_event = next(
+        event
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == CATALOG_START_BATTLE_KEYWORD_SELECTED_EVENT
+    )
+    if mutation == "tampered_decision_record":
+        fated_record["request"]["payload"]["source_rule_ir_hash"] = "sha256:drift"
+    elif mutation == "missing_decision_record":
+        assert records[-1] is fated_record
+        records.pop()
+    elif mutation == "tampered_selected_event":
+        selected_event["payload"]["selected_option_id"] = "fated-hero-option:drift"
+    else:
+        raise AssertionError(f"Unhandled mutation: {mutation}")
+
+    with pytest.raises(GameLifecycleError, match="Catalog keyword choice"):
+        GameLifecycle.from_payload(cast(Any, payload))
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "mismatched_keyword",
+        "unsupported_keyword",
+        "missing_effect",
+        "extra_effect",
+        "owner_drift",
+        "rule_ir_hash_drift",
+        "clause_drift",
+        "roll_type_drift",
+        "roll_value_drift",
+        "expiration_drift",
+        "source_model_drift",
+        "decision_provenance_drift",
+        "extra_envelope_source_drift",
+        "extra_friendly_target_drift",
+        "extra_source_model_context_drift",
+    ],
+)
+def test_fated_hero_replay_rejects_non_atomic_or_drifted_effect_bundles(
+    resolved_fated_hero_lifecycle_payload: dict[str, Any],
+    mutation: str,
+) -> None:
+    payload = cast(
+        dict[str, Any],
+        json.loads(json.dumps(resolved_fated_hero_lifecycle_payload)),
+    )
+    all_effects = cast(list[dict[str, Any]], payload["state"]["persisting_effects"])
+    effects = [effect for effect in all_effects if _is_fated_hero_effect_payload(effect)]
+    assert len(effects) == 2
+    if mutation == "mismatched_keyword":
+        _set_effect_parameter(effects[1], "target_required_keyword", "MONSTER")
+    elif mutation == "unsupported_keyword":
+        for effect in effects:
+            _set_effect_parameter(effect, "target_required_keyword", "TITANIC")
+            effect["effect_payload"]["context"]["trigger_payload"]["selected_keyword"] = "TITANIC"
+    elif mutation == "missing_effect":
+        all_effects.remove(effects[1])
+    elif mutation == "extra_effect":
+        extra = cast(dict[str, Any], json.loads(json.dumps(effects[0])))
+        extra["effect_id"] = f"{extra['effect_id']}:extra"
+        all_effects.append(extra)
+    elif mutation == "owner_drift":
+        effects[0]["owner_player_id"] = "player-b"
+    elif mutation == "rule_ir_hash_drift":
+        effects[0]["effect_payload"]["rule_ir_hash"] = "sha256:drift"
+    elif mutation == "clause_drift":
+        effects[0]["effect_payload"]["clause_id"] = "rule-clause:drift"
+    elif mutation == "roll_type_drift":
+        _set_effect_parameter(effects[0], "roll_type", "wound")
+    elif mutation == "roll_value_drift":
+        _set_effect_parameter(effects[0], "reroll_unmodified_value", 2)
+    elif mutation == "expiration_drift":
+        effects[0]["expiration"] = {
+            "expiration_kind": "end_battle_round",
+            "battle_round": 1,
+            "phase": None,
+            "player_id": None,
+        }
+    elif mutation == "source_model_drift":
+        effects[0]["effect_payload"]["context"]["source_model_instance_id"] = "model:drift"
+    elif mutation == "decision_provenance_drift":
+        for index, effect in enumerate(effects):
+            effect["effect_id"] = (
+                f"result:fated-hero-unknown:catalog-start-battle-keyword:{index:03d}"
+            )
+            effect["effect_payload"]["context"]["trigger_payload"]["result_id"] = (
+                "result:fated-hero-unknown"
+            )
+    elif mutation in {
+        "extra_envelope_source_drift",
+        "extra_friendly_target_drift",
+        "extra_source_model_context_drift",
+    }:
+        extra = cast(dict[str, Any], json.loads(json.dumps(effects[0])))
+        extra["effect_id"] = f"{extra['effect_id']}:extra"
+        if mutation == "extra_envelope_source_drift":
+            extra["source_rule_id"] = "source:drift"
+        elif mutation == "extra_friendly_target_drift":
+            extra["target_unit_instance_ids"] = ["army-a:fated-support-walkers-2"]
+        else:
+            extra["effect_payload"]["context"]["source_model_instance_id"] = "model:drift"
+        all_effects.append(extra)
+    else:
+        raise AssertionError(f"Unhandled mutation: {mutation}")
+
+    with pytest.raises(GameLifecycleError, match="Catalog keyword choice"):
+        GameLifecycle.from_payload(cast(Any, payload))
+
+
+def test_fated_hero_destroyed_source_remains_in_static_effect_audit(
+    resolved_fated_hero_lifecycle_payload: dict[str, Any],
+) -> None:
+    lifecycle = GameLifecycle.from_payload(cast(Any, resolved_fated_hero_lifecycle_payload))
+    state = lifecycle.state
+    assert state is not None
+    destroyed_armies = tuple(
+        replace(
+            army,
+            units=tuple(
+                replace(
+                    unit,
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0) for model in unit.own_models
+                    ),
+                )
+                if unit.unit_instance_id == "army-a:fated-wraithlord"
+                else unit
+                for unit in army.units
+            ),
+        )
+        for army in state.army_definitions
+    )
+    effect_index = next(
+        index
+        for index, effect in enumerate(state.persisting_effects)
+        if _is_fated_hero_effect_payload(cast(dict[str, Any], effect.to_payload()))
+    )
+    drifted_payload = state.persisting_effects[effect_index].to_payload()
+    drifted_effect_payload = cast(dict[str, Any], drifted_payload["effect_payload"])
+    drifted_effect_payload["rule_ir_hash"] = "sha256:destroyed-source-drift"
+    state.persisting_effects[effect_index] = PersistingEffect.from_payload(drifted_payload)
+    catalog = lifecycle.config.army_catalog
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in destroyed_armies
+    }
+
+    with pytest.raises(GameLifecycleError, match="Catalog keyword choice effect payload drifted"):
+        CatalogStartBattleKeywordChoiceRuntime(indexes, destroyed_armies).validate_state(
+            state, lifecycle.decision_controller
+        )
+
+
+def _set_effect_parameter(effect: dict[str, Any], key: str, value: Any) -> None:
+    parameters = cast(list[dict[str, Any]], effect["effect_payload"]["effect"]["parameters"])
+    parameter = next(candidate for candidate in parameters if candidate["key"] == key)
+    parameter["value"] = value
+
+
+def _is_fated_hero_effect_payload(effect: dict[str, Any]) -> bool:
+    effect_payload = effect.get("effect_payload")
+    if not isinstance(effect_payload, dict):
+        return False
+    typed_effect_payload = cast(dict[str, Any], effect_payload)
+    context = typed_effect_payload.get("context")
+    if not isinstance(context, dict):
+        return False
+    typed_context = cast(dict[str, Any], context)
+    trigger = typed_context.get("trigger_payload")
+    if not isinstance(trigger, dict):
+        return False
+    return cast(dict[str, Any], trigger).get("event") == (
+        CATALOG_START_BATTLE_KEYWORD_SELECTED_EVENT
+    )
+
+
+class _RuntimeFixture:
+    def __init__(
+        self,
+        *,
+        armies: tuple[ArmyDefinition, ...],
+        state: GameState,
+        indexes: dict[str, Any],
+        walkers: UnitInstance,
+        wraithlord: UnitInstance,
+        psyker: UnitInstance,
+        enemy_one: UnitInstance,
+        enemy_two: UnitInstance,
+    ) -> None:
+        self.armies = armies
+        self.state = state
+        self.indexes = indexes
+        self.walkers = walkers
+        self.wraithlord = wraithlord
+        self.psyker = psyker
+        self.enemy_one = enemy_one
+        self.enemy_two = enemy_two
+
+
+def _runtime_fixture() -> _RuntimeFixture:
+    package = _package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    walkers = _instantiate(
+        factory, army_id="army-a", selection_id="walkers", datasheet_id=WAR_WALKERS_ID
+    )
+    wraithlord = _instantiate(
+        factory,
+        army_id="army-a",
+        selection_id="wraithlord",
+        datasheet_id=WRAITHLORD_ID,
+    )
+    psyker = _instantiate(
+        factory, army_id="army-a", selection_id="psyker", datasheet_id=KHARSETH_ID
+    )
+    enemy_one = _instantiate(
+        factory,
+        army_id="army-b",
+        selection_id="enemy-one",
+        datasheet_id=WRAITHLORD_ID,
+    )
+    enemy_two = _instantiate(
+        factory,
+        army_id="army-b",
+        selection_id="enemy-two",
+        datasheet_id=WRAITHLORD_ID,
+    )
+    armies = (
+        _army(catalog, "army-a", "player-a", (walkers, wraithlord, psyker)),
+        _army(catalog, "army-b", "player-b", (enemy_one, enemy_two)),
+    )
+    state = _battle_state(armies)
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    return _RuntimeFixture(
+        armies=armies,
+        state=state,
+        indexes=indexes,
+        walkers=walkers,
+        wraithlord=wraithlord,
+        psyker=psyker,
+        enemy_one=enemy_one,
+        enemy_two=enemy_two,
+    )
+
+
+def _battle_state(armies: tuple[ArmyDefinition, ...]) -> GameState:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    phases = tuple(descriptor.battle_phase_sequence.phases)
+    state = GameState(
+        game_id="aeldari-war-walkers-wraithlord-test",
+        ruleset_descriptor_hash=descriptor.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(descriptor.setup_sequence.steps),
+        battle_phase_sequence=phases,
+        setup_step_index=None,
+        battle_phase_index=phases.index(BattlePhase.SHOOTING),
+        battle_round=1,
+        active_player_id="player-a",
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        tactical_secondary_draw_count=2,
+        mission_setup=_mission_setup(),
+    )
+    for army in armies:
+        state.record_army_definition(army)
+    state.battlefield_state = create_deterministic_battlefield_scenario(
+        battlefield_id="aeldari-war-walkers-wraithlord-battlefield",
+        armies=armies,
+    ).battlefield_state
+    return state
+
+
+def _army(
+    catalog: Any, army_id: str, player_id: str, units: tuple[UnitInstance, ...]
+) -> ArmyDefinition:
+    return ArmyDefinition(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="AE",
+            detachment_ids=(TEST_DETACHMENT_ID,),
+        ),
+        force_disposition_id="purge-the-foe",
+        units=units,
+    )
+
+
+def _instantiate(
+    factory: UnitFactory,
+    *,
+    army_id: str,
+    selection_id: str,
+    datasheet_id: str,
+) -> UnitInstance:
+    datasheet = factory.catalog.datasheet_by_id(datasheet_id)
+    profile = datasheet.model_profiles[0]
+    return factory.instantiate_unit(
+        army_id=army_id,
+        datasheet=datasheet,
+        selection=UnitMusterSelection(
+            unit_selection_id=selection_id,
+            datasheet_id=datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    profile.model_profile_id, datasheet.composition[0].min_models
+                ),
+            ),
+        ),
+    )
+
+
+def _fated_hero_config(
+    *,
+    wargear_selections: tuple[WargearSelection, ...] = (),
+    additional_fated_source: bool = False,
+) -> GameConfig:
+    catalog = _fated_hero_catalog()
+    player_a_request = _muster_request(
+        catalog,
+        army_id="army-a",
+        player_id="player-a",
+        faction_id="AE",
+        detachment_id=TEST_DETACHMENT_ID,
+        datasheet_id=WRAITHLORD_ID,
+        selection_id="fated-wraithlord",
+        wargear_selections=wargear_selections,
+    )
+    walkers = catalog.datasheet_by_id(WAR_WALKERS_ID)
+    player_a_request = replace(
+        player_a_request,
+        unit_selections=(
+            *player_a_request.unit_selections,
+            UnitMusterSelection(
+                unit_selection_id="fated-support-walkers-2",
+                datasheet_id=WAR_WALKERS_ID,
+                model_profile_selections=(
+                    ModelProfileSelection(walkers.model_profiles[0].model_profile_id, 1),
+                ),
+            ),
+            *(
+                (
+                    replace(
+                        player_a_request.unit_selections[0],
+                        unit_selection_id="fated-wraithlord-3",
+                    ),
+                )
+                if additional_fated_source
+                else ()
+            ),
+        ),
+    )
+    return GameConfig(
+        game_id="aeldari-fated-hero-lifecycle",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="core-v2-aeldari-fated-hero-test"
+        ),
+        army_catalog=catalog,
+        army_muster_requests=(
+            player_a_request,
+            _muster_request(
+                catalog,
+                army_id="army-b",
+                player_id="player-b",
+                faction_id="core-marine-force",
+                detachment_id="core-combined-arms",
+                datasheet_id=CORE_ENEMY_ID,
+                selection_id="enemy-infantry",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down"),
+        mission_setup=_mission_setup(),
+    )
+
+
+def _compact_fated_hero_config() -> GameConfig:
+    config = _fated_hero_config()
+    descriptor = config.ruleset_descriptor
+    compact_descriptor = RulesetDescriptor(
+        ruleset_id=descriptor.ruleset_id,
+        source_date=descriptor.source_date,
+        descriptor_version=descriptor.descriptor_version,
+        engagement_policy=descriptor.engagement_policy,
+        movement_policy=descriptor.movement_policy,
+        charge_policy=descriptor.charge_policy,
+        fight_policy=descriptor.fight_policy,
+        terrain_movement_policy=descriptor.terrain_movement_policy,
+        terrain_visibility_policy=descriptor.terrain_visibility_policy,
+        objective_policy=descriptor.objective_policy,
+        coherency_policy=descriptor.coherency_policy,
+        fly_policy=descriptor.fly_policy,
+        mission_policy=descriptor.mission_policy,
+        setup_sequence=descriptor.setup_sequence,
+        battle_phase_sequence=BattlePhaseSequenceDescriptor(
+            phases=(BattlePhaseKind.COMMAND, BattlePhaseKind.FIGHT)
+        ),
+    )
+    return replace(config, ruleset_descriptor=compact_descriptor)
+
+
+@cache
+def _fated_hero_catalog() -> ArmyCatalog:
+    generated = _package().army_catalog
+    base = ArmyCatalog.phase9a_canonical_content_pack()
+    datasheets = tuple(
+        generated.datasheet_by_id(datasheet_id) for datasheet_id in (WAR_WALKERS_ID, WRAITHLORD_ID)
+    )
+    linked_wargear_ids = {
+        wargear_id
+        for datasheet in datasheets
+        for option in datasheet.wargear_options
+        for wargear_id in (*option.default_wargear_ids, *option.allowed_wargear_ids)
+    }
+    wargear = tuple(item for item in generated.wargear if item.wargear_id in linked_wargear_ids)
+    return ArmyCatalog(
+        catalog_id="aeldari-war-walkers-wraithlord-lifecycle-test",
+        ruleset_id=base.ruleset_id,
+        source_package_id="data-package:core-v2:aeldari-war-walkers-wraithlord-test",
+        datasheets=(*base.datasheets, *datasheets),
+        wargear=(*base.wargear, *wargear),
+        factions=(
+            *base.factions,
+            FactionDefinition(
+                faction_id="AE",
+                name="Aeldari",
+                faction_keywords=("ASURYANI",),
+                source_ids=("source:aeldari-war-walkers-wraithlord-test",),
+            ),
+        ),
+        army_rules=base.army_rules,
+        detachments=(
+            *base.detachments,
+            DetachmentDefinition(
+                detachment_id=TEST_DETACHMENT_ID,
+                name="War Walkers and Wraithlord Test",
+                faction_id="AE",
+                detachment_point_cost=1,
+                unit_datasheet_ids=(WAR_WALKERS_ID, WRAITHLORD_ID),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("source:aeldari-war-walkers-wraithlord-test",),
+            ),
+        ),
+        enhancements=base.enhancements,
+        stratagems=base.stratagems,
+        source_ids=(generated.source_package_id,),
+    )
+
+
+def _muster_request(
+    catalog: Any,
+    *,
+    army_id: str,
+    player_id: str,
+    faction_id: str,
+    detachment_id: str,
+    datasheet_id: str,
+    selection_id: str,
+    wargear_selections: tuple[WargearSelection, ...] = (),
+) -> ArmyMusterRequest:
+    datasheet = catalog.datasheet_by_id(datasheet_id)
+    return ArmyMusterRequest(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=faction_id,
+            detachment_ids=(detachment_id,),
+        ),
+        force_disposition_id="purge-the-foe",
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id=selection_id,
+                datasheet_id=datasheet_id,
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        datasheet.model_profiles[0].model_profile_id,
+                        datasheet.composition[0].min_models,
+                    ),
+                ),
+                wargear_selections=wargear_selections,
+            ),
+        ),
+    )
+
+
+def _wraithlord_additive_selection(wargear_ids: tuple[str, ...]) -> WargearSelection:
+    counts = {wargear_id: wargear_ids.count(wargear_id) for wargear_id in set(wargear_ids)}
+    return WargearSelection(
+        option_id=f"{WRAITHLORD_ID}:additive-choice:option-3",
+        model_profile_id=f"{WRAITHLORD_ID}:wraithlord",
+        wargear_ids=tuple(counts),
+        bearer_assignments=tuple(
+            WargearBearerAssignment(
+                wargear_id=wargear_id,
+                model_ordinal=1,
+                selection_count=count,
+            )
+            for wargear_id, count in counts.items()
+        ),
+    )
+
+
+def _advance_to_fated_hero_request(lifecycle: GameLifecycle, status: Any) -> Any:
+    while True:
+        request = status.decision_request
+        if request is not None:
+            if request.decision_type == "select_faction_rule_setup_option":
+                return request
+            if request.decision_type == "select_secondary_missions":
+                status = lifecycle.submit_decision(
+                    DecisionResult.for_request(
+                        result_id=f"result:{request.actor_id}:fixed-secondaries",
+                        request=request,
+                        selected_option_id="fixed:assassination:bring_it_down",
+                    )
+                )
+                continue
+            if request.decision_type in {
+                "select_deployment_unit",
+                "submit_deployment_placement",
+            }:
+                status = submit_all_deployments_if_pending(
+                    lifecycle,
+                    status,
+                    result_id_prefix="aeldari-fated-hero-deployment",
+                )
+                continue
+            if request.decision_type == "select_prebattle_action":
+                status = lifecycle.submit_decision(
+                    DecisionResult.for_request(
+                        result_id=f"result:{request.actor_id}:complete-prebattle",
+                        request=request,
+                        selected_option_id="complete_prebattle_actions",
+                    )
+                )
+                continue
+            raise AssertionError(f"Unexpected setup decision: {request.decision_type}")
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status.payload
+        status = lifecycle.advance_until_decision_or_terminal()
+
+
+def _mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+
+
+def _rule_ir(source_row_id: str) -> RuleIR:
+    payload = source_package.datasheet_rule_ir_payload_by_source_row_id(source_row_id)
+    assert payload is not None
+    return RuleIR.from_payload(payload)
+
+
+def _characteristics(datasheet: Any) -> tuple[int, ...]:
+    values = {
+        value.characteristic: value.final for value in datasheet.model_profiles[0].characteristics
+    }
+    return (
+        values[Characteristic.MOVEMENT],
+        values[Characteristic.TOUGHNESS],
+        values[Characteristic.SAVE],
+        values[Characteristic.WOUNDS],
+        values[Characteristic.LEADERSHIP],
+        values[Characteristic.OBJECTIVE_CONTROL],
+        values[Characteristic.INVULNERABLE_SAVE],
+    )
+
+
+def _weapon_names(datasheet_id: str) -> set[str]:
+    return {
+        profile.name
+        for wargear in _package().army_catalog.wargear
+        if wargear.wargear_id.startswith(f"{datasheet_id}:")
+        for profile in wargear.weapon_profiles
+    }
+
+
+def _profile(datasheet_id: str, name: str) -> WeaponProfile:
+    return next(
+        profile
+        for wargear in _package().army_catalog.wargear
+        if wargear.wargear_id.startswith(f"{datasheet_id}:")
+        for profile in wargear.weapon_profiles
+        if profile.name == name
+    )
+
+
+def _ranged_pool(attacker: Any, target: UnitInstance, profile: WeaponProfile) -> RangedAttackPool:
+    assert profile.range_profile.kind is RangeProfileKind.DISTANCE
+    target_ids = target.own_model_ids()
+    return RangedAttackPool(
+        attacker_model_instance_id=attacker.model_instance_id,
+        wargear_id=f"test:{profile.profile_id}:wargear",
+        weapon_profile_id=profile.profile_id,
+        weapon_profile=profile,
+        target_unit_instance_id=target.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        attacks=1,
+        target_visible_model_ids=target_ids,
+        target_in_range_model_ids=target_ids,
+    )
+
+
+def _weapon_context(
+    fixture: _RuntimeFixture,
+    *,
+    profile: WeaponProfile,
+    target: UnitInstance,
+) -> WeaponProfileModifierContext:
+    return WeaponProfileModifierContext(
+        state=fixture.state,
+        source_phase=BattlePhase.SHOOTING
+        if profile.range_profile.kind is RangeProfileKind.DISTANCE
+        else BattlePhase.FIGHT,
+        attacking_unit_instance_id=fixture.wraithlord.unit_instance_id,
+        attacker_model_instance_id=fixture.wraithlord.own_models[0].model_instance_id,
+        target_unit_instance_id=target.unit_instance_id,
+        weapon_profile=profile,
+    )
+
+
+def _move_unit(state: GameState, unit_instance_id: str, *, x: float, y: float) -> None:
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    placement = battlefield.unit_placement_by_id(unit_instance_id)
+    moved = replace(
+        placement,
+        model_placements=tuple(
+            replace(model, pose=Pose.at(x=x, y=y + (index * 2.0)))
+            for index, model in enumerate(placement.model_placements)
+        ),
+    )
+    state.replace_battlefield_state(battlefield.with_unit_placement(moved))

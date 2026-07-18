@@ -7,6 +7,7 @@ from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine import battle_formation_hooks as _bf
 from warhammer40k_core.engine import battle_round_hooks as _br
+from warhammer40k_core.engine import catalog_start_battle_keyword_choice as _sbkc
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
@@ -105,6 +106,9 @@ from warhammer40k_core.engine.fight_phase_decisions import (
 )
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+)
+from warhammer40k_core.engine.finite_decision_validation import (
+    invalid_finite_decision_status as _invalid_finite_decision_status,
 )
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -707,6 +711,16 @@ class GameLifecycle:
         state = self._require_state()
         pending_request = self._pending_decision_request()
         if type(result) is DecisionResult and pending_request is not None:
+            if state.stage is GameLifecycleStage.SETUP:
+                setup_invalid_status = self._setup_flow.invalid_pending_request_status(
+                    state=state,
+                    decisions=self.decision_controller,
+                    config=self._require_config(),
+                    pending_request=pending_request,
+                    reaction_frame_count=len(self.reaction_queue.frames),
+                )
+                if setup_invalid_status is not None:
+                    return setup_invalid_status
             if _is_opportunity_window_request(pending_request):
                 opportunity_invalid_reason = opportunity_submission_invalid_reason(
                     request=pending_request,
@@ -1022,12 +1036,14 @@ class GameLifecycle:
             if invalid_status is not None:
                 return invalid_status
         if request.decision_type == _bf.SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
-            return _invalid_finite_decision_status(
+            invalid_status = _invalid_finite_decision_status(
                 state=state,
                 request=request,
                 result=result,
                 invalid_reason="invalid_faction_rule_setup_option_result",
             )
+            if invalid_status is not None:
+                return invalid_status
         return None
 
     def _apply_setup_decision(
@@ -2427,14 +2443,17 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
-        CatalogDatasheetRuleRuntime(
-            bundle.ability_indexes_by_player_id,
-            armies,
-        ).record_static_destruction_reaction_sources(state=state)
+        ability_indexes = bundle.ability_indexes_by_player_id
+        _sbkc.CatalogStartBattleKeywordChoiceRuntime(ability_indexes, armies).validate_state(
+            state, self.decision_controller
+        )
+        catalog_rules = CatalogDatasheetRuleRuntime(ability_indexes, armies)
+        catalog_rules.record_static_destruction_reaction_sources(state=state)
         self._runtime_content_bundle = bundle
         self._setup_flow = replace(
             self._setup_flow,
             battle_formation_hooks=bundle.battle_formation_hook_registry,
+            start_battle_hooks=bundle.start_battle_hook_registry,
         )
         runtime_stratagem_index = _combined_runtime_stratagem_index(
             bundle,
@@ -3058,51 +3077,6 @@ def _fight_decision_owns_request(
     if _is_fight_movement_proposal_request(request):
         return True
     return _fight_attack_sequence_is_active_for_request(state=state, request=request)
-
-
-def _invalid_finite_decision_status(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-    invalid_reason: str,
-) -> LifecycleStatus | None:
-    if result.request_id != request.request_id:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result does not match the pending request.",
-            payload={"invalid_reason": invalid_reason, "field": "request_id"},
-        )
-    if result.decision_type != request.decision_type:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result type does not match the pending request.",
-            payload={"invalid_reason": invalid_reason, "field": "decision_type"},
-        )
-    if result.actor_id != request.actor_id:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result actor does not match the pending request.",
-            payload={"invalid_reason": invalid_reason, "field": "actor_id"},
-        )
-    if result.selected_option_id not in {option.option_id for option in request.options}:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result selected option is not pending.",
-            payload={"invalid_reason": invalid_reason, "field": "selected_option_id"},
-        )
-    selected_payload = next(
-        option.payload
-        for option in request.options
-        if option.option_id == result.selected_option_id
-    )
-    if result.payload != selected_payload:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result payload does not match the selected option.",
-            payload={"invalid_reason": invalid_reason, "field": "payload"},
-        )
-    return None
 
 
 def _invalid_damage_allocation_model_status(

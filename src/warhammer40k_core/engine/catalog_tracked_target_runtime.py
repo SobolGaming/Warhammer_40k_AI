@@ -9,10 +9,6 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battle_formation_hooks import (
-    BattleFormationHookBinding,
-    BattleFormationRequestContext,
-)
 from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartHookBinding,
     BattleRoundStartRequestContext,
@@ -36,6 +32,10 @@ from warhammer40k_core.engine.catalog_tracked_target_selection_descriptors impor
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id, rules_unit_view_from_armies
+from warhammer40k_core.engine.start_battle_hooks import (
+    StartBattleHookBinding,
+    StartBattleRequestContext,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.tracked_targets import (
     TRACKED_TARGET_EXPIRED_EVENT_TYPE,
@@ -63,16 +63,16 @@ class CatalogTrackedTargetRuntime:
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
     armies: tuple[ArmyDefinition, ...]
 
-    def battle_formation_bindings(self) -> tuple[BattleFormationHookBinding, ...]:
+    def start_battle_bindings(self) -> tuple[StartBattleHookBinding, ...]:
         if not _has_start_battle_tracked_target_selection_records(
             ability_indexes_by_player_id=self.ability_indexes_by_player_id
         ):
             return ()
         return (
-            BattleFormationHookBinding(
+            StartBattleHookBinding(
                 hook_id=f"{CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID}:start-battle",
                 source_id=CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
-                request_handler=self.battle_formation_request,
+                request_handler=self.start_battle_request,
             ),
         )
 
@@ -114,9 +114,9 @@ class CatalogTrackedTargetRuntime:
             return request
         return None
 
-    def battle_formation_request(
+    def start_battle_request(
         self,
-        context: BattleFormationRequestContext,
+        context: StartBattleRequestContext,
     ) -> DecisionRequest | None:
         for request in _tracked_target_start_battle_selection_requests(
             ability_indexes_by_player_id=self.ability_indexes_by_player_id,
@@ -169,15 +169,15 @@ def catalog_tracked_target_battle_round_start_hook_bindings(
     ).battle_round_start_bindings()
 
 
-def catalog_tracked_target_battle_formation_hook_bindings(
+def catalog_tracked_target_start_battle_hook_bindings(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
-) -> tuple[BattleFormationHookBinding, ...]:
+) -> tuple[StartBattleHookBinding, ...]:
     return CatalogTrackedTargetRuntime(
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         armies=armies,
-    ).battle_formation_bindings()
+    ).start_battle_bindings()
 
 
 def catalog_tracked_target_unit_destroyed_hook_bindings(
@@ -232,7 +232,7 @@ def _tracked_target_start_battle_selection_requests(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
-    context: BattleFormationRequestContext,
+    context: StartBattleRequestContext,
 ) -> tuple[DecisionRequest, ...]:
     requests: list[DecisionRequest] = []
     for army in sorted(armies, key=lambda item: item.player_id):
@@ -264,7 +264,7 @@ def _tracked_target_start_battle_selection_requests(
 
 def _initial_selection_requests_for_record(
     *,
-    context: BattleFormationRequestContext | BattleRoundStartRequestContext,
+    context: StartBattleRequestContext | BattleRoundStartRequestContext,
     army: ArmyDefinition,
     unit: UnitInstance,
     current_model_instance_ids: tuple[str, ...],
@@ -404,7 +404,7 @@ def _reselection_request_for_clause(
 
 def _build_request_from_effect(
     *,
-    context: BattleFormationRequestContext | BattleRoundStartRequestContext | UnitDestroyedContext,
+    context: StartBattleRequestContext | BattleRoundStartRequestContext | UnitDestroyedContext,
     actor_player_id: str,
     record: AbilityCatalogRecord,
     clause: RuleClause,
@@ -430,6 +430,9 @@ def _build_request_from_effect(
         return None
     return build_select_tracked_target_request(
         state=context.state,
+        request_id=(
+            context.issue_request_id() if type(context) is StartBattleRequestContext else None
+        ),
         actor_player_id=actor_player_id,
         source_rule_id=record.definition.source_id,
         source_ability_id=record.definition.ability_id,

@@ -147,7 +147,8 @@ def clause_is_shooting_start_selected_target_selection(clause: RuleClause) -> bo
         and _shooting_start_selection_trigger_is_supported(clause)
         and _shooting_start_selection_target_is_supported(clause.target)
         and all(
-            selected_target_selection_condition_is_supported(condition)
+            condition.kind is not RuleConditionKind.FREQUENCY_LIMIT
+            and selected_target_selection_condition_is_supported(condition)
             for condition in clause.conditions
         )
         and not clause.effects
@@ -164,7 +165,8 @@ def fight_start_selected_target_selection_is_supported(clause: RuleClause) -> bo
         and _fight_start_selection_trigger_is_supported(clause)
         and _fight_start_selection_target_is_supported(clause.target)
         and all(
-            selected_target_selection_condition_is_supported(condition)
+            condition.kind is not RuleConditionKind.FREQUENCY_LIMIT
+            and selected_target_selection_condition_is_supported(condition)
             for condition in clause.conditions
         )
         and not clause.effects
@@ -182,6 +184,12 @@ def selected_target_selection_condition_is_supported(condition: RuleCondition) -
         return _selection_distance_condition_is_supported(parameters)
     if condition.kind is RuleConditionKind.VISIBILITY_PREDICATE:
         return _selection_visibility_condition_is_supported(parameters)
+    if condition.kind is RuleConditionKind.FREQUENCY_LIMIT:
+        return parameters == {
+            "maximum_uses": 1,
+            "scope": "turn",
+            "subject": "selected_target_unit",
+        }
     return False
 
 

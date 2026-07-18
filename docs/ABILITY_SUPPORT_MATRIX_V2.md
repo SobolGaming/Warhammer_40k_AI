@@ -240,7 +240,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:attacks-characteristic-modifier` | Daemon Prince of Tzeentch |
 | `catalog-ir:attacks-characteristic-query` | No current generated rows |
 | `catalog-ir:aura-ability:stealth` | Prince of Darkness (Aura) |
-| `catalog-ir:ballistic-skill-characteristic-modifier` | No current generated rows |
+| `catalog-ir:ballistic-skill-characteristic-modifier` | Psychic Guidance |
 | `catalog-ir:ballistic-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:battle-shock-failed-heal` | Pall of Despair (Aura, Psychic) |
 | `catalog-ir:battle-shock-forced-test` | Pall of Despair (Aura, Psychic) |
@@ -276,7 +276,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:fortification-target-permission` | No current generated rows |
 | `catalog-ir:granted-ability:stealth` | No current generated rows |
 | `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Psychic Guidance<br>Revel in Desecration |
-| `catalog-ir:hit-roll-reroll` | Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
+| `catalog-ir:hit-roll-reroll` | Fated Hero<br>Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | Forceshield<br>Mistshield<br>Ranged Invulnerable Save |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
@@ -292,7 +292,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
 | `catalog-ir:once-per-battle-ability` | Malefic Destruction<br>Unholy Vigour |
 | `catalog-ir:passive-hit-reroll` | Reavers of the Void |
-| `catalog-ir:post-shoot-hit-target-effect` | Fury of the Void (Psychic)<br>Harassment Fire |
+| `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Fury of the Void (Psychic)<br>Harassment Fire |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth<br>Target Acquisition |
 | `catalog-ir:prebattle-redeploy-permission` | Prince of Corsairs |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
@@ -307,6 +307,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:shadow-of-chaos-aura` | The Dark Master (Aura) |
 | `catalog-ir:shooting-start-selected-target-effect` | Hallucinogen Grenades |
 | `catalog-ir:shooting-target-range-restriction` | Wreathed in Shadows (Aura, Psychic) |
+| `catalog-ir:start-battle-keyword-choice` | Fated Hero |
 | `catalog-ir:strength-characteristic-modifier` | Daemon Prince of Khorne |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
 | `catalog-ir:toughness-characteristic-modifier` | Daemon Prince of Nurgle |
@@ -340,10 +341,10 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-keyword-grant:sustained-hits` | Harbinger of Death<br>Piratical Hero |
 | `catalog-ir:weapon-keyword-grant:torrent` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:twin-linked` | No current generated rows |
-| `catalog-ir:weapon-skill-characteristic-modifier` | No current generated rows |
+| `catalog-ir:weapon-skill-characteristic-modifier` | Psychic Guidance |
 | `catalog-ir:weapon-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:wound-roll-modifier` | No current generated rows |
-| `catalog-ir:wound-roll-reroll` | No current generated rows |
+| `catalog-ir:wound-roll-reroll` | Fated Hero |
 | `catalog-ir:wounds-characteristic-modifier` | No current generated rows |
 | `catalog-ir:wounds-characteristic-query` | No current generated rows |
 | `core:command-reroll` | Command Re-roll |

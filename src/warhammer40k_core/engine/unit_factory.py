@@ -642,8 +642,8 @@ def _apply_structured_wargear_selection_to_models(
     wargear_by_model_id: dict[str, list[str]],
 ) -> None:
     selected_wargear = list(selection.wargear_ids)
-    selection_count = selection.resolved_selection_count
     for effect in option.effects:
+        effect_selection_count = selection.selection_count_for_wargear(effect.wargear_id)
         if effect.kind in {
             WargearOptionEffectKind.ADD_WARGEAR,
             WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED,
@@ -652,7 +652,8 @@ def _apply_structured_wargear_selection_to_models(
                 option=option,
                 effect=effect,
                 selected_wargear=tuple(selected_wargear),
-                selection_count=selection_count,
+                selection_count=effect_selection_count,
+                selection=selection,
                 models=models,
                 wargear_by_model_id=wargear_by_model_id,
             )
@@ -662,7 +663,8 @@ def _apply_structured_wargear_selection_to_models(
                 option=option,
                 effect=effect,
                 selected_wargear=tuple(selected_wargear),
-                selection_count=selection_count,
+                selection_count=effect_selection_count,
+                selection=selection,
                 models=models,
                 wargear_by_model_id=wargear_by_model_id,
             )
@@ -672,7 +674,8 @@ def _apply_structured_wargear_selection_to_models(
                 option=option,
                 effect=effect,
                 selected_wargear=tuple(selected_wargear),
-                selection_count=selection_count,
+                selection_count=effect_selection_count,
+                selection=selection,
                 models=models,
                 wargear_by_model_id=wargear_by_model_id,
             )
@@ -686,6 +689,7 @@ def _apply_add_wargear_effect_to_models(
     effect: DatasheetWargearOptionEffect,
     selected_wargear: tuple[str, ...],
     selection_count: int,
+    selection: WargearSelection,
     models: tuple[ModelInstance, ...],
     wargear_by_model_id: dict[str, list[str]],
 ) -> None:
@@ -696,12 +700,24 @@ def _apply_add_wargear_effect_to_models(
         models=models,
         wargear_by_model_id=wargear_by_model_id,
     )
+    per_model_capacity = _wargear_option_selection_capacity_per_model(option)
+    if per_model_capacity > 1 and effect.model_count != 1:
+        raise UnitFactoryError(
+            "Structured multi-copy wargear option requires one model per selection."
+        )
+    candidate_slots = _assigned_or_default_wargear_effect_slots(
+        selection=selection,
+        wargear_id=effect.wargear_id,
+        models=models,
+        eligible_models=candidates,
+        default_capacity_per_model=per_model_capacity,
+    )
     affected_model_count = effect.model_count * selection_count
-    if len(candidates) < affected_model_count:
+    if len(candidate_slots) < affected_model_count:
         raise UnitFactoryError(
             "Structured wargear option has fewer eligible model bearers than required."
         )
-    for model in candidates[:affected_model_count]:
+    for model in candidate_slots[:affected_model_count]:
         wargear_by_model_id[model.model_instance_id].extend(
             effect.wargear_id for _index in range(effect.wargear_count)
         )
@@ -713,6 +729,7 @@ def _apply_replace_wargear_effect_to_models(
     effect: DatasheetWargearOptionEffect,
     selected_wargear: tuple[str, ...],
     selection_count: int,
+    selection: WargearSelection,
     models: tuple[ModelInstance, ...],
     wargear_by_model_id: dict[str, list[str]],
 ) -> None:
@@ -720,14 +737,22 @@ def _apply_replace_wargear_effect_to_models(
         return
     if effect.replaced_wargear_id is None:
         raise UnitFactoryError("Structured wargear replacement target is missing.")
-    candidates = tuple(
-        model
-        for model in _eligible_wargear_effect_models(
-            option=option,
-            models=models,
-            wargear_by_model_id=wargear_by_model_id,
-        )
-        if effect.replaced_wargear_id in wargear_by_model_id[model.model_instance_id]
+    eligible_models = _eligible_wargear_effect_models(
+        option=option,
+        models=models,
+        wargear_by_model_id=wargear_by_model_id,
+    )
+    candidates = _assigned_or_default_wargear_effect_slots(
+        selection=selection,
+        wargear_id=effect.wargear_id,
+        models=models,
+        eligible_models=eligible_models,
+        default_capacity_by_model={
+            model.model_instance_id: wargear_by_model_id[model.model_instance_id].count(
+                effect.replaced_wargear_id
+            )
+            for model in eligible_models
+        },
     )
     affected_model_count = effect.model_count * selection_count
     if len(candidates) < affected_model_count:
@@ -746,6 +771,7 @@ def _apply_remove_wargear_effect_from_models(
     effect: DatasheetWargearOptionEffect,
     selected_wargear: tuple[str, ...],
     selection_count: int,
+    selection: WargearSelection,
     models: tuple[ModelInstance, ...],
     wargear_by_model_id: dict[str, list[str]],
 ) -> None:
@@ -753,14 +779,22 @@ def _apply_remove_wargear_effect_from_models(
         return
     if effect.replaced_wargear_id is None:
         raise UnitFactoryError("Structured wargear removal target is missing.")
-    candidates = tuple(
-        model
-        for model in _eligible_wargear_effect_models(
-            option=option,
-            models=models,
-            wargear_by_model_id=wargear_by_model_id,
-        )
-        if effect.replaced_wargear_id in wargear_by_model_id[model.model_instance_id]
+    eligible_models = _eligible_wargear_effect_models(
+        option=option,
+        models=models,
+        wargear_by_model_id=wargear_by_model_id,
+    )
+    candidates = _assigned_or_default_wargear_effect_slots(
+        selection=selection,
+        wargear_id=effect.wargear_id,
+        models=models,
+        eligible_models=eligible_models,
+        default_capacity_by_model={
+            model.model_instance_id: wargear_by_model_id[model.model_instance_id].count(
+                effect.replaced_wargear_id
+            )
+            for model in eligible_models
+        },
     )
     affected_model_count = effect.model_count * selection_count
     if len(candidates) < affected_model_count:
@@ -769,6 +803,61 @@ def _apply_remove_wargear_effect_from_models(
         )
     for model in candidates[:affected_model_count]:
         wargear_by_model_id[model.model_instance_id].remove(effect.replaced_wargear_id)
+
+
+def _assigned_or_default_wargear_effect_slots(
+    *,
+    selection: WargearSelection,
+    wargear_id: str,
+    models: tuple[ModelInstance, ...],
+    eligible_models: tuple[ModelInstance, ...],
+    default_capacity_per_model: int | None = None,
+    default_capacity_by_model: dict[str, int] | None = None,
+) -> tuple[ModelInstance, ...]:
+    if selection.bearer_assignments:
+        eligible_model_ids = {model.model_instance_id for model in eligible_models}
+        slots: list[ModelInstance] = []
+        for assignment in selection.bearer_assignments:
+            if assignment.wargear_id != wargear_id:
+                continue
+            if assignment.model_ordinal > len(models):
+                raise UnitFactoryError(
+                    "WargearSelection bearer assignment references a missing model ordinal."
+                )
+            model = models[assignment.model_ordinal - 1]
+            if model.model_instance_id not in eligible_model_ids:
+                raise UnitFactoryError(
+                    "WargearSelection bearer assignment references an ineligible model."
+                )
+            capacity = (
+                default_capacity_per_model
+                if default_capacity_by_model is None
+                else default_capacity_by_model[model.model_instance_id]
+            )
+            if capacity is None or assignment.selection_count > capacity:
+                raise UnitFactoryError(
+                    "WargearSelection bearer assignment exceeds the model's effect capacity."
+                )
+            slots.extend(model for _index in range(assignment.selection_count))
+        return tuple(slots)
+    if default_capacity_by_model is not None:
+        return tuple(
+            model
+            for model in eligible_models
+            for _index in range(default_capacity_by_model[model.model_instance_id])
+        )
+    if default_capacity_per_model is None:
+        raise UnitFactoryError("Structured wargear effect assignment capacity is missing.")
+    return tuple(model for model in eligible_models for _index in range(default_capacity_per_model))
+
+
+def _wargear_option_selection_capacity_per_model(
+    option: DatasheetWargearOption,
+) -> int:
+    limit = option.selection_limit
+    if limit is None or limit.models_per_increment != 1:
+        return 1
+    return limit.max_option_selections_per_increment
 
 
 def _eligible_wargear_effect_models(

@@ -46,6 +46,7 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedGrantBinding,
     ShootingUnitSelectedHookBinding,
 )
+from warhammer40k_core.engine.start_battle_hooks import StartBattleHookBinding
 from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlHookBinding,
 )
@@ -108,6 +109,7 @@ class RuntimeHookRegistryShape(Protocol):
 _HOOK_EVENT_BY_BINDING_TYPE: Mapping[type[object], LifecycleHookEvent] = MappingProxyType(
     {
         BattleFormationHookBinding: LifecycleHookEvent.BATTLE_FORMATION,
+        StartBattleHookBinding: LifecycleHookEvent.START_BATTLE,
         BattleRoundStartHookBinding: LifecycleHookEvent.BATTLE_ROUND_START,
         TurnEndHookBinding: LifecycleHookEvent.TURN_END,
         CommandPhaseStartHookBinding: LifecycleHookEvent.COMMAND_PHASE_START,
@@ -149,6 +151,7 @@ _HOOK_EVENT_BY_BINDING_TYPE: Mapping[type[object], LifecycleHookEvent] = Mapping
 HOOK_BINDING_COMBINE_NAME_BY_EVENT: Mapping[LifecycleHookEvent, str] = MappingProxyType(
     {
         LifecycleHookEvent.BATTLE_FORMATION: "battle formation hook binding",
+        LifecycleHookEvent.START_BATTLE: "start-battle hook binding",
         LifecycleHookEvent.BATTLE_ROUND_START: "battle-round start hook binding",
         LifecycleHookEvent.TURN_END: "turn-end hook binding",
         LifecycleHookEvent.COMMAND_PHASE_START: "Command-phase start hook binding",

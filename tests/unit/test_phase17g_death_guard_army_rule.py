@@ -263,6 +263,39 @@ def test_battle_formation_hook_registry_enforces_single_request_and_handler() ->
     with pytest.raises(GameLifecycleError, match="multiple simultaneous requests"):
         registry.next_request_for(request_context)
 
+    prioritized_request = BattleFormationHookRegistry.from_bindings(
+        (
+            BattleFormationHookBinding(
+                hook_id="phase17g:test-hook-later",
+                source_id="phase17g:test-source-later",
+                request_handler=lambda context: _test_battle_formation_request(
+                    context=context,
+                    hook_id="phase17g:test-hook-later",
+                ),
+                request_priority=10,
+            ),
+            BattleFormationHookBinding(
+                hook_id="phase17g:test-hook-first",
+                source_id="phase17g:test-source-first",
+                request_handler=lambda context: _test_battle_formation_request(
+                    context=context,
+                    hook_id="phase17g:test-hook-first",
+                ),
+                request_priority=1,
+            ),
+        )
+    ).next_request_for(request_context)
+    assert prioritized_request is not None
+    assert isinstance(prioritized_request.payload, dict)
+    assert prioritized_request.payload["hook_id"] == "phase17g:test-hook-first"
+    with pytest.raises(GameLifecycleError, match="request_priority"):
+        BattleFormationHookBinding(
+            hook_id="phase17g:test-hook-invalid-priority",
+            source_id="phase17g:test-source-invalid-priority",
+            request_handler=lambda context: None,
+            request_priority=-1,
+        )
+
     result = DecisionResult.for_request(
         result_id="phase17g-battle-formation-hook-result",
         request=request,

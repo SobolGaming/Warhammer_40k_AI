@@ -16,7 +16,12 @@ from warhammer40k_core.engine.catalog_prebattle_redeploy import (
     apply_redeploy_to_strategic_reserves,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    DecisionError,
+    DecisionOption,
+    DecisionRequest,
+    DecisionRequestPayload,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.deployment import (
     SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
@@ -72,11 +77,29 @@ from warhammer40k_core.engine.reserve_declarations import (
     reserve_declaration_state_for_state,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.sequencing import (
+    SEQUENCING_DECISION_TYPE,
+    decision_controller_before_pending_sequencing_roll_off,
+)
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
+from warhammer40k_core.engine.start_battle_hooks import (
+    StartBattleHookRegistry,
+    StartBattleRequestContext,
+    StartBattleResultContext,
+    invalid_pending_start_battle_request_status,
+    is_start_battle_boundary,
+)
+from warhammer40k_core.engine.tracked_targets import SELECT_TRACKED_TARGET_DECISION_TYPE
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
+
+
+@dataclass(frozen=True, slots=True)
+class _AuthoritativeSetupRequest:
+    request: DecisionRequest
+    is_start_battle_request: bool
 
 
 @dataclass(slots=True)
@@ -84,10 +107,204 @@ class SetupFlow:
     battle_formation_hooks: BattleFormationHookRegistry = field(
         default_factory=BattleFormationHookRegistry.empty
     )
+    start_battle_hooks: StartBattleHookRegistry = field(
+        default_factory=StartBattleHookRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if type(self.battle_formation_hooks) is not BattleFormationHookRegistry:
             raise GameLifecycleError("SetupFlow battle_formation_hooks must be a registry.")
+        if type(self.start_battle_hooks) is not StartBattleHookRegistry:
+            raise GameLifecycleError("SetupFlow start_battle_hooks must be a registry.")
+
+    def invalid_pending_request_status(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        config: GameConfig,
+        pending_request: DecisionRequest,
+        reaction_frame_count: int,
+    ) -> LifecycleStatus | None:
+        if state.stage is not GameLifecycleStage.SETUP:
+            return None
+        issued_request: DecisionRequest | None = None
+        try:
+            issued_request = _last_issued_setup_request(decisions)
+            authoritative = self._authoritative_pending_request(
+                state=state,
+                decisions=decisions,
+                config=config,
+                pending_request=pending_request,
+                reaction_frame_count=reaction_frame_count,
+            )
+        except GameLifecycleError as exc:
+            return _invalid_authoritative_setup_request_status(
+                state=state,
+                detail=str(exc),
+                source_request=issued_request,
+            )
+        if authoritative is None:
+            return _invalid_authoritative_setup_request_status(
+                state=state,
+                detail="Setup pending request has no authoritative source at this boundary.",
+                source_request=issued_request,
+            )
+        if authoritative.is_start_battle_request:
+            invalid_reason, message = _start_battle_invalid_status_context(authoritative.request)
+            return invalid_pending_start_battle_request_status(
+                registry=self.start_battle_hooks,
+                context=StartBattleRequestContext(
+                    state=state,
+                    decisions=decisions,
+                    config=config,
+                ),
+                request=pending_request,
+                invalid_reason=invalid_reason,
+                message=message,
+            )
+        if pending_request != authoritative.request:
+            return _invalid_authoritative_setup_request_status(
+                state=state,
+                detail="Setup pending request drifted.",
+                source_request=issued_request,
+            )
+        return None
+
+    def _authoritative_pending_request(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        config: GameConfig,
+        pending_request: DecisionRequest,
+        reaction_frame_count: int,
+    ) -> _AuthoritativeSetupRequest | None:
+        state_clone = GameState.from_payload(state.to_payload())
+        decisions_clone = DecisionController.from_payload(decisions.to_payload())
+        removed_request = decisions_clone.queue.pop_next()
+        if removed_request != pending_request:
+            raise GameLifecycleError("Setup pending request clone drifted.")
+        if decisions_clone.queue.pending_requests:
+            raise GameLifecycleError(
+                "Setup request authority requires exactly one pending request."
+            )
+        if state_clone.decision_request_count < 1:
+            raise GameLifecycleError("Setup request authority requires an issued request ID.")
+        state_clone.decision_request_count -= 1
+        nested_request = self._nested_pending_request_from_last_record(
+            state=state_clone,
+            decisions=decisions_clone,
+            config=config,
+        )
+        if nested_request is not None:
+            return _AuthoritativeSetupRequest(
+                request=nested_request,
+                is_start_battle_request=False,
+            )
+        sequencing_roll_off_rewind = decision_controller_before_pending_sequencing_roll_off(
+            decisions=decisions_clone,
+            request=pending_request,
+        )
+        if sequencing_roll_off_rewind is not None:
+            decisions_clone = sequencing_roll_off_rewind.decisions
+        regenerated_suffix_start = len(decisions_clone.event_log.records)
+        hook_state = GameState.from_payload(state_clone.to_payload())
+        hook_decisions = DecisionController.from_payload(decisions_clone.to_payload())
+        status = self.advance(
+            state=state_clone,
+            decisions=decisions_clone,
+            config=config,
+            reaction_frame_count=reaction_frame_count,
+        )
+        authoritative_request = status.decision_request
+        if authoritative_request is None:
+            return None
+        if authoritative_request.decision_type == SEQUENCING_DECISION_TYPE:
+            if sequencing_roll_off_rewind is None:
+                raise GameLifecycleError(
+                    "Setup sequencing request has no authoritative roll-off event suffix."
+                )
+            regenerated_suffix = decisions_clone.event_log.records[regenerated_suffix_start:]
+            if regenerated_suffix != sequencing_roll_off_rewind.removed_events:
+                raise GameLifecycleError(
+                    "Setup sequencing event suffix drifted from authoritative regeneration."
+                )
+        elif sequencing_roll_off_rewind is not None:
+            raise GameLifecycleError(
+                "Setup roll-off event suffix does not belong to the authoritative request."
+            )
+        is_start_battle_request = False
+        if is_start_battle_boundary(hook_state):
+            hook_request = self.start_battle_hooks.next_request_for(
+                StartBattleRequestContext(
+                    state=hook_state,
+                    decisions=hook_decisions,
+                    config=config,
+                    authoritative_request_id=authoritative_request.request_id,
+                )
+            )
+            is_start_battle_request = hook_request == authoritative_request
+        return _AuthoritativeSetupRequest(
+            request=authoritative_request,
+            is_start_battle_request=is_start_battle_request,
+        )
+
+    def _nested_pending_request_from_last_record(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        config: GameConfig,
+    ) -> DecisionRequest | None:
+        if not decisions.records:
+            return None
+        record = decisions.records[-1]
+        if (
+            state.current_setup_step is SetupStep.DEPLOY_ARMIES
+            and record.request.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
+        ):
+            return deployment_placement_request_from_selection(
+                state=state,
+                ruleset_descriptor=config.ruleset_descriptor,
+                selection_request=record.request,
+                result=record.result,
+            ).to_decision_request()
+        if (
+            state.current_setup_step is SetupStep.REDEPLOY_UNITS
+            and record.request.decision_type == SELECT_REDEPLOY_UNIT_DECISION_TYPE
+        ):
+            action_kind = _prebattle_action_kind_from_payload(
+                _decision_payload_object(record.result.payload)
+            )
+            if action_kind is PreBattleActionKind.REDEPLOY:
+                return redeploy_placement_request_from_selection(
+                    state=state,
+                    ruleset_descriptor=config.ruleset_descriptor,
+                    army_catalog=config.army_catalog,
+                    selection_request=record.request,
+                    result=record.result,
+                ).to_decision_request()
+        if (
+            state.current_setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS
+            and record.request.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE
+        ):
+            action_kind = _prebattle_action_kind_from_payload(
+                _decision_payload_object(record.result.payload)
+            )
+            if action_kind in {
+                PreBattleActionKind.SCOUT_MOVE,
+                PreBattleActionKind.SCOUT_RESERVE_SETUP,
+                PreBattleActionKind.DEDICATED_TRANSPORT_SCOUT_MOVE,
+            }:
+                return prebattle_proposal_request_from_selection(
+                    state=state,
+                    ruleset_descriptor=config.ruleset_descriptor,
+                    army_catalog=config.army_catalog,
+                    selection_request=record.request,
+                    result=record.result,
+                ).to_decision_request()
+        return None
 
     def advance(
         self,
@@ -159,10 +376,25 @@ class SetupFlow:
 
         setup_completion_gate: SetupCompletionGate | None = None
         battle_start_payload: dict[str, JsonValue] | None = None
-        final_setup_step = state.setup_step_index is not None and state.setup_step_index + 1 == len(
-            state.setup_sequence
-        )
+        final_setup_step = is_start_battle_boundary(state)
         if final_setup_step:
+            start_battle_request = self.start_battle_hooks.next_request_for(
+                StartBattleRequestContext(
+                    state=state,
+                    decisions=decisions,
+                    config=config,
+                )
+            )
+            if start_battle_request is not None:
+                decisions.request_decision(start_battle_request)
+                return LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.SETUP,
+                    decision_request=start_battle_request,
+                    payload={
+                        "setup_step": current_step.value,
+                        "start_battle_hook_request": start_battle_request.payload,
+                    },
+                )
             setup_completion_gate = SetupCompletionGate()
             invalid_status = setup_completion_gate.invalid_status_if_not_ready(
                 state=state,
@@ -231,12 +463,27 @@ class SetupFlow:
         config: GameConfig,
     ) -> None:
         if result.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
+            request = decisions.record_for_result(result).request
+            if (
+                state.setup_step_index is not None
+                and state.setup_step_index + 1 == len(state.setup_sequence)
+                and self.start_battle_hooks.apply_result(
+                    StartBattleResultContext(
+                        state=state,
+                        decisions=decisions,
+                        config=config,
+                        request=request,
+                        result=result,
+                    )
+                )
+            ):
+                return
             if self.battle_formation_hooks.apply_result(
                 BattleFormationResultContext(
                     state=state,
                     decisions=decisions,
                     config=config,
-                    request=decisions.record_for_result(result).request,
+                    request=request,
                     result=result,
                 )
             ):
@@ -900,6 +1147,78 @@ def _secondary_mission_options(
             )
         )
     return tuple(options)
+
+
+def _invalid_authoritative_setup_request_status(
+    *,
+    state: GameState,
+    detail: str,
+    source_request: DecisionRequest | None,
+) -> LifecycleStatus:
+    if (
+        source_request is not None
+        and source_request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
+    ):
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Reserve declaration request no longer matches setup state.",
+            payload={
+                "invalid_reason": "reserve_declaration_request_drift",
+                "field": "setup_step",
+                "request_id": source_request.request_id,
+            },
+        )
+    return LifecycleStatus.invalid(
+        stage=state.stage,
+        message="Setup submission is stale.",
+        payload={
+            "invalid_reason": _setup_request_drift_reason(source_request),
+            "field": "authoritative_request",
+            "detail": detail,
+        },
+    )
+
+
+def _last_issued_setup_request(decisions: DecisionController) -> DecisionRequest:
+    for event in reversed(decisions.event_log.records):
+        if event.event_type != "decision_requested":
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Setup decision_requested payload must be an object.")
+        try:
+            return DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
+        except (KeyError, TypeError, DecisionError) as exc:
+            raise GameLifecycleError("Setup decision_requested payload is invalid.") from exc
+    raise GameLifecycleError("Setup pending request has no decision_requested event.")
+
+
+def _setup_request_drift_reason(request: DecisionRequest | None) -> str:
+    if request is None:
+        return "invalid_authoritative_setup_request"
+    if request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
+        return "invalid_faction_rule_setup_option_result"
+    if request.decision_type == SELECT_TRACKED_TARGET_DECISION_TYPE:
+        return "invalid_tracked_target_result"
+    if request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE:
+        return "reserve_declaration_request_drift"
+    return "invalid_authoritative_setup_request"
+
+
+def _start_battle_invalid_status_context(request: DecisionRequest) -> tuple[str, str]:
+    if request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
+        return (
+            "invalid_faction_rule_setup_option_result",
+            "Start-battle faction rule submission is stale.",
+        )
+    if request.decision_type == SELECT_TRACKED_TARGET_DECISION_TYPE:
+        return (
+            "invalid_tracked_target_result",
+            "Start-battle tracked target submission is stale.",
+        )
+    return (
+        "invalid_start_battle_request",
+        "Start-battle submission is stale.",
+    )
 
 
 def _record_dedicated_transport_manifests(

@@ -198,8 +198,7 @@ def test_piratical_exact_shapes_reject_ignored_selection_and_grant_parameters(
 
     if runtime_kind == "selection":
         assert (
-            CatalogTrackedTargetRuntime({"player-a": index}, (army,)).battle_formation_bindings()
-            == ()
+            CatalogTrackedTargetRuntime({"player-a": index}, (army,)).start_battle_bindings() == ()
         )
     else:
         assert CatalogWeaponKeywordGrantRuntime({"player-a": index}, (army,)).bindings() == ()

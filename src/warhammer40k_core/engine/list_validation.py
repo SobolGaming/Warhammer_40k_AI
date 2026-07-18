@@ -26,6 +26,9 @@ from warhammer40k_core.engine.scaled_wargear_limits import (
 from warhammer40k_core.engine.structured_wargear_validation import (
     validate_replace_wargear_effect_count,
 )
+from warhammer40k_core.engine.wargear_bearer_assignment_validation import (
+    validate_wargear_bearer_assignments,
+)
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
     ModelProfileSelectionPayload,
@@ -886,6 +889,7 @@ def resolve_wargear_selections(
         selections=resolved_tuple,
         datasheet=datasheet,
         model_profile_selections=model_profile_selections,
+        requested_option_ids=frozenset(requested_by_id),
     )
     return resolved_tuple
 
@@ -1092,8 +1096,15 @@ def _validate_wargear_option_semantics(
     selections: tuple[WargearSelection, ...],
     datasheet: DatasheetDefinition,
     model_profile_selections: tuple[ModelProfileSelection, ...] | None,
+    requested_option_ids: frozenset[str],
 ) -> None:
     options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    validate_wargear_bearer_assignments(
+        selections=selections,
+        options_by_id=options_by_id,
+        model_profile_selections=model_profile_selections,
+        requested_option_ids=requested_option_ids,
+    )
     selected_by_profile: dict[str, set[str]] = {}
     selections_by_profile: dict[str, list[WargearSelection]] = {}
     for selection in selections:
@@ -1210,8 +1221,10 @@ def _structured_selection_bearer_count(
     selection: WargearSelection,
     option: DatasheetWargearOption,
 ) -> int:
+    if selection.bearer_assignments:
+        return len({assignment.model_ordinal for assignment in selection.bearer_assignments})
     effect_model_counts = tuple(
-        effect.model_count * selection.resolved_selection_count
+        effect.model_count * selection.selection_count_for_wargear(effect.wargear_id)
         for effect in option.effects
         if effect.wargear_id in selection.wargear_ids
     )

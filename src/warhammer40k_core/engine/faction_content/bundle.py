@@ -13,6 +13,9 @@ from warhammer40k_core.engine import (
     generic_target_restriction_effects,
 )
 from warhammer40k_core.engine import generic_rule_advance_move_lifecycle_hooks as amh
+from warhammer40k_core.engine import (
+    start_battle_hooks as _sbh,
+)
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
@@ -1031,6 +1034,7 @@ class RuntimeContentBundle:
     faction_rule_execution_registry: FactionRuleExecutionRegistry
     event_index: RuntimeContentEventIndex
     battle_formation_hook_registry: BattleFormationHookRegistry
+    start_battle_hook_registry: _sbh.StartBattleHookRegistry
     battle_round_start_hook_registry: BattleRoundStartHookRegistry
     turn_end_hook_registry: TurnEndHookRegistry
     command_phase_start_hook_registry: CommandPhaseStartHookRegistry
@@ -1099,6 +1103,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires RuntimeContentEventIndex.")
         if type(self.battle_formation_hook_registry) is not BattleFormationHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleFormationHookRegistry.")
+        if type(self.start_battle_hook_registry) is not _sbh.StartBattleHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires StartBattleHookRegistry.")
         if type(self.battle_round_start_hook_registry) is not BattleRoundStartHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleRoundStartHookRegistry.")
         if type(self.turn_end_hook_registry) is not TurnEndHookRegistry:
@@ -1352,10 +1358,6 @@ class RuntimeContentBundle:
         )
         battle_formation_hook_registry = BattleFormationHookRegistry.from_bindings(
             (
-                *catalog_runtime_hooks.battle_formation_hook_bindings(
-                    ability_indexes_by_player_id=ability_indexes_by_player_id,
-                    armies=validated_armies,
-                ),
                 *generic_detachment_rule_effects.battle_formation_hook_bindings(
                     activation,
                     records,
@@ -1367,6 +1369,20 @@ class RuntimeContentBundle:
                 *_contribution_values(
                     validated_contributions,
                     lambda c: c.battle_formation_hook_bindings,
+                ),
+            )
+        )
+        start_battle_hook_registry = _sbh.StartBattleHookRegistry.from_bindings(
+            (
+                *catalog_runtime_hooks.start_battle_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *(
+                    cast(_sbh.StartBattleHookBinding, binding.binding)
+                    for contribution in validated_contributions
+                    for binding in contribution.hook_bindings
+                    if binding.lifecycle_event is LifecycleHookEvent.START_BATTLE
                 ),
             )
         )
@@ -1818,6 +1834,7 @@ class RuntimeContentBundle:
             faction_rule_execution_registry=faction_registry,
             event_index=event_index,
             battle_formation_hook_registry=battle_formation_hook_registry,
+            start_battle_hook_registry=start_battle_hook_registry,
             battle_round_start_hook_registry=battle_round_start_hook_registry,
             turn_end_hook_registry=turn_end_hook_registry,
             command_phase_start_hook_registry=command_phase_start_hook_registry,

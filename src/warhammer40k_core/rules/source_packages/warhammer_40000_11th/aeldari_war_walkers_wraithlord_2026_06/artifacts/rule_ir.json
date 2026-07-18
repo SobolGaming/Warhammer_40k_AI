@@ -1,0 +1,500 @@
+{
+  "artifact_schema": "core-v2-aeldari-war-walkers-wraithlord-rule-ir-v1",
+  "datasheets": {
+    "000000612": "War Walkers",
+    "000000613": "Wraithlord"
+  },
+  "package_hash": "39c0dabeb1520084ad34d920aaf714a5a0bfacc34d0e63d88cc55b4aa2600391",
+  "records": {
+    "000000612:3": {
+      "ability_name": "Crystalline Targeting",
+      "normalized_text_sha256": "2ae2949671cf7b853c5cf7786affa9cddf32c1a31c18efaf7909be023a69b89f",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:war-walkers-wraithlord:000000612:3:clause:001",
+            "conditions": [
+              {
+                "kind": "frequency_limit",
+                "parameters": [
+                  {
+                    "key": "maximum_uses",
+                    "value": 1
+                  },
+                  {
+                    "key": "scope",
+                    "value": "turn"
+                  },
+                  {
+                    "key": "subject",
+                    "value": "selected_target_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 345,
+                  "start": 284,
+                  "text": "Each unit can only be selected for this ability once per turn"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [],
+            "source_span": {
+              "end": 108,
+              "start": 0,
+              "text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks."
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 107,
+                "start": 57,
+                "text": "one enemy unit hit by one or more of those attacks"
+              }
+            },
+            "template_id": "phase17c:selected-target-constraint",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "just_after_friendly_unit_has_shot"
+                }
+              ],
+              "source_span": {
+                "end": 48,
+                "start": 24,
+                "text": "after this unit has shot"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:aeldari:war-walkers-wraithlord:000000612:3:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "attack_target"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "attack_targets_selected_unit"
+                  },
+                  {
+                    "key": "target_reference",
+                    "value": "selected_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 215,
+                  "start": 192,
+                  "text": "targets that enemy unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "endpoint",
+                  "value": "phase"
+                }
+              ],
+              "source_span": {
+                "end": 135,
+                "start": 109,
+                "text": "Until the end of the phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_characteristic",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "characteristic",
+                    "value": "armor_penetration"
+                  },
+                  {
+                    "key": "delta",
+                    "value": -1
+                  }
+                ],
+                "source_span": {
+                  "end": 282,
+                  "start": 217,
+                  "text": "improve the Armour Penetration characteristic of that attack by 1"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 346,
+              "start": 109,
+              "text": "Until the end of the phase, each time a friendly AELDARI unit makes an attack that targets that enemy unit, improve the Armour Penetration characteristic of that attack by 1. Each unit can only be selected for this ability once per turn."
+            },
+            "target": {
+              "kind": "friendly_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "friendly"
+                },
+                {
+                  "key": "required_keyword",
+                  "value": "AELDARI"
+                }
+              ],
+              "source_span": {
+                "end": 170,
+                "start": 147,
+                "text": "a friendly AELDARI unit"
+              }
+            },
+            "template_id": "phase17c:characteristic-modifier",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "e3fa1924df62f780a374685f2db8a548526770b9795bd2cdf7ee348747c38a90",
+        "normalized_text": "In your Shooting phase, after this unit has shot, select one enemy unit hit by one or more of those attacks. Until the end of the phase, each time a friendly AELDARI unit makes an attack that targets that enemy unit, improve the Armour Penetration characteristic of that attack by 1. Each unit can only be selected for this ability once per turn.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:war-walkers-wraithlord:datasheet:000000612:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-war-walkers-wraithlord-datasheets-2026-06-14:datasheet:000000612:3"
+      }
+    },
+    "000000613:2": {
+      "ability_name": "Fated Hero",
+      "normalized_text_sha256": "6b9ca020806a9dd8524e29e5e2797480bd90c7d6bad50c4699202009aab0917f",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:2:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "permanent",
+              "parameters": [],
+              "source_span": {
+                "end": 139,
+                "start": 103,
+                "text": "Each time this model makes an attack"
+              }
+            },
+            "effects": [
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "reroll_unmodified_value",
+                    "value": 1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "hit"
+                  },
+                  {
+                    "key": "target_required_keyword",
+                    "value": "selected_keyword"
+                  },
+                  {
+                    "key": "timing_window",
+                    "value": "attack_sequence.hit"
+                  }
+                ],
+                "source_span": {
+                  "end": 210,
+                  "start": 187,
+                  "text": "re-roll a Hit roll of 1"
+                }
+              },
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "reroll_unmodified_value",
+                    "value": 1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "wound"
+                  },
+                  {
+                    "key": "target_required_keyword",
+                    "value": "selected_keyword"
+                  },
+                  {
+                    "key": "timing_window",
+                    "value": "attack_sequence.wound"
+                  }
+                ],
+                "source_span": {
+                  "end": 240,
+                  "start": 215,
+                  "text": "re-roll a Wound roll of 1"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 241,
+              "start": 0,
+              "text": "At the start of the battle, select one of the following keywords: INFANTRY; MONSTER; MOUNTED; VEHICLE. Each time this model makes an attack that targets a unit with the selected keyword, re-roll a Hit roll of 1 and re-roll a Wound roll of 1."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 123,
+                "start": 113,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17c:start-battle-keyword-choice-reroll",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "start"
+                },
+                {
+                  "key": "keyword_options",
+                  "value": [
+                    "INFANTRY",
+                    "MONSTER",
+                    "MOUNTED",
+                    "VEHICLE"
+                  ]
+                },
+                {
+                  "key": "phase",
+                  "value": "battle"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "start_battle"
+                }
+              ],
+              "source_span": {
+                "end": 26,
+                "start": 0,
+                "text": "At the start of the battle"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "8ec456b79d84d94785a3b09f7c3251dfef34b8256367097270af5fb864285889",
+        "normalized_text": "At the start of the battle, select one of the following keywords: INFANTRY; MONSTER; MOUNTED; VEHICLE. Each time this model makes an attack that targets a unit with the selected keyword, re-roll a Hit roll of 1 and re-roll a Wound roll of 1.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:war-walkers-wraithlord:datasheet:000000613:2",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-war-walkers-wraithlord-datasheets-2026-06-14:datasheet:000000613:2"
+      }
+    },
+    "000000613:3": {
+      "ability_name": "Psychic Guidance",
+      "normalized_text_sha256": "a7b5a2feb92f0b0f759d3b1dd55709b9413bd9fc916dc4a483be785a10ed4290",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:3:clause:001",
+            "conditions": [
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": 12.0
+                  },
+                  {
+                    "key": "negated",
+                    "value": false
+                  },
+                  {
+                    "key": "object_allegiance",
+                    "value": "friendly"
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "model"
+                  },
+                  {
+                    "key": "object_quantity",
+                    "value": "one_or_more"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within"
+                  },
+                  {
+                    "key": "required_keyword_sequence",
+                    "value": [
+                      "AELDARI",
+                      "PSYKER"
+                    ]
+                  },
+                  {
+                    "key": "subject",
+                    "value": "this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 76,
+                  "start": 6,
+                  "text": "this model is within 12\" of one or more friendly Aeldari Psyker models"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "modify_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "ballistic_skill"
+                  },
+                  {
+                    "key": "delta",
+                    "value": -1
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "weapons_equipped_by_this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 105,
+                  "start": 90,
+                  "text": "Ballistic Skill"
+                }
+              },
+              {
+                "kind": "modify_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "weapon_skill"
+                  },
+                  {
+                    "key": "delta",
+                    "value": -1
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "weapons_equipped_by_this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 122,
+                  "start": 110,
+                  "text": "Weapon Skill"
+                }
+              },
+              {
+                "kind": "set_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "leadership"
+                  },
+                  {
+                    "key": "value",
+                    "value": "6+"
+                  }
+                ],
+                "source_span": {
+                  "end": 222,
+                  "start": 191,
+                  "text": "Leadership characteristic of 6+"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 223,
+              "start": 0,
+              "text": "While this model is within 12\" of one or more friendly Aeldari Psyker models, improve the Ballistic Skill and Weapon Skill characteristics of weapons equipped by this model by 1 and it has a Leadership characteristic of 6+."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 16,
+                "start": 6,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17c:characteristic-set",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "25284cf1d62ddc362dfac8866c4bf5bddc9c6e10c1c3daaa438018925b1305f0",
+        "normalized_text": "While this model is within 12\" of one or more friendly Aeldari Psyker models, improve the Ballistic Skill and Weapon Skill characteristics of weapons equipped by this model by 1 and it has a Leadership characteristic of 6+.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:war-walkers-wraithlord:datasheet:000000613:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-war-walkers-wraithlord-datasheets-2026-06-14:datasheet:000000613:3"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-aeldari-war-walkers-wraithlord-datasheets-2026-06-14",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}
