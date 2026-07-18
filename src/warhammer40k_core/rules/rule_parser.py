@@ -20,6 +20,7 @@ from warhammer40k_core.rules.command_point_parser import (
     parse_command_point_effects,
     parse_command_point_trigger,
 )
+from warhammer40k_core.rules.dice_roll_override_parser import dice_roll_override_effects
 from warhammer40k_core.rules.hit_success_threshold_parser import (
     has_hit_success_threshold,
     hit_success_threshold_effects,
@@ -98,6 +99,7 @@ from warhammer40k_core.rules.rule_templates import (
     CONTEXTUAL_STATUS_TEMPLATE_ID,
     DESPERATE_ESCAPE_TEMPLATE_ID,
     DICE_ROLL_MODIFIER_TEMPLATE_ID,
+    DICE_ROLL_OVERRIDE_TEMPLATE_ID,
     DISTANCE_PREDICATE_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
@@ -811,6 +813,7 @@ def _compile_clause(
     duration = _parse_duration(clause_text)
     effects = _dedupe_effects(
         (
+            *dice_roll_override_effects(clause_text.text, clause_text.span),
             *_parse_dice_roll_modifier_effects(clause_text),
             *_parse_reroll_effects(clause_text),
             *_selected_target_extensions.parse_battle_shock_test_reroll_effects(
@@ -2606,6 +2609,8 @@ def _template_id_for_clause(
             candidates.append(DESPERATE_ESCAPE_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
             candidates.append(DICE_ROLL_MODIFIER_TEMPLATE_ID)
+        elif effect.kind is RuleEffectKind.OVERRIDE_DICE_ROLL_RESULT:
+            candidates.append(DICE_ROLL_OVERRIDE_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.REROLL_PERMISSION:
             candidates.append(REROLL_PERMISSION_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:

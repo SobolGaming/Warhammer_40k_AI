@@ -398,6 +398,10 @@ class UnitMusterSelection:
 
     @classmethod
     def from_payload(cls, payload: UnitMusterSelectionPayload) -> Self:
+        if "starting_resources" in payload:
+            raise ListValidationError(
+                "UnitMusterSelection starting_resources are engine-derived from wargear choices."
+            )
         return cls(
             unit_selection_id=payload["unit_selection_id"],
             datasheet_id=payload["datasheet_id"],

@@ -13,11 +13,8 @@ from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
-from warhammer40k_core.engine.army_mustering import (
-    ArmyDefinition,
-    ArmyMusteringError,
-    muster_army,
-)
+from warhammer40k_core.engine.army_muster_consistency import validate_mustered_army_consistency
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
@@ -82,6 +79,11 @@ from warhammer40k_core.engine.deployment import (
     is_deployment_placement_request,
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
+from warhammer40k_core.engine.dice_result_overrides import (
+    DICE_RESULT_OVERRIDE_DECISION_TYPE,
+    apply_dice_result_override_decision,
+    invalid_dice_result_override_status,
+)
 from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
 from warhammer40k_core.engine.event_log import (
     EventRecord,
@@ -129,6 +131,12 @@ from warhammer40k_core.engine.lifecycle_setup_reactive import (
     apply_setup_reactive_lifecycle_decision_if_applicable,
     invalid_setup_reactive_lifecycle_status,
     is_setup_reactive_lifecycle_request,
+)
+from warhammer40k_core.engine.lifecycle_state_queries import (
+    embarked_unit_ids_for_player as _embarked_unit_ids_for_player,
+)
+from warhammer40k_core.engine.lifecycle_state_queries import (
+    unarrived_reserve_unit_ids_for_player as _unarrived_reserve_unit_ids_for_player,
 )
 from warhammer40k_core.engine.mission_decisions import (
     MISSION_DECISION_TYPES,
@@ -349,6 +357,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        DICE_RESULT_OVERRIDE_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
     )
 )
@@ -362,6 +371,7 @@ _ATTACK_SEQUENCE_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        DICE_RESULT_OVERRIDE_DECISION_TYPE,
     )
 )
 _SHOOTING_PHASE_DISPATCH_DECISION_TYPES = _SHOOTING_DECISION_TYPES - (
@@ -404,6 +414,7 @@ _FIGHT_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        DICE_RESULT_OVERRIDE_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
     )
 )
@@ -435,6 +446,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        DICE_RESULT_OVERRIDE_DECISION_TYPE,
         SELECT_HEALING_MODEL_DECISION_TYPE,
     )
 )
@@ -1537,6 +1549,13 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         state = self._require_state()
+        if request.decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE:
+            return invalid_dice_result_override_status(
+                state=state,
+                decisions=self.decision_controller,
+                request=request,
+                result=result,
+            )
         if request.decision_type in (
             SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
             SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
@@ -1596,6 +1615,30 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus:
         state = self._require_state()
+        if record.request.decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE:
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            fight_owned = _fight_decision_owns_request(state=state, request=record.request)
+            apply_dice_result_override_decision(
+                state=state,
+                decisions=self.decision_controller,
+                request=record.request,
+                result=result,
+            )
+            advanced_status = self.advance_until_decision_or_terminal()
+            if resolves_reaction_frame:
+                if fight_owned:
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                else:
+                    handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                    if handled_status is not None:
+                        return handled_status
+            return advanced_status
         if (
             record.request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
             and is_mortal_wound_feel_no_pain_request(record.request)
@@ -3273,30 +3316,11 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     expected_battle = tuple(config.ruleset_descriptor.battle_phase_sequence.phases)
     if state.battle_phase_sequence != expected_battle:
         raise GameLifecycleError("Lifecycle state battle phase sequence does not match config.")
-    _validate_mustered_army_consistency(state=state, config=config)
-
-
-def _validate_mustered_army_consistency(*, state: GameState, config: GameConfig) -> None:
-    if not state.army_definitions and not _state_requires_mustered_armies(state):
-        return
-    try:
-        expected_armies = tuple(
-            sorted(
-                (
-                    muster_army(catalog=config.army_catalog, request=request)
-                    for request in config.army_muster_requests
-                ),
-                key=lambda army: army.player_id,
-            )
-        )
-    except ArmyMusteringError as exc:
-        raise GameLifecycleError("Lifecycle config army muster requests are invalid.") from exc
-    expected_payloads = [army.to_payload() for army in expected_armies]
-    state_payloads = [army.to_payload() for army in state.army_definitions]
-    if _state_requires_mustered_armies(state) and not state_payloads:
-        raise GameLifecycleError("Lifecycle state is missing mustered army definitions.")
-    if state_payloads and state_payloads != expected_payloads:
-        raise GameLifecycleError("Lifecycle state army definitions do not match config.")
+    validate_mustered_army_consistency(
+        state=state,
+        catalog=config.army_catalog,
+        muster_requests=config.army_muster_requests,
+    )
 
 
 def _validate_battlefield_state_consistency(
@@ -3797,22 +3821,6 @@ def _validate_surge_move_state_consistency(*, state: GameState) -> None:
             raise GameLifecycleError("surge_move_states player_id does not match unit owner.")
 
 
-def _embarked_unit_ids_for_player(*, state: GameState, player_id: str) -> set[str]:
-    return {
-        unit_id
-        for cargo_state in state.transport_cargo_states
-        if cargo_state.player_id == player_id
-        for unit_id in cargo_state.embarked_unit_instance_ids
-    }
-
-
-def _unarrived_reserve_unit_ids_for_player(*, state: GameState, player_id: str) -> set[str]:
-    return {
-        reserve_state.unit_instance_id
-        for reserve_state in state.unarrived_reserve_states_for_player(player_id)
-    }
-
-
 def _fully_removed_unit_ids_for_player(*, state: GameState, player_id: str) -> set[str]:
     if state.battlefield_state is None:
         raise GameLifecycleError("removed unit accounting requires battlefield_state.")
@@ -3826,17 +3834,6 @@ def _fully_removed_unit_ids_for_player(*, state: GameState, player_id: str) -> s
             if unit_model_ids and unit_model_ids <= removed_model_ids:
                 fully_removed_unit_ids.add(unit.unit_instance_id)
     return fully_removed_unit_ids
-
-
-def _state_requires_mustered_armies(state: GameState) -> bool:
-    if state.stage is not GameLifecycleStage.SETUP:
-        return True
-    if state.setup_step_index is None:
-        return True
-    muster_step_index = _setup_step_index_or_none(state, SetupStep.MUSTER_ARMIES)
-    if muster_step_index is None:
-        raise GameLifecycleError("Lifecycle state setup sequence must include MUSTER_ARMIES.")
-    return state.setup_step_index > muster_step_index
 
 
 def _state_requires_battlefield_state(state: GameState) -> bool:

@@ -81,6 +81,11 @@ THIS_MODEL_SINGLE_ADDITIVE_RE = re.compile(
     r"^This model can be equipped with 1 (?P<granted>.+?)\.$",
     re.IGNORECASE,
 )
+UNIT_RESOURCE_RE = re.compile(
+    r"^For every (?P<models_per_increment>\d+) models in this unit, it can have "
+    r"(?P<max_per_increment>\d+) (?P<resource_name>.+?)\.$",
+    re.IGNORECASE,
+)
 
 
 def append_unit_wargear_option_rows(
@@ -89,14 +94,30 @@ def append_unit_wargear_option_rows(
     datasheet_id: str,
     model_profile_by_name: dict[str, str],
     max_models_by_profile_id: dict[str, int],
+    required_model_profile_ids: tuple[str, ...],
     minimum_unit_models: int,
     maximum_unit_models: int,
+    resource_namespace: str,
     loadout_assignments: LoadoutAssignments | None,
     wargear_ids_by_name: dict[str, str],
     bridged_rows: dict[str, list[dict[str, str]]],
     error_type: type[ValueError],
 ) -> bool:
     description = _required_field(row, "description", error_type=error_type)
+    unit_resource = UNIT_RESOURCE_RE.fullmatch(description)
+    if unit_resource is not None:
+        _append_unit_resource_option(
+            row=row,
+            datasheet_id=datasheet_id,
+            required_model_profile_ids=required_model_profile_ids,
+            maximum_unit_models=maximum_unit_models,
+            resource_namespace=resource_namespace,
+            wargear_ids_by_name=wargear_ids_by_name,
+            match=unit_resource,
+            bridged_rows=bridged_rows,
+            error_type=error_type,
+        )
+        return True
     each_model_replacement = EACH_MODEL_EQUIPPED_REPLACEMENT_CHOICES_RE.fullmatch(description)
     if each_model_replacement is not None:
         _append_each_equipped_replacement_choices(
@@ -264,6 +285,58 @@ def append_unit_wargear_option_rows(
         )
         return True
     return False
+
+
+def _append_unit_resource_option(
+    *,
+    row: NormalizedSourceRow,
+    datasheet_id: str,
+    required_model_profile_ids: tuple[str, ...],
+    maximum_unit_models: int,
+    resource_namespace: str,
+    wargear_ids_by_name: dict[str, str],
+    match: re.Match[str],
+    bridged_rows: dict[str, list[dict[str, str]]],
+    error_type: type[ValueError],
+) -> None:
+    models_per_increment = int(match.group("models_per_increment"))
+    max_per_increment = int(match.group("max_per_increment"))
+    if models_per_increment < 1 or max_per_increment < 1:
+        raise error_type("Unit-resource wargear option counts must be positive.")
+    max_selections = (maximum_unit_models // models_per_increment) * max_per_increment
+    if max_selections < 1:
+        raise error_type("Unit-resource wargear option is unavailable at maximum unit size.")
+    required_profiles = tuple(sorted(set(required_model_profile_ids)))
+    if not required_profiles:
+        raise error_type("Unit-resource wargear option requires a mandatory model profile.")
+    resource_name = match.group("resource_name")
+    wargear_id = _required_wargear_id(
+        wargear_ids_by_name,
+        resource_name,
+        error_type=error_type,
+    )
+    source_line = _required_field(row, "line", error_type=error_type)
+    resource_slug = _name_key(resource_name).replace("_", "-")
+    namespace_slug = _name_key(resource_namespace).replace("_", "-")
+    bridged_rows["Datasheets_options"].append(
+        {
+            **_option_common(
+                row=row,
+                datasheet_id=datasheet_id,
+                option_id=f"{datasheet_id}:{resource_slug}:option-{source_line}",
+                model_profile_id=required_profiles[0],
+                allowed_wargear_ids=(wargear_id,),
+                max_selections=1,
+            ),
+            "line": source_line,
+            "selection_group_id": f"{datasheet_id}:unit-resource-option-{source_line}",
+            "selection_models_per_increment": str(models_per_increment),
+            "selection_group_max_per_increment": str(max_per_increment),
+            "selection_option_max_per_increment": str(max_per_increment),
+            "unit_resource_kind": f"{namespace_slug}:{resource_slug}",
+            "unit_resource_amount_per_selection": "1",
+        }
+    )
 
 
 def _append_each_equipped_replacement_choices(

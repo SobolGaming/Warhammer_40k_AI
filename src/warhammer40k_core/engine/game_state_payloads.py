@@ -66,6 +66,7 @@ from warhammer40k_core.engine.transports import (
 )
 from warhammer40k_core.engine.triggered_movement import SurgeMoveStatePayload
 from warhammer40k_core.engine.turn_cleanup import EndTurnCleanupStatePayload
+from warhammer40k_core.engine.unit_resources import UnitResourceLedgerPayload
 from warhammer40k_core.engine.unit_state import StartingStrengthRecordPayload
 
 
@@ -143,6 +144,7 @@ class GameStatePayload(TypedDict):
     command_point_ledgers: list[CommandPointLedgerPayload]
     victory_point_ledgers: list[VictoryPointLedgerPayload]
     faction_resource_ledgers: list[FactionResourceLedgerPayload]
+    unit_resource_ledgers: list[UnitResourceLedgerPayload]
     stratagem_use_records: list[StratagemUseRecordPayload]
     faction_rule_states: list[FactionRuleStatePayload]
     army_definitions: list[ArmyDefinitionPayload]

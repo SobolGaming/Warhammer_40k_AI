@@ -1485,8 +1485,8 @@
     "player-a",
     "player-b"
   ],
-  "projection_schema": "game-view-v3-phase18a",
-  "projection_state_hash": "0dbbe89bd334a3d4659ecf1fec0413dd7c75b1e47bf429b7e9c8c86be2925621",
+  "projection_schema": "game-view-v4-unit-resources",
+  "projection_state_hash": "cfcd6eccdf19e52423aabc5f04fc79dd6d2400251806195e64a3c0d8edf6b218",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
@@ -1554,6 +1554,7 @@
         "hidden": false,
         "reason": null
       },
+      "resources": [],
       "selected_wargear_ids": [
         "core-bolt-rifle"
       ],

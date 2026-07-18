@@ -579,6 +579,7 @@ def default_rule_execution_registry() -> RuleExecutionRegistry:
                 template_id=None,
                 effect_kinds=(
                     RuleEffectKind.MODIFY_DICE_ROLL,
+                    RuleEffectKind.OVERRIDE_DICE_ROLL_RESULT,
                     RuleEffectKind.MODIFY_CHARACTERISTIC,
                     RuleEffectKind.MODIFY_MOVE_DISTANCE,
                     RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,

@@ -256,6 +256,9 @@ from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.dice_result_override_descriptors import (
+    ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
+)
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpiration,
@@ -379,7 +382,12 @@ from warhammer40k_core.engine.turn_end_hooks import (
     TurnEndRequestContext,
     TurnEndResultContext,
 )
-from warhammer40k_core.engine.unit_factory import ModelInstance, UnitFactory, UnitInstance
+from warhammer40k_core.engine.unit_factory import (
+    ModelInstance,
+    UnitFactory,
+    UnitFactoryError,
+    UnitInstance,
+)
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_ROLLED_EVENT,
     UnitMoveCompletedContext,
@@ -6806,11 +6814,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in aeldari_markdown
     assert (
         "| Craftworlds / Asuryani | Rangers (`000000592`)<br>"
-        "Shroud Runners (`000002533`)<br>Vypers (`000000605`)<br>"
+        "Shroud Runners (`000002533`)<br>Striking Scorpions (`000000595`)<br>"
+        "Vypers (`000000605`)<br>"
         "War Walkers (`000000612`)<br>Wraithblades (`000000598`)<br>"
         "Wraithguard (`000000597`)<br>Wraithlord (`000000613`) | Crimson Hunter"
     ) in aeldari_markdown
-    assert "Crimson Hunter (`000000603`)<br>Eldrad Ulthran (`000000568`)" in aeldari_markdown
+    assert (
+        "Crimson Hunter (`000000603`)<br>Dark Reapers (`000000607`)<br>Eldrad Ulthran (`000000568`)"
+    ) in aeldari_markdown
     assert "Eldrad Ulthran (`000000568`)<br>Falcon (`000000609`)" in aeldari_markdown
     assert "Wraithguard (`000000597`)" in aeldari_markdown
     assert (
@@ -8367,6 +8378,104 @@ def test_phase17k_bridge_preserves_unsupported_rule_ir_diagnostics() -> None:
     assert ability.support is CatalogAbilitySupport.UNSUPPORTED
     assert ability.rule_ir_payload is not None
     assert ability.rule_ir_diagnostics == tuple(diagnostics)
+
+
+def test_phase17k_unit_resource_wargear_option_derives_source_capped_starting_balance() -> None:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_unit_resource_wargear_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-aspect-warriors",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-aspect-warriors",
+                model_name="Aspect Exarch",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:aspect-exarch-height",
+                height_document_reference="test-doc:aspect-exarch-height",
+            ),
+            ModelHeightOverride(
+                datasheet_id="test-aspect-warriors",
+                model_name="Aspect Warriors",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:aspect-warriors-height",
+                height_document_reference="test-doc:aspect-warriors-height",
+            ),
+        ),
+    )
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=bridge_artifacts,
+    )
+    datasheet = package.army_catalog.datasheet_by_id("test-aspect-warriors")
+    option = next(
+        option
+        for option in datasheet.wargear_options
+        if option.selection_limit is not None
+        and option.selection_limit.unit_resource_kind is not None
+    )
+    token_wargear_id = "test-aspect-warriors:aspect-shrine-token"
+    selection = WargearSelection(
+        option_id=option.option_id,
+        model_profile_id=option.model_profile_id,
+        wargear_ids=(token_wargear_id,),
+        selection_count=2,
+    )
+    model_selections = (
+        ModelProfileSelection(
+            model_profile_id="test-aspect-warriors:aspect-exarch",
+            model_count=1,
+        ),
+        ModelProfileSelection(
+            model_profile_id="test-aspect-warriors:aspect-warriors",
+            model_count=9,
+        ),
+    )
+    unit = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-aeldari",
+        selection=UnitMusterSelection(
+            unit_selection_id="aspect-warriors-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=model_selections,
+            wargear_selections=(selection,),
+        ),
+        datasheet=datasheet,
+    )
+
+    assert option.selection_limit is not None
+    assert option.selection_limit.unit_resource_kind == ASPECT_SHRINE_TOKEN_RESOURCE_KIND
+    assert option.selection_limit.unit_resource_amount_per_selection == 1
+    assert option.selection_limit.models_per_increment == 5
+    assert option.selection_limit.max_option_selections_per_increment == 1
+    assert option.source_ids == (
+        f"{_bridge_package_id().stable_identity()}:Datasheets_options:test-aspect-warriors:1",
+    )
+    assert unit.starting_resources[0].resource_kind == ASPECT_SHRINE_TOKEN_RESOURCE_KIND
+    assert unit.starting_resources[0].amount == 2
+    assert all(token_wargear_id not in model.wargear_ids for model in unit.own_models)
+
+    with pytest.raises(UnitFactoryError, match="UnitMusterSelection is invalid"):
+        UnitFactory(
+            catalog=package.army_catalog,
+            model_geometries=package.model_geometries,
+        ).instantiate_unit(
+            army_id="army-aeldari",
+            selection=UnitMusterSelection(
+                unit_selection_id="aspect-warriors-2",
+                datasheet_id=datasheet.datasheet_id,
+                model_profile_selections=(
+                    model_selections[0],
+                    replace(model_selections[1], model_count=4),
+                ),
+                wargear_selections=(selection,),
+            ),
+            datasheet=datasheet,
+        )
 
 
 def test_phase17k_structured_wargear_option_semantics_block_icon_and_instrument_together() -> None:
@@ -10812,6 +10921,88 @@ def _post_shoot_selected_target_effect_source_artifacts() -> tuple[WahapediaJson
         _artifact_from_csv(
             "Factions",
             "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _unit_resource_wargear_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Battle Focus,Army rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-aspect-warriors,Aspect Warriors,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    ("test-aspect-warriors,1,Faction,test-army-rule,Battle Focus,Army rule text.,"),
+                    (
+                        'test-aspect-warriors,2,Wargear,,Aspect Shrine Token,"Once per battle '
+                        "for each Aspect Shrine token this unit has, you can change the result "
+                        "of one Hit roll or one Wound roll made for a model in this unit "
+                        '(excluding CHARACTER models) to an unmodified 6.",'
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-aspect-warriors,Infantry,,false",
+                    "test-aspect-warriors,Aeldari,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-aspect-warriors,1,7,3,3,-,1,6,1,28.5mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_options",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    (
+                        'test-aspect-warriors,1,"For every 5 models in this unit, it can have '
+                        '1 Aspect Shrine token."'
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    'test-aspect-warriors,1,"1 Aspect Exarch and 4-9 Aspect Warriors"',
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Aeldari")),
         ),
     )
 

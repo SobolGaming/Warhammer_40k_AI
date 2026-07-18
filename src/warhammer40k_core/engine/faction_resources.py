@@ -15,6 +15,33 @@ def _empty_resource_totals() -> dict[str, int]:
     return {}
 
 
+def validate_faction_resource_ledgers(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[FactionResourceLedger]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState faction_resource_ledgers must be a list.")
+    if not values:
+        return initial_faction_resource_ledgers(player_ids)
+    validated: list[FactionResourceLedger] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not FactionResourceLedger:
+            raise GameLifecycleError(
+                "GameState faction_resource_ledgers must contain FactionResourceLedger values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("FactionResourceLedger player_id is not in this game.")
+        if value.player_id in seen:
+            raise GameLifecycleError("GameState faction_resource_ledgers must be unique.")
+        seen.add(value.player_id)
+        validated.append(value)
+    if set(seen) != set(player_ids):
+        raise GameLifecycleError("GameState faction_resource_ledgers must include every player.")
+    return sorted(validated, key=lambda ledger: ledger.player_id)
+
+
 class FactionResourceTransactionKind(StrEnum):
     GAIN = "gain"
     SPEND = "spend"

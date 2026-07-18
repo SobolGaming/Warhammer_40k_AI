@@ -39,6 +39,21 @@ decision path. Adapters normalize the external roster once into a versioned
 `ArmyMusterRequest` is the only roster input passed to `GameConfig` and the
 ordinary setup lifecycle.
 
+Unit-scoped resources obtained through optional wargear are selected through
+the ordinary `UnitMusterSelection.wargear_selections` contract. Adapters submit
+the source-backed wargear option ID, wargear ID, model profile ID, and
+`selection_count`; they do not submit an authoritative resource balance.
+`UnitMusterSelection` therefore has no `starting_resources` field and rejects a
+payload that supplies one. The engine validates the complete selection against
+the datasheet option's scaled selection limit, then derives
+`UnitInstance.starting_resources` and the initial resource ledger. For Aspect
+Shrine Tokens, the source row permits one selected token for every five models
+in that component unit, so a 5-model unit can select at most one and a 10-model
+unit at most two. This datasheet option is independent of detachment choice.
+Lifecycle rehydration remusters from the roster selections and rejects any
+drift between those derived allocations, unit payloads, and initialization
+transactions.
+
 The artifact must carry a selected `force_disposition_id`, Battle Size,
 detachment selection, source IDs, declared points for every unit, declared
 total points, and the exact MFM package identity used to price it. The engine
@@ -112,6 +127,10 @@ The shared contract uses these objects and payloads:
 - `MeleeDeclarationProposalRequest`: Fight phase parameterized request exposing current melee weapon options, model-engaged target snapshots, the source activation decision context, and ruleset descriptor hash.
 - `MeleeDeclarationProposal`: Fight phase parameterized answer selecting each fighting model's primary melee weapon, optional `[EXTRA ATTACKS]` weapons, and target allocations for those melee weapons.
 - `PsychicAttackModifierIgnoreSelection`: finite Shooting/Fight attack-sequence answer selecting one engine-emitted way to keep or ignore current `[PSYCHIC]` weapon skill and hit-roll modifiers for the active attack context.
+- `DiceResultOverrideRequestPayload`: finite Shooting/Fight/out-of-phase
+  attack-sequence request answered with `decline` or `use` for one source-backed
+  unit resource after all reroll opportunities and before the Hit or Wound
+  result is emitted.
 - `PlacementProposalPayload`: parameterized placement answer, including either one attempted physical `UnitPlacement` or one grouped `RulesUnitPlacement` for an attached rules unit.
 - `CultAmbushMarker`: replay-safe Genestealer Cults marker state used by the Cult Ambush marker placement and ingress contracts.
 - `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
@@ -662,6 +681,21 @@ Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule
 Phase 12C source-backed Core Stratagems are adapter-visible through these handler bindings:
 
 - `core:command-reroll`: finite `use_stratagem` option at `after_dice_roll`; the option payload context includes `trigger_payload.dice_roll_state` and `trigger_payload.affected_unit_instance_id`, and the source-backed catalog definition includes `eligible_roll_types` for the edition-specific roll classes that may be re-rolled. The affected unit ID is canonicalized into the resulting `StratagemUseRecord.affected_unit_instance_ids` before the engine enforces the one-Stratagem-per-unit-per-phase restriction; missing, unknown, wrong-owner, stale attached-unit, or otherwise malformed affected-unit context is rejected before option emission and before queue pop. The 11th Edition source list covers Hit, Wound, Damage, saving throw, Advance, Charge, Hazardous, and number-of-attacks rolls; the normalized number-of-attacks roll type is `number_of_attacks_roll`. It does not include Leadership, Battle-shock, Desperate Escape, or no-save allocation-order roll classes. Desperate Escape uses hazard rolls in 11th Edition. Runtime attack/save roll specs can remain precise (`attack_sequence.hit`, `attack_sequence.wound`, `attack_sequence.save.*`, and random Damage roll types); Command Re-roll normalizes those to source-backed roll classes before eligibility comparison. Shooting and Fight attack-sequence hosts open the optional window after Hit rolls, Wound rolls, real armour/invulnerable saving throws, and random Damage rolls before that roll is consumed by the next attack step. Those attack-sequence `use_stratagem` requests are wrapped in the Phase 18B `OpportunityWindow` envelope: the request payload carries `submission_family: "opportunity_window"`, `opportunity_window`, `opportunity_window_id`, boundary state hash, sequence number, anchor event IDs, and the legal-action fingerprint; each use or decline option carries a matching nested `opportunity_submission`. `GameLifecycle.submit_decision(...)` validates wrong window IDs, stale state hashes, stale sequence numbers, changed legal-action fingerprints, wrong players, unavailable actions, malformed envelopes, and action drift before queue pop, CP spend, reroll mutation, or decline recording. A real armour or invulnerable saving throw remains an `attack_sequence.save.*` roll even when its target number is above 6 and cannot succeed on a D6. Synthetic ordered-allocation dice for effects that permit no saving throw use `attack_sequence.allocation_order.no_save` and are not saving throws. The engine rejects unlisted non-roll-off roll types and roll actor drift before option emission and before queue pop. Single-die rolls and Charge rolls resolve through Phase 10J whole-roll reroll semantics. Non-Charge multi-dice rolls emit a nested `select_dice_reroll` finite request with one legal reroll option per die, and lifecycle submission must select one engine-emitted option ID. For failed wound rolls with native reroll permissions such as Twin-linked, Command Re-roll is offered first at the failed wound timing; if declined, the native reroll resolves next and the same original wound roll does not immediately reopen another Command Re-roll prompt. Attack-sequence resumes reuse the recorded original or replacement roll state from the event log so replay, decline, and accepted reroll paths do not re-roll locally. This can be offered in a Phase 12A reaction window, and the parent resumes only after `command_reroll_resolved` and `reaction_parent_resumed` are emitted.
+- `select_dice_result_override`: finite `decline`/`use` options for a
+  source-backed Hit or Wound result replacement. The request includes the roll
+  ID/type and full roll state, attack sequence/context/pool indices, attacker
+  model, target, source component unit, descriptor and source rule IDs, unit
+  resource kind/cost/current count, replacement value, structured critical
+  trigger markers, and a deterministic context fingerprint. The engine emits
+  this request only after source-backed, Command Re-roll, and Twin-linked
+  opportunities have resolved. A decline is scoped to that roll. Use spends
+  the unit resource and records `unit_resource_spent` plus
+  `dice_result_overridden` without consuming RNG; the resumed attack rebuilds
+  its Hit/Wound result from that state. Actor, active attack identity, source
+  membership/aliveness, excluded model keywords, descriptor identity, roll
+  state, marker set, fingerprint, and resource balance are revalidated before
+  queue pop. Visible unit projections expose starting and remaining public unit
+  resource counts; hidden-unit redaction also removes those counts.
 - `core:insane-bravery`: parameterized `submit_stratagem_target_proposal` for a unit pending a Battle-shock test. Accepted use records a persisting auto-pass effect and the Command phase resolves the Battle-shock test as passed without adapter-owned mutation.
 - `core:rapid-ingress`: parameterized target proposal for an unarrived reserves unit during the opponent Movement phase end. Accepted use spends CP and records the Stratagem use, then emits a `submit_placement_proposal` request using the existing placement proposal contract. The placement answer must also go through `GameLifecycle.submit_decision(...)`. When Rapid Ingress is offered from a Phase 12A reaction window, the reaction frame continues from the target proposal to the placement proposal and the parent resumes only after a valid placement resolves. Rule-invalid but well-formed placement proposals are recorded as rejected attempts and emit a fresh pending placement request for retry; stale, malformed, or wrong-context placement proposals are rejected before queue pop.
 - `core:new-orders`: finite `use_stratagem` options for active Tactical secondary cards. The target binding uses `target_kind: "tactical_secondary_card"` and `target_secondary_mission_id`; accepted use costs 1 CP, is once per game, discards that card, and draws one replacement through engine-owned Tactical secondary state.
@@ -2199,8 +2233,9 @@ state:
 
 - `UnitDisplayPayload` records include `unit_instance_id`, `owner_player_id`,
   `unit_display_name`, `datasheet_id`, source metadata, viewer-visible keywords
-  and faction keywords, model instance IDs, selected wargear IDs, visibility
-  status, and redaction metadata.
+  and faction keywords, model instance IDs, selected wargear IDs, visible
+  unit-resource starting and remaining counts, visibility status, and
+  redaction metadata.
 - `ModelDisplayPayload` records include `model_instance_id`,
   `unit_instance_id`, `datasheet_id`, `model_profile_id`, display names,
   manifested model `wargear_ids`, `base_size`, starting/current wounds,

@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.dice_result_overrides import (
+    DICE_RESULT_OVERRIDE_EVENT_TYPE,
+    request_dice_result_override_if_available,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -133,6 +137,46 @@ def _roll_hit_and_wound(
         )
         if status is not None:
             return None, status
+        target_keywords = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=pool.target_unit_instance_id,
+        ).keywords
+        override_request = request_dice_result_override_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=hit_roll.roll_state,
+            roll_type="hit",
+            roll_successful=hit_roll.successful,
+            roll_critical=hit_roll.critical,
+            source_phase=attack_sequence.source_phase.value,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=attack_context_id,
+            pool_index=attack_sequence.pool_index,
+            attack_index=attack_sequence.attack_index,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            weapon_profile_id=pool.weapon_profile_id,
+            weapon_profile=pool.weapon_profile,
+            target_keywords=target_keywords,
+        )
+        if override_request is not None:
+            if hit_roll.roll_state is None:
+                raise GameLifecycleError("Dice-result override request requires a Hit roll state.")
+            decisions.request_decision(override_request)
+            return (
+                None,
+                LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.BATTLE,
+                    decision_request=override_request,
+                    payload={
+                        "phase": attack_sequence.source_phase.value,
+                        "phase_body_status": "attack_hit_dice_result_override_pending",
+                        "attack_context_id": attack_context_id,
+                        "roll_id": hit_roll.roll_state.original_result.roll_id,
+                    },
+                ),
+            )
         _emit_event(
             decisions=decisions,
             hooks=hooks,
@@ -254,6 +298,44 @@ def _roll_hit_and_wound(
             attacker_player_id=attack_sequence.attacker_player_id,
             attack_context_id=attack_context_id,
         )
+        override_request = request_dice_result_override_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=wound_roll.roll_state,
+            roll_type="wound",
+            roll_successful=wound_roll.successful,
+            roll_critical=wound_roll.critical,
+            source_phase=attack_sequence.source_phase.value,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=attack_context_id,
+            pool_index=attack_sequence.pool_index,
+            attack_index=attack_sequence.attack_index,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            weapon_profile_id=pool.weapon_profile_id,
+            weapon_profile=pool.weapon_profile,
+            target_keywords=target_rules_unit.keywords,
+        )
+        if override_request is not None:
+            if wound_roll.roll_state is None:
+                raise GameLifecycleError(
+                    "Dice-result override request requires a Wound roll state."
+                )
+            decisions.request_decision(override_request)
+            return (
+                None,
+                LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.BATTLE,
+                    decision_request=override_request,
+                    payload={
+                        "phase": attack_sequence.source_phase.value,
+                        "phase_body_status": "attack_wound_dice_result_override_pending",
+                        "attack_context_id": attack_context_id,
+                        "roll_id": wound_roll.roll_state.original_result.roll_id,
+                    },
+                ),
+            )
     _emit_event(
         decisions=decisions,
         hooks=hooks,
@@ -351,11 +433,15 @@ def _latest_reroll_state_for_original_roll(
     current = original_state
     roll_id = original_state.original_result.roll_id
     for event in manager.event_log.records:
-        if event.event_type not in {"dice_reroll_resolved", "command_reroll_resolved"}:
+        if event.event_type not in {
+            "dice_reroll_resolved",
+            "command_reroll_resolved",
+            DICE_RESULT_OVERRIDE_EVENT_TYPE,
+        }:
             continue
         if not isinstance(event.payload, dict):
             raise GameLifecycleError("Reroll event payload must be an object.")
-        if event.event_type == "command_reroll_resolved":
+        if event.event_type in {"command_reroll_resolved", DICE_RESULT_OVERRIDE_EVENT_TYPE}:
             updated_payload = event.payload.get("updated_roll_state")
             if not isinstance(updated_payload, dict):
                 raise GameLifecycleError("Command Re-roll event missing updated roll state.")
