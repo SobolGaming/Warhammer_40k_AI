@@ -21,6 +21,7 @@ permissions:
   contents: read
 
 env:
+  NODE_VERSION: "24.18.0"
   PYTHON_VERSION: "3.14.5"
   UV_VERSION: "0.11.29"
 
@@ -45,8 +46,19 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
 
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: conformance/typescript/package-lock.json
+
       - name: Sync quality dependencies
         run: uv sync --locked --no-default-groups --group lint --group test
+
+      - name: Install TypeScript conformance dependencies
+        working-directory: conformance/typescript
+        run: npm ci
 
       - name: Ruff check
         run: uv run --no-sync ruff check .
@@ -72,6 +84,14 @@ jobs:
 
       - name: Smoke installed external contract wheel
         run: uv run --no-sync python scripts/smoke_installed_contract_wheel.py
+
+      - name: Verify generated TypeScript contract client
+        working-directory: conformance/typescript
+        run: npm run check
+
+      - name: Run Phase 18M-A conformance scenario
+        working-directory: conformance/typescript
+        run: npm run conformance
 
       - name: Code-quality tests
         run: uv run --no-sync pytest tests/code_quality -q -n0 --no-cov

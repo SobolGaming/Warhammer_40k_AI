@@ -206,6 +206,9 @@ tempCodeRunnerFile.py
 # OS/editor metadata
 .DS_Store
 
+# Node/TypeScript conformance tooling
+node_modules/
+
 # Ruff stuff:
 .ruff_cache/
 

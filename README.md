@@ -81,6 +81,17 @@ uv run --no-sync python scripts/build_external_contract.py --check
 uv run --no-sync python scripts/smoke_installed_contract_wheel.py
 ```
 
+The Phase 18M-A TypeScript client in
+[`conformance/typescript/`](conformance/typescript/README.md) generates models
+from that OpenAPI document, validates the canonical JSON Schemas, and completes
+the first certified HTTP-only scenario against two clean reference servers:
+
+```bash
+cd conformance/typescript
+npm ci
+npm test
+```
+
 # CORE V2 Architecture
 
 ## 1. Purpose

@@ -61,3 +61,18 @@ The repository contract check validates that the inventory and proposal sets
 remain complete as new registered decision metadata or proposal kinds are
 added. A decision row advances from `envelope_only` to `live_scenario` only when
 its committed example is captured through the ordinary adapter session path.
+
+## Phase 18M-A executable certification
+
+`conformance/typescript/` implements the first executable scenario through the
+published OpenAPI/JSON Schema/HTTP boundary. It authenticates every role with an
+opaque bearer credential, creates and starts the public session fixture,
+compares player/opponent projections, submits emitted finite options and a
+deployment proposal, verifies revisions/idempotency/events/resynchronization,
+closes the session, and compares immutable replay exports from two independent
+reference-server executions.
+
+This slice certifies the Phase 18E-18H generic protocol and one setup/deployment
+decision path. It does not promote `envelope_only` inventory rows to
+`live_scenario`, claim the Phase 20A full-game gate, or claim persistence,
+concurrent-race, every-decision-family, or complete golden-corpus coverage.
