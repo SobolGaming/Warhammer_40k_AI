@@ -11,7 +11,6 @@
   },
   "current_battle_phase": null,
   "current_setup_step": "select_secondary_missions",
-  "event_count": 12,
   "game_id": "ui-contract-hidden-redaction",
   "mission_setup": {
     "attacker_player_id": "player-a",
@@ -1486,8 +1485,8 @@
     "player-a",
     "player-b"
   ],
-  "projection_schema": "game-view-v4-unit-resources",
-  "projection_state_hash": "cfcd6eccdf19e52423aabc5f04fc79dd6d2400251806195e64a3c0d8edf6b218",
+  "projection_schema": "game-view-v5-role-scoped",
+  "projection_state_hash": "596fd54d09bd1c277cb66f3faae83d7459bcc351d9fa324c7f202b3f1818b468",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
@@ -1571,5 +1570,6 @@
       "visible_status": "visible"
     }
   },
-  "viewer_player_id": "player-b"
+  "viewer_player_id": "player-b",
+  "viewer_role": "player"
 }

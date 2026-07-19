@@ -48,7 +48,7 @@ def _handler_for_api(api: AdapterGameServer) -> type[BaseHTTPRequestHandler]:
                 path=parsed.path,
                 query=query,
                 body=body,
-                participant_id=self.headers.get("X-Participant-ID"),
+                authorization=self.headers.get("Authorization"),
             )
             self._write_response(response)
 

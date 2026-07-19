@@ -8,6 +8,7 @@ from pathlib import Path
 from threading import Thread
 from typing import Protocol, cast
 from urllib.error import HTTPError
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 import pytest
@@ -22,11 +23,19 @@ from referencing.jsonschema import (
 )
 from tests.movement_submission_helpers import straight_line_witness_for_unit
 
+from warhammer40k_core.adapters.access_control import (
+    DEV_ADMIN_TOKEN,
+    DEV_PLAYER_A_TOKEN,
+    DEV_PLAYER_B_TOKEN,
+    bearer_authorization,
+)
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.external_contract import (
     CREATE_SESSION_SCHEMA_VERSION,
     EXTERNAL_CONTRACT_VERSION,
     FINITE_SUBMISSION_SCHEMA_VERSION,
     PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+    SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -174,10 +183,12 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         f"/games/{game_id}/events",
         query={
             "viewer_player_id": PLAYER_A,
-            "cursor": str(_field_int(initial_events, "next_cursor")),
+            "cursor": _field_string(initial_events, "next_cursor"),
         },
     )
-    assert _field_list(event_delta, "events")
+    assert event_delta["resync_required"] is True
+    assert event_delta["resync_reason"] == "wrong_viewer"
+    assert _field_list(event_delta, "events") == []
     _schema_validator("event-delta.schema.json").validate(event_delta)
 
     replay_payload = _request(server, "GET", f"/games/{game_id}/replay")
@@ -220,18 +231,20 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
     assert session_id != game_id
     assert created["session_state"] == "created"
     assert created["session_revision"] == 0
-    assert created["projection_state_hash"] is None
+    assert _field_string(created, "projection_state_hash")
     assert created["created_at"] == "2026-07-18T20:00:00Z"
     assert created["last_activity_at"] == created["created_at"]
     assert created["server_contract_version"] == EXTERNAL_CONTRACT_VERSION
     assert created["engine_version"] == "0.1.0"
     assert _field_string(created, "engine_build_id")
-    assignments = [_json_object(value) for value in _field_list(created, "participant_assignments")]
-    assert {(row["role"], row["player_id"]) for row in assignments} == {
-        ("player", PLAYER_A),
-        ("player", PLAYER_B),
-        ("spectator", None),
-        ("observer", None),
+    visibility = _field_object(created, "visibility")
+    assert visibility == {
+        "role": "administrator",
+        "player_id": None,
+        "delay_revisions": 0,
+        "may_mutate_lifecycle": True,
+        "may_submit_decision": False,
+        "omniscient": True,
     }
 
     started = _request(
@@ -240,7 +253,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
         f"/sessions/{session_id}/start",
         query={"viewer_player_id": PLAYER_A},
     )
-    _schema_validator("session-command-result.schema.json").validate(started)
+    _schema_validator("session-command-outcome.schema.json").validate(started)
     assert started["operation"] == "start_session"
     assert started["committed"] is True
     assert started["accepted"] is True
@@ -252,10 +265,10 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
     )
     started_checkpoint = _field_object(started, "checkpoint")
     assert len(_field_string(started_checkpoint, "projection_state_hash")) == 64
-    assert _field_int(started_checkpoint, "event_cursor") >= _field_int(created, "event_cursor")
+    assert _cursor_offset(server, started_checkpoint) >= _cursor_offset(server, created)
     assert _field_object(started, "event_range") == {
-        "from_cursor": _field_int(created, "event_cursor"),
-        "to_cursor": _field_int(started_checkpoint, "event_cursor"),
+        "from_cursor": _field_string(created, "event_cursor"),
+        "to_cursor": _field_string(started_checkpoint, "event_cursor"),
     }
 
     metadata = _request(
@@ -266,7 +279,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
     )
     _schema_validator("session-metadata.schema.json").validate(metadata)
     assert metadata["session_revision"] == 1
-    assert metadata["projection_state_hash"] == started_checkpoint["projection_state_hash"]
+    assert metadata["projection_state_hash"] != started_checkpoint["projection_state_hash"]
 
     projection = _request(
         server,
@@ -284,7 +297,10 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
             server,
             "GET",
             f"/sessions/{session_id}/events",
-            query={"viewer_player_id": PLAYER_A, "cursor": "0"},
+            query={
+                "viewer_player_id": PLAYER_A,
+                "cursor": _field_string(metadata, "event_cursor"),
+            },
         )
     )
     replay_payload = _request(server, "GET", f"/sessions/{session_id}/replay")
@@ -292,13 +308,6 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
         ReplayRunStatus.REPRODUCED
     )
 
-    idle_advance = _request(
-        server,
-        "POST",
-        f"/sessions/{session_id}/advance",
-        query={"viewer_player_id": PLAYER_A},
-    )
-    assert _field_object(idle_advance, "session")["session_revision"] == 2
     first_request = _field_object(projection, "pending_decision")
     first_result = _request(
         server,
@@ -312,7 +321,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
         },
     )
     assert first_result["operation"] == "submit_finite_decision"
-    assert _field_object(first_result, "session")["session_revision"] == 3
+    assert _field_object(first_result, "session")["session_revision"] == 2
     first_result_status = _field_object(_field_object(first_result, "session"), "lifecycle_status")
     assert first_result_status["decision_type"] == "hidden_decision"
     assert first_result_status["actor_id"] is None
@@ -325,7 +334,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
         option_id=FIXED_SECONDARY_OPTION_ID,
         result_id=f"{game_id}-secondary-b",
     )
-    assert _field_object(second_result, "session")["session_revision"] == 4
+    assert _field_object(second_result, "session")["session_revision"] == 3
 
     deployment_request = _protocol_pending_decision_for_any_player(
         server,
@@ -338,7 +347,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
         option_id=_first_option_id(deployment_request),
         result_id=f"{game_id}-deployment-unit",
     )
-    assert _field_object(deployment_result, "session")["session_revision"] == 5
+    assert _field_object(deployment_result, "session")["session_revision"] == 4
 
     placement_request = _protocol_pending_decision_for_any_player(
         server,
@@ -366,7 +375,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
     assert placement_result["operation"] == "submit_parameterized_decision"
     assert placement_result["committed"] is True
     assert placement_result["accepted"] is True
-    assert _field_object(placement_result, "session")["session_revision"] == 6
+    assert _field_object(placement_result, "session")["session_revision"] == 5
 
     closed = _request(
         server,
@@ -377,7 +386,7 @@ def test_phase18e_formal_session_protocol_completes_all_required_operations() ->
     assert closed["operation"] == "close_session"
     closed_session = _field_object(closed, "session")
     assert closed_session["session_state"] == "closed"
-    assert closed_session["session_revision"] == 7
+    assert closed_session["session_revision"] == 6
     assert _field_object(closed_session, "terminal_reason")["code"] == "session_closed"
     rejected = _request_raw(
         server,
@@ -451,8 +460,12 @@ def test_phase18e_recorded_invalid_retry_commits_one_session_revision() -> None:
             _field_object(proposal_view, "pending_proposal"),
         )
     )
+    authoritative_session = cast(
+        LocalGameSession,
+        server._sessions[session_id].adapter_session,  # pyright: ignore[reportPrivateUsage]
+    )
     invalid_witness = straight_line_witness_for_unit(
-        local_session.lifecycle,
+        authoritative_session.lifecycle,
         unit_instance_id=proposal_context.unit_instance_id,
         dx=1000.0,
     )
@@ -483,7 +496,7 @@ def test_phase18e_recorded_invalid_retry_commits_one_session_revision() -> None:
 
     assert response.status_code == 422
     result = _json_object(response.payload)
-    _schema_validator("session-command-result.schema.json").validate(result)
+    _schema_validator("session-command-outcome.schema.json").validate(result)
     assert result["committed"] is True
     assert result["accepted"] is False
     result_session = _field_object(result, "session")
@@ -492,7 +505,9 @@ def test_phase18e_recorded_invalid_retry_commits_one_session_revision() -> None:
         "invalid"
     )
     event_range = _field_object(result, "event_range")
-    assert _field_int(event_range, "to_cursor") > _field_int(event_range, "from_cursor")
+    assert server.cursor_codec.decode(_field_string(event_range, "to_cursor")).offset > (
+        server.cursor_codec.decode(_field_string(event_range, "from_cursor")).offset
+    )
 
     retry_request = _protocol_pending_decision_for_any_player(
         server,
@@ -538,9 +553,9 @@ def test_phase18e_recorded_invalid_retry_commits_one_session_revision() -> None:
         },
         expected_status=422,
     )
-    assert uncommitted["committed"] is False
-    assert uncommitted["accepted"] is False
-    assert _field_object(uncommitted, "session")["session_revision"] == revision_before + 1
+    assert _field_string(_field_object(uncommitted, "error"), "code") == "proposal_invalid"
+    metadata_after_rejection = _request(server, "GET", f"/sessions/{session_id}")
+    assert metadata_after_rejection["session_revision"] == revision_before + 1
     replay_uncommitted = _request(server, "GET", f"/sessions/{session_id}/replay")
     assert len(_field_list(replay_uncommitted, "decision_records")) == before_record_count + 1
 
@@ -614,7 +629,7 @@ def test_phase18e_applied_decision_reaching_transition_budget_is_accepted() -> N
         result_id=second_result_id,
     )
 
-    _schema_validator("session-command-result.schema.json").validate(result)
+    _schema_validator("session-command-outcome.schema.json").validate(result)
     assert result["committed"] is True
     assert result["accepted"] is True
     result_session = _field_object(result, "session")
@@ -626,14 +641,17 @@ def test_phase18e_applied_decision_reaching_transition_budget_is_accepted() -> N
         "transition_budget": 1,
     }
     event_range = _field_object(result, "event_range")
-    from_cursor = _field_int(event_range, "from_cursor")
-    to_cursor = _field_int(event_range, "to_cursor")
-    assert to_cursor > from_cursor
+    from_cursor = _field_string(event_range, "from_cursor")
+    to_cursor = _field_string(event_range, "to_cursor")
+    assert (
+        server.cursor_codec.decode(to_cursor).offset
+        > server.cursor_codec.decode(from_cursor).offset
+    )
     event_delta = _request(
         server,
         "GET",
         f"/sessions/{session_id}/events",
-        query={"viewer_player_id": _actor(second_request), "cursor": str(from_cursor)},
+        query={"viewer_player_id": _actor(second_request), "cursor": from_cursor},
     )
     event_types = [
         _field_string(_json_object(event), "event_type")
@@ -660,6 +678,9 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
     example = _read_json(
         REPO_ROOT / "contracts" / "examples" / "sessions" / "session-command-started.json"
     )
+    example.pop("command_id")
+    example.pop("outcome_code")
+    example["schema_version"] = "session-command-result-v2"
     for committed, accepted in ((True, True), (True, False), (False, False)):
         payload = {**example, "committed": committed, "accepted": accepted}
         validator.validate(payload)
@@ -671,12 +692,6 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
 def test_phase18e_session_create_validation_fails_before_authoritative_creation() -> None:
     server = AdapterGameServer()
     game_id = "phase18e-session-create-validation"
-    missing_assignments = _game_config_body(game_id=game_id)
-    missing_assignments["schema_version"] = SESSION_CREATE_SCHEMA_VERSION
-    malformed = _request_raw(server, "POST", "/sessions", body=missing_assignments)
-    assert malformed.status_code == 400
-    assert _error_code(malformed) == "malformed_payload"
-
     invalid_assignments = _session_create_body(game_id=game_id)
     invalid_assignments["participant_assignments"] = [
         {
@@ -692,7 +707,7 @@ def test_phase18e_session_create_validation_fails_before_authoritative_creation(
     ]
     invalid = _request_raw(server, "POST", "/sessions", body=invalid_assignments)
     assert invalid.status_code == 400
-    assert _error_code(invalid) == "participant_assignments_invalid"
+    assert _error_code(invalid) == "malformed_payload"
 
     created = _request(
         server,
@@ -726,7 +741,6 @@ def test_phase18e_mutation_response_does_not_expose_next_opponent_decision() -> 
         server,
         "POST",
         f"/games/{game_id}/advance",
-        query={"viewer_player_id": PLAYER_A},
     )
     first_status = _field_object(status_payload, "status")
     assert _field_string(first_status, "actor_id") == PLAYER_A
@@ -779,13 +793,18 @@ def test_phase18e_status_response_redacts_secret_pending_for_non_actor_viewers()
     non_actor_server = AdapterGameServer()
     non_actor_game_id = "phase18e-server-redacted-status"
     _create_game(non_actor_server, game_id=non_actor_game_id)
-    non_actor_status_payload = _request(
+    _request(
         non_actor_server,
         "POST",
         f"/games/{non_actor_game_id}/advance",
+    )
+    non_actor_metadata = _request(
+        non_actor_server,
+        "GET",
+        f"/sessions/session-{non_actor_game_id}",
         query={"viewer_player_id": PLAYER_B},
     )
-    non_actor_status = _field_object(non_actor_status_payload, "status")
+    non_actor_status = _field_object(non_actor_metadata, "lifecycle_status")
     assert _field_string(non_actor_status, "status_kind") == "waiting_for_decision"
     assert non_actor_status["pending_request_id"] is None
     assert _field_string(non_actor_status, "decision_type") == "hidden_decision"
@@ -800,9 +819,9 @@ def test_phase18e_status_response_redacts_secret_pending_for_non_actor_viewers()
         f"/games/{no_viewer_game_id}/advance",
     )
     no_viewer_status = _field_object(no_viewer_status_payload, "status")
-    assert no_viewer_status["pending_request_id"] is None
-    assert _field_string(no_viewer_status, "decision_type") == "hidden_decision"
-    assert no_viewer_status["actor_id"] is None
+    assert _field_string(no_viewer_status, "pending_request_id")
+    assert _field_string(no_viewer_status, "decision_type") == SECONDARY_MISSION_DECISION_TYPE
+    assert _field_string(no_viewer_status, "actor_id") == PLAYER_A
 
 
 def test_phase18e_support_profile_generic_ir_datasheet_ability_is_playable() -> None:
@@ -855,8 +874,8 @@ def test_phase18e_server_submission_rejections_are_typed() -> None:
             "result_id": "phase18e-wrong-actor",
         },
     )
-    assert wrong_actor.status_code == 403
-    assert _error_code(wrong_actor) == "wrong_actor"
+    assert wrong_actor.status_code == 409
+    assert _error_code(wrong_actor) == "stale_request_id"
 
     wrong_option = _request_raw(
         server,
@@ -1107,9 +1126,9 @@ def test_phase18e_server_route_errors_are_typed() -> None:
     assert duplicate.status_code == 409
     assert _error_code(duplicate) == "game_already_exists"
 
-    missing_viewer = _request_raw(server, "GET", f"/games/{game_id}/view")
-    assert missing_viewer.status_code == 400
-    assert _error_code(missing_viewer) == "missing_query_parameter"
+    missing_credential = server.handle(method="GET", path=f"/games/{game_id}/view")
+    assert missing_credential.status_code == 401
+    assert _error_code(missing_credential) == "authentication_required"
 
     invalid_cursor = _request_raw(
         server,
@@ -1117,8 +1136,10 @@ def test_phase18e_server_route_errors_are_typed() -> None:
         f"/games/{game_id}/events",
         query={"viewer_player_id": PLAYER_A, "cursor": "-1"},
     )
-    assert invalid_cursor.status_code == 400
-    assert _error_code(invalid_cursor) == "invalid_query_parameter"
+    assert invalid_cursor.status_code == 200
+    invalid_delta = _json_object(invalid_cursor.payload)
+    assert invalid_delta["resync_required"] is True
+    assert invalid_delta["resync_reason"] == "malformed"
 
     malformed_submission = _request_raw(
         server,
@@ -1181,7 +1202,8 @@ def test_phase18e_local_dev_http_server_serves_json_and_rejects_bad_bodies() -> 
             "GET",
             f"{base_url}/games/{game_id}/view?viewer_player_id={PLAYER_A}",
         )
-        _schema_validator("game-view.schema.json").validate(view)
+        _schema_validator("session-projection.schema.json").validate(view)
+        _schema_validator("game-view.schema.json").validate(_field_object(view, "projection"))
 
         ambiguous_query = _http_error(
             Request(f"{base_url}/rules-catalog?viewer=one&viewer=two", method="GET")
@@ -1210,6 +1232,34 @@ def test_phase18e_local_dev_http_server_serves_json_and_rejects_bad_bodies() -> 
         )
         assert bad_utf8.code == 400
         assert _http_error_code(bad_utf8) == "malformed_json_body"
+
+        formal = _http_json(
+            "POST",
+            f"{base_url}/sessions",
+            body=_session_create_body(game_id="phase18g-http-malformed-cursors"),
+        )
+        session_id = _field_string(formal, "session_id")
+        projection = _http_json(
+            "GET",
+            f"{base_url}/sessions/{session_id}/projection",
+        )
+        valid_cursor = _field_string(projection, "event_cursor")
+        malformed_cursors = (
+            "é.x",
+            "x" * 2049,
+            "!" * 43,
+            valid_cursor[:-1] + ("A" if valid_cursor[-1] != "A" else "B"),
+        )
+        for malformed_cursor in malformed_cursors:
+            delta = _http_json(
+                "GET",
+                f"{base_url}/sessions/{session_id}/events"
+                f"?cursor={quote(malformed_cursor, safe='')}&limit=1",
+            )
+            _schema_validator("event-delta.schema.json").validate(delta)
+            assert delta["resync_required"] is True
+            assert delta["resync_reason"] == "malformed"
+            assert delta["supplied_cursor"] == "invalid-cursor"
     finally:
         http_server.shutdown()
         thread.join(timeout=10.0)
@@ -1356,28 +1406,6 @@ def _session_create_body(*, game_id: str) -> dict[str, JsonValue]:
     return {
         "schema_version": SESSION_CREATE_SCHEMA_VERSION,
         "config": config["config"],
-        "participant_assignments": [
-            {
-                "participant_id": "participant-a",
-                "role": "player",
-                "player_id": PLAYER_A,
-            },
-            {
-                "participant_id": "participant-b",
-                "role": "player",
-                "player_id": PLAYER_B,
-            },
-            {
-                "participant_id": "spectator-one",
-                "role": "spectator",
-                "player_id": None,
-            },
-            {
-                "participant_id": "observer-one",
-                "role": "observer",
-                "player_id": None,
-            },
-        ],
     }
 
 
@@ -1440,7 +1468,10 @@ def _http_json(
     body: dict[str, JsonValue] | None = None,
 ) -> dict[str, JsonValue]:
     encoded_body = None if body is None else json.dumps(body, sort_keys=True).encode("utf-8")
-    headers = {} if body is None else {"Content-Type": "application/json"}
+    token = DEV_PLAYER_A_TOKEN if f"viewer_player_id={PLAYER_A}" in url else DEV_ADMIN_TOKEN
+    headers = {"Authorization": bearer_authorization(token)}
+    if body is not None:
+        headers["Content-Type"] = "application/json"
     request = Request(url, data=encoded_body, method=method, headers=headers)
     response = cast(HTTPResponse, urlopen(request, timeout=10.0))
     try:
@@ -1696,7 +1727,10 @@ def _request(
 ) -> dict[str, JsonValue]:
     response = _request_raw(server, method, path, query=query, body=body)
     assert response.status_code == expected_status, response.payload
-    return _json_object(response.payload)
+    payload = _json_object(response.payload)
+    if path.endswith(("/view", "/projection")) and "projection" in payload:
+        return _field_object(payload, "projection")
+    return payload
 
 
 def _request_raw(
@@ -1707,7 +1741,149 @@ def _request_raw(
     query: dict[str, str] | None = None,
     body: JsonValue = None,
 ) -> ServerResponse:
-    return server.handle(method=method, path=path, query=query, body=body)
+    translated_path, translated_body = _translated_formal_command(
+        server=server,
+        method=method,
+        path=path,
+        body=body,
+    )
+    token = _request_token(path=path, query=query, body=body)
+    if isinstance(translated_body, dict):
+        submission = translated_body.get("submission")
+        if isinstance(submission, dict) and submission.get("submission_kind") in {
+            "start_session",
+            "advance_session",
+            "close_session",
+        }:
+            token = DEV_ADMIN_TOKEN
+    translated_query = query
+    if query is not None and "cursor" in query and query["cursor"].isdecimal():
+        translated_query = dict(query)
+        translated_query["cursor"] = _test_cursor_token(
+            server=server,
+            path=path,
+            viewer_token=token,
+            offset=int(query["cursor"]),
+        )
+    return server.handle(
+        method=method,
+        path=translated_path,
+        query=translated_query,
+        body=translated_body,
+        authorization=bearer_authorization(token),
+    )
+
+
+def _translated_formal_command(
+    *,
+    server: AdapterGameServer,
+    method: str,
+    path: str,
+    body: JsonValue,
+) -> tuple[str, JsonValue]:
+    segments = tuple(segment for segment in path.split("/") if segment)
+    if method != "POST" or len(segments) < 3 or segments[0] != "sessions":
+        return path, body
+    session_id = segments[1]
+    if segments[2] in {"start", "advance", "close"}:
+        operation = f"{segments[2]}_session"
+        request_id = None
+        result_id = None
+        submission: dict[str, JsonValue] = {"submission_kind": operation}
+    elif len(segments) == 5 and segments[2] == "decisions":
+        payload = _json_object(body)
+        request_id = segments[3]
+        result_id = _field_string(payload, "result_id")
+        if segments[4] == "option":
+            submission = {
+                "submission_kind": "finite_option",
+                "option_id": _field_string(payload, "option_id"),
+            }
+        else:
+            submission = {
+                "submission_kind": "parameterized_payload",
+                "payload": payload["payload"],
+            }
+    else:
+        return path, body
+    metadata = server.handle(
+        method="GET",
+        path=f"/sessions/{session_id}",
+        authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+    )
+    revision = _field_int(_json_object(metadata.payload), "session_revision")
+    command_id = (
+        f"test-{segments[2]}-{revision}" if result_id is None else f"test-command-{result_id}"
+    )
+    return (
+        f"/sessions/{session_id}/commands",
+        {
+            "schema_version": SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+            "command_id": command_id,
+            "session_id": session_id,
+            "expected_session_revision": revision,
+            "request_id": request_id,
+            "result_id": result_id,
+            "submission": submission,
+        },
+    )
+
+
+def _request_token(
+    *,
+    path: str,
+    query: dict[str, str] | None,
+    body: JsonValue,
+) -> str:
+    if query is not None:
+        viewer = query.get("viewer_player_id")
+        if viewer == PLAYER_A:
+            return DEV_PLAYER_A_TOKEN
+        if viewer == PLAYER_B:
+            return DEV_PLAYER_B_TOKEN
+    if isinstance(body, dict):
+        actor = body.get("actor_id")
+        if actor == PLAYER_A:
+            return DEV_PLAYER_A_TOKEN
+        if actor == PLAYER_B:
+            return DEV_PLAYER_B_TOKEN
+    if "/decisions/" in path and isinstance(body, dict):
+        actor = body.get("actor_id")
+        if actor == PLAYER_A:
+            return DEV_PLAYER_A_TOKEN
+        if actor == PLAYER_B:
+            return DEV_PLAYER_B_TOKEN
+        return DEV_PLAYER_A_TOKEN
+    return DEV_ADMIN_TOKEN
+
+
+def _test_cursor_token(
+    *,
+    server: AdapterGameServer,
+    path: str,
+    viewer_token: str,
+    offset: int,
+) -> str:
+    segments = tuple(segment for segment in path.split("/") if segment)
+    session_id = f"session-{segments[1]}" if segments[0] == "games" else segments[1]
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    principal = server.principal_registry.authenticate(bearer_authorization(viewer_token))
+    viewer = principal.bind_to_session(player_ids=record.player_ids)
+    snapshot = record.snapshot_for_viewer(viewer)
+    view = snapshot.adapter_session.view_for_context(viewer=viewer)
+    return server.cursor_codec.issue(
+        session_id=session_id,
+        viewer=viewer,
+        offset=offset,
+        visible_sequence=snapshot.adapter_session.visible_event_count_for_context(
+            EventStreamCursor(offset),
+            viewer=viewer,
+        ),
+        session_revision=snapshot.session_revision,
+        projection_state_hash=view["projection_state_hash"],
+        minimum_offset=0,
+        minimum_revision=0,
+    )
 
 
 def _decision_from_status(
@@ -1896,8 +2072,10 @@ def _schema_payloads() -> dict[str, Schema]:
         "game-view.schema.json",
         "lifecycle-status.schema.json",
         "rules-catalog.schema.json",
+        "session-command-outcome.schema.json",
         "session-command-result.schema.json",
         "session-metadata.schema.json",
+        "session-projection.schema.json",
     )
     return {
         name: cast(Schema, _read_json(REPO_ROOT / "contracts" / "schemas" / name)) for name in names
@@ -1949,6 +2127,10 @@ def _field_string(payload: dict[str, JsonValue], key: str) -> str:
 
 def _field_int(payload: dict[str, JsonValue], key: str) -> int:
     return _json_int(payload[key])
+
+
+def _cursor_offset(server: AdapterGameServer, payload: dict[str, JsonValue]) -> int:
+    return server.cursor_codec.decode(_field_string(payload, "event_cursor")).offset
 
 
 def _json_string(value: JsonValue) -> str:

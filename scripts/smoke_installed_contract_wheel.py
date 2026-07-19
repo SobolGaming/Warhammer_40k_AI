@@ -29,6 +29,7 @@ EXPECTED_SCHEMA_NAMES = frozenset(
         "session-command-result.schema.json",
         "session-create.schema.json",
         "session-metadata.schema.json",
+        "session-projection.schema.json",
         "support-profile.schema.json",
     }
 )
@@ -75,6 +76,7 @@ expected_schema_names = {
     "session-command-result.schema.json",
     "session-create.schema.json",
     "session-metadata.schema.json",
+    "session-projection.schema.json",
     "support-profile.schema.json",
 }
 module_path = Path(external_contract.__file__).resolve()
@@ -125,10 +127,6 @@ session_create_payload = validate_json_value(
     {
         "schema_version": SESSION_CREATE_SCHEMA_VERSION,
         "config": create_payload["config"],
-        "participant_assignments": [
-            {"participant_id": "player-a", "role": "player", "player_id": "player-a"},
-            {"participant_id": "player-b", "role": "player", "player_id": "player-b"},
-        ],
     }
 )
 session_command_payload = validate_json_value(

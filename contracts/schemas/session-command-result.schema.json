@@ -1,12 +1,8 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/session-command-result.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v2/session-command-result.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "if": {
-    "properties": {
-      "accepted": {"const": true}
-    }
-  },
+  "if": {"properties": {"accepted": {"const": true}}},
   "properties": {
     "accepted": {"type": "boolean"},
     "checkpoint": {"$ref": "#/$defs/checkpoint"},
@@ -22,10 +18,8 @@
       ],
       "type": "string"
     },
-    "schema_version": {"const": "session-command-result-v1", "type": "string"},
-    "session": {
-      "$ref": "https://warhammer40k-core.local/contracts/v1/session-metadata.schema.json"
-    }
+    "schema_version": {"const": "session-command-result-v2", "type": "string"},
+    "session": {"$ref": "https://warhammer40k-core.local/contracts/v2/session-metadata.schema.json"}
   },
   "required": [
     "schema_version",
@@ -36,29 +30,36 @@
     "checkpoint",
     "event_range"
   ],
-  "then": {
-    "properties": {
-      "committed": {"const": true}
-    }
-  },
+  "then": {"properties": {"committed": {"const": true}}},
   "title": "CORE V2 SessionCommandResultPayload",
   "type": "object",
   "$defs": {
     "checkpoint": {
       "additionalProperties": false,
       "properties": {
-        "event_cursor": {"minimum": 0, "type": "integer"},
+        "event_cursor": {"maxLength": 2048, "minLength": 1, "type": "string"},
         "projection_state_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-        "viewer_player_id": {"minLength": 1, "type": "string"}
+        "session_revision": {"minimum": 0, "type": "integer"},
+        "viewer_player_id": {"type": ["string", "null"]},
+        "visibility_role": {
+          "enum": ["player", "coach", "delayed_spectator", "administrator"],
+          "type": "string"
+        }
       },
-      "required": ["viewer_player_id", "projection_state_hash", "event_cursor"],
+      "required": [
+        "visibility_role",
+        "viewer_player_id",
+        "session_revision",
+        "projection_state_hash",
+        "event_cursor"
+      ],
       "type": "object"
     },
     "event_range": {
       "additionalProperties": false,
       "properties": {
-        "from_cursor": {"minimum": 0, "type": "integer"},
-        "to_cursor": {"minimum": 0, "type": "integer"}
+        "from_cursor": {"maxLength": 2048, "minLength": 1, "type": "string"},
+        "to_cursor": {"maxLength": 2048, "minLength": 1, "type": "string"}
       },
       "required": ["from_cursor", "to_cursor"],
       "type": "object"

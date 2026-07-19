@@ -11,7 +11,6 @@
   },
   "current_battle_phase": null,
   "current_setup_step": "select_secondary_missions",
-  "event_count": 9,
   "game_id": "ui-contract-initial",
   "mission_setup": {
     "attacker_player_id": "player-a",
@@ -1426,7 +1425,7 @@
     }
   },
   "pending_decision": {
-    "actor_id": "player-a",
+    "actor_id": null,
     "decision_type": "hidden_decision",
     "is_parameterized": false,
     "options": [],
@@ -1434,7 +1433,7 @@
       "hidden": true,
       "secret": true
     },
-    "request_id": "decision-request-000001",
+    "request_id": "hidden-request",
     "schema_version": "decision-request-view-v1"
   },
   "pending_proposal": null,
@@ -1442,8 +1441,8 @@
     "player-a",
     "player-b"
   ],
-  "projection_schema": "game-view-v4-unit-resources",
-  "projection_state_hash": "546e09b0ebddac0088ea2d09b97d65a6d264d13979e68123f76dc39132b015a2",
+  "projection_schema": "game-view-v5-role-scoped",
+  "projection_state_hash": "e06ea009c4e161a9e9640c7689af48e9ba364ee7c20fe3f7501d3ae2fcb78ee4",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
@@ -1521,5 +1520,6 @@
       "visible_status": "visible"
     }
   },
-  "viewer_player_id": "player-b"
+  "viewer_player_id": "player-b",
+  "viewer_role": "player"
 }

@@ -5,11 +5,14 @@ schemas and the ordinary `AdapterGameSession` path.
 
 1. Create a formal session with the current request schema version and retain
    its distinct `session_id`, engine `game_id`, and revision `0`.
-2. Start it through `ExecuteSessionCommand` with participant context outside the
-   command envelope, then retry that exact command on a new connection and
-   require the same HTTP status and byte-equivalent public response.
+2. Authenticate as the administrator, start it through
+   `ExecuteSessionCommand`, then retry that exact command as the same principal
+   and exact role/player/policy/authorization-epoch context on a new connection
+   and require the same HTTP status and byte-equivalent public response. Change
+   each part of that context in turn and require the shared 403 response rather
+   than the cached data.
 3. Race two valid commands carrying one expected revision and require at most
-   one commit. Verify stale revision/request, wrong participant, malformed
+   one commit. Verify stale revision/request, wrong principal, malformed
    envelope, illegal proposal, terminal session, and pre-commit failure all
    preserve the authoritative revision, replay, event cursor, and projection
    hash.
@@ -22,8 +25,15 @@ schemas and the ordinary `AdapterGameSession` path.
 6. Render every generated proposal-kind fixture, preserve its request/source
    context, and submit the corresponding typed proposal without applying it
    locally.
-7. Consume events from cursor `0`, preserve order, advance to `next_cursor`, and
-   resynchronize from a projection if cursor/state context is lost.
+7. Consume events from the opaque cursor issued with a role-scoped projection,
+   preserve `sequence_number` order, follow `next_cursor` while `has_more`, and
+   replace client state from a full projection when `resync_required` is true.
+   Treat `retention_limit` as the event-record window and
+   `revision_retention_limit` as the revision-snapshot window; a cursor is valid
+   only inside both.
+   Treat sequence numbers as viewer-scoped, and reject projections/deltas that
+   expose authoritative event counts, readable cursor state, hidden placeholders,
+   or sequence gaps caused by hidden records.
 8. Display hidden-decision and hidden-secondary fixtures without revealing
    hidden type, source, option-count, or payload metadata.
 9. Distinguish waiting, advanced, invalid, unsupported, and terminal lifecycle
@@ -31,8 +41,10 @@ schemas and the ordinary `AdapterGameSession` path.
 10. Distinguish malformed, stale/conflict, forbidden, corruption, unsupported,
    and terminal error fixtures; do not blindly retry schema or corruption
    failures.
-11. Export support and replay payloads, verify their schema versions and source
-   identities, and treat them as immutable audit artifacts.
+11. Enforce the player, coach, delayed-spectator, administrator, and replay-
+    viewer route policies; deny raw active-session replay to a replay viewer,
+    permit that role only after terminal/close, and treat exported replay
+    payloads as immutable audit artifacts.
 12. Reject a response that fails its declared schema, contains an unknown major
     version, or contradicts the coordinate/session/redaction semantics.
 

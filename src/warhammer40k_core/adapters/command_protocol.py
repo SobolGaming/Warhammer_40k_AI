@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self
 
+from warhammer40k_core.adapters.access_control import AuthorizationContext
 from warhammer40k_core.adapters.external_contract import SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -176,7 +177,8 @@ class SessionCommandEnvelope:
 @dataclass(frozen=True, slots=True)
 class SessionCommandJournalEntry:
     command_id: str
-    participant_id: str
+    principal_id: str
+    authorization_context: AuthorizationContext
     envelope_fingerprint: str
     status_code: int
     response_payload: JsonValue
@@ -185,9 +187,15 @@ class SessionCommandJournalEntry:
         object.__setattr__(self, "command_id", _validate_identifier("command_id", self.command_id))
         object.__setattr__(
             self,
-            "participant_id",
-            _validate_identifier("participant_id", self.participant_id),
+            "principal_id",
+            _validate_identifier("principal_id", self.principal_id),
         )
+        if type(self.authorization_context) is not AuthorizationContext:
+            raise SessionCommandProtocolError("Command journal authorization context is invalid.")
+        if self.authorization_context.principal_id != self.principal_id:
+            raise SessionCommandProtocolError(
+                "Command journal principal and authorization context differ."
+            )
         object.__setattr__(
             self,
             "envelope_fingerprint",

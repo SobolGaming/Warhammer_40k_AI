@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/game-view.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v2/game-view.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -28,10 +28,6 @@
         "null"
       ]
     },
-    "event_count": {
-      "minimum": 0,
-      "type": "integer"
-    },
     "game_id": {
       "minLength": 1,
       "type": "string"
@@ -48,7 +44,7 @@
     "pending_decision": {
       "oneOf": [
         {
-          "$ref": "decision-request-view.schema.json"
+          "$ref": "https://warhammer40k-core.local/contracts/v1/decision-request-view.schema.json"
         },
         {
           "type": "null"
@@ -66,7 +62,7 @@
       "type": "array"
     },
     "projection_schema": {
-      "const": "game-view-v4-unit-resources",
+      "const": "game-view-v5-role-scoped",
       "minLength": 1,
       "type": "string"
     },
@@ -118,7 +114,13 @@
       "type": "object"
     },
     "viewer_player_id": {
-      "minLength": 1,
+      "oneOf": [
+        {"minLength": 1, "type": "string"},
+        {"type": "null"}
+      ]
+    },
+    "viewer_role": {
+      "enum": ["player", "coach", "delayed_spectator", "administrator"],
       "type": "string"
     }
   },
@@ -126,6 +128,7 @@
     "projection_schema",
     "projection_state_hash",
     "rules_catalog",
+    "viewer_role",
     "viewer_player_id",
     "game_id",
     "stage",
@@ -144,8 +147,7 @@
     "unit_display_by_id",
     "model_display_by_id",
     "pending_decision",
-    "pending_proposal",
-    "event_count"
+    "pending_proposal"
   ],
   "title": "CORE V2 GameViewPayload",
   "type": "object",

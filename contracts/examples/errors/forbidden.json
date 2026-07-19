@@ -1,7 +1,7 @@
 {
   "error": {
-    "code": "actor_not_authorized",
-    "message": "Actor is not authorized."
+    "code": "access_denied",
+    "message": "Authenticated principal is not authorized for this resource."
   },
   "schema_version": "error-envelope-v1"
 }

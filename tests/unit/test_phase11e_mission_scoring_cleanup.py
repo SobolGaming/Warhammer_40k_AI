@@ -1497,35 +1497,20 @@ def test_secondary_reveal_event_emits_after_both_choices_without_pre_reveal_leak
         event["event_type"] == "secondary_missions_revealed"
         for event in player_b_before_reveal["events"]
     )
-    first_choice_event = next(
-        event
+    assert not any(
+        event["event_type"] == "secondary_mission_choice_recorded"
         for event in player_b_before_reveal["events"]
-        if event["event_type"] == "secondary_mission_choice_recorded"
     )
-    assert cast(dict[str, JsonValue], first_choice_event["payload"]) == {
-        "game_id": "phase11e-game",
-        "player_id": "player-a",
-        "setup_step": "select_secondary_missions",
-        "selected": True,
-        "hidden": True,
-    }
     player_a_before_second_submit = EventStreamCursor().events_since(
         lifecycle.decision_controller.event_log,
         viewer_player_id="player-a",
     )
-    second_request_event = next(
-        event
+    assert not any(
+        event["event_type"] == "decision_requested"
         for event in player_a_before_second_submit["events"]
-        if event["event_type"] == "decision_requested"
-        and cast(dict[str, JsonValue], event["payload"])["actor_id"] == "player-b"
+        if isinstance(event["payload"], dict)
+        and event["payload"].get("decision_type") == "hidden_decision"
     )
-    assert cast(dict[str, JsonValue], second_request_event["payload"]) == {
-        "request_id": "decision-request-000002",
-        "decision_type": "hidden_decision",
-        "actor_id": "player-b",
-        "secret": True,
-        "hidden": True,
-    }
 
     second_status = lifecycle.advance_until_decision_or_terminal()
     second_request = second_status.decision_request

@@ -13,9 +13,11 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
+    from warhammer40k_core.adapters.access_control import ViewerContext
     from warhammer40k_core.adapters.event_stream import (
         EventStreamCursor,
         EventStreamDeltaPayload,
+        EventStreamPagePayload,
     )
     from warhammer40k_core.adapters.projection import GameViewPayload, RulesCatalogViewPayload
     from warhammer40k_core.adapters.support_profile import SupportProfilePayload
@@ -42,6 +44,10 @@ class AdapterGameSession(Protocol):
         """Project a viewer-safe live game view."""
         ...
 
+    def view_for_context(self, *, viewer: ViewerContext) -> GameViewPayload:
+        """Project a live view from server-owned authenticated visibility context."""
+        ...
+
     def rules_catalog_view(self) -> RulesCatalogViewPayload:
         """Return the source-hashed static catalog display projection."""
         ...
@@ -53,6 +59,38 @@ class AdapterGameSession(Protocol):
         viewer_player_id: str,
     ) -> EventStreamDeltaPayload:
         """Return viewer-filtered event records after the supplied cursor."""
+        ...
+
+    def events_since_for_context(
+        self,
+        cursor: EventStreamCursor,
+        *,
+        viewer: ViewerContext,
+    ) -> EventStreamDeltaPayload:
+        """Return redacted events from server-owned authenticated visibility context."""
+        ...
+
+    def event_page_for_context(
+        self,
+        cursor: EventStreamCursor,
+        *,
+        viewer: ViewerContext,
+        visible_limit: int,
+    ) -> EventStreamPagePayload:
+        """Return a role-scoped page without exposing skipped hidden-event counts."""
+        ...
+
+    def visible_event_count_for_context(
+        self,
+        cursor: EventStreamCursor,
+        *,
+        viewer: ViewerContext,
+    ) -> int:
+        """Return the internal visible-event count through an authoritative cursor."""
+        ...
+
+    def event_record_count(self) -> int:
+        """Return the internal authoritative event-log length."""
         ...
 
     def decision_record_count(self) -> int:

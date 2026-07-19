@@ -2,22 +2,19 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Warhammer 40,000 CORE V2 Adapter Contract",
-    "version": "1.2.0",
-    "description": "Transport-neutral Phase 18F optimistic-concurrency session protocol over the shared AdapterGameSession decision path."
+    "version": "2.0.0",
+    "description": "Authenticated Phase 18G/18H session protocol with server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
   },
-  "servers": [
-    {"url": "http://127.0.0.1:8000"}
-  ],
+  "servers": [{"url": "http://127.0.0.1:8000"}],
+  "security": [{"bearerAuth": []}],
   "paths": {
     "/rules-catalog": {
       "get": {
         "operationId": "getRulesCatalog",
         "responses": {
           "200": {
-            "description": "Source-hashed rules catalog projection.",
-            "content": {
-              "application/json": {"schema": {"$ref": "./schemas/rules-catalog.schema.json"}}
-            }
+            "description": "Source-hashed rules catalog projection for an authorized principal.",
+            "content": {"application/json": {"schema": {"$ref": "./schemas/rules-catalog.schema.json"}}}
           },
           "default": {"$ref": "#/components/responses/Error"}
         }
@@ -25,12 +22,11 @@
     },
     "/games": {
       "post": {
-        "operationId": "createSession",
+        "deprecated": true,
+        "operationId": "createLegacyGame",
         "requestBody": {
           "required": true,
-          "content": {
-            "application/json": {"schema": {"$ref": "./schemas/create-session.schema.json"}}
-          }
+          "content": {"application/json": {"schema": {"$ref": "./schemas/create-session.schema.json"}}}
         },
         "responses": {
           "201": {"$ref": "#/components/responses/LifecycleStatus"},
@@ -40,11 +36,9 @@
     },
     "/games/{game_id}/advance": {
       "post": {
-        "operationId": "advanceSession",
-        "parameters": [
-          {"$ref": "#/components/parameters/GameId"},
-          {"$ref": "#/components/parameters/OptionalViewerPlayerId"}
-        ],
+        "deprecated": true,
+        "operationId": "advanceLegacyGame",
+        "parameters": [{"$ref": "#/components/parameters/GameId"}],
         "responses": {
           "200": {"$ref": "#/components/responses/LifecycleStatus"},
           "default": {"$ref": "#/components/responses/Error"}
@@ -53,51 +47,39 @@
     },
     "/games/{game_id}/view": {
       "get": {
-        "operationId": "getProjection",
-        "parameters": [
-          {"$ref": "#/components/parameters/GameId"},
-          {"$ref": "#/components/parameters/ViewerPlayerId"}
-        ],
+        "deprecated": true,
+        "operationId": "getLegacyGameProjection",
+        "parameters": [{"$ref": "#/components/parameters/GameId"}],
         "responses": {
-          "200": {
-            "description": "Viewer-scoped game projection.",
-            "content": {
-              "application/json": {"schema": {"$ref": "./schemas/game-view.schema.json"}}
-            }
-          },
+          "200": {"$ref": "#/components/responses/SessionProjection"},
           "default": {"$ref": "#/components/responses/Error"}
         }
       }
     },
     "/games/{game_id}/events": {
       "get": {
-        "operationId": "getEvents",
+        "deprecated": true,
+        "operationId": "getLegacyGameEvents",
         "parameters": [
           {"$ref": "#/components/parameters/GameId"},
-          {"$ref": "#/components/parameters/ViewerPlayerId"},
-          {"$ref": "#/components/parameters/EventCursor"}
+          {"$ref": "#/components/parameters/EventCursor"},
+          {"$ref": "#/components/parameters/EventPageLimit"}
         ],
         "responses": {
-          "200": {
-            "description": "Viewer-scoped event delta.",
-            "content": {
-              "application/json": {"schema": {"$ref": "./schemas/event-delta.schema.json"}}
-            }
-          },
+          "200": {"$ref": "#/components/responses/EventDelta"},
           "default": {"$ref": "#/components/responses/Error"}
         }
       }
     },
     "/games/{game_id}/replay": {
       "get": {
-        "operationId": "exportReplay",
+        "deprecated": true,
+        "operationId": "exportLegacyGameReplay",
         "parameters": [{"$ref": "#/components/parameters/GameId"}],
         "responses": {
           "200": {
-            "description": "Deterministic replay artifact and metadata.",
-            "content": {
-              "application/json": {"schema": {"$ref": "./schemas/replay-metadata.schema.json"}}
-            }
+            "description": "Deterministic replay artifact for an authorized replay role.",
+            "content": {"application/json": {"schema": {"$ref": "./schemas/replay-metadata.schema.json"}}}
           },
           "default": {"$ref": "#/components/responses/Error"}
         }
@@ -105,14 +87,13 @@
     },
     "/games/{game_id}/support-profile": {
       "get": {
-        "operationId": "getSupportProfile",
+        "deprecated": true,
+        "operationId": "getLegacyGameSupportProfile",
         "parameters": [{"$ref": "#/components/parameters/GameId"}],
         "responses": {
           "200": {
-            "description": "Selected roster and runtime support profile.",
-            "content": {
-              "application/json": {"schema": {"$ref": "./schemas/support-profile.schema.json"}}
-            }
+            "description": "Support profile for a role authorized to inspect live support metadata.",
+            "content": {"application/json": {"schema": {"$ref": "./schemas/support-profile.schema.json"}}}
           },
           "default": {"$ref": "#/components/responses/Error"}
         }
@@ -120,37 +101,34 @@
     },
     "/games/{game_id}/decisions/{request_id}/option": {
       "post": {
-        "operationId": "submitFiniteDecision",
+        "deprecated": true,
+        "operationId": "submitLegacyFiniteDecision",
         "parameters": [
           {"$ref": "#/components/parameters/GameId"},
           {"$ref": "#/components/parameters/RequestId"}
         ],
         "requestBody": {
           "required": true,
-          "content": {
-            "application/json": {"schema": {"$ref": "./schemas/finite-submission.schema.json"}}
-          }
+          "content": {"application/json": {"schema": {"$ref": "./schemas/finite-submission.schema.json"}}}
         },
         "responses": {
           "200": {"$ref": "#/components/responses/LifecycleStatus"},
+          "422": {"$ref": "#/components/responses/LifecycleStatus"},
           "default": {"$ref": "#/components/responses/Error"}
         }
       }
     },
     "/games/{game_id}/decisions/{request_id}/payload": {
       "post": {
-        "operationId": "submitParameterizedDecision",
+        "deprecated": true,
+        "operationId": "submitLegacyParameterizedDecision",
         "parameters": [
           {"$ref": "#/components/parameters/GameId"},
           {"$ref": "#/components/parameters/RequestId"}
         ],
         "requestBody": {
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": {"$ref": "./schemas/parameterized-submission.schema.json"}
-            }
-          }
+          "content": {"application/json": {"schema": {"$ref": "./schemas/parameterized-submission.schema.json"}}}
         },
         "responses": {
           "200": {"$ref": "#/components/responses/LifecycleStatus"},
@@ -164,9 +142,7 @@
         "operationId": "createAuthoritativeSession",
         "requestBody": {
           "required": true,
-          "content": {
-            "application/json": {"schema": {"$ref": "./schemas/session-create.schema.json"}}
-          }
+          "content": {"application/json": {"schema": {"$ref": "./schemas/session-create.schema.json"}}}
         },
         "responses": {
           "201": {"$ref": "#/components/responses/SessionMetadata"},
@@ -177,26 +153,9 @@
     "/sessions/{session_id}": {
       "get": {
         "operationId": "getSessionMetadata",
-        "parameters": [
-          {"$ref": "#/components/parameters/SessionId"},
-          {"$ref": "#/components/parameters/OptionalViewerPlayerId"}
-        ],
+        "parameters": [{"$ref": "#/components/parameters/SessionId"}],
         "responses": {
           "200": {"$ref": "#/components/responses/SessionMetadata"},
-          "default": {"$ref": "#/components/responses/Error"}
-        }
-      }
-    },
-    "/sessions/{session_id}/start": {
-      "post": {
-        "deprecated": true,
-        "operationId": "startSession",
-        "parameters": [
-          {"$ref": "#/components/parameters/SessionId"},
-          {"$ref": "#/components/parameters/ViewerPlayerId"}
-        ],
-        "responses": {
-          "200": {"$ref": "#/components/responses/SessionCommandResult"},
           "default": {"$ref": "#/components/responses/Error"}
         }
       }
@@ -204,21 +163,15 @@
     "/sessions/{session_id}/commands": {
       "post": {
         "operationId": "executeSessionCommand",
-        "parameters": [
-          {"$ref": "#/components/parameters/SessionId"},
-          {"$ref": "#/components/parameters/ParticipantId"}
-        ],
+        "parameters": [{"$ref": "#/components/parameters/SessionId"}],
         "requestBody": {
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": {"$ref": "./schemas/session-command-envelope.schema.json"}
-            }
-          }
+          "content": {"application/json": {"schema": {"$ref": "./schemas/session-command-envelope.schema.json"}}}
         },
         "responses": {
           "200": {"$ref": "#/components/responses/SessionCommandOutcome"},
           "400": {"$ref": "#/components/responses/Error"},
+          "401": {"$ref": "#/components/responses/Error"},
           "403": {"$ref": "#/components/responses/Error"},
           "409": {"$ref": "#/components/responses/Error"},
           "422": {"$ref": "#/components/responses/SessionCommandRejected"},
@@ -229,17 +182,9 @@
     "/sessions/{session_id}/projection": {
       "get": {
         "operationId": "getSessionProjection",
-        "parameters": [
-          {"$ref": "#/components/parameters/SessionId"},
-          {"$ref": "#/components/parameters/ViewerPlayerId"}
-        ],
+        "parameters": [{"$ref": "#/components/parameters/SessionId"}],
         "responses": {
-          "200": {
-            "description": "Viewer-scoped game projection.",
-            "content": {
-              "application/json": {"schema": {"$ref": "./schemas/game-view.schema.json"}}
-            }
-          },
+          "200": {"$ref": "#/components/responses/SessionProjection"},
           "default": {"$ref": "#/components/responses/Error"}
         }
       }
@@ -251,9 +196,7 @@
         "responses": {
           "200": {
             "description": "Source-hashed static rules catalog.",
-            "content": {
-              "application/json": {"schema": {"$ref": "./schemas/rules-catalog.schema.json"}}
-            }
+            "content": {"application/json": {"schema": {"$ref": "./schemas/rules-catalog.schema.json"}}}
           },
           "default": {"$ref": "#/components/responses/Error"}
         }
@@ -264,74 +207,11 @@
         "operationId": "getSessionEvents",
         "parameters": [
           {"$ref": "#/components/parameters/SessionId"},
-          {"$ref": "#/components/parameters/ViewerPlayerId"},
-          {"$ref": "#/components/parameters/EventCursor"}
+          {"$ref": "#/components/parameters/EventCursor"},
+          {"$ref": "#/components/parameters/EventPageLimit"}
         ],
         "responses": {
-          "200": {
-            "description": "Viewer-scoped event delta.",
-            "content": {
-              "application/json": {"schema": {"$ref": "./schemas/event-delta.schema.json"}}
-            }
-          },
-          "default": {"$ref": "#/components/responses/Error"}
-        }
-      }
-    },
-    "/sessions/{session_id}/decisions/{request_id}/option": {
-      "post": {
-        "deprecated": true,
-        "operationId": "submitSessionFiniteDecision",
-        "parameters": [
-          {"$ref": "#/components/parameters/SessionId"},
-          {"$ref": "#/components/parameters/RequestId"}
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {"schema": {"$ref": "./schemas/finite-submission.schema.json"}}
-          }
-        },
-        "responses": {
-          "200": {"$ref": "#/components/responses/SessionCommandResult"},
-          "422": {"$ref": "#/components/responses/SessionCommandResult"},
-          "default": {"$ref": "#/components/responses/Error"}
-        }
-      }
-    },
-    "/sessions/{session_id}/decisions/{request_id}/payload": {
-      "post": {
-        "deprecated": true,
-        "operationId": "submitSessionParameterizedDecision",
-        "parameters": [
-          {"$ref": "#/components/parameters/SessionId"},
-          {"$ref": "#/components/parameters/RequestId"}
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {"$ref": "./schemas/parameterized-submission.schema.json"}
-            }
-          }
-        },
-        "responses": {
-          "200": {"$ref": "#/components/responses/SessionCommandResult"},
-          "422": {"$ref": "#/components/responses/SessionCommandResult"},
-          "default": {"$ref": "#/components/responses/Error"}
-        }
-      }
-    },
-    "/sessions/{session_id}/advance": {
-      "post": {
-        "deprecated": true,
-        "operationId": "advanceAuthoritativeSession",
-        "parameters": [
-          {"$ref": "#/components/parameters/SessionId"},
-          {"$ref": "#/components/parameters/ViewerPlayerId"}
-        ],
-        "responses": {
-          "200": {"$ref": "#/components/responses/SessionCommandResult"},
+          "200": {"$ref": "#/components/responses/EventDelta"},
           "default": {"$ref": "#/components/responses/Error"}
         }
       }
@@ -342,55 +222,36 @@
         "parameters": [{"$ref": "#/components/parameters/SessionId"}],
         "responses": {
           "200": {
-            "description": "Deterministic replay artifact and metadata.",
-            "content": {
-              "application/json": {"schema": {"$ref": "./schemas/replay-metadata.schema.json"}}
-            }
+            "description": "Deterministic replay artifact for an administrator, or for a replay viewer after the session is terminal or closed.",
+            "content": {"application/json": {"schema": {"$ref": "./schemas/replay-metadata.schema.json"}}}
           },
-          "default": {"$ref": "#/components/responses/Error"}
-        }
-      }
-    },
-    "/sessions/{session_id}/close": {
-      "post": {
-        "deprecated": true,
-        "operationId": "closeSession",
-        "parameters": [
-          {"$ref": "#/components/parameters/SessionId"},
-          {"$ref": "#/components/parameters/ViewerPlayerId"}
-        ],
-        "responses": {
-          "200": {"$ref": "#/components/responses/SessionCommandResult"},
           "default": {"$ref": "#/components/responses/Error"}
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "opaque"}
+    },
     "parameters": {
       "EventCursor": {
         "name": "cursor",
         "in": "query",
         "required": true,
-        "schema": {"type": "integer", "minimum": 0}
+        "description": "Opaque server-side cursor identifier bound to the session, authenticated principal, authorization epoch, visibility scope, protected authoritative log offset, viewer sequence, revision, and projection hash.",
+        "schema": {"type": "string", "minLength": 1, "maxLength": 2048}
+      },
+      "EventPageLimit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "schema": {"type": "integer", "minimum": 1, "maximum": 500, "default": 100}
       },
       "GameId": {
         "name": "game_id",
         "in": "path",
         "required": true,
-        "schema": {"type": "string", "minLength": 1}
-      },
-      "OptionalViewerPlayerId": {
-        "name": "viewer_player_id",
-        "in": "query",
-        "required": false,
-        "schema": {"type": "string", "minLength": 1}
-      },
-      "ParticipantId": {
-        "name": "X-Participant-ID",
-        "in": "header",
-        "required": true,
-        "description": "Transport-supplied participant routing context. Decision commands bind to the pending actor; lifecycle commands use the first configured player's participant as the development coordinator. Phase 18H replaces this with authenticated principal/operator context.",
         "schema": {"type": "string", "minLength": 1}
       },
       "RequestId": {
@@ -404,45 +265,27 @@
         "in": "path",
         "required": true,
         "schema": {"type": "string", "minLength": 1}
-      },
-      "ViewerPlayerId": {
-        "name": "viewer_player_id",
-        "in": "query",
-        "required": true,
-        "schema": {"type": "string", "minLength": 1}
       }
     },
     "responses": {
       "Error": {
-        "description": "Typed external contract error.",
-        "content": {
-          "application/json": {"schema": {"$ref": "./schemas/error-envelope.schema.json"}}
-        }
+        "description": "Typed error with shared authentication/authorization redaction shape.",
+        "content": {"application/json": {"schema": {"$ref": "./schemas/error-envelope.schema.json"}}}
+      },
+      "EventDelta": {
+        "description": "Role-bound deterministic page or typed projection-resync response.",
+        "content": {"application/json": {"schema": {"$ref": "./schemas/event-delta.schema.json"}}}
       },
       "LifecycleStatus": {
-        "description": "Viewer-scoped lifecycle status.",
-        "content": {
-          "application/json": {"schema": {"$ref": "./schemas/lifecycle-status.schema.json"}}
-        }
-      },
-      "SessionCommandResult": {
-        "description": "Coherent post-drain session command result.",
-        "content": {
-          "application/json": {
-            "schema": {"$ref": "./schemas/session-command-result.schema.json"}
-          }
-        }
+        "description": "Role-scoped lifecycle status.",
+        "content": {"application/json": {"schema": {"$ref": "./schemas/lifecycle-status.schema.json"}}}
       },
       "SessionCommandOutcome": {
-        "description": "Idempotent Phase 18F command outcome with coherent post-commit session state.",
-        "content": {
-          "application/json": {
-            "schema": {"$ref": "./schemas/session-command-outcome.schema.json"}
-          }
-        }
+        "description": "Idempotent authenticated command outcome.",
+        "content": {"application/json": {"schema": {"$ref": "./schemas/session-command-outcome.schema.json"}}}
       },
       "SessionCommandRejected": {
-        "description": "A recorded invalid/unsupported command outcome or a typed rejection before commit.",
+        "description": "Recorded invalid/unsupported outcome or typed pre-commit rejection.",
         "content": {
           "application/json": {
             "schema": {
@@ -455,10 +298,12 @@
         }
       },
       "SessionMetadata": {
-        "description": "Authoritative session identity, lifecycle, and checkpoint metadata.",
-        "content": {
-          "application/json": {"schema": {"$ref": "./schemas/session-metadata.schema.json"}}
-        }
+        "description": "Role-scoped session metadata and opaque reconnect checkpoint.",
+        "content": {"application/json": {"schema": {"$ref": "./schemas/session-metadata.schema.json"}}}
+      },
+      "SessionProjection": {
+        "description": "Full role-scoped projection with replacement hash and resume cursor.",
+        "content": {"application/json": {"schema": {"$ref": "./schemas/session-projection.schema.json"}}}
       }
     },
     "schemas": {
@@ -473,11 +318,12 @@
       "ProposalPayload": {"$ref": "./schemas/proposal-payload.schema.json"},
       "ReplayMetadata": {"$ref": "./schemas/replay-metadata.schema.json"},
       "RulesCatalog": {"$ref": "./schemas/rules-catalog.schema.json"},
-      "SessionCommandResult": {"$ref": "./schemas/session-command-result.schema.json"},
       "SessionCommandEnvelope": {"$ref": "./schemas/session-command-envelope.schema.json"},
       "SessionCommandOutcome": {"$ref": "./schemas/session-command-outcome.schema.json"},
+      "SessionCommandResult": {"$ref": "./schemas/session-command-result.schema.json"},
       "SessionCreate": {"$ref": "./schemas/session-create.schema.json"},
       "SessionMetadata": {"$ref": "./schemas/session-metadata.schema.json"},
+      "SessionProjection": {"$ref": "./schemas/session-projection.schema.json"},
       "SupportProfile": {"$ref": "./schemas/support-profile.schema.json"}
     }
   }

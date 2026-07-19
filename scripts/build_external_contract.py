@@ -17,6 +17,12 @@ from jsonschema import Draft202012Validator
 from referencing import Resource
 from referencing.jsonschema import DRAFT202012, EMPTY_REGISTRY, Schema, SchemaRegistry
 
+from warhammer40k_core.adapters.access_control import (
+    DEV_ADMIN_TOKEN,
+    DEV_PLAYER_A_TOKEN,
+    DEV_PLAYER_B_TOKEN,
+    bearer_authorization,
+)
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.external_contract import (
     CREATE_SESSION_SCHEMA_VERSION,
@@ -33,6 +39,7 @@ from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_RESULT_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_VERSION,
     SESSION_METADATA_SCHEMA_VERSION,
+    SESSION_PROJECTION_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.projection import (
     PROJECTION_SCHEMA_VERSION,
@@ -40,6 +47,7 @@ from warhammer40k_core.adapters.projection import (
 )
 from warhammer40k_core.adapters.redaction import HIDDEN_DECISION_TYPE
 from warhammer40k_core.adapters.server import AdapterGameServer, ServerResponse
+from warhammer40k_core.adapters.session_events import SessionCursorCodec
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.adapters.support_profile import SUPPORT_PROFILE_SCHEMA_VERSION
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
@@ -97,6 +105,7 @@ PRIMARY_SCHEMA_NAMES = frozenset(
         "session-command-outcome.schema.json",
         "session-create.schema.json",
         "session-metadata.schema.json",
+        "session-projection.schema.json",
     }
 )
 PAYLOAD_SCHEMA_VERSION_BY_NAME = {
@@ -138,6 +147,10 @@ PAYLOAD_SCHEMA_VERSION_BY_NAME = {
     ),
     "session-create.schema.json": ("schema_version", SESSION_CREATE_SCHEMA_VERSION),
     "session-metadata.schema.json": ("schema_version", SESSION_METADATA_SCHEMA_VERSION),
+    "session-projection.schema.json": (
+        "schema_version",
+        SESSION_PROJECTION_SCHEMA_VERSION,
+    ),
 }
 
 
@@ -181,14 +194,25 @@ def write_contract_examples() -> None:
     for name, payload in phase18e_session_examples().items():
         _write_json(SESSION_EXAMPLE_DIR / name, payload)
 
-    server = AdapterGameServer()
+    server = AdapterGameServer(
+        cursor_codec=SessionCursorCodec(secret=b"core-v2-local-dev-cursor-secret")
+    )
     created = _successful_response(
-        server.handle(method="POST", path="/games", body=create_payload),
+        server.handle(
+            method="POST",
+            path="/games",
+            body=create_payload,
+            authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+        ),
         expected_status=201,
     )
     _write_json(STATUS_EXAMPLE_DIR / "advanced.json", created)
     waiting = _successful_response(
-        server.handle(method="POST", path=f"/games/{config.game_id}/advance"),
+        server.handle(
+            method="POST",
+            path=f"/games/{config.game_id}/advance",
+            authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+        ),
         expected_status=200,
     )
     _write_json(STATUS_EXAMPLE_DIR / "waiting-for-decision.json", waiting)
@@ -197,10 +221,11 @@ def write_contract_examples() -> None:
         server.handle(
             method="GET",
             path=f"/games/{config.game_id}/view",
-            query={"viewer_player_id": "player-a"},
+            authorization=bearer_authorization(DEV_PLAYER_A_TOKEN),
         ),
         expected_status=200,
     )
+    player_a_view = _json_object(player_a_view["projection"], "player A projection")
     pending = _json_object(player_a_view["pending_decision"], "pending decision")
     options = _json_list(pending["options"], "pending decision options")
     first_option = _json_object(options[0], "pending decision option")
@@ -273,12 +298,24 @@ def _verify_python_schema_versions(schemas: dict[str, Schema]) -> None:
 
 
 def _write_server_read_examples(*, server: AdapterGameServer, game_id: str) -> None:
-    for viewer in ("player-a", "player-b"):
+    for viewer, token in (
+        ("player-a", DEV_PLAYER_A_TOKEN),
+        ("player-b", DEV_PLAYER_B_TOKEN),
+    ):
+        projection = _successful_response(
+            server.handle(
+                method="GET",
+                path=f"/games/{game_id}/view",
+                authorization=bearer_authorization(token),
+            ),
+            expected_status=200,
+        )
         event_payload = _successful_response(
             server.handle(
                 method="GET",
                 path=f"/games/{game_id}/events",
-                query={"viewer_player_id": viewer, "cursor": "0"},
+                query={"cursor": _required_string(projection, "event_cursor")},
+                authorization=bearer_authorization(token),
             ),
             expected_status=200,
         )
@@ -286,14 +323,22 @@ def _write_server_read_examples(*, server: AdapterGameServer, game_id: str) -> N
     _write_json(
         EXAMPLE_DIR / "support-profile.json",
         _successful_response(
-            server.handle(method="GET", path=f"/games/{game_id}/support-profile"),
+            server.handle(
+                method="GET",
+                path=f"/games/{game_id}/support-profile",
+                authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+            ),
             expected_status=200,
         ),
     )
     _write_json(
         EXAMPLE_DIR / "replay-metadata.json",
         _successful_response(
-            server.handle(method="GET", path=f"/games/{game_id}/replay"),
+            server.handle(
+                method="GET",
+                path=f"/games/{game_id}/replay",
+                authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+            ),
             expected_status=200,
         ),
     )
@@ -680,7 +725,10 @@ def _write_error_examples() -> None:
     errors = {
         "conflict": ("session_revision_conflict", "Session revision conflicted."),
         "corruption": ("session_corruption", "Session recovery verification failed."),
-        "forbidden": ("actor_not_authorized", "Actor is not authorized."),
+        "forbidden": (
+            "access_denied",
+            "Authenticated principal is not authorized for this resource.",
+        ),
         "invalid": ("proposal_invalid", "Proposal is invalid."),
         "malformed": ("malformed_payload", "Payload is malformed."),
         "stale": ("stale_decision_request", "Decision request is stale."),
@@ -772,7 +820,7 @@ def _example_schema_bindings() -> dict[str, JsonValue]:
     bindings["examples/sessions/session-create.json"] = "session-create.schema.json"
     bindings["examples/sessions/session-metadata-created.json"] = "session-metadata.schema.json"
     bindings["examples/sessions/session-command-started.json"] = (
-        "session-command-result.schema.json"
+        "session-command-outcome.schema.json"
     )
     bindings["examples/sessions/session-command-envelope.json"] = (
         "session-command-envelope.schema.json"
