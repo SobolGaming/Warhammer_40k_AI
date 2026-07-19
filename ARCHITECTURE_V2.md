@@ -385,6 +385,7 @@ Implemented foundation and partial integration baselines:
 | 18F | Complete | Optimistic concurrency, idempotent command journal, stale-client conflicts, and atomic copy-on-write command commit |
 | 18G | Complete | Signed role-bound event cursors, deterministic pagination/retention, typed resynchronization, and full-projection reconnect checkpoints |
 | 18H | Complete | Authenticated server-owned principal roles, explicit authorization policy, delayed spectators, and shared differential redaction |
+| 18M-A | Complete | HTTP/OpenAPI-only TypeScript conformance client for the first certified setup/deployment, reconnect, terminal, and replay-equivalence scenario |
 
 Next / planned sequence:
 
@@ -396,7 +397,8 @@ Next / planned sequence:
 | 17M | Planned | Source-backed generic semantic completion organized by reusable mechanic family |
 | 17N | Planned | Mission, terrain, deployment, objective, and battlefield package completion |
 | 17O | Planned | Multi-axis engine capability and support manifest |
-| 18I-18M | Planned | UI interaction/coordinate contracts, interface intent, persistence, and backend conformance |
+| 18I-18L | Planned | UI interaction/coordinate contracts, interface intent, and persistence |
+| 18M-B+ | Planned | Remaining decision-family, race, golden-corpus, persistence-claim, and Phase 20A backend certification coverage |
 | 19A-19F | Planned | Performance, AI orchestration, self-play, training corpus generation, and observability |
 | 20A-20D | Planned | Certified vertical slice, full-game regression, adversarial soak, and release gates |
 
@@ -5794,6 +5796,25 @@ Required tests:
 Priority: P0/P1 boundary. Implement the first conformance slice after the P0
 contract, session, concurrency, authorization, and event semantics are fixed;
 expand it with Phase 18I-18L.
+
+Status: Partial. Phase 18M-A provides a generated TypeScript model package and
+transport-neutral runner that uses only the published OpenAPI document, JSON
+Schemas, HTTP operations, and public contract artifacts. Its certified
+setup/deployment scenario covers administrator authentication, create/start,
+player projections and redaction, finite and parameterized submission,
+optimistic concurrency, idempotency, authorization, paged events, forced
+resynchronization, typed malformed/unsupported-lifecycle/route-not-found/
+terminal handling, close, and schema-validated canonical replay equivalence
+across two independent reference-server processes. The client boundary is
+statically audited against engine/lifecycle imports and its executable methods
+derive request, path/query, and status-specific response types from generated
+OpenAPI operations.
+
+Phase 18M-A does not satisfy the complete Phase 18M or Phase 20A gate. Exhaustive
+live decision-family/proposal coverage, concurrent-submission races, the full
+golden corpus, persistence/recovery claims, coach/delayed-spectator policy, live
+rejected `rule_path_unsupported` handling, and the certified Phase 20A full-game
+scenario remain Phase 18M-B+ work.
 
 The existing development server becomes a small reference implementation of the
 canonical contract, not necessarily the production service. It proves that an

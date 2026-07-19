@@ -1,0 +1,28 @@
+{
+  "name": "@warhammer40k-core/phase18m-conformance",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "generate": "node scripts/generate-models.mjs src/generated/openapi.ts",
+    "check:generated": "node scripts/check-generated.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "tsx --test src/**/*.test.ts",
+    "conformance": "tsx src/main.ts",
+    "check": "npm run check:generated && npm run typecheck",
+    "test": "npm run check && npm run test:unit && npm run conformance"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "openapi-typescript": "7.13.0",
+    "tsx": "4.23.1",
+    "typescript": "5.9.3"
+  }
+}
