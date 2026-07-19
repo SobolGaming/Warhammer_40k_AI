@@ -385,6 +385,7 @@ Implemented foundation and partial integration baselines:
 | 18F | Complete | Optimistic concurrency, idempotent command journal, stale-client conflicts, and atomic copy-on-write command commit |
 | 18G | Complete | Signed role-bound event cursors, deterministic pagination/retention, typed resynchronization, and full-projection reconnect checkpoints |
 | 18H | Complete | Authenticated server-owned principal roles, explicit authorization policy, delayed spectators, and shared differential redaction |
+| 18I | Complete | Engine-authored neutral interaction descriptors, exact registered-family coverage, typed submission schema references, and generated TypeScript renderer selection |
 | 18M-A | Complete | HTTP/OpenAPI-only TypeScript conformance client for the first certified setup/deployment, reconnect, terminal, and replay-equivalence scenario |
 
 Next / planned sequence:
@@ -397,7 +398,7 @@ Next / planned sequence:
 | 17M | Planned | Source-backed generic semantic completion organized by reusable mechanic family |
 | 17N | Planned | Mission, terrain, deployment, objective, and battlefield package completion |
 | 17O | Planned | Multi-axis engine capability and support manifest |
-| 18I-18L | Planned | UI interaction/coordinate contracts, interface intent, and persistence |
+| 18J-18L | Planned | Battlefield coordinate contracts, interface intent, and persistence |
 | 18M-B+ | Planned | Remaining decision-family, race, golden-corpus, persistence-claim, and Phase 20A backend certification coverage |
 | 19A-19F | Planned | Performance, AI orchestration, self-play, training corpus generation, and observability |
 | 20A-20D | Planned | Certified vertical slice, full-game regression, adversarial soak, and release gates |
@@ -5259,10 +5260,11 @@ submit every supported decision category, consume viewer-scoped events, and
 distinguish stale, invalid, unsupported, forbidden, conflict, corruption, and
 terminal responses without importing Python or engine internals.
 
-This gate is not yet met. Phase 18I owns neutral interaction metadata and the
-remaining decision-family live scenarios, Phase 18J owns fully typed
-battlefield interaction/coordinate shapes, and Phase 18M owns generated-client
-conformance against the reference server. Phases 18E-18H own the completed
+This gate is not yet met. Phase 18I now supplies neutral interaction metadata
+and exact registry coverage; exhaustive remaining decision-family live scenarios
+remain part of Phase 18M-B+. Phase 18J owns fully typed battlefield
+interaction/coordinate shapes, and Phase 18M owns generated-client conformance
+against the reference server. Phases 18E-18H own the completed
 hosted session, command, cursor, reconnect, and viewer-authorization envelopes;
 those generic baseline shapes are not evidence of a complete strongly typed
 client contract.
@@ -5598,6 +5600,21 @@ projection/event/status/error redaction delegates to the shared adapter module.
 
 Priority: P1, designed alongside Phase 18D.
 
+Status: Complete. `engine/interaction_metadata.py` is the sole engine-owned
+classification and descriptor source for all 67 registered lifecycle decision
+families and the documented nested weapon-ability choice. `DecisionDispatchContract` exposes exact interaction-kind coverage;
+the external family inventory and support profile publish the same registry
+metadata. Visible projections carry `interaction-descriptor-v1`, while hidden
+pending decisions carry `interaction: null` through the shared redaction path.
+
+Contract 2.1 adds the interaction schema, deterministic fixtures, projection and
+replay-checkpoint coverage, typed Cult Ambush marker/return-on-death proposal
+branches, and regenerated TypeScript OpenAPI models. The non-Python conformance
+client selects its finite and placement renderers only by `interaction_kind`.
+Static audits fail when a registered decision lacks metadata, schema/enum
+inventories drift, visual consumers branch on `decision_type`, or an interaction
+descriptor names a framework component.
+
 Finite options and generic parameterized payloads are semantically sufficient
 for the engine but not sufficient for a backend-agnostic visual client. Every
 adapter-visible decision therefore exposes a neutral interaction descriptor
@@ -5657,6 +5674,12 @@ Completion gate:
 A generic client can choose an interaction renderer from the descriptor and
 construct every supported finite/parameterized submission without importing
 engine code or hard-coding rules mutations by `decision_type`.
+
+This gate is met. Every registered finite/parameterized family resolves to one
+standard renderer kind and a canonical submission schema reference, every
+currently supported parameterized wire shape is present in the public typed
+union, and the generated TypeScript selector is exhaustive over the published
+interaction enum.
 
 ## Phase 18J: battlefield rendering and coordinate contract
 

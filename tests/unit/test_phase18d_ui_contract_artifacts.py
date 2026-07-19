@@ -39,6 +39,10 @@ from warhammer40k_core.adapters.projection import project_rules_catalog_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.detachment import StratagemDefinition
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.interaction_metadata import (
+    InteractionKind,
+    registered_interaction_decision_types,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -58,6 +62,7 @@ SCHEMA_FILES = (
     Path("contracts/schemas/decision-request-view.schema.json"),
     Path("contracts/schemas/event-delta.schema.json"),
     Path("contracts/schemas/game-view.schema.json"),
+    Path("contracts/schemas/interaction-descriptor.schema.json"),
     Path("contracts/schemas/lifecycle-status.schema.json"),
     Path("contracts/schemas/rules-catalog.schema.json"),
     Path("contracts/schemas/session-metadata.schema.json"),
@@ -294,6 +299,7 @@ def test_hidden_data_is_redacted_but_legal_options_remain_explicit() -> None:
     assert initial_pending["decision_type"] == "hidden_decision"
     assert initial_pending["payload"] == {"hidden": True, "secret": True}
     assert initial_pending["options"] == []
+    assert initial_pending["interaction"] is None
 
     hidden_redaction = _fixture("hidden_secondary_redaction_view.json")
     choices = _json_list(hidden_redaction["public_secondary_mission_choices"])
@@ -305,6 +311,7 @@ def test_hidden_data_is_redacted_but_legal_options_remain_explicit() -> None:
     assert choices == [{"hidden": True, "player_id": PLAYER_A, "selected": True}]
     assert pending["actor_id"] == PLAYER_B
     assert pending["request_id"] == "decision-request-000002"
+    assert _json_object(pending["interaction"])["interaction_kind"] == "finite_option_list"
     assert {"fixed:assassination:bring_it_down", "tactical"}.issubset(option_ids)
 
 
@@ -316,6 +323,13 @@ def test_pending_decision_and_modifier_datacard_fixtures_are_ui_ready() -> None:
     assert pending["decision_type"] == "select_movement_unit"
     assert all(_json_string(_json_object(option)["option_id"]) for option in options)
     assert {_json_string(_json_object(option)["option_id"]) for option in options} == {UNIT_ALPHA}
+    interaction = _json_object(pending["interaction"])
+    constraints = _json_object(interaction["constraints"])
+    assert interaction["interaction_kind"] == "entity_selection"
+    assert interaction["required_inputs"] == ["selected_entities"]
+    assert constraints["entity_kinds"] == ["unit"]
+    assert constraints["candidate_option_ids"] == [UNIT_ALPHA]
+    assert constraints["submission_schema_ref"] == "finite-submission.schema.json"
 
     modifier_view = _fixture("visible_modifier_datacard_view.json")
     model_display_by_id = cast(dict[str, JsonValue], modifier_view["model_display_by_id"])
@@ -330,12 +344,30 @@ def test_pending_decision_and_modifier_datacard_fixtures_are_ui_ready() -> None:
     assert _json_object(visible_modifiers[0])["source_kind"] == ("engine_resolved_characteristic")
 
 
+def test_parameterized_interaction_metadata_selects_renderer_and_typed_schema() -> None:
+    request = _read_json(
+        REPO_ROOT / DECISION_EXAMPLE_DIR / "families" / "submit_movement_proposal.json"
+    )
+    interaction = _json_object(request["interaction"])
+    constraints = _json_object(interaction["constraints"])
+
+    assert interaction["interaction_kind"] == "path_editor"
+    assert interaction["proposal_kind"] == "normal_move"
+    assert interaction["selected_entity_ids"] == [UNIT_ALPHA]
+    assert interaction["required_inputs"] == ["model_paths", "final_poses"]
+    assert constraints["must_preserve_coherency"] is True
+    assert constraints["may_enter_engagement_range"] is False
+    assert constraints["submission_schema_ref"] == ("proposal-payload.schema.json#/$defs/movement")
+
+
 def test_proposal_examples_cover_engine_facing_payload_families() -> None:
     deployment = _proposal_example("deployment_placement.json")
     movement = _proposal_example("movement_path_witness.json")
     charge = _proposal_example("charge_move.json")
     shooting = _proposal_example("shooting_target_selection.json")
     melee = _proposal_example("melee_declaration.json")
+    cult_ambush_marker = _proposal_example("cult_ambush_marker_placement.json")
+    return_on_death = _proposal_example("submit_return_on_death_placement.json")
     opportunity = _read_json(REPO_ROOT / DECISION_EXAMPLE_DIR / "opportunity_window.json")
 
     assert deployment["proposal_kind"] == "deployment_placement"
@@ -360,6 +392,11 @@ def test_proposal_examples_cover_engine_facing_payload_families() -> None:
         {"target_unit_instance_id": UNIT_BETA}
     ]
 
+    assert cult_ambush_marker["submission_kind"] == "cult_ambush_marker_placement"
+    assert {"x_inches", "y_inches"}.issubset(cult_ambush_marker)
+    assert return_on_death["submission_kind"] == "submit_return_on_death_placement"
+    assert _json_object(return_on_death["attempted_placement"])["model_placements"]
+
     request = _json_object(opportunity["decision_request"])
     request_payload = _json_object(request["payload"])
     options = _json_list(request["options"])
@@ -376,8 +413,7 @@ def test_decision_family_coverage_uses_registry_metadata_and_real_scenarios() ->
     rows = [_json_object(row) for row in _json_list(coverage["families"])]
     rows_by_type = {_json_string(row["decision_type"]): row for row in rows}
     registered = {
-        contract.decision_type: contract.submission_kind.value
-        for contract in GameLifecycle().decision_dispatch_contracts
+        contract.decision_type: contract for contract in GameLifecycle().decision_dispatch_contracts
     }
     live_paths = {
         path.relative_to(REPO_ROOT / Path("contracts")).as_posix(): path
@@ -388,10 +424,14 @@ def test_decision_family_coverage_uses_registry_metadata_and_real_scenarios() ->
     assert coverage["known_external_token_count"] == len(registered) + 2
     assert coverage["live_scenario_count"] == len(live_paths)
     assert set(registered).issubset(rows_by_type)
-    for decision_type, submission_kind in registered.items():
+    assert set(registered) == set(registered_interaction_decision_types())
+    assert coverage["interaction_kind_count"] == len(InteractionKind)
+    assert coverage["standard_interaction_kinds"] == sorted(kind.value for kind in InteractionKind)
+    for decision_type, contract in registered.items():
         row = rows_by_type[decision_type]
         assert row["registry_scope"] == "registered"
-        assert row["submission_kind"] == submission_kind
+        assert row["submission_kind"] == contract.submission_kind.value
+        assert row["interaction_kinds"] == list(contract.interaction_kinds)
 
     for row in rows:
         status = row["coverage_status"]
@@ -401,6 +441,11 @@ def test_decision_family_coverage_uses_registry_metadata_and_real_scenarios() ->
             example = _read_json(live_paths[example_path])
             assert example["decision_type"] == row["decision_type"]
             assert example["is_parameterized"] is (row["submission_kind"] == "parameterized")
+            interaction = _json_object(example["interaction"])
+            assert _json_string(interaction["interaction_kind"]) in _json_list(
+                row["interaction_kinds"]
+            )
+            assert interaction["schema_version"] == "interaction-descriptor-v1"
             assert '"contract_fixture"' not in json.dumps(example, sort_keys=True)
         else:
             assert example_path is None
@@ -420,7 +465,7 @@ def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None
     ).hexdigest()
 
     assert len(baseline_schema_names) == 15
-    assert len(canonical_schema_names) == 21
+    assert len(canonical_schema_names) == 22
     assert baseline_schema_names < canonical_schema_names
     assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
 

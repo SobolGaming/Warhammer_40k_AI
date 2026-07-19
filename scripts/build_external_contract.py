@@ -53,6 +53,10 @@ from warhammer40k_core.adapters.support_profile import SUPPORT_PROFILE_SCHEMA_VE
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.interaction_metadata import (
+    INTERACTION_DESCRIPTOR_SCHEMA_VERSION,
+    InteractionKind,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.replay import REPLAY_ARTIFACT_SCHEMA_VERSION
 from warhammer40k_core.engine.stratagems import (
@@ -85,6 +89,9 @@ COMPATIBILITY_DIR = CONTRACT_ROOT / "compatibility"
 MANIFEST_PATH = CONTRACT_ROOT / "manifest.json"
 OPENAPI_PATH = CONTRACT_ROOT / "openapi.yaml"
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
+_SPECIAL_PARAMETERIZED_PAYLOAD_KINDS = frozenset(
+    {"cult_ambush_marker_placement", "submit_return_on_death_placement"}
+)
 
 PRIMARY_SCHEMA_NAMES = frozenset(
     {
@@ -94,6 +101,7 @@ PRIMARY_SCHEMA_NAMES = frozenset(
         "event-delta.schema.json",
         "finite-submission.schema.json",
         "game-view.schema.json",
+        "interaction-descriptor.schema.json",
         "lifecycle-status.schema.json",
         "parameterized-submission.schema.json",
         "proposal-payload.schema.json",
@@ -122,6 +130,10 @@ PAYLOAD_SCHEMA_VERSION_BY_NAME = {
     "event-delta.schema.json": ("schema_version", EVENT_STREAM_DELTA_SCHEMA_VERSION),
     "finite-submission.schema.json": ("schema_version", FINITE_SUBMISSION_SCHEMA_VERSION),
     "game-view.schema.json": ("projection_schema", PROJECTION_SCHEMA_VERSION),
+    "interaction-descriptor.schema.json": (
+        "schema_version",
+        INTERACTION_DESCRIPTOR_SCHEMA_VERSION,
+    ),
     "lifecycle-status.schema.json": ("schema_version", LIFECYCLE_STATUS_SCHEMA_VERSION),
     "parameterized-submission.schema.json": (
         "schema_version",
@@ -434,6 +446,7 @@ def _decision_family_coverage_payload(*, live_paths: dict[str, str]) -> JsonValu
                 "decision_type": contract.decision_type,
                 "registry_scope": "registered",
                 "submission_kind": contract.submission_kind.value,
+                "interaction_kinds": list(contract.interaction_kinds),
                 "coverage_status": "live_scenario" if live_path is not None else "envelope_only",
                 "example_path": live_path,
             }
@@ -443,6 +456,7 @@ def _decision_family_coverage_payload(*, live_paths: dict[str, str]) -> JsonValu
             "decision_type": WEAPON_ABILITY_SELECTION_DECISION_TYPE,
             "registry_scope": "nested",
             "submission_kind": "finite",
+            "interaction_kinds": [InteractionKind.FINITE_OPTION_LIST.value],
             "coverage_status": "envelope_only",
             "example_path": None,
         }
@@ -452,6 +466,7 @@ def _decision_family_coverage_payload(*, live_paths: dict[str, str]) -> JsonValu
             "decision_type": HIDDEN_DECISION_TYPE,
             "registry_scope": "redaction",
             "submission_kind": "not_submittable",
+            "interaction_kinds": [],
             "coverage_status": "redaction_only",
             "example_path": None,
         }
@@ -469,17 +484,19 @@ def _decision_family_coverage_payload(*, live_paths: dict[str, str]) -> JsonValu
         "schema_version": DECISION_FAMILY_COVERAGE_SCHEMA_VERSION,
         "registered_decision_type_count": len(registered_contracts),
         "known_external_token_count": len(sorted_rows),
+        "interaction_kind_count": len(InteractionKind),
         "live_scenario_count": len(live_paths),
+        "standard_interaction_kinds": sorted(kind.value for kind in InteractionKind),
         "families": sorted_rows,
     }
 
 
 def _write_parameterized_submission_examples() -> None:
     proposal_paths = {
-        _proposal_kind(_read_json(path)): path
+        _parameterized_payload_kind(_read_json(path)): path
         for path in sorted(PROPOSAL_EXAMPLE_DIR.glob("*.json"))
     }
-    expected_kinds = set(_proposal_kind_tokens())
+    expected_kinds = set(_parameterized_payload_kind_tokens())
     if set(proposal_paths) != expected_kinds:
         missing = sorted(expected_kinds - set(proposal_paths))
         extra = sorted(set(proposal_paths) - expected_kinds)
@@ -530,6 +547,14 @@ def _supplemental_proposal_examples() -> dict[str, JsonValue]:
             "movement_phase_action": "advance",
             "movement_mode": "advance",
             "witness": empty_witness,
+        },
+        "cult_ambush_marker_placement": {
+            "request_id": "contract-cult-ambush-marker-request-000001",
+            "submission_kind": "cult_ambush_marker_placement",
+            "marker_id": "cult-ambush-marker:contract:000001",
+            "player_id": "player-a",
+            "x_inches": 12.0,
+            "y_inches": 18.0,
         },
         "consolidate": {
             "proposal_request_id": "contract-consolidate-request-000001",
@@ -642,6 +667,10 @@ def _supplemental_proposal_examples() -> dict[str, JsonValue]:
             "movement_phase_action": "surge_move",
             "movement_mode": "surge_move",
             "witness": empty_witness,
+        },
+        "submit_return_on_death_placement": {
+            "submission_kind": "submit_return_on_death_placement",
+            "attempted_placement": placement,
         },
     }
 
@@ -769,11 +798,13 @@ def _contract_manifest() -> JsonValue:
     return {
         "contract_version": EXTERNAL_CONTRACT_VERSION,
         "known_external_decision_token_count": family_coverage["known_external_token_count"],
+        "interaction_kind_count": family_coverage["interaction_kind_count"],
         "live_decision_scenario_count": family_coverage["live_scenario_count"],
         "registered_decision_type_count": family_coverage["registered_decision_type_count"],
         "example_schema_by_path": example_bindings,
         "file_sha256": hashes,
         "proposal_kind_count": len(_proposal_kind_tokens()),
+        "parameterized_payload_kind_count": len(_parameterized_payload_kind_tokens()),
         "schema_ids": {
             name: _required_string(_json_object(schema, name), "$id")
             for name, schema in sorted(schemas.items())
@@ -847,27 +878,30 @@ def _verify_decision_and_proposal_coverage() -> None:
         raise ExternalContractError("Decision family coverage rows must be unique.")
 
     registered_contracts = GameLifecycle().decision_dispatch_contracts
-    registered_kind_by_type = {
-        contract.decision_type: contract.submission_kind.value for contract in registered_contracts
+    registered_contract_by_type = {
+        contract.decision_type: contract for contract in registered_contracts
     }
     expected_types = {
-        *registered_kind_by_type,
+        *registered_contract_by_type,
         WEAPON_ABILITY_SELECTION_DECISION_TYPE,
         HIDDEN_DECISION_TYPE,
     }
     if set(rows_by_type) != expected_types:
         raise ExternalContractError("Decision family coverage inventory drifted.")
-    for decision_type, submission_kind in registered_kind_by_type.items():
+    for decision_type, contract in registered_contract_by_type.items():
         row = rows_by_type[decision_type]
         if row.get("registry_scope") != "registered":
             raise ExternalContractError("Registered decision coverage scope drifted.")
-        if row.get("submission_kind") != submission_kind:
+        if row.get("submission_kind") != contract.submission_kind.value:
             raise ExternalContractError("Registered decision submission metadata drifted.")
+        if row.get("interaction_kinds") != list(contract.interaction_kinds):
+            raise ExternalContractError("Registered decision interaction metadata drifted.")
 
     nested_row = rows_by_type[WEAPON_ABILITY_SELECTION_DECISION_TYPE]
     if (
         nested_row.get("registry_scope") != "nested"
         or nested_row.get("submission_kind") != "finite"
+        or nested_row.get("interaction_kinds") != [InteractionKind.FINITE_OPTION_LIST.value]
         or nested_row.get("coverage_status") != "envelope_only"
     ):
         raise ExternalContractError("Nested decision coverage metadata drifted.")
@@ -875,6 +909,7 @@ def _verify_decision_and_proposal_coverage() -> None:
     if (
         redaction_row.get("registry_scope") != "redaction"
         or redaction_row.get("submission_kind") != "not_submittable"
+        or redaction_row.get("interaction_kinds") != []
         or redaction_row.get("coverage_status") != "redaction_only"
     ):
         raise ExternalContractError("Hidden decision redaction metadata drifted.")
@@ -914,8 +949,13 @@ def _verify_decision_and_proposal_coverage() -> None:
         raise ExternalContractError("Known decision token count drifted.")
     if coverage.get("live_scenario_count") != len(actual_live_types):
         raise ExternalContractError("Live decision scenario count drifted.")
+    expected_interaction_kinds = sorted(kind.value for kind in InteractionKind)
+    if coverage.get("standard_interaction_kinds") != expected_interaction_kinds:
+        raise ExternalContractError("Standard interaction kind inventory drifted.")
+    if coverage.get("interaction_kind_count") != len(expected_interaction_kinds):
+        raise ExternalContractError("Standard interaction kind count drifted.")
 
-    expected_proposals = set(_proposal_kind_tokens())
+    expected_proposals = set(_parameterized_payload_kind_tokens())
     actual_proposals = {path.stem for path in PARAMETERIZED_EXAMPLE_DIR.glob("*.json")}
     if actual_proposals != expected_proposals:
         raise ExternalContractError("Parameterized proposal example coverage drifted.")
@@ -1433,6 +1473,10 @@ def _proposal_kind_tokens() -> tuple[str, ...]:
     return tuple(sorted(values))
 
 
+def _parameterized_payload_kind_tokens() -> tuple[str, ...]:
+    return tuple(sorted({*_proposal_kind_tokens(), *_SPECIAL_PARAMETERIZED_PAYLOAD_KINDS}))
+
+
 def _source_paths() -> tuple[Path, ...]:
     return tuple(sorted(path for path in SRC_ROOT.rglob("*.py") if path.is_file()))
 
@@ -1463,8 +1507,15 @@ def _schema_file_names() -> tuple[str, ...]:
     return tuple(path.name for path in sorted(SCHEMA_DIR.glob("*.json")))
 
 
-def _proposal_kind(payload: JsonValue) -> str:
-    return _required_string(_json_object(payload, "proposal example"), "proposal_kind")
+def _parameterized_payload_kind(payload: JsonValue) -> str:
+    proposal = _json_object(payload, "proposal example")
+    proposal_kind = proposal.get("proposal_kind")
+    if type(proposal_kind) is str and proposal_kind:
+        return proposal_kind
+    submission_kind = proposal.get("submission_kind")
+    if type(submission_kind) is str and submission_kind in _SPECIAL_PARAMETERIZED_PAYLOAD_KINDS:
+        return submission_kind
+    raise ExternalContractError("Parameterized payload example requires a public discriminator.")
 
 
 def _successful_response(response: ServerResponse, *, expected_status: int) -> dict[str, JsonValue]:

@@ -9,8 +9,15 @@
       "uniqueItems": true
     },
     "known_external_token_count": {"minimum": 1, "type": "integer"},
+    "interaction_kind_count": {"minimum": 1, "type": "integer"},
     "live_scenario_count": {"minimum": 0, "type": "integer"},
     "registered_decision_type_count": {"minimum": 1, "type": "integer"},
+    "standard_interaction_kinds": {
+      "items": {"$ref": "#/$defs/interaction_kind"},
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
     "schema_version": {
       "const": "decision-family-coverage-v1",
       "type": "string"
@@ -57,6 +64,11 @@
         },
         "decision_type": {"minLength": 1, "type": "string"},
         "example_path": {"type": ["string", "null"]},
+        "interaction_kinds": {
+          "items": {"$ref": "#/$defs/interaction_kind"},
+          "type": "array",
+          "uniqueItems": true
+        },
         "registry_scope": {
           "enum": ["registered", "nested", "redaction"],
           "type": "string"
@@ -74,6 +86,24 @@
         "example_path"
       ],
       "type": "object"
+    },
+    "interaction_kind": {
+      "enum": [
+        "battlefield_point_placement",
+        "confirmation",
+        "dice_selection",
+        "entity_selection",
+        "finite_option_list",
+        "model_pose_placement",
+        "multi_model_placement",
+        "opportunity_window",
+        "ordered_sequencing",
+        "path_editor",
+        "quantity_selection",
+        "roster_construction",
+        "weapon_allocation_matrix"
+      ],
+      "type": "string"
     }
   }
 }

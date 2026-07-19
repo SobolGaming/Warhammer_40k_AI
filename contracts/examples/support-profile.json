@@ -32,6 +32,484 @@
       ]
     }
   ],
+  "decision_interaction_support_rows": [
+    {
+      "decision_type": "discard_tactical_secondary_mission",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "draw_tactical_secondary_missions",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "replace_tactical_secondary_mission",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "resolve_fight_interrupt",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "resolve_reaction_window",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "resolve_sequencing_order",
+      "interaction_kinds": [
+        "ordered_sequencing"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "score_tactical_secondary_mission",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_allocation_order",
+      "interaction_kinds": [
+        "ordered_sequencing"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_attack_weapon_group",
+      "interaction_kinds": [
+        "weapon_allocation_matrix"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_any_phase_once_per_battle_ability",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_post_shoot_hit_target_effect",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_post_shoot_hit_target_status",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_setup_reactive_shoot_charge",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_unit_move_completed_mortal_wounds_target",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_charge_declaration_grant",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_charging_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_cult_ambush_resurgence",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_damage_allocation_model",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_deployment_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_desperate_escape_model",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_destruction_reaction",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_dice_reroll",
+      "interaction_kinds": [
+        "dice_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_dice_result_override",
+      "interaction_kinds": [
+        "dice_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_disembark_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_embark_transport",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_battle_round_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_command_phase_start_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_fight_phase_end_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_fight_phase_start_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_setup_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_shooting_phase_start_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_turn_end_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_feel_no_pain",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_fight_activation",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_fight_activation_ability",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_fight_unit_grant",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_healing_model",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_movement_action",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_movement_action_grant",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_movement_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_prebattle_action",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_precision_allocation",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_psychic_attack_modifier_ignores",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_redeploy_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_reinforcement_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_reserve_declaration",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_resolve_target_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_secondary_missions",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_shooting_type",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_shooting_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_shooting_unit_grant",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_stratagem_cost_modifier_option",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_tracked_target",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_triggered_movement",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_weapon_ability_instance",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "start_mission_action",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "submit_cult_ambush_marker_placement",
+      "interaction_kinds": [
+        "battlefield_point_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_deployment_placement",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_melee_declaration",
+      "interaction_kinds": [
+        "weapon_allocation_matrix"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_movement_proposal",
+      "interaction_kinds": [
+        "path_editor"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_placement_proposal",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_redeploy_placement",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_return_on_death_placement",
+      "interaction_kinds": [
+        "model_pose_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_scout_move",
+      "interaction_kinds": [
+        "path_editor"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_scout_reserve_setup",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_shooting_declaration",
+      "interaction_kinds": [
+        "weapon_allocation_matrix"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_stratagem_target_proposal",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "use_stratagem",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    }
+  ],
   "detachment_faction_support_rows": [
     {
       "content_id": "core-combined-arms",
@@ -68,6 +546,21 @@
   ],
   "eligible_for_headless_self_play_smoke": false,
   "game_id": "phase18d-contract-session",
+  "interaction_kinds": [
+    "battlefield_point_placement",
+    "confirmation",
+    "dice_selection",
+    "entity_selection",
+    "finite_option_list",
+    "model_pose_placement",
+    "multi_model_placement",
+    "opportunity_window",
+    "ordered_sequencing",
+    "path_editor",
+    "quantity_selection",
+    "roster_construction",
+    "weapon_allocation_matrix"
+  ],
   "mustering_support_rows": [
     {
       "army_id": "army-alpha",

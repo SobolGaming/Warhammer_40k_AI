@@ -77,7 +77,7 @@ async function main(): Promise<void> {
           assertion_count:
             primary.assertion_count + comparison.assertion_count + equivalenceAssertions,
           client_language: "typescript",
-          contract_version: "2.0.0",
+          contract_version: "2.1.0",
           replay_sha256: primary.replay_sha256,
           scenario_id: primary.scenario_id,
           status: "passed",

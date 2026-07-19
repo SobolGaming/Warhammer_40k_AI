@@ -513,8 +513,29 @@ export interface components {
                 target_unit_instance_id: string | null;
             };
         };
+        "proposal-payload--cult_ambush_marker_placement.schema": {
+            marker_id: components["schemas"]["proposal-payload--identifier.schema"];
+            player_id: components["schemas"]["proposal-payload--identifier.schema"];
+            request_id: components["schemas"]["proposal-payload--identifier.schema"];
+            /** @constant */
+            submission_kind: "cult_ambush_marker_placement";
+            x_inches: number;
+            y_inches: number;
+        } | {
+            marker_id: components["schemas"]["proposal-payload--identifier.schema"];
+            no_marker_reason: components["schemas"]["proposal-payload--identifier.schema"];
+            player_id: components["schemas"]["proposal-payload--identifier.schema"];
+            request_id: components["schemas"]["proposal-payload--identifier.schema"];
+            /** @constant */
+            submission_kind: "cult_ambush_no_marker";
+        };
+        "proposal-payload--return_on_death_placement.schema": {
+            attempted_placement: components["schemas"]["proposal-payload--unit_placement.schema"];
+            /** @constant */
+            submission_kind: "submit_return_on_death_placement";
+        };
         /** CORE V2 ParameterizedProposalPayload */
-        "proposal-payload.schema": components["schemas"]["proposal-payload--movement.schema"] | components["schemas"]["proposal-payload--charge_move.schema"] | components["schemas"]["proposal-payload--fight_movement.schema"] | components["schemas"]["proposal-payload--generic_placement.schema"] | components["schemas"]["proposal-payload--deployment_placement.schema"] | components["schemas"]["proposal-payload--prebattle_placement.schema"] | components["schemas"]["proposal-payload--scout_move.schema"] | components["schemas"]["proposal-payload--shooting_declaration.schema"] | components["schemas"]["proposal-payload--melee_declaration.schema"] | components["schemas"]["proposal-payload--stratagem_target_binding.schema"];
+        "proposal-payload.schema": components["schemas"]["proposal-payload--movement.schema"] | components["schemas"]["proposal-payload--charge_move.schema"] | components["schemas"]["proposal-payload--fight_movement.schema"] | components["schemas"]["proposal-payload--generic_placement.schema"] | components["schemas"]["proposal-payload--deployment_placement.schema"] | components["schemas"]["proposal-payload--prebattle_placement.schema"] | components["schemas"]["proposal-payload--scout_move.schema"] | components["schemas"]["proposal-payload--shooting_declaration.schema"] | components["schemas"]["proposal-payload--melee_declaration.schema"] | components["schemas"]["proposal-payload--stratagem_target_binding.schema"] | components["schemas"]["proposal-payload--cult_ambush_marker_placement.schema"] | components["schemas"]["proposal-payload--return_on_death_placement.schema"];
         "session-command-envelope--parameterized_submission.schema": {
             payload: components["schemas"]["proposal-payload.schema"];
             /** @constant */
@@ -615,6 +636,36 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        "interaction-descriptor--identifier.schema": string;
+        /** CORE V2 InteractionDescriptorPayload */
+        "interaction-descriptor.schema": {
+            constraints: {
+                candidate_option_ids: components["schemas"]["interaction-descriptor--identifier.schema"][];
+                entity_kinds: components["schemas"]["interaction-descriptor--identifier.schema"][];
+                exact_model_count: number | null;
+                maximum_distance_in: number | null;
+                maximum_selections: number;
+                may_enter_engagement_range: boolean | null;
+                minimum_selections: number;
+                minimum_enemy_distance_in: number | null;
+                must_preserve_coherency: boolean | null;
+                placement_kinds: components["schemas"]["interaction-descriptor--identifier.schema"][];
+                submission_schema_ref: string;
+            };
+            display_hints: {
+                confirm_label: components["schemas"]["interaction-descriptor--identifier.schema"];
+                decline_label: components["schemas"]["interaction-descriptor--identifier.schema"] | null;
+            };
+            /** @enum {string} */
+            interaction_kind: "battlefield_point_placement" | "confirmation" | "dice_selection" | "entity_selection" | "finite_option_list" | "model_pose_placement" | "multi_model_placement" | "opportunity_window" | "ordered_sequencing" | "path_editor" | "quantity_selection" | "roster_construction" | "weapon_allocation_matrix";
+            proposal_kind: components["schemas"]["interaction-descriptor--identifier.schema"] | null;
+            required_inputs: components["schemas"]["interaction-descriptor--identifier.schema"][];
+            /** @constant */
+            schema_version: "interaction-descriptor-v1";
+            selected_entity_ids: components["schemas"]["interaction-descriptor--identifier.schema"][];
+            /** @enum {string} */
+            submission_kind: "finite" | "parameterized";
+        };
         "decision-request-view--json_value.schema": null | boolean | number | string | components["schemas"]["decision-request-view--json_value.schema"][] | {
             [key: string]: components["schemas"]["decision-request-view--json_value.schema"];
         };
@@ -630,6 +681,7 @@ export interface components {
             actor_id: string | null;
             decision_type: string;
             is_parameterized: boolean;
+            interaction?: components["schemas"]["interaction-descriptor.schema"] | null;
             options: components["schemas"]["decision-request-view--decision_option.schema"][];
             payload: components["schemas"]["decision-request-view--json_value.schema"];
             request_id: string;

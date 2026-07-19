@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `2.0.0`
+Contract version: `2.1.0`
 
 This directory is the canonical, language-neutral Phase 18D contract, Phase
 18E session protocol, Phase 18F optimistic-concurrency command protocol, Phase
@@ -34,8 +34,14 @@ pagination, separately published event/revision retention windows, bounded
 cursor-state eviction, typed resync responses, and full replacement projections.
 Phase 18H defines explicit player, coach, delayed-spectator, administrator, and
 replay-viewer policies with centralized redaction.
+Phase 18I adds engine-authored interaction descriptors to every emitted visible
+pending decision. Clients select renderers by `interaction_kind`, use the
+descriptor's typed constraints and submission-schema reference, and never infer
+rules interactions from `decision_type` or display text. Hidden decisions expose
+`interaction: null`.
 Its parameterized command member references the same canonical 19-kind proposal
-union as the standalone submission schema; it is not an unrestricted JSON value.
+union plus the typed Cult Ambush marker and return-on-death payload families as
+the standalone submission schema; it is not an unrestricted JSON value.
 
 ## Layout
 

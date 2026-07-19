@@ -8,6 +8,7 @@ from types import MappingProxyType
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.interaction_metadata import interaction_kinds_for_decision_type
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 
 DecisionPreValidator = Callable[[DecisionRequest, DecisionResult], LifecycleStatus | None]
@@ -23,12 +24,17 @@ class DecisionSubmissionKind(StrEnum):
 class DecisionDispatchContract:
     decision_type: str
     submission_kind: DecisionSubmissionKind
+    interaction_kinds: tuple[str, ...]
 
     def __post_init__(self) -> None:
         if type(self.decision_type) is not str or not self.decision_type:
             raise GameLifecycleError("Decision dispatch contract requires a decision type.")
         if type(self.submission_kind) is not DecisionSubmissionKind:
             raise GameLifecycleError("Decision dispatch contract requires a submission kind.")
+        if type(self.interaction_kinds) is not tuple or not self.interaction_kinds:
+            raise GameLifecycleError("Decision dispatch contract requires interaction kinds.")
+        if any(type(value) is not str or not value for value in self.interaction_kinds):
+            raise GameLifecycleError("Decision dispatch interaction kinds must be identifiers.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,6 +108,10 @@ class DecisionDispatchRegistry:
             DecisionDispatchContract(
                 decision_type=decision_type,
                 submission_kind=self._submission_kinds_by_decision_type[decision_type],
+                interaction_kinds=interaction_kinds_for_decision_type(
+                    decision_type=decision_type,
+                    submission_kind=self._submission_kinds_by_decision_type[decision_type].value,
+                ),
             )
             for decision_type in self.registered_decision_types()
         )

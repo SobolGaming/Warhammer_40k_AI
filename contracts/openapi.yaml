@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Warhammer 40,000 CORE V2 Adapter Contract",
-    "version": "2.0.0",
-    "description": "Authenticated Phase 18G/18H session protocol with server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
+    "version": "2.1.0",
+    "description": "Authenticated Phase 18G/18H session protocol with Phase 18I engine-authored interaction metadata, server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
   },
   "servers": [{"url": "http://127.0.0.1:8000"}],
   "security": [{"bearerAuth": []}],
@@ -313,6 +313,7 @@
       "EventDelta": {"$ref": "./schemas/event-delta.schema.json"},
       "FiniteSubmission": {"$ref": "./schemas/finite-submission.schema.json"},
       "GameView": {"$ref": "./schemas/game-view.schema.json"},
+      "InteractionDescriptor": {"$ref": "./schemas/interaction-descriptor.schema.json"},
       "LifecycleStatus": {"$ref": "./schemas/lifecycle-status.schema.json"},
       "ParameterizedSubmission": {"$ref": "./schemas/parameterized-submission.schema.json"},
       "ProposalPayload": {"$ref": "./schemas/proposal-payload.schema.json"},

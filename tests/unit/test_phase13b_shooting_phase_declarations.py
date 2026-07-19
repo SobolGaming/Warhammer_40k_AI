@@ -2381,11 +2381,18 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
         if payload["decision_type"] == WEAPON_ABILITY_SELECTION_DECISION_TYPE
     )
     anti_options = cast(list[dict[str, object]], anti_selection_request["options"])
+    anti_interaction = cast(dict[str, object], anti_selection_request["interaction"])
 
     assert {option["option_id"] for option in anti_options} == {
         anti_vehicle.ability_id,
         anti_infantry.ability_id,
     }
+    assert anti_interaction["schema_version"] == "interaction-descriptor-v1"
+    assert anti_interaction["interaction_kind"] == "finite_option_list"
+    assert (
+        cast(dict[str, object], anti_interaction["constraints"])["submission_schema_ref"]
+        == "finite-submission.schema.json"
+    )
 
     missing_selection_proposal = _proposal_from_request(
         request=declaration_request,

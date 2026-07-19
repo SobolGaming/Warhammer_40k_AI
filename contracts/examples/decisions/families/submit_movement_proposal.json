@@ -1,6 +1,41 @@
 {
   "actor_id": "player-a",
   "decision_type": "submit_movement_proposal",
+  "interaction": {
+    "constraints": {
+      "candidate_option_ids": [
+        "submit_parameterized_payload"
+      ],
+      "entity_kinds": [
+        "unit",
+        "model"
+      ],
+      "exact_model_count": null,
+      "maximum_distance_in": null,
+      "maximum_selections": 1,
+      "may_enter_engagement_range": false,
+      "minimum_enemy_distance_in": null,
+      "minimum_selections": 1,
+      "must_preserve_coherency": true,
+      "placement_kinds": [],
+      "submission_schema_ref": "proposal-payload.schema.json#/$defs/movement"
+    },
+    "display_hints": {
+      "confirm_label": "Submit Paths",
+      "decline_label": null
+    },
+    "interaction_kind": "path_editor",
+    "proposal_kind": "normal_move",
+    "required_inputs": [
+      "model_paths",
+      "final_poses"
+    ],
+    "schema_version": "interaction-descriptor-v1",
+    "selected_entity_ids": [
+      "army-alpha:intercessor-unit-1"
+    ],
+    "submission_kind": "parameterized"
+  },
   "is_parameterized": true,
   "options": [
     {

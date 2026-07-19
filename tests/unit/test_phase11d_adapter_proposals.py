@@ -1271,6 +1271,7 @@ def test_projection_redacts_secret_pending_decisions_for_non_actor_viewers() -> 
         },
         "options": [],
         "is_parameterized": False,
+        "interaction": None,
     }
     assert player_b_view["pending_proposal"] is None
     assert "assassination" not in json.dumps(player_b_view, sort_keys=True)

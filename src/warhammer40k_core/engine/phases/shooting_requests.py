@@ -8,6 +8,9 @@ from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
 from warhammer40k_core.engine.phases.shooting_handler import *
 from warhammer40k_core.engine.phases.shooting_reactions import *
+from warhammer40k_core.engine.interaction_metadata import (
+    interaction_annotated_decision_request_payload,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -522,7 +525,7 @@ def _required_weapon_ability_selections_for_target(
     )
     if selection_request is None:
         return []
-    return [validate_json_value(selection_request.to_payload())]
+    return [validate_json_value(interaction_annotated_decision_request_payload(selection_request))]
 
 
 def _shooting_types_for_candidate_payload(

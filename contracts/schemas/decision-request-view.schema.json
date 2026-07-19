@@ -20,6 +20,16 @@
     "is_parameterized": {
       "type": "boolean"
     },
+    "interaction": {
+      "oneOf": [
+        {
+          "$ref": "https://warhammer40k-core.local/contracts/v1/interaction-descriptor.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "options": {
       "items": {
         "$ref": "#/$defs/decision_option"

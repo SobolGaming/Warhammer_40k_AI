@@ -12,6 +12,11 @@ from warhammer40k_core.engine.faction_content.manifest import (
 )
 from warhammer40k_core.engine.faction_content.runtime import runtime_content_manifest_for_ruleset
 from warhammer40k_core.engine.game_state import GameConfig
+from warhammer40k_core.engine.interaction_metadata import (
+    DecisionInteractionSupportPayload,
+    InteractionKind,
+    decision_interaction_support_rows,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 SUPPORT_PROFILE_SCHEMA_VERSION = "support-profile-v2-ws14"
@@ -76,6 +81,8 @@ class SupportProfilePayload(TypedDict):
     mustering_support_rows: list[MusteringSupportRowPayload]
     datasheet_support_rows: list[DatasheetAbilitySupportRowPayload]
     detachment_faction_support_rows: list[RuntimeSupportRowPayload]
+    interaction_kinds: list[str]
+    decision_interaction_support_rows: list[DecisionInteractionSupportPayload]
 
 
 def build_support_profile(*, config: GameConfig) -> SupportProfilePayload:
@@ -125,6 +132,8 @@ def build_support_profile(*, config: GameConfig) -> SupportProfilePayload:
         "mustering_support_rows": mustering_rows,
         "datasheet_support_rows": datasheet_rows,
         "detachment_faction_support_rows": runtime_support_rows,
+        "interaction_kinds": sorted(kind.value for kind in InteractionKind),
+        "decision_interaction_support_rows": decision_interaction_support_rows(),
     }
     return cast(SupportProfilePayload, validate_json_value(payload))
 

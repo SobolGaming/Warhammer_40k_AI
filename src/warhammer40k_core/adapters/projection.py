@@ -26,6 +26,10 @@ from warhammer40k_core.engine.dice_result_override_descriptors import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.interaction_metadata import (
+    InteractionDescriptorPayload,
+    interaction_descriptor_for_request,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -57,6 +61,7 @@ class DecisionRequestViewPayload(TypedDict):
     payload: JsonValue
     options: list[DecisionOptionPayload]
     is_parameterized: bool
+    interaction: InteractionDescriptorPayload | None
 
 
 class RulesCatalogReferencePayload(TypedDict):
@@ -1058,6 +1063,7 @@ def _decision_request_view(
             },
             "options": [],
             "is_parameterized": False,
+            "interaction": None,
         }
     return {
         "schema_version": DECISION_REQUEST_VIEW_SCHEMA_VERSION,
@@ -1067,6 +1073,7 @@ def _decision_request_view(
         "payload": request.payload,
         "options": [option.to_payload() for option in request.options],
         "is_parameterized": request.is_parameterized_submission_request(),
+        "interaction": interaction_descriptor_for_request(request),
     }
 
 

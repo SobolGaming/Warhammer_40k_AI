@@ -16,8 +16,11 @@ from warhammer40k_core.engine.decision_request import (
     DecisionOption,
     DecisionRequest,
     DecisionRequestPayload,
+    parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
+from warhammer40k_core.engine.interaction_metadata import interaction_descriptor_for_request
+from warhammer40k_core.engine.phase import GameLifecycleError
 
 
 def _select_unit_request(request_id: str = "decision-request-1") -> DecisionRequest:
@@ -237,3 +240,55 @@ def test_decision_controller_rejects_non_sequential_record_payloads() -> None:
                 "event_log": [],
             }
         )
+
+
+def test_interaction_metadata_is_engine_authored_and_fail_closed() -> None:
+    finite = DecisionRequest(
+        request_id="interaction-finite-request",
+        decision_type="select_movement_action",
+        actor_id="player-a",
+        payload={"unit_instance_id": "unit-a"},
+        options=(DecisionOption(option_id="normal_move", label="Normal Move"),),
+    )
+    path = DecisionRequest(
+        request_id="interaction-path-request",
+        decision_type="submit_movement_proposal",
+        actor_id="player-a",
+        payload={
+            "proposal_request": {
+                "proposal_kind": "normal_move",
+                "unit_instance_id": "unit-a",
+                "maximum_distance_inches": 6,
+            }
+        },
+        options=(parameterized_decision_option(),),
+    )
+    marker = DecisionRequest(
+        request_id="interaction-marker-request",
+        decision_type="submit_cult_ambush_marker_placement",
+        actor_id="player-a",
+        payload={
+            "submission_kind": "cult_ambush_marker_placement",
+            "marker_id": "marker-a",
+            "replacement_unit_instance_id": "unit-a",
+        },
+        options=(parameterized_decision_option(),),
+    )
+
+    finite_descriptor = interaction_descriptor_for_request(finite)
+    path_descriptor = interaction_descriptor_for_request(path)
+    marker_descriptor = interaction_descriptor_for_request(marker)
+
+    assert finite_descriptor["interaction_kind"] == "finite_option_list"
+    assert finite_descriptor["selected_entity_ids"] == ["unit-a"]
+    assert path_descriptor["interaction_kind"] == "path_editor"
+    assert path_descriptor["constraints"]["maximum_distance_in"] == 6.0
+    assert path_descriptor["constraints"]["may_enter_engagement_range"] is False
+    assert marker_descriptor["interaction_kind"] == "battlefield_point_placement"
+    assert marker_descriptor["proposal_kind"] == "cult_ambush_marker_placement"
+    assert marker_descriptor["constraints"]["submission_schema_ref"].endswith(
+        "#/$defs/cult_ambush_marker_placement"
+    )
+
+    with pytest.raises(GameLifecycleError, match="missing required engine-authored"):
+        interaction_descriptor_for_request(_select_unit_request())

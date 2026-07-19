@@ -12,8 +12,18 @@
       "items": {"$ref": "#/$defs/runtime_row"},
       "type": "array"
     },
+    "decision_interaction_support_rows": {
+      "items": {"$ref": "#/$defs/decision_interaction_row"},
+      "type": "array",
+      "uniqueItems": true
+    },
     "eligible_for_headless_self_play_smoke": {"type": "boolean"},
     "game_id": {"minLength": 1, "type": "string"},
+    "interaction_kinds": {
+      "items": {"$ref": "#/$defs/interaction_kind"},
+      "type": "array",
+      "uniqueItems": true
+    },
     "mustering_support_rows": {
       "items": {"$ref": "#/$defs/mustering_row"},
       "type": "array"
@@ -40,6 +50,24 @@
   "title": "CORE V2 SupportProfilePayload",
   "type": "object",
   "$defs": {
+    "decision_interaction_row": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_type": {"minLength": 1, "type": "string"},
+        "interaction_kinds": {
+          "items": {"$ref": "#/$defs/interaction_kind"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "submission_kind": {
+          "enum": ["finite", "parameterized"],
+          "type": "string"
+        }
+      },
+      "required": ["decision_type", "submission_kind", "interaction_kinds"],
+      "type": "object"
+    },
     "datasheet_row": {
       "additionalProperties": false,
       "properties": {
@@ -91,6 +119,24 @@
         "violation_count"
       ],
       "type": "object"
+    },
+    "interaction_kind": {
+      "enum": [
+        "battlefield_point_placement",
+        "confirmation",
+        "dice_selection",
+        "entity_selection",
+        "finite_option_list",
+        "model_pose_placement",
+        "multi_model_placement",
+        "opportunity_window",
+        "ordered_sequencing",
+        "path_editor",
+        "quantity_selection",
+        "roster_construction",
+        "weapon_allocation_matrix"
+      ],
+      "type": "string"
     },
     "runtime_row": {
       "additionalProperties": false,

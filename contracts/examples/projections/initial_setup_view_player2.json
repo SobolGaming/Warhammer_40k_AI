@@ -1427,6 +1427,7 @@
   "pending_decision": {
     "actor_id": null,
     "decision_type": "hidden_decision",
+    "interaction": null,
     "is_parameterized": false,
     "options": [],
     "payload": {

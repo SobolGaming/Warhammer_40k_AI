@@ -30,6 +30,59 @@ The engine-facing path is shared:
 
 Adapters are producers of answers. The engine remains the owner of validation, mutation, events, and replay records.
 
+## Phase 18I interaction metadata
+
+Every visible `DecisionRequestViewPayload` emitted by the shared projection path
+contains an `interaction` descriptor authored by
+`engine.interaction_metadata`. Hidden pending decisions contain
+`interaction: null`. Projection, CLI, network, TypeScript, replay, and UI
+consumers select an input renderer from `interaction_kind`; they do not branch
+on `decision_type`, option labels, rule text, display names, or arbitrary
+payload keys to discover what input is required.
+
+The descriptor is versioned as `interaction-descriptor-v1` and carries:
+
+- a presentation-neutral `interaction_kind` and finite/parameterized
+  `submission_kind`;
+- the semantic `proposal_kind` when a parameterized answer is required;
+- engine-selected entity IDs and neutral `required_inputs`;
+- typed assistive constraints, including candidate option IDs, entity kinds,
+  selection cardinality, movement distance, model count, coherency and
+  Engagement Range hints, placement kinds, and the exact public submission
+  schema reference;
+- optional presentation text under `display_hints`.
+
+The standard kinds are finite option list, entity selection, weapon allocation
+matrix, dice selection, ordered sequencing, battlefield point placement, model
+pose placement, multi-model placement, path editor, roster construction,
+confirmation, quantity selection, and opportunity window. They name interaction
+semantics, not framework components. A frontend may map them to any local
+renderer.
+
+`constraints` and `display_hints` are assistance only. They do not grant
+legality, authorize a player, replace the canonical proposal schema, or bypass
+engine validation. Every answer still selects one emitted finite option ID or
+submits the typed payload referenced by `submission_schema_ref`, and stale
+metadata fails through the ordinary request/revision/proposal checks.
+
+Interaction registration is fail closed. The decision dispatch contract exposes
+one or more interaction kinds for every registered decision family, the
+registry-derived `family-coverage.json` artifact records exact coverage, and CI
+compares that inventory with the engine enum and JSON Schema. The documented
+nested weapon-ability request carries the same descriptor and is represented by
+the finite-option interaction inside its parent weapon-allocation proposal; the
+canonical parameterized union also includes typed Cult Ambush marker placement
+and return-on-death placement branches. A new decision family, interaction kind,
+or parameterized payload cannot pass the contract gate without updating this
+document, the engine registry, schemas/examples, generated TypeScript models,
+and viewer-redaction coverage.
+
+Interaction descriptors are part of viewer projection hashes and replay
+checkpoints. The same pending engine request therefore selects the same renderer
+and public submission schema after reconnect or replay, while an opponent-hidden
+request reveals no interaction kind, entity count, constraint, or schema-ref
+oracle.
+
 ## Pre-session army-list input
 
 A player-provided army list is pre-session input, not a separate mutation or

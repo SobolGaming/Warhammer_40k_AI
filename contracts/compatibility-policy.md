@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`2.0.0`, declared in `openapi.yaml`, `manifest.json`, and
+`2.1.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -46,7 +46,7 @@ must be reviewed in the same change.
 
 ## Support window
 
-The reference server supports one contract major at a time. Contract 2.0 is a
+The reference server supports one contract major at a time. Contract 2.x is a
 deliberate breaking security boundary: session creation no longer accepts
 client-owned participant assignments, bearer authentication is mandatory,
 formal mutations use only the command endpoint, projections and metadata are

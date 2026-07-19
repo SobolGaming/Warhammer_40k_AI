@@ -1,0 +1,139 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/interaction-descriptor.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "constraints": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_option_ids": {
+          "items": {"$ref": "#/$defs/identifier"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "entity_kinds": {
+          "items": {"$ref": "#/$defs/identifier"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "exact_model_count": {
+          "oneOf": [
+            {"minimum": 0, "type": "integer"},
+            {"type": "null"}
+          ]
+        },
+        "maximum_distance_in": {
+          "oneOf": [
+            {"minimum": 0, "type": "number"},
+            {"type": "null"}
+          ]
+        },
+        "maximum_selections": {"minimum": 1, "type": "integer"},
+        "may_enter_engagement_range": {"type": ["boolean", "null"]},
+        "minimum_selections": {"minimum": 0, "type": "integer"},
+        "minimum_enemy_distance_in": {
+          "oneOf": [
+            {"minimum": 0, "type": "number"},
+            {"type": "null"}
+          ]
+        },
+        "must_preserve_coherency": {"type": ["boolean", "null"]},
+        "placement_kinds": {
+          "items": {"$ref": "#/$defs/identifier"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "submission_schema_ref": {
+          "pattern": "^[a-z0-9-]+\\.schema\\.json(?:#/.+)?$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate_option_ids",
+        "entity_kinds",
+        "minimum_selections",
+        "maximum_selections",
+        "maximum_distance_in",
+        "minimum_enemy_distance_in",
+        "exact_model_count",
+        "must_preserve_coherency",
+        "may_enter_engagement_range",
+        "placement_kinds",
+        "submission_schema_ref"
+      ],
+      "type": "object"
+    },
+    "display_hints": {
+      "additionalProperties": false,
+      "properties": {
+        "confirm_label": {"$ref": "#/$defs/identifier"},
+        "decline_label": {
+          "oneOf": [
+            {"$ref": "#/$defs/identifier"},
+            {"type": "null"}
+          ]
+        }
+      },
+      "required": ["confirm_label", "decline_label"],
+      "type": "object"
+    },
+    "interaction_kind": {
+      "enum": [
+        "battlefield_point_placement",
+        "confirmation",
+        "dice_selection",
+        "entity_selection",
+        "finite_option_list",
+        "model_pose_placement",
+        "multi_model_placement",
+        "opportunity_window",
+        "ordered_sequencing",
+        "path_editor",
+        "quantity_selection",
+        "roster_construction",
+        "weapon_allocation_matrix"
+      ],
+      "type": "string"
+    },
+    "proposal_kind": {
+      "oneOf": [
+        {"$ref": "#/$defs/identifier"},
+        {"type": "null"}
+      ]
+    },
+    "required_inputs": {
+      "items": {"$ref": "#/$defs/identifier"},
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_version": {
+      "const": "interaction-descriptor-v1",
+      "type": "string"
+    },
+    "selected_entity_ids": {
+      "items": {"$ref": "#/$defs/identifier"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "submission_kind": {
+      "enum": ["finite", "parameterized"],
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "interaction_kind",
+    "submission_kind",
+    "proposal_kind",
+    "selected_entity_ids",
+    "required_inputs",
+    "constraints",
+    "display_hints"
+  ],
+  "title": "CORE V2 InteractionDescriptorPayload",
+  "type": "object",
+  "$defs": {
+    "identifier": {"minLength": 1, "type": "string"}
+  }
+}

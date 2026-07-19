@@ -12,7 +12,9 @@
     {"$ref": "#/$defs/scout_move"},
     {"$ref": "#/$defs/shooting_declaration"},
     {"$ref": "#/$defs/melee_declaration"},
-    {"$ref": "#/$defs/stratagem_target_binding"}
+    {"$ref": "#/$defs/stratagem_target_binding"},
+    {"$ref": "#/$defs/cult_ambush_marker_placement"},
+    {"$ref": "#/$defs/return_on_death_placement"}
   ],
   "$defs": {
     "identifier": {"minLength": 1, "type": "string"},
@@ -87,6 +89,66 @@
         "unit_instance_id": {"$ref": "#/$defs/identifier"}
       },
       "required": ["army_id", "player_id", "unit_instance_id", "model_placements"],
+      "type": "object"
+    },
+    "cult_ambush_marker_placement": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "marker_id": {"$ref": "#/$defs/identifier"},
+            "player_id": {"$ref": "#/$defs/identifier"},
+            "request_id": {"$ref": "#/$defs/identifier"},
+            "submission_kind": {
+              "const": "cult_ambush_marker_placement",
+              "type": "string"
+            },
+            "x_inches": {"type": "number"},
+            "y_inches": {"type": "number"}
+          },
+          "required": [
+            "request_id",
+            "submission_kind",
+            "marker_id",
+            "player_id",
+            "x_inches",
+            "y_inches"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "marker_id": {"$ref": "#/$defs/identifier"},
+            "no_marker_reason": {"$ref": "#/$defs/identifier"},
+            "player_id": {"$ref": "#/$defs/identifier"},
+            "request_id": {"$ref": "#/$defs/identifier"},
+            "submission_kind": {
+              "const": "cult_ambush_no_marker",
+              "type": "string"
+            }
+          },
+          "required": [
+            "request_id",
+            "submission_kind",
+            "marker_id",
+            "player_id",
+            "no_marker_reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "return_on_death_placement": {
+      "additionalProperties": false,
+      "properties": {
+        "attempted_placement": {"$ref": "#/$defs/unit_placement"},
+        "submission_kind": {
+          "const": "submit_return_on_death_placement",
+          "type": "string"
+        }
+      },
+      "required": ["submission_kind", "attempted_placement"],
       "type": "object"
     },
     "path_witness": {
