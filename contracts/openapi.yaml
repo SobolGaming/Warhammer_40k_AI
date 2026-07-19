@@ -390,7 +390,7 @@
         "name": "X-Participant-ID",
         "in": "header",
         "required": true,
-        "description": "Transport-supplied participant routing context; Phase 18H replaces this development binding with authenticated principal context.",
+        "description": "Transport-supplied participant routing context. Decision commands bind to the pending actor; lifecycle commands use the first configured player's participant as the development coordinator. Phase 18H replaces this with authenticated principal/operator context.",
         "schema": {"type": "string", "minLength": 1}
       },
       "RequestId": {
@@ -442,7 +442,7 @@
         }
       },
       "SessionCommandRejected": {
-        "description": "A recorded rejected command outcome or a proposal rejected before commit.",
+        "description": "A recorded invalid/unsupported command outcome or a typed rejection before commit.",
         "content": {
           "application/json": {
             "schema": {

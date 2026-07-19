@@ -28,6 +28,8 @@ monotonic revisions, viewer checkpoints, start/close transitions, and one
 coherent bounded post-submission drain result. The normative Phase 18F command
 route adds an idempotency key and expected revision to every mutation while
 deriving actor authority from participant context outside the command body.
+Its parameterized command member references the same canonical 19-kind proposal
+union as the standalone submission schema; it is not an unrestricted JSON value.
 
 ## Layout
 

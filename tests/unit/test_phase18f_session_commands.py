@@ -15,6 +15,10 @@ from urllib.request import Request, urlopen
 from jsonschema import Draft202012Validator
 from referencing import Resource
 from referencing.jsonschema import DRAFT202012, EMPTY_REGISTRY, Schema, SchemaRegistry
+from tests.phase18f_command_helpers import (
+    pre_record_unsupported_session,
+    recorded_unsupported_session,
+)
 
 from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
@@ -555,6 +559,159 @@ def test_phase18f_recorded_invalid_retry_is_atomically_journaled() -> None:
     assert _authoritative_snapshot(server, session_id=session_id) == after
 
 
+def test_phase18f_unsupported_outcomes_preserve_recording_and_retry_semantics() -> None:
+    pre_server = AdapterGameServer(session_factory=pre_record_unsupported_session)
+    pre_session_id = _create_session(pre_server, game_id="phase18f-pre-record-unsupported")
+    _start_command(pre_server, pre_session_id, "phase18f-pre-unsupported-start")
+    pre_request = _pending_decision(pre_server, session_id=pre_session_id, player_id=PLAYER_A)
+    pre_snapshot = _authoritative_snapshot(pre_server, session_id=pre_session_id)
+    pre_response = _request_raw(
+        pre_server,
+        session_id=pre_session_id,
+        participant_id=PARTICIPANT_A,
+        envelope=_command_envelope(
+            session_id=pre_session_id,
+            command_id="phase18f-pre-unsupported-command",
+            expected_revision=1,
+            submission_kind="finite_option",
+            request_id=_field_string(pre_request, "request_id"),
+            result_id="phase18f-pre-unsupported-result",
+            option_id=_first_option_id(pre_request),
+        ),
+    )
+    assert pre_response.status_code == 422
+    assert _error_code(pre_response) == "rule_path_unsupported"
+    assert _authoritative_snapshot(pre_server, session_id=pre_session_id) == pre_snapshot
+
+    recorded_server = AdapterGameServer(session_factory=recorded_unsupported_session)
+    session_id = _create_session(recorded_server, game_id="phase18f-recorded-unsupported")
+    _start_command(recorded_server, session_id, "phase18f-recorded-unsupported-start")
+    request = _pending_decision(recorded_server, session_id=session_id, player_id=PLAYER_A)
+    envelope = _command_envelope(
+        session_id=session_id,
+        command_id="phase18f-recorded-unsupported-command",
+        expected_revision=1,
+        submission_kind="finite_option",
+        request_id=_field_string(request, "request_id"),
+        result_id="phase18f-recorded-unsupported-result",
+        option_id=_first_option_id(request),
+    )
+    response = _request_raw(
+        recorded_server,
+        session_id=session_id,
+        participant_id=PARTICIPANT_A,
+        envelope=envelope,
+    )
+    outcome = _json_object(response.payload)
+    assert response.status_code == 422
+    assert outcome["outcome_code"] == "rule_path_unsupported"
+    assert outcome["committed"] is True
+    assert outcome["accepted"] is False
+    assert _session_revision(recorded_server, session_id=session_id) == 2
+    replay = _request(recorded_server, "GET", f"/sessions/{session_id}/replay")
+    assert len(_field_list(replay, "decision_records")) == 1
+    snapshot = _authoritative_snapshot(recorded_server, session_id=session_id)
+    assert (
+        _request_raw(
+            recorded_server,
+            session_id=session_id,
+            participant_id=PARTICIPANT_A,
+            envelope=envelope,
+        )
+        == response
+    )
+    assert _authoritative_snapshot(recorded_server, session_id=session_id) == snapshot
+
+
+def test_phase18f_noop_advance_cannot_consume_revision_or_win_decision_race() -> None:
+    server = AdapterGameServer()
+    session_id = _create_session(server, game_id="phase18f-noop-advance")
+    unauthorized = _request_raw(
+        server,
+        session_id=session_id,
+        participant_id=PARTICIPANT_B,
+        envelope=_command_envelope(
+            session_id=session_id,
+            command_id="phase18f-non-coordinator-start",
+            expected_revision=0,
+            submission_kind="start_session",
+        ),
+    )
+    assert unauthorized.status_code == 403
+    assert _session_revision(server, session_id=session_id) == 0
+    _start_command(server, session_id, "phase18f-noop-start")
+    pending = _pending_decision(server, session_id=session_id, player_id=PLAYER_A)
+    snapshot = _authoritative_snapshot(server, session_id=session_id)
+    no_op_id = "phase18f-noop-command"
+    rejected = _request_raw(
+        server,
+        session_id=session_id,
+        participant_id=PARTICIPANT_A,
+        envelope=_command_envelope(
+            session_id=session_id,
+            command_id=no_op_id,
+            expected_revision=1,
+            submission_kind="advance_session",
+        ),
+    )
+    assert rejected.status_code == 409
+    assert _error_code(rejected) == "advance_not_required"
+    assert _authoritative_snapshot(server, session_id=session_id) == snapshot
+    outcome = _submit_command(
+        server,
+        participant_id=PARTICIPANT_A,
+        envelope=_command_envelope(
+            session_id=session_id,
+            command_id=no_op_id,
+            expected_revision=1,
+            submission_kind="finite_option",
+            request_id=_field_string(pending, "request_id"),
+            result_id="phase18f-noop-reused-result",
+            option_id=_first_option_id(pending),
+        ),
+    )
+    assert outcome["committed"] is True
+
+    race_server = AdapterGameServer()
+    race_session = _create_session(race_server, game_id="phase18f-noop-race")
+    _start_command(race_server, race_session, "phase18f-noop-race-start")
+    race_request = _pending_decision(race_server, session_id=race_session, player_id=PLAYER_A)
+    barrier = Barrier(2)
+
+    def race(envelope: dict[str, JsonValue]) -> ServerResponse:
+        barrier.wait()
+        return _request_raw(
+            race_server,
+            session_id=race_session,
+            participant_id=PARTICIPANT_A,
+            envelope=envelope,
+        )
+
+    commands = (
+        _command_envelope(
+            session_id=race_session,
+            command_id="phase18f-racing-noop",
+            expected_revision=1,
+            submission_kind="advance_session",
+        ),
+        _command_envelope(
+            session_id=race_session,
+            command_id="phase18f-racing-decision",
+            expected_revision=1,
+            submission_kind="finite_option",
+            request_id=_field_string(race_request, "request_id"),
+            result_id="phase18f-racing-decision-result",
+            option_id=_first_option_id(race_request),
+        ),
+    )
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        advance_response, decision_response = tuple(executor.map(race, commands))
+    assert decision_response.status_code == 200
+    assert advance_response.status_code == 409
+    assert _error_code(advance_response) in {"advance_not_required", "session_revision_conflict"}
+    assert _session_revision(race_server, session_id=race_session) == 2
+
+
 def test_phase18f_injected_precommit_failure_and_closed_session_preserve_state() -> None:
     current_time = [datetime(2026, 7, 18, 20, 0, tzinfo=UTC)]
     server = AdapterGameServer(clock=lambda: current_time[0])
@@ -725,6 +882,28 @@ def test_phase18f_command_schema_rejects_client_actor_and_invalid_boolean_outcom
             {**outcome, "accepted": False, "outcome_code": "command_committed"}
         )
     )
+    proposal_paths = tuple(
+        sorted((REPO_ROOT / "contracts/examples/decisions/proposals").glob("*.json"))
+    )
+    assert len(proposal_paths) == 19
+    typed_envelope: dict[str, JsonValue] = {}
+    for index, path in enumerate(proposal_paths):
+        typed_envelope = _command_envelope(
+            session_id="phase18f-schema-session",
+            command_id=f"phase18f-schema-command-{index:02d}",
+            expected_revision=0,
+            submission_kind="parameterized_payload",
+            request_id="phase18f-schema-request",
+            result_id="phase18f-schema-result",
+            payload=_read_json(path),
+        )
+        envelope_validator.validate(typed_envelope)
+    for invalid_payload in ({"arbitrary": True}, None):
+        invalid_envelope = {
+            **typed_envelope,
+            "submission": {"submission_kind": "parameterized_payload", "payload": invalid_payload},
+        }
+        assert list(envelope_validator.iter_errors(invalid_envelope))
 
 
 def _create_session(server: AdapterGameServer, *, game_id: str) -> str:
@@ -736,6 +915,19 @@ def _create_session(server: AdapterGameServer, *, game_id: str) -> str:
         expected_status=201,
     )
     return _field_string(created, "session_id")
+
+
+def _start_command(server: AdapterGameServer, session_id: str, command_id: str) -> None:
+    _submit_command(
+        server,
+        participant_id=PARTICIPANT_A,
+        envelope=_command_envelope(
+            session_id=session_id,
+            command_id=command_id,
+            expected_revision=0,
+            submission_kind="start_session",
+        ),
+    )
 
 
 def _session_create_body(game_id: str) -> dict[str, JsonValue]:
@@ -1214,6 +1406,7 @@ def _schema_validator(schema_name: str) -> _PayloadValidator:
 def _schema_payloads() -> dict[str, Schema]:
     names = (
         "lifecycle-status.schema.json",
+        "proposal-payload.schema.json",
         "session-command-envelope.schema.json",
         "session-command-outcome.schema.json",
         "session-metadata.schema.json",

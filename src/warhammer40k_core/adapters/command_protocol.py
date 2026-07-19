@@ -27,6 +27,7 @@ class SessionCommandSubmissionKind(StrEnum):
 class SessionCommandOutcomeCode(StrEnum):
     COMMAND_COMMITTED = "command_committed"
     PROPOSAL_INVALID = "proposal_invalid"
+    RULE_PATH_UNSUPPORTED = "rule_path_unsupported"
 
 
 @dataclass(frozen=True, slots=True)

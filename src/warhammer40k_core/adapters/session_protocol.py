@@ -281,6 +281,12 @@ class AuthoritativeSession:
                 return assignment.player_id
         return None
 
+    def lifecycle_coordinator_player_id(self, participant_id: str) -> str | None:
+        player_id = self.controlling_player_id(participant_id)
+        if player_id != self.player_ids[0]:
+            return None
+        return player_id
+
     def command_entry(self, command_id: str) -> SessionCommandJournalEntry | None:
         return self.command_journal.get(_validate_identifier("command_id", command_id))
 

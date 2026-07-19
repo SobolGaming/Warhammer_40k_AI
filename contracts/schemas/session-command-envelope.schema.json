@@ -94,23 +94,12 @@
       "required": ["submission_kind", "option_id"],
       "type": "object"
     },
-    "json_value": {
-      "oneOf": [
-        {"type": "null"},
-        {"type": "boolean"},
-        {"type": "number"},
-        {"type": "string"},
-        {"items": {"$ref": "#/$defs/json_value"}, "type": "array"},
-        {
-          "additionalProperties": {"$ref": "#/$defs/json_value"},
-          "type": "object"
-        }
-      ]
-    },
     "parameterized_submission": {
       "additionalProperties": false,
       "properties": {
-        "payload": {"$ref": "#/$defs/json_value"},
+        "payload": {
+          "$ref": "https://warhammer40k-core.local/contracts/v1/proposal-payload.schema.json"
+        },
         "submission_kind": {"const": "parameterized_payload", "type": "string"}
       },
       "required": ["submission_kind", "payload"],

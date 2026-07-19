@@ -6,6 +6,6 @@
   "schema_version": "session-command-envelope-v1",
   "session_id": "session-phase18e-contract-session",
   "submission": {
-    "submission_kind": "advance_session"
+    "submission_kind": "close_session"
   }
 }

@@ -88,6 +88,17 @@ def _request_validator(schema_name: str) -> _PayloadValidator:
     if schema_name == PARAMETERIZED_SUBMISSION_SCHEMA_NAME:
         properties = _json_object(schema["properties"], "parameterized schema properties")
         properties["payload"] = _schema_payload(PROPOSAL_PAYLOAD_SCHEMA_NAME)
+    if schema_name == SESSION_COMMAND_ENVELOPE_SCHEMA_NAME:
+        definitions = _json_object(schema["$defs"], "session command definitions")
+        parameterized = _json_object(
+            definitions["parameterized_submission"],
+            "parameterized session command schema",
+        )
+        properties = _json_object(
+            parameterized["properties"],
+            "parameterized session command properties",
+        )
+        properties["payload"] = _schema_payload(PROPOSAL_PAYLOAD_SCHEMA_NAME)
     if schema_name == SESSION_CREATE_SCHEMA_NAME:
         properties = _json_object(schema["properties"], "session create schema properties")
         create_schema = _schema_payload(CREATE_SESSION_SCHEMA_NAME)

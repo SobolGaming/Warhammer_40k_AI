@@ -508,9 +508,30 @@ class AdapterGameServer:
                 code="session_revision_conflict",
                 message="Session revision conflicted.",
             )
-        player_id = record.controlling_player_id(participant)
+        kind = envelope.submission_kind
+        player_id = (
+            record.lifecycle_coordinator_player_id(participant)
+            if kind
+            in {
+                SessionCommandSubmissionKind.START_SESSION,
+                SessionCommandSubmissionKind.ADVANCE_SESSION,
+                SessionCommandSubmissionKind.CLOSE_SESSION,
+            }
+            else record.controlling_player_id(participant)
+        )
         if player_id is None:
             raise _actor_not_authorized()
+        if kind is SessionCommandSubmissionKind.ADVANCE_SESSION:
+            _ensure_session_active(record)
+            if (
+                record.adapter_session.view(viewer_player_id=player_id)["pending_decision"]
+                is not None
+            ):
+                raise ServerApiError(
+                    status_code=HTTPStatus.CONFLICT,
+                    code="advance_not_required",
+                    message="Session is already waiting for a decision.",
+                )
         staged = record.fork_for_command()
         response = self._apply_protocol_command(
             record=staged,
@@ -519,6 +540,13 @@ class AdapterGameServer:
         )
         response_payload = _json_object("session command outcome", response.payload)
         if response_payload.get("committed") is not True:
+            outcome_code = response_payload.get("outcome_code")
+            if outcome_code == SessionCommandOutcomeCode.RULE_PATH_UNSUPPORTED.value:
+                return _error_response(
+                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                    code="rule_path_unsupported",
+                    message="Submitted command reached an unsupported rule path.",
+                )
             return _error_response(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
                 code="proposal_invalid",
@@ -1041,11 +1069,18 @@ def _session_command_outcome_response(
     accepted = base.get("accepted")
     if type(accepted) is not bool:
         raise SessionProtocolError("Session command result accepted flag is invalid.")
-    outcome_code = (
-        SessionCommandOutcomeCode.COMMAND_COMMITTED
-        if accepted
-        else SessionCommandOutcomeCode.PROPOSAL_INVALID
-    )
+    if accepted:
+        outcome_code = SessionCommandOutcomeCode.COMMAND_COMMITTED
+    else:
+        session = _json_object("session command session", base["session"])
+        lifecycle = _json_object("session command lifecycle status", session["lifecycle_status"])
+        status_kind = lifecycle.get("status_kind")
+        if status_kind == LifecycleStatusKind.INVALID.value:
+            outcome_code = SessionCommandOutcomeCode.PROPOSAL_INVALID
+        elif status_kind == LifecycleStatusKind.UNSUPPORTED.value:
+            outcome_code = SessionCommandOutcomeCode.RULE_PATH_UNSUPPORTED
+        else:
+            raise SessionProtocolError("Rejected command lifecycle status is invalid.")
     committed = base.get("committed")
     if type(committed) is not bool:
         raise SessionProtocolError("Session command result committed flag is invalid.")

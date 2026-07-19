@@ -2638,7 +2638,9 @@ post-application deterministic advancement reaches the typed
 `transition_budget_exhausted` safety boundary: the result is `committed: true`,
 `accepted: true` with lifecycle `status_kind: "unsupported"`. A directly
 returned recorded `unsupported` result without that typed proof of completed
-application is `committed: true`, `accepted: false`.
+application is `committed: true`, `accepted: false` with
+`outcome_code: "rule_path_unsupported"`; an unrecorded unsupported result uses
+the error-envelope code `rule_path_unsupported`.
 
 Session metadata and command results obey the same viewer redaction policy as
 projections and event deltas. A viewerless metadata response exposes no
@@ -2659,6 +2661,11 @@ submission. The envelope must not carry `actor_id`, `viewer_player_id`, or any
 other authority claim. The development transport supplies participant context
 out of band, and the server maps an assigned player participant to the pending
 request actor; authenticated principal binding remains Phase 18H work.
+For lifecycle commands, the development transport instead authorizes only the
+participant assigned to the first configured player as lifecycle coordinator;
+other player, spectator, and observer participants cannot start, advance, or
+close. Phase 18H replaces this deterministic development policy with
+authenticated operator authorization.
 
 The server checks a matching journaled command before revision and lifecycle
 preconditions. A retry from the same participant with the same canonical
@@ -2676,6 +2683,11 @@ illegal proposals, and pre-commit failures discard the fork. Recorded
 rule-invalid retry decisions retain the Phase 18E distinction between
 `committed` and gameplay `accepted` and are atomically committed with their
 fresh request and replay record.
+
+`advance_session` is rejected with `advance_not_required` when the authoritative
+session is already waiting for a decision. This rejection occurs before facade
+forking or journal insertion, so a no-op advance cannot consume a revision,
+reserve its command ID, or race a valid decision solely by revision churn.
 
 The Phase 18E mutation endpoints remain documented as deprecated compatibility
 routes during the stated external-contract support window. They do not provide

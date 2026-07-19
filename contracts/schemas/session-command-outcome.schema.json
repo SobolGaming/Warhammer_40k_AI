@@ -15,6 +15,12 @@
         "accepted": {"const": false},
         "outcome_code": {"const": "proposal_invalid"}
       }
+    },
+    {
+      "properties": {
+        "accepted": {"const": false},
+        "outcome_code": {"const": "rule_path_unsupported"}
+      }
     }
   ],
   "properties": {
@@ -34,7 +40,7 @@
       "type": "string"
     },
     "outcome_code": {
-      "enum": ["command_committed", "proposal_invalid"],
+      "enum": ["command_committed", "proposal_invalid", "rule_path_unsupported"],
       "type": "string"
     },
     "schema_version": {"const": "session-command-outcome-v1", "type": "string"},

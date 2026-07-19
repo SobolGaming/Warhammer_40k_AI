@@ -5320,7 +5320,12 @@ Advancement semantics:
   unless their typed status proves completed application;
 - explicit `AdvanceSession` remains available for session start, recovery,
   operator/conformance use, and documented idle boundaries, not as a client-side
-  replacement for post-submission draining.
+  replacement for post-submission draining; an advance at an unchanged pending
+  decision boundary is rejected without revision or journal mutation;
+- the Phase 18F development transport authorizes start, advance, and close only
+  for the participant assigned to the first configured player as lifecycle
+  coordinator, while decision commands remain bound to the pending actor;
+  Phase 18H replaces that routing policy with authenticated operator roles.
 
 Invariants:
 
@@ -5357,6 +5362,8 @@ Status: Complete. The canonical `SessionCommandEnvelope` and
 the reference server exposes `ExecuteSessionCommand` as the normative mutation
 operation. The Phase 18E mutation routes remain explicitly deprecated additive
 compatibility endpoints during the documented support window.
+Parameterized command envelopes reference the canonical proposal-payload union
+directly, keeping OpenAPI/generated-client types and runtime validation aligned.
 
 Every mutating request uses a transport command envelope equivalent to:
 
@@ -5384,6 +5391,11 @@ Required behavior:
 - a wrong pending `request_id` returns typed `stale_decision_request` (409);
 - a well-formed but illegal proposal returns typed `proposal_invalid` (422),
   subject to the owning adapter contract's explicit rejected-attempt policy;
+- a directly returned unsupported result uses `rule_path_unsupported`, preserving
+  recorded versus unrecorded command-history semantics independently;
+- an explicit advance at an existing pending decision returns typed
+  `advance_not_required` without changing revision, state, replay, events, or
+  journal;
 - a principal that does not control the acting player receives
   `actor_not_authorized` (403) without hidden request details;
 - a terminal session returns a typed terminal response;
@@ -5397,6 +5409,9 @@ detect state equality/drift, while revisions record accepted command ordering.
 Required tests:
 
 - simultaneous valid submissions for one revision commit at most one result;
+- a no-op advance racing a valid decision cannot consume the shared revision;
+- pre-record and recorded unsupported results retain their lifecycle
+  classification, and an exact recorded retry returns the cached outcome;
 - duplicate commands before and after reconnect return byte-equivalent public
   outcomes for the same principal/visibility context;
 - stale revision, stale request, wrong actor, malformed envelope, illegal

@@ -61,7 +61,7 @@ def phase18e_session_examples() -> dict[str, JsonValue]:
         "expected_session_revision": 1,
         "request_id": None,
         "result_id": None,
-        "submission": {"submission_kind": "advance_session"},
+        "submission": {"submission_kind": "close_session"},
     }
     command_outcome = _successful_payload(
         server.handle(

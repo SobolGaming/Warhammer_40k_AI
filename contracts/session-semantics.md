@@ -15,10 +15,13 @@ the transport session in `created`; `StartSession` performs the first bounded
 drain and moves it to `active` or `terminal`. `CloseSession` makes the session
 closed and rejects later mutations with a typed error. Participant assignments
 are validated as metadata. The development HTTP transport supplies participant
-context in `X-Participant-ID`, outside the command envelope, and the server maps
-that participant to the pending engine actor. This is routing context rather
-than authentication: Phase 18H still owns authenticated principal binding, and
-a caller-supplied `viewer_player_id` is not authentication.
+context in `X-Participant-ID`, outside the command envelope. Decision commands
+map that participant to the pending engine actor. Lifecycle commands use the
+participant assigned to the first configured player as the development
+lifecycle coordinator; other player, spectator, and observer participants may
+not start, explicitly advance, or close the session. This is routing context
+rather than authentication: Phase 18H still owns authenticated operator and
+principal binding, and a caller-supplied `viewer_player_id` is not authentication.
 
 Every normative mutation uses `POST /sessions/{session_id}/commands` with a
 `SessionCommandEnvelope`. The envelope carries `command_id`, `session_id`,
@@ -28,15 +31,18 @@ submission. It never accepts a viewer or actor identity. The older Phase 18E
 start, finite, parameterized, advance, and close routes remain deprecated
 compatibility operations through at least 2026-10-16 and one released minor
 line, whichever is later; they are not the Phase 18F concurrency contract.
+The parameterized command payload references the canonical proposal union, so
+OpenAPI, generated clients, installed runtime validation, and the standalone
+parameterized route accept the same 19 proposal kinds.
 
 ## State and ordering
 
 - The server owns the authoritative session and invokes only the shared
   `AdapterGameSession` facade for engine interaction.
 - `session_revision` begins at `0` and increases once for each command committed
-  to authoritative history: start, advance, close, an accepted decision, or a
-  recorded rule-invalid retry attempt. A Phase 18F command must present the
-  current expected revision before mutation.
+  to authoritative history: start, state-changing advance, close, an accepted
+  decision, or a recorded rule-invalid retry attempt. A Phase 18F command must
+  present the current expected revision before mutation.
 - `projection_state_hash` identifies a viewer projection state; event cursors
   are monotonically increasing indexes into the viewer-scoped event stream. A
   metadata response without a viewer does not expose a projection hash.
@@ -82,6 +88,9 @@ the typed `transition_budget_exhausted` safety boundary remains accepted; its
 lifecycle status is `unsupported`, but it returns `committed: true`,
 `accepted: true`. Other directly returned recorded `unsupported` outcomes are
 not accepted unless their typed status proves that application completed.
+Rejected `invalid` outcomes use `proposal_invalid`; rejected `unsupported`
+outcomes use `rule_path_unsupported`, whether the latter was recorded or
+rejected before recording.
 
 After an accepted finite or parameterized submission, the server performs a
 bounded deterministic drain until the next adapter-visible decision, terminal
@@ -91,6 +100,9 @@ checkpoint, and half-open event range. Clients do not issue guessed advance
 calls between a decision and its next visible boundary. Explicit
 `AdvanceSession` remains available for start/recovery/conformance and documented
 idle boundaries; it never authorizes the transport to apply an option payload.
+An advance at an existing `waiting_for_decision` boundary returns
+`advance_not_required` without forking the facade, changing state, advancing the
+revision, or reserving the command ID.
 
 The in-memory command journal proves Phase 18F ordering and retry semantics;
 Phase 18L owns durable journal/state persistence and crash recovery. Phase 18G
