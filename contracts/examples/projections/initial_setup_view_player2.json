@@ -11,7 +11,6 @@
   },
   "current_battle_phase": null,
   "current_setup_step": "select_secondary_missions",
-  "event_count": 9,
   "game_id": "ui-contract-initial",
   "mission_setup": {
     "attacker_player_id": "player-a",
@@ -1443,7 +1442,7 @@
     "player-b"
   ],
   "projection_schema": "game-view-v5-role-scoped",
-  "projection_state_hash": "b06729c480bc4b87519c7effa936e2d160f92fed5b941bcc47f79fbf3f13a48a",
+  "projection_state_hash": "e06ea009c4e161a9e9640c7689af48e9ba364ee7c20fe3f7501d3ae2fcb78ee4",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

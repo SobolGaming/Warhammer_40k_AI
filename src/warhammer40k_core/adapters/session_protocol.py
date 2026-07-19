@@ -282,7 +282,7 @@ class AuthoritativeSession:
     def capture_current_revision(self, *, replace_existing: bool = False) -> None:
         if self.session_revision in self.revision_snapshots and not replace_existing:
             raise SessionProtocolError("Session revision snapshot already exists.")
-        event_count = self.adapter_session.view(viewer_player_id=self.player_ids[0])["event_count"]
+        event_count = self.adapter_session.event_record_count()
         self.revision_snapshots[self.session_revision] = SessionRevisionSnapshot(
             session_revision=self.session_revision,
             adapter_session=self.adapter_session.fork(),

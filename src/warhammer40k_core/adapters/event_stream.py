@@ -19,6 +19,10 @@ class EventStreamDeltaPayload(TypedDict):
     events: list[EventRecordPayload]
 
 
+class EventStreamPagePayload(EventStreamDeltaPayload):
+    has_more: bool
+
+
 @dataclass(frozen=True, slots=True)
 class EventStreamCursor:
     value: int = 0
@@ -63,13 +67,17 @@ class EventStreamCursor:
         if self.value > len(records):
             raise GameLifecycleError("EventStreamCursor is ahead of the event log.")
         events = [
-            public_event_record_payload(
-                event_id=record.event_id,
-                event_type=record.event_type,
-                payload=record.payload,
-                viewer=viewer,
-            )
+            public
             for record in records[self.value :]
+            if (
+                public := public_event_record_payload(
+                    event_id=record.event_id,
+                    event_type=record.event_type,
+                    payload=record.payload,
+                    viewer=viewer,
+                )
+            )
+            is not None
         ]
         return {
             "schema_version": ADAPTER_EVENT_STREAM_DELTA_SCHEMA_VERSION,
@@ -80,3 +88,82 @@ class EventStreamCursor:
             "next_cursor": len(records),
             "events": events,
         }
+
+    def page_for_context(
+        self,
+        event_log: EventLog,
+        *,
+        viewer: ViewerContext,
+        visible_limit: int,
+    ) -> EventStreamPagePayload:
+        if type(event_log) is not EventLog:
+            raise GameLifecycleError("EventStreamCursor requires an EventLog.")
+        if type(viewer) is not ViewerContext:
+            raise GameLifecycleError("EventStreamCursor requires a ViewerContext.")
+        if type(visible_limit) is not int or visible_limit < 1:
+            raise GameLifecycleError("Visible event page limit must be positive.")
+        records = event_log.records
+        if self.value > len(records):
+            raise GameLifecycleError("EventStreamCursor is ahead of the event log.")
+        events: list[EventRecordPayload] = []
+        next_cursor = self.value
+        for index, record in enumerate(records[self.value :], start=self.value):
+            public = public_event_record_payload(
+                event_id=record.event_id,
+                event_type=record.event_type,
+                payload=record.payload,
+                viewer=viewer,
+            )
+            next_cursor = index + 1
+            if public is not None:
+                events.append(public)
+            if len(events) == visible_limit:
+                break
+        has_more = False
+        if len(events) == visible_limit:
+            for index, record in enumerate(records[next_cursor:], start=next_cursor):
+                public = public_event_record_payload(
+                    event_id=record.event_id,
+                    event_type=record.event_type,
+                    payload=record.payload,
+                    viewer=viewer,
+                )
+                if public is not None:
+                    has_more = True
+                    break
+                next_cursor = index + 1
+        if not has_more:
+            next_cursor = len(records)
+        return {
+            "schema_version": ADAPTER_EVENT_STREAM_DELTA_SCHEMA_VERSION,
+            "viewer_player_id": (
+                "shared" if viewer.viewer_player_id is None else viewer.viewer_player_id
+            ),
+            "cursor": self.value,
+            "next_cursor": next_cursor,
+            "has_more": has_more,
+            "events": events,
+        }
+
+    def visible_count_for_context(
+        self,
+        event_log: EventLog,
+        *,
+        viewer: ViewerContext,
+    ) -> int:
+        if type(event_log) is not EventLog:
+            raise GameLifecycleError("EventStreamCursor requires an EventLog.")
+        if type(viewer) is not ViewerContext:
+            raise GameLifecycleError("EventStreamCursor requires a ViewerContext.")
+        if self.value > len(event_log.records):
+            raise GameLifecycleError("EventStreamCursor is ahead of the event log.")
+        return sum(
+            public_event_record_payload(
+                event_id=record.event_id,
+                event_type=record.event_type,
+                payload=record.payload,
+                viewer=viewer,
+            )
+            is not None
+            for record in event_log.records[: self.value]
+        )

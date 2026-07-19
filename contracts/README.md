@@ -29,7 +29,7 @@ role-bound checkpoints, start/close transitions, and one coherent bounded
 post-submission drain result. The normative Phase 18F command route adds an
 idempotency key and expected revision to every mutation while deriving actor
 authority from a server-owned authenticated principal binding outside the
-command body. Phase 18G adds signed opaque event cursors, deterministic
+command body. Phase 18G adds protected opaque event cursors, deterministic
 pagination/retention, typed resync responses, and full replacement projections.
 Phase 18H defines explicit player, coach, delayed-spectator, administrator, and
 replay-viewer policies with centralized redaction.

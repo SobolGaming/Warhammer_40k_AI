@@ -7,7 +7,11 @@ from typing import Self
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.decisions import submit_option, submit_parameterized_payload
-from warhammer40k_core.adapters.event_stream import EventStreamCursor, EventStreamDeltaPayload
+from warhammer40k_core.adapters.event_stream import (
+    EventStreamCursor,
+    EventStreamDeltaPayload,
+    EventStreamPagePayload,
+)
 from warhammer40k_core.adapters.projection import (
     GameViewPayload,
     RulesCatalogViewPayload,
@@ -132,8 +136,53 @@ class LocalGameSession(AdapterGameSession):
             viewer=viewer,
         )
 
+    def event_page_for_context(
+        self,
+        cursor: EventStreamCursor,
+        *,
+        viewer: ViewerContext,
+        visible_limit: int,
+    ) -> EventStreamPagePayload:
+        self._validate_event_context(cursor=cursor, viewer=viewer)
+        return cursor.page_for_context(
+            self.lifecycle.decision_controller.event_log,
+            viewer=viewer,
+            visible_limit=visible_limit,
+        )
+
+    def visible_event_count_for_context(
+        self,
+        cursor: EventStreamCursor,
+        *,
+        viewer: ViewerContext,
+    ) -> int:
+        self._validate_event_context(cursor=cursor, viewer=viewer)
+        return cursor.visible_count_for_context(
+            self.lifecycle.decision_controller.event_log,
+            viewer=viewer,
+        )
+
+    def event_record_count(self) -> int:
+        return len(self.lifecycle.decision_controller.event_log.records)
+
     def decision_record_count(self) -> int:
         return len(self.lifecycle.decision_controller.records)
+
+    def _validate_event_context(
+        self,
+        *,
+        cursor: EventStreamCursor,
+        viewer: ViewerContext,
+    ) -> None:
+        if type(cursor) is not EventStreamCursor:
+            raise GameLifecycleError("LocalGameSession events require EventStreamCursor.")
+        if type(viewer) is not ViewerContext:
+            raise GameLifecycleError("LocalGameSession events require ViewerContext.")
+        state = self.lifecycle.state
+        if state is None:
+            raise GameLifecycleError("LocalGameSession event stream requires a started lifecycle.")
+        if viewer.viewer_player_id is not None and viewer.viewer_player_id not in state.player_ids:
+            raise GameLifecycleError("Viewer context player is not part of this game.")
 
     def replay_artifact(self, *, artifact_id: str) -> ReplayArtifactPayload:
         initial_payload = self._initial_replay_lifecycle_payload

@@ -7,8 +7,10 @@ schemas and the ordinary `AdapterGameSession` path.
    its distinct `session_id`, engine `game_id`, and revision `0`.
 2. Authenticate as the administrator, start it through
    `ExecuteSessionCommand`, then retry that exact command as the same principal
-   on a new connection and require the same HTTP status and byte-equivalent
-   public response.
+   and exact role/player/policy/authorization-epoch context on a new connection
+   and require the same HTTP status and byte-equivalent public response. Change
+   each part of that context in turn and require the shared 403 response rather
+   than the cached data.
 3. Race two valid commands carrying one expected revision and require at most
    one commit. Verify stale revision/request, wrong principal, malformed
    envelope, illegal proposal, terminal session, and pre-commit failure all
@@ -26,6 +28,9 @@ schemas and the ordinary `AdapterGameSession` path.
 7. Consume events from the opaque cursor issued with a role-scoped projection,
    preserve `sequence_number` order, follow `next_cursor` while `has_more`, and
    replace client state from a full projection when `resync_required` is true.
+   Treat sequence numbers as viewer-scoped, and reject projections/deltas that
+   expose authoritative event counts, readable cursor state, hidden placeholders,
+   or sequence gaps caused by hidden records.
 8. Display hidden-decision and hidden-secondary fixtures without revealing
    hidden type, source, option-count, or payload metadata.
 9. Distinguish waiting, advanced, invalid, unsupported, and terminal lifecycle
@@ -34,8 +39,9 @@ schemas and the ordinary `AdapterGameSession` path.
    and terminal error fixtures; do not blindly retry schema or corruption
    failures.
 11. Enforce the player, coach, delayed-spectator, administrator, and replay-
-    viewer route policies; export support/replay payloads only with an
-    authorized role and treat them as immutable audit artifacts.
+    viewer route policies; deny raw active-session replay to a replay viewer,
+    permit that role only after terminal/close, and treat exported replay
+    payloads as immutable audit artifacts.
 12. Reject a response that fails its declared schema, contains an unknown major
     version, or contradicts the coordinate/session/redaction semantics.
 

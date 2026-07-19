@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import base64
 import json
-from typing import cast
+from pathlib import Path
+from typing import Protocol, cast
+
+from jsonschema import Draft202012Validator
 
 from warhammer40k_core.adapters.access_control import (
     DEV_ADMIN_TOKEN,
@@ -28,6 +32,11 @@ from warhammer40k_core.engine.event_log import JsonValue
 
 PLAYER_A = "player-a"
 PLAYER_B = "player-b"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+class _PayloadValidator(Protocol):
+    def validate(self, instance: object) -> None: ...
 
 
 def test_phase18g_paginates_authoritative_offsets_and_resumes_from_projection() -> None:
@@ -35,7 +44,7 @@ def test_phase18g_paginates_authoritative_offsets_and_resumes_from_projection() 
     session_id = _create_session(server, game_id="phase18g-pagination")
     initial_projection = _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
     initial_cursor = _string(initial_projection, "event_cursor")
-    initial_offset = server.cursor_codec.decode(initial_cursor).offset
+    initial_sequence = server.cursor_codec.decode(initial_cursor).visible_sequence
 
     _submit_lifecycle_command(
         server,
@@ -63,7 +72,7 @@ def test_phase18g_paginates_authoritative_offsets_and_resumes_from_projection() 
 
     events = [_object(event) for page in pages for event in _list(page, "events")]
     sequence_numbers = [_integer(event, "sequence_number") for event in events]
-    assert sequence_numbers == list(range(initial_offset + 1, initial_offset + len(events) + 1))
+    assert sequence_numbers == list(range(initial_sequence + 1, initial_sequence + len(events) + 1))
     assert all(len(_list(page, "events")) <= 2 for page in pages)
     assert _integer(pages[0], "from_revision") == 0
     assert all(_integer(page, "to_revision") == 0 for page in pages[:-1])
@@ -119,6 +128,7 @@ def test_phase18g_returns_typed_non_leaking_resync_for_invalid_cursor_classes() 
         session_id=first_session,
         viewer=player,
         offset=decoded.offset + 1,
+        visible_sequence=decoded.visible_sequence,
         session_revision=decoded.session_revision,
         projection_state_hash=decoded.projection_state_hash,
     )
@@ -126,6 +136,7 @@ def test_phase18g_returns_typed_non_leaking_resync_for_invalid_cursor_classes() 
         session_id=first_session,
         viewer=player,
         offset=decoded.offset,
+        visible_sequence=decoded.visible_sequence,
         session_revision=decoded.session_revision,
         projection_state_hash="0" * 64,
     )
@@ -150,6 +161,25 @@ def test_phase18g_returns_typed_non_leaking_resync_for_invalid_cursor_classes() 
         assert delta["events"] == []
         assert delta["has_more"] is False
         assert _string(delta, "next_cursor") != cursor
+
+    malformed_cases = (
+        "é.x",
+        "x" * 2049,
+        "!" * 43,
+        current_cursor[:-1] + ("A" if current_cursor[-1] != "A" else "B"),
+    )
+    for malformed_cursor in malformed_cases:
+        delta = _events(
+            server,
+            session_id=first_session,
+            token=DEV_PLAYER_A_TOKEN,
+            cursor=malformed_cursor,
+        )
+        assert delta["resync_required"] is True
+        assert delta["resync_reason"] == "malformed"
+        assert delta["supplied_cursor"] == "invalid-cursor"
+        assert len(_string(delta, "supplied_cursor")) <= 2048
+        _validate_event_delta(delta)
 
     expired = _events(
         server,
@@ -340,20 +370,44 @@ def test_phase18h_enforces_mutation_replay_support_and_viewer_claim_policies() -
     assert replay_metadata.status_code == 403
     assert spectator_support.payload == replay_projection.payload
     assert replay_metadata.payload == replay_projection.payload
-    assert (
+    active_replays = (
         _request(
             server,
             method="GET",
             path=f"/sessions/{session_id}/replay",
             token=DEV_REPLAY_TOKEN,
-        ).status_code
-        == 200
+        ),
+        _request(
+            server,
+            method="GET",
+            path=f"/games/{session_id.removeprefix('session-')}/replay",
+            token=DEV_REPLAY_TOKEN,
+        ),
     )
+    assert all(response.status_code == 403 for response in active_replays)
+    assert all(response.payload == replay_projection.payload for response in active_replays)
     assert (
         _request(
             server,
             method="GET",
             path=f"/sessions/{session_id}/catalog",
+            token=DEV_REPLAY_TOKEN,
+        ).status_code
+        == 200
+    )
+
+    _submit_lifecycle_command(
+        server,
+        session_id=session_id,
+        command_id="phase18h-admin-close",
+        expected_revision=1,
+        submission_kind="close_session",
+    )
+    assert (
+        _request(
+            server,
+            method="GET",
+            path=f"/sessions/{session_id}/replay",
             token=DEV_REPLAY_TOKEN,
         ).status_code
         == 200
@@ -427,7 +481,7 @@ def test_phase18h_auth_failures_share_one_redacted_shape_and_ignore_legacy_heade
     assert _error_code(rejected) == "malformed_payload"
 
 
-def test_phase18h_event_redaction_preserves_sequence_without_secret_identifiers() -> None:
+def test_phase18h_event_redaction_hides_secret_counts_and_uses_viewer_sequences() -> None:
     server = AdapterGameServer()
     session_id = _create_session(server, game_id="phase18h-event-redaction")
     player_a_cursor = _string(
@@ -459,32 +513,51 @@ def test_phase18h_event_redaction_preserves_sequence_without_secret_identifiers(
     )
     player_a_events = [_object(value) for value in _list(player_a_delta, "events")]
     player_b_events = [_object(value) for value in _list(player_b_delta, "events")]
-    assert [_integer(value, "sequence_number") for value in player_a_events] == [
-        _integer(value, "sequence_number") for value in player_b_events
-    ]
-    assert len(player_a_events) == len(player_b_events)
+    player_a_initial_sequence = server.cursor_codec.decode(player_a_cursor).visible_sequence
+    player_b_initial_sequence = server.cursor_codec.decode(player_b_cursor).visible_sequence
+    assert [_integer(value, "sequence_number") for value in player_a_events] == list(
+        range(player_a_initial_sequence + 1, player_a_initial_sequence + len(player_a_events) + 1)
+    )
+    assert [_integer(value, "sequence_number") for value in player_b_events] == list(
+        range(player_b_initial_sequence + 1, player_b_initial_sequence + len(player_b_events) + 1)
+    )
+    assert len(player_a_events) == len(player_b_events) + 1
 
     visible_request = next(
         event for event in player_a_events if event["event_type"] == "decision_requested"
     )
-    hidden_request = next(
-        event for event in player_b_events if event["event_type"] == "decision_requested"
-    )
     visible_payload = _object(visible_request, "payload")
-    hidden_payload = _object(hidden_request, "payload")
     assert _string(visible_payload, "request_id") != HIDDEN_REQUEST_ID
-    assert hidden_payload == {
-        "request_id": HIDDEN_REQUEST_ID,
-        "decision_type": "hidden_decision",
-        "actor_id": None,
-        "secret": True,
-        "hidden": True,
-    }
-    assert PLAYER_A not in json.dumps(hidden_payload, sort_keys=True)
+    assert all(event["event_type"] != "decision_requested" for event in player_b_events)
+    serialized_opponent_delta = json.dumps(player_b_delta, sort_keys=True)
+    assert HIDDEN_REQUEST_ID not in serialized_opponent_delta
+    assert "hidden_event" not in serialized_opponent_delta
+    assert "event_count" not in serialized_opponent_delta
     assert _string(player_a_delta, "next_cursor") != _string(
         player_b_delta,
         "next_cursor",
     )
+
+    player_b_projection = _projection(
+        server,
+        session_id=session_id,
+        token=DEV_PLAYER_B_TOKEN,
+    )
+    assert "event_count" not in _object(player_b_projection, "projection")
+    opaque_cursor = _string(player_b_projection, "event_cursor")
+    assert "." not in opaque_cursor
+    assert session_id not in opaque_cursor
+    decoded_token = base64.urlsafe_b64decode(opaque_cursor + "=")
+    try:
+        decoded_text = decoded_token.decode("utf-8")
+    except UnicodeDecodeError:
+        decoded_json = None
+    else:
+        try:
+            decoded_json = json.loads(decoded_text)
+        except json.JSONDecodeError:
+            decoded_json = None
+    assert decoded_json is None
 
 
 def test_phase18h_role_change_invalidates_existing_cursor_scope() -> None:
@@ -507,7 +580,10 @@ def test_phase18h_role_change_invalidates_existing_cursor_scope() -> None:
             ),
         )
         break
-    server.principal_registry = PrincipalRegistry(credentials=tuple(credentials))
+    server.principal_registry = PrincipalRegistry(
+        credentials=tuple(credentials),
+        authorization_epoch=1,
+    )
 
     delta = _events(
         server,
@@ -517,6 +593,145 @@ def test_phase18h_role_change_invalidates_existing_cursor_scope() -> None:
     )
     assert delta["resync_required"] is True
     assert delta["resync_reason"] == "wrong_viewer"
+
+
+def test_phase18h_idempotent_retry_requires_exact_current_authorization_context() -> None:
+    server = AdapterGameServer()
+    session_id = _create_session(server, game_id="phase18h-idempotent-auth-context")
+    _submit_lifecycle_command(
+        server,
+        session_id=session_id,
+        command_id="phase18h-idempotent-start",
+        expected_revision=0,
+        submission_kind="start_session",
+    )
+    projection = _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
+    pending = _object(_object(projection, "projection"), "pending_decision")
+    request_id = _string(pending, "request_id")
+    result_id = "phase18h-idempotent-result"
+    option_id = _string(_object(_list(pending, "options")[0]), "option_id")
+    command_id = "phase18h-idempotent-player-command"
+    accepted = _command_response(
+        server,
+        session_id=session_id,
+        token=DEV_PLAYER_A_TOKEN,
+        command_id=command_id,
+        expected_revision=1,
+        submission_kind="finite_option",
+        request_id=request_id,
+        result_id=result_id,
+        option_id=option_id,
+    )
+    assert accepted.status_code == 200
+    base_credentials = server.principal_registry.credentials
+    original = next(
+        credential for credential in base_credentials if credential.token == DEV_PLAYER_A_TOKEN
+    ).principal
+    reassigned_principals = (
+        AuthenticatedPrincipal(
+            principal_id=original.principal_id,
+            role=PrincipalRole.COACH,
+            player_id=PLAYER_A,
+        ),
+        AuthenticatedPrincipal(
+            principal_id=original.principal_id,
+            role=PrincipalRole.REPLAY_VIEWER,
+        ),
+        AuthenticatedPrincipal(
+            principal_id=original.principal_id,
+            role=PrincipalRole.PLAYER,
+            player_id=PLAYER_B,
+        ),
+        original,
+    )
+    denied: list[ServerResponse] = []
+    for epoch, reassigned in enumerate(reassigned_principals, start=1):
+        server.principal_registry = _registry_replacing_principal(
+            credentials=base_credentials,
+            token=DEV_PLAYER_A_TOKEN,
+            principal=reassigned,
+            authorization_epoch=epoch,
+        )
+        denied.append(
+            _command_response(
+                server,
+                session_id=session_id,
+                token=DEV_PLAYER_A_TOKEN,
+                command_id=command_id,
+                expected_revision=1,
+                submission_kind="finite_option",
+                request_id=request_id,
+                result_id=result_id,
+                option_id=option_id,
+            )
+        )
+
+    admin_server = AdapterGameServer()
+    admin_session_id = _create_session(
+        admin_server,
+        game_id="phase18h-idempotent-admin-context",
+    )
+    admin_command_id = "phase18h-idempotent-admin-start"
+    original_admin_response = _command_response(
+        admin_server,
+        session_id=admin_session_id,
+        token=DEV_ADMIN_TOKEN,
+        command_id=admin_command_id,
+        expected_revision=0,
+        submission_kind="start_session",
+    )
+    assert original_admin_response.status_code == 200
+    admin_credentials = admin_server.principal_registry.credentials
+    original_admin = next(
+        credential for credential in admin_credentials if credential.token == DEV_ADMIN_TOKEN
+    ).principal
+    admin_server.principal_registry = _registry_replacing_principal(
+        credentials=admin_credentials,
+        token=DEV_ADMIN_TOKEN,
+        principal=AuthenticatedPrincipal(
+            principal_id=original_admin.principal_id,
+            role=PrincipalRole.PLAYER,
+            player_id=PLAYER_A,
+        ),
+        authorization_epoch=1,
+    )
+    denied.append(
+        _command_response(
+            admin_server,
+            session_id=admin_session_id,
+            token=DEV_ADMIN_TOKEN,
+            command_id=admin_command_id,
+            expected_revision=0,
+            submission_kind="start_session",
+        )
+    )
+
+    assert all(response.status_code == 403 for response in denied)
+    assert all(response.payload == denied[0].payload for response in denied)
+    assert _error_code(denied[0]) == "access_denied"
+    serialized = json.dumps(denied[0].payload, sort_keys=True)
+    assert command_id not in serialized
+    assert request_id not in serialized
+    assert PLAYER_A not in serialized
+
+
+def _registry_replacing_principal(
+    *,
+    credentials: tuple[PrincipalCredential, ...],
+    token: str,
+    principal: AuthenticatedPrincipal,
+    authorization_epoch: int,
+) -> PrincipalRegistry:
+    replaced = tuple(
+        PrincipalCredential(token=credential.token, principal=principal)
+        if credential.token == token
+        else credential
+        for credential in credentials
+    )
+    return PrincipalRegistry(
+        credentials=replaced,
+        authorization_epoch=authorization_epoch,
+    )
 
 
 def _create_session(server: AdapterGameServer, *, game_id: str) -> str:
@@ -689,3 +904,10 @@ def _integer(value: dict[str, JsonValue], key: str) -> int:
     target = value[key]
     assert type(target) is int
     return target
+
+
+def _validate_event_delta(payload: dict[str, JsonValue]) -> None:
+    schema_path = REPO_ROOT / "contracts" / "schemas" / "event-delta.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    validator = cast(_PayloadValidator, Draft202012Validator(schema))
+    validator.validate(payload)

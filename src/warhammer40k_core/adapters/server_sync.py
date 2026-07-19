@@ -31,6 +31,8 @@ from warhammer40k_core.adapters.session_protocol import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
+REDACTED_INVALID_CURSOR = "invalid-cursor"
+
 
 def session_projection_payload(
     *,
@@ -46,6 +48,7 @@ def session_projection_payload(
         session_id=record.session_id,
         viewer=viewer,
         offset=snapshot.event_count,
+        visible_sequence=_visible_event_count(snapshot, viewer=viewer),
         session_revision=snapshot.session_revision,
         projection_state_hash=projection_hash,
     )
@@ -82,6 +85,7 @@ def session_checkpoint(
             session_id=record.session_id,
             viewer=viewer,
             offset=snapshot.event_count,
+            visible_sequence=_visible_event_count(snapshot, viewer=viewer),
             session_revision=snapshot.session_revision,
             projection_state_hash=projection_hash,
         ),
@@ -166,12 +170,13 @@ def session_event_delta_payload(
                 cursor_codec=cursor_codec,
                 retention_limit=retained,
             )
-    internal_delta = target.adapter_session.events_since_for_context(
+    internal_delta = target.adapter_session.event_page_for_context(
         EventStreamCursor(cursor.offset),
         viewer=viewer,
+        visible_limit=limit,
     )
-    page_records = internal_delta["events"][:limit]
-    next_offset = cursor.offset + len(page_records)
+    page_records = internal_delta["events"]
+    next_offset = internal_delta["next_cursor"]
     boundary = record.snapshot_at_event_offset(
         offset=next_offset,
         maximum_revision=target.session_revision,
@@ -182,6 +187,7 @@ def session_event_delta_payload(
         session_id=record.session_id,
         viewer=viewer,
         offset=next_offset,
+        visible_sequence=cursor.visible_sequence + len(page_records),
         session_revision=boundary.session_revision,
         projection_state_hash=boundary_hash,
     )
@@ -195,14 +201,14 @@ def session_event_delta_payload(
         "projection_state_hash": boundary_hash,
         "supplied_cursor": supplied_cursor,
         "next_cursor": next_cursor,
-        "has_more": next_offset < target.event_count,
+        "has_more": internal_delta["has_more"],
         "resync_required": False,
         "resync_reason": None,
         "command_id": None,
         "retention_limit": retained,
         "events": sequenced_events(
             page_records,
-            first_sequence_number=cursor.offset + 1,
+            first_sequence_number=cursor.visible_sequence + 1,
         ),
     }
     validate_json_value(cast(JsonValue, payload))
@@ -225,6 +231,12 @@ def _validate_cursor_position(
         raise CursorValidationError(CursorResyncReason.EXPIRED)
     if cursor.offset > target.event_count or cursor.session_revision > target.session_revision:
         raise CursorValidationError(CursorResyncReason.AHEAD)
+    visible_sequence = target.adapter_session.visible_event_count_for_context(
+        EventStreamCursor(cursor.offset),
+        viewer=viewer,
+    )
+    if cursor.visible_sequence != visible_sequence:
+        raise CursorValidationError(CursorResyncReason.PROJECTION_HASH_MISMATCH)
     try:
         cursor_snapshot = record.snapshot(cursor.session_revision)
     except SessionProtocolError as exc:
@@ -249,6 +261,7 @@ def _resync_payload(
         session_id=record.session_id,
         viewer=viewer,
         offset=target.event_count,
+        visible_sequence=_visible_event_count(target, viewer=viewer),
         session_revision=target.session_revision,
         projection_state_hash=target_hash,
     )
@@ -260,7 +273,9 @@ def _resync_payload(
         "from_revision": target.session_revision,
         "to_revision": target.session_revision,
         "projection_state_hash": target_hash,
-        "supplied_cursor": supplied_cursor,
+        "supplied_cursor": (
+            REDACTED_INVALID_CURSOR if reason is CursorResyncReason.MALFORMED else supplied_cursor
+        ),
         "next_cursor": next_cursor,
         "has_more": False,
         "resync_required": True,
@@ -271,6 +286,17 @@ def _resync_payload(
     }
     validate_json_value(cast(JsonValue, payload))
     return payload
+
+
+def _visible_event_count(
+    snapshot: SessionRevisionSnapshot,
+    *,
+    viewer: ViewerContext,
+) -> int:
+    return snapshot.adapter_session.visible_event_count_for_context(
+        EventStreamCursor(snapshot.event_count),
+        viewer=viewer,
+    )
 
 
 def initial_cursor_for_viewer(

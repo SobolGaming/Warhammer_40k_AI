@@ -1,8 +1,8 @@
 {
   "accepted": true,
   "checkpoint": {
-    "event_cursor": "eyJjIjoiYWRtaW5pc3RyYXRvcjpzaGFyZWQ6MCIsImgiOiJjYjYwMjc1NjYxNmVkN2FjOTJiZmI4Mjk2NTY1NTlmZWQ0Y2ZiZWEzMDMyYTc3ODA3MTkzYzliYjcwZDRiOWFlIiwibyI6OSwicCI6InByaW5jaXBhbC1hZG1pbmlzdHJhdG9yIiwiciI6MiwicyI6InNlc3Npb24tcGhhc2UxOGUtY29udHJhY3Qtc2Vzc2lvbiIsInYiOjF9.DwGhU9B9m_sfkLQCGyypOZYozrdplRqvEr9VwQwSmtk",
-    "projection_state_hash": "cb602756616ed7ac92bfb829656559fed4cfbea3032a77807193c9bb70d4b9ae",
+    "event_cursor": "RX5HsVEnfrcTYYaeYyb9FOiX7TbQ0qePSmhhFqoRXwk",
+    "projection_state_hash": "fee58c15207c7204973b73d007a111990efc36583f221bcf42dac63aa73e5956",
     "session_revision": 2,
     "viewer_player_id": null,
     "visibility_role": "administrator"
@@ -10,8 +10,8 @@
   "command_id": "phase18f-contract-command-000001",
   "committed": true,
   "event_range": {
-    "from_cursor": "eyJjIjoiYWRtaW5pc3RyYXRvcjpzaGFyZWQ6MCIsImgiOiJjYjYwMjc1NjYxNmVkN2FjOTJiZmI4Mjk2NTY1NTlmZWQ0Y2ZiZWEzMDMyYTc3ODA3MTkzYzliYjcwZDRiOWFlIiwibyI6OSwicCI6InByaW5jaXBhbC1hZG1pbmlzdHJhdG9yIiwiciI6MSwicyI6InNlc3Npb24tcGhhc2UxOGUtY29udHJhY3Qtc2Vzc2lvbiIsInYiOjF9.-wEHI2V_vYuI04ptHEyeoxmGVFUuuYSn1fi05mgSres",
-    "to_cursor": "eyJjIjoiYWRtaW5pc3RyYXRvcjpzaGFyZWQ6MCIsImgiOiJjYjYwMjc1NjYxNmVkN2FjOTJiZmI4Mjk2NTY1NTlmZWQ0Y2ZiZWEzMDMyYTc3ODA3MTkzYzliYjcwZDRiOWFlIiwibyI6OSwicCI6InByaW5jaXBhbC1hZG1pbmlzdHJhdG9yIiwiciI6MiwicyI6InNlc3Npb24tcGhhc2UxOGUtY29udHJhY3Qtc2Vzc2lvbiIsInYiOjF9.DwGhU9B9m_sfkLQCGyypOZYozrdplRqvEr9VwQwSmtk"
+    "from_cursor": "E9i6imRQYjzbMUFCyeOhhyLpz5ml-wC4kCE-0kJoPpE",
+    "to_cursor": "RX5HsVEnfrcTYYaeYyb9FOiX7TbQ0qePSmhhFqoRXwk"
   },
   "operation": "close_session",
   "outcome_code": "command_committed",
@@ -21,7 +21,7 @@
     "created_at": "2026-07-18T20:00:00Z",
     "engine_build_id": "warhammer40k-core-v2:0.1.0",
     "engine_version": "0.1.0",
-    "event_cursor": "eyJjIjoiYWRtaW5pc3RyYXRvcjpzaGFyZWQ6MCIsImgiOiJjYjYwMjc1NjYxNmVkN2FjOTJiZmI4Mjk2NTY1NTlmZWQ0Y2ZiZWEzMDMyYTc3ODA3MTkzYzliYjcwZDRiOWFlIiwibyI6OSwicCI6InByaW5jaXBhbC1hZG1pbmlzdHJhdG9yIiwiciI6MiwicyI6InNlc3Npb24tcGhhc2UxOGUtY29udHJhY3Qtc2Vzc2lvbiIsInYiOjF9.DwGhU9B9m_sfkLQCGyypOZYozrdplRqvEr9VwQwSmtk",
+    "event_cursor": "RX5HsVEnfrcTYYaeYyb9FOiX7TbQ0qePSmhhFqoRXwk",
     "game_id": "phase18e-contract-session",
     "last_activity_at": "2026-07-18T20:00:00Z",
     "lifecycle_status": {
@@ -33,7 +33,7 @@
       "stage": "setup",
       "status_kind": "waiting_for_decision"
     },
-    "projection_state_hash": "cb602756616ed7ac92bfb829656559fed4cfbea3032a77807193c9bb70d4b9ae",
+    "projection_state_hash": "fee58c15207c7204973b73d007a111990efc36583f221bcf42dac63aa73e5956",
     "ruleset_id": {
       "edition": "11e",
       "game": "warhammer_40000",

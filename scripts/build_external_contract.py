@@ -725,7 +725,10 @@ def _write_error_examples() -> None:
     errors = {
         "conflict": ("session_revision_conflict", "Session revision conflicted."),
         "corruption": ("session_corruption", "Session recovery verification failed."),
-        "forbidden": ("actor_not_authorized", "Actor is not authorized."),
+        "forbidden": (
+            "access_denied",
+            "Authenticated principal is not authorized for this resource.",
+        ),
         "invalid": ("proposal_invalid", "Proposal is invalid."),
         "malformed": ("malformed_payload", "Payload is malformed."),
         "stale": ("stale_decision_request", "Decision request is stale."),

@@ -222,7 +222,7 @@
         "parameters": [{"$ref": "#/components/parameters/SessionId"}],
         "responses": {
           "200": {
-            "description": "Deterministic replay artifact for an administrator or replay viewer.",
+            "description": "Deterministic replay artifact for an administrator, or for a replay viewer after the session is terminal or closed.",
             "content": {"application/json": {"schema": {"$ref": "./schemas/replay-metadata.schema.json"}}}
           },
           "default": {"$ref": "#/components/responses/Error"}
@@ -239,7 +239,7 @@
         "name": "cursor",
         "in": "query",
         "required": true,
-        "description": "Opaque signed cursor bound to the session, authenticated principal, visibility role, authoritative log offset, revision, and projection hash.",
+        "description": "Opaque server-side cursor identifier bound to the session, authenticated principal, authorization epoch, visibility scope, protected authoritative log offset, viewer sequence, revision, and projection hash.",
         "schema": {"type": "string", "minLength": 1, "maxLength": 2048}
       },
       "EventPageLimit": {

@@ -50,7 +50,7 @@ The reference server supports one contract major at a time. Contract 2.0 is a
 deliberate breaking security boundary: session creation no longer accepts
 client-owned participant assignments, bearer authentication is mandatory,
 formal mutations use only the command endpoint, projections and metadata are
-role scoped, and event cursors are opaque signed strings instead of integers.
+role scoped, and event cursors are protected opaque strings instead of integers.
 
 Deployers upgrading a hosted 1.2 service must retain a separately deployed 1.x
 adapter through at least 2026-10-17 and one released 2.x minor line, whichever

@@ -42,22 +42,28 @@ parameterized route accept the same 19 proposal kinds.
   decision, or a recorded rule-invalid retry attempt. A Phase 18F command must
   present the current expected revision before mutation.
 - `projection_state_hash` identifies one role-scoped projection. An event cursor
-  is an opaque HMAC-authenticated token bound to the session, principal,
-  visibility role/player/delay scope, authoritative event-log offset, session
-  revision, and projection hash. Clients never construct or inspect offsets.
+  is an opaque HMAC-derived identifier bound to the session, principal,
+  visibility role/player/delay scope, authorization epoch, protected
+  authoritative event-log offset, viewer sequence, session revision, and
+  projection hash. The wire token resolves to protected server-side state; it
+  does not encode readable state. Clients never construct or inspect offsets.
 - A client begins with the cursor from metadata or a full projection, applies
   events by deterministic `sequence_number`, and advances to `next_cursor`.
   `has_more` requires another page from that cursor.
 - The default page size is 100, the maximum is 500, and the reference retention
-  window is 4096 authoritative records. Offset advancement is based on the
-  authoritative log even when a record's contents are redacted.
+  window is 4096 authoritative records. Pagination scans the authoritative log,
+  omits hidden records, and exposes only contiguous viewer-scoped sequence
+  numbers. The protected offset still advances across hidden records, but no
+  raw count, sequence gap, placeholder record, extra page, or `has_more` value
+  reveals how many were skipped.
 - Malformed, expired, ahead, wrong-session, wrong-principal/role, revision-
   divergent, or projection-hash-divergent cursors return a successful typed
   delta with `resync_required: true`, no events, and a stable `resync_reason`.
   The client then replaces all derived state from `GET /projection` and resumes
   from that projection's cursor.
-- The reference in-memory server generates a cryptographically random signing
-  key per server instance. If session state is restored under a new key,
+- The reference in-memory server generates a cryptographically random cursor
+  key per server instance and retains the protected token-to-state map in
+  memory. If session state is restored without that key and protected map,
   outstanding cursors are classified as malformed and use the same typed full-
   projection resynchronization path. Phase 18L owns durable protected state/key
   storage when sessions and cursors must survive process recovery.
@@ -66,13 +72,16 @@ parameterized route accept the same 19 proposal kinds.
   validated before engine mutation.
 - Retrying a consumed request with a new command ID is stale/conflicting;
   clients must fetch the current projection rather than guessing a replacement
-  ID. Retrying the same command ID, authenticated principal, and canonical envelope
-  returns its cached original public outcome.
+  ID. Retrying the same command ID, canonical envelope, and exact current
+  authorization context returns its cached original public outcome. That
+  context includes principal, role, player binding, visibility/cursor scope,
+  delay/omniscience policy, route permissions, and registry authorization epoch.
 
 Command processing is serialized by the server authority. A command is parsed
-and validated, checked for an existing journal outcome, compared with the
-current revision and pending request, authorized against the principal binding
-and role policy, and then applied to an isolated session fork. Only a committed
+and validated, authorized for its submission kind, checked for an existing
+journal outcome under the exact current authorization context, compared with
+the current revision and pending request, and then applied to an isolated
+session fork. Only a committed
 result replaces the authoritative session together with its journal entry,
 revision, projection checkpoint, and event cursor. Malformed commands,
 revision/request conflicts, unauthorized actors, illegal unrecorded proposals,
@@ -80,12 +89,13 @@ terminal/closed sessions, and failures before that replacement leave
 authoritative state unchanged. Two commands racing on one revision can
 therefore commit at most one result.
 
-A repeated `command_id` is idempotent only when both its principal identity
-and canonical envelope fingerprint match the journaled command. Reuse with a
-different envelope returns `command_id_conflict`; reuse by another principal
-returns the shared authorization denial without revealing the journaled command. The
-cached status and response body are returned unchanged, including after a new
-HTTP connection.
+A repeated `command_id` is idempotent only when its complete authorization
+context and canonical envelope fingerprint match the journaled command and the
+current context still permits that operation. Reuse under another principal,
+role, player binding, policy, cursor scope, or authorization epoch returns the
+shared authorization denial without revealing the journaled command. Only an
+exact authorized context may receive `command_id_conflict` for a different
+envelope or the cached status and response body for an exact retry.
 
 `SessionCommandResult.committed` reports whether a command entered authoritative
 history, while `accepted` reports whether its proposed gameplay action was
@@ -117,7 +127,7 @@ An advance at an existing `waiting_for_decision` boundary returns
 revision, or reserving the command ID.
 
 The in-memory command journal proves Phase 18F ordering and retry semantics;
-Phase 18G adds signed cursor, retention, pagination, delayed-snapshot, and
+Phase 18G adds protected opaque cursor, retention, pagination, delayed-snapshot, and
 reconnect resynchronization semantics over retained in-memory revision
 snapshots. Phase 18L still owns durable journal/state persistence, durable
 cursor-key management, compaction storage, and crash recovery.
@@ -137,3 +147,8 @@ The required formal operations are `CreateSession`, `GetSessionMetadata`,
 `ExportReplay`. Start, finite/parameterized submission, explicit advance, and
 close are typed `ExecuteSessionCommand` variants rather than separate authority
 surfaces.
+
+Raw replay artifacts remain available to omniscient administrators during an
+active session. A non-live replay viewer may export the raw artifact only after
+the session is terminal or closed, so the role cannot become an active-game
+omniscient feed.

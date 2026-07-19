@@ -53,6 +53,15 @@ from warhammer40k_core.adapters.redaction import (
     redacted_decision_type_for_hidden_viewer,
     redacted_lifecycle_status,
 )
+from warhammer40k_core.adapters.server_authorization import (
+    actor_not_authorized as _actor_not_authorized,
+)
+from warhammer40k_core.adapters.server_authorization import (
+    require_permission as _require_permission,
+)
+from warhammer40k_core.adapters.server_authorization import (
+    require_replay_export_allowed as _require_replay_export_allowed,
+)
 from warhammer40k_core.adapters.server_sync import (
     session_checkpoint,
     session_event_delta_payload,
@@ -309,7 +318,7 @@ class AdapterGameServer:
 
         game_id = _validate_identifier("game_id", path_segments[1])
         record = self._session_record_for_game(game_id)
-        viewer = principal.bind_to_session(player_ids=record.player_ids)
+        viewer = self._bind_principal(principal=principal, record=record)
         session = record.adapter_session
         if method == "POST" and path_segments == ("games", game_id, "advance"):
             _require_permission(viewer.policy.may_mutate_lifecycle)
@@ -362,6 +371,7 @@ class AdapterGameServer:
             )
         if method == "GET" and path_segments == ("games", game_id, "replay"):
             _require_permission(viewer.policy.may_export_replay)
+            _require_replay_export_allowed(record=record, viewer=viewer)
             record.touch(self._timestamp())
             return ServerResponse(
                 status_code=int(HTTPStatus.OK),
@@ -423,7 +433,7 @@ class AdapterGameServer:
             raise _not_found()
         session_id = _validate_identifier("session_id", path_segments[1])
         record = self._protocol_session(session_id)
-        viewer = principal.bind_to_session(player_ids=record.player_ids)
+        viewer = self._bind_principal(principal=principal, record=record)
         base = ("sessions", session_id)
         if method == "POST" and path_segments == (*base, "commands"):
             return self._execute_protocol_command(
@@ -481,6 +491,7 @@ class AdapterGameServer:
             )
         if method == "GET" and path_segments == (*base, "replay"):
             _require_permission(viewer.policy.may_export_replay)
+            _require_replay_export_allowed(record=record, viewer=viewer)
             replay = record.adapter_session.replay_artifact(
                 artifact_id=f"session-replay:{session_id}"
             )
@@ -507,10 +518,25 @@ class AdapterGameServer:
                 message="Command session_id does not match the target session.",
             )
         fingerprint = envelope.fingerprint()
+        kind = envelope.submission_kind
+        lifecycle_command = kind in {
+            SessionCommandSubmissionKind.START_SESSION,
+            SessionCommandSubmissionKind.ADVANCE_SESSION,
+            SessionCommandSubmissionKind.CLOSE_SESSION,
+        }
+        if lifecycle_command:
+            _require_permission(viewer.policy.may_mutate_lifecycle)
+            player_id = record.player_ids[0]
+        else:
+            _require_permission(viewer.policy.may_submit_decision)
+            authorized_player_id = viewer.viewer_player_id
+            if authorized_player_id is None:
+                raise AuthorizationError("Authenticated principal cannot submit decisions.")
+            player_id = authorized_player_id
         existing = record.command_entry(envelope.command_id)
         if existing is not None:
-            if existing.principal_id != principal.principal_id:
-                raise _actor_not_authorized()
+            if existing.authorization_context != viewer.authorization_context:
+                raise AuthorizationError("Command authorization context has changed.")
             if existing.envelope_fingerprint != fingerprint:
                 raise ServerApiError(
                     status_code=HTTPStatus.CONFLICT,
@@ -527,21 +553,6 @@ class AdapterGameServer:
                 code="session_revision_conflict",
                 message="Session revision conflicted.",
             )
-        kind = envelope.submission_kind
-        lifecycle_command = kind in {
-            SessionCommandSubmissionKind.START_SESSION,
-            SessionCommandSubmissionKind.ADVANCE_SESSION,
-            SessionCommandSubmissionKind.CLOSE_SESSION,
-        }
-        if lifecycle_command:
-            _require_permission(viewer.policy.may_mutate_lifecycle)
-            player_id = record.player_ids[0]
-        else:
-            _require_permission(viewer.policy.may_submit_decision)
-            authorized_player_id = viewer.viewer_player_id
-            if authorized_player_id is None:
-                raise _actor_not_authorized()
-            player_id = authorized_player_id
         if kind is SessionCommandSubmissionKind.ADVANCE_SESSION:
             _ensure_session_active(record)
             if (
@@ -578,6 +589,7 @@ class AdapterGameServer:
             SessionCommandJournalEntry(
                 command_id=envelope.command_id,
                 principal_id=principal.principal_id,
+                authorization_context=viewer.authorization_context,
                 envelope_fingerprint=fingerprint,
                 status_code=response.status_code,
                 response_payload=response.payload,
@@ -682,7 +694,7 @@ class AdapterGameServer:
         )
         config = GameConfig.from_payload(cast(GameConfigPayload, payload["config"]))
         record = self._create_authoritative_session(config=config)
-        viewer = principal.bind_to_session(player_ids=record.player_ids)
+        viewer = self._bind_principal(principal=principal, record=record)
         return _session_metadata_response(
             record=record,
             viewer=viewer,
@@ -710,7 +722,7 @@ class AdapterGameServer:
         )
         config = GameConfig.from_payload(cast(GameConfigPayload, payload["config"]))
         record = self._create_authoritative_session(config=config)
-        viewer = principal.bind_to_session(player_ids=record.player_ids)
+        viewer = self._bind_principal(principal=principal, record=record)
         return _status_response(
             game_id=config.game_id,
             status=record.lifecycle_status,
@@ -749,6 +761,17 @@ class AdapterGameServer:
         self._sessions[session_id] = record
         self._session_id_by_game_id[config.game_id] = session_id
         return record
+
+    def _bind_principal(
+        self,
+        *,
+        principal: AuthenticatedPrincipal,
+        record: AuthoritativeSession,
+    ) -> ViewerContext:
+        return principal.bind_to_session(
+            player_ids=record.player_ids,
+            authorization_epoch=self.principal_registry.authorization_epoch,
+        )
 
     def _start_protocol_session(
         self,
@@ -1155,27 +1178,12 @@ def _session_command_outcome_response(
     )
 
 
-def _actor_not_authorized() -> ServerApiError:
-    return ServerApiError(
-        status_code=HTTPStatus.FORBIDDEN,
-        code="actor_not_authorized",
-        message="Authenticated principal is not authorized for this operation.",
-    )
-
-
 def _authorized_actor_id(*, viewer: ViewerContext, claimed_actor_id: str) -> str:
     _require_permission(viewer.policy.may_submit_decision)
     actor_id = viewer.viewer_player_id
     if actor_id is None or claimed_actor_id != actor_id:
         raise _actor_not_authorized()
     return actor_id
-
-
-def _require_permission(allowed: bool) -> None:
-    if type(allowed) is not bool:
-        raise AccessControlError("Authorization policy value must be bool.")
-    if not allowed:
-        raise AuthorizationError("Authenticated principal lacks route permission.")
 
 
 def _validate_viewer_claim(
@@ -1439,11 +1447,7 @@ def _pending_decision_for_submission(
             message="Submitted request_id does not match the pending request.",
         )
     if pending["actor_id"] != actor_id:
-        raise ServerApiError(
-            status_code=HTTPStatus.FORBIDDEN,
-            code="wrong_actor",
-            message="Submitted actor does not own the pending request.",
-        )
+        raise AuthorizationError("Submitted actor does not own the pending request.")
     return pending
 
 

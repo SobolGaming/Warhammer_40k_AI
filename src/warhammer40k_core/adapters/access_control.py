@@ -153,7 +153,12 @@ class AuthenticatedPrincipal:
     def policy(self) -> RolePolicy:
         return ROLE_POLICY_BY_ROLE[self.role]
 
-    def bind_to_session(self, *, player_ids: tuple[str, ...]) -> ViewerContext:
+    def bind_to_session(
+        self,
+        *,
+        player_ids: tuple[str, ...],
+        authorization_epoch: int = 0,
+    ) -> ViewerContext:
         players = _validated_player_ids(player_ids)
         if self.player_id is not None and self.player_id not in players:
             raise AuthorizationError("Authenticated principal is not bound to this session.")
@@ -162,6 +167,7 @@ class AuthenticatedPrincipal:
             role=self.role,
             viewer_player_id=self.player_id,
             policy=self.policy,
+            authorization_epoch=authorization_epoch,
         )
 
 
@@ -171,6 +177,7 @@ class ViewerContext:
     role: PrincipalRole
     viewer_player_id: str | None
     policy: RolePolicy
+    authorization_epoch: int = 0
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -188,6 +195,8 @@ class ViewerContext:
             )
         elif self.viewer_player_id is not None:
             raise AccessControlError("This viewer role cannot bind to a player.")
+        if type(self.authorization_epoch) is not int or self.authorization_epoch < 0:
+            raise AccessControlError("Viewer authorization epoch must be non-negative.")
 
     @classmethod
     def for_player(cls, player_id: str) -> Self:
@@ -197,15 +206,79 @@ class ViewerContext:
             role=PrincipalRole.PLAYER,
             viewer_player_id=player,
             policy=ROLE_POLICY_BY_ROLE[PrincipalRole.PLAYER],
+            authorization_epoch=0,
         )
 
     @property
     def cursor_scope(self) -> str:
         player_scope = "shared" if self.viewer_player_id is None else self.viewer_player_id
-        return f"{self.role.value}:{player_scope}:{self.policy.delay_revisions}"
+        return (
+            f"{self.role.value}:{player_scope}:{self.policy.delay_revisions}:"
+            f"{self.authorization_epoch}"
+        )
+
+    @property
+    def authorization_context(self) -> AuthorizationContext:
+        return AuthorizationContext(
+            principal_id=self.principal_id,
+            role=self.role,
+            player_id=self.viewer_player_id,
+            cursor_scope=self.cursor_scope,
+            authorization_epoch=self.authorization_epoch,
+            may_mutate_lifecycle=self.policy.may_mutate_lifecycle,
+            may_submit_decision=self.policy.may_submit_decision,
+            may_view_live=self.policy.may_view_live,
+            may_view_catalog=self.policy.may_view_catalog,
+            may_view_support=self.policy.may_view_support,
+            may_export_replay=self.policy.may_export_replay,
+            omniscient=self.policy.omniscient,
+            delay_revisions=self.policy.delay_revisions,
+        )
 
     def owns_player(self, player_id: str | None) -> bool:
         return player_id is not None and self.viewer_player_id == player_id
+
+
+@dataclass(frozen=True, slots=True)
+class AuthorizationContext:
+    """Exact server-owned visibility and mutation authority for one operation."""
+
+    principal_id: str
+    role: PrincipalRole
+    player_id: str | None
+    cursor_scope: str
+    authorization_epoch: int
+    may_mutate_lifecycle: bool
+    may_submit_decision: bool
+    may_view_live: bool
+    may_view_catalog: bool
+    may_view_support: bool
+    may_export_replay: bool
+    omniscient: bool
+    delay_revisions: int
+
+    def __post_init__(self) -> None:
+        _validate_identifier("authorization principal_id", self.principal_id)
+        if type(self.role) is not PrincipalRole:
+            raise AccessControlError("Authorization context role is invalid.")
+        if self.player_id is not None:
+            _validate_identifier("authorization player_id", self.player_id)
+        _validate_identifier("authorization cursor_scope", self.cursor_scope)
+        if type(self.authorization_epoch) is not int or self.authorization_epoch < 0:
+            raise AccessControlError("Authorization context epoch must be non-negative.")
+        flags = (
+            self.may_mutate_lifecycle,
+            self.may_submit_decision,
+            self.may_view_live,
+            self.may_view_catalog,
+            self.may_view_support,
+            self.may_export_replay,
+            self.omniscient,
+        )
+        if any(type(value) is not bool for value in flags):
+            raise AccessControlError("Authorization context permissions must be bool values.")
+        if type(self.delay_revisions) is not int or self.delay_revisions < 0:
+            raise AccessControlError("Authorization context delay must be non-negative.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -222,10 +295,13 @@ class PrincipalCredential:
 @dataclass(frozen=True, slots=True)
 class PrincipalRegistry:
     credentials: tuple[PrincipalCredential, ...]
+    authorization_epoch: int = 0
 
     def __post_init__(self) -> None:
         if type(self.credentials) is not tuple or not self.credentials:
             raise AccessControlError("Principal registry requires credentials.")
+        if type(self.authorization_epoch) is not int or self.authorization_epoch < 0:
+            raise AccessControlError("Principal registry authorization epoch must be non-negative.")
         seen_tokens: set[str] = set()
         seen_principals: set[str] = set()
         for credential in self.credentials:

@@ -79,6 +79,8 @@ SESSION_PROTOCOL_METHODS = frozenset(
     (
         "advance_until_decision_or_terminal",
         "decision_record_count",
+        "event_page_for_context",
+        "event_record_count",
         "events_since",
         "events_since_for_context",
         "fork",
@@ -90,6 +92,7 @@ SESSION_PROTOCOL_METHODS = frozenset(
         "support_profile",
         "view",
         "view_for_context",
+        "visible_event_count_for_context",
     )
 )
 SESSION_PRODUCER_FORBIDDEN_NAMES = frozenset(("GameLifecycle",))

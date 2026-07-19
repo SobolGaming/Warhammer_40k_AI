@@ -72,7 +72,7 @@ session, command, reconnect, authentication, authorization, and redaction
 contracts are in [`contracts/`](contracts/README.md). The
 bundle includes Draft 2020-12 schemas, OpenAPI 3.1, real session-derived examples with explicit
 decision-family coverage status, proposal examples, versioned session metadata and idempotent
-command outcomes, signed role-bound cursor/resync payloads, explicit principal-role policy,
+command outcomes, protected opaque role-bound cursor/resync payloads, explicit principal-role policy,
 compatibility/redaction/session/coordinate semantics, and conformance scenarios.
 Verify schema, example, OpenAPI, Python-version, coverage, manifest, and compatibility drift with:
 

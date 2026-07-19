@@ -2654,7 +2654,7 @@ projections and event deltas. Every response is principal scoped, and transport
 errors contain stable public text rather than caught engine exception details.
 Phase 18H owns principal-to-role authentication and authorization. Phase 18F
 owns command idempotency and expected-revision concurrency checks, while Phase
-18G owns signed cursor/reconnect/resynchronization behavior.
+18G owns protected opaque cursor/reconnect/resynchronization behavior.
 
 ## Formal Phase 18F Commands
 
@@ -2670,13 +2670,16 @@ actor. Administrators alone may issue lifecycle commands, but cannot impersonate
 a decision actor. Players may answer only their own pending request; coaches,
 delayed spectators, and replay viewers cannot mutate.
 
-The server checks a matching journaled command before revision and lifecycle
-preconditions. A retry from the same principal with the same canonical
-envelope returns the original status and public payload without reapplying the
-engine decision. Reusing the ID with a different envelope is a conflict, and a
-different principal receives a redacted authorization error. New commands
-must match the current revision and current pending request before the shared
-adapter facade is invoked.
+The server authorizes the submission kind before consulting a matching
+journaled command. A retry returns the original status and public payload only
+when the canonical envelope and complete current authorization context match
+the journaled values and still permit the operation. That context includes the
+principal, role, player binding, visibility/cursor policy, delay, omniscience,
+route permissions, and registry authorization epoch. Any context mismatch
+receives the shared redacted authorization error without command-existence
+details. Reusing the ID with a different envelope is a conflict only inside the
+same exact authorized context. New commands must match the current revision and
+current pending request before the shared adapter facade is invoked.
 
 Application occurs on an isolated fork of the facade-owned lifecycle. The
 authoritative session reference changes only after a committed outcome can be
@@ -2700,17 +2703,21 @@ use the command endpoint.
 ## Formal Phase 18G Synchronization
 
 The formal transport never exposes the in-process integer `EventStreamCursor`.
-Metadata, command outcomes, and full projections issue an opaque signed cursor
-bound to the session ID, authenticated principal ID, role/player/delay scope,
-authoritative event-log offset, session revision, and role-scoped projection
-hash. The client treats that token as an indivisible string.
+Metadata, command outcomes, and full projections issue an opaque HMAC-derived
+identifier for protected server-side cursor state bound to the session ID,
+authenticated principal ID, authorization epoch, role/player/delay scope,
+authoritative event-log offset, viewer sequence, session revision, and
+role-scoped projection hash. The wire token contains no readable cursor state;
+the client treats it as an indivisible string.
 
 `GET /sessions/{session_id}/events?cursor=...&limit=...` returns deterministic
-`event-delta-v2` pages. `sequence_number` is the one-based authoritative event
-position, so hidden events advance every role's offset without revealing a
-visible-event count. Page size defaults to 100 and is bounded at 500. The
-reference retention window is 4096 records; retained revision snapshots also
-provide exact projection/hash boundaries and the delayed spectator view.
+`event-delta-v2` pages. `sequence_number` is one-based and contiguous within a
+viewer scope. Hidden records are omitted while pagination advances the
+protected authoritative offset; they create no projection count, placeholder,
+sequence gap, extra page, or `has_more` oracle. Page size defaults to 100 and is
+bounded at 500. The reference retention window is 4096 authoritative records;
+retained revision snapshots also provide exact projection/hash boundaries and
+the delayed spectator view.
 
 Malformed, expired, ahead, wrong-session, wrong-principal/role, revision-
 divergent, and hash-divergent cursors return `resync_required: true`, a typed
@@ -2739,15 +2746,17 @@ Command bodies accept neither viewer nor actor authority.
 | coach | paired player's view | 0 | denied | denied |
 | delayed spectator | public-only | 1 revision | denied | denied |
 | administrator | omniscient | 0 | lifecycle only | allowed |
-| replay viewer | catalog/replay only | n/a | denied | allowed |
+| replay viewer | catalog plus post-session replay only | n/a | denied | terminal/closed only |
 
 Projection, pending-decision, event, lifecycle-status, error, metadata, and
 command-result hidden shapes come from `adapters.redaction`. Missing and invalid
 credentials share the same 401 response, and every authorization denial shares
 the same 403 response. These errors never expose request/actor IDs, option or
 target counts, source IDs, support status, or terminal details. Changing a
-principal's role or player binding changes its cursor scope and invalidates old
-cursors.
+principal's role, player binding, policy, or registry authorization epoch
+changes its cursor scope and invalidates old cursors. Raw active-session replay
+remains available only to the omniscient administrator; a replay viewer cannot
+use the replay route as a live information feed.
 
 ## Suggested Adapter Loop
 

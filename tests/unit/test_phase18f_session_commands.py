@@ -329,7 +329,7 @@ def test_phase18f_precommit_rejections_preserve_authoritative_state() -> None:
                 ),
             ),
             403,
-            "actor_not_authorized",
+            "access_denied",
         ),
         (
             _request_raw(

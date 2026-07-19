@@ -28,10 +28,6 @@
         "null"
       ]
     },
-    "event_count": {
-      "minimum": 0,
-      "type": "integer"
-    },
     "game_id": {
       "minLength": 1,
       "type": "string"
@@ -151,8 +147,7 @@
     "unit_display_by_id",
     "model_display_by_id",
     "pending_decision",
-    "pending_proposal",
-    "event_count"
+    "pending_proposal"
   ],
   "title": "CORE V2 GameViewPayload",
   "type": "object",

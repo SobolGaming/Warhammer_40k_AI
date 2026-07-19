@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 import base64
-import binascii
 import hashlib
 import hmac
-import json
 import secrets
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import EventRecordPayload, JsonValue, canonical_json
 
 CURSOR_TOKEN_VERSION = 1
+CURSOR_TOKEN_LENGTH = 43
 DEFAULT_EVENT_PAGE_LIMIT = 100
 MAX_EVENT_PAGE_LIMIT = 500
 DEFAULT_EVENT_RETENTION_LIMIT = 4096
@@ -89,6 +88,7 @@ class SessionCursor:
     principal_id: str
     cursor_scope: str
     offset: int
+    visible_sequence: int
     session_revision: int
     projection_state_hash: str
 
@@ -106,6 +106,8 @@ class SessionCursor:
         )
         if type(self.offset) is not int or self.offset < 0:
             raise SessionEventProtocolError("Cursor offset must be non-negative.")
+        if type(self.visible_sequence) is not int or self.visible_sequence < 0:
+            raise SessionEventProtocolError("Cursor visible sequence must be non-negative.")
         if type(self.session_revision) is not int or self.session_revision < 0:
             raise SessionEventProtocolError("Cursor revision must be non-negative.")
         object.__setattr__(
@@ -121,18 +123,29 @@ class SessionCursor:
             "p": self.principal_id,
             "c": self.cursor_scope,
             "o": self.offset,
+            "q": self.visible_sequence,
             "r": self.session_revision,
             "h": self.projection_state_hash,
         }
 
 
+def _new_cursor_registry() -> dict[str, SessionCursor]:
+    return {}
+
+
 @dataclass(frozen=True, slots=True)
 class SessionCursorCodec:
     secret: bytes = field(default_factory=_new_cursor_secret)
+    _cursor_by_token: dict[str, SessionCursor] = field(
+        default_factory=_new_cursor_registry,
+        init=False,
+        repr=False,
+        compare=False,
+    )
 
     def __post_init__(self) -> None:
         if type(self.secret) is not bytes or len(self.secret) < 16:
-            raise SessionEventProtocolError("Cursor signing secret must contain 16 bytes.")
+            raise SessionEventProtocolError("Cursor secret must contain 16 bytes.")
 
     def issue(
         self,
@@ -140,6 +153,7 @@ class SessionCursorCodec:
         session_id: str,
         viewer: ViewerContext,
         offset: int,
+        visible_sequence: int,
         session_revision: int,
         projection_state_hash: str,
     ) -> str:
@@ -150,59 +164,35 @@ class SessionCursorCodec:
             principal_id=viewer.principal_id,
             cursor_scope=viewer.cursor_scope,
             offset=offset,
+            visible_sequence=visible_sequence,
             session_revision=session_revision,
             projection_state_hash=projection_state_hash,
         )
-        encoded_payload = _urlsafe_encode(canonical_json(cursor.to_payload()).encode("utf-8"))
-        signature = hmac.new(self.secret, encoded_payload.encode("ascii"), hashlib.sha256).digest()
-        return f"{encoded_payload}.{_urlsafe_encode(signature)}"
-
-    def decode(self, token: str) -> SessionCursor:
-        if (
-            type(token) is not str
-            or not token.strip()
-            or len(token) > 2048
-            or token.count(".") != 1
-        ):
-            raise CursorValidationError(CursorResyncReason.MALFORMED)
-        encoded_payload, encoded_signature = token.strip().split(".")
-        expected_signature = hmac.new(
+        protected_state = canonical_json(cursor.to_payload()).encode("utf-8")
+        digest = hmac.new(
             self.secret,
-            encoded_payload.encode("ascii"),
+            b"core-v2-session-cursor\x00" + protected_state,
             hashlib.sha256,
         ).digest()
-        try:
-            supplied_signature = _urlsafe_decode(encoded_signature)
-        except (binascii.Error, ValueError) as exc:
-            raise CursorValidationError(CursorResyncReason.MALFORMED) from exc
-        if not hmac.compare_digest(expected_signature, supplied_signature):
+        token = _urlsafe_encode(digest)
+        existing = self._cursor_by_token.get(token)
+        if existing is not None and existing != cursor:
+            raise SessionEventProtocolError("Opaque cursor identifier collision detected.")
+        self._cursor_by_token[token] = cursor
+        return token
+
+    def decode(self, token: str) -> SessionCursor:
+        if type(token) is not str or token != token.strip():
             raise CursorValidationError(CursorResyncReason.MALFORMED)
-        try:
-            decoded = _urlsafe_decode(encoded_payload).decode("utf-8")
-        except (binascii.Error, UnicodeDecodeError, ValueError) as exc:
-            raise CursorValidationError(CursorResyncReason.MALFORMED) from exc
-        try:
-            decoded_payload: object = json.loads(decoded)
-        except json.JSONDecodeError as exc:
-            raise CursorValidationError(CursorResyncReason.MALFORMED) from exc
-        if not isinstance(decoded_payload, dict):
+        if len(token) != CURSOR_TOKEN_LENGTH or any(
+            character not in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
+            for character in token
+        ):
             raise CursorValidationError(CursorResyncReason.MALFORMED)
-        payload = cast(dict[str, object], decoded_payload)
-        if set(payload) != {"v", "s", "p", "c", "o", "r", "h"}:
+        cursor = self._cursor_by_token.get(token)
+        if cursor is None:
             raise CursorValidationError(CursorResyncReason.MALFORMED)
-        if payload["v"] != CURSOR_TOKEN_VERSION:
-            raise CursorValidationError(CursorResyncReason.MALFORMED)
-        try:
-            return SessionCursor(
-                session_id=cast(str, payload["s"]),
-                principal_id=cast(str, payload["p"]),
-                cursor_scope=cast(str, payload["c"]),
-                offset=cast(int, payload["o"]),
-                session_revision=cast(int, payload["r"]),
-                projection_state_hash=cast(str, payload["h"]),
-            )
-        except SessionEventProtocolError as exc:
-            raise CursorValidationError(CursorResyncReason.MALFORMED) from exc
+        return cursor
 
     def validate_binding(
         self,
@@ -258,11 +248,6 @@ def retention_floor(*, event_count: int, retention_limit: int) -> int:
 
 def _urlsafe_encode(value: bytes) -> str:
     return base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
-
-
-def _urlsafe_decode(value: str) -> bytes:
-    padding = "=" * (-len(value) % 4)
-    return base64.urlsafe_b64decode((value + padding).encode("ascii"))
 
 
 def _validate_sha256(value: object) -> str:

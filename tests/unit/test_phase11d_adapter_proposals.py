@@ -1306,13 +1306,7 @@ def test_viewer_scoped_event_cursor_redacts_opponent_secret_decision_payloads() 
     ]
     player_a_blob = json.dumps(player_a_delta, sort_keys=True)
 
-    assert secondary_event_payloads_for_player_b == [
-        {
-            "game_id": "phase11d-game",
-            "selected": True,
-            "hidden": True,
-        }
-    ]
+    assert secondary_event_payloads_for_player_b == []
     assert "fixed_mission_ids" not in player_a_events_for_player_b_blob
     assert "fixed_choice_count" not in player_a_events_for_player_b_blob
     assert "mode" not in player_a_events_for_player_b_blob

@@ -12,14 +12,16 @@ metadata: option labels and counts, decision types, source IDs, event details,
 status messages, support rows, record counts, and identifiers. A field is not
 safe merely because it is outside the main game projection.
 
-When a pending decision belongs to another player and is hidden, the viewer
+When a pending decision belongs to another player and is hidden, the projection
 receives the canonical hidden decision type, a stable redacted request ID, an
-empty option list, a redacted payload, and no actor ID. Hidden decision/event
-identifiers are constants rather than derived values. Event records retain the
-authoritative sequence position while their identifiers, type, actor, request,
-result, options, and payload are replaced by the shared hidden-event shape.
-Secret secondary information and similar source-backed state remain hidden
-until the engine records their reveal.
+empty option list, a redacted payload, and no actor ID. Hidden event records are
+omitted from that viewer's event page entirely. Public `sequence_number` values
+are contiguous within each viewer scope, and pagination scans hidden records
+while advancing only an opaque protected authoritative offset. A projection
+does not expose the authoritative event count, and hidden records do not create
+placeholder entries, sequence gaps, extra pages, or `has_more` changes. Secret
+secondary information and similar source-backed state remain hidden until the
+engine records their reveal.
 
 Errors must not echo an opponent's submitted body or hidden current request.
 Status payloads may include request/actor details only when the corresponding
@@ -42,10 +44,10 @@ Role policy is explicit:
 | coach | paired player's view | 0 | denied | principal + player | denied |
 | delayed spectator | public-only view | 1 revision | denied | principal + delay | denied |
 | administrator | omniscient view | 0 | lifecycle only; no actor impersonation | principal + administrator | allowed |
-| replay viewer | no live view | n/a | denied | none | allowed |
+| replay viewer | no live view | n/a | denied | none | terminal/closed only |
 
-A role or player-binding change changes cursor scope and invalidates previously
-issued cursors. Delayed spectators read a retained historical revision snapshot;
+A role, player binding, policy, or registry authorization-epoch change changes
+cursor scope and invalidates previously issued cursors. Delayed spectators read a retained historical revision snapshot;
 they do not receive current hidden state with fields merely omitted.
 
 `examples/projections/hidden_secondary_redaction_view.json` and the generated

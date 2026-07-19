@@ -8,6 +8,7 @@ from pathlib import Path
 from threading import Thread
 from typing import Protocol, cast
 from urllib.error import HTTPError
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 import pytest
@@ -28,6 +29,7 @@ from warhammer40k_core.adapters.access_control import (
     DEV_PLAYER_B_TOKEN,
     bearer_authorization,
 )
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.external_contract import (
     CREATE_SESSION_SCHEMA_VERSION,
     EXTERNAL_CONTRACT_VERSION,
@@ -1230,6 +1232,34 @@ def test_phase18e_local_dev_http_server_serves_json_and_rejects_bad_bodies() -> 
         )
         assert bad_utf8.code == 400
         assert _http_error_code(bad_utf8) == "malformed_json_body"
+
+        formal = _http_json(
+            "POST",
+            f"{base_url}/sessions",
+            body=_session_create_body(game_id="phase18g-http-malformed-cursors"),
+        )
+        session_id = _field_string(formal, "session_id")
+        projection = _http_json(
+            "GET",
+            f"{base_url}/sessions/{session_id}/projection",
+        )
+        valid_cursor = _field_string(projection, "event_cursor")
+        malformed_cursors = (
+            "é.x",
+            "x" * 2049,
+            "!" * 43,
+            valid_cursor[:-1] + ("A" if valid_cursor[-1] != "A" else "B"),
+        )
+        for malformed_cursor in malformed_cursors:
+            delta = _http_json(
+                "GET",
+                f"{base_url}/sessions/{session_id}/events"
+                f"?cursor={quote(malformed_cursor, safe='')}&limit=1",
+            )
+            _schema_validator("event-delta.schema.json").validate(delta)
+            assert delta["resync_required"] is True
+            assert delta["resync_reason"] == "malformed"
+            assert delta["supplied_cursor"] == "invalid-cursor"
     finally:
         http_server.shutdown()
         thread.join(timeout=10.0)
@@ -1845,6 +1875,10 @@ def _test_cursor_token(
         session_id=session_id,
         viewer=viewer,
         offset=offset,
+        visible_sequence=snapshot.adapter_session.visible_event_count_for_context(
+            EventStreamCursor(offset),
+            viewer=viewer,
+        ),
         session_revision=snapshot.session_revision,
         projection_state_hash=view["projection_state_hash"],
     )

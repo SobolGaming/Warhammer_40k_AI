@@ -172,22 +172,74 @@ def public_event_record_payload(
     event_type: str,
     payload: JsonValue,
     viewer: ViewerContext,
-) -> EventRecordPayload:
+) -> EventRecordPayload | None:
+    if _event_record_hidden_from_context(
+        event_type=event_type,
+        payload=payload,
+        viewer=viewer,
+    ):
+        return None
     public_payload = _public_event_payload(
         event_type=event_type,
         payload=payload,
         viewer=viewer,
     )
-    public_type = "hidden_event" if _is_generic_hidden_event_payload(public_payload) else event_type
-    public_id = "hidden-event" if public_type == "hidden_event" else event_id
+    if _is_generic_hidden_event_payload(public_payload):
+        return None
     return cast(
         EventRecordPayload,
         {
-            "event_id": public_id,
-            "event_type": public_type,
+            "event_id": event_id,
+            "event_type": event_type,
             "payload": public_payload,
         },
     )
+
+
+def _event_record_hidden_from_context(
+    *,
+    event_type: str,
+    payload: JsonValue,
+    viewer: ViewerContext,
+) -> bool:
+    if event_type == "decision_requested":
+        request_payload = _json_object("decision_requested payload", payload)
+        return decision_request_payload_hidden_from_context(
+            request_payload=request_payload,
+            viewer=viewer,
+        )
+    if event_type == "decision_recorded":
+        record_payload = _json_object("decision_recorded payload", payload)
+        request_payload = _json_object(
+            "decision_recorded request payload",
+            record_payload["request"],
+        )
+        return decision_request_payload_hidden_from_context(
+            request_payload=request_payload,
+            viewer=viewer,
+        )
+    if event_type == "secondary_mission_choice_recorded":
+        event_payload = _json_object("secondary_mission_choice_recorded payload", payload)
+        return not (
+            viewer.policy.omniscient
+            or viewer.owns_player(_required_string(event_payload, key="player_id"))
+        )
+    if event_type in {
+        "tactical_secondary_missions_drawn",
+        "tactical_secondary_mission_discarded",
+        "tactical_secondary_missions_discarded",
+        "mission_action_started",
+    }:
+        event_payload = _json_object(f"{event_type} payload", payload)
+        hidden = event_payload.get("hidden")
+        if hidden is not None and type(hidden) is not bool:
+            raise GameLifecycleError("Hidden player event payload flag must be a bool.")
+        return bool(
+            hidden is True
+            and not viewer.policy.omniscient
+            and not viewer.owns_player(_required_string(event_payload, key="player_id"))
+        )
+    return False
 
 
 def _public_event_payload(

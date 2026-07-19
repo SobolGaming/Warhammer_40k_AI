@@ -301,7 +301,6 @@ class GameViewPayload(TypedDict):
     model_display_by_id: dict[str, ModelDisplayPayload]
     pending_decision: DecisionRequestViewPayload | None
     pending_proposal: JsonValue
-    event_count: int
 
 
 def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPayload:
@@ -514,7 +513,6 @@ def project_game_view(
         catalog=catalog,
         viewer=context,
     )
-    event_count = len(lifecycle.decision_controller.event_log.records)
     payload: GameViewPayload = {
         "projection_schema": PROJECTION_SCHEMA_VERSION,
         "projection_state_hash": "",
@@ -574,7 +572,6 @@ def project_game_view(
         "pending_proposal": None
         if pending_request is None
         else _proposal_view(pending_request, viewer=context),
-        "event_count": event_count,
     }
     payload["projection_state_hash"] = _projection_state_hash(payload)
     return payload
@@ -1015,7 +1012,6 @@ def _projection_state_hash(payload: GameViewPayload) -> str:
         "battlefield_state": payload["battlefield_state"],
         "unit_display_by_id": payload["unit_display_by_id"],
         "model_display_by_id": payload["model_display_by_id"],
-        "event_count": payload["event_count"],
     }
     encoded = canonical_json(hash_payload).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()

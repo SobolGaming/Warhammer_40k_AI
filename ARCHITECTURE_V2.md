@@ -140,7 +140,7 @@ bounded deterministic post-submission drain behind `AdapterGameSession`.
 expected-revision conflicts, principal-to-actor routing, idempotent outcome
 journaling, serialized concurrent submissions, copy-on-write pre-commit
 isolation, atomic authoritative replacement, and replay/projection/event
-regressions. **Phase 18G and Phase 18H are complete** for signed opaque
+regressions. **Phase 18G and Phase 18H are complete** for protected opaque
 role-bound cursors, deterministic paged event deltas, explicit full-projection
 resynchronization, server-owned authenticated principal/role bindings, delayed
 spectator snapshots, and shared differential hidden-information redaction.
@@ -5402,8 +5402,8 @@ Required behavior:
 - an explicit advance at an existing pending decision returns typed
   `advance_not_required` without changing revision, state, replay, events, or
   journal;
-- a principal that does not control the acting player receives
-  `actor_not_authorized` (403) without hidden request details;
+- every authenticated authorization failure uses the shared `access_denied`
+  (403) shape without hidden request or journal details;
 - a terminal session returns a typed terminal response;
 - a failure before commit leaves no partial authoritative mutation;
 - an accepted command atomically persists the idempotency result, authoritative
@@ -5419,7 +5419,8 @@ Required tests:
 - pre-record and recorded unsupported results retain their lifecycle
   classification, and an exact recorded retry returns the cached outcome;
 - duplicate commands before and after reconnect return byte-equivalent public
-  outcomes for the same principal/visibility context;
+  outcomes only for the same exact principal/role/player/policy/authorization-
+  epoch context;
 - stale revision, stale request, wrong actor, malformed envelope, illegal
   proposal, terminal session, and injected pre-commit failure preserve state;
 - replay from accepted commands reproduces the same decision/event/projection
@@ -5432,9 +5433,11 @@ command retry returns the journaled public result unchanged; all pre-commit
 errors leave the authoritative session unchanged; and a successful command
 publishes one coherent revision, replay, event, and projection checkpoint.
 
-This gate is met. The server serializes command handling, checks journaled
-outcomes before current-state preconditions, routes actor authority from an
-authenticated server-owned principal binding, and applies new work to an isolated
+This gate is met. The server serializes command handling, authorizes the current
+submission kind before consulting journaled outcomes, requires the complete
+current principal/role/player/policy/cursor/authorization-epoch context to match
+before returning cached data, routes actor authority from an authenticated
+server-owned principal binding, and applies new work to an isolated
 `AdapterGameSession` fork. It atomically replaces the authoritative in-memory
 session only for a committed result, together with the command journal entry.
 Focused real-session regressions cover racing valid submissions, reconnect
@@ -5449,15 +5452,19 @@ still owns durable persistence of the same atomic unit across process failure.
 Priority: P0 for network play.
 
 Status: Complete. Contract 2.0 publishes `event-delta-v2` and
-`session-projection-v1`; the reference server issues signed opaque cursors bound
-to session, authenticated principal, visibility scope, authoritative log
-offset, revision, and projection hash. It retains bounded revision snapshots
-for deterministic pagination and delayed-view projection replacement.
+`session-projection-v1`; the reference server issues HMAC-derived opaque
+identifiers for protected server-side cursor state bound to session,
+authenticated principal, authorization epoch, visibility scope, authoritative
+log offset, viewer sequence, revision, and projection hash. It retains bounded
+revision snapshots for deterministic pagination and delayed-view projection
+replacement.
 
-The current viewer-scoped integer cursor advances against the authoritative
-event-log length even when records are redacted. Phase 18G preserves and
-documents that security-sensitive invariant while adding production cursor,
-revision, compaction, and resynchronization semantics.
+The protected cursor offset advances against the authoritative event-log length
+even when records are hidden. Hidden records are omitted from the public page;
+public sequence numbers are contiguous per viewer and the projection exposes no
+raw authoritative event count. Phase 18G preserves authoritative internal
+advancement without exposing a readable offset, placeholder count, sequence
+gap, extra page, or `has_more` oracle.
 
 Required event-delta fields:
 
@@ -5467,7 +5474,7 @@ Required event-delta fields:
 - supplied and next cursor;
 - `has_more` and `resync_required`;
 - optional correlation `command_id`;
-- deterministic event sequence number;
+- deterministic viewer-scoped event sequence number;
 - optional operational/display timestamp that never determines simulation
   ordering.
 
@@ -5479,7 +5486,8 @@ Cursor contract:
 - retention and compaction windows are explicit;
 - an expired, ahead-of-log, wrong-session, or wrong-viewer cursor returns a
   typed resynchronization response without leaking hidden event counts or types;
-- pagination and `has_more` preserve deterministic sequence order;
+- pagination and `has_more` preserve deterministic viewer sequence order while
+  remaining independent of skipped hidden-record counts;
 - a role change invalidates or explicitly rebinds the cursor under a documented
   policy.
 
@@ -5499,7 +5507,7 @@ Required tests:
 
 - reconnect with current, expired, ahead, wrong-session, and wrong-viewer
   cursors;
-- hidden-event redaction with authoritative cursor advancement;
+- hidden-event omission with protected authoritative cursor advancement;
 - pagination followed by full resynchronization;
 - projection hash/revision mismatch recovery;
 - polling, SSE, and WebSocket implementations, when present, produce equivalent
@@ -5510,9 +5518,10 @@ Completion gate:
 This gate is met for the normative HTTP polling transport. Focused real-session
 regressions cover current, malformed, expired, ahead, wrong-session,
 wrong-principal, role-changed, revision-diverged, and hash-diverged cursors;
-authoritative sequence numbers across pagination; hidden-event redaction with
-unchanged cursor advancement; full projection replacement; and an eventless
-revision change. No SSE or WebSocket implementation is present, so there is no
+non-ASCII, overlong, invalid-base64, and unknown-token malformed cursors;
+viewer-scoped sequence numbers across pagination; hidden-event omission with
+protected authoritative cursor advancement; full projection replacement; and
+an eventless revision change. No SSE or WebSocket implementation is present, so there is no
 alternate delivery model to compare.
 
 ## Phase 18H: viewer identity, authorization, and hidden-information security
@@ -5568,12 +5577,13 @@ or transport metadata.
 This gate is met. Players can submit only for their bound player; coaches share
 that player's visibility but cannot mutate; delayed spectators receive the
 latest retained snapshot one revision behind and public-only redaction;
-administrators receive omniscient live/operator access but cannot impersonate a
-decision actor; replay viewers receive catalog/replay access without live
-projection access. Missing and invalid credentials share one 401 shape,
-authorization failures share one 403 shape, role changes invalidate existing
-cursors, and projection/event/status/error redaction delegates to the shared
-adapter module.
+administrators receive omniscient live/operator and active replay access but
+cannot impersonate a decision actor; replay viewers receive catalog access and
+raw replay only after the session is terminal or closed, without live projection
+access. Missing and invalid credentials share one 401 shape, every authenticated
+authorization failure shares one 403 shape, role/player/policy/authorization-
+epoch changes invalidate existing cursors and cached-command access, and
+projection/event/status/error redaction delegates to the shared adapter module.
 
 ## Phase 18I: UI interaction metadata and affordance contract
 

@@ -4,14 +4,14 @@
   "from_revision": 1,
   "game_id": "phase18d-contract-session",
   "has_more": false,
-  "next_cursor": "eyJjIjoicGxheWVyOnBsYXllci1iOjAiLCJoIjoiMWMzMTRhMzZkYjg1MDAwMGY2NGUyMjJkNmRlMmIxNDkwY2Y0ZTczZTA4OTY5ODM5YTRkZDU2ZjhjMjZmYjhiOSIsIm8iOjksInAiOiJwcmluY2lwYWwtcGxheWVyLWIiLCJyIjoxLCJzIjoic2Vzc2lvbi1waGFzZTE4ZC1jb250cmFjdC1zZXNzaW9uIiwidiI6MX0.is1bDT7FxCmHa9vLWDtsKyUQ0g7aWDkG0MojYwnRO0U",
-  "projection_state_hash": "1c314a36db850000f64e222d6de2b1490cf4e73e08969839a4dd56f8c26fb8b9",
+  "next_cursor": "QFiCU9bN5xpjIRIvimJmn-zpZnH4Ne96B-pAbEJto7c",
+  "projection_state_hash": "329e72e7927ee4ae39cc0ae7b0275565fae5713214d748e4635531f1d967767e",
   "resync_reason": null,
   "resync_required": false,
   "retention_limit": 4096,
   "schema_version": "event-delta-v2",
   "session_id": "session-phase18d-contract-session",
-  "supplied_cursor": "eyJjIjoicGxheWVyOnBsYXllci1iOjAiLCJoIjoiMWMzMTRhMzZkYjg1MDAwMGY2NGUyMjJkNmRlMmIxNDkwY2Y0ZTczZTA4OTY5ODM5YTRkZDU2ZjhjMjZmYjhiOSIsIm8iOjksInAiOiJwcmluY2lwYWwtcGxheWVyLWIiLCJyIjoxLCJzIjoic2Vzc2lvbi1waGFzZTE4ZC1jb250cmFjdC1zZXNzaW9uIiwidiI6MX0.is1bDT7FxCmHa9vLWDtsKyUQ0g7aWDkG0MojYwnRO0U",
+  "supplied_cursor": "QFiCU9bN5xpjIRIvimJmn-zpZnH4Ne96B-pAbEJto7c",
   "to_revision": 1,
   "visibility_role": "player"
 }
