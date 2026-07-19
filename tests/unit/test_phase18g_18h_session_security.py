@@ -27,6 +27,8 @@ from warhammer40k_core.adapters.external_contract import (
 from warhammer40k_core.adapters.redaction import HIDDEN_REQUEST_ID
 from warhammer40k_core.adapters.server import AdapterGameServer
 from warhammer40k_core.adapters.server_types import ServerResponse
+from warhammer40k_core.adapters.session_events import CURSOR_TOKEN_LENGTH
+from warhammer40k_core.adapters.session_protocol import DEFAULT_REVISION_RETENTION_LIMIT
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.engine.event_log import JsonValue
 
@@ -131,6 +133,8 @@ def test_phase18g_returns_typed_non_leaking_resync_for_invalid_cursor_classes() 
         visible_sequence=decoded.visible_sequence,
         session_revision=decoded.session_revision,
         projection_state_hash=decoded.projection_state_hash,
+        minimum_offset=0,
+        minimum_revision=0,
     )
     hash_mismatch_cursor = server.cursor_codec.issue(
         session_id=first_session,
@@ -139,6 +143,8 @@ def test_phase18g_returns_typed_non_leaking_resync_for_invalid_cursor_classes() 
         visible_sequence=decoded.visible_sequence,
         session_revision=decoded.session_revision,
         projection_state_hash="0" * 64,
+        minimum_offset=0,
+        minimum_revision=0,
     )
 
     cases = (
@@ -165,7 +171,7 @@ def test_phase18g_returns_typed_non_leaking_resync_for_invalid_cursor_classes() 
     malformed_cases = (
         "é.x",
         "x" * 2049,
-        "!" * 43,
+        "!" * CURSOR_TOKEN_LENGTH,
         current_cursor[:-1] + ("A" if current_cursor[-1] != "A" else "B"),
     )
     for malformed_cursor in malformed_cases:
@@ -207,6 +213,10 @@ def test_phase18g_returns_typed_non_leaking_resync_for_invalid_cursor_classes() 
 def test_phase18g_eventless_revision_change_requires_full_projection_resync() -> None:
     server = AdapterGameServer()
     session_id = _create_session(server, game_id="phase18g-eventless-revision")
+    historical_cursor = _string(
+        _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN),
+        "event_cursor",
+    )
     _submit_lifecycle_command(
         server,
         session_id=session_id,
@@ -215,6 +225,7 @@ def test_phase18g_eventless_revision_change_requires_full_projection_resync() ->
         submission_kind="start_session",
     )
     before_close = _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
+    registered_before_close = server.cursor_codec.registered_cursor_count(session_id=session_id)
     _submit_lifecycle_command(
         server,
         session_id=session_id,
@@ -222,6 +233,7 @@ def test_phase18g_eventless_revision_change_requires_full_projection_resync() ->
         expected_revision=1,
         submission_kind="close_session",
     )
+    registered_after_close = server.cursor_codec.registered_cursor_count(session_id=session_id)
 
     delta = _events(
         server,
@@ -233,6 +245,73 @@ def test_phase18g_eventless_revision_change_requires_full_projection_resync() ->
     assert delta["resync_reason"] == "revision_mismatch"
     assert _integer(delta, "from_revision") == 2
     assert _integer(delta, "to_revision") == 2
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    assert record.cursor_registry_finalized is True
+    assert registered_before_close > 1
+    assert registered_after_close < registered_before_close
+    historical = _events(
+        server,
+        session_id=session_id,
+        token=DEV_PLAYER_A_TOKEN,
+        cursor=historical_cursor,
+    )
+    assert historical["resync_required"] is True
+    assert historical["resync_reason"] == "expired"
+    final_player_cursor = _string(
+        _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN),
+        "event_cursor",
+    )
+    assert final_player_cursor == delta["next_cursor"]
+    assert server.cursor_codec.registered_cursor_count(session_id=session_id) == 4
+
+
+def test_phase18g_publishes_revision_retention_and_bounds_cursor_state() -> None:
+    server = AdapterGameServer()
+    session_id = _create_session(server, game_id="phase18g-revision-retention")
+    initial_projection = _projection(
+        server,
+        session_id=session_id,
+        token=DEV_PLAYER_A_TOKEN,
+    )
+    initial_cursor = _string(initial_projection, "event_cursor")
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    initial_event_count = record.adapter_session.event_record_count()
+
+    for _ in range(DEFAULT_REVISION_RETENTION_LIMIT + 1):
+        record.commit_status(record.lifecycle_status, timestamp=record.last_activity_at)
+        _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
+
+    assert record.session_revision == DEFAULT_REVISION_RETENTION_LIMIT + 1
+    assert record.adapter_session.event_record_count() == initial_event_count
+    assert initial_event_count < server.event_retention_limit
+    assert record.minimum_retained_revision == 2
+    assert len(record.revision_snapshots) == DEFAULT_REVISION_RETENTION_LIMIT
+    assert (
+        server.cursor_codec.registered_cursor_count(session_id=session_id)
+        == DEFAULT_REVISION_RETENTION_LIMIT
+    )
+
+    current_projection = _projection(
+        server,
+        session_id=session_id,
+        token=DEV_PLAYER_A_TOKEN,
+    )
+    assert current_projection["retention_limit"] == server.event_retention_limit
+    assert current_projection["revision_retention_limit"] == DEFAULT_REVISION_RETENTION_LIMIT
+    expired = _events(
+        server,
+        session_id=session_id,
+        token=DEV_PLAYER_A_TOKEN,
+        cursor=initial_cursor,
+    )
+    assert expired["resync_required"] is True
+    assert expired["resync_reason"] == "expired"
+    assert expired["retention_limit"] == server.event_retention_limit
+    assert expired["revision_retention_limit"] == DEFAULT_REVISION_RETENTION_LIMIT
+    assert (
+        server.cursor_codec.registered_cursor_count(session_id=session_id)
+        == DEFAULT_REVISION_RETENTION_LIMIT
+    )
 
 
 def test_phase18h_derives_live_visibility_and_delay_from_server_owned_roles() -> None:
@@ -547,7 +626,7 @@ def test_phase18h_event_redaction_hides_secret_counts_and_uses_viewer_sequences(
     opaque_cursor = _string(player_b_projection, "event_cursor")
     assert "." not in opaque_cursor
     assert session_id not in opaque_cursor
-    decoded_token = base64.urlsafe_b64decode(opaque_cursor + "=")
+    decoded_token = base64.urlsafe_b64decode(opaque_cursor)
     try:
         decoded_text = decoded_token.decode("utf-8")
     except UnicodeDecodeError:

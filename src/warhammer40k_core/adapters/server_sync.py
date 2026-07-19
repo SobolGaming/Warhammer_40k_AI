@@ -28,6 +28,7 @@ from warhammer40k_core.adapters.session_protocol import (
     SessionMetadataPayload,
     SessionProtocolError,
     SessionRevisionSnapshot,
+    SessionState,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
@@ -41,15 +42,18 @@ def session_projection_payload(
     cursor_codec: SessionCursorCodec,
     retention_limit: int,
 ) -> SessionProjectionPayload:
+    retained = _validated_record_retention(record=record, retention_limit=retention_limit)
     snapshot = record.snapshot_for_viewer(viewer)
     view = snapshot.adapter_session.view_for_context(viewer=viewer)
     projection_hash = view["projection_state_hash"]
-    cursor = cursor_codec.issue(
-        session_id=record.session_id,
+    cursor = _issue_cursor(
+        record=record,
         viewer=viewer,
+        cursor_codec=cursor_codec,
+        cursor_snapshot=snapshot,
+        retention_target=snapshot,
         offset=snapshot.event_count,
         visible_sequence=_visible_event_count(snapshot, viewer=viewer),
-        session_revision=snapshot.session_revision,
         projection_state_hash=projection_hash,
     )
     payload: SessionProjectionPayload = {
@@ -60,7 +64,8 @@ def session_projection_payload(
         "visibility_role": viewer.role.value,
         "projection_state_hash": projection_hash,
         "event_cursor": cursor,
-        "retention_limit": validate_retention_limit(retention_limit),
+        "retention_limit": retained,
+        "revision_retention_limit": record.revision_retention_limit,
         "projection": validate_json_value(cast(JsonValue, view)),
     }
     validate_json_value(cast(JsonValue, payload))
@@ -81,12 +86,14 @@ def session_checkpoint(
         "viewer_player_id": viewer.viewer_player_id,
         "session_revision": snapshot.session_revision,
         "projection_state_hash": projection_hash,
-        "event_cursor": cursor_codec.issue(
-            session_id=record.session_id,
+        "event_cursor": _issue_cursor(
+            record=record,
             viewer=viewer,
+            cursor_codec=cursor_codec,
+            cursor_snapshot=snapshot,
+            retention_target=snapshot,
             offset=snapshot.event_count,
             visible_sequence=_visible_event_count(snapshot, viewer=viewer),
-            session_revision=snapshot.session_revision,
             projection_state_hash=projection_hash,
         ),
     }
@@ -122,7 +129,7 @@ def session_event_delta_payload(
     retention_limit: int,
 ) -> SessionEventDeltaPayload:
     limit = validate_page_limit(page_limit)
-    retained = validate_retention_limit(retention_limit)
+    retained = _validated_record_retention(record=record, retention_limit=retention_limit)
     target = record.snapshot_for_viewer(viewer)
     target_view = target.adapter_session.view_for_context(viewer=viewer)
     target_hash = target_view["projection_state_hash"]
@@ -183,12 +190,14 @@ def session_event_delta_payload(
     )
     boundary_view = boundary.adapter_session.view_for_context(viewer=viewer)
     boundary_hash = boundary_view["projection_state_hash"]
-    next_cursor = cursor_codec.issue(
-        session_id=record.session_id,
+    next_cursor = _issue_cursor(
+        record=record,
         viewer=viewer,
+        cursor_codec=cursor_codec,
+        cursor_snapshot=boundary,
+        retention_target=target,
         offset=next_offset,
         visible_sequence=cursor.visible_sequence + len(page_records),
-        session_revision=boundary.session_revision,
         projection_state_hash=boundary_hash,
     )
     payload: SessionEventDeltaPayload = {
@@ -206,6 +215,7 @@ def session_event_delta_payload(
         "resync_reason": None,
         "command_id": None,
         "retention_limit": retained,
+        "revision_retention_limit": record.revision_retention_limit,
         "events": sequenced_events(
             page_records,
             first_sequence_number=cursor.visible_sequence + 1,
@@ -228,6 +238,8 @@ def _validate_cursor_position(
         retention_limit=retention_limit,
     )
     if cursor.offset < floor:
+        raise CursorValidationError(CursorResyncReason.EXPIRED)
+    if cursor.session_revision < record.minimum_retained_revision:
         raise CursorValidationError(CursorResyncReason.EXPIRED)
     if cursor.offset > target.event_count or cursor.session_revision > target.session_revision:
         raise CursorValidationError(CursorResyncReason.AHEAD)
@@ -257,12 +269,14 @@ def _resync_payload(
     cursor_codec: SessionCursorCodec,
     retention_limit: int,
 ) -> SessionEventDeltaPayload:
-    next_cursor = cursor_codec.issue(
-        session_id=record.session_id,
+    next_cursor = _issue_cursor(
+        record=record,
         viewer=viewer,
+        cursor_codec=cursor_codec,
+        cursor_snapshot=target,
+        retention_target=target,
         offset=target.event_count,
         visible_sequence=_visible_event_count(target, viewer=viewer),
-        session_revision=target.session_revision,
         projection_state_hash=target_hash,
     )
     payload: SessionEventDeltaPayload = {
@@ -282,6 +296,7 @@ def _resync_payload(
         "resync_reason": reason.value,
         "command_id": None,
         "retention_limit": retention_limit,
+        "revision_retention_limit": record.revision_retention_limit,
         "events": [],
     }
     validate_json_value(cast(JsonValue, payload))
@@ -297,6 +312,48 @@ def _visible_event_count(
         EventStreamCursor(snapshot.event_count),
         viewer=viewer,
     )
+
+
+def _issue_cursor(
+    *,
+    record: AuthoritativeSession,
+    viewer: ViewerContext,
+    cursor_codec: SessionCursorCodec,
+    cursor_snapshot: SessionRevisionSnapshot,
+    retention_target: SessionRevisionSnapshot,
+    offset: int,
+    visible_sequence: int,
+    projection_state_hash: str,
+) -> str:
+    if record.state in {SessionState.TERMINAL, SessionState.CLOSED} and not (
+        record.cursor_registry_finalized
+    ):
+        cursor_codec.finalize_session(record.session_id)
+        record.cursor_registry_finalized = True
+    return cursor_codec.issue(
+        session_id=record.session_id,
+        viewer=viewer,
+        offset=offset,
+        visible_sequence=visible_sequence,
+        session_revision=cursor_snapshot.session_revision,
+        projection_state_hash=projection_state_hash,
+        minimum_offset=retention_floor(
+            event_count=retention_target.event_count,
+            retention_limit=record.event_retention_limit,
+        ),
+        minimum_revision=record.minimum_retained_revision,
+    )
+
+
+def _validated_record_retention(
+    *,
+    record: AuthoritativeSession,
+    retention_limit: int,
+) -> int:
+    retained = validate_retention_limit(retention_limit)
+    if retained != record.event_retention_limit:
+        raise SessionEventProtocolError("Session event retention policy drifted.")
+    return retained
 
 
 def initial_cursor_for_viewer(

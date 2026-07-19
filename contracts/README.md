@@ -30,7 +30,8 @@ post-submission drain result. The normative Phase 18F command route adds an
 idempotency key and expected revision to every mutation while deriving actor
 authority from a server-owned authenticated principal binding outside the
 command body. Phase 18G adds protected opaque event cursors, deterministic
-pagination/retention, typed resync responses, and full replacement projections.
+pagination, separately published event/revision retention windows, bounded
+cursor-state eviction, typed resync responses, and full replacement projections.
 Phase 18H defines explicit player, coach, delayed-spectator, administrator, and
 replay-viewer policies with centralized redaction.
 Its parameterized command member references the same canonical 19-kind proposal

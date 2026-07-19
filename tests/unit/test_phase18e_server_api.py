@@ -1881,6 +1881,8 @@ def _test_cursor_token(
         ),
         session_revision=snapshot.session_revision,
         projection_state_hash=view["projection_state_hash"],
+        minimum_offset=0,
+        minimum_revision=0,
     )
 
 

@@ -8,6 +8,7 @@
     "projection": {"$ref": "https://warhammer40k-core.local/contracts/v2/game-view.schema.json"},
     "projection_state_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "retention_limit": {"minimum": 1, "type": "integer"},
+    "revision_retention_limit": {"minimum": 1, "type": "integer"},
     "schema_version": {"const": "session-projection-v1", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "session_revision": {"minimum": 0, "type": "integer"},
@@ -25,6 +26,7 @@
     "projection_state_hash",
     "event_cursor",
     "retention_limit",
+    "revision_retention_limit",
     "projection"
   ],
   "title": "CORE V2 SessionProjectionPayload",

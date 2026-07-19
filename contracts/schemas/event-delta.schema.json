@@ -24,6 +24,7 @@
     },
     "resync_required": {"type": "boolean"},
     "retention_limit": {"minimum": 1, "type": "integer"},
+    "revision_retention_limit": {"minimum": 1, "type": "integer"},
     "schema_version": {"const": "event-delta-v2", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "supplied_cursor": {"maxLength": 2048, "minLength": 1, "type": "string"},
@@ -48,6 +49,7 @@
     "resync_reason",
     "command_id",
     "retention_limit",
+    "revision_retention_limit",
     "events"
   ],
   "title": "CORE V2 Role-Bound SessionEventDeltaPayload",

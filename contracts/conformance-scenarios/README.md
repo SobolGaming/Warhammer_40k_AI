@@ -28,6 +28,9 @@ schemas and the ordinary `AdapterGameSession` path.
 7. Consume events from the opaque cursor issued with a role-scoped projection,
    preserve `sequence_number` order, follow `next_cursor` while `has_more`, and
    replace client state from a full projection when `resync_required` is true.
+   Treat `retention_limit` as the event-record window and
+   `revision_retention_limit` as the revision-snapshot window; a cursor is valid
+   only inside both.
    Treat sequence numbers as viewer-scoped, and reject projections/deltas that
    expose authoritative event counts, readable cursor state, hidden placeholders,
    or sequence gaps caused by hidden records.

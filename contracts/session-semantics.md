@@ -50,12 +50,16 @@ parameterized route accept the same 19 proposal kinds.
 - A client begins with the cursor from metadata or a full projection, applies
   events by deterministic `sequence_number`, and advances to `next_cursor`.
   `has_more` requires another page from that cursor.
-- The default page size is 100, the maximum is 500, and the reference retention
-  window is 4096 authoritative records. Pagination scans the authoritative log,
-  omits hidden records, and exposes only contiguous viewer-scoped sequence
-  numbers. The protected offset still advances across hidden records, but no
-  raw count, sequence gap, placeholder record, extra page, or `has_more` value
-  reveals how many were skipped.
+- The default page size is 100 and the maximum is 500. `retention_limit` is the
+  authoritative-event window and defaults to 4096 records;
+  `revision_retention_limit` is the session-wide revision-snapshot window and
+  defaults to 128 revisions. A cursor remains valid only while both its
+  protected offset and its revision are retained. Delayed viewers use the same
+  session-wide snapshot floor, applied to their delayed target projection.
+  Pagination scans the authoritative log, omits hidden records, and exposes
+  only contiguous viewer-scoped sequence numbers. The protected offset still
+  advances across hidden records, but no raw count, sequence gap, placeholder
+  record, extra page, or `has_more` value reveals how many were skipped.
 - Malformed, expired, ahead, wrong-session, wrong-principal/role, revision-
   divergent, or projection-hash-divergent cursors return a successful typed
   delta with `resync_required: true`, no events, and a stable `resync_reason`.
@@ -63,10 +67,16 @@ parameterized route accept the same 19 proposal kinds.
   from that projection's cursor.
 - The reference in-memory server generates a cryptographically random cursor
   key per server instance and retains the protected token-to-state map in
-  memory. If session state is restored without that key and protected map,
-  outstanding cursors are classified as malformed and use the same typed full-
-  projection resynchronization path. Phase 18L owns durable protected state/key
-  storage when sessions and cursors must survive process recovery.
+  memory. Each token carries a server-verifiable authentication tag, so a
+  tampered or foreign token is malformed while an authentic token whose state
+  was evicted is expired. Issuance evicts states below the session-wide revision
+  floor and below the issuing viewer scope's event floor; an authorization-
+  scope change evicts that principal's former scope. A terminal or closed
+  transition compacts each principal/scope to its newest pre-terminal checkpoint
+  before issuing final checkpoints. That preserves terminal-boundary resume
+  while discarding historical cursor states; final cursors remain valid as long
+  as the completed session remains addressable. Phase 18L owns durable protected
+  state/key storage when sessions and cursors must survive process recovery.
 - Only the current pending request may be answered. `request_id`, `actor_id`,
   `result_id`, option ID, proposal request context, and schema version are
   validated before engine mutation.

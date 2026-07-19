@@ -5457,7 +5457,11 @@ identifiers for protected server-side cursor state bound to session,
 authenticated principal, authorization epoch, visibility scope, authoritative
 log offset, viewer sequence, revision, and projection hash. It retains bounded
 revision snapshots for deterministic pagination and delayed-view projection
-replacement.
+replacement. Contract payloads publish the 4096-record event window separately
+from the 128-revision snapshot window; cursor validity is their intersection.
+The protected cursor registry evicts expired state at those floors and purges
+historical pre-terminal entries at the terminal/closed lifecycle boundary while
+preserving each viewer scope's newest boundary checkpoint.
 
 The protected cursor offset advances against the authoritative event-log length
 even when records are hidden. Hidden records are omitted from the public page;
@@ -5483,7 +5487,8 @@ Cursor contract:
 - cursors are bound to a session and viewer visibility role, not freely reusable
   between players or roles;
 - the cursor position is an authoritative-log offset, not a visible-event count;
-- retention and compaction windows are explicit;
+- event-record and revision-snapshot retention windows are separately explicit,
+  and cursor validity requires both;
 - an expired, ahead-of-log, wrong-session, or wrong-viewer cursor returns a
   typed resynchronization response without leaking hidden event counts or types;
 - pagination and `has_more` preserve deterministic viewer sequence order while
@@ -5521,7 +5526,9 @@ wrong-principal, role-changed, revision-diverged, and hash-diverged cursors;
 non-ASCII, overlong, invalid-base64, and unknown-token malformed cursors;
 viewer-scoped sequence numbers across pagination; hidden-event omission with
 protected authoritative cursor advancement; full projection replacement; and
-an eventless revision change. No SSE or WebSocket implementation is present, so there is no
+an eventless revision change; revision-window expiry beyond 128 committed
+revisions while fewer than 4096 events exist; and bounded cursor-state eviction
+at retention and terminal boundaries. No SSE or WebSocket implementation is present, so there is no
 alternate delivery model to compare.
 
 ## Phase 18H: viewer identity, authorization, and hidden-information security

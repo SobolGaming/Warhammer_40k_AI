@@ -1,7 +1,7 @@
 {
   "accepted": true,
   "checkpoint": {
-    "event_cursor": "E9i6imRQYjzbMUFCyeOhhyLpz5ml-wC4kCE-0kJoPpE",
+    "event_cursor": "FzsKTpWdrkeCRSiy2ZlJa3_nLnzKzFzylRwZcEUoitlJtaCld0Lhm6-bPnfHfssf",
     "projection_state_hash": "fee58c15207c7204973b73d007a111990efc36583f221bcf42dac63aa73e5956",
     "session_revision": 1,
     "viewer_player_id": null,
@@ -10,8 +10,8 @@
   "command_id": "phase18g-contract-start-000001",
   "committed": true,
   "event_range": {
-    "from_cursor": "tN2QKUz60uWGK5AxZ9aUKYZLAQGdAQ6ZkAf0YkuU_yk",
-    "to_cursor": "E9i6imRQYjzbMUFCyeOhhyLpz5ml-wC4kCE-0kJoPpE"
+    "from_cursor": "8Q51wekuqzypwN0VmICFPoLygkMEEVD5_66B1lOqX5AmI43LKJ_4yo71p9gtegz1",
+    "to_cursor": "FzsKTpWdrkeCRSiy2ZlJa3_nLnzKzFzylRwZcEUoitlJtaCld0Lhm6-bPnfHfssf"
   },
   "operation": "start_session",
   "outcome_code": "command_committed",
@@ -21,7 +21,7 @@
     "created_at": "2026-07-18T20:00:00Z",
     "engine_build_id": "warhammer40k-core-v2:0.1.0",
     "engine_version": "0.1.0",
-    "event_cursor": "E9i6imRQYjzbMUFCyeOhhyLpz5ml-wC4kCE-0kJoPpE",
+    "event_cursor": "FzsKTpWdrkeCRSiy2ZlJa3_nLnzKzFzylRwZcEUoitlJtaCld0Lhm6-bPnfHfssf",
     "game_id": "phase18e-contract-session",
     "last_activity_at": "2026-07-18T20:00:00Z",
     "lifecycle_status": {

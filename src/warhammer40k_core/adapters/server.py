@@ -757,6 +757,7 @@ class AdapterGameServer:
             config=config,
             lifecycle_status=status,
             created_at=self._timestamp(),
+            event_retention_limit=self.event_retention_limit,
         )
         self._sessions[session_id] = record
         self._session_id_by_game_id[config.game_id] = session_id

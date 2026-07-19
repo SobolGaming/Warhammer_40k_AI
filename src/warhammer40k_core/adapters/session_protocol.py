@@ -19,13 +19,14 @@ from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_RESULT_SCHEMA_VERSION,
     SESSION_METADATA_SCHEMA_VERSION,
 )
+from warhammer40k_core.adapters.session_events import DEFAULT_EVENT_RETENTION_LIMIT
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.phase import LifecycleStatus, LifecycleStatusKind
 
 ENGINE_BUILD_ID = f"warhammer40k-core-v2:{ENGINE_VERSION}"
-MAX_REVISION_SNAPSHOTS = 128
+DEFAULT_REVISION_RETENTION_LIMIT = 128
 
 type OperationalClock = Callable[[], datetime]
 
@@ -163,9 +164,12 @@ class AuthoritativeSession:
     lifecycle_status: LifecycleStatus
     created_at: str
     last_activity_at: str
+    event_retention_limit: int = DEFAULT_EVENT_RETENTION_LIMIT
+    revision_retention_limit: int = DEFAULT_REVISION_RETENTION_LIMIT
     session_revision: int = 0
     started: bool = False
     closed: bool = False
+    cursor_registry_finalized: bool = False
     command_journal: dict[str, SessionCommandJournalEntry] = field(
         default_factory=_new_command_journal
     )
@@ -194,6 +198,16 @@ class AuthoritativeSession:
             raise SessionProtocolError("Session revision must be non-negative.")
         if type(self.started) is not bool or type(self.closed) is not bool:
             raise SessionProtocolError("Session state flags must be bool values.")
+        self.event_retention_limit = _validated_retention_limit(
+            "event_retention_limit",
+            self.event_retention_limit,
+        )
+        self.revision_retention_limit = _validated_retention_limit(
+            "revision_retention_limit",
+            self.revision_retention_limit,
+        )
+        if type(self.cursor_registry_finalized) is not bool:
+            raise SessionProtocolError("Cursor registry finalization flag must be bool.")
         self._validate_journal()
         self._validate_snapshots()
 
@@ -206,6 +220,7 @@ class AuthoritativeSession:
         config: GameConfig,
         lifecycle_status: LifecycleStatus,
         created_at: str,
+        event_retention_limit: int = DEFAULT_EVENT_RETENTION_LIMIT,
     ) -> AuthoritativeSession:
         if type(config) is not GameConfig:
             raise SessionProtocolError("Session creation requires GameConfig.")
@@ -226,6 +241,7 @@ class AuthoritativeSession:
             lifecycle_status=lifecycle_status,
             created_at=created_at,
             last_activity_at=created_at,
+            event_retention_limit=event_retention_limit,
         )
         record.capture_current_revision()
         return record
@@ -326,6 +342,10 @@ class AuthoritativeSession:
             raise SessionProtocolError("Event offset predates retained revision snapshots.")
         return max(candidates, key=lambda snapshot: snapshot.session_revision)
 
+    @property
+    def minimum_retained_revision(self) -> int:
+        return max(0, self.session_revision - self.revision_retention_limit + 1)
+
     def metadata_payload(
         self,
         *,
@@ -382,9 +402,9 @@ class AuthoritativeSession:
         return None
 
     def _prune_snapshots(self) -> None:
-        if len(self.revision_snapshots) <= MAX_REVISION_SNAPSHOTS:
+        if len(self.revision_snapshots) <= self.revision_retention_limit:
             return
-        retained_revisions = sorted(self.revision_snapshots)[-MAX_REVISION_SNAPSHOTS:]
+        retained_revisions = sorted(self.revision_snapshots)[-self.revision_retention_limit :]
         self.revision_snapshots = {
             revision: self.revision_snapshots[revision] for revision in retained_revisions
         }
@@ -418,6 +438,12 @@ def operational_timestamp(clock: OperationalClock) -> str:
     if type(value) is not datetime or value.tzinfo is None or value.utcoffset() is None:
         raise SessionProtocolError("Operational clock must return an aware datetime.")
     return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
+
+def _validated_retention_limit(name: str, value: object) -> int:
+    if type(value) is not int or value < 1:
+        raise SessionProtocolError(f"Session {name} must be positive.")
+    return value
 
 
 def session_command_result_payload(

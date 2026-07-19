@@ -1061,6 +1061,10 @@
           "minimum": 1,
           "type": "integer"
         },
+        "revision_retention_limit": {
+          "minimum": 1,
+          "type": "integer"
+        },
         "schema_version": {
           "const": "event-delta-v2",
           "type": "string"
@@ -1103,6 +1107,7 @@
         "resync_reason",
         "command_id",
         "retention_limit",
+        "revision_retention_limit",
         "events"
       ],
       "title": "CORE V2 Role-Bound SessionEventDeltaPayload",
@@ -3786,6 +3791,10 @@
           "minimum": 1,
           "type": "integer"
         },
+        "revision_retention_limit": {
+          "minimum": 1,
+          "type": "integer"
+        },
         "schema_version": {
           "const": "session-projection-v1",
           "type": "string"
@@ -3817,6 +3826,7 @@
         "projection_state_hash",
         "event_cursor",
         "retention_limit",
+        "revision_retention_limit",
         "projection"
       ],
       "title": "CORE V2 SessionProjectionPayload",

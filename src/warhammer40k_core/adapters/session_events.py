@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
 import hmac
 import secrets
@@ -13,7 +14,9 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import EventRecordPayload, JsonValue, canonical_json
 
 CURSOR_TOKEN_VERSION = 1
-CURSOR_TOKEN_LENGTH = 43
+CURSOR_IDENTIFIER_BYTES = 32
+CURSOR_AUTHENTICATION_TAG_BYTES = 16
+CURSOR_TOKEN_LENGTH = 64
 DEFAULT_EVENT_PAGE_LIMIT = 100
 MAX_EVENT_PAGE_LIMIT = 500
 DEFAULT_EVENT_RETENTION_LIMIT = 4096
@@ -67,6 +70,7 @@ class SessionEventDeltaPayload(TypedDict):
     resync_reason: str | None
     command_id: str | None
     retention_limit: int
+    revision_retention_limit: int
     events: list[SequencedEventPayload]
 
 
@@ -79,6 +83,7 @@ class SessionProjectionPayload(TypedDict):
     projection_state_hash: str
     event_cursor: str
     retention_limit: int
+    revision_retention_limit: int
     projection: JsonValue
 
 
@@ -156,6 +161,8 @@ class SessionCursorCodec:
         visible_sequence: int,
         session_revision: int,
         projection_state_hash: str,
+        minimum_offset: int,
+        minimum_revision: int,
     ) -> str:
         if type(viewer) is not ViewerContext:
             raise SessionEventProtocolError("Cursor issue requires ViewerContext.")
@@ -168,13 +175,27 @@ class SessionCursorCodec:
             session_revision=session_revision,
             projection_state_hash=projection_state_hash,
         )
+        event_floor = _validate_floor("minimum_offset", minimum_offset)
+        revision_floor = _validate_floor("minimum_revision", minimum_revision)
+        if cursor.offset < event_floor or cursor.session_revision < revision_floor:
+            raise SessionEventProtocolError("Cannot issue an already-expired event cursor.")
+        self._prune_expired(
+            cursor=cursor,
+            minimum_offset=event_floor,
+            minimum_revision=revision_floor,
+        )
         protected_state = canonical_json(cursor.to_payload()).encode("utf-8")
-        digest = hmac.new(
+        identifier = hmac.new(
             self.secret,
-            b"core-v2-session-cursor\x00" + protected_state,
+            b"core-v2-session-cursor-state\x00" + protected_state,
             hashlib.sha256,
         ).digest()
-        token = _urlsafe_encode(digest)
+        authentication_tag = hmac.new(
+            self.secret,
+            b"core-v2-session-cursor-auth\x00" + identifier,
+            hashlib.sha256,
+        ).digest()[:CURSOR_AUTHENTICATION_TAG_BYTES]
+        token = _urlsafe_encode(identifier + authentication_tag)
         existing = self._cursor_by_token.get(token)
         if existing is not None and existing != cursor:
             raise SessionEventProtocolError("Opaque cursor identifier collision detected.")
@@ -189,10 +210,47 @@ class SessionCursorCodec:
             for character in token
         ):
             raise CursorValidationError(CursorResyncReason.MALFORMED)
+        protected_identifier = _urlsafe_decode(token)
+        identifier = protected_identifier[:CURSOR_IDENTIFIER_BYTES]
+        authentication_tag = protected_identifier[CURSOR_IDENTIFIER_BYTES:]
+        expected_tag = hmac.new(
+            self.secret,
+            b"core-v2-session-cursor-auth\x00" + identifier,
+            hashlib.sha256,
+        ).digest()[:CURSOR_AUTHENTICATION_TAG_BYTES]
+        if not hmac.compare_digest(authentication_tag, expected_tag):
+            raise CursorValidationError(CursorResyncReason.MALFORMED)
         cursor = self._cursor_by_token.get(token)
         if cursor is None:
-            raise CursorValidationError(CursorResyncReason.MALFORMED)
+            raise CursorValidationError(CursorResyncReason.EXPIRED)
         return cursor
+
+    def finalize_session(self, session_id: str) -> None:
+        session = _validate_identifier("session_id", session_id)
+        latest_token_by_scope: dict[tuple[str, str], str] = {}
+        latest_position_by_scope: dict[tuple[str, str], tuple[int, int, int]] = {}
+        for token, cursor in self._cursor_by_token.items():
+            if cursor.session_id != session:
+                continue
+            scope = (cursor.principal_id, cursor.cursor_scope)
+            position = (cursor.session_revision, cursor.offset, cursor.visible_sequence)
+            if position >= latest_position_by_scope.get(scope, (-1, -1, -1)):
+                latest_position_by_scope[scope] = position
+                latest_token_by_scope[scope] = token
+        retained_tokens = set(latest_token_by_scope.values())
+        stale_tokens = [
+            token
+            for token, cursor in self._cursor_by_token.items()
+            if cursor.session_id == session and token not in retained_tokens
+        ]
+        for token in stale_tokens:
+            del self._cursor_by_token[token]
+
+    def registered_cursor_count(self, *, session_id: str | None = None) -> int:
+        if session_id is None:
+            return len(self._cursor_by_token)
+        session = _validate_identifier("session_id", session_id)
+        return sum(cursor.session_id == session for cursor in self._cursor_by_token.values())
 
     def validate_binding(
         self,
@@ -205,6 +263,31 @@ class SessionCursorCodec:
             raise CursorValidationError(CursorResyncReason.WRONG_SESSION)
         if cursor.principal_id != viewer.principal_id or cursor.cursor_scope != viewer.cursor_scope:
             raise CursorValidationError(CursorResyncReason.WRONG_VIEWER)
+
+    def _prune_expired(
+        self,
+        *,
+        cursor: SessionCursor,
+        minimum_offset: int,
+        minimum_revision: int,
+    ) -> None:
+        stale_tokens = [
+            token
+            for token, retained in self._cursor_by_token.items()
+            if retained.session_id == cursor.session_id
+            and (
+                retained.session_revision < minimum_revision
+                or (
+                    retained.principal_id == cursor.principal_id
+                    and (
+                        retained.cursor_scope != cursor.cursor_scope
+                        or retained.offset < minimum_offset
+                    )
+                )
+            )
+        ]
+        for token in stale_tokens:
+            del self._cursor_by_token[token]
 
 
 def sequenced_events(
@@ -248,6 +331,23 @@ def retention_floor(*, event_count: int, retention_limit: int) -> int:
 
 def _urlsafe_encode(value: bytes) -> str:
     return base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
+
+
+def _urlsafe_decode(value: str) -> bytes:
+    try:
+        decoded = base64.b64decode(value, altchars=b"-_", validate=True)
+    except binascii.Error as exc:
+        raise CursorValidationError(CursorResyncReason.MALFORMED) from exc
+    expected_length = CURSOR_IDENTIFIER_BYTES + CURSOR_AUTHENTICATION_TAG_BYTES
+    if len(decoded) != expected_length:
+        raise CursorValidationError(CursorResyncReason.MALFORMED)
+    return decoded
+
+
+def _validate_floor(name: str, value: object) -> int:
+    if type(value) is not int or value < 0:
+        raise SessionEventProtocolError(f"Cursor {name} must be non-negative.")
+    return value
 
 
 def _validate_sha256(value: object) -> str:
