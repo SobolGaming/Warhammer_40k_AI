@@ -1,15 +1,20 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core import __version__ as ENGINE_VERSION
+from warhammer40k_core.adapters.command_protocol import (
+    SessionCommandJournalEntry,
+    SessionCommandOutcomeCode,
+)
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.external_contract import (
     EXTERNAL_CONTRACT_VERSION,
+    SESSION_COMMAND_OUTCOME_SCHEMA_VERSION,
     SESSION_COMMAND_RESULT_SCHEMA_VERSION,
     SESSION_METADATA_SCHEMA_VERSION,
 )
@@ -21,6 +26,10 @@ from warhammer40k_core.engine.phase import LifecycleStatus, LifecycleStatusKind
 ENGINE_BUILD_ID = f"warhammer40k-core-v2:{ENGINE_VERSION}"
 
 type OperationalClock = Callable[[], datetime]
+
+
+def _new_command_journal() -> dict[str, SessionCommandJournalEntry]:
+    return {}
 
 
 class SessionProtocolError(ValueError):
@@ -92,6 +101,11 @@ class SessionCommandResultPayload(TypedDict):
     session: SessionMetadataPayload
     checkpoint: SessionCheckpointPayload
     event_range: SessionEventRangePayload
+
+
+class SessionCommandOutcomePayload(SessionCommandResultPayload):
+    command_id: str
+    outcome_code: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -169,6 +183,9 @@ class AuthoritativeSession:
     session_revision: int = 0
     started: bool = False
     closed: bool = False
+    command_journal: dict[str, SessionCommandJournalEntry] = field(
+        default_factory=_new_command_journal
+    )
 
     def __post_init__(self) -> None:
         self.session_id = _validate_identifier("session_id", self.session_id)
@@ -195,6 +212,11 @@ class AuthoritativeSession:
             raise SessionProtocolError("Session revision must be non-negative.")
         if type(self.started) is not bool or type(self.closed) is not bool:
             raise SessionProtocolError("Session state flags must be bool values.")
+        if type(self.command_journal) is not dict:
+            raise SessionProtocolError("Session command journal must be a dictionary.")
+        for command_id, entry in self.command_journal.items():
+            if type(entry) is not SessionCommandJournalEntry or entry.command_id != command_id:
+                raise SessionProtocolError("Session command journal entry is invalid.")
 
     @classmethod
     def create(
@@ -244,6 +266,36 @@ class AuthoritativeSession:
         if _parse_timestamp(activity) < _parse_timestamp(self.last_activity_at):
             raise SessionProtocolError("Session activity timestamp cannot move backwards.")
         self.last_activity_at = activity
+
+    def fork_for_command(self) -> AuthoritativeSession:
+        return replace(
+            self,
+            adapter_session=self.adapter_session.fork(),
+            command_journal=dict(self.command_journal),
+        )
+
+    def controlling_player_id(self, participant_id: str) -> str | None:
+        participant = _validate_identifier("participant_id", participant_id)
+        for assignment in self.participant_assignments:
+            if assignment.participant_id == participant:
+                return assignment.player_id
+        return None
+
+    def lifecycle_coordinator_player_id(self, participant_id: str) -> str | None:
+        player_id = self.controlling_player_id(participant_id)
+        if player_id != self.player_ids[0]:
+            return None
+        return player_id
+
+    def command_entry(self, command_id: str) -> SessionCommandJournalEntry | None:
+        return self.command_journal.get(_validate_identifier("command_id", command_id))
+
+    def record_command(self, entry: SessionCommandJournalEntry) -> None:
+        if type(entry) is not SessionCommandJournalEntry:
+            raise SessionProtocolError("Session command journal requires a typed entry.")
+        if entry.command_id in self.command_journal:
+            raise SessionProtocolError("Session command_id was already recorded.")
+        self.command_journal[entry.command_id] = entry
 
     def commit_status(self, status: LifecycleStatus, *, timestamp: str) -> None:
         if type(status) is not LifecycleStatus:
@@ -414,6 +466,37 @@ def session_command_result_payload(
             "from_cursor": from_cursor,
             "to_cursor": to_cursor,
         },
+    }
+    validate_json_value(cast(JsonValue, payload))
+    return payload
+
+
+def session_command_outcome_payload(
+    *,
+    command_id: str,
+    outcome_code: SessionCommandOutcomeCode,
+    operation: str,
+    committed: bool,
+    accepted: bool,
+    session: SessionMetadataPayload,
+    checkpoint: SessionCheckpointPayload,
+    from_cursor: int,
+) -> SessionCommandOutcomePayload:
+    if type(outcome_code) is not SessionCommandOutcomeCode:
+        raise SessionProtocolError("Session command outcome code is invalid.")
+    base = session_command_result_payload(
+        operation=operation,
+        committed=committed,
+        accepted=accepted,
+        session=session,
+        checkpoint=checkpoint,
+        from_cursor=from_cursor,
+    )
+    payload: SessionCommandOutcomePayload = {
+        **base,
+        "schema_version": SESSION_COMMAND_OUTCOME_SCHEMA_VERSION,
+        "command_id": _validate_identifier("command_id", command_id),
+        "outcome_code": outcome_code.value,
     }
     validate_json_value(cast(JsonValue, payload))
     return payload

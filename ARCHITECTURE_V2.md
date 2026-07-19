@@ -125,8 +125,9 @@ source directly, every external wire family has an explicit version, and CI
 verifies schema/example/OpenAPI/Python-version drift plus immutable,
 base-branch compatibility baselines and cumulative compatibility against both
 the exact pull-request base contract and the oldest supported-major baseline.
-An isolated installed-wheel smoke validates packaged schema discovery and all
-three request families outside the repository. The engine registry owns finite
+An isolated installed-wheel smoke validates packaged schema discovery and the
+engine-create, session-create, session-command, finite, and parameterized
+request families outside the repository. The engine registry owns finite
 versus parameterized classification, but only real adapter-session scenarios
 are reported as live decision-family coverage; remaining families are
 explicitly `envelope_only` pending later interaction and conformance work.
@@ -135,8 +136,13 @@ explicitly `envelope_only` pending later interaction and conformance work.
 session/game identities, participant metadata, start/close lifecycle, monotonic
 session revisions, viewer checkpoints, typed errors, shared redaction, and a
 bounded deterministic post-submission drain behind `AdapterGameSession`.
-Idempotency/concurrency, durable cursor resynchronization, authenticated
-participant bindings, persistence, and recovery remain Phase 18F-18L work.
+**Phase 18F is complete** for the versioned mutation command envelope,
+expected-revision conflicts, participant-to-actor routing, idempotent outcome
+journaling, serialized concurrent submissions, copy-on-write pre-commit
+isolation, atomic authoritative replacement, and replay/projection/event
+regressions. Durable cursor resynchronization, authenticated participant
+bindings, persistence, and recovery remain Phase 18G, Phase 18H, and Phase 18L
+work respectively.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -5261,9 +5267,9 @@ Priority: P0.
 Status: Complete. `AdapterGameServer` and its local HTTP wrapper expose the
 formal reference session protocol while keeping create, advance, view, catalog,
 event, decision submission, replay export, typed errors, redaction, and
-engine-owned dice paths behind `AdapterGameSession`. Production idempotency,
-durable resynchronization, authentication, and persistence remain assigned to
-Phases 18F-18H and 18L rather than being implied by this phase.
+engine-owned dice paths behind `AdapterGameSession`. Durable resynchronization,
+authentication, and persistence remain assigned to Phases 18G, 18H, and 18L
+rather than being implied by this phase.
 
 Required operations:
 
@@ -5314,7 +5320,12 @@ Advancement semantics:
   unless their typed status proves completed application;
 - explicit `AdvanceSession` remains available for session start, recovery,
   operator/conformance use, and documented idle boundaries, not as a client-side
-  replacement for post-submission draining.
+  replacement for post-submission draining; an advance at an unchanged pending
+  decision boundary is rejected without revision or journal mutation;
+- the Phase 18F development transport authorizes start, advance, and close only
+  for the participant assigned to the first configured player as lifecycle
+  coordinator, while decision commands remain bound to the pending actor;
+  Phase 18H replaces that routing policy with authenticated operator roles.
 
 Invariants:
 
@@ -5346,6 +5357,14 @@ behavior.
 
 Priority: P0 for multiplayer and P1 for a single-device prototype.
 
+Status: Complete. The canonical `SessionCommandEnvelope` and
+`SessionCommandOutcome` schemas are published in contract version `1.2.0`, and
+the reference server exposes `ExecuteSessionCommand` as the normative mutation
+operation. The Phase 18E mutation routes remain explicitly deprecated additive
+compatibility endpoints during the documented support window.
+Parameterized command envelopes reference the canonical proposal-payload union
+directly, keeping OpenAPI/generated-client types and runtime validation aligned.
+
 Every mutating request uses a transport command envelope equivalent to:
 
 ```json
@@ -5372,6 +5391,11 @@ Required behavior:
 - a wrong pending `request_id` returns typed `stale_decision_request` (409);
 - a well-formed but illegal proposal returns typed `proposal_invalid` (422),
   subject to the owning adapter contract's explicit rejected-attempt policy;
+- a directly returned unsupported result uses `rule_path_unsupported`, preserving
+  recorded versus unrecorded command-history semantics independently;
+- an explicit advance at an existing pending decision returns typed
+  `advance_not_required` without changing revision, state, replay, events, or
+  journal;
 - a principal that does not control the acting player receives
   `actor_not_authorized` (403) without hidden request details;
 - a terminal session returns a typed terminal response;
@@ -5385,12 +5409,34 @@ detect state equality/drift, while revisions record accepted command ordering.
 Required tests:
 
 - simultaneous valid submissions for one revision commit at most one result;
+- a no-op advance racing a valid decision cannot consume the shared revision;
+- pre-record and recorded unsupported results retain their lifecycle
+  classification, and an exact recorded retry returns the cached outcome;
 - duplicate commands before and after reconnect return byte-equivalent public
   outcomes for the same principal/visibility context;
 - stale revision, stale request, wrong actor, malformed envelope, illegal
   proposal, terminal session, and injected pre-commit failure preserve state;
 - replay from accepted commands reproduces the same decision/event/projection
   hashes.
+
+Completion gate:
+
+Concurrent commands for the same revision commit at most once; a matching
+command retry returns the journaled public result unchanged; all pre-commit
+errors leave the authoritative session unchanged; and a successful command
+publishes one coherent revision, replay, event, and projection checkpoint.
+
+This gate is met. The server serializes command handling, checks journaled
+outcomes before current-state preconditions, routes actor authority from
+out-of-envelope participant context, and applies new work to an isolated
+`AdapterGameSession` fork. It atomically replaces the authoritative in-memory
+session only for a committed result, together with the command journal entry.
+Focused real-session regressions cover racing valid submissions, reconnect
+retries, stale revisions and requests, wrong participants, malformed envelopes,
+illegal finite and parameterized proposals, closed sessions, injected
+pre-commit failure, terminal and closed sessions, and exact
+replay/event/projection reproduction. Phase 18L
+still owns durable persistence of the same atomic unit across process failure.
 
 ## Phase 18G: event stream and resynchronization contract
 

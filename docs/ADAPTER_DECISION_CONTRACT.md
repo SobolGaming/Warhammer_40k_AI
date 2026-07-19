@@ -2638,7 +2638,9 @@ post-application deterministic advancement reaches the typed
 `transition_budget_exhausted` safety boundary: the result is `committed: true`,
 `accepted: true` with lifecycle `status_kind: "unsupported"`. A directly
 returned recorded `unsupported` result without that typed proof of completed
-application is `committed: true`, `accepted: false`.
+application is `committed: true`, `accepted: false` with
+`outcome_code: "rule_path_unsupported"`; an unrecorded unsupported result uses
+the error-envelope code `rule_path_unsupported`.
 
 Session metadata and command results obey the same viewer redaction policy as
 projections and event deltas. A viewerless metadata response exposes no
@@ -2647,6 +2649,50 @@ caught engine exception details. Participant roles in Phase 18E are protocol
 metadata, not authentication; Phase 18H owns principal-to-role authorization.
 Phase 18F owns command idempotency and expected-revision concurrency checks,
 while Phase 18G owns durable cursor/reconnect/resynchronization behavior.
+
+## Formal Phase 18F Commands
+
+The normative mutation endpoint is
+`POST /sessions/{session_id}/commands`. Its versioned command envelope carries
+one client-generated `command_id`, the session identity, the exact expected
+session revision, request/result identities where the submission answers a
+decision, and a typed start, advance, close, finite-option, or parameterized
+submission. The envelope must not carry `actor_id`, `viewer_player_id`, or any
+other authority claim. The development transport supplies participant context
+out of band, and the server maps an assigned player participant to the pending
+request actor; authenticated principal binding remains Phase 18H work.
+For lifecycle commands, the development transport instead authorizes only the
+participant assigned to the first configured player as lifecycle coordinator;
+other player, spectator, and observer participants cannot start, advance, or
+close. Phase 18H replaces this deterministic development policy with
+authenticated operator authorization.
+
+The server checks a matching journaled command before revision and lifecycle
+preconditions. A retry from the same participant with the same canonical
+envelope returns the original status and public payload without reapplying the
+engine decision. Reusing the ID with a different envelope is a conflict, and a
+different participant receives a redacted authorization error. New commands
+must match the current revision and current pending request before the shared
+adapter facade is invoked.
+
+Application occurs on an isolated fork of the facade-owned lifecycle. The
+authoritative session reference changes only after a committed outcome can be
+published together with the idempotency journal entry, one revision increment,
+projection checkpoint, and event range. Rejected preconditions, unrecorded
+illegal proposals, and pre-commit failures discard the fork. Recorded
+rule-invalid retry decisions retain the Phase 18E distinction between
+`committed` and gameplay `accepted` and are atomically committed with their
+fresh request and replay record.
+
+`advance_session` is rejected with `advance_not_required` when the authoritative
+session is already waiting for a decision. This rejection occurs before facade
+forking or journal insertion, so a no-op advance cannot consume a revision,
+reserve its command ID, or race a valid decision solely by revision churn.
+
+The Phase 18E mutation endpoints remain documented as deprecated compatibility
+routes during the stated external-contract support window. They do not provide
+the Phase 18F idempotency and expected-revision guarantees; new clients use the
+command endpoint.
 
 ## Suggested Adapter Loop
 

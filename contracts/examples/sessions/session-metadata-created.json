@@ -44,7 +44,7 @@
     "version": "core-v2-setup-prebattle-ui-smoke"
   },
   "schema_version": "session-metadata-v1",
-  "server_contract_version": "1.1.0",
+  "server_contract_version": "1.2.0",
   "session_id": "session-phase18e-contract-session",
   "session_revision": 0,
   "session_state": "created",

@@ -1,0 +1,85 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v1/session-command-outcome.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "properties": {
+        "accepted": {"const": true},
+        "committed": {"const": true},
+        "outcome_code": {"const": "command_committed"}
+      }
+    },
+    {
+      "properties": {
+        "accepted": {"const": false},
+        "outcome_code": {"const": "proposal_invalid"}
+      }
+    },
+    {
+      "properties": {
+        "accepted": {"const": false},
+        "outcome_code": {"const": "rule_path_unsupported"}
+      }
+    }
+  ],
+  "properties": {
+    "accepted": {"type": "boolean"},
+    "checkpoint": {"$ref": "#/$defs/checkpoint"},
+    "command_id": {"minLength": 1, "type": "string"},
+    "committed": {"type": "boolean"},
+    "event_range": {"$ref": "#/$defs/event_range"},
+    "operation": {
+      "enum": [
+        "start_session",
+        "advance_session",
+        "submit_finite_decision",
+        "submit_parameterized_decision",
+        "close_session"
+      ],
+      "type": "string"
+    },
+    "outcome_code": {
+      "enum": ["command_committed", "proposal_invalid", "rule_path_unsupported"],
+      "type": "string"
+    },
+    "schema_version": {"const": "session-command-outcome-v1", "type": "string"},
+    "session": {
+      "$ref": "https://warhammer40k-core.local/contracts/v1/session-metadata.schema.json"
+    }
+  },
+  "required": [
+    "schema_version",
+    "command_id",
+    "outcome_code",
+    "operation",
+    "committed",
+    "accepted",
+    "session",
+    "checkpoint",
+    "event_range"
+  ],
+  "title": "CORE V2 SessionCommandOutcomePayload",
+  "type": "object",
+  "$defs": {
+    "checkpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "event_cursor": {"minimum": 0, "type": "integer"},
+        "projection_state_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "viewer_player_id": {"minLength": 1, "type": "string"}
+      },
+      "required": ["viewer_player_id", "projection_state_hash", "event_cursor"],
+      "type": "object"
+    },
+    "event_range": {
+      "additionalProperties": false,
+      "properties": {
+        "from_cursor": {"minimum": 0, "type": "integer"},
+        "to_cursor": {"minimum": 0, "type": "integer"}
+      },
+      "required": ["from_cursor", "to_cursor"],
+      "type": "object"
+    }
+  }
+}

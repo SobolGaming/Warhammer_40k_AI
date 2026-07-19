@@ -3,29 +3,37 @@
 A conforming client demonstrates the following scenarios against the canonical
 schemas and the ordinary `AdapterGameSession` path.
 
-1. Create a session with the current request schema version and retain the
-   returned `game_id`.
-2. Retrieve and cache the source-hashed rules catalog; retrieve a player-scoped
+1. Create a formal session with the current request schema version and retain
+   its distinct `session_id`, engine `game_id`, and revision `0`.
+2. Start it through `ExecuteSessionCommand` with participant context outside the
+   command envelope, then retry that exact command on a new connection and
+   require the same HTTP status and byte-equivalent public response.
+3. Race two valid commands carrying one expected revision and require at most
+   one commit. Verify stale revision/request, wrong participant, malformed
+   envelope, illegal proposal, terminal session, and pre-commit failure all
+   preserve the authoritative revision, replay, event cursor, and projection
+   hash.
+4. Retrieve and cache the source-hashed rules catalog; retrieve a player-scoped
    game projection and verify its projection schema/hash.
-3. Render every decision family marked `live_scenario` in
+5. Render every decision family marked `live_scenario` in
    `examples/decisions/family-coverage.json` and submit only one of the emitted
    option IDs with a unique deterministic/replay-safe `result_id`. Treat
    `envelope_only` rows as inventory, not conformance evidence.
-4. Render every generated proposal-kind fixture, preserve its request/source
+6. Render every generated proposal-kind fixture, preserve its request/source
    context, and submit the corresponding typed proposal without applying it
    locally.
-5. Consume events from cursor `0`, preserve order, advance to `next_cursor`, and
+7. Consume events from cursor `0`, preserve order, advance to `next_cursor`, and
    resynchronize from a projection if cursor/state context is lost.
-6. Display hidden-decision and hidden-secondary fixtures without revealing
+8. Display hidden-decision and hidden-secondary fixtures without revealing
    hidden type, source, option-count, or payload metadata.
-7. Distinguish waiting, advanced, invalid, unsupported, and terminal lifecycle
+9. Distinguish waiting, advanced, invalid, unsupported, and terminal lifecycle
    statuses.
-8. Distinguish malformed, stale/conflict, forbidden, corruption, unsupported,
+10. Distinguish malformed, stale/conflict, forbidden, corruption, unsupported,
    and terminal error fixtures; do not blindly retry schema or corruption
    failures.
-9. Export support and replay payloads, verify their schema versions and source
+11. Export support and replay payloads, verify their schema versions and source
    identities, and treat them as immutable audit artifacts.
-10. Reject a response that fails its declared schema, contains an unknown major
+12. Reject a response that fails its declared schema, contains an unknown major
     version, or contradicts the coordinate/session/redaction semantics.
 
 The generated coverage directories are:

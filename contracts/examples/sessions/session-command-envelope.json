@@ -1,0 +1,11 @@
+{
+  "command_id": "phase18f-contract-command-000001",
+  "expected_session_revision": 1,
+  "request_id": null,
+  "result_id": null,
+  "schema_version": "session-command-envelope-v1",
+  "session_id": "session-phase18e-contract-session",
+  "submission": {
+    "submission_kind": "close_session"
+  }
+}

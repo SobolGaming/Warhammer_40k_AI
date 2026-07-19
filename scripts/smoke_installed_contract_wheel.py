@@ -24,6 +24,8 @@ EXPECTED_SCHEMA_NAMES = frozenset(
         "proposal-payload.schema.json",
         "replay-metadata.schema.json",
         "rules-catalog.schema.json",
+        "session-command-envelope.schema.json",
+        "session-command-outcome.schema.json",
         "session-command-result.schema.json",
         "session-create.schema.json",
         "session-metadata.schema.json",
@@ -43,8 +45,11 @@ from warhammer40k_core.adapters.external_contract import (
     FINITE_SUBMISSION_SCHEMA_VERSION,
     PARAMETERIZED_SUBMISSION_SCHEMA_NAME,
     PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+    SESSION_COMMAND_ENVELOPE_SCHEMA_NAME,
+    SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_NAME,
     SESSION_CREATE_SCHEMA_VERSION,
+    ExternalContractValidationError,
     validate_external_request_payload,
 )
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
@@ -65,6 +70,8 @@ expected_schema_names = {
     "proposal-payload.schema.json",
     "replay-metadata.schema.json",
     "rules-catalog.schema.json",
+    "session-command-envelope.schema.json",
+    "session-command-outcome.schema.json",
     "session-command-result.schema.json",
     "session-create.schema.json",
     "session-metadata.schema.json",
@@ -124,6 +131,31 @@ session_create_payload = validate_json_value(
         ],
     }
 )
+session_command_payload = validate_json_value(
+    {
+        "schema_version": SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+        "command_id": "installed-wheel-session-command",
+        "session_id": "installed-wheel-session",
+        "expected_session_revision": 0,
+        "request_id": None,
+        "result_id": None,
+        "submission": {"submission_kind": "start_session"},
+    }
+)
+parameterized_session_command_payload = validate_json_value(
+    {
+        "schema_version": SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+        "command_id": "installed-wheel-parameterized-session-command",
+        "session_id": "installed-wheel-session",
+        "expected_session_revision": 1,
+        "request_id": "installed-wheel-proposal-request",
+        "result_id": "installed-wheel-parameterized-command-result",
+        "submission": {
+            "submission_kind": "parameterized_payload",
+            "payload": parameterized_payload["payload"],
+        },
+    }
+)
 for schema_name, payload, payload_name in (
     (CREATE_SESSION_SCHEMA_NAME, create_payload, "installed create session"),
     (FINITE_SUBMISSION_SCHEMA_NAME, finite_payload, "installed finite submission"),
@@ -133,12 +165,38 @@ for schema_name, payload, payload_name in (
         "installed parameterized submission",
     ),
     (SESSION_CREATE_SCHEMA_NAME, session_create_payload, "installed session create"),
+    (
+        SESSION_COMMAND_ENVELOPE_SCHEMA_NAME,
+        session_command_payload,
+        "installed session command",
+    ),
+    (
+        SESSION_COMMAND_ENVELOPE_SCHEMA_NAME,
+        parameterized_session_command_payload,
+        "installed parameterized session command",
+    ),
 ):
     validate_external_request_payload(
         schema_name=schema_name,
         payload=payload,
         payload_name=payload_name,
     )
+
+invalid_parameterized_session_command = dict(parameterized_session_command_payload)
+invalid_parameterized_session_command["submission"] = {
+    "submission_kind": "parameterized_payload",
+    "payload": {"arbitrary": True},
+}
+try:
+    validate_external_request_payload(
+        schema_name=SESSION_COMMAND_ENVELOPE_SCHEMA_NAME,
+        payload=validate_json_value(invalid_parameterized_session_command),
+        payload_name="invalid installed parameterized session command",
+    )
+except ExternalContractValidationError:
+    pass
+else:
+    raise RuntimeError("Installed command validator accepted an untyped proposal payload.")
 
 print(
     json.dumps(
@@ -150,6 +208,8 @@ print(
                 "finite",
                 "parameterized",
                 "session_create",
+                "session_command",
+                "parameterized_session_command",
             ],
         },
         sort_keys=True,

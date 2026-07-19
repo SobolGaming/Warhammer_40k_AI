@@ -28,6 +28,8 @@ from warhammer40k_core.adapters.external_contract import (
     FINITE_SUBMISSION_SCHEMA_VERSION,
     LIFECYCLE_STATUS_SCHEMA_VERSION,
     PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+    SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+    SESSION_COMMAND_OUTCOME_SCHEMA_VERSION,
     SESSION_COMMAND_RESULT_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_VERSION,
     SESSION_METADATA_SCHEMA_VERSION,
@@ -91,6 +93,8 @@ PRIMARY_SCHEMA_NAMES = frozenset(
         "rules-catalog.schema.json",
         "support-profile.schema.json",
         "session-command-result.schema.json",
+        "session-command-envelope.schema.json",
+        "session-command-outcome.schema.json",
         "session-create.schema.json",
         "session-metadata.schema.json",
     }
@@ -123,6 +127,14 @@ PAYLOAD_SCHEMA_VERSION_BY_NAME = {
     "session-command-result.schema.json": (
         "schema_version",
         SESSION_COMMAND_RESULT_SCHEMA_VERSION,
+    ),
+    "session-command-envelope.schema.json": (
+        "schema_version",
+        SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+    ),
+    "session-command-outcome.schema.json": (
+        "schema_version",
+        SESSION_COMMAND_OUTCOME_SCHEMA_VERSION,
     ),
     "session-create.schema.json": ("schema_version", SESSION_CREATE_SCHEMA_VERSION),
     "session-metadata.schema.json": ("schema_version", SESSION_METADATA_SCHEMA_VERSION),
@@ -761,6 +773,12 @@ def _example_schema_bindings() -> dict[str, JsonValue]:
     bindings["examples/sessions/session-metadata-created.json"] = "session-metadata.schema.json"
     bindings["examples/sessions/session-command-started.json"] = (
         "session-command-result.schema.json"
+    )
+    bindings["examples/sessions/session-command-envelope.json"] = (
+        "session-command-envelope.schema.json"
+    )
+    bindings["examples/sessions/session-command-outcome.json"] = (
+        "session-command-outcome.schema.json"
     )
     bindings["examples/support-profile.json"] = "support-profile.schema.json"
     bindings["examples/replay-metadata.json"] = "replay-metadata.schema.json"

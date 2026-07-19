@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass, field
+from typing import Self
 
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.decisions import submit_option, submit_parameterized_payload
@@ -32,6 +33,15 @@ class LocalGameSession(AdapterGameSession):
         init=False,
         repr=False,
     )
+
+    def fork(self) -> Self:
+        clone = type(self)(
+            lifecycle=GameLifecycle.from_payload(copy.deepcopy(self.lifecycle.to_payload()))
+        )
+        clone._initial_replay_lifecycle_payload = copy.deepcopy(
+            self._initial_replay_lifecycle_payload
+        )
+        return clone
 
     def start(self, config: GameConfig) -> LifecycleStatus:
         if type(config) is not GameConfig:
