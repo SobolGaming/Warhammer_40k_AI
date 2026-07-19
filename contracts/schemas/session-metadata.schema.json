@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/session-metadata.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v2/session-metadata.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -7,29 +7,16 @@
     "created_at": {"format": "date-time", "type": "string"},
     "engine_build_id": {"minLength": 1, "type": "string"},
     "engine_version": {"minLength": 1, "type": "string"},
-    "event_cursor": {"minimum": 0, "type": "integer"},
+    "event_cursor": {"maxLength": 2048, "minLength": 1, "type": "string"},
     "game_id": {"minLength": 1, "type": "string"},
     "last_activity_at": {"format": "date-time", "type": "string"},
     "lifecycle_status": {
       "$ref": "https://warhammer40k-core.local/contracts/v1/lifecycle-status.schema.json#/$defs/status"
     },
-    "participant_assignments": {
-      "items": {"$ref": "#/$defs/participant_assignment"},
-      "minItems": 2,
-      "type": "array"
-    },
-    "projection_state_hash": {
-      "oneOf": [
-        {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-        {"type": "null"}
-      ]
-    },
+    "projection_state_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "ruleset_id": {"minProperties": 1, "type": "object"},
-    "schema_version": {"const": "session-metadata-v1", "type": "string"},
-    "server_contract_version": {
-      "pattern": "^1\\.[0-9]+\\.[0-9]+$",
-      "type": "string"
-    },
+    "schema_version": {"const": "session-metadata-v2", "type": "string"},
+    "server_contract_version": {"pattern": "^2\\.[0-9]+\\.[0-9]+$", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "session_revision": {"minimum": 0, "type": "integer"},
     "session_state": {
@@ -39,11 +26,9 @@
     "source_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "source_package_id": {"minLength": 1, "type": "string"},
     "terminal_reason": {
-      "oneOf": [
-        {"$ref": "#/$defs/terminal_reason"},
-        {"type": "null"}
-      ]
-    }
+      "oneOf": [{"$ref": "#/$defs/terminal_reason"}, {"type": "null"}]
+    },
+    "visibility": {"$ref": "#/$defs/visibility"}
   },
   "required": [
     "schema_version",
@@ -61,27 +46,14 @@
     "terminal_reason",
     "created_at",
     "last_activity_at",
-    "participant_assignments",
+    "visibility",
     "server_contract_version",
     "engine_version",
     "engine_build_id"
   ],
-  "title": "CORE V2 SessionMetadataPayload",
+  "title": "CORE V2 Authenticated SessionMetadataPayload",
   "type": "object",
   "$defs": {
-    "participant_assignment": {
-      "additionalProperties": false,
-      "properties": {
-        "participant_id": {"minLength": 1, "type": "string"},
-        "player_id": {"type": ["string", "null"]},
-        "role": {
-          "enum": ["player", "spectator", "observer"],
-          "type": "string"
-        }
-      },
-      "required": ["participant_id", "role", "player_id"],
-      "type": "object"
-    },
     "terminal_reason": {
       "additionalProperties": false,
       "properties": {
@@ -89,6 +61,29 @@
         "message": {"minLength": 1, "type": "string"}
       },
       "required": ["code", "message"],
+      "type": "object"
+    },
+    "visibility": {
+      "additionalProperties": false,
+      "properties": {
+        "delay_revisions": {"minimum": 0, "type": "integer"},
+        "may_mutate_lifecycle": {"type": "boolean"},
+        "may_submit_decision": {"type": "boolean"},
+        "omniscient": {"type": "boolean"},
+        "player_id": {"type": ["string", "null"]},
+        "role": {
+          "enum": ["player", "coach", "delayed_spectator", "administrator", "replay_viewer"],
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "player_id",
+        "delay_revisions",
+        "may_mutate_lifecycle",
+        "may_submit_decision",
+        "omniscient"
+      ],
       "type": "object"
     }
   }

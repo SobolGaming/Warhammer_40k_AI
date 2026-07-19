@@ -20,6 +20,12 @@ from tests.phase18f_command_helpers import (
     recorded_unsupported_session,
 )
 
+from warhammer40k_core.adapters.access_control import (
+    DEV_ADMIN_TOKEN,
+    DEV_PLAYER_A_TOKEN,
+    DEV_PLAYER_B_TOKEN,
+    bearer_authorization,
+)
 from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_VERSION,
@@ -227,7 +233,10 @@ def test_phase18f_duplicate_http_commands_are_byte_equivalent_after_reconnect() 
             Request(
                 f"{base_url}/sessions",
                 data=json.dumps(_session_create_body("phase18f-http-idempotent")).encode(),
-                headers={"Content-Type": "application/json"},
+                headers={
+                    "Authorization": bearer_authorization(DEV_ADMIN_TOKEN),
+                    "Content-Type": "application/json",
+                },
                 method="POST",
             )
         )
@@ -540,7 +549,10 @@ def test_phase18f_recorded_invalid_retry_is_atomically_journaled() -> None:
         revision_before + 1
     )
     event_range = _field_object(outcome, "event_range")
-    assert _field_int(event_range, "to_cursor") > _field_int(event_range, "from_cursor")
+    assert _cursor_offset(server, _field_string(event_range, "to_cursor")) > _cursor_offset(
+        server,
+        _field_string(event_range, "from_cursor"),
+    )
     retry = _pending_decision_for_any_player(server, session_id=session_id)
     assert _field_string(retry, "request_id") != _field_string(
         proposal_request,
@@ -939,12 +951,6 @@ def _session_create_body_from_config(config: GameConfig) -> dict[str, JsonValue]
     return {
         "schema_version": SESSION_CREATE_SCHEMA_VERSION,
         "config": validate_json_value(config.to_payload()),
-        "participant_assignments": [
-            {"participant_id": PARTICIPANT_A, "role": "player", "player_id": PLAYER_A},
-            {"participant_id": PARTICIPANT_B, "role": "player", "player_id": PLAYER_B},
-            {"participant_id": "spectator-one", "role": "spectator", "player_id": None},
-            {"participant_id": "observer-one", "role": "observer", "player_id": None},
-        ],
     }
 
 
@@ -1075,10 +1081,24 @@ def _request_raw(
     participant_id: str | None,
     envelope: dict[str, JsonValue],
 ) -> ServerResponse:
+    submission = _field_object(envelope, "submission")
+    lifecycle_command = _field_string(submission, "submission_kind") in {
+        "start_session",
+        "advance_session",
+        "close_session",
+    }
+    if participant_id == PARTICIPANT_A and lifecycle_command:
+        token = DEV_ADMIN_TOKEN
+    elif participant_id == PARTICIPANT_A:
+        token = DEV_PLAYER_A_TOKEN
+    elif participant_id == PARTICIPANT_B:
+        token = DEV_PLAYER_B_TOKEN
+    else:
+        token = "invalid-principal-token"
     return server.handle(
         method="POST",
         path=f"/sessions/{session_id}/commands",
-        participant_id=participant_id,
+        authorization=bearer_authorization(token),
         body=envelope,
     )
 
@@ -1092,9 +1112,18 @@ def _request(
     body: JsonValue = None,
     expected_status: int = 200,
 ) -> dict[str, JsonValue]:
-    response = server.handle(method=method, path=path, query=query, body=body)
+    response = server.handle(
+        method=method,
+        path=path,
+        query=query,
+        body=body,
+        authorization=bearer_authorization(_request_token(path=path, query=query, body=body)),
+    )
     assert response.status_code == expected_status, response.payload
-    return _json_object(response.payload)
+    payload = _json_object(response.payload)
+    if path.endswith("/projection") and "projection" in payload:
+        return _field_object(payload, "projection")
+    return payload
 
 
 def _pending_decision(
@@ -1122,6 +1151,27 @@ def _pending_decision_for_any_player(
         if pending["decision_type"] != "hidden_decision":
             return pending
     raise AssertionError("No actor-visible protocol decision found.")
+
+
+def _request_token(
+    *,
+    path: str,
+    query: dict[str, str] | None,
+    body: JsonValue,
+) -> str:
+    if query is not None:
+        viewer = query.get("viewer_player_id")
+        if viewer == PLAYER_A:
+            return DEV_PLAYER_A_TOKEN
+        if viewer == PLAYER_B:
+            return DEV_PLAYER_B_TOKEN
+    if isinstance(body, dict):
+        actor = body.get("actor_id")
+        if actor == PLAYER_A:
+            return DEV_PLAYER_A_TOKEN
+        if actor == PLAYER_B:
+            return DEV_PLAYER_B_TOKEN
+    return DEV_ADMIN_TOKEN
 
 
 def _advance_to_deployment_placement(
@@ -1317,7 +1367,7 @@ def _authoritative_snapshot(
     server: AdapterGameServer,
     *,
     session_id: str,
-) -> tuple[int, str | None, int, int, int]:
+) -> tuple[int, str | None, str, int, int]:
     metadata = _request(
         server,
         "GET",
@@ -1330,10 +1380,14 @@ def _authoritative_snapshot(
     return (
         _field_int(metadata, "session_revision"),
         projection_hash,
-        _field_int(metadata, "event_cursor"),
+        _field_string(metadata, "event_cursor"),
         len(_field_list(replay, "decision_records")),
         len(_field_list(replay, "event_records")),
     )
+
+
+def _cursor_offset(server: AdapterGameServer, token: str) -> int:
+    return server.cursor_codec.decode(token).offset
 
 
 def _session_revision(server: AdapterGameServer, *, session_id: str) -> int:
@@ -1385,7 +1439,10 @@ def _http_command_bytes(
     request = Request(
         f"{base_url}/sessions/{session_id}/commands",
         data=json.dumps(envelope, sort_keys=True).encode("utf-8"),
-        headers={"Content-Type": "application/json", "X-Participant-ID": PARTICIPANT_A},
+        headers={
+            "Authorization": bearer_authorization(DEV_ADMIN_TOKEN),
+            "Content-Type": "application/json",
+        },
         method="POST",
     )
     response = cast(HTTPResponse, urlopen(request, timeout=10.0))

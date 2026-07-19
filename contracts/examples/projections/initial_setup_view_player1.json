@@ -1486,8 +1486,8 @@
     "player-a",
     "player-b"
   ],
-  "projection_schema": "game-view-v4-unit-resources",
-  "projection_state_hash": "2921d0953ae962d136c5033e3cf62ea720e89a790f12778036cd4b51db4e3539",
+  "projection_schema": "game-view-v5-role-scoped",
+  "projection_state_hash": "305c8c9d588e709197d3e9ef048574af04e41b442ae143322ae04f01846bddb1",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
@@ -1565,5 +1565,6 @@
       "visible_status": "visible"
     }
   },
-  "viewer_player_id": "player-a"
+  "viewer_player_id": "player-a",
+  "viewer_role": "player"
 }

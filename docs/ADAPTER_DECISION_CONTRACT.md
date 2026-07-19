@@ -272,7 +272,12 @@ reference server currently requires:
 - `parameterized-submission-v1` for proposal submissions;
 - `lifecycle-status-v1` for server lifecycle responses;
 - `decision-request-view-v1` for visible or redacted pending decisions;
-- `event-delta-v1` for viewer event deltas;
+- `event-delta-v1` for the in-process integer-cursor adapter delta only;
+- `event-delta-v2` for authenticated role-bound HTTP event deltas;
+- `session-projection-v1` for full role-scoped reconnect projections;
+- `session-create-v2`, `session-metadata-v2`,
+  `session-command-result-v2`, and `session-command-outcome-v2` for the
+  authenticated formal session protocol;
 - `error-envelope-v1` for typed transport errors.
 
 Game views, rules catalogs, support profiles, and replay artifacts retain their
@@ -2611,9 +2616,11 @@ Phase 18E wraps the shared facade in an authoritative formal session protocol.
 Its required operations are create, metadata, start, projection, catalog,
 events, finite submission, parameterized submission, explicit advance, replay
 export, and close. The transport keeps `session_id` distinct from engine
-`game_id`, validates participant assignments, publishes source/build/contract
-identity, and returns monotonic session revisions plus viewer-scoped projection
-and event checkpoints.
+`game_id`, binds authenticated principals to server-owned roles, publishes
+source/build/contract identity, and returns monotonic session revisions plus
+role-scoped projection and event checkpoints. Contract 2.0 expresses start,
+finite/parameterized submission, explicit advance, and close as typed variants
+of the single normative command operation.
 
 An accepted finite or parameterized command is submitted exactly once through
 `AdapterGameSession`, then the session owner performs a bounded deterministic
@@ -2643,12 +2650,11 @@ application is `committed: true`, `accepted: false` with
 the error-envelope code `rule_path_unsupported`.
 
 Session metadata and command results obey the same viewer redaction policy as
-projections and event deltas. A viewerless metadata response exposes no
-projection hash, and transport errors contain stable public text rather than
-caught engine exception details. Participant roles in Phase 18E are protocol
-metadata, not authentication; Phase 18H owns principal-to-role authorization.
-Phase 18F owns command idempotency and expected-revision concurrency checks,
-while Phase 18G owns durable cursor/reconnect/resynchronization behavior.
+projections and event deltas. Every response is principal scoped, and transport
+errors contain stable public text rather than caught engine exception details.
+Phase 18H owns principal-to-role authentication and authorization. Phase 18F
+owns command idempotency and expected-revision concurrency checks, while Phase
+18G owns signed cursor/reconnect/resynchronization behavior.
 
 ## Formal Phase 18F Commands
 
@@ -2658,20 +2664,17 @@ one client-generated `command_id`, the session identity, the exact expected
 session revision, request/result identities where the submission answers a
 decision, and a typed start, advance, close, finite-option, or parameterized
 submission. The envelope must not carry `actor_id`, `viewer_player_id`, or any
-other authority claim. The development transport supplies participant context
-out of band, and the server maps an assigned player participant to the pending
-request actor; authenticated principal binding remains Phase 18H work.
-For lifecycle commands, the development transport instead authorizes only the
-participant assigned to the first configured player as lifecycle coordinator;
-other player, spectator, and observer participants cannot start, advance, or
-close. Phase 18H replaces this deterministic development policy with
-authenticated operator authorization.
+other authority claim. The transport authenticates an opaque bearer credential,
+and the server maps its server-owned principal binding to the pending request
+actor. Administrators alone may issue lifecycle commands, but cannot impersonate
+a decision actor. Players may answer only their own pending request; coaches,
+delayed spectators, and replay viewers cannot mutate.
 
 The server checks a matching journaled command before revision and lifecycle
-preconditions. A retry from the same participant with the same canonical
+preconditions. A retry from the same principal with the same canonical
 envelope returns the original status and public payload without reapplying the
 engine decision. Reusing the ID with a different envelope is a conflict, and a
-different participant receives a redacted authorization error. New commands
+different principal receives a redacted authorization error. New commands
 must match the current revision and current pending request before the shared
 adapter facade is invoked.
 
@@ -2689,10 +2692,62 @@ session is already waiting for a decision. This rejection occurs before facade
 forking or journal insertion, so a no-op advance cannot consume a revision,
 reserve its command ID, or race a valid decision solely by revision churn.
 
-The Phase 18E mutation endpoints remain documented as deprecated compatibility
-routes during the stated external-contract support window. They do not provide
-the Phase 18F idempotency and expected-revision guarantees; new clients use the
-command endpoint.
+The formal Phase 18E mutation endpoints are removed from contract 2.0. Legacy
+authenticated `/games` routes remain deprecated development adapters and do not
+provide the Phase 18F idempotency and expected-revision guarantees; new clients
+use the command endpoint.
+
+## Formal Phase 18G Synchronization
+
+The formal transport never exposes the in-process integer `EventStreamCursor`.
+Metadata, command outcomes, and full projections issue an opaque signed cursor
+bound to the session ID, authenticated principal ID, role/player/delay scope,
+authoritative event-log offset, session revision, and role-scoped projection
+hash. The client treats that token as an indivisible string.
+
+`GET /sessions/{session_id}/events?cursor=...&limit=...` returns deterministic
+`event-delta-v2` pages. `sequence_number` is the one-based authoritative event
+position, so hidden events advance every role's offset without revealing a
+visible-event count. Page size defaults to 100 and is bounded at 500. The
+reference retention window is 4096 records; retained revision snapshots also
+provide exact projection/hash boundaries and the delayed spectator view.
+
+Malformed, expired, ahead, wrong-session, wrong-principal/role, revision-
+divergent, and hash-divergent cursors return `resync_required: true`, a typed
+`resync_reason`, an empty event list, and no hidden event details. The canonical
+client recovery is:
+
+1. Fetch `GET /sessions/{session_id}/projection`.
+2. Replace all client-derived state with its `projection`.
+3. Verify the returned revision and projection hash.
+4. Resume polling from its `event_cursor`.
+
+HTTP polling is normative. Any future SSE or WebSocket adapter must carry the
+same delta payloads and cursor rules.
+
+## Formal Phase 18H Principal Roles
+
+Every route requires an opaque bearer credential and resolves it through an
+injected server-owned principal registry before dispatch. Session creation does
+not accept participant assignments. A `viewer_player_id` query may only assert
+the already-bound player and is omitted from OpenAPI; it never selects a view.
+Command bodies accept neither viewer nor actor authority.
+
+| Role | Visibility | Delay | Mutation | Replay |
+|---|---|---:|---|---|
+| player | bound player's view | 0 | own decisions | denied |
+| coach | paired player's view | 0 | denied | denied |
+| delayed spectator | public-only | 1 revision | denied | denied |
+| administrator | omniscient | 0 | lifecycle only | allowed |
+| replay viewer | catalog/replay only | n/a | denied | allowed |
+
+Projection, pending-decision, event, lifecycle-status, error, metadata, and
+command-result hidden shapes come from `adapters.redaction`. Missing and invalid
+credentials share the same 401 response, and every authorization denial shares
+the same 403 response. These errors never expose request/actor IDs, option or
+target counts, source IDs, support status, or terminal details. Changing a
+principal's role or player binding changes its cursor scope and invalidates old
+cursors.
 
 ## Suggested Adapter Loop
 

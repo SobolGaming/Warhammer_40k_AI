@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import hashlib
-from typing import TypedDict
+from typing import TypedDict, cast
 
+from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.external_contract import (
     DECISION_REQUEST_VIEW_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.redaction import (
-    decision_request_hidden_from_viewer,
+    HIDDEN_REQUEST_ID,
+    decision_request_hidden_from_context,
     redacted_decision_type_for_hidden_viewer,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -33,7 +35,7 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v4-unit-resources"
+PROJECTION_SCHEMA_VERSION = "game-view-v5-role-scoped"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -279,7 +281,8 @@ class GameViewPayload(TypedDict):
     projection_schema: str
     projection_state_hash: str
     rules_catalog: RulesCatalogReferencePayload
-    viewer_player_id: str
+    viewer_role: str
+    viewer_player_id: str | None
     game_id: str
     stage: str
     battle_round: int
@@ -480,7 +483,8 @@ def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPaylo
 def project_game_view(
     *,
     lifecycle: GameLifecycle,
-    viewer_player_id: str,
+    viewer_player_id: str | None = None,
+    viewer: ViewerContext | None = None,
 ) -> GameViewPayload:
     if type(lifecycle) is not GameLifecycle:
         raise GameLifecycleError("Game projection requires a GameLifecycle.")
@@ -488,7 +492,14 @@ def project_game_view(
     if state is None:
         raise GameLifecycleError("Game projection requires a started lifecycle.")
     catalog = lifecycle.config.army_catalog
-    viewer = _validate_viewer(state=state, viewer_player_id=viewer_player_id)
+    context = _validated_viewer_context(
+        state=state,
+        viewer_player_id=viewer_player_id,
+        viewer=viewer,
+    )
+    domain_viewer = (
+        state.player_ids[0] if context.viewer_player_id is None else context.viewer_player_id
+    )
     pending_request = _pending_request(lifecycle)
     secondary_mission_choices_revealed = state.secondary_mission_choices_are_revealed()
     battlefield_payload = (
@@ -501,14 +512,15 @@ def project_game_view(
     unit_display_by_id, model_display_by_id = _live_display_maps(
         state=state,
         catalog=catalog,
-        viewer_player_id=viewer,
+        viewer=context,
     )
     event_count = len(lifecycle.decision_controller.event_log.records)
     payload: GameViewPayload = {
         "projection_schema": PROJECTION_SCHEMA_VERSION,
         "projection_state_hash": "",
         "rules_catalog": rules_catalog,
-        "viewer_player_id": viewer,
+        "viewer_role": context.role.value,
+        "viewer_player_id": context.viewer_player_id,
         "game_id": state.game_id,
         "stage": state.stage.value,
         "battle_round": state.battle_round,
@@ -521,7 +533,9 @@ def project_game_view(
         "public_secondary_mission_choices": [
             validate_json_value(
                 choice.to_public_payload(
-                    viewer_player_id=viewer,
+                    viewer_player_id=(
+                        choice.player_id if context.policy.omniscient else domain_viewer
+                    ),
                     secondary_mission_choices_revealed=secondary_mission_choices_revealed,
                 )
             )
@@ -529,8 +543,10 @@ def project_game_view(
         ],
         "public_secondary_mission_card_states": [
             validate_json_value(card_state_payload)
-            for card_state_payload in state.public_secondary_mission_card_states(
-                viewer_player_id=viewer
+            for card_state_payload in _public_secondary_mission_card_states(
+                state=state,
+                viewer=context,
+                domain_viewer=domain_viewer,
             )
         ],
         "public_command_point_ledgers": [
@@ -539,7 +555,9 @@ def project_game_view(
         "public_victory_point_ledgers": [
             validate_json_value(
                 ledger.to_public_payload(
-                    viewer_player_id=viewer,
+                    viewer_player_id=(
+                        ledger.player_id if context.policy.omniscient else domain_viewer
+                    ),
                     secondary_mission_choices_revealed=secondary_mission_choices_revealed,
                 )
             )
@@ -552,10 +570,10 @@ def project_game_view(
         "model_display_by_id": model_display_by_id,
         "pending_decision": None
         if pending_request is None
-        else _decision_request_view(pending_request, viewer_player_id=viewer),
+        else _decision_request_view(pending_request, viewer=context),
         "pending_proposal": None
         if pending_request is None
-        else _proposal_view(pending_request, viewer_player_id=viewer),
+        else _proposal_view(pending_request, viewer=context),
         "event_count": event_count,
     }
     payload["projection_state_hash"] = _projection_state_hash(payload)
@@ -566,16 +584,19 @@ def _live_display_maps(
     *,
     state: GameState,
     catalog: ArmyCatalog,
-    viewer_player_id: str,
+    viewer: ViewerContext,
 ) -> tuple[dict[str, UnitDisplayPayload], dict[str, ModelDisplayPayload]]:
     placed_unit_ids = _placed_unit_ids(state)
     unit_display_by_id: dict[str, UnitDisplayPayload] = {}
     model_display_by_id: dict[str, ModelDisplayPayload] = {}
     for army in state.army_definitions:
         for unit in army.units:
-            if army.player_id != viewer_player_id and unit.unit_instance_id not in placed_unit_ids:
+            owns_army = viewer.owns_player(army.player_id)
+            visible = (
+                viewer.policy.omniscient or owns_army or unit.unit_instance_id in placed_unit_ids
+            )
+            if not visible:
                 continue
-            visible = army.player_id == viewer_player_id or unit.unit_instance_id in placed_unit_ids
             unit_display_by_id[unit.unit_instance_id] = _unit_display_payload(
                 state=state,
                 catalog=catalog,
@@ -983,6 +1004,7 @@ def _projection_state_hash(payload: GameViewPayload) -> str:
     hash_payload = {
         "projection_schema": payload["projection_schema"],
         "rules_catalog": payload["rules_catalog"],
+        "viewer_role": payload["viewer_role"],
         "viewer_player_id": payload["viewer_player_id"],
         "game_id": payload["game_id"],
         "stage": payload["stage"],
@@ -1026,14 +1048,14 @@ def _insert_unique[T](
 def _decision_request_view(
     request: DecisionRequest,
     *,
-    viewer_player_id: str,
+    viewer: ViewerContext,
 ) -> DecisionRequestViewPayload:
-    if decision_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
+    if decision_request_hidden_from_context(request=request, viewer=viewer):
         return {
             "schema_version": DECISION_REQUEST_VIEW_SCHEMA_VERSION,
-            "request_id": request.request_id,
+            "request_id": HIDDEN_REQUEST_ID,
             "decision_type": redacted_decision_type_for_hidden_viewer(),
-            "actor_id": request.actor_id,
+            "actor_id": None,
             "payload": {
                 "secret": True,
                 "hidden": True,
@@ -1055,9 +1077,9 @@ def _decision_request_view(
 def _proposal_view(
     request: DecisionRequest,
     *,
-    viewer_player_id: str,
+    viewer: ViewerContext,
 ) -> JsonValue:
-    if decision_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
+    if decision_request_hidden_from_context(request=request, viewer=viewer):
         return None
     if not request.is_parameterized_submission_request():
         return None
@@ -1092,15 +1114,55 @@ def _pending_request(lifecycle: GameLifecycle) -> DecisionRequest | None:
     return lifecycle.pending_decision_request()
 
 
-def _validate_viewer(*, state: GameState, viewer_player_id: object) -> str:
+def _validated_viewer_context(
+    *,
+    state: GameState,
+    viewer_player_id: object,
+    viewer: ViewerContext | None,
+) -> ViewerContext:
+    if viewer is not None:
+        if type(viewer) is not ViewerContext:
+            raise GameLifecycleError("Game projection viewer context is invalid.")
+        if viewer.viewer_player_id is not None and viewer.viewer_player_id not in state.player_ids:
+            raise GameLifecycleError("Viewer context player is not part of this game.")
+        if viewer_player_id is not None:
+            raise GameLifecycleError("Game projection accepts one viewer authority.")
+        return viewer
     if type(viewer_player_id) is not str:
         raise GameLifecycleError("viewer_player_id must be a string.")
-    viewer = viewer_player_id.strip()
-    if not viewer:
+    legacy_viewer = viewer_player_id.strip()
+    if not legacy_viewer:
         raise GameLifecycleError("viewer_player_id must not be empty.")
-    if viewer not in state.player_ids:
+    if legacy_viewer not in state.player_ids:
         raise GameLifecycleError("viewer_player_id must be a player in this game.")
-    return viewer
+    return ViewerContext.for_player(legacy_viewer)
+
+
+def _public_secondary_mission_card_states(
+    *,
+    state: GameState,
+    viewer: ViewerContext,
+    domain_viewer: str,
+) -> list[dict[str, JsonValue]]:
+    revealed = state.secondary_mission_choices_are_revealed()
+    if viewer.policy.omniscient:
+        return [
+            cast(dict[str, JsonValue], card_state.to_payload())
+            for card_state in state.secondary_mission_card_states
+        ]
+    if viewer.viewer_player_id is not None:
+        return state.public_secondary_mission_card_states(
+            viewer_player_id=domain_viewer,
+        )
+    if not revealed:
+        return []
+    return [
+        card_state.to_public_payload(
+            viewer_player_id=domain_viewer,
+            secondary_mission_choices_revealed=True,
+        )
+        for card_state in state.secondary_mission_card_states
+    ]
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

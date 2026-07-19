@@ -3989,27 +3989,5 @@
       "player-b"
     ]
   },
-  "participant_assignments": [
-    {
-      "participant_id": "participant-a",
-      "player_id": "player-a",
-      "role": "player"
-    },
-    {
-      "participant_id": "participant-b",
-      "player_id": "player-b",
-      "role": "player"
-    },
-    {
-      "participant_id": "spectator-one",
-      "player_id": null,
-      "role": "spectator"
-    },
-    {
-      "participant_id": "observer-one",
-      "player_id": null,
-      "role": "observer"
-    }
-  ],
-  "schema_version": "session-create-v1"
+  "schema_version": "session-create-v2"
 }

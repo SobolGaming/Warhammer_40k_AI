@@ -176,7 +176,7 @@ class SessionCommandEnvelope:
 @dataclass(frozen=True, slots=True)
 class SessionCommandJournalEntry:
     command_id: str
-    participant_id: str
+    principal_id: str
     envelope_fingerprint: str
     status_code: int
     response_payload: JsonValue
@@ -185,8 +185,8 @@ class SessionCommandJournalEntry:
         object.__setattr__(self, "command_id", _validate_identifier("command_id", self.command_id))
         object.__setattr__(
             self,
-            "participant_id",
-            _validate_identifier("participant_id", self.participant_id),
+            "principal_id",
+            _validate_identifier("principal_id", self.principal_id),
         )
         object.__setattr__(
             self,

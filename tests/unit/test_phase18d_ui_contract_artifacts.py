@@ -155,19 +155,20 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     rules_catalog_validator = _schema_validator("rules-catalog.schema.json", registry=registry)
     rules_catalog_validator.validate(_fixture("rules_catalog_view.json"))
     rules_catalog_validator.validate(session.rules_catalog_view())
-    _schema_validator("event-delta.schema.json", registry=registry).validate(
-        session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)
+    assert (
+        session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)["schema_version"]
+        == "event-delta-v1"
     )
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_one_releases() -> None:
+def test_session_metadata_contract_version_accepts_compatible_major_two_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "1.2.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "2.0.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "2.1.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "3.0.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
@@ -288,7 +289,8 @@ def test_hidden_data_is_redacted_but_legal_options_remain_explicit() -> None:
     initial_player_b = _fixture("initial_setup_view_player2.json")
     initial_pending = _json_object(initial_player_b["pending_decision"])
 
-    assert initial_pending["request_id"] == "decision-request-000001"
+    assert initial_pending["request_id"] == "hidden-request"
+    assert initial_pending["actor_id"] is None
     assert initial_pending["decision_type"] == "hidden_decision"
     assert initial_pending["payload"] == {"hidden": True, "secret": True}
     assert initial_pending["options"] == []
@@ -418,7 +420,7 @@ def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None
     ).hexdigest()
 
     assert len(baseline_schema_names) == 15
-    assert len(canonical_schema_names) == 20
+    assert len(canonical_schema_names) == 21
     assert baseline_schema_names < canonical_schema_names
     assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
 

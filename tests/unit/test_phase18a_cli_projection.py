@@ -17,6 +17,7 @@ from warhammer40k_core.adapters.projection import (
     project_game_view,
     project_rules_catalog_view,
 )
+from warhammer40k_core.adapters.redaction import HIDDEN_REQUEST_ID
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -141,9 +142,9 @@ def test_cli_adapter_renders_hidden_prompt_through_viewer_projection() -> None:
 
     prompt = render_pending_decision_for_cli(session=session, viewer_player_id="player-b")
 
-    assert prompt["request_id"] == request.request_id
+    assert prompt["request_id"] == HIDDEN_REQUEST_ID
     assert prompt["decision_type"] == "hidden_decision"
-    assert prompt["actor_id"] == "player-a"
+    assert prompt["actor_id"] is None
     assert prompt["is_parameterized"] is False
     assert prompt["options"] == []
 

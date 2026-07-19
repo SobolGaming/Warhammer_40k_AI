@@ -4,6 +4,7 @@ import copy
 from dataclasses import dataclass, field
 from typing import Self
 
+from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.decisions import submit_option, submit_parameterized_payload
 from warhammer40k_core.adapters.event_stream import EventStreamCursor, EventStreamDeltaPayload
@@ -83,6 +84,14 @@ class LocalGameSession(AdapterGameSession):
             viewer_player_id=viewer_player_id,
         )
 
+    def view_for_context(self, *, viewer: ViewerContext) -> GameViewPayload:
+        if type(viewer) is not ViewerContext:
+            raise GameLifecycleError("LocalGameSession view requires a ViewerContext.")
+        return project_game_view(
+            lifecycle=self.lifecycle,
+            viewer=viewer,
+        )
+
     def rules_catalog_view(self) -> RulesCatalogViewPayload:
         return project_rules_catalog_view(catalog=self.lifecycle.config.army_catalog)
 
@@ -101,6 +110,26 @@ class LocalGameSession(AdapterGameSession):
         return cursor.events_since(
             self.lifecycle.decision_controller.event_log,
             viewer_player_id=viewer,
+        )
+
+    def events_since_for_context(
+        self,
+        cursor: EventStreamCursor,
+        *,
+        viewer: ViewerContext,
+    ) -> EventStreamDeltaPayload:
+        if type(cursor) is not EventStreamCursor:
+            raise GameLifecycleError("LocalGameSession events require EventStreamCursor.")
+        if type(viewer) is not ViewerContext:
+            raise GameLifecycleError("LocalGameSession events require ViewerContext.")
+        state = self.lifecycle.state
+        if state is None:
+            raise GameLifecycleError("LocalGameSession event stream requires a started lifecycle.")
+        if viewer.viewer_player_id is not None and viewer.viewer_player_id not in state.player_ids:
+            raise GameLifecycleError("Viewer context player is not part of this game.")
+        return cursor.events_since_for_context(
+            self.lifecycle.decision_controller.event_log,
+            viewer=viewer,
         )
 
     def decision_record_count(self) -> int:

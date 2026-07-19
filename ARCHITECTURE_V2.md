@@ -137,12 +137,14 @@ session/game identities, participant metadata, start/close lifecycle, monotonic
 session revisions, viewer checkpoints, typed errors, shared redaction, and a
 bounded deterministic post-submission drain behind `AdapterGameSession`.
 **Phase 18F is complete** for the versioned mutation command envelope,
-expected-revision conflicts, participant-to-actor routing, idempotent outcome
+expected-revision conflicts, principal-to-actor routing, idempotent outcome
 journaling, serialized concurrent submissions, copy-on-write pre-commit
 isolation, atomic authoritative replacement, and replay/projection/event
-regressions. Durable cursor resynchronization, authenticated participant
-bindings, persistence, and recovery remain Phase 18G, Phase 18H, and Phase 18L
-work respectively.
+regressions. **Phase 18G and Phase 18H are complete** for signed opaque
+role-bound cursors, deterministic paged event deltas, explicit full-projection
+resynchronization, server-owned authenticated principal/role bindings, delayed
+spectator snapshots, and shared differential hidden-information redaction.
+Persistence and recovery remain Phase 18L work.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -380,6 +382,9 @@ Implemented foundation and partial integration baselines:
 | 18C | Complete | Shared adapter session facade for CLI, UI, network, headless, and replay producers |
 | 18D | Partial | Canonical versioned JSON Schema/OpenAPI baseline, registry-derived decision inventory with honest live/envelope-only coverage, normative external semantics, runtime request validation, and immutable breaking-change CI gate |
 | 18E | Complete | Formal reference session protocol, metadata/revisions, start/close, typed errors, viewer checkpoints, and bounded post-submission drain |
+| 18F | Complete | Optimistic concurrency, idempotent command journal, stale-client conflicts, and atomic copy-on-write command commit |
+| 18G | Complete | Signed role-bound event cursors, deterministic pagination/retention, typed resynchronization, and full-projection reconnect checkpoints |
+| 18H | Complete | Authenticated server-owned principal roles, explicit authorization policy, delayed spectators, and shared differential redaction |
 
 Next / planned sequence:
 
@@ -391,7 +396,6 @@ Next / planned sequence:
 | 17M | Planned | Source-backed generic semantic completion organized by reusable mechanic family |
 | 17N | Planned | Mission, terrain, deployment, objective, and battlefield package completion |
 | 17O | Planned | Multi-axis engine capability and support manifest |
-| 18E-18H | Partial / planned | Session semantics, concurrency, event resynchronization, and viewer authorization |
 | 18I-18M | Planned | UI interaction/coordinate contracts, interface intent, persistence, and backend conformance |
 | 19A-19F | Planned | Performance, AI orchestration, self-play, training corpus generation, and observability |
 | 20A-20D | Planned | Certified vertical slice, full-game regression, adversarial soak, and release gates |
@@ -5256,9 +5260,10 @@ terminal responses without importing Python or engine internals.
 This gate is not yet met. Phase 18I owns neutral interaction metadata and the
 remaining decision-family live scenarios, Phase 18J owns fully typed
 battlefield interaction/coordinate shapes, and Phase 18M owns generated-client
-conformance against the reference server. Phase 18E-18H continue to own hosted
-session, command, cursor, and viewer-authorization envelopes; their generic
-baseline shapes are not evidence of a complete strongly typed client contract.
+conformance against the reference server. Phases 18E-18H own the completed
+hosted session, command, cursor, reconnect, and viewer-authorization envelopes;
+those generic baseline shapes are not evidence of a complete strongly typed
+client contract.
 
 ## Phase 18E: session and transport semantics
 
@@ -5267,9 +5272,9 @@ Priority: P0.
 Status: Complete. `AdapterGameServer` and its local HTTP wrapper expose the
 formal reference session protocol while keeping create, advance, view, catalog,
 event, decision submission, replay export, typed errors, redaction, and
-engine-owned dice paths behind `AdapterGameSession`. Durable resynchronization,
-authentication, and persistence remain assigned to Phases 18G, 18H, and 18L
-rather than being implied by this phase.
+engine-owned dice paths behind `AdapterGameSession`. Durable resynchronization
+and authentication are completed by Phases 18G and 18H; persistence remains
+assigned to Phase 18L rather than being implied by this phase.
 
 Required operations:
 
@@ -5297,7 +5302,7 @@ Required session fields:
 - lifecycle status and typed terminal reason;
 - operational `created_at` and `last_activity_at` timestamps that do not affect
   simulation ordering;
-- participant-to-player assignments and spectator/observer roles;
+- server-owned principal-to-player assignments and explicit non-player roles;
 - server contract version and engine build/version identity.
 
 Advancement semantics:
@@ -5322,10 +5327,10 @@ Advancement semantics:
   operator/conformance use, and documented idle boundaries, not as a client-side
   replacement for post-submission draining; an advance at an unchanged pending
   decision boundary is rejected without revision or journal mutation;
-- the Phase 18F development transport authorizes start, advance, and close only
-  for the participant assigned to the first configured player as lifecycle
-  coordinator, while decision commands remain bound to the pending actor;
-  Phase 18H replaces that routing policy with authenticated operator roles.
+- authenticated administrators alone authorize start, advance, and close,
+  while authenticated player principals may submit only for their server-bound
+  pending actor; coaches, delayed spectators, and replay viewers are read-only
+  according to the Phase 18H role table.
 
 Invariants:
 
@@ -5358,10 +5363,11 @@ behavior.
 Priority: P0 for multiplayer and P1 for a single-device prototype.
 
 Status: Complete. The canonical `SessionCommandEnvelope` and
-`SessionCommandOutcome` schemas are published in contract version `1.2.0`, and
-the reference server exposes `ExecuteSessionCommand` as the normative mutation
-operation. The Phase 18E mutation routes remain explicitly deprecated additive
-compatibility endpoints during the documented support window.
+`SessionCommandOutcome` schemas are carried forward in contract version `2.0.0`,
+and the reference server exposes `ExecuteSessionCommand` as the normative
+mutation operation. The formal Phase 18E mutation routes have been removed from
+the 2.0 surface; authenticated legacy `/games` routes remain deprecated
+development adapters and do not replace the normative command envelope.
 Parameterized command envelopes reference the canonical proposal-payload union
 directly, keeping OpenAPI/generated-client types and runtime validation aligned.
 
@@ -5427,12 +5433,12 @@ errors leave the authoritative session unchanged; and a successful command
 publishes one coherent revision, replay, event, and projection checkpoint.
 
 This gate is met. The server serializes command handling, checks journaled
-outcomes before current-state preconditions, routes actor authority from
-out-of-envelope participant context, and applies new work to an isolated
+outcomes before current-state preconditions, routes actor authority from an
+authenticated server-owned principal binding, and applies new work to an isolated
 `AdapterGameSession` fork. It atomically replaces the authoritative in-memory
 session only for a committed result, together with the command journal entry.
 Focused real-session regressions cover racing valid submissions, reconnect
-retries, stale revisions and requests, wrong participants, malformed envelopes,
+retries, stale revisions and requests, wrong principals, malformed envelopes,
 illegal finite and parameterized proposals, closed sessions, injected
 pre-commit failure, terminal and closed sessions, and exact
 replay/event/projection reproduction. Phase 18L
@@ -5441,6 +5447,12 @@ still owns durable persistence of the same atomic unit across process failure.
 ## Phase 18G: event stream and resynchronization contract
 
 Priority: P0 for network play.
+
+Status: Complete. Contract 2.0 publishes `event-delta-v2` and
+`session-projection-v1`; the reference server issues signed opaque cursors bound
+to session, authenticated principal, visibility scope, authoritative log
+offset, revision, and projection hash. It retains bounded revision snapshots
+for deterministic pagination and delayed-view projection replacement.
 
 The current viewer-scoped integer cursor advances against the authoritative
 event-log length even when records are redacted. Phase 18G preserves and
@@ -5493,9 +5505,24 @@ Required tests:
 - polling, SSE, and WebSocket implementations, when present, produce equivalent
   deltas.
 
+Completion gate:
+
+This gate is met for the normative HTTP polling transport. Focused real-session
+regressions cover current, malformed, expired, ahead, wrong-session,
+wrong-principal, role-changed, revision-diverged, and hash-diverged cursors;
+authoritative sequence numbers across pagination; hidden-event redaction with
+unchanged cursor advancement; full projection replacement; and an eventless
+revision change. No SSE or WebSocket implementation is present, so there is no
+alternate delivery model to compare.
+
 ## Phase 18H: viewer identity, authorization, and hidden-information security
 
 Priority: P0.
+
+Status: Complete. Every reference-server route authenticates an opaque bearer
+credential through an injected server-owned principal registry and derives its
+viewer/actor context from the bound role. The 2.0 request schemas accept no
+participant assignments, viewer authority, or actor authority from clients.
 
 The backend authenticates a principal and binds it server-side to one of:
 
@@ -5537,6 +5564,16 @@ Completion gate:
 No route accepts arbitrary viewer identity as authority, and differential
 viewer tests prove that hidden information cannot leak through primary payloads
 or transport metadata.
+
+This gate is met. Players can submit only for their bound player; coaches share
+that player's visibility but cannot mutate; delayed spectators receive the
+latest retained snapshot one revision behind and public-only redaction;
+administrators receive omniscient live/operator access but cannot impersonate a
+decision actor; replay viewers receive catalog/replay access without live
+projection access. Missing and invalid credentials share one 401 shape,
+authorization failures share one 403 shape, role changes invalidate existing
+cursors, and projection/event/status/error redaction delegates to the shared
+adapter module.
 
 ## Phase 18I: UI interaction metadata and affordance contract
 

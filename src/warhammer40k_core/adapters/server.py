@@ -10,6 +10,15 @@ from typing import TYPE_CHECKING, Protocol, TypedDict, cast
 if TYPE_CHECKING:
     from http.server import ThreadingHTTPServer
 
+from warhammer40k_core.adapters.access_control import (
+    AccessControlError,
+    AuthenticatedPrincipal,
+    AuthenticationError,
+    AuthorizationError,
+    PrincipalRegistry,
+    ViewerContext,
+    default_principal_registry,
+)
 from warhammer40k_core.adapters.command_protocol import (
     SessionCommandEnvelope,
     SessionCommandJournalEntry,
@@ -18,11 +27,9 @@ from warhammer40k_core.adapters.command_protocol import (
     SessionCommandSubmissionKind,
 )
 from warhammer40k_core.adapters.contracts import AdapterGameSession
-from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.external_contract import (
     CREATE_SESSION_SCHEMA_NAME,
     CREATE_SESSION_SCHEMA_VERSION,
-    ERROR_ENVELOPE_SCHEMA_VERSION,
     FINITE_SUBMISSION_SCHEMA_NAME,
     FINITE_SUBMISSION_SCHEMA_VERSION,
     LIFECYCLE_STATUS_SCHEMA_VERSION,
@@ -41,8 +48,16 @@ from warhammer40k_core.adapters.projection import (
     RulesCatalogViewPayload,
 )
 from warhammer40k_core.adapters.redaction import (
-    decision_request_hidden_from_viewer,
+    public_error_envelope,
+    public_support_profile_payload,
     redacted_decision_type_for_hidden_viewer,
+    redacted_lifecycle_status,
+)
+from warhammer40k_core.adapters.server_sync import (
+    session_checkpoint,
+    session_event_delta_payload,
+    session_metadata_payload,
+    session_projection_payload,
 )
 from warhammer40k_core.adapters.server_types import (
     ServerApiError as ServerApiError,
@@ -83,16 +98,19 @@ from warhammer40k_core.adapters.server_validation import (
 from warhammer40k_core.adapters.server_validation import (
     validate_identifier as _validate_identifier,
 )
+from warhammer40k_core.adapters.session_events import (
+    DEFAULT_EVENT_PAGE_LIMIT,
+    DEFAULT_EVENT_RETENTION_LIMIT,
+    SessionCursorCodec,
+    SessionEventProtocolError,
+)
 from warhammer40k_core.adapters.session_protocol import (
     AuthoritativeSession,
     OperationalClock,
-    ParticipantAssignment,
     SessionCheckpointPayload,
     SessionMetadataPayload,
     SessionProtocolError,
-    default_participant_assignments,
     operational_timestamp,
-    participant_assignments_from_payload,
     session_command_outcome_payload,
     session_command_result_payload,
     utc_operational_clock,
@@ -157,7 +175,7 @@ class _MutationOutcome:
     status: LifecycleStatus
     committed: bool
     accepted: bool
-    from_cursor: int
+    from_cursor: str
 
 
 def _default_rules_catalog_view() -> RulesCatalogViewPayload:
@@ -171,6 +189,9 @@ class AdapterGameServer:
     session_factory: SessionFactory = LocalGameSession
     rules_catalog_provider: RulesCatalogProvider = _default_rules_catalog_view
     clock: OperationalClock = utc_operational_clock
+    principal_registry: PrincipalRegistry = field(default_factory=default_principal_registry)
+    cursor_codec: SessionCursorCodec = field(default_factory=SessionCursorCodec)
+    event_retention_limit: int = DEFAULT_EVENT_RETENTION_LIMIT
     _sessions: dict[str, AuthoritativeSession] = field(
         default_factory=_empty_session_registry,
         init=False,
@@ -190,19 +211,30 @@ class AdapterGameServer:
         path: str,
         query: Mapping[str, str] | None = None,
         body: JsonValue = None,
-        participant_id: str | None = None,
+        authorization: str | None = None,
     ) -> ServerResponse:
         # Phase 18E keeps the local dev server authoritative by serializing access to
         # the in-memory session registry. A production server can replace this with
         # an explicit session store or per-game actor loop.
         with self._lock:
             try:
+                principal = self.principal_registry.authenticate(authorization)
                 return self._handle(
                     method=_method(method),
                     path_segments=_path_segments(path),
                     query={} if query is None else query,
                     body=validate_json_value(body),
-                    participant_id=participant_id,
+                    principal=principal,
+                )
+            except AuthenticationError:
+                return _authentication_required_response()
+            except AuthorizationError:
+                return _access_denied_response()
+            except AccessControlError:
+                return _error_response(
+                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    code="access_control_failure",
+                    message="Access control processing failed.",
                 )
             except ServerApiError as exc:
                 return exc.to_response()
@@ -236,6 +268,12 @@ class AdapterGameServer:
                     code="session_command_protocol_failure",
                     message="Session command protocol processing failed.",
                 )
+            except SessionEventProtocolError:
+                return _error_response(
+                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    code="session_event_protocol_failure",
+                    message="Session event protocol processing failed.",
+                )
 
     def _handle(
         self,
@@ -244,32 +282,37 @@ class AdapterGameServer:
         path_segments: tuple[str, ...],
         query: Mapping[str, str],
         body: JsonValue,
-        participant_id: str | None,
+        principal: AuthenticatedPrincipal,
     ) -> ServerResponse:
         if method == "GET" and path_segments == ("rules-catalog",):
+            _require_permission(principal.policy.may_view_catalog)
             return ServerResponse(
                 status_code=int(HTTPStatus.OK),
                 payload=validate_json_value(cast(JsonValue, self.rules_catalog_provider())),
             )
         if method == "POST" and path_segments == ("games",):
-            return self._create_game(body)
+            _require_permission(principal.policy.may_create_session)
+            return self._create_game(body, principal=principal)
         if method == "POST" and path_segments == ("sessions",):
-            return self._create_protocol_session(body)
+            _require_permission(principal.policy.may_create_session)
+            return self._create_protocol_session(body, principal=principal)
         if path_segments and path_segments[0] == "sessions":
             return self._handle_protocol_session(
                 method=method,
                 path_segments=path_segments,
                 query=query,
                 body=body,
-                participant_id=participant_id,
+                principal=principal,
             )
         if len(path_segments) < 2 or path_segments[0] != "games":
             raise _not_found()
 
         game_id = _validate_identifier("game_id", path_segments[1])
         record = self._session_record_for_game(game_id)
+        viewer = principal.bind_to_session(player_ids=record.player_ids)
         session = record.adapter_session
         if method == "POST" and path_segments == ("games", game_id, "advance"):
+            _require_permission(viewer.policy.may_mutate_lifecycle)
             _ensure_session_open(record)
             status = session.advance_until_decision_or_terminal()
             record.started = True
@@ -277,34 +320,48 @@ class AdapterGameServer:
             return _status_response(
                 game_id=game_id,
                 status=status,
-                viewer_player_id=_optional_query_string(query, key="viewer_player_id"),
+                viewer=viewer,
             )
         if method == "GET" and path_segments == ("games", game_id, "view"):
+            _require_permission(viewer.policy.may_view_live)
+            _validate_viewer_claim(query=query, viewer=viewer)
             record.touch(self._timestamp())
             return ServerResponse(
                 status_code=int(HTTPStatus.OK),
                 payload=validate_json_value(
                     cast(
                         JsonValue,
-                        session.view(viewer_player_id=_query_string(query, key="viewer_player_id")),
+                        session_projection_payload(
+                            record=record,
+                            viewer=viewer,
+                            cursor_codec=self.cursor_codec,
+                            retention_limit=self.event_retention_limit,
+                        ),
                     )
                 ),
             )
         if method == "GET" and path_segments == ("games", game_id, "events"):
+            _require_permission(viewer.policy.may_view_live)
+            _validate_viewer_claim(query=query, viewer=viewer)
             record.touch(self._timestamp())
             return ServerResponse(
                 status_code=int(HTTPStatus.OK),
                 payload=validate_json_value(
                     cast(
                         JsonValue,
-                        session.events_since(
-                            EventStreamCursor(_query_int(query, key="cursor")),
-                            viewer_player_id=_query_string(query, key="viewer_player_id"),
+                        session_event_delta_payload(
+                            record=record,
+                            viewer=viewer,
+                            supplied_cursor=_query_string(query, key="cursor"),
+                            page_limit=_optional_page_limit(query),
+                            cursor_codec=self.cursor_codec,
+                            retention_limit=self.event_retention_limit,
                         ),
                     )
                 ),
             )
         if method == "GET" and path_segments == ("games", game_id, "replay"):
+            _require_permission(viewer.policy.may_export_replay)
             record.touch(self._timestamp())
             return ServerResponse(
                 status_code=int(HTTPStatus.OK),
@@ -316,10 +373,14 @@ class AdapterGameServer:
                 ),
             )
         if method == "GET" and path_segments == ("games", game_id, "support-profile"):
+            _require_permission(viewer.policy.may_view_support)
             record.touch(self._timestamp())
             return ServerResponse(
                 status_code=int(HTTPStatus.OK),
-                payload=validate_json_value(cast(JsonValue, session.support_profile())),
+                payload=public_support_profile_payload(
+                    session.support_profile(),
+                    viewer=viewer,
+                ),
             )
         if (
             method == "POST"
@@ -332,6 +393,7 @@ class AdapterGameServer:
                 record=record,
                 request_id=_validate_identifier("request_id", path_segments[3]),
                 body=body,
+                viewer=viewer,
             )
         if (
             method == "POST"
@@ -344,6 +406,7 @@ class AdapterGameServer:
                 record=record,
                 request_id=_validate_identifier("request_id", path_segments[3]),
                 body=body,
+                viewer=viewer,
             )
         raise _not_found()
 
@@ -354,44 +417,38 @@ class AdapterGameServer:
         path_segments: tuple[str, ...],
         query: Mapping[str, str],
         body: JsonValue,
-        participant_id: str | None,
+        principal: AuthenticatedPrincipal,
     ) -> ServerResponse:
         if len(path_segments) < 2:
             raise _not_found()
         session_id = _validate_identifier("session_id", path_segments[1])
         record = self._protocol_session(session_id)
+        viewer = principal.bind_to_session(player_ids=record.player_ids)
         base = ("sessions", session_id)
         if method == "POST" and path_segments == (*base, "commands"):
             return self._execute_protocol_command(
                 record=record,
-                participant_id=participant_id,
+                principal=principal,
+                viewer=viewer,
                 body=body,
             )
         if method == "GET" and path_segments == base:
-            viewer_player_id = _optional_query_string(query, key="viewer_player_id")
+            _require_permission(viewer.policy.may_view_live)
+            _validate_viewer_claim(query=query, viewer=viewer)
             record.touch(self._timestamp())
             return _session_metadata_response(
                 record=record,
-                viewer_player_id=viewer_player_id,
-            )
-        if method == "POST" and path_segments == (*base, "start"):
-            return self._start_protocol_session(
-                record=record,
-                viewer_player_id=_query_string(query, key="viewer_player_id"),
-            )
-        if method == "POST" and path_segments == (*base, "advance"):
-            return self._advance_protocol_session(
-                record=record,
-                viewer_player_id=_query_string(query, key="viewer_player_id"),
-            )
-        if method == "POST" and path_segments == (*base, "close"):
-            return self._close_protocol_session(
-                record=record,
-                viewer_player_id=_query_string(query, key="viewer_player_id"),
+                viewer=viewer,
+                cursor_codec=self.cursor_codec,
             )
         if method == "GET" and path_segments == (*base, "projection"):
-            projection = record.adapter_session.view(
-                viewer_player_id=_query_string(query, key="viewer_player_id")
+            _require_permission(viewer.policy.may_view_live)
+            _validate_viewer_claim(query=query, viewer=viewer)
+            projection = session_projection_payload(
+                record=record,
+                viewer=viewer,
+                cursor_codec=self.cursor_codec,
+                retention_limit=self.event_retention_limit,
             )
             record.touch(self._timestamp())
             return ServerResponse(
@@ -399,6 +456,7 @@ class AdapterGameServer:
                 payload=validate_json_value(cast(JsonValue, projection)),
             )
         if method == "GET" and path_segments == (*base, "catalog"):
+            _require_permission(viewer.policy.may_view_catalog)
             catalog = record.adapter_session.rules_catalog_view()
             record.touch(self._timestamp())
             return ServerResponse(
@@ -406,9 +464,15 @@ class AdapterGameServer:
                 payload=validate_json_value(cast(JsonValue, catalog)),
             )
         if method == "GET" and path_segments == (*base, "events"):
-            delta = record.adapter_session.events_since(
-                EventStreamCursor(_query_int(query, key="cursor")),
-                viewer_player_id=_query_string(query, key="viewer_player_id"),
+            _require_permission(viewer.policy.may_view_live)
+            _validate_viewer_claim(query=query, viewer=viewer)
+            delta = session_event_delta_payload(
+                record=record,
+                viewer=viewer,
+                supplied_cursor=_query_string(query, key="cursor"),
+                page_limit=_optional_page_limit(query),
+                cursor_codec=self.cursor_codec,
+                retention_limit=self.event_retention_limit,
             )
             record.touch(self._timestamp())
             return ServerResponse(
@@ -416,6 +480,7 @@ class AdapterGameServer:
                 payload=validate_json_value(cast(JsonValue, delta)),
             )
         if method == "GET" and path_segments == (*base, "replay"):
+            _require_permission(viewer.policy.may_export_replay)
             replay = record.adapter_session.replay_artifact(
                 artifact_id=f"session-replay:{session_id}"
             )
@@ -424,59 +489,14 @@ class AdapterGameServer:
                 status_code=int(HTTPStatus.OK),
                 payload=validate_json_value(cast(JsonValue, replay)),
             )
-        if (
-            method == "POST"
-            and len(path_segments) == 5
-            and path_segments[:3] == ("sessions", session_id, "decisions")
-            and path_segments[4] == "option"
-        ):
-            outcome = self._apply_option(
-                record=record,
-                request_id=_validate_identifier("request_id", path_segments[3]),
-                body=body,
-                require_started=True,
-            )
-            return _session_command_response(
-                record=record,
-                operation="submit_finite_decision",
-                committed=outcome.committed,
-                accepted=outcome.accepted,
-                viewer_player_id=outcome.actor_id,
-                from_cursor=outcome.from_cursor,
-                status_code=(
-                    HTTPStatus.OK if outcome.accepted else HTTPStatus.UNPROCESSABLE_ENTITY
-                ),
-            )
-        if (
-            method == "POST"
-            and len(path_segments) == 5
-            and path_segments[:3] == ("sessions", session_id, "decisions")
-            and path_segments[4] == "payload"
-        ):
-            outcome = self._apply_parameterized_payload(
-                record=record,
-                request_id=_validate_identifier("request_id", path_segments[3]),
-                body=body,
-                require_started=True,
-            )
-            return _session_command_response(
-                record=record,
-                operation="submit_parameterized_decision",
-                committed=outcome.committed,
-                accepted=outcome.accepted,
-                viewer_player_id=outcome.actor_id,
-                from_cursor=outcome.from_cursor,
-                status_code=(
-                    HTTPStatus.OK if outcome.accepted else HTTPStatus.UNPROCESSABLE_ENTITY
-                ),
-            )
         raise _not_found()
 
     def _execute_protocol_command(
         self,
         *,
         record: AuthoritativeSession,
-        participant_id: str | None,
+        principal: AuthenticatedPrincipal,
+        viewer: ViewerContext,
         body: JsonValue,
     ) -> ServerResponse:
         envelope = _session_command_envelope(body)
@@ -486,11 +506,10 @@ class AdapterGameServer:
                 code="session_id_mismatch",
                 message="Command session_id does not match the target session.",
             )
-        participant = _command_participant_id(participant_id)
         fingerprint = envelope.fingerprint()
         existing = record.command_entry(envelope.command_id)
         if existing is not None:
-            if existing.participant_id != participant:
+            if existing.principal_id != principal.principal_id:
                 raise _actor_not_authorized()
             if existing.envelope_fingerprint != fingerprint:
                 raise ServerApiError(
@@ -509,18 +528,20 @@ class AdapterGameServer:
                 message="Session revision conflicted.",
             )
         kind = envelope.submission_kind
-        player_id = (
-            record.lifecycle_coordinator_player_id(participant)
-            if kind
-            in {
-                SessionCommandSubmissionKind.START_SESSION,
-                SessionCommandSubmissionKind.ADVANCE_SESSION,
-                SessionCommandSubmissionKind.CLOSE_SESSION,
-            }
-            else record.controlling_player_id(participant)
-        )
-        if player_id is None:
-            raise _actor_not_authorized()
+        lifecycle_command = kind in {
+            SessionCommandSubmissionKind.START_SESSION,
+            SessionCommandSubmissionKind.ADVANCE_SESSION,
+            SessionCommandSubmissionKind.CLOSE_SESSION,
+        }
+        if lifecycle_command:
+            _require_permission(viewer.policy.may_mutate_lifecycle)
+            player_id = record.player_ids[0]
+        else:
+            _require_permission(viewer.policy.may_submit_decision)
+            authorized_player_id = viewer.viewer_player_id
+            if authorized_player_id is None:
+                raise _actor_not_authorized()
+            player_id = authorized_player_id
         if kind is SessionCommandSubmissionKind.ADVANCE_SESSION:
             _ensure_session_active(record)
             if (
@@ -537,6 +558,7 @@ class AdapterGameServer:
             record=staged,
             envelope=envelope,
             player_id=player_id,
+            viewer=viewer,
         )
         response_payload = _json_object("session command outcome", response.payload)
         if response_payload.get("committed") is not True:
@@ -555,7 +577,7 @@ class AdapterGameServer:
         staged.record_command(
             SessionCommandJournalEntry(
                 command_id=envelope.command_id,
-                participant_id=participant,
+                principal_id=principal.principal_id,
                 envelope_fingerprint=fingerprint,
                 status_code=response.status_code,
                 response_payload=response.payload,
@@ -570,14 +592,15 @@ class AdapterGameServer:
         record: AuthoritativeSession,
         envelope: SessionCommandEnvelope,
         player_id: str,
+        viewer: ViewerContext,
     ) -> ServerResponse:
         kind = envelope.submission_kind
         if kind is SessionCommandSubmissionKind.START_SESSION:
-            response = self._start_protocol_session(record=record, viewer_player_id=player_id)
+            response = self._start_protocol_session(record=record, viewer=viewer)
         elif kind is SessionCommandSubmissionKind.ADVANCE_SESSION:
-            response = self._advance_protocol_session(record=record, viewer_player_id=player_id)
+            response = self._advance_protocol_session(record=record, viewer=viewer)
         elif kind is SessionCommandSubmissionKind.CLOSE_SESSION:
-            response = self._close_protocol_session(record=record, viewer_player_id=player_id)
+            response = self._close_protocol_session(record=record, viewer=viewer)
         else:
             _ensure_session_active(record)
             request_id = _command_request_id(envelope)
@@ -600,6 +623,7 @@ class AdapterGameServer:
                         "result_id": _command_result_id(envelope),
                     },
                     require_started=True,
+                    viewer=viewer,
                 )
                 operation = "submit_finite_decision"
             else:
@@ -615,6 +639,7 @@ class AdapterGameServer:
                         "result_id": _command_result_id(envelope),
                     },
                     require_started=True,
+                    viewer=viewer,
                 )
                 operation = "submit_parameterized_decision"
             response = _session_command_response(
@@ -622,7 +647,8 @@ class AdapterGameServer:
                 operation=operation,
                 committed=outcome.committed,
                 accepted=outcome.accepted,
-                viewer_player_id=player_id,
+                viewer=viewer,
+                cursor_codec=self.cursor_codec,
                 from_cursor=outcome.from_cursor,
                 status_code=(
                     HTTPStatus.OK if outcome.accepted else HTTPStatus.UNPROCESSABLE_ENTITY
@@ -633,11 +659,16 @@ class AdapterGameServer:
             response=response,
         )
 
-    def _create_protocol_session(self, body: JsonValue) -> ServerResponse:
+    def _create_protocol_session(
+        self,
+        body: JsonValue,
+        *,
+        principal: AuthenticatedPrincipal,
+    ) -> ServerResponse:
         payload = _json_object("POST /sessions body", body)
         _require_exact_keys(
             payload,
-            keys=frozenset({"schema_version", "config", "participant_assignments"}),
+            keys=frozenset({"schema_version", "config"}),
         )
         _require_external_schema_version(
             payload,
@@ -650,28 +681,21 @@ class AdapterGameServer:
             payload_name="session create payload",
         )
         config = GameConfig.from_payload(cast(GameConfigPayload, payload["config"]))
-        try:
-            assignments = participant_assignments_from_payload(
-                payload["participant_assignments"],
-                player_ids=config.player_ids,
-            )
-        except SessionProtocolError as exc:
-            raise ServerApiError(
-                status_code=HTTPStatus.BAD_REQUEST,
-                code="participant_assignments_invalid",
-                message="Participant assignments do not match the game players.",
-            ) from exc
-        record = self._create_authoritative_session(
-            config=config,
-            participant_assignments=assignments,
-        )
+        record = self._create_authoritative_session(config=config)
+        viewer = principal.bind_to_session(player_ids=record.player_ids)
         return _session_metadata_response(
             record=record,
-            viewer_player_id=None,
+            viewer=viewer,
+            cursor_codec=self.cursor_codec,
             status_code=HTTPStatus.CREATED,
         )
 
-    def _create_game(self, body: JsonValue) -> ServerResponse:
+    def _create_game(
+        self,
+        body: JsonValue,
+        *,
+        principal: AuthenticatedPrincipal,
+    ) -> ServerResponse:
         payload = _json_object("POST /games body", body)
         _require_exact_keys(payload, keys=frozenset({"schema_version", "config"}))
         _require_external_schema_version(
@@ -685,22 +709,19 @@ class AdapterGameServer:
             payload_name="create session payload",
         )
         config = GameConfig.from_payload(cast(GameConfigPayload, payload["config"]))
-        record = self._create_authoritative_session(
-            config=config,
-            participant_assignments=default_participant_assignments(config.player_ids),
-        )
+        record = self._create_authoritative_session(config=config)
+        viewer = principal.bind_to_session(player_ids=record.player_ids)
         return _status_response(
             game_id=config.game_id,
             status=record.lifecycle_status,
             status_code=HTTPStatus.CREATED,
-            viewer_player_id=None,
+            viewer=viewer,
         )
 
     def _create_authoritative_session(
         self,
         *,
         config: GameConfig,
-        participant_assignments: tuple[ParticipantAssignment, ...],
     ) -> AuthoritativeSession:
         if config.game_id in self._session_id_by_game_id:
             raise ServerApiError(
@@ -715,13 +736,13 @@ class AdapterGameServer:
                 code="session_already_exists",
                 message="Session already exists.",
             )
+        self.principal_registry.validate_player_bindings(player_ids=config.player_ids)
         session = self.session_factory()
         status = session.start(config)
         record = AuthoritativeSession.create(
             session_id=session_id,
             adapter_session=session,
             config=config,
-            participant_assignments=participant_assignments,
             lifecycle_status=status,
             created_at=self._timestamp(),
         )
@@ -733,7 +754,7 @@ class AdapterGameServer:
         self,
         *,
         record: AuthoritativeSession,
-        viewer_player_id: str,
+        viewer: ViewerContext,
     ) -> ServerResponse:
         _ensure_session_open(record)
         if record.started:
@@ -742,7 +763,11 @@ class AdapterGameServer:
                 code="session_already_started",
                 message="Session has already started.",
             )
-        before = _session_checkpoint(record=record, viewer_player_id=viewer_player_id)
+        before = session_checkpoint(
+            record=record,
+            viewer=viewer,
+            cursor_codec=self.cursor_codec,
+        )
         status = record.adapter_session.advance_until_decision_or_terminal()
         record.started = True
         record.commit_status(status, timestamp=self._timestamp())
@@ -751,7 +776,8 @@ class AdapterGameServer:
             operation="start_session",
             committed=True,
             accepted=True,
-            viewer_player_id=viewer_player_id,
+            viewer=viewer,
+            cursor_codec=self.cursor_codec,
             from_cursor=before["event_cursor"],
         )
 
@@ -759,10 +785,14 @@ class AdapterGameServer:
         self,
         *,
         record: AuthoritativeSession,
-        viewer_player_id: str,
+        viewer: ViewerContext,
     ) -> ServerResponse:
         _ensure_session_active(record)
-        before = _session_checkpoint(record=record, viewer_player_id=viewer_player_id)
+        before = session_checkpoint(
+            record=record,
+            viewer=viewer,
+            cursor_codec=self.cursor_codec,
+        )
         status = record.adapter_session.advance_until_decision_or_terminal()
         record.commit_status(status, timestamp=self._timestamp())
         return _session_command_response(
@@ -770,7 +800,8 @@ class AdapterGameServer:
             operation="advance_session",
             committed=True,
             accepted=True,
-            viewer_player_id=viewer_player_id,
+            viewer=viewer,
+            cursor_codec=self.cursor_codec,
             from_cursor=before["event_cursor"],
         )
 
@@ -778,17 +809,22 @@ class AdapterGameServer:
         self,
         *,
         record: AuthoritativeSession,
-        viewer_player_id: str,
+        viewer: ViewerContext,
     ) -> ServerResponse:
         _ensure_session_open(record)
-        before = _session_checkpoint(record=record, viewer_player_id=viewer_player_id)
+        before = session_checkpoint(
+            record=record,
+            viewer=viewer,
+            cursor_codec=self.cursor_codec,
+        )
         record.close(timestamp=self._timestamp())
         return _session_command_response(
             record=record,
             operation="close_session",
             committed=True,
             accepted=True,
-            viewer_player_id=viewer_player_id,
+            viewer=viewer,
+            cursor_codec=self.cursor_codec,
             from_cursor=before["event_cursor"],
         )
 
@@ -799,18 +835,21 @@ class AdapterGameServer:
         record: AuthoritativeSession,
         request_id: str,
         body: JsonValue,
+        viewer: ViewerContext,
     ) -> ServerResponse:
+        _require_permission(viewer.policy.may_submit_decision)
         outcome = self._apply_option(
             record=record,
             request_id=request_id,
             body=body,
             require_started=False,
+            viewer=viewer,
         )
         return _status_response(
             game_id=game_id,
             status=outcome.status,
             status_code=(HTTPStatus.OK if outcome.accepted else HTTPStatus.UNPROCESSABLE_ENTITY),
-            viewer_player_id=outcome.actor_id,
+            viewer=viewer,
         )
 
     def _apply_option(
@@ -820,6 +859,7 @@ class AdapterGameServer:
         request_id: str,
         body: JsonValue,
         require_started: bool,
+        viewer: ViewerContext,
     ) -> _MutationOutcome:
         payload = _json_object("finite option submission body", body)
         _require_exact_keys(
@@ -836,7 +876,8 @@ class AdapterGameServer:
             schema_name=FINITE_SUBMISSION_SCHEMA_NAME,
             payload_name="finite option submission",
         )
-        actor_id = _required_string(payload, key="actor_id")
+        claimed_actor_id = _required_string(payload, key="actor_id")
+        actor_id = _authorized_actor_id(viewer=viewer, claimed_actor_id=claimed_actor_id)
         option_id = _required_string(payload, key="option_id")
         _ensure_session_open(record)
         if require_started and not record.started:
@@ -857,7 +898,11 @@ class AdapterGameServer:
                 code="wrong_selected_option",
                 message="Selected option is not one of the pending engine-emitted options.",
             )
-        before = _session_checkpoint(record=record, viewer_player_id=actor_id)
+        before = session_checkpoint(
+            record=record,
+            viewer=viewer,
+            cursor_codec=self.cursor_codec,
+        )
         record_count_before = _decision_record_count(record)
         result_id = _required_string(payload, key="result_id")
         status = session.submit_option(
@@ -887,18 +932,21 @@ class AdapterGameServer:
         record: AuthoritativeSession,
         request_id: str,
         body: JsonValue,
+        viewer: ViewerContext,
     ) -> ServerResponse:
+        _require_permission(viewer.policy.may_submit_decision)
         outcome = self._apply_parameterized_payload(
             record=record,
             request_id=request_id,
             body=body,
             require_started=False,
+            viewer=viewer,
         )
         return _status_response(
             game_id=game_id,
             status=outcome.status,
             status_code=(HTTPStatus.OK if outcome.accepted else HTTPStatus.UNPROCESSABLE_ENTITY),
-            viewer_player_id=outcome.actor_id,
+            viewer=viewer,
         )
 
     def _apply_parameterized_payload(
@@ -908,6 +956,7 @@ class AdapterGameServer:
         request_id: str,
         body: JsonValue,
         require_started: bool,
+        viewer: ViewerContext,
     ) -> _MutationOutcome:
         payload = _json_object("parameterized submission body", body)
         _require_exact_keys(
@@ -919,7 +968,8 @@ class AdapterGameServer:
             expected=PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
             payload_name="parameterized submission",
         )
-        actor_id = _required_string(payload, key="actor_id")
+        claimed_actor_id = _required_string(payload, key="actor_id")
+        actor_id = _authorized_actor_id(viewer=viewer, claimed_actor_id=claimed_actor_id)
         submitted_payload = validate_json_value(payload["payload"])
         _reject_raw_dice_payload(submitted_payload)
         _require_canonical_request_schema(
@@ -946,7 +996,11 @@ class AdapterGameServer:
                 code="request_is_not_parameterized",
                 message="Pending request does not accept a parameterized payload.",
             )
-        before = _session_checkpoint(record=record, viewer_player_id=actor_id)
+        before = session_checkpoint(
+            record=record,
+            viewer=viewer,
+            cursor_codec=self.cursor_codec,
+        )
         record_count_before = _decision_record_count(record)
         result_id = _required_string(payload, key="result_id")
         status = session.submit_parameterized_payload(
@@ -1012,12 +1066,6 @@ def _session_command_envelope(body: JsonValue) -> SessionCommandEnvelope:
             code="malformed_command_envelope",
             message="Session command envelope was malformed.",
         ) from exc
-
-
-def _command_participant_id(participant_id: str | None) -> str:
-    if type(participant_id) is not str or not participant_id.strip():
-        raise _actor_not_authorized()
-    return participant_id.strip()
 
 
 def _command_request_id(envelope: SessionCommandEnvelope) -> str:
@@ -1089,7 +1137,7 @@ def _session_command_outcome_response(
         raise SessionProtocolError("Session command result operation is invalid.")
     event_range = _json_object("session command event range", base["event_range"])
     from_cursor = event_range.get("from_cursor")
-    if type(from_cursor) is not int:
+    if type(from_cursor) is not str:
         raise SessionProtocolError("Session command result event range is invalid.")
     payload = session_command_outcome_payload(
         command_id=command_id,
@@ -1111,7 +1159,56 @@ def _actor_not_authorized() -> ServerApiError:
     return ServerApiError(
         status_code=HTTPStatus.FORBIDDEN,
         code="actor_not_authorized",
-        message="Participant is not authorized to submit this command.",
+        message="Authenticated principal is not authorized for this operation.",
+    )
+
+
+def _authorized_actor_id(*, viewer: ViewerContext, claimed_actor_id: str) -> str:
+    _require_permission(viewer.policy.may_submit_decision)
+    actor_id = viewer.viewer_player_id
+    if actor_id is None or claimed_actor_id != actor_id:
+        raise _actor_not_authorized()
+    return actor_id
+
+
+def _require_permission(allowed: bool) -> None:
+    if type(allowed) is not bool:
+        raise AccessControlError("Authorization policy value must be bool.")
+    if not allowed:
+        raise AuthorizationError("Authenticated principal lacks route permission.")
+
+
+def _validate_viewer_claim(
+    *,
+    query: Mapping[str, str],
+    viewer: ViewerContext,
+) -> None:
+    claim = _optional_query_string(query, key="viewer_player_id")
+    if claim is None:
+        return
+    if viewer.viewer_player_id is None or claim != viewer.viewer_player_id:
+        raise AuthorizationError("Viewer claim does not match authenticated principal.")
+
+
+def _optional_page_limit(query: Mapping[str, str]) -> int:
+    if "limit" not in query:
+        return DEFAULT_EVENT_PAGE_LIMIT
+    return _query_int(query, key="limit")
+
+
+def _authentication_required_response() -> ServerResponse:
+    return _error_response(
+        status_code=HTTPStatus.UNAUTHORIZED,
+        code="authentication_required",
+        message="A valid bearer credential is required.",
+    )
+
+
+def _access_denied_response() -> ServerResponse:
+    return _error_response(
+        status_code=HTTPStatus.FORBIDDEN,
+        code="access_denied",
+        message="Authenticated principal is not authorized for this resource.",
     )
 
 
@@ -1223,53 +1320,24 @@ def _decision_history_advanced(
     return record_count_after > record_count_before
 
 
-def _session_checkpoint(
-    *,
-    record: AuthoritativeSession,
-    viewer_player_id: str,
-) -> SessionCheckpointPayload:
-    view = record.adapter_session.view(viewer_player_id=viewer_player_id)
-    return {
-        "viewer_player_id": viewer_player_id,
-        "projection_state_hash": view["projection_state_hash"],
-        "event_cursor": view["event_count"],
-    }
-
-
-def _session_metadata_payload(
-    *,
-    record: AuthoritativeSession,
-    viewer_player_id: str | None,
-) -> JsonValue:
-    anchor_viewer = record.player_ids[0] if viewer_player_id is None else viewer_player_id
-    checkpoint = _session_checkpoint(
-        record=record,
-        viewer_player_id=anchor_viewer,
-    )
-    metadata = record.metadata_payload(
-        lifecycle_status=cast(
-            JsonValue,
-            _status_summary(record.lifecycle_status, viewer_player_id=viewer_player_id),
-        ),
-        projection_state_hash=(
-            None if viewer_player_id is None else checkpoint["projection_state_hash"]
-        ),
-        event_cursor=checkpoint["event_cursor"],
-    )
-    return validate_json_value(cast(JsonValue, metadata))
-
-
 def _session_metadata_response(
     *,
     record: AuthoritativeSession,
-    viewer_player_id: str | None,
+    viewer: ViewerContext,
+    cursor_codec: SessionCursorCodec,
     status_code: HTTPStatus = HTTPStatus.OK,
 ) -> ServerResponse:
     return ServerResponse(
         status_code=int(status_code),
-        payload=_session_metadata_payload(
-            record=record,
-            viewer_player_id=viewer_player_id,
+        payload=validate_json_value(
+            cast(
+                JsonValue,
+                session_metadata_payload(
+                    record=record,
+                    viewer=viewer,
+                    cursor_codec=cursor_codec,
+                ),
+            )
         ),
     )
 
@@ -1280,21 +1348,20 @@ def _session_command_response(
     operation: str,
     committed: bool,
     accepted: bool,
-    viewer_player_id: str,
-    from_cursor: int,
+    viewer: ViewerContext,
+    cursor_codec: SessionCursorCodec,
+    from_cursor: str,
     status_code: HTTPStatus = HTTPStatus.OK,
 ) -> ServerResponse:
-    checkpoint = _session_checkpoint(
+    checkpoint = session_checkpoint(
         record=record,
-        viewer_player_id=viewer_player_id,
+        viewer=viewer,
+        cursor_codec=cursor_codec,
     )
-    metadata = record.metadata_payload(
-        lifecycle_status=cast(
-            JsonValue,
-            _status_summary(record.lifecycle_status, viewer_player_id=viewer_player_id),
-        ),
-        projection_state_hash=checkpoint["projection_state_hash"],
-        event_cursor=checkpoint["event_cursor"],
+    metadata = session_metadata_payload(
+        record=record,
+        viewer=viewer,
+        cursor_codec=cursor_codec,
     )
     payload = session_command_result_payload(
         operation=operation,
@@ -1384,76 +1451,27 @@ def _status_response(
     *,
     game_id: str,
     status: LifecycleStatus,
-    viewer_player_id: str | None,
+    viewer: ViewerContext,
     status_code: HTTPStatus = HTTPStatus.OK,
 ) -> ServerResponse:
     payload: ServerGameStatusPayload = {
         "schema_version": LIFECYCLE_STATUS_SCHEMA_VERSION,
         "game_id": game_id,
-        "status": _status_summary(status, viewer_player_id=viewer_player_id),
+        "status": redacted_lifecycle_status(status, viewer=viewer),
     }
     return ServerResponse(
         status_code=int(status_code),
         payload=validate_json_value(cast(JsonValue, payload)),
     )
-
-
-def _status_summary(
-    status: LifecycleStatus,
-    *,
-    viewer_player_id: str | None,
-) -> ServerLifecycleStatusPayload:
-    decision_request = status.decision_request
-    hidden_pending = (
-        False
-        if decision_request is None
-        else decision_request_hidden_from_viewer(
-            request=decision_request,
-            viewer_player_id=viewer_player_id,
-        )
-    )
-    metadata_payload = (
-        status.payload
-        if status.status_kind
-        in {
-            LifecycleStatusKind.TERMINAL,
-            LifecycleStatusKind.INVALID,
-            LifecycleStatusKind.UNSUPPORTED,
-        }
-        else None
-    )
-    return {
-        "stage": status.stage.value,
-        "status_kind": status.status_kind.value,
-        "message": status.message,
-        "payload": metadata_payload,
-        "pending_request_id": (
-            None if decision_request is None or hidden_pending else decision_request.request_id
-        ),
-        "decision_type": (
-            None
-            if decision_request is None
-            else redacted_decision_type_for_hidden_viewer()
-            if hidden_pending
-            else decision_request.decision_type
-        ),
-        "actor_id": (
-            None if decision_request is None or hidden_pending else decision_request.actor_id
-        ),
-    }
 
 
 def _error_response(*, status_code: HTTPStatus, code: str, message: str) -> ServerResponse:
-    payload: dict[str, JsonValue] = {
-        "schema_version": ERROR_ENVELOPE_SCHEMA_VERSION,
-        "error": {
-            "code": _validate_identifier("error code", code),
-            "message": _validate_identifier("error message", message),
-        },
-    }
     return ServerResponse(
         status_code=int(status_code),
-        payload=validate_json_value(cast(JsonValue, payload)),
+        payload=public_error_envelope(
+            code=_validate_identifier("error code", code),
+            message=_validate_identifier("error message", message),
+        ),
     )
 
 

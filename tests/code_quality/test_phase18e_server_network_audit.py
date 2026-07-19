@@ -43,6 +43,8 @@ REDACTION_CONSUMER_MODULES = (
     SRC / "adapters" / "projection.py",
     SRC / "adapters" / "event_stream.py",
     SRC / "adapters" / "server.py",
+    SRC / "adapters" / "server_sync.py",
+    SRC / "adapters" / "server_types.py",
 )
 LOCAL_REDACTION_HELPER_NAMES = frozenset(
     {

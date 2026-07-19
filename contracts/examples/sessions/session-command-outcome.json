@@ -1,25 +1,27 @@
 {
   "accepted": true,
   "checkpoint": {
-    "event_cursor": 9,
-    "projection_state_hash": "ad9e0743a44262b49109646fa176c799879e90f4d83dcc848f4cbd33a9a28ad6",
-    "viewer_player_id": "player-a"
+    "event_cursor": "eyJjIjoiYWRtaW5pc3RyYXRvcjpzaGFyZWQ6MCIsImgiOiJjYjYwMjc1NjYxNmVkN2FjOTJiZmI4Mjk2NTY1NTlmZWQ0Y2ZiZWEzMDMyYTc3ODA3MTkzYzliYjcwZDRiOWFlIiwibyI6OSwicCI6InByaW5jaXBhbC1hZG1pbmlzdHJhdG9yIiwiciI6MiwicyI6InNlc3Npb24tcGhhc2UxOGUtY29udHJhY3Qtc2Vzc2lvbiIsInYiOjF9.DwGhU9B9m_sfkLQCGyypOZYozrdplRqvEr9VwQwSmtk",
+    "projection_state_hash": "cb602756616ed7ac92bfb829656559fed4cfbea3032a77807193c9bb70d4b9ae",
+    "session_revision": 2,
+    "viewer_player_id": null,
+    "visibility_role": "administrator"
   },
   "command_id": "phase18f-contract-command-000001",
   "committed": true,
   "event_range": {
-    "from_cursor": 9,
-    "to_cursor": 9
+    "from_cursor": "eyJjIjoiYWRtaW5pc3RyYXRvcjpzaGFyZWQ6MCIsImgiOiJjYjYwMjc1NjYxNmVkN2FjOTJiZmI4Mjk2NTY1NTlmZWQ0Y2ZiZWEzMDMyYTc3ODA3MTkzYzliYjcwZDRiOWFlIiwibyI6OSwicCI6InByaW5jaXBhbC1hZG1pbmlzdHJhdG9yIiwiciI6MSwicyI6InNlc3Npb24tcGhhc2UxOGUtY29udHJhY3Qtc2Vzc2lvbiIsInYiOjF9.-wEHI2V_vYuI04ptHEyeoxmGVFUuuYSn1fi05mgSres",
+    "to_cursor": "eyJjIjoiYWRtaW5pc3RyYXRvcjpzaGFyZWQ6MCIsImgiOiJjYjYwMjc1NjYxNmVkN2FjOTJiZmI4Mjk2NTY1NTlmZWQ0Y2ZiZWEzMDMyYTc3ODA3MTkzYzliYjcwZDRiOWFlIiwibyI6OSwicCI6InByaW5jaXBhbC1hZG1pbmlzdHJhdG9yIiwiciI6MiwicyI6InNlc3Npb24tcGhhc2UxOGUtY29udHJhY3Qtc2Vzc2lvbiIsInYiOjF9.DwGhU9B9m_sfkLQCGyypOZYozrdplRqvEr9VwQwSmtk"
   },
   "operation": "close_session",
   "outcome_code": "command_committed",
-  "schema_version": "session-command-outcome-v1",
+  "schema_version": "session-command-outcome-v2",
   "session": {
     "catalog_id": "phase9a-canonical",
     "created_at": "2026-07-18T20:00:00Z",
     "engine_build_id": "warhammer40k-core-v2:0.1.0",
     "engine_version": "0.1.0",
-    "event_cursor": 9,
+    "event_cursor": "eyJjIjoiYWRtaW5pc3RyYXRvcjpzaGFyZWQ6MCIsImgiOiJjYjYwMjc1NjYxNmVkN2FjOTJiZmI4Mjk2NTY1NTlmZWQ0Y2ZiZWEzMDMyYTc3ODA3MTkzYzliYjcwZDRiOWFlIiwibyI6OSwicCI6InByaW5jaXBhbC1hZG1pbmlzdHJhdG9yIiwiciI6MiwicyI6InNlc3Npb24tcGhhc2UxOGUtY29udHJhY3Qtc2Vzc2lvbiIsInYiOjF9.DwGhU9B9m_sfkLQCGyypOZYozrdplRqvEr9VwQwSmtk",
     "game_id": "phase18e-contract-session",
     "last_activity_at": "2026-07-18T20:00:00Z",
     "lifecycle_status": {
@@ -31,36 +33,14 @@
       "stage": "setup",
       "status_kind": "waiting_for_decision"
     },
-    "participant_assignments": [
-      {
-        "participant_id": "participant-a",
-        "player_id": "player-a",
-        "role": "player"
-      },
-      {
-        "participant_id": "participant-b",
-        "player_id": "player-b",
-        "role": "player"
-      },
-      {
-        "participant_id": "spectator-one",
-        "player_id": null,
-        "role": "spectator"
-      },
-      {
-        "participant_id": "observer-one",
-        "player_id": null,
-        "role": "observer"
-      }
-    ],
-    "projection_state_hash": "ad9e0743a44262b49109646fa176c799879e90f4d83dcc848f4cbd33a9a28ad6",
+    "projection_state_hash": "cb602756616ed7ac92bfb829656559fed4cfbea3032a77807193c9bb70d4b9ae",
     "ruleset_id": {
       "edition": "11e",
       "game": "warhammer_40000",
       "version": "core-v2-setup-prebattle-ui-smoke"
     },
-    "schema_version": "session-metadata-v1",
-    "server_contract_version": "1.2.0",
+    "schema_version": "session-metadata-v2",
+    "server_contract_version": "2.0.0",
     "session_id": "session-phase18e-contract-session",
     "session_revision": 2,
     "session_state": "closed",
@@ -69,6 +49,14 @@
     "terminal_reason": {
       "code": "session_closed",
       "message": "Session was closed."
+    },
+    "visibility": {
+      "delay_revisions": 0,
+      "may_mutate_lifecycle": true,
+      "may_submit_decision": false,
+      "omniscient": true,
+      "player_id": null,
+      "role": "administrator"
     }
   }
 }

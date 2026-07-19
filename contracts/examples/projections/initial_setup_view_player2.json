@@ -1426,7 +1426,7 @@
     }
   },
   "pending_decision": {
-    "actor_id": "player-a",
+    "actor_id": null,
     "decision_type": "hidden_decision",
     "is_parameterized": false,
     "options": [],
@@ -1434,7 +1434,7 @@
       "hidden": true,
       "secret": true
     },
-    "request_id": "decision-request-000001",
+    "request_id": "hidden-request",
     "schema_version": "decision-request-view-v1"
   },
   "pending_proposal": null,
@@ -1442,8 +1442,8 @@
     "player-a",
     "player-b"
   ],
-  "projection_schema": "game-view-v4-unit-resources",
-  "projection_state_hash": "546e09b0ebddac0088ea2d09b97d65a6d264d13979e68123f76dc39132b015a2",
+  "projection_schema": "game-view-v5-role-scoped",
+  "projection_state_hash": "b06729c480bc4b87519c7effa936e2d160f92fed5b941bcc47f79fbf3f13a48a",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
@@ -1521,5 +1521,6 @@
       "visible_status": "visible"
     }
   },
-  "viewer_player_id": "player-b"
+  "viewer_player_id": "player-b",
+  "viewer_role": "player"
 }

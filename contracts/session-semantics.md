@@ -1,36 +1,34 @@
 # Session semantics
 
-The Phase 18E-18F reference server exposes a formal session and optimistic-
-concurrency command protocol around the Phase 18C `AdapterGameSession` facade.
+The Phase 18E-18H reference server exposes a formal authenticated session,
+optimistic-concurrency command, and reconnect protocol around the Phase 18C
+`AdapterGameSession` facade.
 `session_id` identifies the server-owned transport session and is distinct from
 the authoritative engine `game_id`.
 Session metadata records ruleset, catalog, source-package, contract, engine,
-and build identities; participant-to-player assignments; spectator/observer
-roles; operational timestamps; lifecycle state; terminal reason; monotonic
-session revision; viewer event cursor; and viewer projection hash.
+and build identities; the authenticated visibility role; operational
+timestamps; lifecycle state; a role-scoped terminal reason; monotonic session
+revision; signed viewer event cursor; and viewer projection hash.
 
-A client creates a session with `SessionCreatePayload`, then explicitly starts
-it. Creation initializes the engine-owned game behind the facade while leaving
-the transport session in `created`; `StartSession` performs the first bounded
-drain and moves it to `active` or `terminal`. `CloseSession` makes the session
-closed and rejects later mutations with a typed error. Participant assignments
-are validated as metadata. The development HTTP transport supplies participant
-context in `X-Participant-ID`, outside the command envelope. Decision commands
-map that participant to the pending engine actor. Lifecycle commands use the
-participant assigned to the first configured player as the development
-lifecycle coordinator; other player, spectator, and observer participants may
-not start, explicitly advance, or close the session. This is routing context
-rather than authentication: Phase 18H still owns authenticated operator and
-principal binding, and a caller-supplied `viewer_player_id` is not authentication.
+A client authenticates with an opaque bearer credential. An administrator may
+create a session with `SessionCreatePayload`; the server validates that every
+configured game player has a server-owned player-principal binding. Creation
+initializes the engine-owned game behind the facade while leaving the transport
+session in `created`. The administrator starts and closes it through typed
+commands. A player principal may submit a decision only when its bound
+`player_id` owns the pending engine request. Coaches, delayed spectators, and
+replay viewers cannot mutate. Client-supplied participant assignments are
+schema-invalid, and no header, query, or body actor/viewer value establishes
+authority.
 
 Every normative mutation uses `POST /sessions/{session_id}/commands` with a
 `SessionCommandEnvelope`. The envelope carries `command_id`, `session_id`,
 `expected_session_revision`, the pending `request_id` and client `result_id`
 where applicable, and one typed lifecycle, finite-option, or parameterized
-submission. It never accepts a viewer or actor identity. The older Phase 18E
-start, finite, parameterized, advance, and close routes remain deprecated
-compatibility operations through at least 2026-10-16 and one released minor
-line, whichever is later; they are not the Phase 18F concurrency contract.
+submission. It never accepts a viewer or actor identity. The formal Phase 18E
+start, finite, parameterized, advance, and close routes are not part of contract
+2.0. Deprecated authenticated `/games` development routes remain separate from
+the Phase 18F command contract and must not be used by new clients.
 The parameterized command payload references the canonical proposal union, so
 OpenAPI, generated clients, installed runtime validation, and the standalone
 parameterized route accept the same 19 proposal kinds.
@@ -43,24 +41,38 @@ parameterized route accept the same 19 proposal kinds.
   to authoritative history: start, state-changing advance, close, an accepted
   decision, or a recorded rule-invalid retry attempt. A Phase 18F command must
   present the current expected revision before mutation.
-- `projection_state_hash` identifies a viewer projection state; event cursors
-  are monotonically increasing indexes into the viewer-scoped event stream. A
-  metadata response without a viewer does not expose a projection hash.
-- A client starts at cursor `0`, applies events in response order, and advances
-  to `next_cursor`. It must retrieve a fresh projection after cursor loss or
-  state-hash drift.
+- `projection_state_hash` identifies one role-scoped projection. An event cursor
+  is an opaque HMAC-authenticated token bound to the session, principal,
+  visibility role/player/delay scope, authoritative event-log offset, session
+  revision, and projection hash. Clients never construct or inspect offsets.
+- A client begins with the cursor from metadata or a full projection, applies
+  events by deterministic `sequence_number`, and advances to `next_cursor`.
+  `has_more` requires another page from that cursor.
+- The default page size is 100, the maximum is 500, and the reference retention
+  window is 4096 authoritative records. Offset advancement is based on the
+  authoritative log even when a record's contents are redacted.
+- Malformed, expired, ahead, wrong-session, wrong-principal/role, revision-
+  divergent, or projection-hash-divergent cursors return a successful typed
+  delta with `resync_required: true`, no events, and a stable `resync_reason`.
+  The client then replaces all derived state from `GET /projection` and resumes
+  from that projection's cursor.
+- The reference in-memory server generates a cryptographically random signing
+  key per server instance. If session state is restored under a new key,
+  outstanding cursors are classified as malformed and use the same typed full-
+  projection resynchronization path. Phase 18L owns durable protected state/key
+  storage when sessions and cursors must survive process recovery.
 - Only the current pending request may be answered. `request_id`, `actor_id`,
   `result_id`, option ID, proposal request context, and schema version are
   validated before engine mutation.
 - Retrying a consumed request with a new command ID is stale/conflicting;
   clients must fetch the current projection rather than guessing a replacement
-  ID. Retrying the same command ID, participant context, and canonical envelope
+  ID. Retrying the same command ID, authenticated principal, and canonical envelope
   returns its cached original public outcome.
 
 Command processing is serialized by the server authority. A command is parsed
 and validated, checked for an existing journal outcome, compared with the
-current revision and pending request, authorized against the participant
-assignment, and then applied to an isolated session fork. Only a committed
+current revision and pending request, authorized against the principal binding
+and role policy, and then applied to an isolated session fork. Only a committed
 result replaces the authoritative session together with its journal entry,
 revision, projection checkpoint, and event cursor. Malformed commands,
 revision/request conflicts, unauthorized actors, illegal unrecorded proposals,
@@ -68,10 +80,10 @@ terminal/closed sessions, and failures before that replacement leave
 authoritative state unchanged. Two commands racing on one revision can
 therefore commit at most one result.
 
-A repeated `command_id` is idempotent only when both its participant context
+A repeated `command_id` is idempotent only when both its principal identity
 and canonical envelope fingerprint match the journaled command. Reuse with a
-different envelope returns `command_id_conflict`; reuse by another participant
-returns `actor_not_authorized` without revealing the journaled command. The
+different envelope returns `command_id_conflict`; reuse by another principal
+returns the shared authorization denial without revealing the journaled command. The
 cached status and response body are returned unchanged, including after a new
 HTTP connection.
 
@@ -105,9 +117,10 @@ An advance at an existing `waiting_for_decision` boundary returns
 revision, or reserving the command ID.
 
 The in-memory command journal proves Phase 18F ordering and retry semantics;
-Phase 18L owns durable journal/state persistence and crash recovery. Phase 18G
-still owns durable event cursor tokens, retention windows, and reconnect
-resynchronization semantics.
+Phase 18G adds signed cursor, retention, pagination, delayed-snapshot, and
+reconnect resynchronization semantics over retained in-memory revision
+snapshots. Phase 18L still owns durable journal/state persistence, durable
+cursor-key management, compaction storage, and crash recovery.
 
 ## Lifecycle outcomes
 
@@ -121,7 +134,6 @@ all failures to a generic retry.
 
 The required formal operations are `CreateSession`, `GetSessionMetadata`,
 `ExecuteSessionCommand`, `GetProjection`, `GetCatalog`, `GetEvents`, and
-`ExportReplay`. `StartSession`, `SubmitFiniteDecision`,
-`SubmitParameterizedDecision`, `AdvanceSession`, and `CloseSession` remain
-documented deprecated Phase 18E compatibility operations during the support
-window above.
+`ExportReplay`. Start, finite/parameterized submission, explicit advance, and
+close are typed `ExecuteSessionCommand` variants rather than separate authority
+surfaces.

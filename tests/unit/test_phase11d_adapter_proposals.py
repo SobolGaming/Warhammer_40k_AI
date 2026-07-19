@@ -22,13 +22,16 @@ from warhammer40k_core.adapters.decisions import (
     submit_option,
     submit_parameterized_payload,
 )
-from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.event_stream import (
+    ADAPTER_EVENT_STREAM_DELTA_SCHEMA_VERSION,
+    EventStreamCursor,
+)
 from warhammer40k_core.adapters.external_contract import (
     DECISION_REQUEST_VIEW_SCHEMA_VERSION,
-    EVENT_STREAM_DELTA_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import project_game_view
+from warhammer40k_core.adapters.redaction import HIDDEN_REQUEST_ID
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import (
@@ -1259,9 +1262,9 @@ def test_projection_redacts_secret_pending_decisions_for_non_actor_viewers() -> 
     assert request.actor_id == "player-a"
     assert redacted_pending == {
         "schema_version": DECISION_REQUEST_VIEW_SCHEMA_VERSION,
-        "request_id": request.request_id,
+        "request_id": HIDDEN_REQUEST_ID,
         "decision_type": "hidden_decision",
-        "actor_id": "player-a",
+        "actor_id": None,
         "payload": {
             "secret": True,
             "hidden": True,
@@ -1296,20 +1299,16 @@ def test_viewer_scoped_event_cursor_redacts_opponent_secret_decision_payloads() 
         if "player-a" in json.dumps(event["payload"], sort_keys=True)
     ]
     player_a_events_for_player_b_blob = json.dumps(player_a_events_for_player_b, sort_keys=True)
-    secondary_event_payloads_for_player_b: list[dict[str, object]] = []
-    for event in player_b_delta["events"]:
-        if event["event_type"] != "secondary_mission_choice_recorded":
-            continue
-        payload = cast(dict[str, object], event["payload"])
-        if payload["player_id"] == "player-a":
-            secondary_event_payloads_for_player_b.append(payload)
+    secondary_event_payloads_for_player_b = [
+        cast(dict[str, object], event["payload"])
+        for event in player_b_delta["events"]
+        if event["event_type"] == "secondary_mission_choice_recorded"
+    ]
     player_a_blob = json.dumps(player_a_delta, sort_keys=True)
 
     assert secondary_event_payloads_for_player_b == [
         {
             "game_id": "phase11d-game",
-            "player_id": "player-a",
-            "setup_step": "select_secondary_missions",
             "selected": True,
             "hidden": True,
         }
@@ -1448,7 +1447,7 @@ def test_adapter_helpers_and_cursor_reject_invalid_inputs() -> None:
     with pytest.raises(GameLifecycleError, match="ahead of the event log"):
         EventStreamCursor(value=2).events_since(event_log, viewer_player_id="player-a")
     assert EventStreamCursor(value=1).events_since(event_log, viewer_player_id="player-a") == {
-        "schema_version": EVENT_STREAM_DELTA_SCHEMA_VERSION,
+        "schema_version": ADAPTER_EVENT_STREAM_DELTA_SCHEMA_VERSION,
         "viewer_player_id": "player-a",
         "cursor": 1,
         "next_cursor": 1,

@@ -13,6 +13,7 @@ from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.redaction import HIDDEN_REQUEST_ID
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.deployment_zones import (
@@ -1504,8 +1505,6 @@ def test_secondary_reveal_event_emits_after_both_choices_without_pre_reveal_leak
     )
     assert cast(dict[str, JsonValue], first_choice_event["payload"]) == {
         "game_id": "phase11e-game",
-        "player_id": "player-a",
-        "setup_step": "select_secondary_missions",
         "selected": True,
         "hidden": True,
     }
@@ -1517,12 +1516,12 @@ def test_secondary_reveal_event_emits_after_both_choices_without_pre_reveal_leak
         event
         for event in player_a_before_second_submit["events"]
         if event["event_type"] == "decision_requested"
-        and cast(dict[str, JsonValue], event["payload"])["actor_id"] == "player-b"
+        and cast(dict[str, JsonValue], event["payload"])["decision_type"] == "hidden_decision"
     )
     assert cast(dict[str, JsonValue], second_request_event["payload"]) == {
-        "request_id": "decision-request-000002",
+        "request_id": HIDDEN_REQUEST_ID,
         "decision_type": "hidden_decision",
-        "actor_id": "player-b",
+        "actor_id": None,
         "secret": True,
         "hidden": True,
     }

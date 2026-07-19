@@ -2,11 +2,16 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
+from warhammer40k_core.adapters.access_control import (
+    DEV_ADMIN_TOKEN,
+    bearer_authorization,
+)
 from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.server import AdapterGameServer, ServerResponse
+from warhammer40k_core.adapters.session_events import SessionCursorCodec
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
@@ -16,41 +21,37 @@ def phase18e_session_examples() -> dict[str, JsonValue]:
     create_payload: JsonValue = {
         "schema_version": SESSION_CREATE_SCHEMA_VERSION,
         "config": config.to_payload(),
-        "participant_assignments": [
-            {
-                "participant_id": "participant-a",
-                "role": "player",
-                "player_id": "player-a",
-            },
-            {
-                "participant_id": "participant-b",
-                "role": "player",
-                "player_id": "player-b",
-            },
-            {
-                "participant_id": "spectator-one",
-                "role": "spectator",
-                "player_id": None,
-            },
-            {
-                "participant_id": "observer-one",
-                "role": "observer",
-                "player_id": None,
-            },
-        ],
     }
     timestamp = datetime(2026, 7, 18, 20, 0, tzinfo=UTC)
-    server = AdapterGameServer(clock=lambda: timestamp)
+    server = AdapterGameServer(
+        clock=lambda: timestamp,
+        cursor_codec=SessionCursorCodec(secret=b"core-v2-local-dev-cursor-secret"),
+    )
     created = _successful_payload(
-        server.handle(method="POST", path="/sessions", body=create_payload),
+        server.handle(
+            method="POST",
+            path="/sessions",
+            body=create_payload,
+            authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+        ),
         expected_status=201,
     )
     session_id = _required_string(created, "session_id")
+    start_envelope: JsonValue = {
+        "schema_version": SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+        "command_id": "phase18g-contract-start-000001",
+        "session_id": session_id,
+        "expected_session_revision": 0,
+        "request_id": None,
+        "result_id": None,
+        "submission": {"submission_kind": "start_session"},
+    }
     started = _successful_payload(
         server.handle(
             method="POST",
-            path=f"/sessions/{session_id}/start",
-            query={"viewer_player_id": "player-a"},
+            path=f"/sessions/{session_id}/commands",
+            body=start_envelope,
+            authorization=bearer_authorization(DEV_ADMIN_TOKEN),
         ),
         expected_status=200,
     )
@@ -67,8 +68,8 @@ def phase18e_session_examples() -> dict[str, JsonValue]:
         server.handle(
             method="POST",
             path=f"/sessions/{session_id}/commands",
-            participant_id="participant-a",
             body=command_envelope,
+            authorization=bearer_authorization(DEV_ADMIN_TOKEN),
         ),
         expected_status=200,
     )

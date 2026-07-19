@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from http import HTTPStatus
 
-from warhammer40k_core.adapters.external_contract import ERROR_ENVELOPE_SCHEMA_VERSION
+from warhammer40k_core.adapters.redaction import public_error_envelope
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
@@ -41,13 +41,7 @@ class ServerApiError(ValueError):
     def to_response(self) -> ServerResponse:
         return ServerResponse(
             status_code=int(self.status_code),
-            payload={
-                "schema_version": ERROR_ENVELOPE_SCHEMA_VERSION,
-                "error": {
-                    "code": self.code,
-                    "message": str(self),
-                },
-            },
+            payload=public_error_envelope(code=self.code, message=str(self)),
         )
 
 
