@@ -80,6 +80,7 @@ SESSION_PROTOCOL_METHODS = frozenset(
         "advance_until_decision_or_terminal",
         "decision_record_count",
         "events_since",
+        "fork",
         "replay_artifact",
         "rules_catalog_view",
         "start",

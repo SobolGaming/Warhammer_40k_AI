@@ -12,7 +12,7 @@ from referencing.jsonschema import Schema
 
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
-EXTERNAL_CONTRACT_VERSION = "1.1.0"
+EXTERNAL_CONTRACT_VERSION = "1.2.0"
 
 CREATE_SESSION_SCHEMA_VERSION = "create-session-v1"
 DECISION_FAMILY_COVERAGE_SCHEMA_VERSION = "decision-family-coverage-v1"
@@ -23,6 +23,8 @@ FINITE_SUBMISSION_SCHEMA_VERSION = "finite-submission-v1"
 LIFECYCLE_STATUS_SCHEMA_VERSION = "lifecycle-status-v1"
 PARAMETERIZED_SUBMISSION_SCHEMA_VERSION = "parameterized-submission-v1"
 SESSION_COMMAND_RESULT_SCHEMA_VERSION = "session-command-result-v1"
+SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION = "session-command-envelope-v1"
+SESSION_COMMAND_OUTCOME_SCHEMA_VERSION = "session-command-outcome-v1"
 SESSION_CREATE_SCHEMA_VERSION = "session-create-v1"
 SESSION_METADATA_SCHEMA_VERSION = "session-metadata-v1"
 
@@ -31,12 +33,14 @@ FINITE_SUBMISSION_SCHEMA_NAME = "finite-submission.schema.json"
 PARAMETERIZED_SUBMISSION_SCHEMA_NAME = "parameterized-submission.schema.json"
 PROPOSAL_PAYLOAD_SCHEMA_NAME = "proposal-payload.schema.json"
 SESSION_CREATE_SCHEMA_NAME = "session-create.schema.json"
+SESSION_COMMAND_ENVELOPE_SCHEMA_NAME = "session-command-envelope.schema.json"
 
 _REQUEST_SCHEMA_NAMES = frozenset(
     {
         CREATE_SESSION_SCHEMA_NAME,
         FINITE_SUBMISSION_SCHEMA_NAME,
         PARAMETERIZED_SUBMISSION_SCHEMA_NAME,
+        SESSION_COMMAND_ENVELOPE_SCHEMA_NAME,
         SESSION_CREATE_SCHEMA_NAME,
     }
 )

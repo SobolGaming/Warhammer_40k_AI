@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, Self, runtime_checkable
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import (
@@ -26,6 +26,10 @@ if TYPE_CHECKING:
 
 @runtime_checkable
 class AdapterGameSession(Protocol):
+    def fork(self) -> Self:
+        """Return an isolated copy for an atomic transport transaction."""
+        ...
+
     def start(self, config: GameConfig) -> LifecycleStatus:
         """Start the authoritative lifecycle for one game."""
         ...

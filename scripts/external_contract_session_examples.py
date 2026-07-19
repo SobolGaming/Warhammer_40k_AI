@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from warhammer40k_core.adapters.external_contract import SESSION_CREATE_SCHEMA_VERSION
+from warhammer40k_core.adapters.external_contract import (
+    SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+    SESSION_CREATE_SCHEMA_VERSION,
+)
 from warhammer40k_core.adapters.server import AdapterGameServer, ServerResponse
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -51,10 +54,30 @@ def phase18e_session_examples() -> dict[str, JsonValue]:
         ),
         expected_status=200,
     )
+    command_envelope: JsonValue = {
+        "schema_version": SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+        "command_id": "phase18f-contract-command-000001",
+        "session_id": session_id,
+        "expected_session_revision": 1,
+        "request_id": None,
+        "result_id": None,
+        "submission": {"submission_kind": "advance_session"},
+    }
+    command_outcome = _successful_payload(
+        server.handle(
+            method="POST",
+            path=f"/sessions/{session_id}/commands",
+            participant_id="participant-a",
+            body=command_envelope,
+        ),
+        expected_status=200,
+    )
     return {
         "session-create.json": create_payload,
         "session-metadata-created.json": created,
         "session-command-started.json": started,
+        "session-command-envelope.json": command_envelope,
+        "session-command-outcome.json": command_outcome,
     }
 
 

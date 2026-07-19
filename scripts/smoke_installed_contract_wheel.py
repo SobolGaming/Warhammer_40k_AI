@@ -24,6 +24,8 @@ EXPECTED_SCHEMA_NAMES = frozenset(
         "proposal-payload.schema.json",
         "replay-metadata.schema.json",
         "rules-catalog.schema.json",
+        "session-command-envelope.schema.json",
+        "session-command-outcome.schema.json",
         "session-command-result.schema.json",
         "session-create.schema.json",
         "session-metadata.schema.json",
@@ -43,6 +45,8 @@ from warhammer40k_core.adapters.external_contract import (
     FINITE_SUBMISSION_SCHEMA_VERSION,
     PARAMETERIZED_SUBMISSION_SCHEMA_NAME,
     PARAMETERIZED_SUBMISSION_SCHEMA_VERSION,
+    SESSION_COMMAND_ENVELOPE_SCHEMA_NAME,
+    SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_NAME,
     SESSION_CREATE_SCHEMA_VERSION,
     validate_external_request_payload,
@@ -65,6 +69,8 @@ expected_schema_names = {
     "proposal-payload.schema.json",
     "replay-metadata.schema.json",
     "rules-catalog.schema.json",
+    "session-command-envelope.schema.json",
+    "session-command-outcome.schema.json",
     "session-command-result.schema.json",
     "session-create.schema.json",
     "session-metadata.schema.json",
@@ -124,6 +130,17 @@ session_create_payload = validate_json_value(
         ],
     }
 )
+session_command_payload = validate_json_value(
+    {
+        "schema_version": SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+        "command_id": "installed-wheel-session-command",
+        "session_id": "installed-wheel-session",
+        "expected_session_revision": 0,
+        "request_id": None,
+        "result_id": None,
+        "submission": {"submission_kind": "start_session"},
+    }
+)
 for schema_name, payload, payload_name in (
     (CREATE_SESSION_SCHEMA_NAME, create_payload, "installed create session"),
     (FINITE_SUBMISSION_SCHEMA_NAME, finite_payload, "installed finite submission"),
@@ -133,6 +150,11 @@ for schema_name, payload, payload_name in (
         "installed parameterized submission",
     ),
     (SESSION_CREATE_SCHEMA_NAME, session_create_payload, "installed session create"),
+    (
+        SESSION_COMMAND_ENVELOPE_SCHEMA_NAME,
+        session_command_payload,
+        "installed session command",
+    ),
 ):
     validate_external_request_payload(
         schema_name=schema_name,
@@ -150,6 +172,7 @@ print(
                 "finite",
                 "parameterized",
                 "session_create",
+                "session_command",
             ],
         },
         sort_keys=True,

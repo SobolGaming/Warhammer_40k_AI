@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Warhammer 40,000 CORE V2 Adapter Contract",
-    "version": "1.1.0",
-    "description": "Transport-neutral Phase 18E session protocol over the shared AdapterGameSession decision path."
+    "version": "1.2.0",
+    "description": "Transport-neutral Phase 18F optimistic-concurrency session protocol over the shared AdapterGameSession decision path."
   },
   "servers": [
     {"url": "http://127.0.0.1:8000"}
@@ -189,6 +189,7 @@
     },
     "/sessions/{session_id}/start": {
       "post": {
+        "deprecated": true,
         "operationId": "startSession",
         "parameters": [
           {"$ref": "#/components/parameters/SessionId"},
@@ -196,6 +197,31 @@
         ],
         "responses": {
           "200": {"$ref": "#/components/responses/SessionCommandResult"},
+          "default": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/sessions/{session_id}/commands": {
+      "post": {
+        "operationId": "executeSessionCommand",
+        "parameters": [
+          {"$ref": "#/components/parameters/SessionId"},
+          {"$ref": "#/components/parameters/ParticipantId"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "./schemas/session-command-envelope.schema.json"}
+            }
+          }
+        },
+        "responses": {
+          "200": {"$ref": "#/components/responses/SessionCommandOutcome"},
+          "400": {"$ref": "#/components/responses/Error"},
+          "403": {"$ref": "#/components/responses/Error"},
+          "409": {"$ref": "#/components/responses/Error"},
+          "422": {"$ref": "#/components/responses/SessionCommandRejected"},
           "default": {"$ref": "#/components/responses/Error"}
         }
       }
@@ -254,6 +280,7 @@
     },
     "/sessions/{session_id}/decisions/{request_id}/option": {
       "post": {
+        "deprecated": true,
         "operationId": "submitSessionFiniteDecision",
         "parameters": [
           {"$ref": "#/components/parameters/SessionId"},
@@ -274,6 +301,7 @@
     },
     "/sessions/{session_id}/decisions/{request_id}/payload": {
       "post": {
+        "deprecated": true,
         "operationId": "submitSessionParameterizedDecision",
         "parameters": [
           {"$ref": "#/components/parameters/SessionId"},
@@ -296,6 +324,7 @@
     },
     "/sessions/{session_id}/advance": {
       "post": {
+        "deprecated": true,
         "operationId": "advanceAuthoritativeSession",
         "parameters": [
           {"$ref": "#/components/parameters/SessionId"},
@@ -324,6 +353,7 @@
     },
     "/sessions/{session_id}/close": {
       "post": {
+        "deprecated": true,
         "operationId": "closeSession",
         "parameters": [
           {"$ref": "#/components/parameters/SessionId"},
@@ -354,6 +384,13 @@
         "name": "viewer_player_id",
         "in": "query",
         "required": false,
+        "schema": {"type": "string", "minLength": 1}
+      },
+      "ParticipantId": {
+        "name": "X-Participant-ID",
+        "in": "header",
+        "required": true,
+        "description": "Transport-supplied participant routing context; Phase 18H replaces this development binding with authenticated principal context.",
         "schema": {"type": "string", "minLength": 1}
       },
       "RequestId": {
@@ -396,6 +433,27 @@
           }
         }
       },
+      "SessionCommandOutcome": {
+        "description": "Idempotent Phase 18F command outcome with coherent post-commit session state.",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "./schemas/session-command-outcome.schema.json"}
+          }
+        }
+      },
+      "SessionCommandRejected": {
+        "description": "A recorded rejected command outcome or a proposal rejected before commit.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "oneOf": [
+                {"$ref": "./schemas/session-command-outcome.schema.json"},
+                {"$ref": "./schemas/error-envelope.schema.json"}
+              ]
+            }
+          }
+        }
+      },
       "SessionMetadata": {
         "description": "Authoritative session identity, lifecycle, and checkpoint metadata.",
         "content": {
@@ -416,6 +474,8 @@
       "ReplayMetadata": {"$ref": "./schemas/replay-metadata.schema.json"},
       "RulesCatalog": {"$ref": "./schemas/rules-catalog.schema.json"},
       "SessionCommandResult": {"$ref": "./schemas/session-command-result.schema.json"},
+      "SessionCommandEnvelope": {"$ref": "./schemas/session-command-envelope.schema.json"},
+      "SessionCommandOutcome": {"$ref": "./schemas/session-command-outcome.schema.json"},
       "SessionCreate": {"$ref": "./schemas/session-create.schema.json"},
       "SessionMetadata": {"$ref": "./schemas/session-metadata.schema.json"},
       "SupportProfile": {"$ref": "./schemas/support-profile.schema.json"}
