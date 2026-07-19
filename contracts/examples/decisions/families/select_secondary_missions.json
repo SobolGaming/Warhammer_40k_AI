@@ -18,6 +18,7 @@
       "minimum_selections": 1,
       "must_preserve_coherency": null,
       "placement_kinds": [],
+      "proposal_schema_ref": null,
       "submission_schema_ref": "finite-submission.schema.json"
     },
     "display_hints": {
@@ -29,9 +30,20 @@
     "required_inputs": [
       "selected_option"
     ],
-    "schema_version": "interaction-descriptor-v1",
+    "schema_version": "interaction-descriptor-v2-variants",
     "selected_entity_ids": [],
-    "submission_kind": "finite"
+    "submission_kind": "finite",
+    "submission_variants": [
+      {
+        "display_label": "Confirm Option",
+        "interaction_kind": "finite_option_list",
+        "proposal_schema_ref": null,
+        "required_inputs": [
+          "selected_option"
+        ],
+        "variant_id": "finite_option"
+      }
+    ]
   },
   "is_parameterized": false,
   "options": [
@@ -84,5 +96,5 @@
     "setup_step": "select_secondary_missions"
   },
   "request_id": "decision-request-000001",
-  "schema_version": "decision-request-view-v1"
+  "schema_version": "decision-request-view-v2-interaction"
 }

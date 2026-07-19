@@ -597,7 +597,7 @@
   ],
   "overall_status": "unsupported",
   "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
-  "schema_version": "support-profile-v2-ws14",
+  "schema_version": "support-profile-v3-interactions",
   "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
   "status_counts": {
     "full": 0,

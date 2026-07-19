@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+# pyright: reportPrivateUsage=false
 import hashlib
 import json
 import re
 import runpy
 import subprocess
 import sys
+from collections.abc import Iterable
 from dataclasses import replace
 from pathlib import Path
 from typing import Protocol, cast
@@ -35,7 +37,11 @@ from scripts.export_ui_contract_fixtures import (
 )
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
-from warhammer40k_core.adapters.projection import project_rules_catalog_view
+from warhammer40k_core.adapters.projection import (
+    GameViewPayload,
+    _projection_state_hash,
+    project_rules_catalog_view,
+)
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.detachment import StratagemDefinition
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -60,6 +66,7 @@ SCHEMA_FILES = (
     Path("contracts/schemas/decision-family-coverage.schema.json"),
     Path("contracts/schemas/decision-family-live.schema.json"),
     Path("contracts/schemas/decision-request-view.schema.json"),
+    Path("contracts/schemas/annotated-decision-request.schema.json"),
     Path("contracts/schemas/event-delta.schema.json"),
     Path("contracts/schemas/game-view.schema.json"),
     Path("contracts/schemas/interaction-descriptor.schema.json"),
@@ -95,6 +102,8 @@ DECISION_FAMILY_COVERAGE_PATH = Path("contracts/examples/decisions/family-covera
 
 class _PayloadValidator(Protocol):
     def validate(self, instance: object) -> None: ...
+
+    def iter_errors(self, instance: object) -> Iterable[object]: ...
 
 
 class _ContractSnapshotVerifier(Protocol):
@@ -166,18 +175,53 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     )
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_two_releases() -> None:
+def test_session_metadata_contract_version_accepts_compatible_major_three_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "2.1.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "3.0.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "3.1.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "2.1.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
         validator.validate(incompatible)
+
+
+def test_contract_three_payloads_are_rejected_by_closed_contract_two_client_schemas() -> None:
+    baseline = _read_json(REPO_ROOT / Path("contracts/compatibility/2.0.0-shape.json"))
+    old_schemas = cast(dict[str, Schema], _json_object(baseline["schemas"]))
+    old_registry = EMPTY_REGISTRY
+    for schema in old_schemas.values():
+        schema_id = _json_string(_json_object(cast(JsonValue, schema))["$id"])
+        old_registry = old_registry.with_resource(
+            schema_id,
+            cast(
+                SchemaResource,
+                Resource.from_contents(schema, default_specification=DRAFT202012),
+            ),
+        )
+
+    current_decision = _fixture("pending_movement_request.json")
+    current_support = _read_json(REPO_ROOT / Path("contracts/examples/support-profile.json"))
+    old_decision = cast(
+        _PayloadValidator,
+        Draft202012Validator(
+            old_schemas["decision-request-view.schema.json"],
+            registry=old_registry,
+        ),
+    )
+    old_support = cast(
+        _PayloadValidator,
+        Draft202012Validator(
+            old_schemas["support-profile.schema.json"],
+            registry=old_registry,
+        ),
+    )
+
+    assert list(old_decision.iter_errors(current_decision))
+    assert list(old_support.iter_errors(current_support))
 
 
 def test_rules_catalog_schema_requires_catalog_card_detail_maps() -> None:
@@ -330,6 +374,9 @@ def test_pending_decision_and_modifier_datacard_fixtures_are_ui_ready() -> None:
     assert constraints["entity_kinds"] == ["unit"]
     assert constraints["candidate_option_ids"] == [UNIT_ALPHA]
     assert constraints["submission_schema_ref"] == "finite-submission.schema.json"
+    assert constraints["proposal_schema_ref"] is None
+    assert constraints["minimum_selections"] == 1
+    assert constraints["maximum_selections"] == 1
 
     modifier_view = _fixture("visible_modifier_datacard_view.json")
     model_display_by_id = cast(dict[str, JsonValue], modifier_view["model_display_by_id"])
@@ -357,7 +404,8 @@ def test_parameterized_interaction_metadata_selects_renderer_and_typed_schema() 
     assert interaction["required_inputs"] == ["model_paths", "final_poses"]
     assert constraints["must_preserve_coherency"] is True
     assert constraints["may_enter_engagement_range"] is False
-    assert constraints["submission_schema_ref"] == ("proposal-payload.schema.json#/$defs/movement")
+    assert constraints["submission_schema_ref"] == "parameterized-submission.schema.json"
+    assert constraints["proposal_schema_ref"] == "proposal-payload.schema.json#/$defs/movement"
 
 
 def test_proposal_examples_cover_engine_facing_payload_families() -> None:
@@ -367,6 +415,7 @@ def test_proposal_examples_cover_engine_facing_payload_families() -> None:
     shooting = _proposal_example("shooting_target_selection.json")
     melee = _proposal_example("melee_declaration.json")
     cult_ambush_marker = _proposal_example("cult_ambush_marker_placement.json")
+    cult_ambush_no_marker = _proposal_example("cult_ambush_no_marker.json")
     return_on_death = _proposal_example("submit_return_on_death_placement.json")
     opportunity = _read_json(REPO_ROOT / DECISION_EXAMPLE_DIR / "opportunity_window.json")
 
@@ -394,6 +443,8 @@ def test_proposal_examples_cover_engine_facing_payload_families() -> None:
 
     assert cult_ambush_marker["submission_kind"] == "cult_ambush_marker_placement"
     assert {"x_inches", "y_inches"}.issubset(cult_ambush_marker)
+    assert cult_ambush_no_marker["submission_kind"] == "cult_ambush_no_marker"
+    assert cult_ambush_no_marker["no_marker_reason"] == "no_legal_marker_position"
     assert return_on_death["submission_kind"] == "submit_return_on_death_placement"
     assert _json_object(return_on_death["attempted_placement"])["model_placements"]
 
@@ -445,7 +496,7 @@ def test_decision_family_coverage_uses_registry_metadata_and_real_scenarios() ->
             assert _json_string(interaction["interaction_kind"]) in _json_list(
                 row["interaction_kinds"]
             )
-            assert interaction["schema_version"] == "interaction-descriptor-v1"
+            assert interaction["schema_version"] == "interaction-descriptor-v2-variants"
             assert '"contract_fixture"' not in json.dumps(example, sort_keys=True)
         else:
             assert example_path is None
@@ -465,9 +516,48 @@ def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None
     ).hexdigest()
 
     assert len(baseline_schema_names) == 15
-    assert len(canonical_schema_names) == 22
+    assert len(canonical_schema_names) == 24
     assert baseline_schema_names < canonical_schema_names
     assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
+
+
+def test_projection_hash_covers_pending_request_and_interaction_metadata_after_redaction() -> None:
+    session, _status = build_local_session_at_movement_request(game_id="phase18i-projection-hash")
+    owner_view = session.view(viewer_player_id=PLAYER_A)
+    owner_hash = _json_string(owner_view["projection_state_hash"])
+    request_changed = cast(
+        GameViewPayload,
+        json.loads(json.dumps(owner_view, sort_keys=True)),
+    )
+    request_pending = cast(dict[str, JsonValue], request_changed["pending_decision"])
+    request_pending["request_id"] = "changed-request-id"
+    assert _projection_state_hash(request_changed) != owner_hash
+
+    interaction_changed = cast(
+        GameViewPayload,
+        json.loads(json.dumps(owner_view, sort_keys=True)),
+    )
+    interaction_pending = cast(dict[str, JsonValue], interaction_changed["pending_decision"])
+    interaction = cast(dict[str, JsonValue], interaction_pending["interaction"])
+    display_hints = cast(dict[str, JsonValue], interaction["display_hints"])
+    display_hints["confirm_label"] = "Changed Interaction Label"
+    assert _projection_state_hash(interaction_changed) != owner_hash
+
+    opponent_view = cast(GameViewPayload, _fixture("initial_setup_view_player2.json"))
+    opponent_pending = cast(dict[str, JsonValue], opponent_view["pending_decision"])
+    assert opponent_pending["interaction"] is None
+    assert opponent_view["nested_interaction_requests"] == []
+    assert _projection_state_hash(opponent_view) == opponent_view["projection_state_hash"]
+
+
+def test_typescript_interaction_gate_has_no_decision_family_switches_or_engine_imports() -> None:
+    for relative_path in (
+        Path("conformance/typescript/src/interaction.ts"),
+        Path("conformance/typescript/src/interaction-conformance.test.ts"),
+    ):
+        source = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+        assert "decision_type" not in source
+        assert "warhammer40k_core.engine" not in source
 
 
 def test_pr_base_contract_comparison_preserves_cumulative_minor_additions() -> None:

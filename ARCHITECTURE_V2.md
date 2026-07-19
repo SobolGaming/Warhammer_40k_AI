@@ -5260,14 +5260,14 @@ submit every supported decision category, consume viewer-scoped events, and
 distinguish stale, invalid, unsupported, forbidden, conflict, corruption, and
 terminal responses without importing Python or engine internals.
 
-This gate is not yet met. Phase 18I now supplies neutral interaction metadata
-and exact registry coverage; exhaustive remaining decision-family live scenarios
-remain part of Phase 18M-B+. Phase 18J owns fully typed battlefield
-interaction/coordinate shapes, and Phase 18M owns generated-client conformance
-against the reference server. Phases 18E-18H own the completed
-hosted session, command, cursor, reconnect, and viewer-authorization envelopes;
-those generic baseline shapes are not evidence of a complete strongly typed
-client contract.
+This gate is met for the published Phase 18I interaction surface. The generated
+TypeScript client consumes a registry-derived 79-case artifact covering every
+registered finite family, the documented nested family, and every committed
+parameterized payload discriminator. It selects renderers, chooses variants,
+constructs generated-model submissions, and validates wrapper and proposal
+schemas without decision-type switches or Python imports. The transport-level
+certified scenario continues to be owned by Phase 18M, and Phase 18J owns
+additional battlefield interaction/coordinate semantics.
 
 ## Phase 18E: session and transport semantics
 
@@ -5604,13 +5604,15 @@ Status: Complete. `engine/interaction_metadata.py` is the sole engine-owned
 classification and descriptor source for all 67 registered lifecycle decision
 families and the documented nested weapon-ability choice. `DecisionDispatchContract` exposes exact interaction-kind coverage;
 the external family inventory and support profile publish the same registry
-metadata. Visible projections carry `interaction-descriptor-v1`, while hidden
-pending decisions carry `interaction: null` through the shared redaction path.
+metadata. Visible projections carry `interaction-descriptor-v2-variants`, while
+hidden pending decisions carry `interaction: null` and an empty typed nested
+interaction list through the shared redaction path.
 
-Contract 2.1 adds the interaction schema, deterministic fixtures, projection and
-replay-checkpoint coverage, typed Cult Ambush marker/return-on-death proposal
-branches, and regenerated TypeScript OpenAPI models. The non-Python conformance
-client selects its finite and placement renderers only by `interaction_kind`.
+Contract 3.0 makes the interaction schema required, publishes typed annotated
+nested requests, hashes the complete viewer-visible projection, separates the
+Cult Ambush point and no-marker alternatives, and regenerates TypeScript OpenAPI
+models. The non-Python conformance client exhaustively selects renderers and
+constructs submissions only from descriptor metadata.
 Static audits fail when a registered decision lacks metadata, schema/enum
 inventories drift, visual consumers branch on `decision_type`, or an interaction
 descriptor names a framework component.
@@ -5629,10 +5631,19 @@ Example shape:
   "proposal_kind": "normal_move",
   "selected_entity_ids": ["unit-17"],
   "required_inputs": ["model_paths", "final_poses"],
+  "submission_variants": [{
+    "variant_id": "normal_move",
+    "interaction_kind": "path_editor",
+    "required_inputs": ["model_paths", "final_poses"],
+    "proposal_schema_ref": "proposal-payload.schema.json#/$defs/movement",
+    "display_label": "Submit Paths"
+  }],
   "constraints": {
     "maximum_distance_in": 7,
     "must_preserve_coherency": true,
-    "may_enter_engagement_range": false
+    "may_enter_engagement_range": false,
+    "submission_schema_ref": "parameterized-submission.schema.json",
+    "proposal_schema_ref": "proposal-payload.schema.json#/$defs/movement"
   },
   "display_hints": {
     "confirm_label": "Complete Normal Move"

@@ -17,6 +17,7 @@
       "minimum_selections": 1,
       "must_preserve_coherency": null,
       "placement_kinds": [],
+      "proposal_schema_ref": null,
       "submission_schema_ref": "finite-submission.schema.json"
     },
     "display_hints": {
@@ -28,9 +29,20 @@
     "required_inputs": [
       "selected_entities"
     ],
-    "schema_version": "interaction-descriptor-v1",
+    "schema_version": "interaction-descriptor-v2-variants",
     "selected_entity_ids": [],
-    "submission_kind": "finite"
+    "submission_kind": "finite",
+    "submission_variants": [
+      {
+        "display_label": "Confirm Selection",
+        "interaction_kind": "entity_selection",
+        "proposal_schema_ref": null,
+        "required_inputs": [
+          "selected_entities"
+        ],
+        "variant_id": "finite_option"
+      }
+    ]
   },
   "is_parameterized": false,
   "options": [
@@ -56,5 +68,5 @@
     "phase": "movement"
   },
   "request_id": "decision-request-000007",
-  "schema_version": "decision-request-view-v1"
+  "schema_version": "decision-request-view-v2-interaction"
 }

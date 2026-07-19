@@ -1,0 +1,12 @@
+{
+  "actor_id": "player-a",
+  "payload": {
+    "marker_id": "cult-ambush-marker:contract:000001",
+    "no_marker_reason": "no_legal_marker_position",
+    "player_id": "player-a",
+    "request_id": "contract-cult-ambush-marker-request-000001",
+    "submission_kind": "cult_ambush_no_marker"
+  },
+  "result_id": "phase18d-cult_ambush_no_marker-result-000001",
+  "schema_version": "parameterized-submission-v1"
+}

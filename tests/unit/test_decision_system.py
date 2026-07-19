@@ -286,9 +286,31 @@ def test_interaction_metadata_is_engine_authored_and_fail_closed() -> None:
     assert path_descriptor["constraints"]["may_enter_engagement_range"] is False
     assert marker_descriptor["interaction_kind"] == "battlefield_point_placement"
     assert marker_descriptor["proposal_kind"] == "cult_ambush_marker_placement"
-    assert marker_descriptor["constraints"]["submission_schema_ref"].endswith(
-        "#/$defs/cult_ambush_marker_placement"
+    assert (
+        marker_descriptor["constraints"]["submission_schema_ref"]
+        == "parameterized-submission.schema.json"
     )
+    assert marker_descriptor["constraints"]["proposal_schema_ref"] == (
+        "proposal-payload.schema.json#/$defs/cult_ambush_marker_placement"
+    )
+    assert marker_descriptor["constraints"]["minimum_selections"] is None
+    assert marker_descriptor["constraints"]["maximum_selections"] is None
+    assert marker_descriptor["submission_variants"] == [
+        {
+            "variant_id": "place_marker",
+            "interaction_kind": "battlefield_point_placement",
+            "required_inputs": ["battlefield_point"],
+            "proposal_schema_ref": ("proposal-payload.schema.json#/$defs/cult_ambush_marker_point"),
+            "display_label": "Place Marker",
+        },
+        {
+            "variant_id": "no_marker",
+            "interaction_kind": "confirmation",
+            "required_inputs": ["no_marker_reason"],
+            "proposal_schema_ref": "proposal-payload.schema.json#/$defs/cult_ambush_no_marker",
+            "display_label": "No Legal Marker Position",
+        },
+    ]
 
     with pytest.raises(GameLifecycleError, match="missing required engine-authored"):
         interaction_descriptor_for_request(_select_unit_request())

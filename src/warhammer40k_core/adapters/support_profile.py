@@ -19,7 +19,7 @@ from warhammer40k_core.engine.interaction_metadata import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 
-SUPPORT_PROFILE_SCHEMA_VERSION = "support-profile-v2-ws14"
+SUPPORT_PROFILE_SCHEMA_VERSION = "support-profile-v3-interactions"
 
 type AdapterSupportStatus = Literal["unsupported", "playable", "full"]
 

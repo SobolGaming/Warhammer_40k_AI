@@ -693,7 +693,7 @@
   "known_external_token_count": 69,
   "live_scenario_count": 4,
   "registered_decision_type_count": 67,
-  "schema_version": "decision-family-coverage-v1",
+  "schema_version": "decision-family-coverage-v2-interactions",
   "standard_interaction_kinds": [
     "battlefield_point_placement",
     "confirmation",

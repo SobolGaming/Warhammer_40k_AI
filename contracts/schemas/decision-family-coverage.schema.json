@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/decision-family-coverage.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/decision-family-coverage.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -19,7 +19,7 @@
       "uniqueItems": true
     },
     "schema_version": {
-      "const": "decision-family-coverage-v1",
+      "const": "decision-family-coverage-v2-interactions",
       "type": "string"
     }
   },
@@ -28,6 +28,8 @@
     "registered_decision_type_count",
     "known_external_token_count",
     "live_scenario_count",
+    "interaction_kind_count",
+    "standard_interaction_kinds",
     "families"
   ],
   "title": "CORE V2 DecisionFamilyCoveragePayload",
@@ -83,7 +85,8 @@
         "registry_scope",
         "submission_kind",
         "coverage_status",
-        "example_path"
+        "example_path",
+        "interaction_kinds"
       ],
       "type": "object"
     },

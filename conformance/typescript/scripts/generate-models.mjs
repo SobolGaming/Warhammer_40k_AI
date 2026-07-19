@@ -43,6 +43,14 @@ const normativeResponses = new Set([
   "SessionMetadata",
   "SessionProjection",
 ]);
+const normativeSchemas = new Set([
+  "AnnotatedDecisionRequest",
+  "DecisionRequestView",
+  "FiniteSubmission",
+  "InteractionConformance",
+  "InteractionDescriptor",
+  "ParameterizedSubmission",
+]);
 
 try {
   mkdirSync(normalizedSchemaRoot, { recursive: true });
@@ -53,7 +61,7 @@ try {
     normativeParameters,
   );
   openapi.components.responses = selectedEntries(openapi.components.responses, normativeResponses);
-  delete openapi.components.schemas;
+  openapi.components.schemas = selectedEntries(openapi.components.schemas, normativeSchemas);
   writeFileSync(
     resolve(normalizedContractRoot, "openapi.yaml"),
     `${JSON.stringify(openapi, null, 2)}\n`,

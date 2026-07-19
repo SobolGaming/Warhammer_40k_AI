@@ -40,16 +40,20 @@ consumers select an input renderer from `interaction_kind`; they do not branch
 on `decision_type`, option labels, rule text, display names, or arbitrary
 payload keys to discover what input is required.
 
-The descriptor is versioned as `interaction-descriptor-v1` and carries:
+The descriptor is versioned as `interaction-descriptor-v2-variants` and carries:
 
 - a presentation-neutral `interaction_kind` and finite/parameterized
   `submission_kind`;
 - the semantic `proposal_kind` when a parameterized answer is required;
-- engine-selected entity IDs and neutral `required_inputs`;
+- engine-selected entity IDs and neutral `required_inputs`; multi-variant
+  interactions leave the top-level input list empty and publish the inputs on
+  each variant;
+- one or more `submission_variants`, each with a stable variant ID, interaction
+  kind, required inputs, proposal schema reference, and neutral display label;
 - typed assistive constraints, including candidate option IDs, entity kinds,
   selection cardinality, movement distance, model count, coherency and
-  Engagement Range hints, placement kinds, and the exact public submission
-  schema reference;
+  Engagement Range hints, placement kinds, the public finite/parameterized
+  wrapper schema reference, and a separate exact proposal schema reference;
 - optional presentation text under `display_hints`.
 
 The standard kinds are finite option list, entity selection, weapon allocation
@@ -62,20 +66,29 @@ renderer.
 `constraints` and `display_hints` are assistance only. They do not grant
 legality, authorize a player, replace the canonical proposal schema, or bypass
 engine validation. Every answer still selects one emitted finite option ID or
-submits the typed payload referenced by `submission_schema_ref`, and stale
-metadata fails through the ordinary request/revision/proposal checks.
+submits the typed wrapper referenced by `submission_schema_ref`. Parameterized
+clients validate the body against the selected variant's `proposal_schema_ref`;
+stale metadata fails through the ordinary request/revision/proposal checks.
+`minimum_selections` and `maximum_selections` are nullable: `null` means the
+engine cannot state a safe exact cardinality from request metadata, not one.
 
 Interaction registration is fail closed. The decision dispatch contract exposes
 one or more interaction kinds for every registered decision family, the
 registry-derived `family-coverage.json` artifact records exact coverage, and CI
 compares that inventory with the engine enum and JSON Schema. The documented
-nested weapon-ability request carries the same descriptor and is represented by
-the finite-option interaction inside its parent weapon-allocation proposal; the
-canonical parameterized union also includes typed Cult Ambush marker placement
-and return-on-death placement branches. A new decision family, interaction kind,
-or parameterized payload cannot pass the contract gate without updating this
-document, the engine registry, schemas/examples, generated TypeScript models,
-and viewer-redaction coverage.
+nested weapon-ability request carries the same descriptor inside the parent
+proposal and in the typed top-level `nested_interaction_requests` projection
+field. The canonical parameterized union includes distinct Cult Ambush
+`place_marker` and `no_marker` variants plus return-on-death placement. A new
+decision family, interaction kind, variant, or parameterized payload cannot pass
+the contract gate without updating this document, the engine registry,
+schemas/examples, generated TypeScript models, and viewer-redaction coverage.
+
+The committed `interaction-conformance.json` artifact is generated from the
+dispatch registry, the documented nested family, and every parameterized
+proposal fixture. The TypeScript test consumes the generated request and
+submission models, constructs every case, and validates the wrapper plus exact
+proposal schema without importing Python or switching on decision type.
 
 Interaction descriptors are part of viewer projection hashes and replay
 checkpoints. The same pending engine request therefore selects the same renderer
@@ -324,12 +337,12 @@ reference server currently requires:
 - `finite-submission-v1` for finite option submissions;
 - `parameterized-submission-v1` for proposal submissions;
 - `lifecycle-status-v1` for server lifecycle responses;
-- `decision-request-view-v1` for visible or redacted pending decisions;
+- `decision-request-view-v2-interaction` for visible or redacted pending decisions;
 - `event-delta-v1` for the in-process integer-cursor adapter delta only;
 - `event-delta-v2` for authenticated role-bound HTTP event deltas;
-- `session-projection-v1` for full role-scoped reconnect projections;
-- `session-create-v2`, `session-metadata-v2`,
-  `session-command-result-v2`, and `session-command-outcome-v2` for the
+- `session-projection-v2-interaction` for full role-scoped reconnect projections;
+- `session-create-v2`, `session-metadata-v3-contract`,
+  `session-command-result-v3-contract`, and `session-command-outcome-v3-contract` for the
   authenticated formal session protocol;
 - `error-envelope-v1` for typed transport errors.
 
@@ -1559,6 +1572,14 @@ If a marker can legally be placed, the engine emits the parameterized decision t
 ```
 
 If the engine reports that no legal marker position exists, adapters may answer the same request with `submission_kind: "cult_ambush_no_marker"` and a replay-safe `no_marker_reason`; this is rejected if a legal marker position still exists. Marker placement validates battlefield bounds and more-than-9-inch horizontal enemy distance before recording a 32mm Cult Ambush marker. Enemy non-AIRCRAFT model moves that end within 8 inches remove markers automatically through engine event processing, not through an adapter choice.
+
+The Phase 18I descriptor publishes both accepted alternatives on every such
+request. Variant `place_marker` uses `battlefield_point_placement` and
+`proposal-payload.schema.json#/$defs/cult_ambush_marker_point`; variant
+`no_marker` uses `confirmation`, requires `no_marker_reason`, and references
+`proposal-payload.schema.json#/$defs/cult_ambush_no_marker`. Top-level selection
+cardinality is null because the alternatives have different input semantics.
+The engine remains authoritative for whether the no-marker alternative is legal.
 
 At the end of an opponent Movement phase, each surviving marker can emit the shared turn-end finite decision type `select_faction_rule_turn_end_option` with `selection_kind: "cult_ambush_marker_ingress"`. Current options are:
 

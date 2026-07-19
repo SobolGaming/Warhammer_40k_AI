@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.interaction_metadata import (
+    InteractionAnnotatedDecisionRequestPayload,
+)
 from warhammer40k_core.engine.phases.shooting_imports import *
 
 # fmt: off
@@ -143,6 +146,7 @@ class ShootingDeclarationProposalRequestPayload(TypedDict):
 
 class ShootingDeclarationDecisionPayload(TypedDict):
     proposal_request: ShootingDeclarationProposalRequestPayload
+    nested_interaction_requests: list[InteractionAnnotatedDecisionRequestPayload]
 
 
 class _AvailableWeapon(TypedDict):

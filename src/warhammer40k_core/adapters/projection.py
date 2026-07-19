@@ -27,8 +27,10 @@ from warhammer40k_core.engine.dice_result_override_descriptors import (
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.interaction_metadata import (
+    InteractionAnnotatedDecisionRequestPayload,
     InteractionDescriptorPayload,
     interaction_descriptor_for_request,
+    nested_interaction_request_payloads,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
@@ -39,7 +41,7 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v5-role-scoped"
+PROJECTION_SCHEMA_VERSION = "game-view-v6-interaction"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -306,6 +308,7 @@ class GameViewPayload(TypedDict):
     model_display_by_id: dict[str, ModelDisplayPayload]
     pending_decision: DecisionRequestViewPayload | None
     pending_proposal: JsonValue
+    nested_interaction_requests: list[InteractionAnnotatedDecisionRequestPayload]
 
 
 def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPayload:
@@ -577,6 +580,11 @@ def project_game_view(
         "pending_proposal": None
         if pending_request is None
         else _proposal_view(pending_request, viewer=context),
+        "nested_interaction_requests": (
+            []
+            if pending_request is None
+            else _nested_interaction_request_views(pending_request, viewer=context)
+        ),
     }
     payload["projection_state_hash"] = _projection_state_hash(payload)
     return payload
@@ -1003,21 +1011,7 @@ def _rules_catalog_source_hash(catalog: ArmyCatalog) -> str:
 
 
 def _projection_state_hash(payload: GameViewPayload) -> str:
-    hash_payload = {
-        "projection_schema": payload["projection_schema"],
-        "rules_catalog": payload["rules_catalog"],
-        "viewer_role": payload["viewer_role"],
-        "viewer_player_id": payload["viewer_player_id"],
-        "game_id": payload["game_id"],
-        "stage": payload["stage"],
-        "battle_round": payload["battle_round"],
-        "active_player_id": payload["active_player_id"],
-        "current_setup_step": payload["current_setup_step"],
-        "current_battle_phase": payload["current_battle_phase"],
-        "battlefield_state": payload["battlefield_state"],
-        "unit_display_by_id": payload["unit_display_by_id"],
-        "model_display_by_id": payload["model_display_by_id"],
-    }
+    hash_payload = {key: value for key, value in payload.items() if key != "projection_state_hash"}
     encoded = canonical_json(hash_payload).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
@@ -1092,6 +1086,16 @@ def _proposal_view(
     if not isinstance(proposal_request, dict):
         raise GameLifecycleError("Parameterized DecisionRequest payload missing proposal_request.")
     return validate_json_value(_metadata_bearing_proposal_request(request, proposal_request))
+
+
+def _nested_interaction_request_views(
+    request: DecisionRequest,
+    *,
+    viewer: ViewerContext,
+) -> list[InteractionAnnotatedDecisionRequestPayload]:
+    if decision_request_hidden_from_context(request=request, viewer=viewer):
+        return []
+    return nested_interaction_request_payloads(request)
 
 
 def _metadata_bearing_proposal_request(

@@ -705,7 +705,7 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
     )
     example.pop("command_id")
     example.pop("outcome_code")
-    example["schema_version"] = "session-command-result-v2"
+    example["schema_version"] = "session-command-result-v3-contract"
     for committed, accepted in ((True, True), (True, False), (False, False)):
         payload = {**example, "committed": committed, "accepted": accepted}
         validator.validate(payload)

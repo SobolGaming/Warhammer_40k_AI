@@ -897,7 +897,7 @@ def test_phase18f_command_schema_rejects_client_actor_and_invalid_boolean_outcom
     proposal_paths = tuple(
         sorted((REPO_ROOT / "contracts/examples/decisions/proposals").glob("*.json"))
     )
-    assert len(proposal_paths) == 21
+    assert len(proposal_paths) == 22
     typed_envelope: dict[str, JsonValue] = {}
     for index, path in enumerate(proposal_paths):
         typed_envelope = _command_envelope(

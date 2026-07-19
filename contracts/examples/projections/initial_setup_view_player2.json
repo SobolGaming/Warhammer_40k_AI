@@ -1424,6 +1424,7 @@
       "wounds_remaining": 2
     }
   },
+  "nested_interaction_requests": [],
   "pending_decision": {
     "actor_id": null,
     "decision_type": "hidden_decision",
@@ -1435,15 +1436,15 @@
       "secret": true
     },
     "request_id": "hidden-request",
-    "schema_version": "decision-request-view-v1"
+    "schema_version": "decision-request-view-v2-interaction"
   },
   "pending_proposal": null,
   "player_ids": [
     "player-a",
     "player-b"
   ],
-  "projection_schema": "game-view-v5-role-scoped",
-  "projection_state_hash": "e06ea009c4e161a9e9640c7689af48e9ba364ee7c20fe3f7501d3ae2fcb78ee4",
+  "projection_schema": "game-view-v6-interaction",
+  "projection_state_hash": "10a7d5ecb97e96b16883ba66f38bdd3b02a8c6dfc6123d5bb1a83aa2bf7b246e",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

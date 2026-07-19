@@ -31,7 +31,8 @@ start, finite, parameterized, advance, and close routes are not part of contract
 the Phase 18F command contract and must not be used by new clients.
 The parameterized command payload references the canonical proposal union, so
 OpenAPI, generated clients, installed runtime validation, and the standalone
-parameterized route accept the same 19 proposal kinds.
+parameterized route accept the same 19 proposal kinds plus the two Cult Ambush
+alternatives and return-on-death payload.
 
 ## State and ordering
 
@@ -41,7 +42,11 @@ parameterized route accept the same 19 proposal kinds.
   to authoritative history: start, state-changing advance, close, an accepted
   decision, or a recorded rule-invalid retry attempt. A Phase 18F command must
   present the current expected revision before mutation.
-- `projection_state_hash` identifies one role-scoped projection. An event cursor
+- `projection_state_hash` is the SHA-256 of the canonical complete role-scoped
+  projection object excluding only the hash field itself. Pending decisions,
+  proposals, interaction descriptors, typed nested interaction requests, public
+  ledgers, display maps, and every other viewer-visible field are therefore
+  checkpointed; hidden source state is absent before hashing. An event cursor
   is an opaque HMAC-derived identifier bound to the session, principal,
   visibility role/player/delay scope, authorization epoch, protected
   authoritative event-log offset, viewer sequence, session revision, and

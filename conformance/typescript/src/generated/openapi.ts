@@ -137,6 +137,12 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AnnotatedDecisionRequest: components["schemas"]["annotated-decision-request.schema"];
+        DecisionRequestView: components["schemas"]["decision-request-view.schema"];
+        FiniteSubmission: components["schemas"]["finite-submission.schema"];
+        InteractionDescriptor: components["schemas"]["interaction-descriptor.schema"];
+        InteractionConformance: components["schemas"]["interaction-conformance.schema"];
+        ParameterizedSubmission: components["schemas"]["parameterized-submission.schema"];
         /** CORE V2 ErrorEnvelopePayload */
         "error-envelope.schema": {
             error: {
@@ -280,7 +286,7 @@ export interface components {
             projection_state_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v2";
+            schema_version: "session-metadata-v3-contract";
             server_contract_version: string;
             session_id: string;
             session_revision: number;
@@ -513,7 +519,7 @@ export interface components {
                 target_unit_instance_id: string | null;
             };
         };
-        "proposal-payload--cult_ambush_marker_placement.schema": {
+        "proposal-payload--cult_ambush_marker_point.schema": {
             marker_id: components["schemas"]["proposal-payload--identifier.schema"];
             player_id: components["schemas"]["proposal-payload--identifier.schema"];
             request_id: components["schemas"]["proposal-payload--identifier.schema"];
@@ -521,7 +527,8 @@ export interface components {
             submission_kind: "cult_ambush_marker_placement";
             x_inches: number;
             y_inches: number;
-        } | {
+        };
+        "proposal-payload--cult_ambush_no_marker.schema": {
             marker_id: components["schemas"]["proposal-payload--identifier.schema"];
             no_marker_reason: components["schemas"]["proposal-payload--identifier.schema"];
             player_id: components["schemas"]["proposal-payload--identifier.schema"];
@@ -529,6 +536,7 @@ export interface components {
             /** @constant */
             submission_kind: "cult_ambush_no_marker";
         };
+        "proposal-payload--cult_ambush_marker_placement.schema": components["schemas"]["proposal-payload--cult_ambush_marker_point.schema"] | components["schemas"]["proposal-payload--cult_ambush_no_marker.schema"];
         "proposal-payload--return_on_death_placement.schema": {
             attempted_placement: components["schemas"]["proposal-payload--unit_placement.schema"];
             /** @constant */
@@ -576,7 +584,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v2";
+            schema_version: "session-command-outcome-v3-contract";
             session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
@@ -637,6 +645,15 @@ export interface components {
             [key: string]: unknown;
         };
         "interaction-descriptor--identifier.schema": string;
+        /** @enum {string} */
+        "interaction-descriptor--interaction_kind.schema": "battlefield_point_placement" | "confirmation" | "dice_selection" | "entity_selection" | "finite_option_list" | "model_pose_placement" | "multi_model_placement" | "opportunity_window" | "ordered_sequencing" | "path_editor" | "quantity_selection" | "roster_construction" | "weapon_allocation_matrix";
+        "interaction-descriptor--submission_variant.schema": {
+            display_label: components["schemas"]["interaction-descriptor--identifier.schema"];
+            interaction_kind: components["schemas"]["interaction-descriptor--interaction_kind.schema"];
+            proposal_schema_ref: string | null;
+            required_inputs: components["schemas"]["interaction-descriptor--identifier.schema"][];
+            variant_id: components["schemas"]["interaction-descriptor--identifier.schema"];
+        };
         /** CORE V2 InteractionDescriptorPayload */
         "interaction-descriptor.schema": {
             constraints: {
@@ -644,24 +661,25 @@ export interface components {
                 entity_kinds: components["schemas"]["interaction-descriptor--identifier.schema"][];
                 exact_model_count: number | null;
                 maximum_distance_in: number | null;
-                maximum_selections: number;
+                maximum_selections: number | null;
                 may_enter_engagement_range: boolean | null;
-                minimum_selections: number;
+                minimum_selections: number | null;
                 minimum_enemy_distance_in: number | null;
                 must_preserve_coherency: boolean | null;
                 placement_kinds: components["schemas"]["interaction-descriptor--identifier.schema"][];
                 submission_schema_ref: string;
+                proposal_schema_ref: string | null;
             };
             display_hints: {
                 confirm_label: components["schemas"]["interaction-descriptor--identifier.schema"];
                 decline_label: components["schemas"]["interaction-descriptor--identifier.schema"] | null;
             };
-            /** @enum {string} */
-            interaction_kind: "battlefield_point_placement" | "confirmation" | "dice_selection" | "entity_selection" | "finite_option_list" | "model_pose_placement" | "multi_model_placement" | "opportunity_window" | "ordered_sequencing" | "path_editor" | "quantity_selection" | "roster_construction" | "weapon_allocation_matrix";
+            interaction_kind: components["schemas"]["interaction-descriptor--interaction_kind.schema"];
             proposal_kind: components["schemas"]["interaction-descriptor--identifier.schema"] | null;
             required_inputs: components["schemas"]["interaction-descriptor--identifier.schema"][];
+            submission_variants: components["schemas"]["interaction-descriptor--submission_variant.schema"][];
             /** @constant */
-            schema_version: "interaction-descriptor-v1";
+            schema_version: "interaction-descriptor-v2-variants";
             selected_entity_ids: components["schemas"]["interaction-descriptor--identifier.schema"][];
             /** @enum {string} */
             submission_kind: "finite" | "parameterized";
@@ -677,14 +695,34 @@ export interface components {
         /** CORE V2 DecisionRequestViewPayload */
         "decision-request-view.schema": {
             /** @constant */
-            schema_version: "decision-request-view-v1";
+            schema_version: "decision-request-view-v2-interaction";
             actor_id: string | null;
             decision_type: string;
             is_parameterized: boolean;
-            interaction?: components["schemas"]["interaction-descriptor.schema"] | null;
+            interaction: components["schemas"]["interaction-descriptor.schema"] | null;
             options: components["schemas"]["decision-request-view--decision_option.schema"][];
             payload: components["schemas"]["decision-request-view--json_value.schema"];
             request_id: string;
+        };
+        "annotated-decision-request--json_value.schema": null | boolean | number | string | components["schemas"]["annotated-decision-request--json_value.schema"][] | {
+            [key: string]: components["schemas"]["annotated-decision-request--json_value.schema"];
+        };
+        "annotated-decision-request--decision_option.schema": {
+            label: string;
+            option_id: string;
+            payload: components["schemas"]["annotated-decision-request--json_value.schema"];
+        };
+        /** CORE V2 InteractionAnnotatedDecisionRequestPayload */
+        "annotated-decision-request.schema": {
+            actor_id: string;
+            decision_type: string;
+            interaction: components["schemas"]["interaction-descriptor.schema"];
+            is_parameterized: boolean;
+            options: components["schemas"]["annotated-decision-request--decision_option.schema"][];
+            payload: components["schemas"]["annotated-decision-request--json_value.schema"];
+            request_id: string;
+            /** @constant */
+            schema_version: "annotated-decision-request-v1";
         };
         "game-view--rules_catalog_reference.schema": {
             catalog_id: string;
@@ -717,9 +755,10 @@ export interface components {
             };
             pending_decision: components["schemas"]["decision-request-view.schema"] | null;
             pending_proposal: components["schemas"]["game-view--json_value.schema"];
+            nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][];
             player_ids: string[];
             /** @constant */
-            projection_schema: "game-view-v5-role-scoped";
+            projection_schema: "game-view-v6-interaction";
             projection_state_hash: string;
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
@@ -744,7 +783,7 @@ export interface components {
             retention_limit: number;
             revision_retention_limit: number;
             /** @constant */
-            schema_version: "session-projection-v1";
+            schema_version: "session-projection-v2-interaction";
             session_id: string;
             session_revision: number;
             /** @enum {string} */
@@ -810,6 +849,34 @@ export interface components {
             /** @constant */
             schema_version: "replay-artifact-v1-phase18b";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
+        };
+        /** CORE V2 FiniteOptionSubmissionPayload */
+        "finite-submission.schema": {
+            actor_id: string;
+            option_id: string;
+            result_id: string;
+            /** @constant */
+            schema_version: "finite-submission-v1";
+        };
+        "interaction-conformance--case.schema": {
+            case_id: string;
+            proposal_payload: components["schemas"]["proposal-payload.schema"] | null;
+            request: components["schemas"]["annotated-decision-request.schema"];
+            submission_variant_id: string;
+        };
+        /** CORE V2 Interaction Conformance Cases */
+        "interaction-conformance.schema": {
+            cases: components["schemas"]["interaction-conformance--case.schema"][];
+            /** @constant */
+            schema_version: "interaction-conformance-v1";
+        };
+        /** CORE V2 ParameterizedSubmissionPayload */
+        "parameterized-submission.schema": {
+            actor_id: string;
+            payload: components["schemas"]["proposal-payload.schema"];
+            result_id: string;
+            /** @constant */
+            schema_version: "parameterized-submission-v1";
         };
     };
     responses: {

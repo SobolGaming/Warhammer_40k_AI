@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/decision-family-live.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/decision-family-live.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "oneOf": [
     {"$ref": "#/$defs/select_secondary_missions"},
@@ -54,7 +54,7 @@
     },
     "select_secondary_missions": {
       "allOf": [
-        {"$ref": "decision-request-view.schema.json"},
+        {"$ref": "https://warhammer40k-core.local/contracts/v3/decision-request-view.schema.json"},
         {
           "properties": {
             "decision_type": {"const": "select_secondary_missions"},
@@ -86,7 +86,7 @@
     },
     "select_movement_unit": {
       "allOf": [
-        {"$ref": "decision-request-view.schema.json"},
+        {"$ref": "https://warhammer40k-core.local/contracts/v3/decision-request-view.schema.json"},
         {
           "properties": {
             "decision_type": {"const": "select_movement_unit"},
@@ -136,7 +136,7 @@
     },
     "select_movement_action": {
       "allOf": [
-        {"$ref": "decision-request-view.schema.json"},
+        {"$ref": "https://warhammer40k-core.local/contracts/v3/decision-request-view.schema.json"},
         {
           "properties": {
             "decision_type": {"const": "select_movement_action"},
@@ -225,7 +225,7 @@
     },
     "submit_movement_proposal": {
       "allOf": [
-        {"$ref": "decision-request-view.schema.json"},
+        {"$ref": "https://warhammer40k-core.local/contracts/v3/decision-request-view.schema.json"},
         {
           "properties": {
             "decision_type": {"const": "submit_movement_proposal"},

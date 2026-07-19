@@ -10,6 +10,7 @@ from tempfile import TemporaryDirectory
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SCHEMA_NAMES = frozenset(
     {
+        "annotated-decision-request.schema.json",
         "create-session.schema.json",
         "decision-family-coverage.schema.json",
         "decision-family-live.schema.json",
@@ -18,6 +19,8 @@ EXPECTED_SCHEMA_NAMES = frozenset(
         "event-delta.schema.json",
         "finite-submission.schema.json",
         "game-view.schema.json",
+        "interaction-conformance.schema.json",
+        "interaction-descriptor.schema.json",
         "lifecycle-status.schema.json",
         "opportunity-window-example.schema.json",
         "parameterized-submission.schema.json",
@@ -57,6 +60,7 @@ from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smo
 from warhammer40k_core.engine.event_log import validate_json_value
 
 expected_schema_names = {
+    "annotated-decision-request.schema.json",
     "create-session.schema.json",
     "decision-family-coverage.schema.json",
     "decision-family-live.schema.json",
@@ -65,6 +69,8 @@ expected_schema_names = {
     "event-delta.schema.json",
     "finite-submission.schema.json",
     "game-view.schema.json",
+    "interaction-conformance.schema.json",
+    "interaction-descriptor.schema.json",
     "lifecycle-status.schema.json",
     "opportunity-window-example.schema.json",
     "parameterized-submission.schema.json",

@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v2/game-view.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/game-view.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -44,7 +44,7 @@
     "pending_decision": {
       "oneOf": [
         {
-          "$ref": "https://warhammer40k-core.local/contracts/v1/decision-request-view.schema.json"
+          "$ref": "https://warhammer40k-core.local/contracts/v3/decision-request-view.schema.json"
         },
         {
           "type": "null"
@@ -54,6 +54,13 @@
     "pending_proposal": {
       "$ref": "#/$defs/json_value"
     },
+    "nested_interaction_requests": {
+      "items": {
+        "$ref": "https://warhammer40k-core.local/contracts/v3/annotated-decision-request.schema.json"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
     "player_ids": {
       "items": {
         "minLength": 1,
@@ -62,7 +69,7 @@
       "type": "array"
     },
     "projection_schema": {
-      "const": "game-view-v5-role-scoped",
+      "const": "game-view-v6-interaction",
       "minLength": 1,
       "type": "string"
     },
@@ -147,7 +154,8 @@
     "unit_display_by_id",
     "model_display_by_id",
     "pending_decision",
-    "pending_proposal"
+    "pending_proposal",
+    "nested_interaction_requests"
   ],
   "title": "CORE V2 GameViewPayload",
   "type": "object",

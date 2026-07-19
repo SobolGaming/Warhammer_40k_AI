@@ -1,8 +1,8 @@
 {
   "accepted": true,
   "checkpoint": {
-    "event_cursor": "0xAQcz9Cu53g8-lHQD0sq5o0g8aOLhaO8B3u1CwrIqI8MviVQcnELr3QE58PZnf-",
-    "projection_state_hash": "fee58c15207c7204973b73d007a111990efc36583f221bcf42dac63aa73e5956",
+    "event_cursor": "YHQwOBdIjmSHITK9qUZJb4-cdhQhQlcTdOmXnEeUze7B2rL_agYVcT7iOvCLmyMU",
+    "projection_state_hash": "476761d59a70ad209127faada42a86e75771b1a0fede12965161cad2957d6b21",
     "session_revision": 2,
     "viewer_player_id": null,
     "visibility_role": "administrator"
@@ -10,18 +10,18 @@
   "command_id": "phase18f-contract-command-000001",
   "committed": true,
   "event_range": {
-    "from_cursor": "FzsKTpWdrkeCRSiy2ZlJa3_nLnzKzFzylRwZcEUoitlJtaCld0Lhm6-bPnfHfssf",
-    "to_cursor": "0xAQcz9Cu53g8-lHQD0sq5o0g8aOLhaO8B3u1CwrIqI8MviVQcnELr3QE58PZnf-"
+    "from_cursor": "zC4YUhDRqf8TBK_a3SLtH6kd9pvXFHzykSG-bl-8vuif21hhKkHltruRpsqarFP8",
+    "to_cursor": "YHQwOBdIjmSHITK9qUZJb4-cdhQhQlcTdOmXnEeUze7B2rL_agYVcT7iOvCLmyMU"
   },
   "operation": "close_session",
   "outcome_code": "command_committed",
-  "schema_version": "session-command-outcome-v2",
+  "schema_version": "session-command-outcome-v3-contract",
   "session": {
     "catalog_id": "phase9a-canonical",
     "created_at": "2026-07-18T20:00:00Z",
     "engine_build_id": "warhammer40k-core-v2:0.1.0",
     "engine_version": "0.1.0",
-    "event_cursor": "0xAQcz9Cu53g8-lHQD0sq5o0g8aOLhaO8B3u1CwrIqI8MviVQcnELr3QE58PZnf-",
+    "event_cursor": "YHQwOBdIjmSHITK9qUZJb4-cdhQhQlcTdOmXnEeUze7B2rL_agYVcT7iOvCLmyMU",
     "game_id": "phase18e-contract-session",
     "last_activity_at": "2026-07-18T20:00:00Z",
     "lifecycle_status": {
@@ -33,14 +33,14 @@
       "stage": "setup",
       "status_kind": "waiting_for_decision"
     },
-    "projection_state_hash": "fee58c15207c7204973b73d007a111990efc36583f221bcf42dac63aa73e5956",
+    "projection_state_hash": "476761d59a70ad209127faada42a86e75771b1a0fede12965161cad2957d6b21",
     "ruleset_id": {
       "edition": "11e",
       "game": "warhammer_40000",
       "version": "core-v2-setup-prebattle-ui-smoke"
     },
-    "schema_version": "session-metadata-v2",
-    "server_contract_version": "2.1.0",
+    "schema_version": "session-metadata-v3-contract",
+    "server_contract_version": "3.0.0",
     "session_id": "session-phase18e-contract-session",
     "session_revision": 2,
     "session_state": "closed",

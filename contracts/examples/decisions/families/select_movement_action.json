@@ -17,6 +17,7 @@
       "minimum_selections": 1,
       "must_preserve_coherency": null,
       "placement_kinds": [],
+      "proposal_schema_ref": null,
       "submission_schema_ref": "finite-submission.schema.json"
     },
     "display_hints": {
@@ -28,11 +29,22 @@
     "required_inputs": [
       "selected_option"
     ],
-    "schema_version": "interaction-descriptor-v1",
+    "schema_version": "interaction-descriptor-v2-variants",
     "selected_entity_ids": [
       "army-alpha:intercessor-unit-1"
     ],
-    "submission_kind": "finite"
+    "submission_kind": "finite",
+    "submission_variants": [
+      {
+        "display_label": "Confirm Option",
+        "interaction_kind": "finite_option_list",
+        "proposal_schema_ref": null,
+        "required_inputs": [
+          "selected_option"
+        ],
+        "variant_id": "finite_option"
+      }
+    ]
   },
   "is_parameterized": false,
   "options": [
@@ -74,5 +86,5 @@
     "unit_instance_id": "army-alpha:intercessor-unit-1"
   },
   "request_id": "decision-request-000008",
-  "schema_version": "decision-request-view-v1"
+  "schema_version": "decision-request-view-v2-interaction"
 }

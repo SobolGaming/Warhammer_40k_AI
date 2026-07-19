@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/support-profile.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/support-profile.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -30,7 +30,7 @@
     },
     "overall_status": {"$ref": "#/$defs/support_status"},
     "ruleset_descriptor_hash": {"minLength": 64, "type": "string"},
-    "schema_version": {"const": "support-profile-v2-ws14", "type": "string"},
+    "schema_version": {"const": "support-profile-v3-interactions", "type": "string"},
     "source_package_id": {"minLength": 1, "type": "string"},
     "status_counts": {"$ref": "#/$defs/status_counts"}
   },
@@ -45,7 +45,9 @@
     "status_counts",
     "mustering_support_rows",
     "datasheet_support_rows",
-    "detachment_faction_support_rows"
+    "detachment_faction_support_rows",
+    "interaction_kinds",
+    "decision_interaction_support_rows"
   ],
   "title": "CORE V2 SupportProfilePayload",
   "type": "object",

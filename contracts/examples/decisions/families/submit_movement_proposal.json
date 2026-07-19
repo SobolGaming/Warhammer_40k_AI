@@ -12,13 +12,14 @@
       ],
       "exact_model_count": null,
       "maximum_distance_in": null,
-      "maximum_selections": 1,
+      "maximum_selections": null,
       "may_enter_engagement_range": false,
       "minimum_enemy_distance_in": null,
-      "minimum_selections": 1,
+      "minimum_selections": null,
       "must_preserve_coherency": true,
       "placement_kinds": [],
-      "submission_schema_ref": "proposal-payload.schema.json#/$defs/movement"
+      "proposal_schema_ref": "proposal-payload.schema.json#/$defs/movement",
+      "submission_schema_ref": "parameterized-submission.schema.json"
     },
     "display_hints": {
       "confirm_label": "Submit Paths",
@@ -30,11 +31,23 @@
       "model_paths",
       "final_poses"
     ],
-    "schema_version": "interaction-descriptor-v1",
+    "schema_version": "interaction-descriptor-v2-variants",
     "selected_entity_ids": [
       "army-alpha:intercessor-unit-1"
     ],
-    "submission_kind": "parameterized"
+    "submission_kind": "parameterized",
+    "submission_variants": [
+      {
+        "display_label": "Submit Paths",
+        "interaction_kind": "path_editor",
+        "proposal_schema_ref": "proposal-payload.schema.json#/$defs/movement",
+        "required_inputs": [
+          "model_paths",
+          "final_poses"
+        ],
+        "variant_id": "normal_move"
+      }
+    ]
   },
   "is_parameterized": true,
   "options": [
@@ -67,5 +80,5 @@
     }
   },
   "request_id": "decision-request-000009",
-  "schema_version": "decision-request-view-v1"
+  "schema_version": "decision-request-view-v2-interaction"
 }

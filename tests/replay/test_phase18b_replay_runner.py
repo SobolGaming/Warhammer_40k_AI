@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# pyright: reportPrivateUsage=false
 import json
 import re
 from typing import cast
@@ -8,7 +9,11 @@ import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
-from warhammer40k_core.adapters.projection import GameViewPayload, project_game_view
+from warhammer40k_core.adapters.projection import (
+    GameViewPayload,
+    _projection_state_hash,
+    project_game_view,
+)
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
@@ -439,6 +444,10 @@ def _projection_checkpoint(
     decision_record_index: int,
 ) -> ReplayProjectionCheckpoint:
     view = _game_view(lifecycle, viewer_player_id="player-a")
+    pending_decision = view["pending_decision"]
+    assert pending_decision is not None
+    assert pending_decision["interaction"] is not None
+    assert _projection_state_hash(view) == view["projection_state_hash"]
     return ReplayProjectionCheckpoint.from_lifecycle(
         lifecycle=lifecycle,
         checkpoint_id=checkpoint_id,

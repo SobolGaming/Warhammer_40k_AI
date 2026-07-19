@@ -1,10 +1,10 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/decision-request-view.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/decision-request-view.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "decision-request-view-v1",
+      "const": "decision-request-view-v2-interaction",
       "type": "string"
     },
     "actor_id": {
@@ -23,7 +23,7 @@
     "interaction": {
       "oneOf": [
         {
-          "$ref": "https://warhammer40k-core.local/contracts/v1/interaction-descriptor.schema.json"
+          "$ref": "https://warhammer40k-core.local/contracts/v3/interaction-descriptor.schema.json"
         },
         {
           "type": "null"
@@ -51,7 +51,8 @@
     "actor_id",
     "payload",
     "options",
-    "is_parameterized"
+    "is_parameterized",
+    "interaction"
   ],
   "title": "CORE V2 DecisionRequestViewPayload",
   "type": "object",

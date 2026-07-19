@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/interaction-descriptor.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/interaction-descriptor.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -28,9 +28,19 @@
             {"type": "null"}
           ]
         },
-        "maximum_selections": {"minimum": 1, "type": "integer"},
+        "maximum_selections": {
+          "oneOf": [
+            {"minimum": 0, "type": "integer"},
+            {"type": "null"}
+          ]
+        },
         "may_enter_engagement_range": {"type": ["boolean", "null"]},
-        "minimum_selections": {"minimum": 0, "type": "integer"},
+        "minimum_selections": {
+          "oneOf": [
+            {"minimum": 0, "type": "integer"},
+            {"type": "null"}
+          ]
+        },
         "minimum_enemy_distance_in": {
           "oneOf": [
             {"minimum": 0, "type": "number"},
@@ -46,6 +56,15 @@
         "submission_schema_ref": {
           "pattern": "^[a-z0-9-]+\\.schema\\.json(?:#/.+)?$",
           "type": "string"
+        },
+        "proposal_schema_ref": {
+          "oneOf": [
+            {
+              "pattern": "^[a-z0-9-]+\\.schema\\.json#/.+$",
+              "type": "string"
+            },
+            {"type": "null"}
+          ]
         }
       },
       "required": [
@@ -59,7 +78,8 @@
         "must_preserve_coherency",
         "may_enter_engagement_range",
         "placement_kinds",
-        "submission_schema_ref"
+        "submission_schema_ref",
+        "proposal_schema_ref"
       ],
       "type": "object"
     },
@@ -77,24 +97,7 @@
       "required": ["confirm_label", "decline_label"],
       "type": "object"
     },
-    "interaction_kind": {
-      "enum": [
-        "battlefield_point_placement",
-        "confirmation",
-        "dice_selection",
-        "entity_selection",
-        "finite_option_list",
-        "model_pose_placement",
-        "multi_model_placement",
-        "opportunity_window",
-        "ordered_sequencing",
-        "path_editor",
-        "quantity_selection",
-        "roster_construction",
-        "weapon_allocation_matrix"
-      ],
-      "type": "string"
-    },
+    "interaction_kind": {"$ref": "#/$defs/interaction_kind"},
     "proposal_kind": {
       "oneOf": [
         {"$ref": "#/$defs/identifier"},
@@ -103,12 +106,17 @@
     },
     "required_inputs": {
       "items": {"$ref": "#/$defs/identifier"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "submission_variants": {
+      "items": {"$ref": "#/$defs/submission_variant"},
       "minItems": 1,
       "type": "array",
       "uniqueItems": true
     },
     "schema_version": {
-      "const": "interaction-descriptor-v1",
+      "const": "interaction-descriptor-v2-variants",
       "type": "string"
     },
     "selected_entity_ids": {
@@ -128,12 +136,61 @@
     "proposal_kind",
     "selected_entity_ids",
     "required_inputs",
+    "submission_variants",
     "constraints",
     "display_hints"
   ],
   "title": "CORE V2 InteractionDescriptorPayload",
   "type": "object",
   "$defs": {
-    "identifier": {"minLength": 1, "type": "string"}
+    "identifier": {"minLength": 1, "type": "string"},
+    "interaction_kind": {
+      "enum": [
+        "battlefield_point_placement",
+        "confirmation",
+        "dice_selection",
+        "entity_selection",
+        "finite_option_list",
+        "model_pose_placement",
+        "multi_model_placement",
+        "opportunity_window",
+        "ordered_sequencing",
+        "path_editor",
+        "quantity_selection",
+        "roster_construction",
+        "weapon_allocation_matrix"
+      ],
+      "type": "string"
+    },
+    "submission_variant": {
+      "additionalProperties": false,
+      "properties": {
+        "display_label": {"$ref": "#/$defs/identifier"},
+        "interaction_kind": {"$ref": "#/$defs/interaction_kind"},
+        "proposal_schema_ref": {
+          "oneOf": [
+            {
+              "pattern": "^[a-z0-9-]+\\.schema\\.json#/.+$",
+              "type": "string"
+            },
+            {"type": "null"}
+          ]
+        },
+        "required_inputs": {
+          "items": {"$ref": "#/$defs/identifier"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "variant_id": {"$ref": "#/$defs/identifier"}
+      },
+      "required": [
+        "variant_id",
+        "interaction_kind",
+        "required_inputs",
+        "proposal_schema_ref",
+        "display_label"
+      ],
+      "type": "object"
+    }
   }
 }

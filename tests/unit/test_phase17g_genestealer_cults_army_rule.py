@@ -65,6 +65,7 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
+from warhammer40k_core.engine.interaction_metadata import interaction_descriptor_for_request
 from warhammer40k_core.engine.list_validation import (
     BattleSize,
     DetachmentSelection,
@@ -630,6 +631,7 @@ def test_marker_placement_validates_enemy_distance_and_serializes() -> None:
         enemy_x=30.0,
         enemy_y=30.0,
     )
+    _assert_cult_ambush_submission_variants(marker_request)
     invalid_result = _marker_placement_result(
         request=marker_request,
         result_id="phase17g-gsc-marker-invalid",
@@ -729,6 +731,7 @@ def test_no_marker_submission_records_when_no_legal_position_exists() -> None:
         enemy_x=0.5,
         enemy_y=0.5,
     )
+    _assert_cult_ambush_submission_variants(marker_request)
     battlefield_state = state.battlefield_state
     assert battlefield_state is not None
     state.replace_battlefield_state(
@@ -762,6 +765,24 @@ def test_no_marker_submission_records_when_no_legal_position_exists() -> None:
     assert state.cult_ambush_markers == []
     payloads = _event_payloads(decisions, "genestealer_cults_cult_ambush_marker_not_placed")
     assert payloads[-1]["reason"] == "no_legal_marker_position"
+
+
+def _assert_cult_ambush_submission_variants(request: DecisionRequest) -> None:
+    descriptor = interaction_descriptor_for_request(request)
+    variants = descriptor["submission_variants"]
+
+    assert [variant["variant_id"] for variant in variants] == ["place_marker", "no_marker"]
+    assert variants[0]["proposal_schema_ref"] == (
+        "proposal-payload.schema.json#/$defs/cult_ambush_marker_point"
+    )
+    assert variants[1]["proposal_schema_ref"] == (
+        "proposal-payload.schema.json#/$defs/cult_ambush_no_marker"
+    )
+    assert descriptor["constraints"]["submission_schema_ref"] == (
+        "parameterized-submission.schema.json"
+    )
+    assert descriptor["constraints"]["minimum_selections"] is None
+    assert descriptor["constraints"]["maximum_selections"] is None
 
 
 def test_marker_placement_rejects_stale_and_malformed_submissions() -> None:

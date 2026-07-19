@@ -5,11 +5,16 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import TypedDict, cast
 
-from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
+from warhammer40k_core.engine.decision_request import (
+    DecisionOptionPayload,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
-INTERACTION_DESCRIPTOR_SCHEMA_VERSION = "interaction-descriptor-v1"
+INTERACTION_DESCRIPTOR_SCHEMA_VERSION = "interaction-descriptor-v2-variants"
+INTERACTION_ANNOTATED_REQUEST_SCHEMA_VERSION = "annotated-decision-request-v1"
+NESTED_INTERACTION_REQUESTS_KEY = "nested_interaction_requests"
 
 
 class InteractionKind(StrEnum):
@@ -31,8 +36,8 @@ class InteractionKind(StrEnum):
 class InteractionConstraintsPayload(TypedDict):
     candidate_option_ids: list[str]
     entity_kinds: list[str]
-    minimum_selections: int
-    maximum_selections: int
+    minimum_selections: int | None
+    maximum_selections: int | None
     maximum_distance_in: float | None
     minimum_enemy_distance_in: float | None
     exact_model_count: int | None
@@ -40,11 +45,20 @@ class InteractionConstraintsPayload(TypedDict):
     may_enter_engagement_range: bool | None
     placement_kinds: list[str]
     submission_schema_ref: str
+    proposal_schema_ref: str | None
 
 
 class InteractionDisplayHintsPayload(TypedDict):
     confirm_label: str
     decline_label: str | None
+
+
+class InteractionSubmissionVariantPayload(TypedDict):
+    variant_id: str
+    interaction_kind: str
+    required_inputs: list[str]
+    proposal_schema_ref: str | None
+    display_label: str
 
 
 class InteractionDescriptorPayload(TypedDict):
@@ -54,6 +68,7 @@ class InteractionDescriptorPayload(TypedDict):
     proposal_kind: str | None
     selected_entity_ids: list[str]
     required_inputs: list[str]
+    submission_variants: list[InteractionSubmissionVariantPayload]
     constraints: InteractionConstraintsPayload
     display_hints: InteractionDisplayHintsPayload
 
@@ -64,7 +79,14 @@ class DecisionInteractionSupportPayload(TypedDict):
     interaction_kinds: list[str]
 
 
-class InteractionAnnotatedDecisionRequestPayload(DecisionRequestPayload):
+class InteractionAnnotatedDecisionRequestPayload(TypedDict):
+    schema_version: str
+    request_id: str
+    decision_type: str
+    actor_id: str
+    payload: JsonValue
+    options: list[DecisionOptionPayload]
+    is_parameterized: bool
     interaction: InteractionDescriptorPayload
 
 
@@ -348,20 +370,30 @@ def interaction_descriptor_for_request(request: DecisionRequest) -> InteractionD
     )
     context = _request_context(request)
     proposal_kind = _proposal_kind(request=request, context=context)
+    variants = _submission_variants(
+        request=request,
+        interaction_kind=spec.interaction_kind,
+        proposal_kind=proposal_kind,
+    )
+    required_inputs = variants[0]["required_inputs"] if len(variants) == 1 else []
     return {
         "schema_version": INTERACTION_DESCRIPTOR_SCHEMA_VERSION,
         "interaction_kind": spec.interaction_kind.value,
         "submission_kind": submission_kind,
         "proposal_kind": proposal_kind,
         "selected_entity_ids": _selected_entity_ids(context),
-        "required_inputs": list(_required_inputs(spec.interaction_kind)),
+        "required_inputs": list(required_inputs),
+        "submission_variants": variants,
         "constraints": _constraints(
             request=request,
             context=context,
             spec=spec,
             proposal_kind=proposal_kind,
         ),
-        "display_hints": _display_hints(spec.interaction_kind),
+        "display_hints": _display_hints(
+            spec.interaction_kind,
+            has_alternative=len(variants) > 1,
+        ),
     }
 
 
@@ -370,10 +402,40 @@ def interaction_annotated_decision_request_payload(
 ) -> InteractionAnnotatedDecisionRequestPayload:
     if type(request) is not DecisionRequest:
         raise GameLifecycleError("Interaction annotation requires a DecisionRequest.")
+    if request.actor_id is None:
+        raise GameLifecycleError("Interaction annotation requires an actor.")
     return {
-        **request.to_payload(),
+        "schema_version": INTERACTION_ANNOTATED_REQUEST_SCHEMA_VERSION,
+        "request_id": request.request_id,
+        "decision_type": request.decision_type,
+        "actor_id": request.actor_id,
+        "payload": request.payload,
+        "options": [option.to_payload() for option in request.options],
+        "is_parameterized": request.is_parameterized_submission_request(),
         "interaction": interaction_descriptor_for_request(request),
     }
+
+
+def nested_interaction_request_payloads(
+    request: DecisionRequest,
+) -> list[InteractionAnnotatedDecisionRequestPayload]:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Nested interaction lookup requires a DecisionRequest.")
+    if not isinstance(request.payload, dict):
+        return []
+    if NESTED_INTERACTION_REQUESTS_KEY not in request.payload:
+        return []
+    value = validate_json_value(request.payload[NESTED_INTERACTION_REQUESTS_KEY])
+    if not isinstance(value, list):
+        raise GameLifecycleError("Nested interaction requests must be an array.")
+    for entry in value:
+        if not isinstance(entry, dict):
+            raise GameLifecycleError("Nested interaction request entries must be objects.")
+        if entry.get("schema_version") != INTERACTION_ANNOTATED_REQUEST_SCHEMA_VERSION:
+            raise GameLifecycleError("Nested interaction request schema version drifted.")
+        if not isinstance(entry.get("interaction"), dict):
+            raise GameLifecycleError("Nested interaction request requires metadata.")
+    return cast(list[InteractionAnnotatedDecisionRequestPayload], value)
 
 
 def adapter_visible_interaction_decision_types() -> tuple[str, ...]:
@@ -488,6 +550,51 @@ def _required_inputs(interaction_kind: InteractionKind) -> tuple[str, ...]:
     return ("selected_option",)
 
 
+def _submission_variants(
+    *,
+    request: DecisionRequest,
+    interaction_kind: InteractionKind,
+    proposal_kind: str | None,
+) -> list[InteractionSubmissionVariantPayload]:
+    if request.decision_type == "submit_cult_ambush_marker_placement":
+        return [
+            {
+                "variant_id": "place_marker",
+                "interaction_kind": InteractionKind.BATTLEFIELD_POINT_PLACEMENT.value,
+                "required_inputs": ["battlefield_point"],
+                "proposal_schema_ref": (
+                    "proposal-payload.schema.json#/$defs/cult_ambush_marker_point"
+                ),
+                "display_label": "Place Marker",
+            },
+            {
+                "variant_id": "no_marker",
+                "interaction_kind": InteractionKind.CONFIRMATION.value,
+                "required_inputs": ["no_marker_reason"],
+                "proposal_schema_ref": (
+                    "proposal-payload.schema.json#/$defs/cult_ambush_no_marker"
+                ),
+                "display_label": "No Legal Marker Position",
+            },
+        ]
+    proposal_schema_ref = _proposal_schema_ref(
+        request=request,
+        proposal_kind=proposal_kind,
+    )
+    return [
+        {
+            "variant_id": "finite_option" if proposal_kind is None else proposal_kind,
+            "interaction_kind": interaction_kind.value,
+            "required_inputs": list(_required_inputs(interaction_kind)),
+            "proposal_schema_ref": proposal_schema_ref,
+            "display_label": _display_hints(
+                interaction_kind,
+                has_alternative=False,
+            )["confirm_label"],
+        }
+    ]
+
+
 def _constraints(
     *,
     request: DecisionRequest,
@@ -525,31 +632,75 @@ def _constraints(
     elif proposal_kind in _ENGAGEMENT_FORBIDDEN_PATH_KINDS:
         may_enter_engagement_range = False
     candidate_option_ids = [option.option_id for option in request.options]
+    minimum_selections, maximum_selections = _selection_cardinality(
+        interaction_kind=spec.interaction_kind,
+        exact_model_count=exact_model_count,
+        has_alternative=request.decision_type == "submit_cult_ambush_marker_placement",
+    )
     return {
         "candidate_option_ids": candidate_option_ids,
         "entity_kinds": list(spec.entity_kinds),
-        "minimum_selections": 1,
-        "maximum_selections": 1,
+        "minimum_selections": minimum_selections,
+        "maximum_selections": maximum_selections,
         "maximum_distance_in": maximum_distance,
         "minimum_enemy_distance_in": minimum_enemy_distance,
         "exact_model_count": exact_model_count,
         "must_preserve_coherency": must_preserve_coherency,
         "may_enter_engagement_range": may_enter_engagement_range,
         "placement_kinds": sorted(placement_kinds),
-        "submission_schema_ref": _submission_schema_ref(
+        "submission_schema_ref": _submission_schema_ref(request=request),
+        "proposal_schema_ref": _proposal_schema_ref(
             request=request,
             proposal_kind=proposal_kind,
         ),
     }
 
 
+def _selection_cardinality(
+    *,
+    interaction_kind: InteractionKind,
+    exact_model_count: int | None,
+    has_alternative: bool,
+) -> tuple[int | None, int | None]:
+    if has_alternative:
+        return None, None
+    if interaction_kind in {
+        InteractionKind.BATTLEFIELD_POINT_PLACEMENT,
+        InteractionKind.CONFIRMATION,
+        InteractionKind.ENTITY_SELECTION,
+        InteractionKind.FINITE_OPTION_LIST,
+        InteractionKind.MODEL_POSE_PLACEMENT,
+        InteractionKind.OPPORTUNITY_WINDOW,
+    }:
+        return 1, 1
+    if (
+        interaction_kind
+        in {
+            InteractionKind.MULTI_MODEL_PLACEMENT,
+            InteractionKind.PATH_EDITOR,
+        }
+        and exact_model_count is not None
+    ):
+        return exact_model_count, exact_model_count
+    return None, None
+
+
 def _submission_schema_ref(
     *,
     request: DecisionRequest,
-    proposal_kind: str | None,
 ) -> str:
     if not request.is_parameterized_submission_request():
         return "finite-submission.schema.json"
+    return "parameterized-submission.schema.json"
+
+
+def _proposal_schema_ref(
+    *,
+    request: DecisionRequest,
+    proposal_kind: str | None,
+) -> str | None:
+    if not request.is_parameterized_submission_request():
+        return None
     special_definition = _SPECIAL_PROPOSAL_SCHEMA_DEFINITION_BY_DECISION_TYPE.get(
         request.decision_type
     )
@@ -563,7 +714,11 @@ def _submission_schema_ref(
     return f"proposal-payload.schema.json#/$defs/{definition}"
 
 
-def _display_hints(interaction_kind: InteractionKind) -> InteractionDisplayHintsPayload:
+def _display_hints(
+    interaction_kind: InteractionKind,
+    *,
+    has_alternative: bool,
+) -> InteractionDisplayHintsPayload:
     labels = {
         InteractionKind.BATTLEFIELD_POINT_PLACEMENT: "Place Point",
         InteractionKind.CONFIRMATION: "Confirm",
@@ -582,7 +737,9 @@ def _display_hints(interaction_kind: InteractionKind) -> InteractionDisplayHints
     return {
         "confirm_label": labels[interaction_kind],
         "decline_label": (
-            "Decline" if interaction_kind is InteractionKind.OPPORTUNITY_WINDOW else None
+            "No Legal Marker Position"
+            if has_alternative
+            else ("Decline" if interaction_kind is InteractionKind.OPPORTUNITY_WINDOW else None)
         ),
     }
 

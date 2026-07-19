@@ -60,8 +60,8 @@ def test_published_interaction_kind_inventory_matches_engine_enum() -> None:
             )
         )
     )
-    properties = _json_object(schema["properties"])
-    interaction_kind = _json_object(properties["interaction_kind"])
+    definitions = _json_object(schema["$defs"])
+    interaction_kind = _json_object(definitions["interaction_kind"])
     schema_values = {_json_string(value) for value in _json_list(interaction_kind["enum"])}
     engine_values = {kind.value for kind in InteractionKind}
 
