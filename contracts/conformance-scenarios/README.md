@@ -65,14 +65,26 @@ its committed example is captured through the ordinary adapter session path.
 ## Phase 18M-A executable certification
 
 `conformance/typescript/` implements the first executable scenario through the
-published OpenAPI/JSON Schema/HTTP boundary. It authenticates every role with an
-opaque bearer credential, creates and starts the public session fixture,
-compares player/opponent projections, submits emitted finite options and a
-deployment proposal, verifies revisions/idempotency/events/resynchronization,
-closes the session, and compares immutable replay exports from two independent
-reference-server executions.
+published OpenAPI/JSON Schema/HTTP boundary. It authenticates an administrator,
+both players, and a replay viewer with opaque bearer credentials; creates and
+starts the public session fixture; compares player/opponent projections; submits
+emitted finite options and a deployment proposal; verifies revisions,
+idempotency, events, and resynchronization; closes the session; and compares
+immutable replay exports from two independent reference-server executions.
+
+Exact command retries against one backend require byte-equivalent cached
+responses. Cross-backend replay comparison instead parses and schema-validates
+both artifacts, recursively orders object member names by Unicode code point,
+preserves array order, emits compact JSON with non-ASCII strings escaped as
+lower-case `\\u` code units, and compares the SHA-256 of that canonical form.
+It separately compares complete semantic content, source identity, decision
+records, event records, projection checkpoints, and published source/checkpoint
+hashes. Wire property order and insignificant whitespace are not conformance
+requirements.
 
 This slice certifies the Phase 18E-18H generic protocol and one setup/deployment
 decision path. It does not promote `envelope_only` inventory rows to
 `live_scenario`, claim the Phase 20A full-game gate, or claim persistence,
-concurrent-race, every-decision-family, or complete golden-corpus coverage.
+concurrent-race, every-decision-family, complete golden-corpus, coach,
+delayed-spectator, or live rejected `rule_path_unsupported` coverage. Those
+backend-executable cases remain Phase 18M-B+ work.

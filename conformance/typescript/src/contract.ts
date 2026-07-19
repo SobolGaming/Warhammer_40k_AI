@@ -10,17 +10,51 @@ import {
 import * as addFormatsModule from "ajv-formats";
 import type { FormatsPlugin } from "ajv-formats";
 
-import type { components } from "./generated/openapi.js";
+import type { paths } from "./generated/openapi.js";
 
-export type ErrorEnvelope = components["schemas"]["error-envelope.schema"];
-export type EventDelta = components["schemas"]["event-delta.schema"];
-export type ReplayMetadata = components["schemas"]["replay-metadata.schema"];
-export type RulesCatalog = components["schemas"]["rules-catalog.schema"];
-export type SessionCommandEnvelope = components["schemas"]["session-command-envelope.schema"];
-export type SessionCommandOutcome = components["schemas"]["session-command-outcome.schema"];
-export type SessionCreate = components["schemas"]["session-create.schema"];
-export type SessionMetadata = components["schemas"]["session-metadata.schema"];
-export type SessionProjection = components["schemas"]["session-projection.schema"];
+type JsonResponseBody<Response> = Response extends {
+  content: { "application/json": infer Body };
+}
+  ? Body
+  : never;
+
+export type GetRulesCatalogOperation = paths["/rules-catalog"]["get"];
+export type CreateSessionOperation = paths["/sessions"]["post"];
+export type GetSessionMetadataOperation = paths["/sessions/{session_id}"]["get"];
+export type ExecuteSessionCommandOperation = paths["/sessions/{session_id}/commands"]["post"];
+export type GetSessionProjectionOperation = paths["/sessions/{session_id}/projection"]["get"];
+export type GetSessionCatalogOperation = paths["/sessions/{session_id}/catalog"]["get"];
+export type GetSessionEventsOperation = paths["/sessions/{session_id}/events"]["get"];
+export type ExportSessionReplayOperation = paths["/sessions/{session_id}/replay"]["get"];
+
+export type SessionCreate =
+  CreateSessionOperation["requestBody"]["content"]["application/json"];
+export type SessionMetadata = JsonResponseBody<CreateSessionOperation["responses"][201]>;
+export type SessionCommandEnvelope =
+  ExecuteSessionCommandOperation["requestBody"]["content"]["application/json"];
+export type ParameterizedPayload = Extract<
+  SessionCommandEnvelope["submission"],
+  { submission_kind: "parameterized_payload" }
+>["payload"];
+export type DeploymentPlacementPayload = Extract<
+  ParameterizedPayload,
+  { proposal_kind: "deployment_placement" }
+>;
+export type SessionCommandOutcome = JsonResponseBody<
+  ExecuteSessionCommandOperation["responses"][200]
+>;
+export type SessionProjection = JsonResponseBody<
+  GetSessionProjectionOperation["responses"][200]
+>;
+export type RulesCatalog = JsonResponseBody<GetSessionCatalogOperation["responses"][200]>;
+export type EventDelta = JsonResponseBody<GetSessionEventsOperation["responses"][200]>;
+export type ReplayMetadata = JsonResponseBody<ExportSessionReplayOperation["responses"][200]>;
+export type ErrorEnvelope = JsonResponseBody<
+  ExecuteSessionCommandOperation["responses"][400]
+>;
+
+export type SessionPathParameters = GetSessionMetadataOperation["parameters"]["path"];
+export type SessionEventQuery = GetSessionEventsOperation["parameters"]["query"];
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 

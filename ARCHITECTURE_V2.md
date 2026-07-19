@@ -5803,14 +5803,18 @@ Schemas, HTTP operations, and public contract artifacts. Its certified
 setup/deployment scenario covers administrator authentication, create/start,
 player projections and redaction, finite and parameterized submission,
 optimistic concurrency, idempotency, authorization, paged events, forced
-resynchronization, typed malformed/unsupported/terminal handling, close, and
-replay equivalence across two independent reference-server processes. The
-client boundary is statically audited against engine/lifecycle imports.
+resynchronization, typed malformed/unsupported-lifecycle/route-not-found/
+terminal handling, close, and schema-validated canonical replay equivalence
+across two independent reference-server processes. The client boundary is
+statically audited against engine/lifecycle imports and its executable methods
+derive request, path/query, and status-specific response types from generated
+OpenAPI operations.
 
 Phase 18M-A does not satisfy the complete Phase 18M or Phase 20A gate. Exhaustive
 live decision-family/proposal coverage, concurrent-submission races, the full
-golden corpus, persistence/recovery claims, and the certified Phase 20A
-full-game scenario remain Phase 18M-B+ work.
+golden corpus, persistence/recovery claims, coach/delayed-spectator policy, live
+rejected `rule_path_unsupported` handling, and the certified Phase 20A full-game
+scenario remain Phase 18M-B+ work.
 
 The existing development server becomes a small reference implementation of the
 canonical contract, not necessarily the production service. It proves that an

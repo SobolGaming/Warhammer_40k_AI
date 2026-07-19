@@ -10,9 +10,10 @@
     "generate": "node scripts/generate-models.mjs src/generated/openapi.ts",
     "check:generated": "node scripts/check-generated.mjs",
     "typecheck": "tsc --noEmit",
+    "test:unit": "tsx --test src/**/*.test.ts",
     "conformance": "tsx src/main.ts",
     "check": "npm run check:generated && npm run typecheck",
-    "test": "npm run check && npm run conformance"
+    "test": "npm run check && npm run test:unit && npm run conformance"
   },
   "dependencies": {
     "ajv": "8.20.0",

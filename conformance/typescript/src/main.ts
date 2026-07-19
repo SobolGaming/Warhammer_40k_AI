@@ -5,8 +5,10 @@ import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 
 import { ContractHttpClient } from "./client.js";
+import { ContractRegistry, type ReplayMetadata } from "./contract.js";
 import {
   type CertifiedScenarioResult,
   type PrincipalTokens,
@@ -42,15 +44,24 @@ await main();
 async function main(): Promise<void> {
   const options = parseArguments(process.argv.slice(2));
   const tokens = principalTokens();
+  const registry = new ContractRegistry(contractRoot);
   const managedServers: ManagedServer[] = [];
   try {
     const primaryUrl =
       options.baseUrl ??
-      (await startReferenceServer(repositoryRoot, managedServers, tokens.administrator)).baseUrl;
+      (await startReferenceServer(repositoryRoot, managedServers, tokens.administrator, registry))
+        .baseUrl;
     const comparisonUrl =
       options.comparisonBaseUrl ??
       (options.baseUrl === null
-        ? (await startReferenceServer(repositoryRoot, managedServers, tokens.administrator)).baseUrl
+        ? (
+            await startReferenceServer(
+              repositoryRoot,
+              managedServers,
+              tokens.administrator,
+              registry,
+            )
+          ).baseUrl
         : null);
     if (comparisonUrl === null) {
       throw new Error(
@@ -59,11 +70,12 @@ async function main(): Promise<void> {
     }
     const primary = await runCertifiedScenario(primaryUrl, contractRoot, tokens);
     const comparison = await runCertifiedScenario(comparisonUrl, contractRoot, tokens);
-    assertReplayEquivalence(primary, comparison);
+    const equivalenceAssertions = assertReplayEquivalence(primary, comparison);
     process.stdout.write(
       `${JSON.stringify(
         {
-          assertion_count: primary.assertion_count + comparison.assertion_count + 2,
+          assertion_count:
+            primary.assertion_count + comparison.assertion_count + equivalenceAssertions,
           client_language: "typescript",
           contract_version: "2.0.0",
           replay_sha256: primary.replay_sha256,
@@ -112,6 +124,7 @@ async function startReferenceServer(
   projectRoot: string,
   managedServers: ManagedServer[],
   administratorToken: string,
+  registry: ContractRegistry,
 ): Promise<ManagedServer> {
   const port = await availablePort();
   const logs: string[] = [];
@@ -142,7 +155,7 @@ async function startReferenceServer(
     shutdownFile,
   };
   managedServers.push(server);
-  await waitUntilReady(server, administratorToken);
+  await waitUntilReady(server, administratorToken, registry);
   return server;
 }
 
@@ -160,8 +173,12 @@ async function stopReferenceServer(server: ManagedServer): Promise<void> {
   rmSync(server.shutdownDirectory, { recursive: true, force: true });
 }
 
-async function waitUntilReady(server: ManagedServer, administratorToken: string): Promise<void> {
-  const client = new ContractHttpClient(server.baseUrl, administratorToken);
+async function waitUntilReady(
+  server: ManagedServer,
+  administratorToken: string,
+  registry: ContractRegistry,
+): Promise<void> {
+  const client = new ContractHttpClient(server.baseUrl, administratorToken, registry);
   const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
     if (server.child.exitCode !== null) {
@@ -229,11 +246,39 @@ function availablePort(): Promise<number> {
 function assertReplayEquivalence(
   primary: CertifiedScenarioResult,
   comparison: CertifiedScenarioResult,
-): void {
-  if (primary.replay_sha256 !== comparison.replay_sha256) {
-    throw new Error("Independent HTTP executions produced different replay hashes.");
+): number {
+  const comparisons: ReadonlyArray<readonly [unknown, unknown, string]> = [
+    [primary.scenario_id, comparison.scenario_id, "scenario identity"],
+    [primary.replay_sha256, comparison.replay_sha256, "canonical replay SHA-256"],
+    [primary.replay, comparison.replay, "complete replay semantics"],
+    [primary.replay.source_identity, comparison.replay.source_identity, "source identity"],
+    [primary.replay.decision_records, comparison.replay.decision_records, "decision records"],
+    [primary.replay.event_records, comparison.replay.event_records, "event records"],
+    [
+      primary.replay.projection_checkpoints,
+      comparison.replay.projection_checkpoints,
+      "projection checkpoints",
+    ],
+    [replayHashes(primary.replay), replayHashes(comparison.replay), "published replay hashes"],
+  ];
+  for (const [actual, expected, label] of comparisons) {
+    if (!isDeepStrictEqual(actual, expected)) {
+      throw new Error(`Independent HTTP executions differ in ${label}.`);
+    }
   }
-  if (primary.replay_raw !== comparison.replay_raw) {
-    throw new Error("Independent HTTP executions produced non-equivalent replay artifacts.");
-  }
+  return comparisons.length;
+}
+
+function replayHashes(replay: ReplayMetadata): unknown {
+  return {
+    source_identity: {
+      catalog_hash: replay.source_identity.catalog_hash,
+      game_config_hash: replay.source_identity.game_config_hash,
+      ruleset_descriptor_hash: replay.source_identity.ruleset_descriptor_hash,
+    },
+    projection_checkpoints: replay.projection_checkpoints.map((checkpoint) => ({
+      event_log_hash: checkpoint.event_log_hash,
+      projection_state_hash: checkpoint.projection_state_hash,
+    })),
+  };
 }

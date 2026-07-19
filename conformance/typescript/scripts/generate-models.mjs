@@ -66,12 +66,23 @@ try {
     const source = JSON.parse(
       readFileSync(resolve(contractRoot, "schemas", schemaName), "utf8"),
     );
-    const normalized = normalizeSchemaReferences(source);
+    const normalized = normalizeSchemaReferences(source, schemaName);
     writeFileSync(
       resolve(normalizedSchemaRoot, schemaName),
       `${JSON.stringify(normalized, null, 2)}\n`,
       "utf8",
     );
+    for (const [definitionName, definition] of Object.entries(source.$defs ?? {})) {
+      const definitionPath = resolve(
+        normalizedSchemaRoot,
+        definitionFileName(schemaName, definitionName),
+      );
+      writeFileSync(
+        definitionPath,
+        `${JSON.stringify(normalizeSchemaReferences(definition, schemaName), null, 2)}\n`,
+        "utf8",
+      );
+    }
   }
 
   mkdirSync(dirname(outputPath), { recursive: true });
@@ -92,26 +103,56 @@ try {
   rmSync(temporaryDirectory, { recursive: true, force: true });
 }
 
-function normalizeSchemaReferences(value) {
+function normalizeSchemaReferences(value, currentSchemaName) {
   if (Array.isArray(value)) {
-    return value.map(normalizeSchemaReferences);
+    return value.map((item) => normalizeSchemaReferences(item, currentSchemaName));
   }
   if (value === null || typeof value !== "object") {
     return value;
   }
   const normalized = {};
   for (const [key, child] of Object.entries(value)) {
-    if (key === "$id") {
+    if (key === "$id" || key === "$defs") {
       continue;
     }
-    if (key === "$ref" && typeof child === "string" && child.startsWith(localSchemaPrefix)) {
-      const [schemaUrl, fragment] = child.split("#", 2);
-      normalized[key] = `./${basename(schemaUrl)}${fragment === undefined ? "" : `#${fragment}`}`;
+    if (key === "$ref" && typeof child === "string") {
+      normalized[key] = normalizeReference(child, currentSchemaName);
       continue;
     }
-    normalized[key] = normalizeSchemaReferences(child);
+    normalized[key] = normalizeSchemaReferences(child, currentSchemaName);
   }
   return normalized;
+}
+
+function normalizeReference(reference, currentSchemaName) {
+  if (reference.startsWith("#/$defs/")) {
+    return definitionReference(currentSchemaName, reference.slice(1));
+  }
+  if (!reference.startsWith(localSchemaPrefix)) {
+    return reference;
+  }
+  const [schemaUrl, fragment] = reference.split("#", 2);
+  const schemaName = basename(schemaUrl);
+  if (fragment?.startsWith("/$defs/") === true) {
+    return definitionReference(schemaName, fragment);
+  }
+  return `./${schemaName}${fragment === undefined ? "" : `#${fragment}`}`;
+}
+
+function definitionReference(schemaName, fragment) {
+  const pointer = fragment.slice("/$defs/".length).split("/");
+  const definitionName = pointer.shift();
+  if (definitionName === undefined || definitionName.length === 0) {
+    throw new Error(`Invalid JSON Schema definition reference #${fragment}.`);
+  }
+  const remainder = pointer.length === 0 ? "" : `#/${pointer.join("/")}`;
+  return `./${definitionFileName(schemaName, definitionName)}${remainder}`;
+}
+
+function definitionFileName(schemaName, definitionName) {
+  const stem = schemaName.replace(/\.schema\.json$/, "");
+  const safeDefinitionName = definitionName.replace(/[^A-Za-z0-9_.-]/g, "-");
+  return `${stem}--${safeDefinitionName}.schema.json`;
 }
 
 function selectedEntries(value, names) {

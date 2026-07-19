@@ -1,10 +1,11 @@
-import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 
+import { canonicalJsonSha256 } from "./canonical-json.js";
 import { ContractHttpClient, type HttpResult } from "./client.js";
 import {
   ContractRegistry,
+  type DeploymentPlacementPayload,
   type ErrorEnvelope,
   type EventDelta,
   type JsonValue,
@@ -14,6 +15,7 @@ import {
   type SessionCommandOutcome,
   type SessionCreate,
   type SessionMetadata,
+  type SessionPathParameters,
   type SessionProjection,
   jsonArray,
   jsonObject,
@@ -30,8 +32,8 @@ export interface PrincipalTokens {
 
 export interface CertifiedScenarioResult {
   readonly assertion_count: number;
+  readonly replay: ReplayMetadata;
   readonly replay_sha256: string;
-  readonly replay_raw: string;
   readonly scenario_id: "phase18m-a-certified-setup";
 }
 
@@ -54,7 +56,7 @@ export async function runCertifiedScenario(
 ): Promise<CertifiedScenarioResult> {
   const registry = new ContractRegistry(contractRoot);
   const assertions: MutableAssertionCounter = { count: 0 };
-  const administrator = new ContractHttpClient(baseUrl, tokens.administrator);
+  const administrator = new ContractHttpClient(baseUrl, tokens.administrator, registry);
   const clients: ScenarioClients = {
     administrator,
     anonymous: administrator.withToken(null),
@@ -68,6 +70,7 @@ export async function runCertifiedScenario(
     "session-create.schema.json",
     parseJsonFile(resolve(contractRoot, "examples/sessions/session-create.json")),
   );
+  const armyIdsByPlayer = playerArmyIds(createBody);
   const createdResponse = await clients.administrator.createSession(createBody);
   equal(createdResponse.status, 201, "administrator creates authoritative session", assertions);
   const created = validateMetadata(createdResponse, registry);
@@ -84,17 +87,23 @@ export async function runCertifiedScenario(
   await assertMalformedCommand(clients, sessionId, registry, assertions);
   await assertLiveUnsupportedBoundary(clients, createBody, registry, assertions);
   const started = lifecycleEnvelope(sessionId, "phase18m-start-000001", 0, "start_session");
-  const startResponse = await clients.administrator.executeCommand(sessionId, started);
+  const startResponse = await clients.administrator.executeCommand(
+    sessionParameters(sessionId),
+    started,
+  );
   equal(startResponse.status, 200, "administrator starts session", assertions);
   const startOutcome = validateOutcome(startResponse, registry);
   assertCommittedAccepted(startOutcome, "start command", assertions);
   equal(startOutcome.session.session_revision, 1, "start commits one revision", assertions);
-  const startRetry = await clients.administrator.executeCommand(sessionId, started);
+  const startRetry = await clients.administrator.executeCommand(
+    sessionParameters(sessionId),
+    started,
+  );
   equal(startRetry.status, startResponse.status, "idempotent retry preserves status", assertions);
   equal(startRetry.rawBody, startResponse.rawBody, "idempotent retry is byte-equivalent", assertions);
 
   await assertStaleRevision(clients, sessionId, registry, assertions);
-  await assertUnsupportedClassification(clients, sessionId, contractRoot, registry, assertions);
+  await assertUnsupportedClassification(clients, sessionId, assertions);
   await assertActiveReplayAuthorization(clients, sessionId, registry, assertions);
 
   const ownerProjection = await projection(clients.playerA, sessionId, registry);
@@ -116,11 +125,17 @@ export async function runCertifiedScenario(
     1,
     firstRequest,
   );
-  const firstFiniteResponse = await clients.playerA.executeCommand(sessionId, firstFinite);
+  const firstFiniteResponse = await clients.playerA.executeCommand(
+    sessionParameters(sessionId),
+    firstFinite,
+  );
   equal(firstFiniteResponse.status, 200, "player submits visible finite option", assertions);
   const firstFiniteOutcome = validateOutcome(firstFiniteResponse, registry);
   assertCommittedAccepted(firstFiniteOutcome, "first finite decision", assertions);
-  const firstFiniteRetry = await clients.playerA.executeCommand(sessionId, firstFinite);
+  const firstFiniteRetry = await clients.playerA.executeCommand(
+    sessionParameters(sessionId),
+    firstFinite,
+  );
   equal(
     firstFiniteRetry.rawBody,
     firstFiniteResponse.rawBody,
@@ -145,7 +160,7 @@ export async function runCertifiedScenario(
     secondRequest,
   );
   const secondFiniteOutcome = validateOutcome(
-    await clients.playerB.executeCommand(sessionId, secondFinite),
+    await clients.playerB.executeCommand(sessionParameters(sessionId), secondFinite),
     registry,
   );
   assertCommittedAccepted(secondFiniteOutcome, "second player finite decision", assertions);
@@ -159,7 +174,7 @@ export async function runCertifiedScenario(
     setupFiniteCount += 1;
     const setupOutcome = validateOutcome(
       await setupClient.executeCommand(
-        sessionId,
+        sessionParameters(sessionId),
         finiteEnvelope(
           sessionId,
           `phase18m-setup-finite-${String(setupFiniteCount).padStart(6, "0")}`,
@@ -180,8 +195,11 @@ export async function runCertifiedScenario(
 
   const placementRequest = pendingDecision(placementProjection);
   equal(placementRequest.is_parameterized, true, "placement request is parameterized", assertions);
-  const proposalPayload = deploymentPayload(placementProjection.projection.pending_proposal);
-  registry.validate<JsonValue>("proposal-payload.schema.json", proposalPayload);
+  const proposalPayload = deploymentPayload(
+    placementProjection.projection.pending_proposal,
+    armyIdsByPlayer,
+  );
+  registry.validate<DeploymentPlacementPayload>("proposal-payload.schema.json", proposalPayload);
   const placementClient = clientForActor(clients, placementRequest.actor_id);
   const placementEnvelope = parameterizedEnvelope(
     sessionId,
@@ -190,11 +208,17 @@ export async function runCertifiedScenario(
     placementRequest,
     proposalPayload,
   );
-  const placementResponse = await placementClient.executeCommand(sessionId, placementEnvelope);
+  const placementResponse = await placementClient.executeCommand(
+    sessionParameters(sessionId),
+    placementEnvelope,
+  );
   equal(placementResponse.status, 200, "player submits deployment proposal", assertions);
   const placementOutcome = validateOutcome(placementResponse, registry);
   assertCommittedAccepted(placementOutcome, "deployment proposal", assertions);
-  const placementRetry = await placementClient.executeCommand(sessionId, placementEnvelope);
+  const placementRetry = await placementClient.executeCommand(
+    sessionParameters(sessionId),
+    placementEnvelope,
+  );
   equal(
     placementRetry.rawBody,
     placementResponse.rawBody,
@@ -226,7 +250,10 @@ export async function runCertifiedScenario(
     placementOutcome.session.session_revision,
     "close_session",
   );
-  const closeResponse = await clients.administrator.executeCommand(sessionId, closeEnvelope);
+  const closeResponse = await clients.administrator.executeCommand(
+    sessionParameters(sessionId),
+    closeEnvelope,
+  );
   equal(closeResponse.status, 200, "administrator closes session", assertions);
   const closeOutcome = validateOutcome(closeResponse, registry);
   assertCommittedAccepted(closeOutcome, "close command", assertions);
@@ -262,8 +289,8 @@ export async function runCertifiedScenario(
 
   return {
     assertion_count: assertions.count,
-    replay_sha256: createHash("sha256").update(closedReplay.rawBody).digest("hex"),
-    replay_raw: closedReplay.rawBody,
+    replay: closedReplay.body,
+    replay_sha256: canonicalJsonSha256(closedReplay.body),
     scenario_id: "phase18m-a-certified-setup",
   };
 }
@@ -282,7 +309,7 @@ function lifecycleEnvelope(
     request_id: null,
     result_id: null,
     submission: { submission_kind: submissionKind },
-  } as SessionCommandEnvelope;
+  } satisfies SessionCommandEnvelope;
 }
 
 function finiteEnvelope(
@@ -303,7 +330,7 @@ function finiteEnvelope(
     request_id: request.request_id,
     result_id: `${commandId}-result`,
     submission: { submission_kind: "finite_option", option_id: firstOption.option_id },
-  } as SessionCommandEnvelope;
+  } satisfies SessionCommandEnvelope;
 }
 
 function parameterizedEnvelope(
@@ -311,7 +338,7 @@ function parameterizedEnvelope(
   commandId: string,
   expectedRevision: number,
   request: ReturnType<typeof pendingDecision>,
-  payload: JsonValue,
+  payload: DeploymentPlacementPayload,
 ): SessionCommandEnvelope {
   return {
     schema_version: "session-command-envelope-v1",
@@ -321,7 +348,7 @@ function parameterizedEnvelope(
     request_id: request.request_id,
     result_id: `${commandId}-result`,
     submission: { submission_kind: "parameterized_payload", payload },
-  } as SessionCommandEnvelope;
+  } satisfies SessionCommandEnvelope;
 }
 
 async function assertAuthentication(
@@ -341,9 +368,8 @@ async function assertMalformedCommand(
   registry: ContractRegistry,
   assertions: MutableAssertionCounter,
 ): Promise<void> {
-  const response = await clients.administrator.request<ErrorEnvelope>(
-    "POST",
-    `/sessions/${encodeURIComponent(sessionId)}/commands`,
+  const response = await clients.administrator.probeMalformedSessionCommand(
+    sessionParameters(sessionId),
     { schema_version: "session-command-envelope-v1", unexpected: true },
   );
   equal(response.status, 400, "malformed command is rejected before mutation", assertions);
@@ -365,7 +391,7 @@ async function assertStaleRevision(
   assertions: MutableAssertionCounter,
 ): Promise<void> {
   const response = await clients.administrator.executeCommand(
-    sessionId,
+    sessionParameters(sessionId),
     lifecycleEnvelope(sessionId, "phase18m-stale-revision", 0, "advance_session"),
   );
   equal(response.status, 409, "stale expected revision is rejected", assertions);
@@ -378,25 +404,16 @@ async function assertStaleRevision(
 async function assertUnsupportedClassification(
   clients: ScenarioClients,
   sessionId: string,
-  contractRoot: string,
-  registry: ContractRegistry,
   assertions: MutableAssertionCounter,
 ): Promise<void> {
-  const response = await clients.administrator.request<ErrorEnvelope>(
-    "GET",
-    `/sessions/${encodeURIComponent(sessionId)}/support-profile`,
+  const response = await clients.administrator.probeUnpublishedSupportProfile(
+    sessionParameters(sessionId),
   );
   equal(response.status, 404, "unpublished formal route is rejected", assertions);
-  const routeError = registry.validate<ErrorEnvelope>("error-envelope.schema.json", response.body);
-  equal(routeError.error.code, "route_not_found", "unsupported transport path is classified", assertions);
-  const unsupported = registry.validate<ErrorEnvelope>(
-    "error-envelope.schema.json",
-    parseJsonFile(resolve(contractRoot, "examples/errors/unsupported.json")),
-  );
   equal(
-    unsupported.error.code,
-    "rule_path_unsupported",
-    "published rule-path unsupported classification is distinct",
+    response.body.error.code,
+    "route_not_found",
+    "unpublished transport path is classified",
     assertions,
   );
 }
@@ -408,7 +425,7 @@ async function assertLiveUnsupportedBoundary(
   assertions: MutableAssertionCounter,
 ): Promise<void> {
   const boundaryBody = jsonObject(
-    structuredClone(createBody as unknown as JsonValue),
+    structuredClone(createBody),
     "transition-budget session create body",
   );
   const boundaryConfig = jsonObject(boundaryBody.config, "transition-budget config");
@@ -422,14 +439,14 @@ async function assertLiveUnsupportedBoundary(
   equal(created.status, 201, "administrator creates unsupported-boundary session", assertions);
   const metadata = validateMetadata(created, registry);
   const started = await clients.administrator.executeCommand(
-    metadata.session_id,
+    sessionParameters(metadata.session_id),
     lifecycleEnvelope(metadata.session_id, "phase18m-budget-start", 0, "start_session"),
   );
   equal(started.status, 200, "transition-budget command returns public outcome", assertions);
   const outcome = validateOutcome(started, registry);
   assertCommittedAccepted(outcome, "transition-budget boundary", assertions);
   const lifecycleStatus = jsonObject(
-    outcome.session.lifecycle_status as unknown as JsonValue,
+    outcome.session.lifecycle_status,
     "transition-budget lifecycle status",
   );
   equal(lifecycleStatus.status_kind, "unsupported", "unsupported lifecycle is classified", assertions);
@@ -441,7 +458,7 @@ async function assertLiveUnsupportedBoundary(
     assertions,
   );
   const closed = await clients.administrator.executeCommand(
-    metadata.session_id,
+    sessionParameters(metadata.session_id),
     lifecycleEnvelope(metadata.session_id, "phase18m-budget-close", 1, "close_session"),
   );
   equal(closed.status, 200, "unsupported-boundary session closes cleanly", assertions);
@@ -453,7 +470,7 @@ async function assertActiveReplayAuthorization(
   registry: ContractRegistry,
   assertions: MutableAssertionCounter,
 ): Promise<void> {
-  const response = await clients.replayViewer.exportReplay(sessionId);
+  const response = await clients.replayViewer.exportReplay(sessionParameters(sessionId));
   equal(response.status, 403, "replay viewer cannot inspect active replay", assertions);
   const error = registry.validate<ErrorEnvelope>("error-envelope.schema.json", response.body);
   equal(error.error.code, "access_denied", "active replay denial is redacted", assertions);
@@ -485,8 +502,8 @@ async function assertCatalogEquivalence(
   registry: ContractRegistry,
   assertions: MutableAssertionCounter,
 ): Promise<void> {
-  const administrator = await clients.administrator.getCatalog(sessionId);
-  const player = await clients.playerA.getCatalog(sessionId);
+  const administrator = await clients.administrator.getCatalog(sessionParameters(sessionId));
+  const player = await clients.playerA.getCatalog(sessionParameters(sessionId));
   equal(administrator.status, 200, "administrator retrieves session catalog", assertions);
   equal(player.status, 200, "player retrieves session catalog", assertions);
   const administratorCatalog = registry.validate<RulesCatalog>(
@@ -510,7 +527,7 @@ async function assertAdministratorCannotSubmit(
   assertions: MutableAssertionCounter,
 ): Promise<void> {
   const response = await clients.administrator.executeCommand(
-    sessionId,
+    sessionParameters(sessionId),
     finiteEnvelope(sessionId, "phase18m-admin-impersonation", 1, request),
   );
   equal(response.status, 403, "administrator cannot impersonate decision actor", assertions);
@@ -530,7 +547,7 @@ async function assertStaleRequest(
   const currentRequest = pendingDecision(currentProjection);
   const client = clientForActor(clients, currentRequest.actor_id);
   const response = await client.executeCommand(
-    sessionId,
+    sessionParameters(sessionId),
     finiteEnvelope(sessionId, "phase18m-stale-request", revision, request),
   );
   equal(response.status, 409, "consumed request is rejected", assertions);
@@ -549,7 +566,7 @@ async function assertEventPagination(
   const sequenceNumbers: number[] = [];
   let pageCount = 0;
   while (true) {
-    const response = await client.getEvents(sessionId, cursor, 5);
+    const response = await client.getEvents(sessionParameters(sessionId), { cursor, limit: 5 });
     equal(response.status, 200, "viewer event page succeeds", assertions);
     const page = registry.validate<EventDelta>("event-delta.schema.json", response.body);
     equal(page.resync_required, false, "retained cursor does not require resync", assertions);
@@ -581,7 +598,9 @@ async function assertForcedResynchronization(
   registry: ContractRegistry,
   assertions: MutableAssertionCounter,
 ): Promise<void> {
-  const response = await client.getEvents(sessionId, "not-a-cursor");
+  const response = await client.getEvents(sessionParameters(sessionId), {
+    cursor: "not-a-cursor",
+  });
   equal(response.status, 200, "invalid cursor returns typed resync payload", assertions);
   const delta = registry.validate<EventDelta>("event-delta.schema.json", response.body);
   equal(delta.resync_required, true, "invalid cursor forces resynchronization", assertions);
@@ -605,7 +624,7 @@ async function assertTerminalHandling(
   assertions: MutableAssertionCounter,
 ): Promise<void> {
   const response = await clients.administrator.executeCommand(
-    sessionId,
+    sessionParameters(sessionId),
     lifecycleEnvelope(sessionId, "phase18m-after-close", revision, "advance_session"),
   );
   equal(response.status, 409, "closed session rejects further commands", assertions);
@@ -634,13 +653,47 @@ function assertReplayContainsDecisions(
   );
 }
 
-function deploymentPayload(value: JsonValue): JsonValue {
+function playerArmyIds(createBody: SessionCreate): ReadonlyMap<string, string> {
+  const result = new Map<string, string>();
+  const musterRequests = jsonArray(
+    createBody.config.army_muster_requests,
+    "session-create army muster requests",
+  );
+  for (const requestValue of musterRequests) {
+    const request = jsonObject(requestValue, "session-create army muster request");
+    const playerId = requiredString(request, "player_id");
+    const armyId = requiredString(request, "army_id");
+    if (result.has(playerId)) {
+      throw new Error(`Session-create fixture repeats army identity for ${playerId}.`);
+    }
+    result.set(playerId, armyId);
+  }
+  for (const playerId of createBody.config.player_ids) {
+    if (!result.has(playerId)) {
+      throw new Error(`Session-create fixture has no published army identity for ${playerId}.`);
+    }
+  }
+  return result;
+}
+
+function deploymentPayload(
+  value: JsonValue,
+  armyIdsByPlayer: ReadonlyMap<string, string>,
+): DeploymentPlacementPayload {
   const proposal = jsonObject(value, "pending deployment proposal");
   const playerId = requiredString(proposal, "player_id");
   const unitInstanceId = requiredString(proposal, "unit_instance_id");
-  const armyId = unitInstanceId.split(":", 1)[0];
-  if (armyId === undefined || armyId.length === 0) {
-    throw new Error("Deployment unit ID does not contain an army identity.");
+  const armyId = armyIdsByPlayer.get(playerId);
+  if (armyId === undefined) {
+    throw new Error(`Deployment actor ${playerId} has no published session-create army identity.`);
+  }
+  const proposalKind = requiredString(proposal, "proposal_kind");
+  if (proposalKind !== "deployment_placement") {
+    throw new Error(`Certified deployment received proposal kind ${proposalKind}.`);
+  }
+  const placementKind = requiredString(proposal, "placement_kind");
+  if (placementKind !== "deployment") {
+    throw new Error(`Certified deployment received placement kind ${placementKind}.`);
   }
   const zones = jsonArray(proposal.legal_deployment_zones, "legal deployment zones");
   const firstZone = jsonObject(zones[0], "first legal deployment zone");
@@ -655,7 +708,6 @@ function deploymentPayload(value: JsonValue): JsonValue {
   const minimumX = Math.min(...xs);
   const minimumY = Math.min(...ys);
   const modelIds = jsonArray(proposal.model_instance_ids, "deployment model IDs");
-  const facing = playerId === "player-b" ? 180 : 0;
   const modelPlacements = modelIds.map((modelId, index) => {
     if (typeof modelId !== "string" || modelId.length === 0) {
       throw new Error("Deployment model ID must be a non-empty string.");
@@ -671,22 +723,22 @@ function deploymentPayload(value: JsonValue): JsonValue {
           y: minimumY + 3 + (index % 3) * 1.8,
           z: 0,
         },
-        facing: { degrees: facing },
+        facing: { degrees: 0 },
       },
     };
   });
   return {
     proposal_request_id: requiredString(proposal, "request_id"),
-    proposal_kind: requiredString(proposal, "proposal_kind"),
+    proposal_kind: "deployment_placement",
     game_id: requiredString(proposal, "game_id"),
     ruleset_descriptor_hash: requiredString(proposal, "ruleset_descriptor_hash"),
     setup_step: requiredString(proposal, "setup_step"),
     player_id: playerId,
     unit_instance_id: unitInstanceId,
-    placement_kind: requiredString(proposal, "placement_kind"),
+    placement_kind: "deployment",
     model_placements: modelPlacements,
     context: proposal.context ?? null,
-  };
+  } satisfies DeploymentPlacementPayload;
 }
 
 function requiredNumber(value: unknown, key: string): number {
@@ -695,6 +747,10 @@ function requiredNumber(value: unknown, key: string): number {
     throw new Error(`Payload requires finite number ${key}.`);
   }
   return field;
+}
+
+function sessionParameters(sessionId: string): SessionPathParameters {
+  return { session_id: sessionId } satisfies SessionPathParameters;
 }
 
 async function visiblePendingProjection(
@@ -758,7 +814,7 @@ async function metadataFor(
   sessionId: string,
   registry: ContractRegistry,
 ): Promise<SessionMetadata> {
-  const response = await client.getMetadata(sessionId);
+  const response = await client.getMetadata(sessionParameters(sessionId));
   if (response.status !== 200) {
     throw new Error(`Session metadata returned HTTP ${response.status}.`);
   }
@@ -770,7 +826,7 @@ async function projection(
   sessionId: string,
   registry: ContractRegistry,
 ): Promise<SessionProjection> {
-  const response = await client.getProjection(sessionId);
+  const response = await client.getProjection(sessionParameters(sessionId));
   if (response.status !== 200) {
     throw new Error(`Session projection returned HTTP ${response.status}.`);
   }
@@ -782,7 +838,7 @@ async function replay(
   sessionId: string,
   registry: ContractRegistry,
 ): Promise<HttpResult<ReplayMetadata>> {
-  const response = await client.exportReplay(sessionId);
+  const response = await client.exportReplay(sessionParameters(sessionId));
   if (response.status !== 200) {
     throw new Error(`Replay export returned HTTP ${response.status}.`);
   }
