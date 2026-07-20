@@ -12,6 +12,8 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
+    select_source_backed_reroll_permission_context,
+    source_backed_reroll_permission_contexts_for_unit,
 )
 
 if TYPE_CHECKING:
@@ -973,16 +975,21 @@ class RuntimeModifierRegistry:
         self,
         context: AttackRerollPermissionContext,
     ) -> SourceBackedRerollPermissionContext | None:
+        return select_source_backed_reroll_permission_context(
+            self.attack_reroll_permission_contexts(context)
+        )
+
+    def attack_reroll_permission_contexts(
+        self,
+        context: AttackRerollPermissionContext,
+    ) -> tuple[SourceBackedRerollPermissionContext, ...]:
         if type(context) is not AttackRerollPermissionContext:
             raise GameLifecycleError("Attack reroll permissions require a context.")
-        candidates = tuple(
+        return tuple(
             candidate
             for binding in self.attack_reroll_permission_bindings
             if (candidate := binding.handler(context)) is not None
         )
-        if len(candidates) > 1:
-            raise GameLifecycleError("Multiple attack reroll permissions are available.")
-        return candidates[0] if candidates else None
 
     def failed_save_damage_replacement(
         self,
@@ -1178,6 +1185,45 @@ class RuntimeModifierRegistry:
                 binding.handler(replace(context, weapon_profile=current)),
             )
         return generic_rule_modified_weapon_profile(replace(context, weapon_profile=current))
+
+
+def unified_attack_reroll_permission_contexts_for_unit(
+    *,
+    state: GameState,
+    player_id: str,
+    attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
+    target_unit_instance_id: str | None,
+    source_phase: BattlePhase,
+    attack_kind: str,
+    roll_type: str,
+    registry: RuntimeModifierRegistry,
+) -> tuple[SourceBackedRerollPermissionContext, ...]:
+    source_backed_contexts = source_backed_reroll_permission_contexts_for_unit(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=attacking_unit_instance_id,
+        model_instance_id=attacker_model_instance_id,
+        roll_type=roll_type,
+        timing_window=roll_type,
+        attack_kind=attack_kind,
+        target_unit_instance_id=target_unit_instance_id,
+    )
+    if target_unit_instance_id is None or roll_type.startswith("attack_sequence.save."):
+        return source_backed_contexts
+    catalog_contexts = registry.attack_reroll_permission_contexts(
+        AttackRerollPermissionContext(
+            state=state,
+            player_id=player_id,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
+            target_unit_instance_id=target_unit_instance_id,
+            source_phase=source_phase,
+            roll_type=roll_type,
+            timing_window=roll_type,
+        )
+    )
+    return (*source_backed_contexts, *catalog_contexts)
 
 
 def _validate_bindings[T](

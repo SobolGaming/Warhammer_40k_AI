@@ -1498,10 +1498,9 @@ class RuntimeContentBundle:
             )
         )
         advance_move_hook_registry = AdvanceMoveHookRegistry.from_bindings(
-            (
-                *amh.advance_move_hook_bindings(activation=activation, execution_records=records),
-                *_contribution_values(vc, lambda c: c.advance_move_hook_bindings),
-            )
+            catalog_rules.advance_move_hook_bindings()
+            + amh.advance_move_hook_bindings(activation=activation, execution_records=records)
+            + _contribution_values(vc, lambda c: c.advance_move_hook_bindings)
         )
         fall_back_hook_registry = FallBackEligibilityHookRegistry.from_bindings(
             (

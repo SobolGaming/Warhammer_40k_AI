@@ -2966,14 +2966,17 @@ def test_source_backed_reroll_payloads_and_lookup_are_fail_fast() -> None:
             effect_payload=duplicate_payload,
         )
     )
-    with pytest.raises(GameLifecycleError):
-        source_backed_reroll_permission_for_unit(
-            state=duplicate_state,
-            player_id="player-a",
-            unit_instance_id=duplicate_unit.unit_instance_id,
-            roll_type="charge_roll",
-            timing_window="after_charge_roll",
-        )
+    assert source_backed_reroll_permission_for_unit(
+        state=duplicate_state,
+        player_id="player-a",
+        unit_instance_id=duplicate_unit.unit_instance_id,
+        roll_type="charge_roll",
+        timing_window="after_charge_roll",
+    ) == lithe_agility_charge_reroll_permission(
+        state=duplicate_state,
+        player_id="player-a",
+        unit_instance_id=duplicate_unit.unit_instance_id,
+    )
 
 
 def test_power_from_pain_helpers_validate_eligibility_and_payloads() -> None:

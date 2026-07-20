@@ -30,6 +30,7 @@ from warhammer40k_core.core.weapon_profiles import (
     validate_weapon_ability_descriptor_multiplicity,
 )
 from warhammer40k_core.rules import wahapedia_base_size_bridge as _base_size_bridge
+from warhammer40k_core.rules import wahapedia_model_profile_mapping as _model_profiles
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -81,7 +82,6 @@ from warhammer40k_core.rules.wahapedia_bridge_rows import (
 from warhammer40k_core.rules.wahapedia_equipment_choice_bridge import append_choice_rows
 from warhammer40k_core.rules.wahapedia_invulnerable_save_bridge import (
     ConditionalInvulnerableSaveBridge,
-    conditional_invulnerable_save_bridge_for_model_row,
 )
 from warhammer40k_core.rules.wahapedia_loadout_bridge import (
     LoadoutAssignments,
@@ -226,16 +226,19 @@ def _bridge_datasheet(
     model_source_rows = _rows_matching(
         context.rows_by_table, "Datasheets_models", "datasheet_id", datasheet_id
     )
-    if len(model_source_rows) != 1:
-        raise WahapediaBridgeError(
-            "Bridge currently requires one Wahapedia model stat row per datasheet."
-        )
-    model_source_row = model_source_rows[0]
-    conditional_invulnerable_save = conditional_invulnerable_save_bridge_for_model_row(
-        datasheet_id=datasheet_id,
-        model_source_row=model_source_row,
-    )
+    if not model_source_rows:
+        raise WahapediaBridgeError("Datasheet has no Wahapedia model stat rows.")
     composition_entries = _composition_entries(context=context, datasheet_id=datasheet_id)
+    model_source_rows_by_profile_id = _model_profiles.model_source_rows_by_profile_id(
+        composition_profiles=composition_entries,
+        model_source_rows=model_source_rows,
+        error_type=WahapediaBridgeError,
+    )
+    conditional_invulnerable_save = _model_profiles.conditional_invulnerable_save_for_model_rows(
+        datasheet_id=datasheet_id,
+        model_source_rows=model_source_rows,
+        error_type=WahapediaBridgeError,
+    )
     loadout_assignments = parse_loadout_assignments(
         loadout=_normalized_or_field(datasheet_row, "loadout"),
         model_profile_by_name=_model_profiles_by_name(composition_entries),
@@ -272,7 +275,6 @@ def _bridge_datasheet(
             "source_ids": _joined(faction_source_ids),
         },
     )
-    model_source_ids = _source_ids(model_source_row, *cost_rows)
     bridged_rows["Datasheets"].append(
         {
             "id": datasheet_id,
@@ -299,6 +301,8 @@ def _bridge_datasheet(
         }
     )
     for entry in composition_entries:
+        model_source_row = model_source_rows_by_profile_id[entry.model_profile_id]
+        model_source_ids = _source_ids(model_source_row, *cost_rows)
         height = _required_height_override(
             context=context,
             datasheet_id=datasheet_id,

@@ -14,7 +14,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
-from warhammer40k_core.engine.source_backed_rerolls import SourceBackedRerollPermissionContext
+from warhammer40k_core.engine.source_backed_rerolls import (
+    SourceBackedRerollPermissionContext,
+    select_source_backed_reroll_permission_context,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -572,6 +575,31 @@ def tracked_target_reroll_permission_context_for_unit(
     attack_kind: str | None,
     target_unit_instance_id: str | None,
 ) -> SourceBackedRerollPermissionContext | None:
+    return select_source_backed_reroll_permission_context(
+        tracked_target_reroll_permission_contexts_for_unit(
+            state=state,
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+            model_instance_id=model_instance_id,
+            roll_type=roll_type,
+            timing_window=timing_window,
+            attack_kind=attack_kind,
+            target_unit_instance_id=target_unit_instance_id,
+        )
+    )
+
+
+def tracked_target_reroll_permission_contexts_for_unit(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+    model_instance_id: str | None,
+    roll_type: str,
+    timing_window: str,
+    attack_kind: str | None,
+    target_unit_instance_id: str | None,
+) -> tuple[SourceBackedRerollPermissionContext, ...]:
     requested_player = _validate_identifier("player_id", player_id)
     requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
     requested_model = _validate_optional_identifier("model_instance_id", model_instance_id)
@@ -586,7 +614,7 @@ def tracked_target_reroll_permission_context_for_unit(
         else _validate_identifier("target_unit_instance_id", target_unit_instance_id)
     )
     if requested_target is None:
-        return None
+        return ()
     contexts: list[SourceBackedRerollPermissionContext] = []
     for record in state.tracked_target_records:
         if not record.active:
@@ -645,9 +673,7 @@ def tracked_target_reroll_permission_context_for_unit(
                 },
             )
         )
-    if len(contexts) > 1:
-        raise GameLifecycleError("Multiple tracked-target reroll permissions are available.")
-    return contexts[0] if contexts else None
+    return tuple(contexts)
 
 
 def _legal_target_unit_ids(

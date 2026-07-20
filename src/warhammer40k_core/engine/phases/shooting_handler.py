@@ -794,6 +794,7 @@ class ShootingPhaseHandler:
                 state=state,
                 result=result,
                 decisions=decisions,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_attack_sequence_decision(

@@ -48,6 +48,7 @@ def _apply_shooting_dice_reroll_decision(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_shooting_phase_state(state)
     shooting_state = _ensure_shooting_phase_state(state=state)
@@ -61,6 +62,7 @@ def _apply_shooting_dice_reroll_decision(
         attack_sequence=attack_sequence,
         expected_phase=BattlePhase.SHOOTING,
         phase_label="Shooting",
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     return None
 

@@ -257,10 +257,12 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-query` | No current generated rows |
+| `catalog-ir:damage-roll-reroll` | Assured Destruction |
 | `catalog-ir:desperate-escape-roll-modifier` | Bane of Cowards |
 | `catalog-ir:destroyed-unit-restore-lost-wounds` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
+| `catalog-ir:dice-result-override` | Aspect Shrine Token |
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
 | `catalog-ir:fight-activation-movement-distance` | No current generated rows |
@@ -276,13 +278,14 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:fortification-target-permission` | No current generated rows |
 | `catalog-ir:granted-ability:stealth` | No current generated rows |
 | `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Psychic Guidance<br>Revel in Desecration |
-| `catalog-ir:hit-roll-reroll` | Fated Hero<br>Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
+| `catalog-ir:hit-roll-reroll` | Assured Destruction<br>Fated Hero<br>Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | Forceshield<br>Mistshield<br>Ranged Invulnerable Save |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon<br>Psychic Guidance |
 | `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures |
+| `catalog-ir:movement-action-grant` | Flickerjump |
 | `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
 | `catalog-ir:movement-end-reactive-normal-move` | Path of the Outcast |
@@ -316,7 +319,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:tracked-target-reroll` | No current generated rows |
 | `catalog-ir:tracked-target-selection` | Piratical Raiders |
 | `catalog-ir:unit-move-completed-battle-shock` | No current generated rows |
-| `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede |
+| `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede<br>Grenade Pack Flyover |
 | `catalog-ir:weapon-keyword-grant` | Faolchú<br>Harbinger of Death<br>Piratical Hero<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
@@ -344,7 +347,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-skill-characteristic-modifier` | Psychic Guidance |
 | `catalog-ir:weapon-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:wound-roll-modifier` | No current generated rows |
-| `catalog-ir:wound-roll-reroll` | Fated Hero |
+| `catalog-ir:wound-roll-reroll` | Assured Destruction<br>Fated Hero |
 | `catalog-ir:wounds-characteristic-modifier` | No current generated rows |
 | `catalog-ir:wounds-characteristic-query` | No current generated rows |
 | `core:command-reroll` | Command Re-roll |

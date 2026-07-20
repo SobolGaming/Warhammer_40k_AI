@@ -176,6 +176,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     SaveOptionModifierContext,
     UnitCharacteristicModifierContext,
     WoundRollModifierContext,
+    unified_attack_reroll_permission_contexts_for_unit,
 )
 from warhammer40k_core.engine.saves import (
     SaveKind,
@@ -195,7 +196,9 @@ from warhammer40k_core.engine.shooting_targets import (
 )
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
+    select_source_backed_reroll_permission_context,
     source_backed_reroll_permission_context_for_unit,
+    source_backed_reroll_permission_contexts_for_unit,
 )
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
@@ -461,7 +464,10 @@ __all__ = (
     "shooting_dynamic_model_blockers",
     "shooting_visibility_cache_key",
     "source_backed_reroll_permission_context_for_unit",
+    "source_backed_reroll_permission_contexts_for_unit",
+    "select_source_backed_reroll_permission_context",
     "sustained_hits_generated_hits",
+    "unified_attack_reroll_permission_contexts_for_unit",
     "unit_by_id",
     "unit_effect_hit_roll_modifier",
     "unit_effect_invulnerable_save",

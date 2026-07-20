@@ -1333,7 +1333,7 @@ def test_tracked_target_attack_roll_pairs_do_not_grant_cross_product_rerolls() -
     assert permission_context(attack_kind="ranged", roll_type="attack_sequence.hit") is None
 
 
-def test_tracked_target_reroll_rejects_duplicate_internal_permissions() -> None:
+def test_tracked_target_reroll_selects_duplicate_internal_permissions_deterministically() -> None:
     state = _battle_state_with_scenario()
     source_unit = state.army_definitions[0].units[0]
     source_model_id = source_unit.own_models[0].model_instance_id
@@ -1349,17 +1349,21 @@ def test_tracked_target_reroll_rejects_duplicate_internal_permissions() -> None:
         replace(state.tracked_target_records[0], record_id="record:duplicate")
     )
 
-    with pytest.raises(GameLifecycleError, match="Multiple tracked-target reroll permissions"):
-        tracked_target_reroll_permission_context_for_unit(
-            state=state,
-            player_id="player-a",
-            unit_instance_id=source_unit.unit_instance_id,
-            model_instance_id=source_model_id,
-            roll_type="attack_sequence.wound",
-            timing_window="attack_sequence.wound",
-            attack_kind="melee",
-            target_unit_instance_id=target_unit_id,
-        )
+    context = tracked_target_reroll_permission_context_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=source_unit.unit_instance_id,
+        model_instance_id=source_model_id,
+        roll_type="attack_sequence.wound",
+        timing_window="attack_sequence.wound",
+        attack_kind="melee",
+        target_unit_instance_id=target_unit_id,
+    )
+
+    assert context is not None
+    assert context.source_payload["tracked_target_record_id"] == min(
+        record.record_id for record in state.tracked_target_records
+    )
 
 
 def test_tracked_target_defensive_validation_rejects_malformed_records_and_payloads() -> None:

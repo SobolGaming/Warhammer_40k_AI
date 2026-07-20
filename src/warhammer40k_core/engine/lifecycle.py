@@ -8,10 +8,14 @@ from typing import NotRequired, Self, TypedDict, cast
 from warhammer40k_core.engine import battle_formation_hooks as _bf
 from warhammer40k_core.engine import battle_round_hooks as _br
 from warhammer40k_core.engine import catalog_start_battle_keyword_choice as _sbkc
+from warhammer40k_core.engine import (
+    catalog_unit_move_completed_mortal_wounds_runtime as _catalog_move_mw,
+)
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
+from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_muster_consistency import validate_mustered_army_consistency
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -35,8 +39,6 @@ from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
-    apply_catalog_unit_move_completed_mortal_wounds_target_result,
-    invalid_catalog_unit_move_completed_mortal_wounds_target_status,
 )
 from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
     SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
@@ -305,10 +307,6 @@ from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
-from warhammer40k_core.engine.unit_move_completed_hooks import (
-    apply_unit_move_completed_mortal_wound_feel_no_pain_decision,
-    is_unit_move_completed_mortal_wound_feel_no_pain_request,
-)
 
 
 class GameLifecyclePayload(TypedDict):
@@ -1686,14 +1684,15 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus:
         state = self._require_state()
-        if is_unit_move_completed_mortal_wound_feel_no_pain_request(record.request):
-            move_completed_status = apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if move_completed_status is not None:
-                return move_completed_status
+        movement_fnp_status = _movement_mw.apply_movement_fnp_if_applicable(
+            state=state,
+            decisions=self.decision_controller,
+            request=record.request,
+            result=result,
+        )
+        if movement_fnp_status is not False:
+            if movement_fnp_status is not None:
+                return movement_fnp_status
             return self.advance_until_decision_or_terminal()
         source_context = mortal_wound_feel_no_pain_source_context(record.request)
         if isinstance(source_context, dict) and source_context.get("source_kind") == "explosives":
@@ -1851,7 +1850,7 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
-        return invalid_catalog_unit_move_completed_mortal_wounds_target_status(
+        return _catalog_move_mw.invalid_catalog_unit_move_completed_mortal_wounds_target_status(
             state=self._require_state(),
             request=request,
             result=result,
@@ -1864,11 +1863,13 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus:
         state = self._require_state()
-        target_status = apply_catalog_unit_move_completed_mortal_wounds_target_result(
-            state=state,
-            decisions=self.decision_controller,
-            result=result,
-            ruleset_descriptor=self._require_config().ruleset_descriptor,
+        target_status = (
+            _catalog_move_mw.apply_catalog_unit_move_completed_mortal_wounds_target_result(
+                state=state,
+                decisions=self.decision_controller,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
         )
         if target_status is not None:
             return target_status

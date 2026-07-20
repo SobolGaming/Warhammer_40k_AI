@@ -123,6 +123,9 @@ from warhammer40k_core.engine.movement_keyword_effects import (
     movement_keywords_granted_by_effects,
 )
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
+from warhammer40k_core.engine.movement_phase_end_mortal_wounds import (
+    resolve_movement_phase_end_mortal_wounds,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -366,6 +369,7 @@ __all__ = (
     "MovementProposalRequest",
     "MovementRollbackRecord",
     "MovementRollbackRecordPayload",
+    "resolve_movement_phase_end_mortal_wounds",
     "NotRequired",
     "ObjectiveMarker",
     "PLACEMENT_PROPOSAL_DECISION_TYPE",

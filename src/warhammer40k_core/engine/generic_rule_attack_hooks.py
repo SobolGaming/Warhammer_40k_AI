@@ -373,6 +373,49 @@ def generic_rule_reroll_permission_context_for_unit(
     timing_window: str,
     target_unit_instance_id: str | None,
 ) -> GenericRuleRerollPermissionContext | None:
+    contexts = generic_rule_reroll_permission_contexts_for_unit(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        model_instance_id=model_instance_id,
+        roll_type=roll_type,
+        timing_window=timing_window,
+        target_unit_instance_id=target_unit_instance_id,
+    )
+    if not contexts:
+        return None
+    from warhammer40k_core.engine.source_backed_rerolls import (
+        SourceBackedRerollPermissionContext,
+        select_source_backed_reroll_permission_context,
+    )
+
+    selected = select_source_backed_reroll_permission_context(
+        tuple(
+            SourceBackedRerollPermissionContext(
+                permission=context.permission,
+                source_payload=context.source_payload,
+            )
+            for context in contexts
+        )
+    )
+    if selected is None:
+        return None
+    return GenericRuleRerollPermissionContext(
+        permission=selected.permission,
+        source_payload=selected.source_payload,
+    )
+
+
+def generic_rule_reroll_permission_contexts_for_unit(
+    *,
+    state: object,
+    player_id: str,
+    unit_instance_id: str,
+    model_instance_id: str | None = None,
+    roll_type: str,
+    timing_window: str,
+    target_unit_instance_id: str | None,
+) -> tuple[GenericRuleRerollPermissionContext, ...]:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -424,9 +467,7 @@ def generic_rule_reroll_permission_context_for_unit(
                 source_payload=_generic_source_payload(effect, requested_target_id),
             )
         )
-    if len(candidates) > 1:
-        raise GameLifecycleError("Multiple generic RuleIR reroll permissions are available.")
-    return candidates[0] if candidates else None
+    return tuple(candidates)
 
 
 def generic_rule_modified_unit_characteristic(
