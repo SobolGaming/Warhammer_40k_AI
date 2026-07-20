@@ -1981,18 +1981,27 @@
         {
           "ability_id": "000000611:monofilament-web",
           "ability_name": "Monofilament Web",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "216df69d884389595d0f70a17fffb9cebe0261971dc512b52180608a0de6db79",
           "raw_text": "In your Shooting phase, after this model has shot, if one or more of those attacks made with its doomweaver scored a hit against an enemy unit, until the start of your next turn, that enemy unit is pinned. While a unit is pinned, subtract 2 from that unit's Move characteristic and subtract 2 from Charge rolls made for it.",
           "raw_text_sha256": "216df69d884389595d0f70a17fffb9cebe0261971dc512b52180608a0de6db79",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-effect"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000611:3:description:clause:002:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:post-shoot-hit-target-effect"
+              ],
+              "semantic_id": "phase17k:aeldari:night-spinner:datasheet:000000611:3:clause:002:effect:0",
+              "semantic_kind": "modify_characteristic"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:post-shoot-hit-target-effect"
+              ],
+              "semantic_id": "phase17k:aeldari:night-spinner:datasheet:000000611:3:clause:003:effect:0",
               "semantic_kind": "modify_dice_roll"
             }
           ],
@@ -2001,14 +2010,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000611:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000611",
       "datasheet_name": "Night Spinner",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -4259,9 +4268,9 @@
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 17,
+    "All exact abilities consumed": 18,
     "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 47
+    "Exact ability IR unsupported": 46
   },
   "source_artifact_hashes": {
     "Abilities": "dd7d779531e88bd2c30ee2405275b41dba0e5d56007c43a7fcf8bb7c105032e0",

@@ -1,0 +1,239 @@
+{
+  "artifact_schema": "core-v2-aeldari-night-spinner-rule-ir-v1",
+  "datasheet_id": "000000611",
+  "datasheet_name": "Night Spinner",
+  "package_hash": "48799f43bc37a0550a7e98108f4e7db1751f3b6ab81d91c129608861a5807bf4",
+  "records": {
+    "000000611:3": {
+      "ability_name": "Monofilament Web",
+      "normalized_text_sha256": "216df69d884389595d0f70a17fffb9cebe0261971dc512b52180608a0de6db79",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:aeldari:night-spinner:datasheet:000000611:3:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [],
+            "source_span": {
+              "end": 142,
+              "start": 0,
+              "text": "In your Shooting phase, after this model has shot, if one or more of those attacks made with its doomweaver scored a hit against an enemy unit"
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 142,
+                "start": 129,
+                "text": "an enemy unit"
+              }
+            },
+            "template_id": "phase17c:selected-target-constraint",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "attacker_model_reference",
+                  "value": "this_model"
+                },
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "just_after_friendly_unit_has_shot"
+                },
+                {
+                  "key": "weapon_names",
+                  "value": [
+                    "Doomweaver"
+                  ]
+                }
+              ],
+              "source_span": {
+                "end": 49,
+                "start": 24,
+                "text": "after this model has shot"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:aeldari:night-spinner:datasheet:000000611:3:clause:002",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "battle_round_offset",
+                  "value": 1
+                },
+                {
+                  "key": "boundary",
+                  "value": "start"
+                },
+                {
+                  "key": "endpoint",
+                  "value": "turn"
+                },
+                {
+                  "key": "owner",
+                  "value": "source_player"
+                }
+              ],
+              "source_span": {
+                "end": 177,
+                "start": 144,
+                "text": "until the start of your next turn"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "movement"
+                  },
+                  {
+                    "key": "delta",
+                    "value": -2
+                  }
+                ],
+                "source_span": {
+                  "end": 277,
+                  "start": 230,
+                  "text": "subtract 2 from that unit's Move characteristic"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 277,
+              "start": 230,
+              "text": "subtract 2 from that unit's Move characteristic"
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 194,
+                "start": 179,
+                "text": "that enemy unit"
+              }
+            },
+            "template_id": "phase17c:selected-unit-characteristic-modifier",
+            "trigger": null,
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:aeldari:night-spinner:datasheet:000000611:3:clause:003",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "battle_round_offset",
+                  "value": 1
+                },
+                {
+                  "key": "boundary",
+                  "value": "start"
+                },
+                {
+                  "key": "endpoint",
+                  "value": "turn"
+                },
+                {
+                  "key": "owner",
+                  "value": "source_player"
+                }
+              ],
+              "source_span": {
+                "end": 177,
+                "start": 144,
+                "text": "until the start of your next turn"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_dice_roll",
+                "parameters": [
+                  {
+                    "key": "delta",
+                    "value": -2
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "charge"
+                  }
+                ],
+                "source_span": {
+                  "end": 322,
+                  "start": 282,
+                  "text": "subtract 2 from Charge rolls made for it"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 322,
+              "start": 282,
+              "text": "subtract 2 from Charge rolls made for it"
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 194,
+                "start": 179,
+                "text": "that enemy unit"
+              }
+            },
+            "template_id": "phase17c:selected-unit-dice-roll-modifier",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "4dbba1ed1884c0721866cce85aeb7c163c63b77b25e04f1b98bd47e83c4490c1",
+        "normalized_text": "In your Shooting phase, after this model has shot, if one or more of those attacks made with its doomweaver scored a hit against an enemy unit, until the start of your next turn, that enemy unit is pinned. While a unit is pinned, subtract 2 from that unit's Move characteristic and subtract 2 from Charge rolls made for it.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:aeldari:night-spinner:datasheet:000000611:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-night-spinner-datasheet-2026-06-14:datasheet:000000611:3"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-aeldari-night-spinner-datasheet-2026-06-14",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}

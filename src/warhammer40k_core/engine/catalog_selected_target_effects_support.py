@@ -42,6 +42,7 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     fight_start_selected_target_effect_clauses_after,
     selected_target_effect_attack_role,
     selected_target_effect_clause_is_supported,
+    selected_target_effect_uses_unit_context,
     selected_target_effect_weapon_scope,
     selected_target_pair_requires_source_model,
     selected_target_selection_clause_binds_source_model,
@@ -541,8 +542,13 @@ def effect_with_selected_target(
             raise GameLifecycleError(
                 "Catalog selected-target effect normalization is already clause-derived."
             )
+        uses_unit_context = selected_target_effect_uses_unit_context(
+            clause=clause,
+            effect=effect,
+        )
         if (
-            not clause_has_immediate_selected_target_effect(clause)
+            not uses_unit_context
+            and not clause_has_immediate_selected_target_effect(clause)
             and effect.kind is not RuleEffectKind.GRANT_ABILITY
         ):
             normalized_attack_role = selected_target_effect_attack_role(

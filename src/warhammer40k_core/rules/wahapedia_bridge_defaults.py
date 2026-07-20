@@ -158,6 +158,20 @@ AELDARI_RANGERS_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000611",
+        model_name="Night Spinner",
+        height=2.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:night-spinner:height",
+        height_document_reference=(
+            "Aeldari Night Spinner assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (60mm flying base)"
+        ),
+    ),
+)
+
 AELDARI_ASPECT_WARRIORS_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000000596",

@@ -295,7 +295,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
 | `catalog-ir:once-per-battle-ability` | Malefic Destruction<br>Unholy Vigour |
 | `catalog-ir:passive-hit-reroll` | Reavers of the Void |
-| `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Fury of the Void (Psychic)<br>Harassment Fire |
+| `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Fury of the Void (Psychic)<br>Harassment Fire<br>Monofilament Web |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth<br>Target Acquisition |
 | `catalog-ir:prebattle-redeploy-permission` | Prince of Corsairs |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |

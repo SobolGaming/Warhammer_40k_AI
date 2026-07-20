@@ -540,10 +540,25 @@ def generic_rule_charge_roll_modifiers(
         charge_roll_modifiers_from_generic_rule_ir,
     )
 
+    current = list(context.current_roll_modifiers)
+    for effect in _matching_generic_unit_effects(
+        state=context.state,
+        unit_instance_id=context.unit_instance_id,
+        effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+    ):
+        if not _roll_type_matches(effect.parameters, expected="charge"):
+            continue
+        current.append(
+            RollModifier(
+                modifier_id=effect.persisting_effect.effect_id,
+                source_id=_modifier_source_id(effect),
+                operand=_required_int_parameter(effect.parameters, key="delta"),
+            )
+        )
     return charge_roll_modifiers_from_generic_rule_ir(
         state=context.state,
         unit_instance_id=context.unit_instance_id,
-        current_roll_modifiers=context.current_roll_modifiers,
+        current_roll_modifiers=tuple(sorted(current, key=lambda modifier: modifier.modifier_id)),
     )
 
 
@@ -592,7 +607,7 @@ def _matching_generic_unit_effects(
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR unit hooks require GameState.")
     unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    matches: list[_GenericAttackEffect] = []
+    matches_by_modifier_source_id: dict[str, _GenericAttackEffect] = {}
     for persisting_effect in state.persisting_effects_for_unit(unit_id):
         generic_effect = _generic_attack_effect_or_none(
             persisting_effect=persisting_effect,
@@ -603,8 +618,20 @@ def _matching_generic_unit_effects(
             continue
         if not _generic_unit_effect_applies(effect=generic_effect, unit_instance_id=unit_id):
             continue
-        matches.append(generic_effect)
-    return tuple(sorted(matches, key=lambda effect: _modifier_source_id(effect)))
+        modifier_source_id = _modifier_source_id(generic_effect)
+        existing = matches_by_modifier_source_id.get(modifier_source_id)
+        if existing is not None and not _generic_unit_effect_semantics_match(
+            existing,
+            generic_effect,
+        ):
+            raise GameLifecycleError("Generic unit modifier source has conflicting semantics.")
+        if existing is None or _generic_unit_effect_precedence(
+            generic_effect
+        ) > _generic_unit_effect_precedence(existing):
+            matches_by_modifier_source_id[modifier_source_id] = generic_effect
+    return tuple(
+        matches_by_modifier_source_id[key] for key in sorted(matches_by_modifier_source_id)
+    )
 
 
 def _matching_generic_attack_effects(
@@ -1297,6 +1324,30 @@ def _modifier_source_id(effect: _GenericAttackEffect) -> str:
     return _validate_identifier(
         "generic modifier source_id",
         f"{effect.source_id}:{effect.clause_id}:{effect.effect_kind.value}",
+    )
+
+
+def _generic_unit_effect_precedence(effect: _GenericAttackEffect) -> tuple[int, str]:
+    return (
+        effect.persisting_effect.started_battle_round,
+        effect.persisting_effect.effect_id,
+    )
+
+
+def _generic_unit_effect_semantics_match(
+    left: _GenericAttackEffect,
+    right: _GenericAttackEffect,
+) -> bool:
+    return (
+        left.rule_id,
+        left.rule_ir_hash,
+        left.target_kind,
+        left.parameters,
+    ) == (
+        right.rule_id,
+        right.rule_ir_hash,
+        right.target_kind,
+        right.parameters,
     )
 
 

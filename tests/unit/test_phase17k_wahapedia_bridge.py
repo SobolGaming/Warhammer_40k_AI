@@ -6821,6 +6821,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in aeldari_markdown
     assert (
         "| Craftworlds / Asuryani | Fire Dragons (`000000596`)<br>"
+        "Night Spinner (`000000611`)<br>"
         "Rangers (`000000592`)<br>"
         "Shroud Runners (`000002533`)<br>Striking Scorpions (`000000595`)<br>"
         "Swooping Hawks (`000000600`)<br>Vypers (`000000605`)<br>"

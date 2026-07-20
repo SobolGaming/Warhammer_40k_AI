@@ -313,6 +313,18 @@ def selected_target_effect_weapon_scope(
     return attack_kind if attack_kind is not None else explicit_scope
 
 
+def selected_target_effect_uses_unit_context(
+    *,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+) -> bool:
+    if type(clause) is not RuleClause or type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Selected-target unit-context resolution requires RuleIR values.")
+    if effect not in clause.effects:
+        raise GameLifecycleError("Selected-target unit-context effect is not owned by the clause.")
+    return _selected_target_unit_modifier_is_supported(effect, clause=clause)
+
+
 def clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Selected-target effect support requires RuleClause.")
@@ -618,6 +630,8 @@ def _selected_target_effect_is_supported(
     clause: RuleClause,
 ) -> bool:
     parameters = parameter_payload(effect.parameters)
+    if _selected_target_unit_modifier_is_supported(effect, clause=clause):
+        return True
     if effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:
         effect_is_supported = _characteristic_modifier_is_supported(parameters)
     elif effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
@@ -638,6 +652,34 @@ def _selected_target_effect_is_supported(
         and _resolved_effect_attack_role(clause=clause, effect=effect) is not None
         and _effect_weapon_scope_matches_attack_kind(clause=clause, effect=effect)
     )
+
+
+def _selected_target_unit_modifier_is_supported(
+    effect: RuleEffectSpec,
+    *,
+    clause: RuleClause,
+) -> bool:
+    if (
+        clause.trigger is not None
+        or clause.conditions
+        or clause.target is None
+        or clause.target.kind not in {RuleTargetKind.SELECTED_TARGET, RuleTargetKind.SELECTED_UNIT}
+    ):
+        return False
+    parameters = parameter_payload(effect.parameters)
+    if effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:
+        return (
+            frozenset(parameters) == frozenset({"characteristic", "delta"})
+            and parameters.get("characteristic") == Characteristic.MOVEMENT.value
+            and type(parameters.get("delta")) is int
+        )
+    if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
+        return (
+            frozenset(parameters) == frozenset({"delta", "roll_type"})
+            and parameters.get("roll_type") == "charge"
+            and type(parameters.get("delta")) is int
+        )
+    return False
 
 
 def _effect_attack_kind_is_consistent(clause: RuleClause) -> bool:
