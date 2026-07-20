@@ -406,6 +406,17 @@ def test_generic_same_kind_clause_effect_slots_coexist_deduplicate_and_fail_on_d
         state=state,
         record_persisting_effects=False,
     )
+    with pytest.raises(
+        GameLifecycleError,
+        match="effect_index does not identify the supplied effect",
+    ):
+        generic_rule_effect_payload(
+            rule_ir=combined_rule,
+            clause=combined_clause,
+            effect=movement_effect,
+            context=context,
+            effect_index=1,
+        )
     payloads = tuple(
         generic_rule_effect_payload(
             rule_ir=combined_rule,

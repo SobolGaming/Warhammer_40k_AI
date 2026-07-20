@@ -1133,15 +1133,15 @@ def _effect_index(
             clause.effects
         ):
             raise GameLifecycleError("Generic RuleIR effect_index is outside its clause.")
+        if clause.effects[explicit_effect_index] != effect:
+            raise GameLifecycleError(
+                "Generic RuleIR effect_index does not identify the supplied effect."
+            )
         return explicit_effect_index
-    identity_matches = tuple(
-        index for index, candidate in enumerate(clause.effects) if candidate is effect
-    )
+    identity_matches = tuple(i for i, candidate in enumerate(clause.effects) if candidate is effect)
     if len(identity_matches) == 1:
         return identity_matches[0]
-    semantic_matches = tuple(
-        index for index, candidate in enumerate(clause.effects) if candidate == effect
-    )
+    semantic_matches = tuple(i for i, candidate in enumerate(clause.effects) if candidate == effect)
     if len(semantic_matches) != 1:
         raise GameLifecycleError("Generic RuleIR effect has no unique clause slot.")
     return semantic_matches[0]
