@@ -28,6 +28,9 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
     generic_rule_target_constraints_apply,
     generic_rule_target_proximity_keyword_gate_applies,
 )
+from warhammer40k_core.engine.generic_rule_effect_payloads import (
+    generic_rule_effect_index_from_payload,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_modified_weapon_profile,
@@ -95,6 +98,7 @@ class _GenericAttackEffect:
     rule_id: str
     rule_ir_hash: str
     clause_id: str
+    effect_index: int
     target_kind: RuleTargetKind | None
     effect_kind: RuleEffectKind
     parameters: dict[str, JsonValue]
@@ -540,10 +544,25 @@ def generic_rule_charge_roll_modifiers(
         charge_roll_modifiers_from_generic_rule_ir,
     )
 
+    current = list(context.current_roll_modifiers)
+    for effect in _matching_generic_unit_effects(
+        state=context.state,
+        unit_instance_id=context.unit_instance_id,
+        effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+    ):
+        if not _roll_type_matches(effect.parameters, expected="charge"):
+            continue
+        current.append(
+            RollModifier(
+                modifier_id=effect.persisting_effect.effect_id,
+                source_id=_modifier_source_id(effect),
+                operand=_required_int_parameter(effect.parameters, key="delta"),
+            )
+        )
     return charge_roll_modifiers_from_generic_rule_ir(
         state=context.state,
         unit_instance_id=context.unit_instance_id,
-        current_roll_modifiers=context.current_roll_modifiers,
+        current_roll_modifiers=tuple(sorted(current, key=lambda modifier: modifier.modifier_id)),
     )
 
 
@@ -592,7 +611,7 @@ def _matching_generic_unit_effects(
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR unit hooks require GameState.")
     unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    matches: list[_GenericAttackEffect] = []
+    matches_by_effect_slot: dict[str, _GenericAttackEffect] = {}
     for persisting_effect in state.persisting_effects_for_unit(unit_id):
         generic_effect = _generic_attack_effect_or_none(
             persisting_effect=persisting_effect,
@@ -603,8 +622,37 @@ def _matching_generic_unit_effects(
             continue
         if not _generic_unit_effect_applies(effect=generic_effect, unit_instance_id=unit_id):
             continue
-        matches.append(generic_effect)
-    return tuple(sorted(matches, key=lambda effect: _modifier_source_id(effect)))
+        effect_slot = f"{_modifier_source_id(generic_effect)}:{generic_effect.effect_index}"
+        existing = matches_by_effect_slot.get(effect_slot)
+        if existing is not None and (
+            existing.rule_id,
+            existing.rule_ir_hash,
+            existing.target_kind,
+            existing.parameters,
+            existing.conditions,
+        ) != (
+            generic_effect.rule_id,
+            generic_effect.rule_ir_hash,
+            generic_effect.target_kind,
+            generic_effect.parameters,
+            generic_effect.conditions,
+        ):
+            raise GameLifecycleError("Generic unit modifier source has conflicting semantics.")
+        candidate_precedence = (
+            generic_effect.persisting_effect.started_battle_round,
+            generic_effect.persisting_effect.effect_id,
+        )
+        existing_precedence = (
+            (-1, "")
+            if existing is None
+            else (
+                existing.persisting_effect.started_battle_round,
+                existing.persisting_effect.effect_id,
+            )
+        )
+        if candidate_precedence > existing_precedence:
+            matches_by_effect_slot[effect_slot] = generic_effect
+    return tuple(matches_by_effect_slot[key] for key in sorted(matches_by_effect_slot))
 
 
 def _matching_generic_attack_effects(
@@ -743,6 +791,7 @@ def _generic_attack_effect_or_none(
         rule_id=_required_identifier_payload(payload, "rule_id"),
         rule_ir_hash=_required_identifier_payload(payload, "rule_ir_hash"),
         clause_id=_required_identifier_payload(payload, "clause_id"),
+        effect_index=generic_rule_effect_index_from_payload(payload),
         target_kind=_target_kind_from_payload(payload),
         effect_kind=effect_kind,
         parameters=generic_rule_parameters_from_effect_payload(effect_payload),
@@ -1310,6 +1359,7 @@ def _generic_source_payload(
         "source_id": effect.source_id,
         "rule_ir_hash": effect.rule_ir_hash,
         "clause_id": effect.clause_id,
+        "effect_index": effect.effect_index,
         "effect_id": effect.persisting_effect.effect_id,
         "target_role": effect.role,
         "target_kind": None if effect.target_kind is None else effect.target_kind.value,

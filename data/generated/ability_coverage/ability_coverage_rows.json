@@ -453,6 +453,70 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
+    "datasheet_id": "000000611",
+    "datasheet_name": "Night Spinner",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000611:monofilament-web",
+    "ability_name": "Monofilament Web",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none",
+    "datasheet_id": "000000611",
+    "datasheet_name": "Night Spinner",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-effect"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.charge.selected_unit",
+      "datasheet.rule_ir.modify_characteristic.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/faction/000009894/none",
+    "datasheet_id": "000000611",
+    "datasheet_name": "Night Spinner",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008344",
     "ability_name": "Scouts",
     "catalog_id": "chaos-daemons-bridge-catalog",

@@ -168,6 +168,7 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES,
     AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES,
     AELDARI_KHARSETH_HEIGHT_OVERRIDES,
+    AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES,
     AELDARI_RANGERS_HEIGHT_OVERRIDES,
     AELDARI_SHROUD_RUNNERS_WRAITHBLADES_HEIGHT_OVERRIDES,
     AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES,
@@ -199,6 +200,7 @@ AELDARI_RANGERS_DATASHEET_IDS = ("000000592",)
 AELDARI_SHROUD_RUNNERS_WRAITHBLADES_DATASHEET_IDS = ("000002533", "000000598")
 AELDARI_WAR_WALKERS_WRAITHLORD_DATASHEET_IDS = ("000000612", "000000613")
 AELDARI_KHARSETH_DATASHEET_IDS = ("000004194",)
+AELDARI_NIGHT_SPINNER_DATASHEET_IDS = ("000000611",)
 AELDARI_CORSAIR_SKYREAVERS_DATASHEET_IDS = ("000004196",)
 AELDARI_CORSAIR_VOID_UNITS_DATASHEET_IDS = ("000002531", "000002532")
 AELDARI_YRIEL_VYPERS_STARFANGS_DATASHEET_IDS = (
@@ -219,6 +221,7 @@ ABILITY_SUPPORT_DATASHEET_IDS = (
     *AELDARI_CORSAIR_SKYREAVERS_DATASHEET_IDS,
     *AELDARI_CORSAIR_VOID_UNITS_DATASHEET_IDS,
     *AELDARI_KHARSETH_DATASHEET_IDS,
+    *AELDARI_NIGHT_SPINNER_DATASHEET_IDS,
     *AELDARI_YRIEL_VYPERS_STARFANGS_DATASHEET_IDS,
     *BELAKOR_DATASHEET_IDS,
     *DAEMON_WARGEAR_DATASHEET_IDS,
@@ -1435,6 +1438,16 @@ def _ability_support_catalog_package(
             ),
         )
     )
+    aeldari_tacoma_overlay_pack = SourceOverlayPack.from_payload(
+        cast(
+            SourceOverlayPackPayload,
+            json.loads(
+                aeldari_datasheet_semantic_coverage.TACOMA_OVERLAY_PACK_PATH.read_text(
+                    encoding="utf-8"
+                )
+            ),
+        )
+    )
     aeldari_release_manifest = SourceReleaseManifest.from_payload(
         cast(
             SourceReleaseManifestPayload,
@@ -1448,7 +1461,7 @@ def _ability_support_catalog_package(
     overlaid_artifacts = apply_source_release_overlays(
         source_artifacts=chaos_overlaid_artifacts,
         release_manifest=aeldari_release_manifest,
-        overlay_packs=(aeldari_overlay_pack,),
+        overlay_packs=(aeldari_overlay_pack, aeldari_tacoma_overlay_pack),
     )
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=overlaid_artifacts,
@@ -1459,6 +1472,7 @@ def _ability_support_catalog_package(
             + AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES
             + AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES
             + AELDARI_KHARSETH_HEIGHT_OVERRIDES
+            + AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES
             + AELDARI_RANGERS_HEIGHT_OVERRIDES
             + AELDARI_SHROUD_RUNNERS_WRAITHBLADES_HEIGHT_OVERRIDES
             + AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES

@@ -55,6 +55,7 @@ from warhammer40k_core.rules.source_overlay import (
     SourceReleaseManifest,
     apply_source_release_overlays,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 from warhammer40k_core.rules.source_patch import source_row_hash
 from warhammer40k_core.rules.wahapedia_bridge_rows import bridge_rows_by_table
 from warhammer40k_core.rules.wahapedia_datasheet_ability_bridge import (
@@ -73,7 +74,10 @@ OUTPUT_PATH = (
 OVERLAY_DIR = REPO_ROOT / "data" / "source_overlays" / "aeldari_faction_pack_2026_06"
 OVERLAY_PACK_PATH = OVERLAY_DIR / "aeldari-faction-pack-datasheet-overlay.overlay-pack.json"
 RELEASE_MANIFEST_PATH = OVERLAY_DIR / "source_release_manifest.json"
+TACOMA_OVERLAY_DIR = REPO_ROOT / "data" / "source_overlays" / "tacoma_open_2026"
+TACOMA_OVERLAY_PACK_PATH = TACOMA_OVERLAY_DIR / "aeldari-frame-keyword.overlay-pack.json"
 SOURCE_DATE = "2026-06-09"
+TACOMA_SOURCE_DATE = "2026-07-10"
 SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p23"
 KHARSETH_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p14-15"
 PRINCE_YRIEL_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p12-13"
@@ -94,9 +98,14 @@ OVERLAY_PACKAGE_ID = DataPackageId(
     package_name="aeldari-faction-pack-datasheet-overlay",
     version="11th-2026-06-09",
 )
+TACOMA_OVERLAY_PACKAGE_ID = DataPackageId(
+    namespace="gw",
+    package_name="aeldari-tacoma-open-frame-keyword-overlay",
+    version="11th-2026-07-10",
+)
 CATALOG_VERSION = CatalogVersion.dated(
-    version_id="warhammer-40000-11th-aeldari-faction-pack-2026-06",
-    source_date=date.fromisoformat(SOURCE_DATE),
+    version_id="warhammer-40000-11th-aeldari-tacoma-open-2026-07",
+    source_date=date.fromisoformat(TACOMA_SOURCE_DATE),
 )
 SUPPORT_ABILITY_ID = "core-v2-11e-support"
 
@@ -126,16 +135,19 @@ class _UpdateSpec:
 
 
 def main() -> None:
-    overlay_pack, release_manifest, coverage_payload = (
+    overlay_pack, tacoma_overlay_pack, release_manifest, coverage_payload = (
         generated_aeldari_datasheet_semantic_coverage()
     )
     OVERLAY_DIR.mkdir(parents=True, exist_ok=True)
+    TACOMA_OVERLAY_DIR.mkdir(parents=True, exist_ok=True)
     _write_json(OVERLAY_PACK_PATH, overlay_pack.to_payload())
+    _write_json(TACOMA_OVERLAY_PACK_PATH, tacoma_overlay_pack.to_payload())
     _write_json(RELEASE_MANIFEST_PATH, release_manifest.to_payload())
     _write_json(OUTPUT_PATH, coverage_payload)
 
 
 def generated_aeldari_datasheet_semantic_coverage() -> tuple[
+    SourceOverlayPack,
     SourceOverlayPack,
     SourceReleaseManifest,
     dict[str, object],
@@ -146,19 +158,20 @@ def generated_aeldari_datasheet_semantic_coverage() -> tuple[
         error_type=WahapediaDatasheetAbilityBridgeError,
     )
     overlay_pack = _overlay_pack(rows_by_table)
+    tacoma_overlay_pack = _tacoma_overlay_pack()
     release_manifest = _release_manifest()
     effective_artifacts = apply_source_release_overlays(
         source_artifacts=source_artifacts,
         release_manifest=release_manifest,
-        overlay_packs=(overlay_pack,),
+        overlay_packs=(overlay_pack, tacoma_overlay_pack),
     )
     _validate_effective_updates(effective_artifacts)
     coverage_payload = _coverage_payload(
         effective_artifacts=effective_artifacts,
-        overlay_pack=overlay_pack,
+        overlay_packs=(overlay_pack, tacoma_overlay_pack),
         release_manifest=release_manifest,
     )
-    return overlay_pack, release_manifest, coverage_payload
+    return overlay_pack, tacoma_overlay_pack, release_manifest, coverage_payload
 
 
 def _overlay_pack(
@@ -399,12 +412,42 @@ def _overlay_pack(
 
 def _release_manifest() -> SourceReleaseManifest:
     return SourceReleaseManifest(
-        release_id="aeldari-faction-pack-datasheet-release-2026-06",
+        release_id="aeldari-datasheet-release-2026-07",
         catalog_version=CATALOG_VERSION,
         base_source_package_id=BASE_SOURCE_PACKAGE_ID,
         base_source_edition="warhammer-40000-10th",
         target_edition=TARGET_EDITION,
-        overlay_package_ids=(OVERLAY_PACKAGE_ID,),
+        overlay_package_ids=(OVERLAY_PACKAGE_ID, TACOMA_OVERLAY_PACKAGE_ID),
+    )
+
+
+def _tacoma_overlay_pack() -> SourceOverlayPack:
+    return SourceOverlayPack(
+        package_id=TACOMA_OVERLAY_PACKAGE_ID,
+        catalog_version=CATALOG_VERSION,
+        base_source_package_id=BASE_SOURCE_PACKAGE_ID,
+        target_edition=TARGET_EDITION,
+        effective_date=TACOMA_SOURCE_DATE,
+        operations=(
+            SourceOverlayOperation(
+                op_id="aeldari-add-night-spinner-frame-keyword",
+                order_index=1,
+                operation_kind=SourceOverlayOperationKind.ADD_ROW,
+                target_edition=TARGET_EDITION,
+                source_table="Datasheets_keywords",
+                source_row_id="000000611:FRAME:global:false:3",
+                source_reference=tacoma_open_2026.FRAME_KEYWORD_ADDITIONS_SOURCE_ID,
+                effective_date=TACOMA_SOURCE_DATE,
+                reason="Apply the Tacoma Open FAQ FRAME keyword addition for Night Spinner.",
+                expected_preimage_hash=None,
+                fields=(
+                    ("datasheet_id", "000000611"),
+                    ("keyword", "FRAME"),
+                    ("model", ""),
+                    ("is_faction_keyword", "false"),
+                ),
+            ),
+        ),
     )
 
 
@@ -594,7 +637,7 @@ def _update_specs(
 def _coverage_payload(
     *,
     effective_artifacts: tuple[OverlaySourceArtifact, ...],
-    overlay_pack: SourceOverlayPack,
+    overlay_packs: tuple[SourceOverlayPack, ...],
     release_manifest: SourceReleaseManifest,
 ) -> dict[str, object]:
     review = faction_pack_datasheet_review("aeldari")
@@ -668,7 +711,9 @@ def _coverage_payload(
         "pdf_sha256": review.pdf_sha256,
         "source_snapshot_path": DEFAULT_SOURCE_JSON_DIR.as_posix(),
         "source_artifact_hashes": dict(sorted(source_artifact_hashes.items())),
-        "overlay_pack_hash": overlay_pack.package_hash(),
+        "overlay_pack_hashes": {
+            pack.package_id.stable_identity(): pack.package_hash() for pack in overlay_packs
+        },
         "release_hash": release_manifest.release_hash(),
         "treatment_counts": {
             treatment.value: len(review.rows_for(treatment))
@@ -690,6 +735,7 @@ def _validate_effective_updates(
     )
     _assert_keyword(rows, "000000603", "FRAME", present=True)
     _assert_keyword(rows, "000000606", "FRAME", present=True)
+    _assert_keyword(rows, "000000611", "FRAME", present=True)
     _assert_keyword(rows, "000000584", "CHARACTER", present=False)
     _assert_keyword(rows, "000000587", "CHARACTER", present=False)
     leader_targets = {

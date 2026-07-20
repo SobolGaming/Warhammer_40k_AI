@@ -1069,6 +1069,7 @@ def _effect_payload(
     effect: RuleEffectSpec,
     context: RuleExecutionContext,
     target_unit_instance_ids: tuple[str, ...] | None = None,
+    effect_index: int | None = None,
 ) -> dict[str, JsonValue]:
     target_ids = target_unit_instance_ids_for_clause(
         clause=clause,
@@ -1082,6 +1083,11 @@ def _effect_payload(
             "source_id": rule_ir.source_id,
             "rule_ir_hash": rule_ir.ir_hash(),
             "clause_id": clause.clause_id,
+            "effect_index": _effect_index(
+                clause=clause,
+                effect=effect,
+                explicit_effect_index=effect_index,
+            ),
             "source_span": clause.source_span.to_payload(),
             "target": None if clause.target is None else clause.target.to_payload(),
             "target_unit_instance_ids": list(target_ids),
@@ -1104,6 +1110,7 @@ def generic_rule_effect_payload(
     effect: RuleEffectSpec,
     context: RuleExecutionContext,
     target_unit_instance_ids: tuple[str, ...] | None = None,
+    effect_index: int | None = None,
 ) -> dict[str, JsonValue]:
     return _effect_payload(
         rule_ir=_validate_rule_ir(rule_ir),
@@ -1111,7 +1118,33 @@ def generic_rule_effect_payload(
         effect=effect,
         context=context,
         target_unit_instance_ids=target_unit_instance_ids,
+        effect_index=effect_index,
     )
+
+
+def _effect_index(
+    *,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+    explicit_effect_index: int | None,
+) -> int:
+    if explicit_effect_index is not None:
+        if type(explicit_effect_index) is not int or not 0 <= explicit_effect_index < len(
+            clause.effects
+        ):
+            raise GameLifecycleError("Generic RuleIR effect_index is outside its clause.")
+        if clause.effects[explicit_effect_index] != effect:
+            raise GameLifecycleError(
+                "Generic RuleIR effect_index does not identify the supplied effect."
+            )
+        return explicit_effect_index
+    identity_matches = tuple(i for i, candidate in enumerate(clause.effects) if candidate is effect)
+    if len(identity_matches) == 1:
+        return identity_matches[0]
+    semantic_matches = tuple(i for i, candidate in enumerate(clause.effects) if candidate == effect)
+    if len(semantic_matches) != 1:
+        raise GameLifecycleError("Generic RuleIR effect has no unique clause slot.")
+    return semantic_matches[0]
 
 
 def _persisting_effect_or_none(

@@ -1186,6 +1186,7 @@ def _effect_records_for_selected_target(
                     "source_id": record.definition.source_id,
                     "rule_ir_hash": rule_ir.ir_hash(),
                     "clause_id": clause.clause_id,
+                    "effect_index": effect_index,
                     "source_span": clause.source_span.to_payload(),
                     "target": None if clause.target is None else clause.target.to_payload(),
                     "target_unit_instance_ids": list(target_unit_ids),

@@ -44,6 +44,14 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/faction/000009894/none",
+        "datasheet_id": "000000611",
+        "datasheet_name": "Night Spinner",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/faction/000009894/none",
         "datasheet_id": "000004193",
         "datasheet_name": "Prince Yriel",
@@ -111,13 +119,14 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 13,
+    "coverage_row_count": 14,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000596/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000611/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004193/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000592/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002533/faction/000009894/none",
@@ -133,6 +142,7 @@
       "Corsair Voidscarred",
       "Fire Dragons",
       "Kharseth",
+      "Night Spinner",
       "Prince Yriel",
       "Rangers",
       "Shroud Runners",
@@ -151,7 +161,7 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 13
+      "faction": 14
     },
     "support_stages": [
       "engine_consumed"
@@ -432,6 +442,14 @@
       {
         "ability_id": "000008339",
         "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
+        "datasheet_id": "000000611",
+        "datasheet_name": "Night Spinner",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/core/000008339/none",
         "datasheet_id": "000001151",
         "datasheet_name": "Soul Grinder",
@@ -467,7 +485,7 @@
     ],
     "category_id": "core.deadly_demise",
     "category_name": "Core Deadly Demise",
-    "coverage_row_count": 11,
+    "coverage_row_count": 12,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
       "chaos-daemons-bridge-catalog/000002758/core/000008339/none",
@@ -476,6 +494,7 @@
       "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004208/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004209/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001151/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004195/core/000008339/none",
       "chaos-daemons-bridge-catalog/000000605/core/000008339/none",
@@ -486,6 +505,7 @@
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Defiler",
+      "Night Spinner",
       "Soul Grinder",
       "Starfangs",
       "Vypers",
@@ -496,7 +516,7 @@
       "descriptor:destruction-reaction:deadly-demise-source"
     ],
     "source_kind_counts": {
-      "core": 11
+      "core": 12
     },
     "support_stages": [
       "engine_consumed"
@@ -718,6 +738,39 @@
     ],
     "runtime_consumer_ids": [
       "catalog-ir:movement-action-grant"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000611:monofilament-web",
+        "ability_name": "Monofilament Web",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none",
+        "datasheet_id": "000000611",
+        "datasheet_name": "Night Spinner",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Monofilament Web"
+    ],
+    "category_id": "datasheet.roll_modifier.charge.selected_unit",
+    "category_name": "Datasheet Roll Modifier Charge Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none"
+    ],
+    "datasheet_names": [
+      "Night Spinner"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-effect"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -1330,6 +1383,39 @@
     ],
     "source_kind_counts": {
       "datasheet": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000611:monofilament-web",
+        "ability_name": "Monofilament Web",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none",
+        "datasheet_id": "000000611",
+        "datasheet_name": "Night Spinner",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Monofilament Web"
+    ],
+    "category_id": "datasheet.rule_ir.modify_characteristic.selected_unit",
+    "category_name": "Datasheet Rule Ir Modify Characteristic Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none"
+    ],
+    "datasheet_names": [
+      "Night Spinner"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-effect"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
     },
     "support_stages": [
       "engine_consumed"

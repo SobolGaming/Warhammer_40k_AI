@@ -48,6 +48,7 @@ from warhammer40k_core.engine.start_battle_hooks import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleEffectSpec,
     RuleIR,
     RuleParameter,
 )
@@ -518,19 +519,9 @@ def _validate_effect_bundle(
         installed_payload = effect_payloads_by_id.get(expected_id)
         if installed_payload is None:
             raise GameLifecycleError("Catalog keyword choice effect identity drifted.")
-        expected_effect = replace(
-            source_effect,
-            parameters=tuple(
-                RuleParameter(
-                    key=parameter.key,
-                    value=(
-                        selected_keyword
-                        if parameter.key == "target_required_keyword"
-                        else parameter.value
-                    ),
-                )
-                for parameter in source_effect.parameters
-            ),
+        expected_effect = _effect_with_selected_keyword(
+            effect=source_effect,
+            selected_keyword=selected_keyword,
         )
         expected_payload = {
             "effect_kind": "generic_rule_execution",
@@ -538,6 +529,7 @@ def _validate_effect_bundle(
             "source_id": source.rule_ir.source_id,
             "rule_ir_hash": source.rule_ir.ir_hash(),
             "clause_id": source.clause.clause_id,
+            "effect_index": index,
             "source_span": source.clause.source_span.to_payload(),
             "target": None if source.clause.target is None else source.clause.target.to_payload(),
             "target_unit_instance_ids": [source.unit.unit_instance_id],
@@ -801,28 +793,25 @@ def _persisting_effects_for_result(
         event_log=context.decisions.event_log,
         record_persisting_effects=False,
     )
+    specialized_clause = replace(
+        source.clause,
+        effects=tuple(
+            _effect_with_selected_keyword(
+                effect=source_effect,
+                selected_keyword=selected_keyword,
+            )
+            for source_effect in source.clause.effects
+        ),
+    )
     effects: list[PersistingEffect] = []
-    for index, source_effect in enumerate(source.clause.effects):
-        effect = replace(
-            source_effect,
-            parameters=tuple(
-                RuleParameter(
-                    key=parameter.key,
-                    value=(
-                        selected_keyword
-                        if parameter.key == "target_required_keyword"
-                        else parameter.value
-                    ),
-                )
-                for parameter in source_effect.parameters
-            ),
-        )
+    for index, effect in enumerate(specialized_clause.effects):
         effect_payload = generic_rule_effect_payload(
             rule_ir=source.rule_ir,
-            clause=source.clause,
+            clause=specialized_clause,
             effect=effect,
             context=execution_context,
             target_unit_instance_ids=(source.unit.unit_instance_id,),
+            effect_index=index,
         )
         effects.append(
             generic_rule_persisting_effect(
@@ -837,6 +826,27 @@ def _persisting_effects_for_result(
             )
         )
     return tuple(effects)
+
+
+def _effect_with_selected_keyword(
+    *,
+    effect: RuleEffectSpec,
+    selected_keyword: str,
+) -> RuleEffectSpec:
+    return replace(
+        effect,
+        parameters=tuple(
+            RuleParameter(
+                key=parameter.key,
+                value=(
+                    selected_keyword
+                    if parameter.key == "target_required_keyword"
+                    else parameter.value
+                ),
+            )
+            for parameter in effect.parameters
+        ),
+    )
 
 
 def _effect_source_model_id(effect: PersistingEffect) -> str | None:

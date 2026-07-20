@@ -9,6 +9,9 @@ SOURCE_PACKAGE_ID = "gw-11e-tacoma-open-2026-event-faq"
 CULT_AMBUSH_ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID = (
     "warhammer_40000_11th:event_faq:tacoma_2026:cult_ambush_attached_character_exclusions"
 )
+FRAME_KEYWORD_ADDITIONS_SOURCE_ID = (
+    "warhammer_40000_11th:event_faq:tacoma_2026:frame_keyword_additions"
+)
 SOURCE_PDF_FILENAME = "faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf"
 SOURCE_PDF_SHA256 = "5beadb2c29e100a31bb7ee54f429498555e07430997063111aa4694556568f97"
 

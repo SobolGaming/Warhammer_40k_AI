@@ -17,6 +17,7 @@ from tools.aeldari_datasheet_semantic_coverage import (
     SEMANTIC_BUCKETS,
     SOURCE_ARTIFACT_TABLES,
     SOURCE_JSON_DIR,
+    TACOMA_OVERLAY_PACK_PATH,
     aeldari_datasheet_semantic_coverage,
     load_aeldari_datasheet_semantic_coverage,
 )
@@ -58,11 +59,13 @@ from warhammer40k_core.engine.core_descriptor_consumption import (
     CORE_SCOUTS_PREBATTLE_CONSUMER_ID,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
 )
 from warhammer40k_core.rules.source_patch import source_row_hash
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
+    AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES,
     AELDARI_RANGERS_HEIGHT_OVERRIDES,
 )
 from warhammer40k_core.rules.wahapedia_schema import WahapediaJsonArtifact
@@ -228,6 +231,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("aeldari", "000000601", "Playable"),
         ("aeldari", "000000598", "Playable"),
         ("aeldari", "000000605", "Playable"),
+        ("aeldari", "000000611", "Playable"),
         ("aeldari", "000000612", "Playable"),
         ("aeldari", "000000613", "Playable"),
         ("aeldari", "000002531", "Playable"),
@@ -337,15 +341,26 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 17,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 18,
         SEMANTIC_BUCKET_HOST_NEEDED: 6,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 47,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 46,
     }
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000571"].semantic_bucket == SEMANTIC_BUCKET_UNSUPPORTED_IR
     assert rows_by_id["000002531"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert rows_by_id["000002532"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    night_spinner = rows_by_id["000000611"]
+    assert night_spinner.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    assert {
+        ability.ability_name: (ability.support_stage.value, ability.runtime_consumer_ids)
+        for ability in night_spinner.abilities
+    } == {
+        "Monofilament Web": (
+            "engine_consumed",
+            (CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,),
+        ),
+    }
     rangers = rows_by_id["000000592"]
     assert rangers.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert {
@@ -513,13 +528,29 @@ def test_aeldari_rangers_catalog_geometry_is_source_reviewed() -> None:
     assert CORE_INFILTRATORS_PREBATTLE_CONSUMER_ID == "descriptor:prebattle:infiltrators"
 
 
+def test_aeldari_night_spinner_catalog_geometry_is_source_reviewed() -> None:
+    assert len(AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES) == 1
+    geometry = AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES[0]
+    assert geometry.datasheet_id == "000000611"
+    assert geometry.model_name == "Night Spinner"
+    assert geometry.height == 2.75
+    assert geometry.height_source_id == "geometry-review:aeldari:night-spinner:height"
+    assert "Warhammer Event Companion" in geometry.height_document_reference
+
+
 def test_aeldari_semantic_coverage_artifacts_are_current() -> None:
-    overlay_pack, release_manifest, coverage_payload = (
+    overlay_pack, tacoma_overlay_pack, release_manifest, coverage_payload = (
         generated_aeldari_datasheet_semantic_coverage()
     )
 
     assert json.loads(COVERAGE_PATH.read_text(encoding="utf-8")) == coverage_payload
     assert json.loads(OVERLAY_PACK_PATH.read_text(encoding="utf-8")) == (overlay_pack.to_payload())
+    assert json.loads(TACOMA_OVERLAY_PACK_PATH.read_text(encoding="utf-8")) == (
+        tacoma_overlay_pack.to_payload()
+    )
+    assert tacoma_overlay_pack.operations[0].source_reference == (
+        tacoma_open_2026.FRAME_KEYWORD_ADDITIONS_SOURCE_ID
+    )
     assert json.loads(RELEASE_MANIFEST_PATH.read_text(encoding="utf-8")) == (
         release_manifest.to_payload()
     )

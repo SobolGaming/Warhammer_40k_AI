@@ -16,6 +16,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_kharseth_2026_06 as aeldari_kharseth_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_night_spinner_2026_06 as aeldari_night_spinner_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_shroud_runners_wraithblades_2026_06 as aeldari_shroud_wraith_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -47,6 +50,7 @@ def datasheet_rule_ir_payload_by_source_row_id(source_row_id: str) -> RuleIRPayl
                 source_row_id
             ),
             aeldari_kharseth_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
+            aeldari_night_spinner_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
             aeldari_shroud_wraith_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
             aeldari_war_walkers_wraithlord_source.datasheet_rule_ir_payload_by_source_row_id(
                 source_row_id
