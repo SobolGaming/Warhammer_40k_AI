@@ -347,13 +347,15 @@ reference server currently requires:
 - `session-create-v2`, `session-metadata-v3-contract`,
   `session-command-result-v3-contract`, and `session-command-outcome-v3-contract` for the
   authenticated formal session protocol;
+- `replay-artifact-v2-phase18i` for replay artifacts whose required source identity includes
+  `ruleset_descriptor_hash` and `rules_overlay_ids`;
 - `error-envelope-v1` for typed transport errors.
 
-Game views, rules catalogs, support profiles, and replay artifacts retain their
-existing explicit projection/artifact schema fields. A mismatched request
-version fails before queue consumption or engine mutation. External error and
-status payloads are viewer-scoped by the same shared redaction policy as game
-projections and events.
+Game views, rules catalogs, and support profiles retain their existing explicit
+projection schema fields. A mismatched request version fails before queue
+consumption or engine mutation. External error and status payloads are
+viewer-scoped by the same shared redaction policy as game projections and
+events.
 
 Compatibility, coordinate, session, and redaction semantics are normative in
 `contracts/compatibility-policy.md`, `contracts/coordinate-system.md`,

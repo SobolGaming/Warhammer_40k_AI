@@ -22,7 +22,7 @@ from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
-REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v1-phase18b"
+REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v2-phase18i"
 
 
 class ReplayArtifactError(ValueError):

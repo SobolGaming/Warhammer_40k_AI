@@ -3325,6 +3325,14 @@
               "minLength": 1,
               "type": "string"
             },
+            "rules_overlay_ids": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
             "ruleset_descriptor_hash": {
               "minLength": 64,
               "type": "string"
@@ -3344,6 +3352,7 @@
             "game_id",
             "game_config_hash",
             "ruleset_descriptor_hash",
+            "rules_overlay_ids",
             "catalog_id",
             "catalog_hash",
             "source_package_id",
@@ -3352,7 +3361,7 @@
           "type": "object"
         }
       },
-      "$id": "https://warhammer40k-core.local/contracts/v1/replay-metadata.schema.json",
+      "$id": "https://warhammer40k-core.local/contracts/v2/replay-metadata.schema.json",
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "additionalProperties": false,
       "properties": {
@@ -3385,7 +3394,7 @@
           "type": "array"
         },
         "schema_version": {
-          "const": "replay-artifact-v1-phase18b",
+          "const": "replay-artifact-v2-phase18i",
           "type": "string"
         },
         "source_identity": {
@@ -4283,6 +4292,18 @@
           "pattern": "^[0-9a-f]{64}$",
           "type": "string"
         },
+        "rules_overlay_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "ruleset_descriptor_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
         "ruleset_id": {
           "minProperties": 1,
           "type": "object"
@@ -4341,6 +4362,8 @@
         "session_state",
         "session_revision",
         "ruleset_id",
+        "ruleset_descriptor_hash",
+        "rules_overlay_ids",
         "catalog_id",
         "source_package_id",
         "source_hash",

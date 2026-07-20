@@ -64,6 +64,7 @@ from warhammer40k_core.engine.phases.shooting import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.replay import (
+    REPLAY_ARTIFACT_SCHEMA_VERSION,
     ReplayArtifact,
     ReplayArtifactError,
     ReplayArtifactPayload,
@@ -123,6 +124,8 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["decision_records"]
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
+    assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v2-phase18i"
 
 
 def test_replay_source_identity_verifies_active_rules_overlay() -> None:

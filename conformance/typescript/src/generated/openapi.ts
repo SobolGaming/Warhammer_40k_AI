@@ -284,8 +284,8 @@ export interface components {
             last_activity_at: string;
             lifecycle_status: components["schemas"]["lifecycle-status--status.schema"];
             projection_state_hash: string;
-            rules_overlay_ids?: string[];
-            ruleset_descriptor_hash?: string;
+            rules_overlay_ids: string[];
+            ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
             schema_version: "session-metadata-v3-contract";
@@ -837,7 +837,7 @@ export interface components {
             game_config_hash: string;
             game_id: string;
             ruleset_descriptor_hash: string;
-            rules_overlay_ids?: string[];
+            rules_overlay_ids: string[];
             source_ids: string[];
             source_package_id: string;
         };
@@ -850,7 +850,7 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v1-phase18b";
+            schema_version: "replay-artifact-v2-phase18i";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */
@@ -919,7 +919,7 @@ export interface components {
                 "application/json": components["schemas"]["session-command-outcome.schema"] | components["schemas"]["error-envelope.schema"];
             };
         };
-        /** @description Role-scoped session metadata and opaque reconnect checkpoint. */
+        /** @description Role-scoped session metadata with mandatory ruleset descriptor and overlay identity plus an opaque reconnect checkpoint. */
         SessionMetadata: {
             headers: {
                 [name: string]: unknown;
@@ -1095,7 +1095,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Deterministic replay artifact for an administrator, or for a replay viewer after the session is terminal or closed. */
+            /** @description Replay artifact v2 with mandatory ruleset descriptor and overlay source identity for an administrator, or for a replay viewer after the session is terminal or closed. */
             200: {
                 headers: {
                     [name: string]: unknown;

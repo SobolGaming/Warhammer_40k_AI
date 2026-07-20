@@ -43,6 +43,8 @@
     "session_state",
     "session_revision",
     "ruleset_id",
+    "ruleset_descriptor_hash",
+    "rules_overlay_ids",
     "catalog_id",
     "source_package_id",
     "source_hash",

@@ -71,6 +71,7 @@ SCHEMA_FILES = (
     Path("contracts/schemas/game-view.schema.json"),
     Path("contracts/schemas/interaction-descriptor.schema.json"),
     Path("contracts/schemas/lifecycle-status.schema.json"),
+    Path("contracts/schemas/replay-metadata.schema.json"),
     Path("contracts/schemas/rules-catalog.schema.json"),
     Path("contracts/schemas/session-metadata.schema.json"),
 )
@@ -187,6 +188,34 @@ def test_session_metadata_contract_version_accepts_compatible_major_three_releas
     validator.validate(compatible)
     with pytest.raises(ValidationError):
         validator.validate(incompatible)
+
+
+@pytest.mark.parametrize("field_name", ["ruleset_descriptor_hash", "rules_overlay_ids"])
+def test_session_metadata_schema_rejects_missing_rules_overlay_identity(field_name: str) -> None:
+    validator = _schema_validator("session-metadata.schema.json", registry=_schema_registry())
+    metadata = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json"))
+    )
+    metadata.pop(field_name)
+
+    with pytest.raises(ValidationError):
+        validator.validate(metadata)
+
+
+def test_replay_metadata_schema_rejects_missing_rules_overlay_identity() -> None:
+    replay_schema = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/replay-metadata.schema.json"))
+    )
+    assert replay_schema["$id"] == (
+        "https://warhammer40k-core.local/contracts/v2/replay-metadata.schema.json"
+    )
+    validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
+    replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
+    source_identity = _json_object(replay["source_identity"])
+    source_identity.pop("rules_overlay_ids")
+
+    with pytest.raises(ValidationError):
+        validator.validate(replay)
 
 
 def test_contract_three_payloads_are_rejected_by_closed_contract_two_client_schemas() -> None:
