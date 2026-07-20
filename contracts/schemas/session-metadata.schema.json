@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v2/session-metadata.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/session-metadata.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -14,9 +14,15 @@
       "$ref": "https://warhammer40k-core.local/contracts/v1/lifecycle-status.schema.json#/$defs/status"
     },
     "projection_state_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "rules_overlay_ids": {
+      "items": {"minLength": 1, "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "ruleset_descriptor_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "ruleset_id": {"minProperties": 1, "type": "object"},
-    "schema_version": {"const": "session-metadata-v2", "type": "string"},
-    "server_contract_version": {"pattern": "^2\\.[0-9]+\\.[0-9]+$", "type": "string"},
+    "schema_version": {"const": "session-metadata-v3-contract", "type": "string"},
+    "server_contract_version": {"pattern": "^3\\.[0-9]+\\.[0-9]+$", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "session_revision": {"minimum": 0, "type": "integer"},
     "session_state": {
@@ -37,6 +43,8 @@
     "session_state",
     "session_revision",
     "ruleset_id",
+    "ruleset_descriptor_hash",
+    "rules_overlay_ids",
     "catalog_id",
     "source_package_id",
     "source_hash",

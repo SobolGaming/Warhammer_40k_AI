@@ -1,0 +1,10 @@
+{
+  "cult_ambush_attached_character_exclusion_source_id": "warhammer_40000_11th:event_faq:tacoma_2026:cult_ambush_attached_character_exclusions",
+  "official_article_url": "https://www.warhammer-community.com/en-gb/articles/hkjbvun1/important-updates-for-warhammer-40000-players-at-the-tacoma-open/",
+  "official_pdf_url": "https://assets.warhammer-community.com/articles/0-2026/july/wc06-07/faq-warhammer-open-tacoma-dtb3ingprd-cvcl2agtfd.pdf",
+  "rules_overlay_id": "warhammer_40000_11th:event_overlay:tacoma_open_2026",
+  "scope": "warhammer_open_tacoma_2026_only",
+  "source_package_id": "gw-11e-tacoma-open-2026-event-faq",
+  "source_pdf_filename": "faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf",
+  "source_pdf_sha256": "5beadb2c29e100a31bb7ee54f429498555e07430997063111aa4694556568f97"
+}

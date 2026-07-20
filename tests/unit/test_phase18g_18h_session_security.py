@@ -362,13 +362,14 @@ def test_phase18h_derives_live_visibility_and_delay_from_server_owned_roles() ->
     assert coach_pending == player_a_pending
     assert admin_pending == player_a_pending
     assert player_b_pending == {
-        "schema_version": "decision-request-view-v1",
+        "schema_version": "decision-request-view-v2-interaction",
         "request_id": HIDDEN_REQUEST_ID,
         "decision_type": "hidden_decision",
         "actor_id": None,
         "payload": {"secret": True, "hidden": True},
         "options": [],
         "is_parameterized": False,
+        "interaction": None,
     }
     assert _object(player_a, "projection")["viewer_role"] == "player"
     assert _object(coach, "projection")["viewer_role"] == "coach"

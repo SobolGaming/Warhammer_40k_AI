@@ -3,6 +3,7 @@ import { isDeepStrictEqual } from "node:util";
 
 import { canonicalJsonSha256 } from "./canonical-json.js";
 import { ContractHttpClient, type HttpResult } from "./client.js";
+import { selectInteractionRenderer } from "./interaction.js";
 import {
   ContractRegistry,
   type DeploymentPlacementPayload,
@@ -112,6 +113,12 @@ export async function runCertifiedScenario(
   await assertCatalogEquivalence(clients, sessionId, registry, assertions);
 
   const firstRequest = pendingDecision(ownerProjection);
+  equal(
+    selectInteractionRenderer(firstRequest).renderer,
+    "finite-option-list",
+    "engine metadata selects the finite renderer",
+    assertions,
+  );
   await assertAdministratorCannotSubmit(
     clients,
     sessionId,
@@ -195,6 +202,12 @@ export async function runCertifiedScenario(
 
   const placementRequest = pendingDecision(placementProjection);
   equal(placementRequest.is_parameterized, true, "placement request is parameterized", assertions);
+  equal(
+    selectInteractionRenderer(placementRequest).renderer,
+    "multi-model-placement",
+    "engine metadata selects the placement renderer",
+    assertions,
+  );
   const proposalPayload = deploymentPayload(
     placementProjection.projection.pending_proposal,
     armyIdsByPlayer,
@@ -485,9 +498,11 @@ function assertDecisionRedaction(
   const opponentDecision = pendingDecision(opponent);
   equal(ownerDecision.actor_id, "player-a", "owner sees acting player", assertions);
   equal(ownerDecision.decision_type, "select_secondary_missions", "owner sees decision type", assertions);
+  truthy(ownerDecision.interaction !== null, "owner sees interaction metadata", assertions);
   truthy(ownerDecision.options.length > 0, "owner sees finite options", assertions);
   equal(opponentDecision.actor_id, null, "opponent actor is redacted", assertions);
   equal(opponentDecision.decision_type, "hidden_decision", "opponent type is redacted", assertions);
+  equal(opponentDecision.interaction, null, "opponent interaction metadata is redacted", assertions);
   equal(opponentDecision.options.length, 0, "opponent option count is hidden", assertions);
   truthy(
     !JSON.stringify(opponentDecision).includes("select_secondary_missions"),

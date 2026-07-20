@@ -1,6 +1,50 @@
 {
   "actor_id": "player-a",
   "decision_type": "select_secondary_missions",
+  "interaction": {
+    "constraints": {
+      "candidate_option_ids": [
+        "fixed:assassination:bring_it_down",
+        "fixed:assassination:cleanse",
+        "fixed:bring_it_down:cleanse",
+        "tactical"
+      ],
+      "entity_kinds": [],
+      "exact_model_count": null,
+      "maximum_distance_in": null,
+      "maximum_selections": 1,
+      "may_enter_engagement_range": null,
+      "minimum_enemy_distance_in": null,
+      "minimum_selections": 1,
+      "must_preserve_coherency": null,
+      "placement_kinds": [],
+      "proposal_schema_ref": null,
+      "submission_schema_ref": "finite-submission.schema.json"
+    },
+    "display_hints": {
+      "confirm_label": "Confirm Option",
+      "decline_label": null
+    },
+    "interaction_kind": "finite_option_list",
+    "proposal_kind": null,
+    "required_inputs": [
+      "selected_option"
+    ],
+    "schema_version": "interaction-descriptor-v2-variants",
+    "selected_entity_ids": [],
+    "submission_kind": "finite",
+    "submission_variants": [
+      {
+        "display_label": "Confirm Option",
+        "interaction_kind": "finite_option_list",
+        "proposal_schema_ref": null,
+        "required_inputs": [
+          "selected_option"
+        ],
+        "variant_id": "finite_option"
+      }
+    ]
+  },
   "is_parameterized": false,
   "options": [
     {
@@ -52,5 +96,5 @@
     "setup_step": "select_secondary_missions"
   },
   "request_id": "decision-request-000001",
-  "schema_version": "decision-request-view-v1"
+  "schema_version": "decision-request-view-v2-interaction"
 }

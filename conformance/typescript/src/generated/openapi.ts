@@ -137,6 +137,12 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AnnotatedDecisionRequest: components["schemas"]["annotated-decision-request.schema"];
+        DecisionRequestView: components["schemas"]["decision-request-view.schema"];
+        FiniteSubmission: components["schemas"]["finite-submission.schema"];
+        InteractionDescriptor: components["schemas"]["interaction-descriptor.schema"];
+        InteractionConformance: components["schemas"]["interaction-conformance.schema"];
+        ParameterizedSubmission: components["schemas"]["parameterized-submission.schema"];
         /** CORE V2 ErrorEnvelopePayload */
         "error-envelope.schema": {
             error: {
@@ -278,9 +284,11 @@ export interface components {
             last_activity_at: string;
             lifecycle_status: components["schemas"]["lifecycle-status--status.schema"];
             projection_state_hash: string;
+            rules_overlay_ids: string[];
+            ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v2";
+            schema_version: "session-metadata-v3-contract";
             server_contract_version: string;
             session_id: string;
             session_revision: number;
@@ -513,8 +521,31 @@ export interface components {
                 target_unit_instance_id: string | null;
             };
         };
+        "proposal-payload--cult_ambush_marker_point.schema": {
+            marker_id: components["schemas"]["proposal-payload--identifier.schema"];
+            player_id: components["schemas"]["proposal-payload--identifier.schema"];
+            request_id: components["schemas"]["proposal-payload--identifier.schema"];
+            /** @constant */
+            submission_kind: "cult_ambush_marker_placement";
+            x_inches: number;
+            y_inches: number;
+        };
+        "proposal-payload--cult_ambush_no_marker.schema": {
+            marker_id: components["schemas"]["proposal-payload--identifier.schema"];
+            no_marker_reason: components["schemas"]["proposal-payload--identifier.schema"];
+            player_id: components["schemas"]["proposal-payload--identifier.schema"];
+            request_id: components["schemas"]["proposal-payload--identifier.schema"];
+            /** @constant */
+            submission_kind: "cult_ambush_no_marker";
+        };
+        "proposal-payload--cult_ambush_marker_placement.schema": components["schemas"]["proposal-payload--cult_ambush_marker_point.schema"] | components["schemas"]["proposal-payload--cult_ambush_no_marker.schema"];
+        "proposal-payload--return_on_death_placement.schema": {
+            attempted_placement: components["schemas"]["proposal-payload--unit_placement.schema"];
+            /** @constant */
+            submission_kind: "submit_return_on_death_placement";
+        };
         /** CORE V2 ParameterizedProposalPayload */
-        "proposal-payload.schema": components["schemas"]["proposal-payload--movement.schema"] | components["schemas"]["proposal-payload--charge_move.schema"] | components["schemas"]["proposal-payload--fight_movement.schema"] | components["schemas"]["proposal-payload--generic_placement.schema"] | components["schemas"]["proposal-payload--deployment_placement.schema"] | components["schemas"]["proposal-payload--prebattle_placement.schema"] | components["schemas"]["proposal-payload--scout_move.schema"] | components["schemas"]["proposal-payload--shooting_declaration.schema"] | components["schemas"]["proposal-payload--melee_declaration.schema"] | components["schemas"]["proposal-payload--stratagem_target_binding.schema"];
+        "proposal-payload.schema": components["schemas"]["proposal-payload--movement.schema"] | components["schemas"]["proposal-payload--charge_move.schema"] | components["schemas"]["proposal-payload--fight_movement.schema"] | components["schemas"]["proposal-payload--generic_placement.schema"] | components["schemas"]["proposal-payload--deployment_placement.schema"] | components["schemas"]["proposal-payload--prebattle_placement.schema"] | components["schemas"]["proposal-payload--scout_move.schema"] | components["schemas"]["proposal-payload--shooting_declaration.schema"] | components["schemas"]["proposal-payload--melee_declaration.schema"] | components["schemas"]["proposal-payload--stratagem_target_binding.schema"] | components["schemas"]["proposal-payload--cult_ambush_marker_placement.schema"] | components["schemas"]["proposal-payload--return_on_death_placement.schema"];
         "session-command-envelope--parameterized_submission.schema": {
             payload: components["schemas"]["proposal-payload.schema"];
             /** @constant */
@@ -555,7 +586,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v2";
+            schema_version: "session-command-outcome-v3-contract";
             session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
@@ -615,6 +646,46 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        "interaction-descriptor--identifier.schema": string;
+        /** @enum {string} */
+        "interaction-descriptor--interaction_kind.schema": "battlefield_point_placement" | "confirmation" | "dice_selection" | "entity_selection" | "finite_option_list" | "model_pose_placement" | "multi_model_placement" | "opportunity_window" | "ordered_sequencing" | "path_editor" | "quantity_selection" | "roster_construction" | "weapon_allocation_matrix";
+        "interaction-descriptor--submission_variant.schema": {
+            display_label: components["schemas"]["interaction-descriptor--identifier.schema"];
+            interaction_kind: components["schemas"]["interaction-descriptor--interaction_kind.schema"];
+            proposal_schema_ref: string | null;
+            required_inputs: components["schemas"]["interaction-descriptor--identifier.schema"][];
+            variant_id: components["schemas"]["interaction-descriptor--identifier.schema"];
+        };
+        /** CORE V2 InteractionDescriptorPayload */
+        "interaction-descriptor.schema": {
+            constraints: {
+                candidate_option_ids: components["schemas"]["interaction-descriptor--identifier.schema"][];
+                entity_kinds: components["schemas"]["interaction-descriptor--identifier.schema"][];
+                exact_model_count: number | null;
+                maximum_distance_in: number | null;
+                maximum_selections: number | null;
+                may_enter_engagement_range: boolean | null;
+                minimum_selections: number | null;
+                minimum_enemy_distance_in: number | null;
+                must_preserve_coherency: boolean | null;
+                placement_kinds: components["schemas"]["interaction-descriptor--identifier.schema"][];
+                submission_schema_ref: string;
+                proposal_schema_ref: string | null;
+            };
+            display_hints: {
+                confirm_label: components["schemas"]["interaction-descriptor--identifier.schema"];
+                decline_label: components["schemas"]["interaction-descriptor--identifier.schema"] | null;
+            };
+            interaction_kind: components["schemas"]["interaction-descriptor--interaction_kind.schema"];
+            proposal_kind: components["schemas"]["interaction-descriptor--identifier.schema"] | null;
+            required_inputs: components["schemas"]["interaction-descriptor--identifier.schema"][];
+            submission_variants: components["schemas"]["interaction-descriptor--submission_variant.schema"][];
+            /** @constant */
+            schema_version: "interaction-descriptor-v2-variants";
+            selected_entity_ids: components["schemas"]["interaction-descriptor--identifier.schema"][];
+            /** @enum {string} */
+            submission_kind: "finite" | "parameterized";
+        };
         "decision-request-view--json_value.schema": null | boolean | number | string | components["schemas"]["decision-request-view--json_value.schema"][] | {
             [key: string]: components["schemas"]["decision-request-view--json_value.schema"];
         };
@@ -626,13 +697,34 @@ export interface components {
         /** CORE V2 DecisionRequestViewPayload */
         "decision-request-view.schema": {
             /** @constant */
-            schema_version: "decision-request-view-v1";
+            schema_version: "decision-request-view-v2-interaction";
             actor_id: string | null;
             decision_type: string;
             is_parameterized: boolean;
+            interaction: components["schemas"]["interaction-descriptor.schema"] | null;
             options: components["schemas"]["decision-request-view--decision_option.schema"][];
             payload: components["schemas"]["decision-request-view--json_value.schema"];
             request_id: string;
+        };
+        "annotated-decision-request--json_value.schema": null | boolean | number | string | components["schemas"]["annotated-decision-request--json_value.schema"][] | {
+            [key: string]: components["schemas"]["annotated-decision-request--json_value.schema"];
+        };
+        "annotated-decision-request--decision_option.schema": {
+            label: string;
+            option_id: string;
+            payload: components["schemas"]["annotated-decision-request--json_value.schema"];
+        };
+        /** CORE V2 InteractionAnnotatedDecisionRequestPayload */
+        "annotated-decision-request.schema": {
+            actor_id: string;
+            decision_type: string;
+            interaction: components["schemas"]["interaction-descriptor.schema"];
+            is_parameterized: boolean;
+            options: components["schemas"]["annotated-decision-request--decision_option.schema"][];
+            payload: components["schemas"]["annotated-decision-request--json_value.schema"];
+            request_id: string;
+            /** @constant */
+            schema_version: "annotated-decision-request-v1";
         };
         "game-view--rules_catalog_reference.schema": {
             catalog_id: string;
@@ -665,9 +757,10 @@ export interface components {
             };
             pending_decision: components["schemas"]["decision-request-view.schema"] | null;
             pending_proposal: components["schemas"]["game-view--json_value.schema"];
+            nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][];
             player_ids: string[];
             /** @constant */
-            projection_schema: "game-view-v5-role-scoped";
+            projection_schema: "game-view-v6-interaction";
             projection_state_hash: string;
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
@@ -692,7 +785,7 @@ export interface components {
             retention_limit: number;
             revision_retention_limit: number;
             /** @constant */
-            schema_version: "session-projection-v1";
+            schema_version: "session-projection-v2-interaction";
             session_id: string;
             session_revision: number;
             /** @enum {string} */
@@ -744,6 +837,7 @@ export interface components {
             game_config_hash: string;
             game_id: string;
             ruleset_descriptor_hash: string;
+            rules_overlay_ids: string[];
             source_ids: string[];
             source_package_id: string;
         };
@@ -756,8 +850,36 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v1-phase18b";
+            schema_version: "replay-artifact-v2-phase18i";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
+        };
+        /** CORE V2 FiniteOptionSubmissionPayload */
+        "finite-submission.schema": {
+            actor_id: string;
+            option_id: string;
+            result_id: string;
+            /** @constant */
+            schema_version: "finite-submission-v1";
+        };
+        "interaction-conformance--case.schema": {
+            case_id: string;
+            proposal_payload: components["schemas"]["proposal-payload.schema"] | null;
+            request: components["schemas"]["annotated-decision-request.schema"];
+            submission_variant_id: string;
+        };
+        /** CORE V2 Interaction Conformance Cases */
+        "interaction-conformance.schema": {
+            cases: components["schemas"]["interaction-conformance--case.schema"][];
+            /** @constant */
+            schema_version: "interaction-conformance-v1";
+        };
+        /** CORE V2 ParameterizedSubmissionPayload */
+        "parameterized-submission.schema": {
+            actor_id: string;
+            payload: components["schemas"]["proposal-payload.schema"];
+            result_id: string;
+            /** @constant */
+            schema_version: "parameterized-submission-v1";
         };
     };
     responses: {
@@ -797,7 +919,7 @@ export interface components {
                 "application/json": components["schemas"]["session-command-outcome.schema"] | components["schemas"]["error-envelope.schema"];
             };
         };
-        /** @description Role-scoped session metadata and opaque reconnect checkpoint. */
+        /** @description Role-scoped session metadata with mandatory ruleset descriptor and overlay identity plus an opaque reconnect checkpoint. */
         SessionMetadata: {
             headers: {
                 [name: string]: unknown;
@@ -973,7 +1095,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Deterministic replay artifact for an administrator, or for a replay viewer after the session is terminal or closed. */
+            /** @description Replay artifact v2 with mandatory ruleset descriptor and overlay source identity for an administrator, or for a replay viewer after the session is terminal or closed. */
             200: {
                 headers: {
                     [name: string]: unknown;

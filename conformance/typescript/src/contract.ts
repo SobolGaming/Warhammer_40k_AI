@@ -10,7 +10,7 @@ import {
 import * as addFormatsModule from "ajv-formats";
 import type { FormatsPlugin } from "ajv-formats";
 
-import type { paths } from "./generated/openapi.js";
+import type { components, paths } from "./generated/openapi.js";
 
 type JsonResponseBody<Response> = Response extends {
   content: { "application/json": infer Body };
@@ -52,6 +52,12 @@ export type ReplayMetadata = JsonResponseBody<ExportSessionReplayOperation["resp
 export type ErrorEnvelope = JsonResponseBody<
   ExecuteSessionCommandOperation["responses"][400]
 >;
+export type InteractionRequest =
+  | components["schemas"]["AnnotatedDecisionRequest"]
+  | NonNullable<SessionProjection["projection"]["pending_decision"]>;
+export type FiniteSubmission = components["schemas"]["FiniteSubmission"];
+export type ParameterizedSubmission = components["schemas"]["ParameterizedSubmission"];
+export type InteractionConformance = components["schemas"]["InteractionConformance"];
 
 export type SessionPathParameters = GetSessionMetadataOperation["parameters"]["path"];
 export type SessionEventQuery = GetSessionEventsOperation["parameters"]["query"];
@@ -70,11 +76,14 @@ const REQUIRED_OPERATION_IDS = new Set([
 const addFormats = addFormatsModule.default as unknown as FormatsPlugin;
 
 export class ContractRegistry {
+  readonly #ajv: Ajv2020;
+  readonly #schemaIdByName = new Map<string, string>();
   readonly #validatorsByName = new Map<string, ValidateFunction>();
 
   constructor(contractRoot: string) {
     assertPublishedOpenApi(contractRoot);
     const ajv = new Ajv2020({ allErrors: true, strict: false, validateSchema: true });
+    this.#ajv = ajv;
     addFormats(ajv);
     const schemaRoot = resolve(contractRoot, "schemas");
     const schemas = readdirSync(schemaRoot)
@@ -91,6 +100,7 @@ export class ContractRegistry {
         throw new Error(`JSON Schema validator was not registered for ${name}.`);
       }
       this.#validatorsByName.set(name, validator);
+      this.#schemaIdByName.set(name, schemaId);
     }
   }
 
@@ -101,6 +111,29 @@ export class ContractRegistry {
     }
     if (!validator(value)) {
       throw new Error(`${schemaName} rejected payload: ${formatAjvErrors(validator.errors)}`);
+    }
+    return value as T;
+  }
+
+  validateReference<T>(schemaReference: string, value: unknown): T {
+    const [schemaName, fragment] = schemaReference.split("#", 2);
+    if (schemaName === undefined) {
+      throw new Error(`Invalid public schema reference ${schemaReference}.`);
+    }
+    const schemaId = this.#schemaIdByName.get(schemaName);
+    if (schemaId === undefined) {
+      throw new Error(`Unknown public schema reference ${schemaReference}.`);
+    }
+    const validator = this.#ajv.getSchema(
+      fragment === undefined ? schemaId : `${schemaId}#${fragment}`,
+    );
+    if (validator === undefined) {
+      throw new Error(`Unknown public schema reference ${schemaReference}.`);
+    }
+    if (!validator(value)) {
+      throw new Error(
+        `${schemaReference} rejected payload: ${formatAjvErrors(validator.errors)}`,
+      );
     }
     return value as T;
   }
@@ -138,8 +171,8 @@ function assertPublishedOpenApi(contractRoot: string): void {
     throw new Error("Conformance requires the published OpenAPI 3.1.0 document.");
   }
   const info = jsonObject(document.info, "OpenAPI info");
-  if (info.version !== "2.0.0") {
-    throw new Error("Conformance requires external contract version 2.0.0.");
+  if (info.version !== "3.0.0") {
+    throw new Error("Conformance requires external contract version 3.0.0.");
   }
   const operationIds = new Set<string>();
   for (const pathValue of Object.values(jsonObject(document.paths, "OpenAPI paths"))) {

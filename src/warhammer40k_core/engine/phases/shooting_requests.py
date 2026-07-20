@@ -8,6 +8,11 @@ from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
 from warhammer40k_core.engine.phases.shooting_handler import *
 from warhammer40k_core.engine.phases.shooting_reactions import *
+from warhammer40k_core.engine.interaction_metadata import (
+    NESTED_INTERACTION_REQUESTS_KEY,
+    InteractionAnnotatedDecisionRequestPayload,
+    interaction_annotated_decision_request_payload,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -262,6 +267,9 @@ def _request_shooting_declaration(
         ),
         "target_candidates": target_candidates,
     }
+    nested_interaction_requests = _nested_interaction_requests_for_target_candidates(
+        target_candidates
+    )
     request = DecisionRequest(
         request_id=request_id,
         decision_type=SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
@@ -270,6 +278,7 @@ def _request_shooting_declaration(
             {
                 "proposal_request": proposal_request,
                 "request_context": request_context,
+                NESTED_INTERACTION_REQUESTS_KEY: nested_interaction_requests,
             }
         ),
         options=(parameterized_decision_option(),),
@@ -522,7 +531,33 @@ def _required_weapon_ability_selections_for_target(
     )
     if selection_request is None:
         return []
-    return [validate_json_value(selection_request.to_payload())]
+    return [validate_json_value(interaction_annotated_decision_request_payload(selection_request))]
+
+
+def _nested_interaction_requests_for_target_candidates(
+    target_candidates: list[JsonValue],
+) -> list[InteractionAnnotatedDecisionRequestPayload]:
+    by_request_id: dict[str, InteractionAnnotatedDecisionRequestPayload] = {}
+    for candidate in target_candidates:
+        if not isinstance(candidate, dict):
+            raise GameLifecycleError("Shooting target candidate must be an object.")
+        raw_requests = candidate.get("required_weapon_ability_selections")
+        if not isinstance(raw_requests, list):
+            raise GameLifecycleError(
+                "Shooting target candidate requires nested interaction requests."
+            )
+        for raw_request in raw_requests:
+            if not isinstance(raw_request, dict):
+                raise GameLifecycleError("Nested shooting interaction request must be an object.")
+            request_id = raw_request.get("request_id")
+            if type(request_id) is not str or not request_id:
+                raise GameLifecycleError("Nested shooting interaction request requires request_id.")
+            typed_request = cast(InteractionAnnotatedDecisionRequestPayload, raw_request)
+            existing = by_request_id.get(request_id)
+            if existing is not None and existing != typed_request:
+                raise GameLifecycleError("Nested shooting interaction request payload drifted.")
+            by_request_id[request_id] = typed_request
+    return [by_request_id[request_id] for request_id in sorted(by_request_id)]
 
 
 def _shooting_types_for_candidate_payload(

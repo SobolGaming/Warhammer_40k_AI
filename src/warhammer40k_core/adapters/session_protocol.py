@@ -71,6 +71,8 @@ class SessionMetadataPayload(TypedDict):
     session_state: str
     session_revision: int
     ruleset_id: JsonValue
+    ruleset_descriptor_hash: str
+    rules_overlay_ids: list[str]
     catalog_id: str
     source_package_id: str
     source_hash: str
@@ -158,6 +160,8 @@ class AuthoritativeSession:
     adapter_session: AdapterGameSession
     player_ids: tuple[str, ...]
     ruleset_id: JsonValue
+    ruleset_descriptor_hash: str
+    rules_overlay_ids: tuple[str, ...]
     catalog_id: str
     source_package_id: str
     source_hash: str
@@ -182,6 +186,10 @@ class AuthoritativeSession:
         self.game_id = _validate_identifier("game_id", self.game_id)
         self.player_ids = _validated_player_ids(self.player_ids)
         self.ruleset_id = validate_json_value(self.ruleset_id)
+        self.ruleset_descriptor_hash = _validate_sha256(
+            "ruleset_descriptor_hash", self.ruleset_descriptor_hash
+        )
+        self.rules_overlay_ids = _validated_rules_overlay_ids(self.rules_overlay_ids)
         self.catalog_id = _validate_identifier("catalog_id", self.catalog_id)
         self.source_package_id = _validate_identifier(
             "source_package_id",
@@ -235,6 +243,8 @@ class AuthoritativeSession:
             adapter_session=adapter_session,
             player_ids=config.player_ids,
             ruleset_id=validate_json_value(config.ruleset_descriptor.ruleset_id.to_payload()),
+            ruleset_descriptor_hash=config.ruleset_descriptor.descriptor_hash,
+            rules_overlay_ids=config.ruleset_descriptor.rules_overlay_ids,
             catalog_id=catalog_view["catalog_id"],
             source_package_id=catalog_view["source_package_id"],
             source_hash=catalog_view["source_hash"],
@@ -364,6 +374,8 @@ class AuthoritativeSession:
             "session_state": snapshot.state.value,
             "session_revision": snapshot.session_revision,
             "ruleset_id": self.ruleset_id,
+            "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
+            "rules_overlay_ids": list(self.rules_overlay_ids),
             "catalog_id": self.catalog_id,
             "source_package_id": self.source_package_id,
             "source_hash": self.source_hash,
@@ -513,6 +525,15 @@ def _validated_player_ids(values: tuple[str, ...]) -> tuple[str, ...]:
     validated = tuple(_validate_identifier("player_id", value) for value in values)
     if len(validated) != len(set(validated)):
         raise SessionProtocolError("Session player IDs must be unique.")
+    return validated
+
+
+def _validated_rules_overlay_ids(values: tuple[str, ...]) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise SessionProtocolError("rules_overlay_ids must be a tuple.")
+    validated = tuple(sorted(_validate_identifier("rules_overlay_id", value) for value in values))
+    if len(validated) != len(set(validated)):
+        raise SessionProtocolError("rules_overlay_ids must not contain duplicates.")
     return validated
 
 

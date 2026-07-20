@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v2/session-command-result.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/session-command-result.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "if": {"properties": {"accepted": {"const": true}}},
@@ -18,8 +18,8 @@
       ],
       "type": "string"
     },
-    "schema_version": {"const": "session-command-result-v2", "type": "string"},
-    "session": {"$ref": "https://warhammer40k-core.local/contracts/v2/session-metadata.schema.json"}
+    "schema_version": {"const": "session-command-result-v3-contract", "type": "string"},
+    "session": {"$ref": "https://warhammer40k-core.local/contracts/v3/session-metadata.schema.json"}
   },
   "required": [
     "schema_version",

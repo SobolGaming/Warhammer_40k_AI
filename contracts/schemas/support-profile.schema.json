@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/support-profile.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/support-profile.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -12,15 +12,25 @@
       "items": {"$ref": "#/$defs/runtime_row"},
       "type": "array"
     },
+    "decision_interaction_support_rows": {
+      "items": {"$ref": "#/$defs/decision_interaction_row"},
+      "type": "array",
+      "uniqueItems": true
+    },
     "eligible_for_headless_self_play_smoke": {"type": "boolean"},
     "game_id": {"minLength": 1, "type": "string"},
+    "interaction_kinds": {
+      "items": {"$ref": "#/$defs/interaction_kind"},
+      "type": "array",
+      "uniqueItems": true
+    },
     "mustering_support_rows": {
       "items": {"$ref": "#/$defs/mustering_row"},
       "type": "array"
     },
     "overall_status": {"$ref": "#/$defs/support_status"},
     "ruleset_descriptor_hash": {"minLength": 64, "type": "string"},
-    "schema_version": {"const": "support-profile-v2-ws14", "type": "string"},
+    "schema_version": {"const": "support-profile-v3-interactions", "type": "string"},
     "source_package_id": {"minLength": 1, "type": "string"},
     "status_counts": {"$ref": "#/$defs/status_counts"}
   },
@@ -35,11 +45,31 @@
     "status_counts",
     "mustering_support_rows",
     "datasheet_support_rows",
-    "detachment_faction_support_rows"
+    "detachment_faction_support_rows",
+    "interaction_kinds",
+    "decision_interaction_support_rows"
   ],
   "title": "CORE V2 SupportProfilePayload",
   "type": "object",
   "$defs": {
+    "decision_interaction_row": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_type": {"minLength": 1, "type": "string"},
+        "interaction_kinds": {
+          "items": {"$ref": "#/$defs/interaction_kind"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "submission_kind": {
+          "enum": ["finite", "parameterized"],
+          "type": "string"
+        }
+      },
+      "required": ["decision_type", "submission_kind", "interaction_kinds"],
+      "type": "object"
+    },
     "datasheet_row": {
       "additionalProperties": false,
       "properties": {
@@ -91,6 +121,24 @@
         "violation_count"
       ],
       "type": "object"
+    },
+    "interaction_kind": {
+      "enum": [
+        "battlefield_point_placement",
+        "confirmation",
+        "dice_selection",
+        "entity_selection",
+        "finite_option_list",
+        "model_pose_placement",
+        "multi_model_placement",
+        "opportunity_window",
+        "ordered_sequencing",
+        "path_editor",
+        "quantity_selection",
+        "roster_construction",
+        "weapon_allocation_matrix"
+      ],
+      "type": "string"
     },
     "runtime_row": {
       "additionalProperties": false,

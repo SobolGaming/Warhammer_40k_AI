@@ -57,7 +57,7 @@ def test_phase18m_executable_client_is_operation_bound_without_identifier_conven
         CLIENT_ROOT / "src" / "type-fixtures" / "session-command-envelope.type-test.ts"
     ).read_text(encoding="utf-8")
 
-    assert 'import type { paths } from "./generated/openapi.js";' in contract
+    assert 'import type { components, paths } from "./generated/openapi.js";' in contract
     assert 'CreateSessionOperation["requestBody"]' in contract
     assert 'ExecuteSessionCommandOperation["requestBody"]' in contract
     assert "as SessionCommandEnvelope" not in scenario

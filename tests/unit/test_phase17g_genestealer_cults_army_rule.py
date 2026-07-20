@@ -22,6 +22,7 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     RosterLegalityReport,
 )
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -31,6 +32,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.cult_ambush import (
+    ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID,
     GENESTEALER_CULTS_FACTION_ID,
     RESURGENCE_RESOURCE_KIND,
     SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE,
@@ -65,6 +67,7 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
+from warhammer40k_core.engine.interaction_metadata import interaction_descriptor_for_request
 from warhammer40k_core.engine.list_validation import (
     BattleSize,
     DetachmentSelection,
@@ -101,6 +104,7 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 GSC_PLAYER_ID = "player-gsc"
 ENEMY_PLAYER_ID = "player-enemy"
@@ -108,6 +112,8 @@ GSC_ARMY_ID = "army-gsc"
 ENEMY_ARMY_ID = "army-enemy"
 ACOLYTE_UNIT_ID = f"{GSC_ARMY_ID}:acolyte-hybrids"
 NEOPHYTE_UNIT_ID = f"{GSC_ARMY_ID}:neophyte-hybrids"
+GSC_CHARACTER_UNIT_ID = f"{GSC_ARMY_ID}:primus"
+GSC_ATTACHED_UNIT_ID = f"attached-unit:{GSC_ARMY_ID}:neophytes-with-primus"
 ENEMY_UNIT_ID = f"{ENEMY_ARMY_ID}:enemy-unit"
 ONE_SHOT_WARGEAR_ID = "demo-charge"
 ONE_SHOT_PROFILE_ID = "demo-charge-profile"
@@ -235,6 +241,114 @@ def test_destroyed_unit_spends_resurgence_and_creates_cult_ambush_reserve() -> N
     assert marker_request.decision_type == SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE
     assert marker_request.actor_id == GSC_PLAYER_ID
     assert json.loads(json.dumps(marker_request.to_payload())) == marker_request.to_payload()
+
+
+def test_default_ruleset_does_not_activate_tacoma_cult_ambush_exclusions() -> None:
+    state, bodyguard, _enemy_unit = _battle_state(
+        gsc_unit_id=NEOPHYTE_UNIT_ID,
+        gsc_datasheet_id="neophyte-hybrids",
+        gsc_unit_name="Neophyte Hybrids",
+        gsc_model_count=10,
+        phase=BattlePhase.SHOOTING,
+        active_player_id=ENEMY_PLAYER_ID,
+        attach_character_without_cult_ambush=True,
+    )
+    assert state.rules_overlay_ids == ()
+    assert cult_ambush_resurgence_cost_for_unit(state, bodyguard) is None
+
+    decisions = DecisionController()
+    _run_resurgence_hook(
+        state=state,
+        decisions=decisions,
+        destroyed_unit=bodyguard,
+        destroyed_unit_instance_id=GSC_ATTACHED_UNIT_ID,
+    )
+
+    assert list(decisions.queue.pending_requests) == []
+    assert all(
+        ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID not in reserve.source_rule_ids
+        for reserve in state.reserve_states
+    )
+
+
+def test_tacoma_overlay_excludes_attached_character_from_cult_ambush() -> None:
+    state, bodyguard, _enemy_unit = _battle_state(
+        gsc_unit_id=NEOPHYTE_UNIT_ID,
+        gsc_datasheet_id="neophyte-hybrids",
+        gsc_unit_name="Neophyte Hybrids",
+        gsc_model_count=10,
+        phase=BattlePhase.SHOOTING,
+        active_player_id=ENEMY_PLAYER_ID,
+        attach_character_without_cult_ambush=True,
+        tacoma_overlay=True,
+    )
+    character = _unit_by_id(state, GSC_CHARACTER_UNIT_ID)
+    assert state.rules_overlay_ids == (tacoma_open_2026.RULES_OVERLAY_ID,)
+    assert state.runtime_ruleset_descriptor().rules_overlay_ids == state.rules_overlay_ids
+    assert character.datasheet_abilities == ()
+    assert cult_ambush_resurgence_cost_for_unit(state, bodyguard) == 3
+    assert cult_ambush_resurgence_cost_for_unit(state, character) is None
+
+    decisions = DecisionController()
+    _run_resurgence_hook(
+        state=state,
+        decisions=decisions,
+        destroyed_unit=bodyguard,
+        destroyed_unit_instance_id=GSC_ATTACHED_UNIT_ID,
+    )
+    request = _next_request(decisions)
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["destroyed_unit_instance_id"] == GSC_ATTACHED_UNIT_ID
+    assert request_payload["starting_strength"] == 10
+    assert request_payload["resurgence_cost"] == 3
+
+    result = DecisionResult.for_request(
+        result_id="phase17g-gsc-attached-character-exclusion",
+        request=request,
+        selected_option_id=_option_by_selection(request, "spend").option_id,
+    )
+    assert (
+        invalid_cult_ambush_resurgence_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+        is None
+    )
+    decisions.submit_result(result)
+    apply_cult_ambush_resurgence_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        result=result,
+    )
+
+    replacement = _unit_by_id(state, f"{bodyguard.unit_instance_id}:cult-ambush-001")
+    assert replacement.datasheet_id == bodyguard.datasheet_id
+    assert len(replacement.own_models) == 10
+    assert all(model.datasheet_id == bodyguard.datasheet_id for model in replacement.own_models)
+    assert all(model.datasheet_id != character.datasheet_id for model in replacement.own_models)
+    reserve_state = state.reserve_state_for_unit(replacement.unit_instance_id)
+    assert reserve_state is not None
+    assert ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID in reserve_state.source_rule_ids
+
+    character_only_state, _bodyguard, _enemy_unit = _battle_state(
+        gsc_unit_id=NEOPHYTE_UNIT_ID,
+        gsc_datasheet_id="neophyte-hybrids",
+        gsc_unit_name="Neophyte Hybrids",
+        gsc_model_count=10,
+        phase=BattlePhase.SHOOTING,
+        active_player_id=ENEMY_PLAYER_ID,
+        attach_character_without_cult_ambush=True,
+        tacoma_overlay=True,
+    )
+    character_only_decisions = DecisionController()
+    _run_resurgence_hook(
+        state=character_only_state,
+        decisions=character_only_decisions,
+        destroyed_unit=_unit_by_id(character_only_state, GSC_CHARACTER_UNIT_ID),
+    )
+    assert list(character_only_decisions.queue.pending_requests) == []
 
 
 def test_destroyed_unit_declines_resurgence_without_mutation() -> None:
@@ -630,6 +744,7 @@ def test_marker_placement_validates_enemy_distance_and_serializes() -> None:
         enemy_x=30.0,
         enemy_y=30.0,
     )
+    _assert_cult_ambush_submission_variants(marker_request)
     invalid_result = _marker_placement_result(
         request=marker_request,
         result_id="phase17g-gsc-marker-invalid",
@@ -729,6 +844,7 @@ def test_no_marker_submission_records_when_no_legal_position_exists() -> None:
         enemy_x=0.5,
         enemy_y=0.5,
     )
+    _assert_cult_ambush_submission_variants(marker_request)
     battlefield_state = state.battlefield_state
     assert battlefield_state is not None
     state.replace_battlefield_state(
@@ -762,6 +878,24 @@ def test_no_marker_submission_records_when_no_legal_position_exists() -> None:
     assert state.cult_ambush_markers == []
     payloads = _event_payloads(decisions, "genestealer_cults_cult_ambush_marker_not_placed")
     assert payloads[-1]["reason"] == "no_legal_marker_position"
+
+
+def _assert_cult_ambush_submission_variants(request: DecisionRequest) -> None:
+    descriptor = interaction_descriptor_for_request(request)
+    variants = descriptor["submission_variants"]
+
+    assert [variant["variant_id"] for variant in variants] == ["place_marker", "no_marker"]
+    assert variants[0]["proposal_schema_ref"] == (
+        "proposal-payload.schema.json#/$defs/cult_ambush_marker_point"
+    )
+    assert variants[1]["proposal_schema_ref"] == (
+        "proposal-payload.schema.json#/$defs/cult_ambush_no_marker"
+    )
+    assert descriptor["constraints"]["submission_schema_ref"] == (
+        "parameterized-submission.schema.json"
+    )
+    assert descriptor["constraints"]["minimum_selections"] is None
+    assert descriptor["constraints"]["maximum_selections"] is None
 
 
 def test_marker_placement_rejects_stale_and_malformed_submissions() -> None:
@@ -1847,8 +1981,10 @@ def _battle_state(
     enemy_y: float = 40.0,
     enemy_aircraft: bool = False,
     gsc_has_cult_ambush: bool = True,
+    attach_character_without_cult_ambush: bool = False,
+    tacoma_overlay: bool = False,
 ) -> tuple[GameState, UnitInstance, UnitInstance]:
-    descriptor = _ruleset_descriptor()
+    descriptor = _ruleset_descriptor(tacoma_overlay=tacoma_overlay)
     battle_phase_sequence = tuple(descriptor.battle_phase_sequence.phases)
     gsc_unit = _unit(
         unit_instance_id=gsc_unit_id,
@@ -1865,12 +2001,40 @@ def _battle_state(
         has_cult_ambush=False,
         keywords=("AIRCRAFT",) if enemy_aircraft else ("INFANTRY",),
     )
+    gsc_units: tuple[UnitInstance, ...] = (gsc_unit,)
+    attached_units: tuple[AttachedUnitFormation, ...] = ()
+    if attach_character_without_cult_ambush:
+        character = replace(
+            _unit(
+                unit_instance_id=GSC_CHARACTER_UNIT_ID,
+                datasheet_id="primus",
+                name="Primus",
+                model_count=1,
+                has_cult_ambush=False,
+                keywords=("CHARACTER", "INFANTRY"),
+            ),
+            faction_keywords=("GENESTEALER CULTS",),
+        )
+        gsc_units = (gsc_unit, character)
+        attached_units = (
+            AttachedUnitFormation(
+                attached_unit_instance_id=GSC_ATTACHED_UNIT_ID,
+                bodyguard_unit_instance_id=gsc_unit.unit_instance_id,
+                leader_unit_instance_ids=(character.unit_instance_id,),
+                component_unit_instance_ids=tuple(
+                    sorted((gsc_unit.unit_instance_id, character.unit_instance_id))
+                ),
+                source_id="phase17g-gsc-attached-character-formation",
+                attachment_source_ids=("phase17g-gsc-primus-leader-source",),
+            ),
+        )
     gsc_army = _army(
         army_id=GSC_ARMY_ID,
         player_id=GSC_PLAYER_ID,
         faction_id=GENESTEALER_CULTS_FACTION_ID,
         battle_size=BattleSize.STRIKE_FORCE,
-        units=(gsc_unit,),
+        units=gsc_units,
+        attached_units=attached_units,
     )
     enemy_army = _army(
         army_id=ENEMY_ARMY_ID,
@@ -1882,6 +2046,7 @@ def _battle_state(
     state = GameState(
         game_id="phase17g-genestealer-cults-battle",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
+        rules_overlay_ids=descriptor.rules_overlay_ids,
         stage=GameLifecycleStage.BATTLE,
         setup_sequence=tuple(descriptor.setup_sequence.steps),
         battle_phase_sequence=battle_phase_sequence,
@@ -2054,9 +2219,11 @@ def _run_resurgence_hook(
     state: GameState,
     decisions: DecisionController,
     destroyed_unit: UnitInstance,
+    destroyed_unit_instance_id: str | None = None,
     destroying_player_id: str = ENEMY_PLAYER_ID,
     destroyed_player_id: str = GSC_PLAYER_ID,
 ) -> None:
+    target_unit_instance_id = destroyed_unit_instance_id or destroyed_unit.unit_instance_id
     event = decisions.event_log.append(
         "model_destroyed",
         validate_json_value(
@@ -2068,7 +2235,7 @@ def _run_resurgence_hook(
                 if state.current_battle_phase is not None
                 else BattlePhase.SHOOTING.value,
                 "destroying_player_id": destroying_player_id,
-                "target_unit_instance_id": destroyed_unit.unit_instance_id,
+                "target_unit_instance_id": target_unit_instance_id,
                 "model_instance_id": destroyed_unit.own_models[-1].model_instance_id,
             }
         ),
@@ -2081,7 +2248,7 @@ def _run_resurgence_hook(
             model_destroyed_event_id=event.event_id,
             model_destroyed_payload=cast(dict[str, JsonValue], event.payload),
             destroying_player_id=destroying_player_id,
-            destroyed_unit_instance_id=destroyed_unit.unit_instance_id,
+            destroyed_unit_instance_id=target_unit_instance_id,
             destroyed_player_id=destroyed_player_id,
         )
     )
@@ -2160,6 +2327,7 @@ def _army(
     faction_id: str,
     battle_size: BattleSize,
     units: tuple[UnitInstance, ...],
+    attached_units: tuple[AttachedUnitFormation, ...] = (),
 ) -> ArmyDefinition:
     descriptor = _ruleset_descriptor()
     return ArmyDefinition(
@@ -2174,6 +2342,7 @@ def _army(
         ),
         force_disposition_id="purge-the-foe",
         units=units,
+        attached_units=attached_units,
         roster_legality_report=RosterLegalityReport(battle_size=battle_size),
         battle_size=battle_size,
     )
@@ -2351,10 +2520,11 @@ def _violation_codes(result: ProposalValidationResult) -> set[str]:
     return {violation.violation_code for violation in result.violations}
 
 
-def _ruleset_descriptor() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_eleventh(
+def _ruleset_descriptor(*, tacoma_overlay: bool = False) -> RulesetDescriptor:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh(
         descriptor_version="core-v2-phase17g-genestealer-cults-test"
     )
+    return tacoma_open_2026.apply_rules_overlay(descriptor) if tacoma_overlay else descriptor
 
 
 def _config_for_context(game_id: str) -> GameConfig:

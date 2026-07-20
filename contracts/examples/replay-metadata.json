@@ -3590,6 +3590,7 @@
           ],
           "terrain_objective_control_policy": "terrain_area_occupancy"
         },
+        "rules_overlay_ids": [],
         "ruleset_id": {
           "edition": "11e",
           "game": "warhammer_40000",
@@ -8229,6 +8230,7 @@
       "ranged_attack_history_records": [],
       "reserve_states": [],
       "return_on_death_consumed_keys": [],
+      "rules_overlay_ids": [],
       "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
       "scoring_window_states": [],
       "secondary_mission_card_states": [],
@@ -8328,12 +8330,13 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v1-phase18b",
+  "schema_version": "replay-artifact-v2-phase18i",
   "source_identity": {
     "catalog_hash": "f21547e82d783bb1b43d0e0b2e931d044bf26eafd78e997c7a6a0952b37f8a74",
     "catalog_id": "phase9a-canonical",
-    "game_config_hash": "03e82aae453c3e99851a4006b2e18d2a67afe7d0e58c477ce76d57f67eb2385d",
+    "game_config_hash": "da43ff0db2004e0c46579de1691eef60bf799f0c6fcab21c30414eb8fedd7838",
     "game_id": "phase18d-contract-session",
+    "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
     "source_ids": [
       "catalog:phase9a-canonical"

@@ -14,7 +14,15 @@ safe merely because it is outside the main game projection.
 
 When a pending decision belongs to another player and is hidden, the projection
 receives the canonical hidden decision type, a stable redacted request ID, an
-empty option list, a redacted payload, and no actor ID. Hidden event records are
+empty option list, a redacted payload, and no actor ID. Hidden pending decisions
+are also assigned `interaction: null`; renderer kind, required inputs, selected
+entities, constraints, schema references, and display hints are hidden metadata.
+Their projection also carries an empty `nested_interaction_requests` array.
+When the parent request is visible, that array contains only typed nested
+requests derived from the same engine payload and visibility decision; transport
+code does not rescan arbitrary proposal JSON or apply a second redaction rule.
+Visible pending decisions receive only the engine-authored descriptor produced
+for their authorized request. Hidden event records are
 omitted from that viewer's event page entirely. Public `sequence_number` values
 are contiguous within each viewer scope, and pagination scans hidden records
 while advancing only an opaque protected authoritative offset. A projection

@@ -26,6 +26,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainObjectiveControlPolicy,
     TerrainTraversalMode,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 
 def test_ruleset_descriptor_payload_round_trips_with_eleventh_edition_identity() -> None:
@@ -73,6 +74,25 @@ def test_descriptor_hash_is_deterministic_and_rejects_policy_payload_drift() -> 
 
     with pytest.raises(RulesetDescriptorError, match="descriptor_hash"):
         RulesetDescriptor.from_payload(payload)
+
+
+def test_rules_overlay_identity_participates_in_descriptor_hash_and_serialization() -> None:
+    base = RulesetDescriptor.warhammer_40000_eleventh()
+    tacoma = tacoma_open_2026.apply_rules_overlay(base)
+
+    assert base.rules_overlay_ids == ()
+    assert (
+        base.descriptor_hash == "6a0c441b9151f7e7f3a74b9024a42522f5683bef5fda1ca7f62d3d1e83fa8961"
+    )
+    assert tacoma.rules_overlay_ids == (tacoma_open_2026.RULES_OVERLAY_ID,)
+    assert tacoma.descriptor_hash != base.descriptor_hash
+    assert tacoma.to_payload()["rules_overlay_ids"] == [tacoma_open_2026.RULES_OVERLAY_ID]
+    assert RulesetDescriptor.from_payload(tacoma.to_payload()) == tacoma
+
+    drifted_payload = tacoma.to_payload()
+    drifted_payload["rules_overlay_ids"] = []
+    with pytest.raises(RulesetDescriptorError, match="descriptor_hash"):
+        RulesetDescriptor.from_payload(drifted_payload)
 
 
 def test_descriptor_hash_includes_setup_and_battle_phase_sequences() -> None:

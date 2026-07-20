@@ -2888,9 +2888,53 @@
       "wounds_remaining": 2
     }
   },
+  "nested_interaction_requests": [],
   "pending_decision": {
     "actor_id": "player-a",
     "decision_type": "select_movement_unit",
+    "interaction": {
+      "constraints": {
+        "candidate_option_ids": [
+          "army-alpha:intercessor-unit-1"
+        ],
+        "entity_kinds": [
+          "unit"
+        ],
+        "exact_model_count": null,
+        "maximum_distance_in": null,
+        "maximum_selections": 1,
+        "may_enter_engagement_range": null,
+        "minimum_enemy_distance_in": null,
+        "minimum_selections": 1,
+        "must_preserve_coherency": null,
+        "placement_kinds": [],
+        "proposal_schema_ref": null,
+        "submission_schema_ref": "finite-submission.schema.json"
+      },
+      "display_hints": {
+        "confirm_label": "Confirm Selection",
+        "decline_label": null
+      },
+      "interaction_kind": "entity_selection",
+      "proposal_kind": null,
+      "required_inputs": [
+        "selected_entities"
+      ],
+      "schema_version": "interaction-descriptor-v2-variants",
+      "selected_entity_ids": [],
+      "submission_kind": "finite",
+      "submission_variants": [
+        {
+          "display_label": "Confirm Selection",
+          "interaction_kind": "entity_selection",
+          "proposal_schema_ref": null,
+          "required_inputs": [
+            "selected_entities"
+          ],
+          "variant_id": "finite_option"
+        }
+      ]
+    },
     "is_parameterized": false,
     "options": [
       {
@@ -2915,15 +2959,15 @@
       "phase": "movement"
     },
     "request_id": "decision-request-000007",
-    "schema_version": "decision-request-view-v1"
+    "schema_version": "decision-request-view-v2-interaction"
   },
   "pending_proposal": null,
   "player_ids": [
     "player-a",
     "player-b"
   ],
-  "projection_schema": "game-view-v5-role-scoped",
-  "projection_state_hash": "d208dce84c3ca48e17c10e9801831f2ea0edfb622c36fe6419bc472d14eb2f28",
+  "projection_schema": "game-view-v6-interaction",
+  "projection_state_hash": "ab1ee653bc7d5841b9922042e1d4dbb2618d28b7aac09ecad70d320474ae30fe",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

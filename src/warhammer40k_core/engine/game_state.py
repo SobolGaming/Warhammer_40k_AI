@@ -1062,6 +1062,7 @@ class GameState:
     player_ids: tuple[str, ...]
     turn_order: tuple[str, ...]
     tactical_secondary_draw_count: int
+    rules_overlay_ids: tuple[str, ...] = ()
     setup_step_index: int | None = 0
     battle_phase_index: int | None = None
     battle_round: int = 0
@@ -1205,6 +1206,9 @@ class GameState:
         self.ruleset_descriptor_hash = _validate_descriptor_hash(
             "GameState ruleset_descriptor_hash",
             self.ruleset_descriptor_hash,
+        )
+        self.rules_overlay_ids = _validate_identifier_tuple(
+            "GameState rules_overlay_ids", self.rules_overlay_ids, min_length=0, sort_values=True
         )
         self.stage = game_lifecycle_stage_from_token(self.stage)
         self.setup_sequence = _validate_setup_sequence(self.setup_sequence)
@@ -1510,6 +1514,7 @@ class GameState:
         return cls(
             game_id=config.game_id,
             ruleset_descriptor_hash=config.ruleset_descriptor.descriptor_hash,
+            rules_overlay_ids=config.ruleset_descriptor.rules_overlay_ids,
             stage=GameLifecycleStage.SETUP,
             setup_sequence=tuple(config.ruleset_descriptor.setup_sequence.steps),
             battle_phase_sequence=tuple(config.ruleset_descriptor.battle_phase_sequence.phases),
@@ -4504,6 +4509,7 @@ class GameState:
         return {
             "game_id": self.game_id,
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
+            "rules_overlay_ids": list(self.rules_overlay_ids),
             "stage": self.stage.value,
             "setup_sequence": [step.value for step in self.setup_sequence],
             "battle_phase_sequence": [phase.value for phase in self.battle_phase_sequence],
@@ -4785,6 +4791,7 @@ class GameState:
         return cls(
             game_id=payload["game_id"],
             ruleset_descriptor_hash=payload["ruleset_descriptor_hash"],
+            rules_overlay_ids=tuple(payload["rules_overlay_ids"]),
             stage=game_lifecycle_stage_from_token(payload["stage"]),
             setup_sequence=tuple(
                 setup_step_kind_from_token(step) for step in payload["setup_sequence"]
@@ -5319,8 +5326,10 @@ class GameState:
         if self.mission_setup is not None and (
             self.mission_setup.mission_pack_id == eleventh_ca_2026_27_source.MISSION_PACK_ID
         ):
-            return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27()
-        return RulesetDescriptor.warhammer_40000_eleventh()
+            descriptor = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27()
+        else:
+            descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+        return replace(descriptor, rules_overlay_ids=self.rules_overlay_ids, descriptor_hash="")
 
     def _active_player_is_last_in_round(self, player_id: str) -> bool:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)

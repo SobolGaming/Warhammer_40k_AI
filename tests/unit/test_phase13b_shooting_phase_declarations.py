@@ -44,6 +44,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _weapon_profile_by_wargear,
 )
 
+from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     DamagedEffectDefinition,
@@ -2381,11 +2382,25 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
         if payload["decision_type"] == WEAPON_ABILITY_SELECTION_DECISION_TYPE
     )
     anti_options = cast(list[dict[str, object]], anti_selection_request["options"])
+    anti_interaction = cast(dict[str, object], anti_selection_request["interaction"])
+    nested_requests = cast(list[dict[str, object]], request_payload["nested_interaction_requests"])
 
     assert {option["option_id"] for option in anti_options} == {
         anti_vehicle.ability_id,
         anti_infantry.ability_id,
     }
+    assert anti_selection_request in nested_requests
+    assert anti_selection_request["schema_version"] == "annotated-decision-request-v1"
+    assert anti_interaction["schema_version"] == "interaction-descriptor-v2-variants"
+    assert anti_interaction["interaction_kind"] == "finite_option_list"
+    assert (
+        cast(dict[str, object], anti_interaction["constraints"])["submission_schema_ref"]
+        == "finite-submission.schema.json"
+    )
+    owner_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-a")
+    opponent_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-b")
+    assert owner_view["nested_interaction_requests"] == nested_requests
+    assert opponent_view["nested_interaction_requests"] == nested_requests
 
     missing_selection_proposal = _proposal_from_request(
         request=declaration_request,

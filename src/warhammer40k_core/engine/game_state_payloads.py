@@ -129,6 +129,7 @@ class RangedAttackHistoryRecordPayload(TypedDict):
 class GameStatePayload(TypedDict):
     game_id: str
     ruleset_descriptor_hash: str
+    rules_overlay_ids: list[str]
     stage: str
     setup_sequence: list[str]
     battle_phase_sequence: list[str]

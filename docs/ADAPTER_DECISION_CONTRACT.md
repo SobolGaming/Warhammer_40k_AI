@@ -30,6 +30,75 @@ The engine-facing path is shared:
 
 Adapters are producers of answers. The engine remains the owner of validation, mutation, events, and replay records.
 
+## Phase 18I interaction metadata
+
+Every visible `DecisionRequestViewPayload` emitted by the shared projection path
+contains an `interaction` descriptor authored by
+`engine.interaction_metadata`. Hidden pending decisions contain
+`interaction: null`. Projection, CLI, network, TypeScript, replay, and UI
+consumers select an input renderer from `interaction_kind`; they do not branch
+on `decision_type`, option labels, rule text, display names, or arbitrary
+payload keys to discover what input is required.
+
+The descriptor is versioned as `interaction-descriptor-v2-variants` and carries:
+
+- a presentation-neutral `interaction_kind` and finite/parameterized
+  `submission_kind`;
+- the semantic `proposal_kind` when a parameterized answer is required;
+- engine-selected entity IDs and neutral `required_inputs`; multi-variant
+  interactions leave the top-level input list empty and publish the inputs on
+  each variant;
+- one or more `submission_variants`, each with a stable variant ID, interaction
+  kind, required inputs, proposal schema reference, and neutral display label;
+- typed assistive constraints, including candidate option IDs, entity kinds,
+  selection cardinality, movement distance, model count, coherency and
+  Engagement Range hints, placement kinds, the public finite/parameterized
+  wrapper schema reference, and a separate exact proposal schema reference;
+- optional presentation text under `display_hints`.
+
+The standard kinds are finite option list, entity selection, weapon allocation
+matrix, dice selection, ordered sequencing, battlefield point placement, model
+pose placement, multi-model placement, path editor, roster construction,
+confirmation, quantity selection, and opportunity window. They name interaction
+semantics, not framework components. A frontend may map them to any local
+renderer.
+
+`constraints` and `display_hints` are assistance only. They do not grant
+legality, authorize a player, replace the canonical proposal schema, or bypass
+engine validation. Every answer still selects one emitted finite option ID or
+submits the typed wrapper referenced by `submission_schema_ref`. Parameterized
+clients validate the body against the selected variant's `proposal_schema_ref`;
+stale metadata fails through the ordinary request/revision/proposal checks.
+`minimum_selections` and `maximum_selections` are nullable: `null` means the
+engine cannot state a safe exact cardinality from request metadata, not one.
+
+Interaction registration is fail closed. The decision dispatch contract exposes
+one or more interaction kinds for every registered decision family, the
+registry-derived `family-coverage.json` artifact records exact coverage, and the
+support profile publishes the same set. CI collects the renderer-kind union from
+every conformance request's `submission_variants` and requires that exact set to
+match the dispatch contract, family inventory, and support-profile row, in
+addition to comparing the global inventory with the engine enum and JSON Schema. The documented
+nested weapon-ability request carries the same descriptor inside the parent
+proposal and in the typed top-level `nested_interaction_requests` projection
+field. The canonical parameterized union includes distinct Cult Ambush
+`place_marker` and `no_marker` variants plus return-on-death placement. A new
+decision family, interaction kind, variant, or parameterized payload cannot pass
+the contract gate without updating this document, the engine registry,
+schemas/examples, generated TypeScript models, and viewer-redaction coverage.
+
+The committed `interaction-conformance.json` artifact is generated from the
+dispatch registry, the documented nested family, and every parameterized
+proposal fixture. The TypeScript test consumes the generated request and
+submission models, constructs every case, and validates the wrapper plus exact
+proposal schema without importing Python or switching on decision type.
+
+Interaction descriptors are part of viewer projection hashes and replay
+checkpoints. The same pending engine request therefore selects the same renderer
+and public submission schema after reconnect or replay, while an opponent-hidden
+request reveals no interaction kind, entity count, constraint, or schema-ref
+oracle.
+
 ## Pre-session army-list input
 
 A player-provided army list is pre-session input, not a separate mutation or
@@ -271,20 +340,22 @@ reference server currently requires:
 - `finite-submission-v1` for finite option submissions;
 - `parameterized-submission-v1` for proposal submissions;
 - `lifecycle-status-v1` for server lifecycle responses;
-- `decision-request-view-v1` for visible or redacted pending decisions;
+- `decision-request-view-v2-interaction` for visible or redacted pending decisions;
 - `event-delta-v1` for the in-process integer-cursor adapter delta only;
 - `event-delta-v2` for authenticated role-bound HTTP event deltas;
-- `session-projection-v1` for full role-scoped reconnect projections;
-- `session-create-v2`, `session-metadata-v2`,
-  `session-command-result-v2`, and `session-command-outcome-v2` for the
+- `session-projection-v2-interaction` for full role-scoped reconnect projections;
+- `session-create-v2`, `session-metadata-v3-contract`,
+  `session-command-result-v3-contract`, and `session-command-outcome-v3-contract` for the
   authenticated formal session protocol;
+- `replay-artifact-v2-phase18i` for replay artifacts whose required source identity includes
+  `ruleset_descriptor_hash` and `rules_overlay_ids`;
 - `error-envelope-v1` for typed transport errors.
 
-Game views, rules catalogs, support profiles, and replay artifacts retain their
-existing explicit projection/artifact schema fields. A mismatched request
-version fails before queue consumption or engine mutation. External error and
-status payloads are viewer-scoped by the same shared redaction policy as game
-projections and events.
+Game views, rules catalogs, and support profiles retain their existing explicit
+projection schema fields. A mismatched request version fails before queue
+consumption or engine mutation. External error and status payloads are
+viewer-scoped by the same shared redaction policy as game projections and
+events.
 
 Compatibility, coordinate, session, and redaction semantics are normative in
 `contracts/compatibility-policy.md`, `contracts/coordinate-system.md`,
@@ -1483,6 +1554,10 @@ Required Phase 17K charge-end catalog mortal-wound tests:
 
 Phase 17G implements the 11th Edition Genestealer Cults `Cult Ambush` army rule update. During `declare_battle_formations`, the setup hook grants Resurgence points through the faction-resource ledger based on battle size: Incursion 6, Strike Force 10, and Onslaught 14. This grant is automatic and emits no adapter choice.
 
+The [2026 Warhammer Open Tacoma FAQ](source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf) is formally scoped to that event while the late-July rules update is pending. Its committed [source-package manifest](source_rules/tacoma-open-2026-source-package.json) records the official URLs, PDF SHA-256, event-only scope, and stable source identities. CORE V2 applies the correction only when rules overlay `warhammer_40000_11th:event_overlay:tacoma_open_2026` is active. Under that overlay, source ID `warhammer_40000_11th:event_faq:tacoma_2026:cult_ambush_attached_character_exclusions` excludes attached `CHARACTER` models when checking Cult Ambush eligibility, calculating Starting Strength for the Resurgence cost, and constructing the identical replacement unit. A destroyed attached `CHARACTER` component alone does not create a replacement. The base/default ruleset retains the published faction-pack behavior and does not record the Tacoma source ID.
+
+Rules overlay IDs are immutable session source identity. They are included in the `RulesetDescriptor` hash and serialization, copied into authoritative `GameState`, published with session metadata, and verified explicitly by replay source identity. Descriptor, lifecycle, session, and replay payload loaders reject overlay/hash drift. Contract generation also hashes the committed Tacoma PDF and audits the source-backed Genestealer Cults attachment inventory. The current source contains seven Cult Ambush bodyguards and only `CHARACTER` attaching datasheets; generation fails if a non-`CHARACTER` attaching component becomes eligible, because multi-component replacement is not yet supported by the Cult Ambush ingress path.
+
 When an eligible Genestealer Cults unit is destroyed, the engine may emit the finite decision type `select_cult_ambush_resurgence`. The pending request payload contains source rule ID, model-destroyed event ID, destroyed unit ID, destroyed player ID, destroying player ID, battle round, phase, starting strength, Resurgence cost, and current Resurgence points. Current option IDs are:
 
 - `genestealer_cults:cult_ambush:decline:<destroyed_unit_instance_id>`;
@@ -1507,6 +1582,14 @@ If a marker can legally be placed, the engine emits the parameterized decision t
 
 If the engine reports that no legal marker position exists, adapters may answer the same request with `submission_kind: "cult_ambush_no_marker"` and a replay-safe `no_marker_reason`; this is rejected if a legal marker position still exists. Marker placement validates battlefield bounds and more-than-9-inch horizontal enemy distance before recording a 32mm Cult Ambush marker. Enemy non-AIRCRAFT model moves that end within 8 inches remove markers automatically through engine event processing, not through an adapter choice.
 
+The Phase 18I descriptor publishes both accepted alternatives on every such
+request. Variant `place_marker` uses `battlefield_point_placement` and
+`proposal-payload.schema.json#/$defs/cult_ambush_marker_point`; variant
+`no_marker` uses `confirmation`, requires `no_marker_reason`, and references
+`proposal-payload.schema.json#/$defs/cult_ambush_no_marker`. Top-level selection
+cardinality is null because the alternatives have different input semantics.
+The engine remains authoritative for whether the no-marker alternative is legal.
+
 At the end of an opponent Movement phase, each surviving marker can emit the shared turn-end finite decision type `select_faction_rule_turn_end_option` with `selection_kind: "cult_ambush_marker_ingress"`. Current options are:
 
 - `genestealer_cults:cult_ambush:marker:<marker_id>:decline`;
@@ -1523,6 +1606,7 @@ Required Phase 17G Cult Ambush tests:
 - initial Resurgence grant by battle size is idempotent and replay-safe;
 - valid spend and decline choices through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
 - replacement units are deterministic, full-wound, source-backed Cult Ambush Strategic Reserves;
+- attached `CHARACTER` components are excluded from eligibility, Resurgence cost, and replacement composition;
 - marker placement accepts valid parameterized payloads and rejects stale, drifted, malformed, or illegal positions;
 - enemy non-AIRCRAFT marker removal and AIRCRAFT exclusion are event-driven and replay-safe;
 - valid marker ingress selection emits `cult_ambush_placement` and first-round placement can arrive through the shared placement proposal contract;

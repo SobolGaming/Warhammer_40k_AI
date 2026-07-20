@@ -385,6 +385,7 @@ Implemented foundation and partial integration baselines:
 | 18F | Complete | Optimistic concurrency, idempotent command journal, stale-client conflicts, and atomic copy-on-write command commit |
 | 18G | Complete | Signed role-bound event cursors, deterministic pagination/retention, typed resynchronization, and full-projection reconnect checkpoints |
 | 18H | Complete | Authenticated server-owned principal roles, explicit authorization policy, delayed spectators, and shared differential redaction |
+| 18I | Complete | Engine-authored neutral interaction descriptors, exact registered-family coverage, typed submission schema references, and generated TypeScript renderer selection |
 | 18M-A | Complete | HTTP/OpenAPI-only TypeScript conformance client for the first certified setup/deployment, reconnect, terminal, and replay-equivalence scenario |
 
 Next / planned sequence:
@@ -397,7 +398,7 @@ Next / planned sequence:
 | 17M | Planned | Source-backed generic semantic completion organized by reusable mechanic family |
 | 17N | Planned | Mission, terrain, deployment, objective, and battlefield package completion |
 | 17O | Planned | Multi-axis engine capability and support manifest |
-| 18I-18L | Planned | UI interaction/coordinate contracts, interface intent, and persistence |
+| 18J-18L | Planned | Battlefield coordinate contracts, interface intent, and persistence |
 | 18M-B+ | Planned | Remaining decision-family, race, golden-corpus, persistence-claim, and Phase 20A backend certification coverage |
 | 19A-19F | Planned | Performance, AI orchestration, self-play, training corpus generation, and observability |
 | 20A-20D | Planned | Certified vertical slice, full-game regression, adversarial soak, and release gates |
@@ -2438,6 +2439,8 @@ Required tests:
 
 - static audit rejects active runtime/test references to retired edition IDs;
 - ruleset descriptor hash is deterministic and 11th Edition-only;
+- event/rules overlay IDs are explicit descriptor inputs, participate in the descriptor hash,
+  serialize through lifecycle state, and remain visible in session and replay source identity;
 - source package payloads round-trip with 11th Edition IDs;
 - no compatibility shim can instantiate a retired ruleset.
 
@@ -5259,13 +5262,14 @@ submit every supported decision category, consume viewer-scoped events, and
 distinguish stale, invalid, unsupported, forbidden, conflict, corruption, and
 terminal responses without importing Python or engine internals.
 
-This gate is not yet met. Phase 18I owns neutral interaction metadata and the
-remaining decision-family live scenarios, Phase 18J owns fully typed
-battlefield interaction/coordinate shapes, and Phase 18M owns generated-client
-conformance against the reference server. Phases 18E-18H own the completed
-hosted session, command, cursor, reconnect, and viewer-authorization envelopes;
-those generic baseline shapes are not evidence of a complete strongly typed
-client contract.
+This gate is met for the published Phase 18I interaction surface. The generated
+TypeScript client consumes a registry-derived 79-case artifact covering every
+registered finite family, the documented nested family, and every committed
+parameterized payload discriminator. It selects renderers, chooses variants,
+constructs generated-model submissions, and validates wrapper and proposal
+schemas without decision-type switches or Python imports. The transport-level
+certified scenario continues to be owned by Phase 18M, and Phase 18J owns
+additional battlefield interaction/coordinate semantics.
 
 ## Phase 18E: session and transport semantics
 
@@ -5598,6 +5602,23 @@ projection/event/status/error redaction delegates to the shared adapter module.
 
 Priority: P1, designed alongside Phase 18D.
 
+Status: Complete. `engine/interaction_metadata.py` is the sole engine-owned
+classification and descriptor source for all 67 registered lifecycle decision
+families and the documented nested weapon-ability choice. `DecisionDispatchContract` exposes exact interaction-kind coverage;
+the external family inventory and support profile publish the same registry
+metadata. Visible projections carry `interaction-descriptor-v2-variants`, while
+hidden pending decisions carry `interaction: null` and an empty typed nested
+interaction list through the shared redaction path.
+
+Contract 3.0 makes the interaction schema required, publishes typed annotated
+nested requests, hashes the complete viewer-visible projection, separates the
+Cult Ambush point and no-marker alternatives, and regenerates TypeScript OpenAPI
+models. The non-Python conformance client exhaustively selects renderers and
+constructs submissions only from descriptor metadata.
+Static audits fail when a registered decision lacks metadata, schema/enum
+inventories drift, visual consumers branch on `decision_type`, or an interaction
+descriptor names a framework component.
+
 Finite options and generic parameterized payloads are semantically sufficient
 for the engine but not sufficient for a backend-agnostic visual client. Every
 adapter-visible decision therefore exposes a neutral interaction descriptor
@@ -5612,10 +5633,19 @@ Example shape:
   "proposal_kind": "normal_move",
   "selected_entity_ids": ["unit-17"],
   "required_inputs": ["model_paths", "final_poses"],
+  "submission_variants": [{
+    "variant_id": "normal_move",
+    "interaction_kind": "path_editor",
+    "required_inputs": ["model_paths", "final_poses"],
+    "proposal_schema_ref": "proposal-payload.schema.json#/$defs/movement",
+    "display_label": "Submit Paths"
+  }],
   "constraints": {
     "maximum_distance_in": 7,
     "must_preserve_coherency": true,
-    "may_enter_engagement_range": false
+    "may_enter_engagement_range": false,
+    "submission_schema_ref": "parameterized-submission.schema.json",
+    "proposal_schema_ref": "proposal-payload.schema.json#/$defs/movement"
   },
   "display_hints": {
     "confirm_label": "Complete Normal Move"
@@ -5657,6 +5687,14 @@ Completion gate:
 A generic client can choose an interaction renderer from the descriptor and
 construct every supported finite/parameterized submission without importing
 engine code or hard-coding rules mutations by `decision_type`.
+
+This gate is met. Every registered finite/parameterized family resolves to one
+or more exact standard renderer kinds and canonical submission schema references, every
+currently supported parameterized wire shape is present in the public typed
+union, and the generated TypeScript selector is exhaustive over the published
+interaction enum. A fail-closed audit requires every conformance request's
+submission-variant renderer union to match its dispatch contract, family
+inventory, and support-profile row exactly.
 
 ## Phase 18J: battlefield rendering and coordinate contract
 

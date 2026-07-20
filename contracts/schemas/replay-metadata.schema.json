@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/replay-metadata.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v2/replay-metadata.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -12,7 +12,7 @@
       "items": {"$ref": "#/$defs/projection_checkpoint"},
       "type": "array"
     },
-    "schema_version": {"const": "replay-artifact-v1-phase18b", "type": "string"},
+    "schema_version": {"const": "replay-artifact-v2-phase18i", "type": "string"},
     "source_identity": {"$ref": "#/$defs/source_identity"}
   },
   "required": [
@@ -58,6 +58,11 @@
         "game_config_hash": {"minLength": 64, "type": "string"},
         "game_id": {"minLength": 1, "type": "string"},
         "ruleset_descriptor_hash": {"minLength": 64, "type": "string"},
+        "rules_overlay_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "type": "array",
+          "uniqueItems": true
+        },
         "source_ids": {"items": {"type": "string"}, "type": "array"},
         "source_package_id": {"minLength": 1, "type": "string"}
       },
@@ -65,6 +70,7 @@
         "game_id",
         "game_config_hash",
         "ruleset_descriptor_hash",
+        "rules_overlay_ids",
         "catalog_id",
         "catalog_hash",
         "source_package_id",

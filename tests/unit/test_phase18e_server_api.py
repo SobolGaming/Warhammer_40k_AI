@@ -201,6 +201,31 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     support_profile = _request(server, "GET", f"/games/{game_id}/support-profile")
     assert support_profile["overall_status"] == "playable"
     assert support_profile["eligible_for_headless_self_play_smoke"] is True
+    assert "path_editor" in _field_list(support_profile, "interaction_kinds")
+    interaction_rows = [
+        _json_object(row)
+        for row in _field_list(support_profile, "decision_interaction_support_rows")
+    ]
+    movement_rows = [
+        row for row in interaction_rows if row["decision_type"] == "submit_movement_proposal"
+    ]
+    nested_rows = [
+        row for row in interaction_rows if row["decision_type"] == "select_weapon_ability_instance"
+    ]
+    assert movement_rows == [
+        {
+            "decision_type": "submit_movement_proposal",
+            "submission_kind": "parameterized",
+            "interaction_kinds": ["path_editor"],
+        }
+    ]
+    assert nested_rows == [
+        {
+            "decision_type": "select_weapon_ability_instance",
+            "submission_kind": "finite",
+            "interaction_kinds": ["finite_option_list"],
+        }
+    ]
     assert _field_list(support_profile, "mustering_support_rows")
     runtime_rows = [
         _json_object(row) for row in _field_list(support_profile, "detachment_faction_support_rows")
@@ -680,7 +705,7 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
     )
     example.pop("command_id")
     example.pop("outcome_code")
-    example["schema_version"] = "session-command-result-v2"
+    example["schema_version"] = "session-command-result-v3-contract"
     for committed, accepted in ((True, True), (True, False), (False, False)):
         payload = {**example, "committed": committed, "accepted": accepted}
         validator.validate(payload)
@@ -2070,6 +2095,7 @@ def _schema_payloads() -> dict[str, Schema]:
         "decision-request-view.schema.json",
         "event-delta.schema.json",
         "game-view.schema.json",
+        "interaction-descriptor.schema.json",
         "lifecycle-status.schema.json",
         "rules-catalog.schema.json",
         "session-command-outcome.schema.json",
