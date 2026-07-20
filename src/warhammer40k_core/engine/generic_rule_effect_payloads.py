@@ -7,6 +7,13 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 
+def generic_rule_effect_index_from_payload(effect_payload: Mapping[str, JsonValue]) -> int:
+    value = effect_payload.get("effect_index")
+    if type(value) is not int or value < 0:
+        raise GameLifecycleError("Generic RuleIR effect_index must be a non-negative int.")
+    return value
+
+
 def generic_rule_effect_payload_grants_ability(
     effect_payload: Mapping[str, JsonValue],
     *,

@@ -6028,6 +6028,7 @@ def _generic_fire_overwatch_threshold_effect(
                 "source_id": f"source:{effect_id}",
                 "rule_ir_hash": "0" * 64,
                 "clause_id": f"clause:{effect_id}",
+                "effect_index": 0,
                 "source_span": {"start": 0, "end": 1, "text": "x"},
                 "target": {
                     "kind": "this_unit",

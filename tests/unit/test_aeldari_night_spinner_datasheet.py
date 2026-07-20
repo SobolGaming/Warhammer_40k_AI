@@ -42,15 +42,25 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.effects import EffectExpirationBoundary, EffectExpirationKind
+from warhammer40k_core.engine.effects import (
+    EffectExpiration,
+    EffectExpirationBoundary,
+    EffectExpirationKind,
+    generic_rule_persisting_effect,
+)
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rule_execution import (
+    RuleExecutionContext,
+    generic_rule_effect_payload,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     MovementBudgetModifierContext,
+    ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
@@ -69,6 +79,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTargetKind,
     RuleTriggerKind,
     parameter_payload,
+    parameters_from_pairs,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_night_spinner_2026_06 as source_package,
@@ -114,7 +125,13 @@ def test_night_spinner_catalog_preserves_complete_datasheet_and_rule_semantics()
         values[Characteristic.OBJECTIVE_CONTROL],
     ) == (14, 9, 3, 12, 7, 3)
     assert datasheet.model_profiles[0].base_size.diameter_mm == 60.0
-    assert datasheet.keywords.keywords == ("AELDARI", "FLY", "NIGHT SPINNER", "VEHICLE")
+    assert datasheet.keywords.keywords == (
+        "AELDARI",
+        "FLY",
+        "FRAME",
+        "NIGHT SPINNER",
+        "VEHICLE",
+    )
     assert datasheet.keywords.faction_keywords == ("ASURYANI",)
     assert {ability.name for ability in datasheet.abilities} == {
         "Battle Focus",
@@ -289,6 +306,7 @@ def test_monofilament_web_pins_only_doomweaver_hit_target_until_next_turn() -> N
         assert effect.expiration.battle_round == 2
         assert effect.expiration.player_id == "player-a"
         payload = cast(dict[str, Any], effect.effect_payload)
+        assert payload["effect_index"] == 0
         effect_payload = cast(dict[str, Any], payload["effect"])
         parameters = {
             parameter["key"]: parameter["value"]
@@ -354,6 +372,100 @@ def test_monofilament_web_pins_only_doomweaver_hit_target_until_next_turn() -> N
     )
     assert len(expired) == 4
     assert registry.modified_movement_inches(_movement_context(restored, enemy_one)) == 14.0
+
+
+def test_generic_same_kind_clause_effect_slots_coexist_deduplicate_and_fail_on_drift() -> None:
+    _, state, _, night_spinner, enemy, _ = _runtime_fixture()
+    movement_clause = _rule_ir().clauses[1]
+    movement_effect = movement_clause.effects[0]
+    objective_control_effect = replace(
+        movement_effect,
+        parameters=parameters_from_pairs(
+            (
+                ("characteristic", Characteristic.OBJECTIVE_CONTROL.value),
+                ("delta", -1),
+            )
+        ),
+    )
+    combined_clause = replace(
+        movement_clause,
+        effects=(movement_effect, objective_control_effect),
+    )
+    combined_rule = replace(_rule_ir(), clauses=(combined_clause,))
+    context = RuleExecutionContext(
+        game_id=state.game_id,
+        player_id="player-a",
+        battle_round=state.battle_round,
+        phase=BattlePhase.SHOOTING,
+        active_player_id=state.active_player_id,
+        timing_window_id="generic-effect-slot-regression",
+        source_unit_instance_id=night_spinner.unit_instance_id,
+        source_model_instance_id=night_spinner.own_models[0].model_instance_id,
+        target_unit_instance_ids=(enemy.unit_instance_id,),
+        source_keywords=night_spinner.keywords,
+        state=state,
+        record_persisting_effects=False,
+    )
+    payloads = tuple(
+        generic_rule_effect_payload(
+            rule_ir=combined_rule,
+            clause=combined_clause,
+            effect=effect,
+            context=context,
+        )
+        for effect in combined_clause.effects
+    )
+    assert tuple(payload["effect_index"] for payload in payloads) == (0, 1)
+
+    for effect_index, payload in enumerate(payloads):
+        state.record_persisting_effect(
+            generic_rule_persisting_effect(
+                effect_id=f"generic-effect-slot:{effect_index}",
+                source_rule_id=combined_rule.source_id,
+                owner_player_id="player-a",
+                target_unit_instance_ids=(enemy.unit_instance_id,),
+                started_battle_round=state.battle_round,
+                started_phase=BattlePhase.SHOOTING,
+                expiration=EffectExpiration.end_of_battle(),
+                effect_payload=payload,
+            )
+        )
+
+    registry = RuntimeModifierRegistry.empty()
+    objective_context = ObjectiveControlModifierContext(
+        state=state,
+        unit_instance_id=enemy.unit_instance_id,
+        model_instance_id=enemy.own_models[0].model_instance_id,
+        base_objective_control=3,
+        current_objective_control=3,
+    )
+    assert registry.modified_movement_inches(_movement_context(state, enemy)) == 12.0
+    assert registry.modified_objective_control(objective_context) == 2
+
+    for effect in tuple(state.persisting_effects):
+        state.record_persisting_effect(replace(effect, effect_id=f"{effect.effect_id}:reapplied"))
+    assert registry.modified_movement_inches(_movement_context(state, enemy)) == 12.0
+    assert registry.modified_objective_control(objective_context) == 2
+
+    drifted_payload = cast(dict[str, Any], json.loads(json.dumps(payloads[0])))
+    parameters = cast(
+        list[dict[str, Any]], cast(dict[str, Any], drifted_payload["effect"])["parameters"]
+    )
+    next(parameter for parameter in parameters if parameter["key"] == "delta")["value"] = -3
+    state.record_persisting_effect(
+        generic_rule_persisting_effect(
+            effect_id="generic-effect-slot:0:drifted",
+            source_rule_id=combined_rule.source_id,
+            owner_player_id="player-a",
+            target_unit_instance_ids=(enemy.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhase.SHOOTING,
+            expiration=EffectExpiration.end_of_battle(),
+            effect_payload=drifted_payload,
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="conflicting semantics"):
+        registry.modified_movement_inches(_movement_context(state, enemy))
 
 
 def _runtime_fixture() -> tuple[

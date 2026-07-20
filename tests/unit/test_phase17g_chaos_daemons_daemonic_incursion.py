@@ -2503,19 +2503,20 @@ def _single_rule_effect_payload(
 ) -> dict[str, JsonValue]:
     rule_ir = _rule_ir_by_descriptor_id(descriptor_id)
     matching_effects = tuple(
-        (clause, effect)
+        (clause, effect_index, effect)
         for clause in rule_ir.clauses
-        for effect in clause.effects
+        for effect_index, effect in enumerate(clause.effects)
         if effect.kind.value == effect_kind
     )
     if len(matching_effects) != 1:
         raise AssertionError("Generic stratagem test requires exactly one matching effect.")
-    clause, effect = matching_effects[0]
+    clause, effect_index, effect = matching_effects[0]
     return {
         "rule_id": rule_ir.rule_id,
         "source_id": rule_ir.source_id,
         "rule_ir_hash": rule_ir.ir_hash(),
         "clause_id": clause.clause_id,
+        "effect_index": effect_index,
         "target": validate_json_value(
             None if clause.target is None else clause.target.to_payload()
         ),
@@ -2625,14 +2626,14 @@ def _generic_stratagem_persisting_effect(
         descriptor_id
     )
     matching_effects = tuple(
-        (clause, effect)
+        (clause, effect_index, effect)
         for clause in rule_ir.clauses
-        for effect in clause.effects
+        for effect_index, effect in enumerate(clause.effects)
         if effect.kind.value == effect_kind
     )
     if len(matching_effects) != 1:
         raise AssertionError("Generic stratagem test requires exactly one matching effect.")
-    clause, effect = matching_effects[0]
+    clause, effect_index, effect = matching_effects[0]
     return PersistingEffect(
         effect_id=effect_id,
         source_rule_id=source_rule_id,
@@ -2651,6 +2652,7 @@ def _generic_stratagem_persisting_effect(
             "source_id": rule_ir.source_id,
             "rule_ir_hash": rule_ir.ir_hash(),
             "clause_id": clause.clause_id,
+            "effect_index": effect_index,
             "target": validate_json_value(
                 None if clause.target is None else clause.target.to_payload()
             ),

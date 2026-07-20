@@ -4262,28 +4262,31 @@
   "faction_id": "aeldari",
   "faction_name": "Aeldari",
   "generated_by": "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py",
-  "overlay_pack_hash": "aba0ba6bf9197f22804bc19f45ce6c82da9eef097c35cf8b178c8b9449513a3f",
+  "overlay_pack_hashes": {
+    "data-package:gw:aeldari-faction-pack-datasheet-overlay:11th-2026-06-09": "c0add91026619feefb5aef23f8941c9dada577432232b9ceb27ff3b4e1bfa833",
+    "data-package:gw:aeldari-tacoma-open-frame-keyword-overlay:11th-2026-07-10": "85ba1b52ddcc4dec798d2b60143c8a0769e35ab9bb0727aaebdbbbf59502eec3"
+  },
   "pdf_filename": "eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
   "pdf_sha256": "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9",
-  "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
-  "schema_version": "aeldari-datasheet-semantic-coverage-v3",
+  "release_hash": "379616e1abaf64a4e6de5c9614d452b146783a0efccab03c18f3cb82e07e6eed",
+  "schema_version": "aeldari-datasheet-semantic-coverage-v4",
   "semantic_bucket_counts": {
     "All exact abilities consumed": 18,
     "Exact IR parsed; host needed": 6,
     "Exact ability IR unsupported": 46
   },
   "source_artifact_hashes": {
-    "Abilities": "dd7d779531e88bd2c30ee2405275b41dba0e5d56007c43a7fcf8bb7c105032e0",
-    "Datasheets": "874cd5578bb7eda0294212beaf6c6e3f1ce215c7699fd491718a45a688dbbafc",
-    "Datasheets_abilities": "44a5aa857c2a576af664dc47cd9eea0c8404f1c238cad2b22d585a38a77a79fa",
-    "Datasheets_keywords": "a11cd8e0d802daa8280eb261245df02b288b1565deed1baef734bb198fa9e1c4",
-    "Datasheets_leader": "829f8e33527795ad982e82c4558d215f09a4549976288dc0bb75a3ffa25950fc",
-    "Datasheets_models": "c2f0fe096494ab19f652736357213918b446cf97fc36f5ff4c78f2432a42ef47",
-    "Datasheets_models_cost": "540f6b6c13dd527ced1e84742a261f050274237360c33c28f7de18054a3f69e8",
-    "Datasheets_options": "727c94f2c06270ace1ef8b049748ab3786a274397c974bbc60b06360be74eeaf",
-    "Datasheets_unit_composition": "44dcf2add274d3e647d9bc0f7b201bf76f094daf57d2190ba942fec179d2d07b",
-    "Datasheets_wargear": "ee91a79c82d38e19099bb99e464ce7538cb82911ed3e1036b0dcd05f1805143a",
-    "Factions": "fc69d0e36743c08ce18af07155eae022794fd5985420ef5c512bc2e266bee135"
+    "Abilities": "c3f7d3ed3f27041a13cc46835ba8c8d4d6b731edc9cfbc70e9e92fe8a7c229c4",
+    "Datasheets": "8cfff4a5cc60e4585d1c2e02681349b35c3bcfe860d7df3adf361de578e53f7f",
+    "Datasheets_abilities": "17fda778d813676c16d81fabe5ffaaac0ea4084501418ce63245f09d2dea1908",
+    "Datasheets_keywords": "9ab71f2e1fc7c650d437a844a269dbe117f492ba46e09882cadb4c064916c464",
+    "Datasheets_leader": "cb627026f8c201b47a0ed1154e9fe055d17115587526e1622ef9c10a8d5f76ce",
+    "Datasheets_models": "e562fbc42d1c7d0dc5944614b82731fbe306343177d76b3feee2ba32cad28cf9",
+    "Datasheets_models_cost": "de8c05c7a170ca8f89b4a8e0a153514cf3b402168658e3646024790fcc1f254f",
+    "Datasheets_options": "331386590eb238d2a305b963bb8943c143e78999ac5473c99084ef581013e0e8",
+    "Datasheets_unit_composition": "fb348611c43db69db9729207cda04f11bbc35b53701cf80e3b1b832557191395",
+    "Datasheets_wargear": "38f85b40a5fd1af0f4f985a8383b04df6ce73549d160490dbe83ce13c3e53e5f",
+    "Factions": "9572f067ac13839d1a3a3a193b1b8391b54d0ccb3902b52ce6f28ae33e1f3a84"
   },
   "source_snapshot_path": "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json",
   "treatment_counts": {

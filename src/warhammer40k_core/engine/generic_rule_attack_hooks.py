@@ -28,6 +28,9 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
     generic_rule_target_constraints_apply,
     generic_rule_target_proximity_keyword_gate_applies,
 )
+from warhammer40k_core.engine.generic_rule_effect_payloads import (
+    generic_rule_effect_index_from_payload,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_modified_weapon_profile,
@@ -95,6 +98,7 @@ class _GenericAttackEffect:
     rule_id: str
     rule_ir_hash: str
     clause_id: str
+    effect_index: int
     target_kind: RuleTargetKind | None
     effect_kind: RuleEffectKind
     parameters: dict[str, JsonValue]
@@ -607,7 +611,7 @@ def _matching_generic_unit_effects(
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR unit hooks require GameState.")
     unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    matches_by_modifier_source_id: dict[str, _GenericAttackEffect] = {}
+    matches_by_effect_slot: dict[str, _GenericAttackEffect] = {}
     for persisting_effect in state.persisting_effects_for_unit(unit_id):
         generic_effect = _generic_attack_effect_or_none(
             persisting_effect=persisting_effect,
@@ -618,20 +622,37 @@ def _matching_generic_unit_effects(
             continue
         if not _generic_unit_effect_applies(effect=generic_effect, unit_instance_id=unit_id):
             continue
-        modifier_source_id = _modifier_source_id(generic_effect)
-        existing = matches_by_modifier_source_id.get(modifier_source_id)
-        if existing is not None and not _generic_unit_effect_semantics_match(
-            existing,
-            generic_effect,
+        effect_slot = f"{_modifier_source_id(generic_effect)}:{generic_effect.effect_index}"
+        existing = matches_by_effect_slot.get(effect_slot)
+        if existing is not None and (
+            existing.rule_id,
+            existing.rule_ir_hash,
+            existing.target_kind,
+            existing.parameters,
+            existing.conditions,
+        ) != (
+            generic_effect.rule_id,
+            generic_effect.rule_ir_hash,
+            generic_effect.target_kind,
+            generic_effect.parameters,
+            generic_effect.conditions,
         ):
             raise GameLifecycleError("Generic unit modifier source has conflicting semantics.")
-        if existing is None or _generic_unit_effect_precedence(
-            generic_effect
-        ) > _generic_unit_effect_precedence(existing):
-            matches_by_modifier_source_id[modifier_source_id] = generic_effect
-    return tuple(
-        matches_by_modifier_source_id[key] for key in sorted(matches_by_modifier_source_id)
-    )
+        candidate_precedence = (
+            generic_effect.persisting_effect.started_battle_round,
+            generic_effect.persisting_effect.effect_id,
+        )
+        existing_precedence = (
+            (-1, "")
+            if existing is None
+            else (
+                existing.persisting_effect.started_battle_round,
+                existing.persisting_effect.effect_id,
+            )
+        )
+        if candidate_precedence > existing_precedence:
+            matches_by_effect_slot[effect_slot] = generic_effect
+    return tuple(matches_by_effect_slot[key] for key in sorted(matches_by_effect_slot))
 
 
 def _matching_generic_attack_effects(
@@ -770,6 +791,7 @@ def _generic_attack_effect_or_none(
         rule_id=_required_identifier_payload(payload, "rule_id"),
         rule_ir_hash=_required_identifier_payload(payload, "rule_ir_hash"),
         clause_id=_required_identifier_payload(payload, "clause_id"),
+        effect_index=generic_rule_effect_index_from_payload(payload),
         target_kind=_target_kind_from_payload(payload),
         effect_kind=effect_kind,
         parameters=generic_rule_parameters_from_effect_payload(effect_payload),
@@ -1327,30 +1349,6 @@ def _modifier_source_id(effect: _GenericAttackEffect) -> str:
     )
 
 
-def _generic_unit_effect_precedence(effect: _GenericAttackEffect) -> tuple[int, str]:
-    return (
-        effect.persisting_effect.started_battle_round,
-        effect.persisting_effect.effect_id,
-    )
-
-
-def _generic_unit_effect_semantics_match(
-    left: _GenericAttackEffect,
-    right: _GenericAttackEffect,
-) -> bool:
-    return (
-        left.rule_id,
-        left.rule_ir_hash,
-        left.target_kind,
-        left.parameters,
-    ) == (
-        right.rule_id,
-        right.rule_ir_hash,
-        right.target_kind,
-        right.parameters,
-    )
-
-
 def _generic_source_payload(
     effect: _GenericAttackEffect,
     target_unit_instance_id: str | None,
@@ -1361,6 +1359,7 @@ def _generic_source_payload(
         "source_id": effect.source_id,
         "rule_ir_hash": effect.rule_ir_hash,
         "clause_id": effect.clause_id,
+        "effect_index": effect.effect_index,
         "effect_id": effect.persisting_effect.effect_id,
         "target_role": effect.role,
         "target_kind": None if effect.target_kind is None else effect.target_kind.value,

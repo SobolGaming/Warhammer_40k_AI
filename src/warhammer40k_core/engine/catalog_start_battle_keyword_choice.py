@@ -538,6 +538,7 @@ def _validate_effect_bundle(
             "source_id": source.rule_ir.source_id,
             "rule_ir_hash": source.rule_ir.ir_hash(),
             "clause_id": source.clause.clause_id,
+            "effect_index": index,
             "source_span": source.clause.source_span.to_payload(),
             "target": None if source.clause.target is None else source.clause.target.to_payload(),
             "target_unit_instance_ids": [source.unit.unit_instance_id],
@@ -823,6 +824,7 @@ def _persisting_effects_for_result(
             effect=effect,
             context=execution_context,
             target_unit_instance_ids=(source.unit.unit_instance_id,),
+            effect_index=index,
         )
         effects.append(
             generic_rule_persisting_effect(

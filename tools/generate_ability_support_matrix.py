@@ -1438,6 +1438,16 @@ def _ability_support_catalog_package(
             ),
         )
     )
+    aeldari_tacoma_overlay_pack = SourceOverlayPack.from_payload(
+        cast(
+            SourceOverlayPackPayload,
+            json.loads(
+                aeldari_datasheet_semantic_coverage.TACOMA_OVERLAY_PACK_PATH.read_text(
+                    encoding="utf-8"
+                )
+            ),
+        )
+    )
     aeldari_release_manifest = SourceReleaseManifest.from_payload(
         cast(
             SourceReleaseManifestPayload,
@@ -1451,7 +1461,7 @@ def _ability_support_catalog_package(
     overlaid_artifacts = apply_source_release_overlays(
         source_artifacts=chaos_overlaid_artifacts,
         release_manifest=aeldari_release_manifest,
-        overlay_packs=(aeldari_overlay_pack,),
+        overlay_packs=(aeldari_overlay_pack, aeldari_tacoma_overlay_pack),
     )
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=overlaid_artifacts,

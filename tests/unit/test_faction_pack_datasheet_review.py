@@ -17,6 +17,7 @@ from tools.aeldari_datasheet_semantic_coverage import (
     SEMANTIC_BUCKETS,
     SOURCE_ARTIFACT_TABLES,
     SOURCE_JSON_DIR,
+    TACOMA_OVERLAY_PACK_PATH,
     aeldari_datasheet_semantic_coverage,
     load_aeldari_datasheet_semantic_coverage,
 )
@@ -58,6 +59,7 @@ from warhammer40k_core.engine.core_descriptor_consumption import (
     CORE_SCOUTS_PREBATTLE_CONSUMER_ID,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
 )
@@ -537,12 +539,18 @@ def test_aeldari_night_spinner_catalog_geometry_is_source_reviewed() -> None:
 
 
 def test_aeldari_semantic_coverage_artifacts_are_current() -> None:
-    overlay_pack, release_manifest, coverage_payload = (
+    overlay_pack, tacoma_overlay_pack, release_manifest, coverage_payload = (
         generated_aeldari_datasheet_semantic_coverage()
     )
 
     assert json.loads(COVERAGE_PATH.read_text(encoding="utf-8")) == coverage_payload
     assert json.loads(OVERLAY_PACK_PATH.read_text(encoding="utf-8")) == (overlay_pack.to_payload())
+    assert json.loads(TACOMA_OVERLAY_PACK_PATH.read_text(encoding="utf-8")) == (
+        tacoma_overlay_pack.to_payload()
+    )
+    assert tacoma_overlay_pack.operations[0].source_reference == (
+        tacoma_open_2026.FRAME_KEYWORD_ADDITIONS_SOURCE_ID
+    )
     assert json.loads(RELEASE_MANIFEST_PATH.read_text(encoding="utf-8")) == (
         release_manifest.to_payload()
     )

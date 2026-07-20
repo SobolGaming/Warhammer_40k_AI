@@ -1,0 +1,40 @@
+{
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "catalog_version": {
+    "source_date": "2026-07-10",
+    "version_id": "warhammer-40000-11th-aeldari-tacoma-open-2026-07"
+  },
+  "effective_date": "2026-07-10",
+  "operations": [
+    {
+      "effective_date": "2026-07-10",
+      "expected_preimage_hash": null,
+      "fields": {
+        "datasheet_id": "000000611",
+        "is_faction_keyword": "false",
+        "keyword": "FRAME",
+        "model": ""
+      },
+      "op_id": "aeldari-add-night-spinner-frame-keyword",
+      "operation_kind": "add_row",
+      "order_index": 1,
+      "reason": "Apply the Tacoma Open FAQ FRAME keyword addition for Night Spinner.",
+      "source_reference": "warhammer_40000_11th:event_faq:tacoma_2026:frame_keyword_additions",
+      "source_row_id": "000000611:FRAME:global:false:3",
+      "source_table": "Datasheets_keywords",
+      "target_edition": "warhammer-40000-11th"
+    }
+  ],
+  "package_hash": "85ba1b52ddcc4dec798d2b60143c8a0769e35ab9bb0727aaebdbbbf59502eec3",
+  "package_id": {
+    "namespace": "gw",
+    "package_name": "aeldari-tacoma-open-frame-keyword-overlay",
+    "version": "11th-2026-07-10"
+  },
+  "schema_version": "phase17-source-overlay-v1",
+  "target_edition": "warhammer-40000-11th"
+}

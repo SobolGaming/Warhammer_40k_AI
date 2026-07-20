@@ -52,6 +52,13 @@ COVERAGE_PATH = (
 OVERLAY_DIR = REPO_ROOT / "data" / "source_overlays" / "aeldari_faction_pack_2026_06"
 OVERLAY_PACK_PATH = OVERLAY_DIR / "aeldari-faction-pack-datasheet-overlay.overlay-pack.json"
 RELEASE_MANIFEST_PATH = OVERLAY_DIR / "source_release_manifest.json"
+TACOMA_OVERLAY_PACK_PATH = (
+    REPO_ROOT
+    / "data"
+    / "source_overlays"
+    / "tacoma_open_2026"
+    / "aeldari-frame-keyword.overlay-pack.json"
+)
 SOURCE_SNAPSHOT_RELATIVE_PATH = (
     Path("data") / "source_snapshots" / "wahapedia" / "10th-edition" / "2026-06-14" / "json"
 )
@@ -69,7 +76,7 @@ SOURCE_ARTIFACT_TABLES = (
     "Datasheets_wargear",
     "Factions",
 )
-SCHEMA_VERSION = "aeldari-datasheet-semantic-coverage-v3"
+SCHEMA_VERSION = "aeldari-datasheet-semantic-coverage-v4"
 GENERATED_BY = "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py"
 SEMANTIC_BUCKET_ALL_CONSUMED = "All exact abilities consumed"
 SEMANTIC_BUCKET_HOST_NEEDED = "Exact IR parsed; host needed"
@@ -92,7 +99,7 @@ _ROOT_KEYS = frozenset(
         "pdf_sha256",
         "source_snapshot_path",
         "source_artifact_hashes",
-        "overlay_pack_hash",
+        "overlay_pack_hashes",
         "release_hash",
         "treatment_counts",
         "semantic_bucket_counts",
@@ -255,7 +262,7 @@ class AeldariDatasheetSemanticCoverage:
 
 @dataclass(frozen=True, slots=True)
 class AeldariSemanticCoverageArtifact:
-    overlay_pack_hash: str
+    overlay_pack_hashes: tuple[tuple[str, str], ...]
     release_hash: str
     source_artifact_hashes: tuple[tuple[str, str], ...]
     rows: tuple[AeldariDatasheetSemanticCoverage, ...]
@@ -290,7 +297,7 @@ def load_aeldari_datasheet_semantic_coverage(
     if payload["source_snapshot_path"] != SOURCE_SNAPSHOT_RELATIVE_PATH.as_posix():
         raise ValueError("Aeldari semantic coverage source snapshot path drifted.")
     (
-        overlay_pack_hash,
+        overlay_pack_hashes,
         release_hash,
         actual_source_hashes,
         expected_ability_evidence,
@@ -298,8 +305,9 @@ def load_aeldari_datasheet_semantic_coverage(
     recorded_source_hashes = _required_sha256_map(payload, "source_artifact_hashes")
     if recorded_source_hashes != dict(actual_source_hashes):
         raise ValueError("Aeldari semantic coverage source artifact hashes drifted.")
-    if _required_sha256(payload, "overlay_pack_hash") != overlay_pack_hash:
-        raise ValueError("Aeldari semantic coverage overlay hash drifted.")
+    recorded_overlay_hashes = _required_digest_map(payload, "overlay_pack_hashes")
+    if recorded_overlay_hashes != dict(overlay_pack_hashes):
+        raise ValueError("Aeldari semantic coverage overlay hashes drifted.")
     if _required_sha256(payload, "release_hash") != release_hash:
         raise ValueError("Aeldari semantic coverage release hash drifted.")
     rows = tuple(_parse_datasheet(row) for row in _required_list(payload, "datasheets"))
@@ -331,7 +339,7 @@ def load_aeldari_datasheet_semantic_coverage(
     ):
         raise ValueError("Aeldari semantic coverage ability count drifted.")
     return AeldariSemanticCoverageArtifact(
-        overlay_pack_hash=overlay_pack_hash,
+        overlay_pack_hashes=overlay_pack_hashes,
         release_hash=release_hash,
         source_artifact_hashes=actual_source_hashes,
         rows=rows,
@@ -561,13 +569,16 @@ def _validate_source_derived_ability_evidence(
 
 @cache
 def _canonical_source_provenance() -> tuple[
-    str,
+    tuple[tuple[str, str], ...],
     str,
     tuple[tuple[str, str], ...],
     tuple[SourceDerivedAeldariAbilityEvidence, ...],
 ]:
     overlay_pack = SourceOverlayPack.from_payload(
         cast(SourceOverlayPackPayload, _load_object(OVERLAY_PACK_PATH))
+    )
+    tacoma_overlay_pack = SourceOverlayPack.from_payload(
+        cast(SourceOverlayPackPayload, _load_object(TACOMA_OVERLAY_PACK_PATH))
     )
     release_manifest = SourceReleaseManifest.from_payload(
         cast(SourceReleaseManifestPayload, _load_object(RELEASE_MANIFEST_PATH))
@@ -578,7 +589,7 @@ def _canonical_source_provenance() -> tuple[
     effective_artifacts = apply_source_release_overlays(
         source_artifacts=source_artifacts,
         release_manifest=release_manifest,
-        overlay_packs=(overlay_pack,),
+        overlay_packs=(overlay_pack, tacoma_overlay_pack),
     )
     source_hashes = tuple(
         sorted(
@@ -600,7 +611,10 @@ def _canonical_source_provenance() -> tuple[
         datasheet_id_names=datasheet_id_names,
     )
     return (
-        overlay_pack.package_hash(),
+        tuple(
+            (pack.package_id.stable_identity(), pack.package_hash())
+            for pack in (overlay_pack, tacoma_overlay_pack)
+        ),
         release_manifest.release_hash(),
         source_hashes,
         expected_ability_evidence,
@@ -690,6 +704,13 @@ def _required_sha256_map(payload: dict[str, Any], key: str) -> dict[str, str]:
     expected_keys = frozenset(SOURCE_ARTIFACT_TABLES)
     _require_exact_keys(raw, expected_keys, key)
     return {table_name: _required_sha256(raw, table_name) for table_name in sorted(raw)}
+
+
+def _required_digest_map(payload: dict[str, Any], key: str) -> dict[str, str]:
+    raw = _object(payload.get(key), key)
+    if not raw:
+        raise ValueError(f"{key!r} must not be empty.")
+    return {identity: _required_sha256(raw, identity) for identity in sorted(raw)}
 
 
 def _sha256_text(value: str) -> str:

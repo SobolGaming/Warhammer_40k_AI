@@ -545,7 +545,7 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
     config = _cavalcade_config(turn_order=("player-b", "player-a"))
     lifecycle, movement_status = advance_to_movement_unit_selection(config)
     state = fall_back_state(lifecycle)
-    move_first_enemy_model_into_side_engagement(lifecycle)
+    _move_enemy_unit_into_coherent_side_engagement(lifecycle)
     _grant_cp(state, player_id="player-a", amount=1)
     command_points_before_use = state.command_point_total("player-a")
 
@@ -663,6 +663,33 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
         list[str],
         first_requirement["reasons"],
     )
+
+
+def _move_enemy_unit_into_coherent_side_engagement(lifecycle: GameLifecycle) -> None:
+    state = fall_back_state(lifecycle)
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("test state requires battlefield_state")
+    friendly = battlefield.unit_placement_by_id(_CAVALCADE_UNIT_ID)
+    enemy = battlefield.unit_placement_by_id(_ENEMY_UNIT_ID)
+    target_x = friendly.model_placements[0].pose.position.x - 2.0
+    first_enemy_pose = enemy.model_placements[0].pose
+    second_enemy_pose = enemy.model_placements[1].pose
+    spacing = second_enemy_pose.position.x - first_enemy_pose.position.x
+    updated_enemy = enemy.with_model_placements(
+        tuple(
+            placement.with_pose(
+                Pose.at(
+                    target_x,
+                    friendly.model_placements[0].pose.position.y + (index * spacing),
+                    placement.pose.position.z,
+                    facing_degrees=placement.pose.facing.degrees,
+                )
+            )
+            for index, placement in enumerate(enemy.model_placements)
+        )
+    )
+    state.replace_battlefield_state(battlefield.with_unit_placement(updated_enemy))
 
 
 def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle() -> None:
