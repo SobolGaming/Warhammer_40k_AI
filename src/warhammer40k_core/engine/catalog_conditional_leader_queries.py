@@ -122,8 +122,7 @@ def conditional_leader_grant_effect_applies(
     return any(
         component.role == "bodyguard"
         and any(model.is_alive for model in component.unit.own_models)
-        and required_bodyguard_keyword
-        in {_canonical_keyword(keyword) for keyword in component.unit.keywords}
+        and required_bodyguard_keyword in component.unit.keywords
         for component in view.components
     )
 
@@ -258,30 +257,10 @@ def _source_unit_instance_id(payload: dict[str, JsonValue]) -> str:
 
 
 def _required_bodyguard_keyword(payload: dict[str, JsonValue]) -> str:
-    conditions = payload.get("conditions")
-    if not isinstance(conditions, list):
-        raise GameLifecycleError("Conditional leader ability conditions are missing.")
-    values: list[str] = []
-    for condition in conditions:
-        if not isinstance(condition, dict) or condition.get("kind") != "keyword_gate":
-            continue
-        parameters = condition.get("parameters")
-        if not isinstance(parameters, list):
-            raise GameLifecycleError("Conditional leader ability keyword gate is malformed.")
-        gate_subject = None
-        required_keyword = None
-        for parameter in parameters:
-            if not isinstance(parameter, dict):
-                raise GameLifecycleError("Conditional leader ability parameter is malformed.")
-            if parameter.get("key") == "gate_subject":
-                gate_subject = parameter.get("value")
-            elif parameter.get("key") == "required_keyword":
-                required_keyword = parameter.get("value")
-        if gate_subject == "bodyguard_unit":
-            values.append(_required_string("required_keyword", required_keyword))
-    if len(values) != 1:
-        raise GameLifecycleError("Conditional leader ability requires one bodyguard keyword.")
-    return _canonical_keyword(values[0])
+    return _required_string(
+        "required_bodyguard_keyword",
+        payload.get("required_bodyguard_keyword"),
+    )
 
 
 def _rule_effect_parameter(payload: dict[str, JsonValue], *, key: str) -> JsonValue:
@@ -323,10 +302,6 @@ def _faction_resource_refund_values(
     }:
         raise GameLifecycleError("Faction resource refund descriptor payload drift.")
     return values
-
-
-def _canonical_keyword(value: str) -> str:
-    return _required_string("keyword", value).upper().replace("-", " ").replace("_", " ")
 
 
 def _required_string(field_name: str, value: object) -> str:

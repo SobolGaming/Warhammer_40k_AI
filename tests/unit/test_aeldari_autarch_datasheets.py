@@ -18,16 +18,23 @@ from tools.generate_aeldari_autarchs_rule_ir import (
     generated_artifact_payload,
 )
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.validation import canonical_keyword_token
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
     catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.advance_hooks import AdvanceMoveContext
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusteringError,
+    ArmyMusterRequest,
+    muster_army,
+)
 from warhammer40k_core.engine.catalog_conditional_leader_abilities import (
     CatalogConditionalLeaderAbilityRuntime,
 )
@@ -35,6 +42,10 @@ from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     conditional_faction_resource_refund_roll_payload,
     conditional_granted_ability_effects_for_rules_unit,
     conditional_leading_roll_reroll_permission,
+)
+from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
+    conditional_leader_ability_grant_descriptor_for_clause,
+    faction_resource_refund_roll_descriptor_for_clause,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID,
@@ -53,7 +64,11 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari impor
 from warhammer40k_core.engine.faction_resources import resolve_faction_resource_refund_roll
 from warhammer40k_core.engine.fight_order import FightsFirstRegistry
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
+from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
+    DetachmentSelection,
+    UnitMusterSelection,
+)
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_proposals import MOVEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import (
@@ -74,9 +89,12 @@ from warhammer40k_core.engine.triggered_movement import (
     triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
-from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
-from warhammer40k_core.rules.rule_ir import RuleIR
+from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_autarchs_2026_06 as source_package,
 )
@@ -86,16 +104,160 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
 
 AUTARCH_ID = "000000577"
 WAYLEAPER_ID = "000002759"
-VOIDREAVERS_ID = "000002531"
+HOWLING_BANSHEES_ID = "000000594"
+STRIKING_SCORPIONS_ID = "000000595"
 HAWKS_ID = "000000600"
 WRAITHBLADES_ID = "000000598"
-AUTARCH_ATTACHED_ID = "attached-unit:army-a:autarch-rangers"
-WAYLEAPER_ATTACHED_ID = "attached-unit:army-a:wayleaper-hawks"
+AUTARCH_BANSHEE_BLADE_ID = "000000577:banshee-blade"
+AUTARCH_SCORPION_CHAINSWORD_ID = "000000577:scorpion-chainsword"
+AUTARCH_ATTACHED_ID = "attached-unit:army-a:autarch-bodyguard"
+WAYLEAPER_ATTACHED_ID = "attached-unit:army-a:wayleaper-bodyguard"
+TEST_DETACHMENT_ID = "autarch-aspect-training-test"
 
 
 @cache
 def _package() -> Any:
     return _ability_support_catalog_package()
+
+
+@cache
+def _mustering_catalog() -> ArmyCatalog:
+    generated = _package().army_catalog
+    aeldari_datasheet_ids = tuple(
+        datasheet.datasheet_id
+        for datasheet in generated.datasheets
+        if "ASURYANI" in datasheet.keywords.faction_keywords
+    )
+    return ArmyCatalog(
+        catalog_id="aeldari-autarch-aspect-training-test",
+        ruleset_id=generated.ruleset_id,
+        source_package_id=generated.source_package_id,
+        datasheets=generated.datasheets,
+        wargear=generated.wargear,
+        factions=tuple(
+            replace(faction, faction_id="aeldari") if faction.faction_id == "AE" else faction
+            for faction in generated.factions
+        ),
+        army_rules=generated.army_rules,
+        detachments=(
+            DetachmentDefinition(
+                detachment_id=TEST_DETACHMENT_ID,
+                name="Autarch Aspect Training Test",
+                faction_id="aeldari",
+                detachment_point_cost=1,
+                unit_datasheet_ids=aeldari_datasheet_ids,
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("test:aeldari-autarch-aspect-training-detachment",),
+            ),
+        ),
+        source_ids=generated.source_ids,
+    )
+
+
+def _muster_autarch_army(
+    *,
+    bodyguard_datasheet_id: str,
+    autarch_wargear_id: str | None,
+    attach_autarch: bool = True,
+    include_wayleaper: bool = True,
+) -> ArmyDefinition:
+    catalog = _mustering_catalog()
+    unit_selections = [
+        _unit_muster_selection(
+            catalog=catalog,
+            selection_id="autarch",
+            datasheet_id=AUTARCH_ID,
+            selected_wargear_id=autarch_wargear_id,
+        ),
+        _unit_muster_selection(
+            catalog=catalog,
+            selection_id="autarch-bodyguard",
+            datasheet_id=bodyguard_datasheet_id,
+        ),
+    ]
+    attachment_declarations: list[AttachmentDeclaration] = []
+    if attach_autarch:
+        attachment_declarations.append(
+            AttachmentDeclaration(
+                source_unit_selection_id="autarch",
+                bodyguard_unit_selection_id="autarch-bodyguard",
+            )
+        )
+    if include_wayleaper:
+        unit_selections.extend(
+            (
+                _unit_muster_selection(
+                    catalog=catalog,
+                    selection_id="wayleaper",
+                    datasheet_id=WAYLEAPER_ID,
+                ),
+                _unit_muster_selection(
+                    catalog=catalog,
+                    selection_id="wayleaper-bodyguard",
+                    datasheet_id=HAWKS_ID,
+                ),
+            )
+        )
+        attachment_declarations.append(
+            AttachmentDeclaration(
+                source_unit_selection_id="wayleaper",
+                bodyguard_unit_selection_id="wayleaper-bodyguard",
+            )
+        )
+    return muster_army(
+        catalog=catalog,
+        request=ArmyMusterRequest(
+            army_id="army-a",
+            player_id="player-a",
+            catalog_id=catalog.catalog_id,
+            source_package_id=catalog.source_package_id,
+            ruleset_id=catalog.ruleset_id,
+            detachment_selection=DetachmentSelection(
+                faction_id="aeldari",
+                detachment_ids=(TEST_DETACHMENT_ID,),
+            ),
+            force_disposition_id="purge-the-foe",
+            unit_selections=tuple(unit_selections),
+            attachment_declarations=tuple(attachment_declarations),
+        ),
+        model_geometries=_package().model_geometries,
+    )
+
+
+def _unit_muster_selection(
+    *,
+    catalog: ArmyCatalog,
+    selection_id: str,
+    datasheet_id: str,
+    selected_wargear_id: str | None = None,
+) -> UnitMusterSelection:
+    datasheet = catalog.datasheet_by_id(datasheet_id)
+    wargear_selections: tuple[WargearSelection, ...] = ()
+    if selected_wargear_id is not None:
+        matching_options = tuple(
+            option
+            for option in datasheet.wargear_options
+            if selected_wargear_id in option.allowed_wargear_ids
+        )
+        assert len(matching_options) == 1
+        option = matching_options[0]
+        wargear_selections = (
+            WargearSelection(
+                option_id=option.option_id,
+                model_profile_id=option.model_profile_id,
+                wargear_ids=(selected_wargear_id,),
+            ),
+        )
+    return UnitMusterSelection(
+        unit_selection_id=selection_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=tuple(
+            ModelProfileSelection(part.model_profile_id, part.min_models)
+            for part in datasheet.composition
+            if part.min_models > 0
+        ),
+        wargear_selections=wargear_selections,
+    )
 
 
 def test_generated_autarch_rule_ir_is_current_source_bound_and_fail_fast() -> None:
@@ -132,6 +294,55 @@ def test_autarch_exact_rules_have_registered_source_backed_consumers() -> None:
     assert catalog_rule_ir_consumers_for_rule(indomitable) == (
         CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID,
     )
+
+
+def test_aspect_training_descriptor_uses_shared_canonical_keyword_tokens() -> None:
+    payload = json.loads(json.dumps(_static_rule(ASPECT_TRAINING_ROW_ID).to_payload()))
+    keyword_parameters = payload["clauses"][0]["conditions"][1]["parameters"]
+    next(parameter for parameter in keyword_parameters if parameter["key"] == "required_keyword")[
+        "value"
+    ] = "howling-banshees"
+    clause = RuleClause.from_payload(payload["clauses"][0])
+
+    descriptor = conditional_leader_ability_grant_descriptor_for_clause(clause)
+
+    assert descriptor is not None
+    assert descriptor.required_bodyguard_keyword == canonical_keyword_token("howling-banshees")
+
+
+@pytest.mark.parametrize(
+    "drift",
+    [
+        "missing_dice_gate",
+        "changed_threshold",
+        "extra_condition",
+        "target_parameters",
+        "duration_parameters",
+    ],
+)
+def test_indomitable_strength_descriptor_rejects_rule_ir_shape_drift(drift: str) -> None:
+    payload = json.loads(json.dumps(_static_rule(INDOMITABLE_STRENGTH_ROW_ID).to_payload()))
+    clause_payload = payload["clauses"][0]
+    if drift == "missing_dice_gate":
+        clause_payload["conditions"].pop()
+    elif drift == "changed_threshold":
+        threshold = next(
+            parameter
+            for parameter in clause_payload["conditions"][1]["parameters"]
+            if parameter["key"] == "threshold"
+        )
+        threshold["value"] = 4
+    elif drift == "extra_condition":
+        clause_payload["conditions"].append(clause_payload["conditions"][0])
+    elif drift == "target_parameters":
+        clause_payload["target"]["parameters"][0]["value"] = "another_unit"
+    elif drift == "duration_parameters":
+        clause_payload["duration"]["parameters"].append({"key": "unsupported", "value": True})
+    else:
+        raise AssertionError("Unknown Indomitable Strength drift fixture.")
+    clause = RuleClause.from_payload(clause_payload)
+
+    assert faction_resource_refund_roll_descriptor_for_clause(clause) is None
 
 
 def test_catalog_preserves_autarch_stats_geometry_abilities_weapons_and_leader_targets() -> None:
@@ -187,7 +398,11 @@ def test_catalog_preserves_autarch_stats_geometry_abilities_weapons_and_leader_t
     }
     assert _weapon_names(AUTARCH_ID) == expected_weapon_names
     assert _weapon_names(WAYLEAPER_ID) == expected_weapon_names
-    assert _leader_target_ids(autarch) == {"000000596"}
+    assert _leader_target_ids(autarch) == {
+        HOWLING_BANSHEES_ID,
+        STRIKING_SCORPIONS_ID,
+        "000000596",
+    }
     assert _leader_target_ids(wayleaper) == {HAWKS_ID, "000000601"}
     assert {
         (override.datasheet_id, override.model_name, override.height)
@@ -198,8 +413,45 @@ def test_catalog_preserves_autarch_stats_geometry_abilities_weapons_and_leader_t
     }
 
 
+@pytest.mark.parametrize(
+    ("bodyguard_datasheet_id", "required_wargear_id"),
+    [
+        (HOWLING_BANSHEES_ID, AUTARCH_BANSHEE_BLADE_ID),
+        (STRIKING_SCORPIONS_ID, AUTARCH_SCORPION_CHAINSWORD_ID),
+    ],
+)
+def test_autarch_aspect_attachments_are_mustered_only_with_source_required_wargear(
+    bodyguard_datasheet_id: str,
+    required_wargear_id: str,
+) -> None:
+    legal = _muster_autarch_army(
+        bodyguard_datasheet_id=bodyguard_datasheet_id,
+        autarch_wargear_id=required_wargear_id,
+        include_wayleaper=False,
+    )
+
+    assert len(legal.attached_units) == 1
+    formation = legal.attached_units[0]
+    assert formation.attached_unit_instance_id == AUTARCH_ATTACHED_ID
+    assert any("Datasheets_leader:000000577:" in value for value in formation.attachment_source_ids)
+    assert required_wargear_id in legal.unit_by_id("army-a:autarch").own_models[0].wargear_ids
+
+    with pytest.raises(
+        ArmyMusteringError,
+        match="does not satisfy the target wargear requirements",
+    ):
+        _muster_autarch_army(
+            bodyguard_datasheet_id=bodyguard_datasheet_id,
+            autarch_wargear_id=None,
+            include_wayleaper=False,
+        )
+
+
 def test_aspect_training_is_live_attachment_and_bodyguard_keyword_scoped() -> None:
-    scorpions = _runtime_fixture(autarch_bodyguard_keyword="STRIKING SCORPIONS")
+    scorpions = _runtime_fixture(
+        autarch_bodyguard_datasheet_id=STRIKING_SCORPIONS_ID,
+        autarch_wargear_id=AUTARCH_SCORPION_CHAINSWORD_ID,
+    )
     view = rules_unit_view_by_id(
         state=scorpions.state,
         unit_instance_id=scorpions.autarch_bodyguard.unit_instance_id,
@@ -224,7 +476,10 @@ def test_aspect_training_is_live_attachment_and_bodyguard_keyword_scoped() -> No
     assert len(scout_instances) == len(view.alive_models())
     assert {instance.distance_inches for instance in scout_instances} == {7.0}
 
-    banshees = _runtime_fixture(autarch_bodyguard_keyword="HOWLING BANSHEES")
+    banshees = _runtime_fixture(
+        autarch_bodyguard_datasheet_id=HOWLING_BANSHEES_ID,
+        autarch_wargear_id=AUTARCH_BANSHEE_BLADE_ID,
+    )
     assert FightsFirstRegistry.from_state(banshees.state).has_unit(AUTARCH_ATTACHED_ID)
     assert not conditional_granted_ability_effects_for_rules_unit(
         state=banshees.state,
@@ -233,7 +488,8 @@ def test_aspect_training_is_live_attachment_and_bodyguard_keyword_scoped() -> No
     )
 
     detached = _runtime_fixture(
-        autarch_bodyguard_keyword="STRIKING SCORPIONS",
+        autarch_bodyguard_datasheet_id=STRIKING_SCORPIONS_ID,
+        autarch_wargear_id=AUTARCH_SCORPION_CHAINSWORD_ID,
         attach_autarch=False,
     )
     assert not conditional_granted_ability_effects_for_rules_unit(
@@ -242,7 +498,8 @@ def test_aspect_training_is_live_attachment_and_bodyguard_keyword_scoped() -> No
         ability="stealth",
     )
     dead = _runtime_fixture(
-        autarch_bodyguard_keyword="STRIKING SCORPIONS",
+        autarch_bodyguard_datasheet_id=STRIKING_SCORPIONS_ID,
+        autarch_wargear_id=AUTARCH_SCORPION_CHAINSWORD_ID,
         autarch_alive=False,
     )
     assert not conditional_granted_ability_effects_for_rules_unit(
@@ -472,62 +729,43 @@ class _RuntimeFixture:
 def _runtime_fixture(
     *,
     game_id: str = "aeldari-autarch-test",
-    autarch_bodyguard_keyword: str | None = None,
+    autarch_bodyguard_datasheet_id: str = STRIKING_SCORPIONS_ID,
+    autarch_wargear_id: str = AUTARCH_SCORPION_CHAINSWORD_ID,
     attach_autarch: bool = True,
     autarch_alive: bool = True,
 ) -> _RuntimeFixture:
     package = _package()
-    catalog = package.army_catalog
+    catalog = _mustering_catalog()
     factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
-    autarch = _instantiate(
-        factory, army_id="army-a", selection_id="autarch", datasheet_id=AUTARCH_ID
+    army_a = _muster_autarch_army(
+        bodyguard_datasheet_id=autarch_bodyguard_datasheet_id,
+        autarch_wargear_id=autarch_wargear_id,
+        attach_autarch=attach_autarch,
     )
+    autarch = army_a.unit_by_id("army-a:autarch")
     if not autarch_alive:
         autarch = replace(
             autarch,
             own_models=(replace(autarch.own_models[0], wounds_remaining=0),),
         )
-    autarch_bodyguard = _instantiate(
-        factory,
-        army_id="army-a",
-        selection_id="autarch-bodyguard",
-        datasheet_id=VOIDREAVERS_ID,
-    )
-    if autarch_bodyguard_keyword is not None:
-        autarch_bodyguard = replace(
-            autarch_bodyguard,
-            keywords=tuple(sorted((*autarch_bodyguard.keywords, autarch_bodyguard_keyword))),
+        army_a = replace(
+            army_a,
+            units=tuple(
+                autarch if unit.unit_instance_id == autarch.unit_instance_id else unit
+                for unit in army_a.units
+            ),
         )
-    wayleaper = _instantiate(
-        factory,
-        army_id="army-a",
-        selection_id="wayleaper",
-        datasheet_id=WAYLEAPER_ID,
-    )
-    wayleaper_bodyguard = _instantiate(
-        factory,
-        army_id="army-a",
-        selection_id="wayleaper-bodyguard",
-        datasheet_id=HAWKS_ID,
-    )
+    autarch_bodyguard = army_a.unit_by_id("army-a:autarch-bodyguard")
+    wayleaper = army_a.unit_by_id("army-a:wayleaper")
+    wayleaper_bodyguard = army_a.unit_by_id("army-a:wayleaper-bodyguard")
     enemy = _instantiate(
         factory,
         army_id="army-b",
         selection_id="enemy",
         datasheet_id=WRAITHBLADES_ID,
     )
-    attached: list[AttachedUnitFormation] = []
-    if attach_autarch:
-        attached.append(_formation(AUTARCH_ATTACHED_ID, autarch_bodyguard, autarch))
-    attached.append(_formation(WAYLEAPER_ATTACHED_ID, wayleaper_bodyguard, wayleaper))
     armies = (
-        _army(
-            catalog,
-            army_id="army-a",
-            player_id="player-a",
-            units=(autarch, autarch_bodyguard, wayleaper, wayleaper_bodyguard),
-            attached_units=tuple(attached),
-        ),
+        army_a,
         _army(catalog, army_id="army-b", player_id="player-b", units=(enemy,)),
     )
     state = _state(game_id=game_id, armies=armies)
@@ -587,7 +825,6 @@ def _army(
     army_id: str,
     player_id: str,
     units: tuple[UnitInstance, ...],
-    attached_units: tuple[AttachedUnitFormation, ...] = (),
 ) -> ArmyDefinition:
     return ArmyDefinition(
         army_id=army_id,
@@ -601,24 +838,6 @@ def _army(
         ),
         force_disposition_id="purge-the-foe",
         units=units,
-        attached_units=attached_units,
-    )
-
-
-def _formation(
-    attached_id: str,
-    bodyguard: UnitInstance,
-    leader: UnitInstance,
-) -> AttachedUnitFormation:
-    return AttachedUnitFormation(
-        attached_unit_instance_id=attached_id,
-        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
-        leader_unit_instance_ids=(leader.unit_instance_id,),
-        component_unit_instance_ids=tuple(
-            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
-        ),
-        source_id=f"test:{attached_id}:formation",
-        attachment_source_ids=(f"test:{attached_id}:eligibility",),
     )
 
 

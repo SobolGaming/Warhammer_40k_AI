@@ -250,6 +250,47 @@
   },
   {
     "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
+      "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:acrobatic/none",
+      "chaos-daemons-bridge-catalog/000000594/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000594/wargear/000000594:aspect-shrine-token/000000594:aspect-shrine-token"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Blocked",
+    "datasheet_id": "000000594",
+    "datasheet_name": "Howling Banshees",
+    "detachment_ids": [
+      "armoured-warhost",
+      "aspect-host",
+      "corsair-coterie",
+      "devoted-of-ynnead",
+      "eldritch-raiders",
+      "fateful-performance",
+      "ghosts-of-the-webway",
+      "guardian-battlehost",
+      "path-of-the-outcast",
+      "seer-council",
+      "serpents-brood",
+      "spirit-conclave",
+      "twilight-flickers",
+      "warhost",
+      "windrider-host"
+    ],
+    "faction_id": "aeldari",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "`000000594:acrobatic` Acrobatic: diagnostics `unsupported_language` `000000594:acrobatic` Acrobatic: `ir_compiled_unsupported` Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "overall": "Blocked",
+    "supported_detachment_ids": [
+      "corsair-coterie",
+      "path-of-the-outcast"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:dice-result-override`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008344/none",
       "chaos-daemons-bridge-catalog/000004194/datasheet/000004194:aethersense-psychic/none",
@@ -494,6 +535,49 @@
       "path-of-the-outcast"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:shooting-start-selected-target-effect`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:prebattle:scouts`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000595/core/000008345/none",
+      "chaos-daemons-bridge-catalog/000000595/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000000595/core/000008337/none",
+      "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none",
+      "chaos-daemons-bridge-catalog/000000595/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000595/wargear/000000595:aspect-shrine-token/000000595:aspect-shrine-token"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Full",
+    "datasheet_id": "000000595",
+    "datasheet_name": "Striking Scorpions",
+    "detachment_ids": [
+      "armoured-warhost",
+      "aspect-host",
+      "corsair-coterie",
+      "devoted-of-ynnead",
+      "eldritch-raiders",
+      "fateful-performance",
+      "ghosts-of-the-webway",
+      "guardian-battlehost",
+      "path-of-the-outcast",
+      "seer-council",
+      "serpents-brood",
+      "spirit-conclave",
+      "twilight-flickers",
+      "warhost",
+      "windrider-host"
+    ],
+    "faction_id": "aeldari",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "overall": "Playable",
+    "supported_detachment_ids": [
+      "corsair-coterie",
+      "path-of-the-outcast"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:dice-result-override`, `catalog-ir:minimum-unmodified-hit-success`, `core:stealth`, `descriptor:prebattle:infiltrators`, `descriptor:prebattle:scouts`, `warhammer_40000_11th:aeldari:army_rule:fade_back`, `warhammer_40000_11th:aeldari:army_rule:flitting_shadows`, `warhammer_40000_11th:aeldari:army_rule:opportunity_seized`, `warhammer_40000_11th:aeldari:army_rule:star_engines`, `warhammer_40000_11th:aeldari:army_rule:sudden_strike`, `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

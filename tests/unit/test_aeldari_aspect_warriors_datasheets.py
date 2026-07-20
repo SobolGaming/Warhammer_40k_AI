@@ -115,6 +115,8 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_ASPECT_WARRIORS_HEIGHT_OVERRIDES,
 )
 
+HOWLING_BANSHEES_ID = "000000594"
+STRIKING_SCORPIONS_ID = "000000595"
 FIRE_DRAGONS_ID = "000000596"
 SWOOPING_HAWKS_ID = "000000600"
 WARP_SPIDERS_ID = "000000601"
@@ -163,6 +165,15 @@ def test_exact_rules_have_source_linked_generic_consumers() -> None:
 def test_catalog_preserves_aspect_warrior_profiles_geometry_loadouts_and_options() -> None:
     catalog = _package().army_catalog
     expected = {
+        HOWLING_BANSHEES_ID: ("Howling Banshee Exarch", "Howling Banshees", 8, 3, 4, 28.5),
+        STRIKING_SCORPIONS_ID: (
+            "Striking Scorpion Exarch",
+            "Striking Scorpions",
+            7,
+            3,
+            3,
+            28.5,
+        ),
         FIRE_DRAGONS_ID: ("Fire Dragon Exarch", "Fire Dragons", 7, 3, 3, 28.5),
         SWOOPING_HAWKS_ID: ("Swooping Hawk Exarch", "Swooping Hawks", 14, 3, 4, 32.0),
         WARP_SPIDERS_ID: ("Warp Spider Exarch", "Warp Spiders", 12, 3, 3, 28.5),
@@ -201,6 +212,10 @@ def test_catalog_preserves_aspect_warrior_profiles_geometry_loadouts_and_options
         (row.datasheet_id, row.model_name, row.height)
         for row in AELDARI_ASPECT_WARRIORS_HEIGHT_OVERRIDES
     } == {
+        (HOWLING_BANSHEES_ID, "Howling Banshee Exarch", 2.0),
+        (HOWLING_BANSHEES_ID, "Howling Banshees", 2.0),
+        (STRIKING_SCORPIONS_ID, "Striking Scorpion Exarch", 2.0),
+        (STRIKING_SCORPIONS_ID, "Striking Scorpions", 2.0),
         (FIRE_DRAGONS_ID, "Fire Dragon Exarch", 2.0),
         (FIRE_DRAGONS_ID, "Fire Dragons", 2.0),
         (SWOOPING_HAWKS_ID, "Swooping Hawk Exarch", 2.75),

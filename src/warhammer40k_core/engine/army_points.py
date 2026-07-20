@@ -272,6 +272,16 @@ def _datasheets_with_mfm_leader_allowances(
             for eligibility in datasheet.attachment_eligibilities
             if eligibility.role is not AttachmentRole.LEADER
         )
+        leader_eligibilities = tuple(
+            eligibility
+            for eligibility in datasheet.attachment_eligibilities
+            if eligibility.role is AttachmentRole.LEADER
+        )
+        if len(leader_eligibilities) > 1:
+            raise ArmyPointsError(
+                "Catalog datasheet declares multiple Leader attachment eligibilities."
+            )
+        source_leader_eligibility = leader_eligibilities[0] if leader_eligibilities else None
         if leader_allowance is None:
             updated_datasheets.append(
                 replace(datasheet, attachment_eligibilities=non_leader_eligibilities)
@@ -285,6 +295,7 @@ def _datasheets_with_mfm_leader_allowances(
                     _attachment_eligibility_from_mfm(
                         leader_allowance=leader_allowance,
                         datasheets_by_unit_id=datasheets_by_unit_id,
+                        source_leader_eligibility=source_leader_eligibility,
                     ),
                 ),
             )
@@ -707,6 +718,7 @@ def _attachment_eligibility_from_mfm(
     *,
     leader_allowance: MfmLeaderAllowance,
     datasheets_by_unit_id: dict[str, tuple[DatasheetDefinition, ...]],
+    source_leader_eligibility: AttachmentEligibility | None,
 ) -> AttachmentEligibility:
     bodyguard_datasheet_ids: list[str] = []
     for unit_id in leader_allowance.allowed_bodyguard_unit_ids:
@@ -716,12 +728,33 @@ def _attachment_eligibility_from_mfm(
                 "MFM leader allowance did not resolve to one bodyguard datasheet."
             )
         bodyguard_datasheet_ids.append(datasheets[0].datasheet_id)
+    source_targets_by_bodyguard_id = (
+        {}
+        if source_leader_eligibility is None
+        else {target.bodyguard_datasheet_id: target for target in source_leader_eligibility.targets}
+    )
     return AttachmentEligibility(
         role=AttachmentRole.LEADER,
         targets=tuple(
             AttachmentTargetEligibility(
                 bodyguard_datasheet_id=bodyguard_datasheet_id,
-                source_ids=(leader_allowance.source_id,),
+                source_ids=tuple(
+                    sorted(
+                        {
+                            leader_allowance.source_id,
+                            *(
+                                source_targets_by_bodyguard_id[bodyguard_datasheet_id].source_ids
+                                if bodyguard_datasheet_id in source_targets_by_bodyguard_id
+                                else ()
+                            ),
+                        }
+                    )
+                ),
+                required_wargear_ids=(
+                    source_targets_by_bodyguard_id[bodyguard_datasheet_id].required_wargear_ids
+                    if bodyguard_datasheet_id in source_targets_by_bodyguard_id
+                    else ()
+                ),
             )
             for bodyguard_datasheet_id in bodyguard_datasheet_ids
         ),

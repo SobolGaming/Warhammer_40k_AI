@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.validation import canonical_keyword_token
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
@@ -230,7 +231,7 @@ def conditional_leader_ability_grant_descriptor_for_clause(
         distance_inches = None
     return CatalogConditionalLeaderAbilityGrantDescriptor(
         ability=ability,
-        required_bodyguard_keyword=required_keyword,
+        required_bodyguard_keyword=canonical_keyword_token(required_keyword),
         distance_inches=distance_inches,
     )
 
@@ -274,10 +275,23 @@ def faction_resource_refund_roll_descriptor_for_clause(
         or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW
         or clause.target is None
         or clause.target.kind is not RuleTargetKind.SELECTED_UNIT
+        or parameter_payload(clause.target.parameters)
+        != {"relationship": "this_model_leading_unit"}
         or clause.duration is None
         or clause.duration.kind is not RuleDurationKind.IMMEDIATE
+        or clause.duration.parameters
+        or len(clause.conditions) != 2
         or len(clause.effects) != 1
-        or not _clause_has_leading_relationship(clause)
+    ):
+        return None
+    relationship = clause.conditions[0]
+    dice_gate = clause.conditions[1]
+    if (
+        relationship.kind is not RuleConditionKind.TARGET_CONSTRAINT
+        or parameter_payload(relationship.parameters) != {"relationship": "this_model_leading_unit"}
+        or dice_gate.kind is not RuleConditionKind.DICE_ROLL_GATE
+        or parameter_payload(dice_gate.parameters)
+        != {"comparison": "greater_than_or_equal", "threshold": 3}
     ):
         return None
     trigger = parameter_payload(clause.trigger.parameters)

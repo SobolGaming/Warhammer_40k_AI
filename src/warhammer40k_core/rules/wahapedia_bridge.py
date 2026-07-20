@@ -30,7 +30,11 @@ from warhammer40k_core.core.weapon_profiles import (
     validate_weapon_ability_descriptor_multiplicity,
 )
 from warhammer40k_core.rules import wahapedia_base_size_bridge as _base_size_bridge
+from warhammer40k_core.rules import wahapedia_bridge_columns as _bridge_columns
 from warhammer40k_core.rules import wahapedia_model_profile_mapping as _model_profiles
+from warhammer40k_core.rules.attachment_wargear_requirements import (
+    AttachmentWargearRequirement,
+)
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -132,6 +136,7 @@ def build_wahapedia_canonical_bridge_artifacts(
     datasheet_ids: tuple[str, ...],
     pdf_corrections: tuple[PdfDatasheetCorrection, ...] | None = None,
     height_overrides: tuple[ModelHeightOverride, ...] | None = None,
+    attachment_wargear_requirements: tuple[AttachmentWargearRequirement, ...] = (),
 ) -> tuple[WahapediaJsonArtifact, ...]:
     if type(source_artifacts) is not tuple:
         raise WahapediaBridgeError("source_artifacts must be a tuple.")
@@ -153,11 +158,15 @@ def build_wahapedia_canonical_bridge_artifacts(
     height_by_datasheet_and_model = _height_overrides_by_datasheet_and_model(
         selected_height_overrides
     )
+    attachment_wargear_requirements_by_target = _attachment_wargear_requirements_by_target(
+        attachment_wargear_requirements
+    )
     context = _BridgeContext(
         rows_by_table=rows_by_table,
         selected_datasheet_ids=frozenset(selected_datasheet_ids),
         corrections_by_datasheet=corrections_by_datasheet,
         height_by_datasheet_and_model=height_by_datasheet_and_model,
+        attachment_wargear_requirements_by_target=attachment_wargear_requirements_by_target,
         event_companion_base_sizes_by_key=event_companion_base_sizes_by_key(
             error_type=WahapediaBridgeError
         ),
@@ -165,6 +174,10 @@ def build_wahapedia_canonical_bridge_artifacts(
     bridged_rows = _empty_bridge_rows()
     for datasheet_id in selected_datasheet_ids:
         _bridge_datasheet(datasheet_id=datasheet_id, context=context, bridged_rows=bridged_rows)
+    _validate_active_attachment_wargear_requirements(
+        context=context,
+        bridged_rows=bridged_rows,
+    )
     return _artifacts_from_bridge_rows(
         bridge_package_id=bridge_package_id,
         rows_by_table=bridged_rows,
@@ -177,6 +190,7 @@ class _BridgeContext:
     selected_datasheet_ids: frozenset[str]
     corrections_by_datasheet: dict[str, PdfDatasheetCorrection]
     height_by_datasheet_and_model: dict[tuple[str, str], ModelHeightOverride]
+    attachment_wargear_requirements_by_target: dict[tuple[str, str], AttachmentWargearRequirement]
     event_companion_base_sizes_by_key: EventCompanionBaseSizesByKey
 
 
@@ -626,9 +640,12 @@ def _bridge_wargear(
         context=context,
         datasheet_id=datasheet_id,
     )
-    for row in _rows_matching(
+    source_rows = _rows_matching(
         context.rows_by_table, "Datasheets_wargear", "datasheet_id", datasheet_id
-    ):
+    )
+    prepared_rows: list[tuple[NormalizedSourceRow, str]] = []
+    profile_count_by_wargear_id: dict[str, int] = {}
+    for row in source_rows:
         name = _required_wargear_name(
             row=row,
             default_wargear_name_keys=(
@@ -637,6 +654,10 @@ def _bridge_wargear(
         )
         if name is None:
             continue
+        prepared_rows.append((row, name))
+        wargear_id = f"{datasheet_id}:{_slug(_base_wargear_name(name))}"
+        profile_count_by_wargear_id[wargear_id] = profile_count_by_wargear_id.get(wargear_id, 0) + 1
+    for row, name in prepared_rows:
         base_name = _base_wargear_name(name)
         profile_name = _weapon_profile_name(name)
         wargear_id = f"{datasheet_id}:{_slug(base_name)}"
@@ -661,9 +682,13 @@ def _bridge_wargear(
                 "name": _raw_or_field(row, "name"),
                 "wargear_id": wargear_id,
                 "weapon_profile_id": (
-                    f"{wargear_id}:standard"
-                    if profile_name is None
-                    else f"{wargear_id}:{_slug(profile_name)}"
+                    f"{wargear_id}:{_slug(profile_name)}"
+                    if profile_name is not None
+                    else (
+                        f"{wargear_id}:{_slug(_required_field(row, 'type'))}"
+                        if profile_count_by_wargear_id[wargear_id] > 1
+                        else f"{wargear_id}:standard"
+                    )
                 ),
                 "model_profile_ids": _joined(
                     default_model_profile_ids if is_default_loadout else model_profile_ids
@@ -1277,11 +1302,21 @@ def _bridge_leader_links(
         attached_id = _required_field(row, "attached_id")
         if leader_id != datasheet_id or attached_id not in context.selected_datasheet_ids:
             continue
+        requirement = context.attachment_wargear_requirements_by_target.get(
+            (leader_id, attached_id)
+        )
         bridged_rows["Datasheets_leader"].append(
             {
                 "leader_id": leader_id,
                 "attached_id": attached_id,
-                "source_ids": _joined(_source_ids(row)),
+                "required_wargear_ids": (
+                    "" if requirement is None else _joined(requirement.required_wargear_ids)
+                ),
+                "source_ids": _joined(
+                    _source_ids(row)
+                    if requirement is None
+                    else tuple(_deduplicated([*_source_ids(row), *requirement.source_ids]))
+                ),
             }
         )
 
@@ -1551,7 +1586,10 @@ def _artifacts_from_bridge_rows(
     for table_name, rows in rows_by_table.items():
         if not rows:
             continue
-        columns = _columns_for_table(table_name)
+        columns = _bridge_columns.bridge_columns_for_table(
+            table_name,
+            error_type=WahapediaBridgeError,
+        )
         csv_text = _csv_text(columns=columns, rows=tuple(rows))
         artifacts.append(
             WahapediaJsonArtifact.from_csv_table(
@@ -1560,151 +1598,6 @@ def _artifacts_from_bridge_rows(
             )
         )
     return tuple(sorted(artifacts, key=lambda artifact: artifact.source_table))
-
-
-def _columns_for_table(table_name: str) -> tuple[str, ...]:
-    columns_by_table = {
-        "Factions": (
-            "id",
-            "name",
-            "content_scope",
-            "faction_keywords",
-            "army_rule_id",
-            "army_rule_name",
-            "source_ids",
-        ),
-        "Datasheets": (
-            "id",
-            "name",
-            "content_scope",
-            "keywords",
-            "faction_keywords",
-            "legend",
-            "loadout",
-            "transport",
-            "leader_head",
-            "leader_footer",
-            "damaged_description",
-            "damaged_effects",
-            "max_unit_models",
-            "source_ids",
-        ),
-        "Datasheets_models": (
-            "datasheet_id",
-            "line",
-            "name",
-            "model_profile_id",
-            "content_scope",
-            "m",
-            "t",
-            "sv",
-            "inv_sv",
-            "w",
-            "ld",
-            "oc",
-            "ws",
-            "bs",
-            "min_models",
-            "max_models",
-            "allows_zero_models",
-            "base_size",
-            "base_size_source_id",
-            "base_size_document_reference",
-            "height",
-            "height_units",
-            "height_source_id",
-            "height_document_reference",
-            "height_reviewer_status",
-            "height_evidence_kind",
-            "source_ids",
-        ),
-        "Datasheets_wargear": (
-            "datasheet_id",
-            "line",
-            "line_in_wargear",
-            "name",
-            "wargear_id",
-            "weapon_profile_id",
-            "model_profile_ids",
-            "range",
-            "a",
-            "skill_characteristic",
-            "skill",
-            "s",
-            "ap",
-            "d",
-            "weapon_keywords",
-            "weapon_abilities",
-            "default_loadout",
-            "default_wargear_count",
-            "source_ids",
-        ),
-        "Datasheets_options": (
-            "datasheet_id",
-            "line",
-            "description",
-            "option_id",
-            "model_profile_id",
-            "default_wargear_ids",
-            "allowed_wargear_ids",
-            "min_selections",
-            "max_selections",
-            "condition_kind",
-            "condition_wargear_ids",
-            "selection_group_id",
-            "selection_models_per_increment",
-            "selection_group_max_per_increment",
-            "selection_option_max_per_increment",
-            "effect_kind",
-            "effect_wargear_id",
-            "effect_replaced_wargear_id",
-            "effect_model_count",
-            "effect_wargear_count",
-            "unit_resource_kind",
-            "unit_resource_amount_per_selection",
-            "source_ids",
-        ),
-        "Datasheets_mustering_options": (
-            "datasheet_id",
-            "line",
-            "description",
-            "option_id",
-            "selection_group_id",
-            "label",
-            "model_profile_id",
-            "required",
-            "effect_kind",
-            "effect_keyword",
-            "effect_wargear_id",
-            "effect_model_count",
-            "effect_wargear_count",
-            "source_ids",
-        ),
-        "Datasheets_abilities": (
-            "datasheet_id",
-            "line",
-            "ability_id",
-            "name",
-            "description",
-            "parameter",
-            "type",
-            "support",
-            "source_kind",
-            "effect_description",
-            "source_wargear_id",
-            "rule_ir_payload",
-            "rule_ir_diagnostics",
-            "timing_tags",
-            "parameter_tokens",
-            "source_ids",
-        ),
-        "Datasheets_leader": ("leader_id", "attached_id", "source_ids"),
-        "Datasheets_unit_composition": ("datasheet_id", "line", "description", "source_ids"),
-    }
-    columns = columns_by_table.get(table_name)
-    if columns is None:
-        raise WahapediaBridgeError("Unsupported bridge output table.")
-    return columns
 
 
 def _csv_text(*, columns: tuple[str, ...], rows: tuple[dict[str, str], ...]) -> str:
@@ -1941,6 +1834,55 @@ def _height_overrides_by_datasheet_and_model(
             raise WahapediaBridgeError("height_overrides must not duplicate model names.")
         by_key[key] = override
     return by_key
+
+
+def _attachment_wargear_requirements_by_target(
+    requirements: tuple[AttachmentWargearRequirement, ...],
+) -> dict[tuple[str, str], AttachmentWargearRequirement]:
+    if type(requirements) is not tuple:
+        raise WahapediaBridgeError("attachment_wargear_requirements must be a tuple.")
+    by_target: dict[tuple[str, str], AttachmentWargearRequirement] = {}
+    for requirement in requirements:
+        if type(requirement) is not AttachmentWargearRequirement:
+            raise WahapediaBridgeError(
+                "attachment_wargear_requirements must contain requirement values."
+            )
+        key = (requirement.leader_datasheet_id, requirement.bodyguard_datasheet_id)
+        if key in by_target:
+            raise WahapediaBridgeError(
+                "attachment_wargear_requirements must not duplicate attachment targets."
+            )
+        by_target[key] = requirement
+    return by_target
+
+
+def _validate_active_attachment_wargear_requirements(
+    *,
+    context: _BridgeContext,
+    bridged_rows: dict[str, list[dict[str, str]]],
+) -> None:
+    active_requirements = tuple(
+        requirement
+        for requirement in context.attachment_wargear_requirements_by_target.values()
+        if requirement.leader_datasheet_id in context.selected_datasheet_ids
+        and requirement.bodyguard_datasheet_id in context.selected_datasheet_ids
+    )
+    bridged_wargear_ids = {row["wargear_id"] for row in bridged_rows["Datasheets_wargear"]}
+    for requirement in active_requirements:
+        matching_rows = tuple(
+            row
+            for row in bridged_rows["Datasheets_leader"]
+            if row["leader_id"] == requirement.leader_datasheet_id
+            and row["attached_id"] == requirement.bodyguard_datasheet_id
+        )
+        if len(matching_rows) != 1:
+            raise WahapediaBridgeError(
+                "Attachment wargear requirement did not resolve to one source leader link."
+            )
+        if not set(requirement.required_wargear_ids).issubset(bridged_wargear_ids):
+            raise WahapediaBridgeError(
+                "Attachment wargear requirement references unknown bridged wargear."
+            )
 
 
 def _required_height_override(

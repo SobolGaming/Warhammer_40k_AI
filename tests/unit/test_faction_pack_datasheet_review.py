@@ -226,6 +226,8 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     non_daemons_rows = tuple(row for row in support_rows if row.faction_id != "chaos-daemons")
     assert {(row.faction_id, row.datasheet_id, row.overall) for row in non_daemons_rows} == {
         ("aeldari", "000000577", "Playable"),
+        ("aeldari", "000000594", "Blocked"),
+        ("aeldari", "000000595", "Playable"),
         ("aeldari", "000000592", "Playable"),
         ("aeldari", "000000596", "Playable"),
         ("aeldari", "000000600", "Playable"),

@@ -156,6 +156,11 @@ def _persisting_effect_for_source(
     )
     payload["descriptor_id"] = source.descriptor_id
     payload["template_id"] = source.clause.template_id
+    if source.descriptor_id == CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID:
+        descriptor = conditional_leader_ability_grant_descriptor_for_clause(source.clause)
+        if descriptor is None:
+            raise GameLifecycleError("Conditional leader ability descriptor drifted.")
+        payload["required_bodyguard_keyword"] = descriptor.required_bodyguard_keyword
     return generic_rule_persisting_effect(
         effect_id=source.effect_id,
         source_rule_id=source.rule_ir.source_id,

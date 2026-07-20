@@ -210,6 +210,10 @@ The shared contract uses these objects and payloads:
   `attachment_source_ids` field carries the sorted source IDs of the exact catalog
   attachment targets accepted by the engine. Adapters and replay consumers may display or
   audit this evidence but must not infer, add, or mutate attachment legality from it.
+  Each catalog attachment-target payload also carries sorted `required_wargear_ids`; an empty
+  list means the target has no loadout gate. List-validation and mustering compare those IDs
+  with the engine-instantiated source unit before creating a formation. Adapters may render the
+  requirement but must not decide that a loadout satisfies it or fabricate a formation locally.
 - `FactionRuleState`: deterministic replay-safe setup state for faction-rule selections, keyed by player, faction, source rule, state kind, setup request, and setup result.
 - `FactionRuleSetupSelection`: finite setup answer selecting one engine-emitted option from a faction runtime hook during `declare_battle_formations`.
 - `ReserveDeclarationRequest`: finite setup request context for declaring Strategic Reserves or Deep Strike units during `declare_battle_formations`.

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import Final
 
+from warhammer40k_core.rules.attachment_wargear_requirements import (
+    AttachmentWargearRequirement,
+)
 from warhammer40k_core.rules.rule_ir import RuleIRPayload
 from warhammer40k_core.rules.source_packages.artifact_loader import (
     SourcePackageArtifactError,
@@ -24,6 +27,7 @@ __all__ = (
     "SOURCE_SNAPSHOT_FILENAME",
     "SOURCE_SNAPSHOT_SHA256",
     "AeldariAutarchsRuleIrArtifactError",
+    "attachment_wargear_requirements",
     "datasheet_rule_ir_payload_by_source_row_id",
     "supported_datasheet_source_row_ids",
     "validate_generated_artifact_bytes",
@@ -56,6 +60,10 @@ def supported_datasheet_source_row_ids() -> tuple[str, ...]:
 
 def datasheet_rule_ir_payload_by_source_row_id(source_row_id: str) -> RuleIRPayload | None:
     return _ARTIFACT.rule_ir_payload_by_source_row_id(source_row_id)
+
+
+def attachment_wargear_requirements() -> tuple[AttachmentWargearRequirement, ...]:
+    return _ARTIFACT.validated_attachment_wargear_requirements()
 
 
 def validate_generated_artifact_bytes(raw: bytes) -> None:

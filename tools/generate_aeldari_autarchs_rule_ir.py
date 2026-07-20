@@ -23,15 +23,17 @@ from warhammer40k_core.rules.rule_ir import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SOURCE_PATH = (
-    REPO_ROOT
-    / "data"
-    / "source_snapshots"
-    / "wahapedia"
-    / "10th-edition"
-    / "2026-06-14"
-    / "json"
-    / "Datasheets_abilities.json"
+SOURCE_DIRECTORY = (
+    REPO_ROOT / "data" / "source_snapshots" / "wahapedia" / "10th-edition" / "2026-06-14" / "json"
+)
+SOURCE_PATH = SOURCE_DIRECTORY / "Datasheets_abilities.json"
+ATTACHMENT_SOURCE_PATHS = tuple(
+    SOURCE_DIRECTORY / filename
+    for filename in (
+        "Datasheets_leader.json",
+        "Datasheets_options.json",
+        "Datasheets_wargear.json",
+    )
 )
 OUTPUT_PATH = (
     REPO_ROOT
@@ -45,7 +47,7 @@ OUTPUT_PATH = (
     / "rule_ir.json"
 )
 
-ARTIFACT_SCHEMA = "core-v2-aeldari-autarchs-rule-ir-v1"
+ARTIFACT_SCHEMA = "core-v2-aeldari-autarchs-rule-ir-v2"
 SOURCE_PACKAGE_ID = "gw-11e-aeldari-autarchs-datasheets-2026-06-14"
 PARSER_VERSION = "manual-source-backed-rule-ir:v1"
 
@@ -54,6 +56,10 @@ AUTARCH_WAYLEAPER_DATASHEET_ID = "000002759"
 SUPERLATIVE_STRATEGIST_ROW_ID = "000000577:3"
 ASPECT_TRAINING_ROW_ID = "000000577:5"
 INDOMITABLE_STRENGTH_ROW_ID = "000002759:4"
+HOWLING_BANSHEES_DATASHEET_ID = "000000594"
+STRIKING_SCORPIONS_DATASHEET_ID = "000000595"
+BANSHEE_BLADE_WARGEAR_ID = "000000577:banshee-blade"
+SCORPION_CHAINSWORD_WARGEAR_ID = "000000577:scorpion-chainsword"
 
 DATASHEETS = {
     AUTARCH_DATASHEET_ID: "Autarch",
@@ -83,6 +89,34 @@ ABILITY_NAME_BY_SOURCE_ROW_ID = {
 }
 
 
+def _source_row_id(table_name: str, source_row_id: str) -> str:
+    return f"{SOURCE_PACKAGE_ID}:{table_name}:{source_row_id}"
+
+
+ATTACHMENT_WARGEAR_REQUIREMENTS = (
+    {
+        "leader_datasheet_id": AUTARCH_DATASHEET_ID,
+        "bodyguard_datasheet_id": HOWLING_BANSHEES_DATASHEET_ID,
+        "required_wargear_ids": [BANSHEE_BLADE_WARGEAR_ID],
+        "source_ids": [
+            _source_row_id("Datasheets_leader", "000000577:000000594:124"),
+            _source_row_id("Datasheets_options", "000000577:2"),
+            _source_row_id("Datasheets_wargear", "000000577:7:1:1618"),
+        ],
+    },
+    {
+        "leader_datasheet_id": AUTARCH_DATASHEET_ID,
+        "bodyguard_datasheet_id": STRIKING_SCORPIONS_DATASHEET_ID,
+        "required_wargear_ids": [SCORPION_CHAINSWORD_WARGEAR_ID],
+        "source_ids": [
+            _source_row_id("Datasheets_leader", "000000577:000000595:122"),
+            _source_row_id("Datasheets_options", "000000577:2"),
+            _source_row_id("Datasheets_wargear", "000000577:8:1:1619"),
+        ],
+    },
+)
+
+
 def main() -> None:
     payload = generated_artifact_payload()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -91,6 +125,7 @@ def main() -> None:
 
 def generated_artifact_payload() -> dict[str, object]:
     _validate_source_rows()
+    _validate_attachment_source_rows()
     records: dict[str, object] = {}
     for source_row_id, normalized_text in RULE_TEXT_BY_SOURCE_ROW_ID.items():
         records[source_row_id] = {
@@ -105,6 +140,15 @@ def generated_artifact_payload() -> dict[str, object]:
         "source_snapshot_filename": SOURCE_PATH.name,
         "source_snapshot_sha256": hashlib.sha256(SOURCE_PATH.read_bytes()).hexdigest(),
         "source_artifact_hash": source_payload["artifact_hash"],
+        "attachment_source_snapshot_sha256s": {
+            path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in ATTACHMENT_SOURCE_PATHS
+        },
+        "attachment_source_artifact_hashes": {
+            path.name: json.loads(path.read_text(encoding="utf-8"))["artifact_hash"]
+            for path in ATTACHMENT_SOURCE_PATHS
+        },
+        "attachment_wargear_requirements": list(ATTACHMENT_WARGEAR_REQUIREMENTS),
         "datasheets": DATASHEETS,
         "records": records,
         "package_hash": "",
@@ -124,6 +168,43 @@ def _validate_source_rows() -> None:
             raise ValueError("Aeldari Autarch datasheet source text drifted.")
         if row["name"] != ABILITY_NAME_BY_SOURCE_ROW_ID[source_row_id]:
             raise ValueError("Aeldari Autarch datasheet ability name drifted.")
+
+
+def _validate_attachment_source_rows() -> None:
+    payloads = {
+        path.stem: json.loads(path.read_text(encoding="utf-8")) for path in ATTACHMENT_SOURCE_PATHS
+    }
+    leader_rows = {
+        row["source_row_id"]: row["fields"] for row in payloads["Datasheets_leader"]["rows"]
+    }
+    for source_row_id, bodyguard_datasheet_id in (
+        ("000000577:000000594:124", HOWLING_BANSHEES_DATASHEET_ID),
+        ("000000577:000000595:122", STRIKING_SCORPIONS_DATASHEET_ID),
+    ):
+        if leader_rows.get(source_row_id) != {
+            "attached_id": bodyguard_datasheet_id,
+            "leader_id": AUTARCH_DATASHEET_ID,
+        }:
+            raise ValueError("Aeldari Autarch attachment source row drifted.")
+    option_rows = {
+        row["source_row_id"]: row["fields"] for row in payloads["Datasheets_options"]["rows"]
+    }
+    expected_option = (
+        "This model's star glaive can be replaced with one of the following:\n"
+        "- 1 Banshee blade\n"
+        "- 1 Scorpion chainsword"
+    )
+    if option_rows.get("000000577:2", {}).get("description") != expected_option:
+        raise ValueError("Aeldari Autarch attachment wargear option source text drifted.")
+    wargear_rows = {
+        row["source_row_id"]: row["fields"] for row in payloads["Datasheets_wargear"]["rows"]
+    }
+    for source_row_id, expected_name in (
+        ("000000577:7:1:1618", "Banshee blade"),
+        ("000000577:8:1:1619", "Scorpion chainsword"),
+    ):
+        if wargear_rows.get(source_row_id, {}).get("name") != expected_name:
+            raise ValueError("Aeldari Autarch attachment wargear source row drifted.")
 
 
 def _rule_ir(source_row_id: str, text: str) -> RuleIR:

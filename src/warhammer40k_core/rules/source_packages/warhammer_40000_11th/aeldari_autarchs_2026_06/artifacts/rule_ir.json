@@ -1,10 +1,46 @@
 {
-  "artifact_schema": "core-v2-aeldari-autarchs-rule-ir-v1",
+  "artifact_schema": "core-v2-aeldari-autarchs-rule-ir-v2",
+  "attachment_source_artifact_hashes": {
+    "Datasheets_leader.json": "581c60f74358aed92c927d93b4c1abcac1b7047cca8c3dcef768708b6a761b62",
+    "Datasheets_options.json": "869b21016b1ce7904351c6671e00ab963bd8a536b39872c52524b00abf14bd38",
+    "Datasheets_wargear.json": "21a0f8444e15a20f3481df4a83f52f7eb676e682e89ab08757556b48949f1b93"
+  },
+  "attachment_source_snapshot_sha256s": {
+    "Datasheets_leader.json": "6dcc73d4706fa32675fe77b83532cc573cd96e8196e9c7b7e8097b96e3c2fc68",
+    "Datasheets_options.json": "eccec5de773f6c6944eb8602a749902005815c067d36e348a8519dba1606b6d6",
+    "Datasheets_wargear.json": "d8586097e94b91ea24c1f556e6d6ed41b05b0331c58f798dbdba53817e2ceb74"
+  },
+  "attachment_wargear_requirements": [
+    {
+      "bodyguard_datasheet_id": "000000594",
+      "leader_datasheet_id": "000000577",
+      "required_wargear_ids": [
+        "000000577:banshee-blade"
+      ],
+      "source_ids": [
+        "gw-11e-aeldari-autarchs-datasheets-2026-06-14:Datasheets_leader:000000577:000000594:124",
+        "gw-11e-aeldari-autarchs-datasheets-2026-06-14:Datasheets_options:000000577:2",
+        "gw-11e-aeldari-autarchs-datasheets-2026-06-14:Datasheets_wargear:000000577:7:1:1618"
+      ]
+    },
+    {
+      "bodyguard_datasheet_id": "000000595",
+      "leader_datasheet_id": "000000577",
+      "required_wargear_ids": [
+        "000000577:scorpion-chainsword"
+      ],
+      "source_ids": [
+        "gw-11e-aeldari-autarchs-datasheets-2026-06-14:Datasheets_leader:000000577:000000595:122",
+        "gw-11e-aeldari-autarchs-datasheets-2026-06-14:Datasheets_options:000000577:2",
+        "gw-11e-aeldari-autarchs-datasheets-2026-06-14:Datasheets_wargear:000000577:8:1:1619"
+      ]
+    }
+  ],
   "datasheets": {
     "000000577": "Autarch",
     "000002759": "Autarch Wayleaper"
   },
-  "package_hash": "cf07556046e8afedaceb7e8bfdce9232d0d0c1a636d9a184492b5a3a18b7285d",
+  "package_hash": "e9c19461dddd910d7fbd746f884dd2103ee19d0898d5be131d80a3953d53d063",
   "records": {
     "000000577:3": {
       "ability_name": "Superlative Strategist",

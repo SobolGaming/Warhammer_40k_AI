@@ -290,7 +290,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon<br>Psychic Guidance |
-| `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures |
+| `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures<br>Mandiblasters |
 | `catalog-ir:movement-action-grant` | Flickerjump |
 | `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |

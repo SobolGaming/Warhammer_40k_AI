@@ -1531,7 +1531,7 @@
     "player-b"
   ],
   "projection_schema": "game-view-v6-interaction",
-  "projection_state_hash": "c0312bd8d3ec1972324593aed93a1abbd14caf31f1618e24b6a8aa3af6046d83",
+  "projection_state_hash": "b4ec446001c2f9d15f2d9b3f4e4c36f7c4efa9e1bae46a43ee2fb83c1fd19636",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
@@ -1567,7 +1567,7 @@
       "game": "warhammer_40000",
       "version": "core-v2-phase9a"
     },
-    "source_hash": "61d45fc487ff61b6df12ceaf0bc3fb4e922b312c5fb50e382ebabb4ab663666b",
+    "source_hash": "867152e5e5856a1d37d8993a333fa5b733e1e4aa1352072cbd56d03c86711e04",
     "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
   },
   "stage": "setup",
