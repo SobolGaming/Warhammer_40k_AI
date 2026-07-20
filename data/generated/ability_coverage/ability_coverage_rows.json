@@ -100,6 +100,70 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000000596:assured-destruction",
+    "ability_name": "Assured Destruction",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000596/datasheet/000000596:assured-destruction/none",
+    "datasheet_id": "000000596",
+    "datasheet_name": "Fire Dragons",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:damage-roll-reroll",
+      "catalog-ir:hit-roll-reroll",
+      "catalog-ir:wound-roll-reroll"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.reroll_permission.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000596/faction/000009894/none",
+    "datasheet_id": "000000596",
+    "datasheet_name": "Fire Dragons",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000596:aspect-shrine-token",
+    "ability_name": "Aspect Shrine Token",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000596/wargear/000000596:aspect-shrine-token/000000596:aspect-shrine-token",
+    "datasheet_id": "000000596",
+    "datasheet_name": "Fire Dragons",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:dice-result-override"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.override_dice_roll_result.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000000596:aspect-shrine-token",
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000000598:malevolent-souls",
     "ability_name": "Malevolent Souls",
     "catalog_id": "chaos-daemons-bridge-catalog",
@@ -156,6 +220,173 @@
     ],
     "source_kind": "wargear",
     "source_wargear_id": "000000598:forceshield",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000600/core/000008343/none",
+    "datasheet_id": "000000600",
+    "datasheet_name": "Swooping Hawks",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000600:grenade-pack-flyover",
+    "ability_name": "Grenade Pack Flyover",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000600/datasheet/000000600:grenade-pack-flyover/none",
+    "datasheet_id": "000000600",
+    "datasheet_name": "Swooping Hawks",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:unit-move-completed-mortal-wounds"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.enemy_unit",
+      "datasheet.rule_ir.inflict_mortal_wounds.enemy_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000600/faction/000009894/none",
+    "datasheet_id": "000000600",
+    "datasheet_name": "Swooping Hawks",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000600:aspect-shrine-token",
+    "ability_name": "Aspect Shrine Token",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000600/wargear/000000600:aspect-shrine-token/000000600:aspect-shrine-token",
+    "datasheet_id": "000000600",
+    "datasheet_name": "Swooping Hawks",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:dice-result-override"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.override_dice_roll_result.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000000600:aspect-shrine-token",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/core/000008343/none",
+    "datasheet_id": "000000601",
+    "datasheet_name": "Warp Spiders",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000601:flickerjump",
+    "ability_name": "Flickerjump",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none",
+    "datasheet_id": "000000601",
+    "datasheet_name": "Warp Spiders",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-action-grant"
+    ],
+    "semantic_categories": [
+      "datasheet.characteristic_set.movement.this_unit",
+      "datasheet.rule_ir.grant_ability.this_unit",
+      "datasheet.rule_ir.inflict_mortal_wounds.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/faction/000009894/none",
+    "datasheet_id": "000000601",
+    "datasheet_name": "Warp Spiders",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000601:aspect-shrine-token",
+    "ability_name": "Aspect Shrine Token",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/wargear/000000601:aspect-shrine-token/000000601:aspect-shrine-token",
+    "datasheet_id": "000000601",
+    "datasheet_name": "Warp Spiders",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:dice-result-override"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.override_dice_roll_result.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000000601:aspect-shrine-token",
     "support_stage": "engine_consumed"
   },
   {

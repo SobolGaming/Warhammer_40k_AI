@@ -28,6 +28,14 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000596/faction/000009894/none",
+        "datasheet_id": "000000596",
+        "datasheet_name": "Fire Dragons",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
@@ -68,6 +76,14 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000600/faction/000009894/none",
+        "datasheet_id": "000000600",
+        "datasheet_name": "Swooping Hawks",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000605/faction/000009894/none",
         "datasheet_id": "000000605",
         "datasheet_name": "Vypers",
@@ -80,6 +96,14 @@
         "datasheet_id": "000000612",
         "datasheet_name": "War Walkers",
         "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/faction/000009894/none",
+        "datasheet_id": "000000601",
+        "datasheet_name": "Warp Spiders",
+        "source_kind": "faction"
       }
     ],
     "ability_names": [
@@ -87,30 +111,36 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 10,
+    "coverage_row_count": 13,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000596/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004193/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000592/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002533/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000600/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000605/faction/000009894/none",
-      "chaos-daemons-bridge-catalog/000000612/faction/000009894/none"
+      "chaos-daemons-bridge-catalog/000000612/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000601/faction/000009894/none"
     ],
     "datasheet_names": [
       "Corsair Skyreavers",
       "Corsair Voidreavers",
       "Corsair Voidscarred",
+      "Fire Dragons",
       "Kharseth",
       "Prince Yriel",
       "Rangers",
       "Shroud Runners",
       "Starfangs",
+      "Swooping Hawks",
       "Vypers",
-      "War Walkers"
+      "War Walkers",
+      "Warp Spiders"
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:aeldari:army_rule:fade_back",
@@ -121,7 +151,7 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 10
+      "faction": 13
     },
     "support_stages": [
       "engine_consumed"
@@ -666,6 +696,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000601:flickerjump",
+        "ability_name": "Flickerjump",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none",
+        "datasheet_id": "000000601",
+        "datasheet_name": "Warp Spiders",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Flickerjump"
+    ],
+    "category_id": "datasheet.characteristic_set.movement.this_unit",
+    "category_name": "Datasheet Characteristic Set Movement This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none"
+    ],
+    "datasheet_names": [
+      "Warp Spiders"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-action-grant"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001114:bane-of-cowards",
         "ability_name": "Bane of Cowards",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
@@ -902,6 +965,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000600:grenade-pack-flyover",
+        "ability_name": "Grenade Pack Flyover",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000600/datasheet/000000600:grenade-pack-flyover/none",
+        "datasheet_id": "000000600",
+        "datasheet_name": "Swooping Hawks",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Grenade Pack Flyover"
+    ],
+    "category_id": "datasheet.rule_ir.grant_ability.enemy_unit",
+    "category_name": "Datasheet Rule Ir Grant Ability Enemy Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000600/datasheet/000000600:grenade-pack-flyover/none"
+    ],
+    "datasheet_names": [
+      "Swooping Hawks"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:unit-move-completed-mortal-wounds"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000004195:hallucinogen-grenades",
         "ability_name": "Hallucinogen Grenades",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/datasheet/000004195:hallucinogen-grenades/none",
@@ -972,6 +1068,39 @@
     ],
     "source_kind_counts": {
       "datasheet": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000601:flickerjump",
+        "ability_name": "Flickerjump",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none",
+        "datasheet_id": "000000601",
+        "datasheet_name": "Warp Spiders",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Flickerjump"
+    ],
+    "category_id": "datasheet.rule_ir.grant_ability.this_unit",
+    "category_name": "Datasheet Rule Ir Grant Ability This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none"
+    ],
+    "datasheet_names": [
+      "Warp Spiders"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-action-grant"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
     },
     "support_stages": [
       "engine_consumed"
@@ -1094,22 +1223,66 @@
         "datasheet_id": "000001115",
         "datasheet_name": "Bloodcrushers",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000000600:grenade-pack-flyover",
+        "ability_name": "Grenade Pack Flyover",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000600/datasheet/000000600:grenade-pack-flyover/none",
+        "datasheet_id": "000000600",
+        "datasheet_name": "Swooping Hawks",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
-      "Brass Stampede"
+      "Brass Stampede",
+      "Grenade Pack Flyover"
     ],
     "category_id": "datasheet.rule_ir.inflict_mortal_wounds.enemy_unit",
     "category_name": "Datasheet Rule Ir Inflict Mortal Wounds Enemy Unit",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none"
+      "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
+      "chaos-daemons-bridge-catalog/000000600/datasheet/000000600:grenade-pack-flyover/none"
     ],
     "datasheet_names": [
-      "Bloodcrushers"
+      "Bloodcrushers",
+      "Swooping Hawks"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:unit-move-completed-mortal-wounds"
+    ],
+    "source_kind_counts": {
+      "datasheet": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000601:flickerjump",
+        "ability_name": "Flickerjump",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none",
+        "datasheet_id": "000000601",
+        "datasheet_name": "Warp Spiders",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Flickerjump"
+    ],
+    "category_id": "datasheet.rule_ir.inflict_mortal_wounds.this_unit",
+    "category_name": "Datasheet Rule Ir Inflict Mortal Wounds This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none"
+    ],
+    "datasheet_names": [
+      "Warp Spiders"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-action-grant"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -1690,26 +1863,39 @@
         "datasheet_id": "000002531",
         "datasheet_name": "Corsair Voidreavers",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000000596:assured-destruction",
+        "ability_name": "Assured Destruction",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000596/datasheet/000000596:assured-destruction/none",
+        "datasheet_id": "000000596",
+        "datasheet_name": "Fire Dragons",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
+      "Assured Destruction",
       "Reavers of the Void"
     ],
     "category_id": "datasheet.rule_ir.reroll_permission.this_unit",
     "category_name": "Datasheet Rule Ir Reroll Permission This Unit",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000002531/datasheet/000002531:reavers-of-the-void/none"
+      "chaos-daemons-bridge-catalog/000002531/datasheet/000002531:reavers-of-the-void/none",
+      "chaos-daemons-bridge-catalog/000000596/datasheet/000000596:assured-destruction/none"
     ],
     "datasheet_names": [
-      "Corsair Voidreavers"
+      "Corsair Voidreavers",
+      "Fire Dragons"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:damage-roll-reroll",
       "catalog-ir:hit-roll-reroll",
-      "catalog-ir:passive-hit-reroll"
+      "catalog-ir:passive-hit-reroll",
+      "catalog-ir:wound-roll-reroll"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -2034,6 +2220,22 @@
         "datasheet_id": "000001151",
         "datasheet_name": "Soul Grinder",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000600/core/000008343/none",
+        "datasheet_id": "000000600",
+        "datasheet_name": "Swooping Hawks",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/core/000008343/none",
+        "datasheet_id": "000000601",
+        "datasheet_name": "Warp Spiders",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -2041,7 +2243,7 @@
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
-    "coverage_row_count": 8,
+    "coverage_row_count": 10,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
@@ -2050,7 +2252,9 @@
       "chaos-daemons-bridge-catalog/000002758/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001149/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001112/core/000008343/none",
-      "chaos-daemons-bridge-catalog/000001151/core/000008343/none"
+      "chaos-daemons-bridge-catalog/000001151/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000000600/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000000601/core/000008343/none"
     ],
     "datasheet_names": [
       "Be'lakor",
@@ -2060,14 +2264,16 @@
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Flesh Hounds",
-      "Soul Grinder"
+      "Soul Grinder",
+      "Swooping Hawks",
+      "Warp Spiders"
     ],
     "runtime_consumer_ids": [
       "descriptor:movement:deep-strike-placement",
       "descriptor:reserve-declaration:deep-strike"
     ],
     "source_kind_counts": {
-      "core": 8
+      "core": 10
     },
     "support_stages": [
       "engine_consumed"
@@ -3154,6 +3360,59 @@
     ],
     "source_kind_counts": {
       "wargear": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000596:aspect-shrine-token",
+        "ability_name": "Aspect Shrine Token",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000596/wargear/000000596:aspect-shrine-token/000000596:aspect-shrine-token",
+        "datasheet_id": "000000596",
+        "datasheet_name": "Fire Dragons",
+        "source_kind": "wargear"
+      },
+      {
+        "ability_id": "000000600:aspect-shrine-token",
+        "ability_name": "Aspect Shrine Token",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000600/wargear/000000600:aspect-shrine-token/000000600:aspect-shrine-token",
+        "datasheet_id": "000000600",
+        "datasheet_name": "Swooping Hawks",
+        "source_kind": "wargear"
+      },
+      {
+        "ability_id": "000000601:aspect-shrine-token",
+        "ability_name": "Aspect Shrine Token",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/wargear/000000601:aspect-shrine-token/000000601:aspect-shrine-token",
+        "datasheet_id": "000000601",
+        "datasheet_name": "Warp Spiders",
+        "source_kind": "wargear"
+      }
+    ],
+    "ability_names": [
+      "Aspect Shrine Token"
+    ],
+    "category_id": "wargear.rule_ir.override_dice_roll_result.this_unit",
+    "category_name": "Wargear Rule Ir Override Dice Roll Result This Unit",
+    "coverage_row_count": 3,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000596/wargear/000000596:aspect-shrine-token/000000596:aspect-shrine-token",
+      "chaos-daemons-bridge-catalog/000000600/wargear/000000600:aspect-shrine-token/000000600:aspect-shrine-token",
+      "chaos-daemons-bridge-catalog/000000601/wargear/000000601:aspect-shrine-token/000000601:aspect-shrine-token"
+    ],
+    "datasheet_names": [
+      "Fire Dragons",
+      "Swooping Hawks",
+      "Warp Spiders"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:dice-result-override"
+    ],
+    "source_kind_counts": {
+      "wargear": 3
     },
     "support_stages": [
       "engine_consumed"

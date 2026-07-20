@@ -274,6 +274,7 @@ def _roll_hit_and_wound(
             ).keywords,
             attack_context_id=attack_context_id,
             source_phase=attack_sequence.source_phase,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         if status is not None:
             return None, status
@@ -839,6 +840,7 @@ def apply_source_backed_attack_dice_reroll_decision(
     attack_sequence: AttackSequence,
     expected_phase: BattlePhase,
     phase_label: str,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> None:
     if type(attack_sequence) is not AttackSequence:
         raise GameLifecycleError(f"{phase_label} dice reroll requires an active attack sequence.")
@@ -848,6 +850,8 @@ def apply_source_backed_attack_dice_reroll_decision(
     request_payload = _payload_object(record.request.payload)
     roll_type = _payload_string(request_payload, key="roll_type")
     roll_state_key = SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS.get(roll_type)
+    if roll_state_key is None and roll_type.startswith("random_characteristic.damage."):
+        roll_state_key = "damage_roll_state"
     if roll_state_key is None:
         raise GameLifecycleError(
             f"{phase_label} dice reroll must target an attack source-backed roll."
@@ -900,6 +904,7 @@ def apply_source_backed_attack_dice_reroll_decision(
         attack_context=attack_context,
         owning_player_id=expected_actor_id,
         phase_label=phase_label,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if initial_roll_state.original_result.spec.roll_type != roll_type:
         raise GameLifecycleError(f"{phase_label} dice reroll initial roll type drift.")
@@ -927,6 +932,7 @@ def _validate_current_source_backed_attack_reroll_context_if_required(
     attack_context: dict[str, JsonValue],
     owning_player_id: str,
     phase_label: str,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> None:
     source_payload_value = attack_context.get("source_payload")
     if source_payload_value is None:
@@ -945,6 +951,22 @@ def _validate_current_source_backed_attack_reroll_context_if_required(
         attack_kind=attack_kind,
         target_unit_instance_id=current_pool.target_unit_instance_id,
     )
+    if current_permission_context is None and source_payload.get("effect_kind") == (
+        "catalog_conditional_attack_reroll"
+    ):
+        registry = _runtime_modifier_registry(runtime_modifier_registry)
+        current_permission_context = registry.attack_reroll_permission_context(
+            AttackRerollPermissionContext(
+                state=state,
+                player_id=owning_player_id,
+                attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+                attacker_model_instance_id=current_pool.attacker_model_instance_id,
+                target_unit_instance_id=current_pool.target_unit_instance_id,
+                source_phase=attack_sequence.source_phase,
+                roll_type=roll_type,
+                timing_window=roll_type,
+            )
+        )
     if current_permission_context is None:
         raise GameLifecycleError(f"{phase_label} dice reroll source context drift.")
     if current_permission_context.permission.source_id != source_rule_id:
@@ -995,6 +1017,7 @@ def _request_source_backed_wound_reroll_if_available(
     attacker_keywords: tuple[str, ...],
     attack_context_id: str,
     source_phase: BattlePhase,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> LifecycleStatus | None:
     if roll_state is None:
         return None
@@ -1017,6 +1040,23 @@ def _request_source_backed_wound_reroll_if_available(
         attack_kind=_source_backed_attack_kind_for_phase(source_phase),
         target_unit_instance_id=pool.target_unit_instance_id,
     )
+    registry = _runtime_modifier_registry(runtime_modifier_registry)
+    catalog_permission_context = registry.attack_reroll_permission_context(
+        AttackRerollPermissionContext(
+            state=state,
+            player_id=actor_id,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            source_phase=source_phase,
+            roll_type=roll_state.original_result.spec.roll_type,
+            timing_window="attack_sequence.wound",
+        )
+    )
+    if permission_context is not None and catalog_permission_context is not None:
+        raise GameLifecycleError("Multiple source-backed wound reroll permissions are available.")
+    if catalog_permission_context is not None:
+        permission_context = catalog_permission_context
     if permission_context is None:
         return None
     permission = _source_backed_wound_permission_for_attack(

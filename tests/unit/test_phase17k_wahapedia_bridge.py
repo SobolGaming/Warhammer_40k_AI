@@ -149,6 +149,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
     CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
@@ -182,7 +183,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CatalogNamedWeaponAbilityChoiceOption,
     CatalogNamedWeaponAbilityChoiceRuntime,
     CatalogPostShootHitTargetStatusRuntime,
-    CatalogUnitMoveCompletedMortalWoundsRuntime,
     CatalogWeaponKeywordGrant,
     CatalogWeaponKeywordGrantRuntime,
     _available_catalog_named_weapon_ability_choice_groups,  # pyright: ignore[reportPrivateUsage]
@@ -222,7 +222,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     _weapon_names_from_parameters,  # pyright: ignore[reportPrivateUsage]
     _weapon_scope_matches_profile,  # pyright: ignore[reportPrivateUsage]
     apply_catalog_post_shoot_hit_target_status_result,
-    apply_catalog_unit_move_completed_mortal_wounds_target_result,
     catalog_advance_roll_reroll_permission_for_unit,
     catalog_charge_roll_modifiers_for_unit,
     catalog_charge_roll_reroll_permission_for_unit,
@@ -232,7 +231,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_weapon_keyword_grants_for_unit,
     catalog_weapon_profile_modifier_bindings,
     invalid_catalog_post_shoot_hit_target_status_status,
-    invalid_catalog_unit_move_completed_mortal_wounds_target_status,
     record_catalog_feel_no_pain_sources_for_unit,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects import (
@@ -249,6 +247,11 @@ from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
 from warhammer40k_core.engine.catalog_turn_end_reserves import (
     CATALOG_TURN_END_RESERVES_USED_EVENT,
     CatalogTurnEndReserveRuntime,
+)
+from warhammer40k_core.engine.catalog_unit_move_completed_mortal_wounds_runtime import (
+    CatalogUnitMoveCompletedMortalWoundsRuntime,
+    apply_catalog_unit_move_completed_mortal_wounds_target_result,
+    invalid_catalog_unit_move_completed_mortal_wounds_target_status,
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
 from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
@@ -6158,7 +6161,7 @@ def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_targe
         ),
         target_kind=RuleTargetKind.AURA_UNITS,
     )
-    unsupported_roll_rule = _catalog_rule_ir(
+    damage_roll_rule = _catalog_rule_ir(
         (_effect(RuleEffectKind.REROLL_PERMISSION, roll_type="damage"),),
         target_kind=RuleTargetKind.THIS_UNIT,
     )
@@ -6175,8 +6178,12 @@ def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_targe
     assert catalog_rule_ir_consumers_for_rule(aura_attack_reroll_rule) == (
         CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
     )
-    assert catalog_rule_ir_consumers_for_rule(unsupported_roll_rule) == ()
-    assert catalog_rule_ir_hook_ids_for_rule(unsupported_roll_rule) == ()
+    assert catalog_rule_ir_consumers_for_rule(damage_roll_rule) == (
+        CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(damage_roll_rule) == (
+        CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
+    )
 
 
 def test_phase17k_catalog_ir_roll_reroll_effect_helpers_are_strict() -> None:
@@ -6813,11 +6820,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Exact ability bridge blocked |"
     ) in aeldari_markdown
     assert (
-        "| Craftworlds / Asuryani | Rangers (`000000592`)<br>"
+        "| Craftworlds / Asuryani | Fire Dragons (`000000596`)<br>"
+        "Rangers (`000000592`)<br>"
         "Shroud Runners (`000002533`)<br>Striking Scorpions (`000000595`)<br>"
-        "Vypers (`000000605`)<br>"
-        "War Walkers (`000000612`)<br>Wraithblades (`000000598`)<br>"
-        "Wraithguard (`000000597`)<br>Wraithlord (`000000613`) | Crimson Hunter"
+        "Swooping Hawks (`000000600`)<br>Vypers (`000000605`)<br>"
+        "War Walkers (`000000612`)<br>Warp Spiders (`000000601`)<br>"
+        "Wraithblades (`000000598`)<br>Wraithguard (`000000597`)<br>"
+        "Wraithlord (`000000613`) | Crimson Hunter"
     ) in aeldari_markdown
     assert (
         "Crimson Hunter (`000000603`)<br>Dark Reapers (`000000607`)<br>Eldrad Ulthran (`000000568`)"
@@ -7006,6 +7015,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Bloodcrushers",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Deep Strike"]) == (
+        "Swooping Hawks",
+        "Warp Spiders",
         "Flesh Hounds",
         "Bloodletters",
         "Bloodcrushers",
@@ -7486,7 +7497,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ].support_stages == (AbilityCoverageSupportStage.ENGINE_CONSUMED,)
     assert categories_by_name[
         "Datasheet Rule Ir Inflict Mortal Wounds Enemy Unit"
-    ].ability_names == ("Brass Stampede",)
+    ].ability_names == ("Brass Stampede", "Grenade Pack Flyover")
     assert categories_by_name[
         "Datasheet Rule Ir Inflict Mortal Wounds Enemy Unit"
     ].runtime_consumer_ids == (CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,)

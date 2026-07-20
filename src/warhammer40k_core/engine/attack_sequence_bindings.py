@@ -6,6 +6,7 @@ from types import ModuleType
 
 from warhammer40k_core.engine import (
     attack_sequence_damage_resolution as attack_sequence_damage_resolution,
+    attack_sequence_damage_rerolls as attack_sequence_damage_rerolls,
     attack_sequence_destroyed_transport as attack_sequence_destroyed_transport,
     attack_sequence_dice_rerolls as attack_sequence_dice_rerolls,
     attack_sequence_dispatch as attack_sequence_dispatch,
@@ -29,6 +30,7 @@ _ATTACK_SEQUENCE_MODULES: tuple[ModuleType, ...] = (
     attack_sequence_group_selection,
     attack_sequence_grouped_allocation,
     attack_sequence_damage_resolution,
+    attack_sequence_damage_rerolls,
     attack_sequence_dice_rerolls,
     attack_sequence_psychic_modifiers,
     attack_sequence_hit_wound,

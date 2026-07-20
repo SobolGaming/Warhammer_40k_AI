@@ -21,23 +21,32 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
     AbilitySourceKind,
 )
+from warhammer40k_core.engine.advance_hooks import (
+    AdvanceMoveContext,
+    AdvanceMoveGrant,
+    AdvanceMoveHookBinding,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     CatalogAnyPhaseOncePerBattleRuntime,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
+    CatalogConditionalAttackRerollDescriptor,
     CatalogConditionalInvulnerableSaveDescriptor,
     CatalogConditionalProximityEffectsDescriptor,
     CatalogFightOnDeathDescriptor,
     CatalogFirstFailedSaveDamageReplacementDescriptor,
     CatalogInvulnerableSaveDescriptor,
+    CatalogMovementActionGrantDescriptor,
     CatalogPassiveHitRerollDescriptor,
+    conditional_attack_reroll_descriptor_for_clause,
     conditional_invulnerable_save_descriptor_for_clause,
     conditional_proximity_effects_descriptor_for_clause,
     fight_on_death_descriptor_for_clause,
     first_failed_save_damage_replacement_descriptor_for_clause,
     invulnerable_save_descriptor_for_clause,
+    movement_action_grant_descriptor_for_clause,
     passive_hit_reroll_descriptor_for_clause,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
@@ -235,7 +244,7 @@ class CatalogDatasheetRuleRuntime:
         ).event_subscriptions()
 
     def movement_budget_modifier_bindings(self) -> tuple[MovementBudgetModifierBinding, ...]:
-        return tuple(
+        passive = tuple(
             MovementBudgetModifierBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
@@ -243,6 +252,29 @@ class CatalogDatasheetRuleRuntime:
             )
             for source in self._sources(clause_is_passive_characteristic_modifier)
             if _source_characteristic(source) is Characteristic.MOVEMENT
+        )
+        grants = tuple(
+            MovementBudgetModifierBinding(
+                modifier_id=f"{source.binding_id}:movement-action-grant",
+                source_id=source.rule_ir.source_id,
+                handler=self._movement_action_grant_movement_handler(source, descriptor),
+            )
+            for source, descriptor in self._described_sources(
+                movement_action_grant_descriptor_for_clause
+            )
+        )
+        return (*passive, *grants)
+
+    def advance_move_hook_bindings(self) -> tuple[AdvanceMoveHookBinding, ...]:
+        return tuple(
+            AdvanceMoveHookBinding(
+                hook_id=f"{source.binding_id}:movement-action-grant",
+                source_id=source.rule_ir.source_id,
+                handler=self._movement_action_grant_handler(source, descriptor),
+            )
+            for source, descriptor in self._described_sources(
+                movement_action_grant_descriptor_for_clause
+            )
         )
 
     def save_option_modifier_bindings(self) -> tuple[SaveOptionModifierBinding, ...]:
@@ -271,7 +303,7 @@ class CatalogDatasheetRuleRuntime:
     def attack_reroll_permission_bindings(
         self,
     ) -> tuple[AttackRerollPermissionBinding, ...]:
-        return tuple(
+        passive = tuple(
             AttackRerollPermissionBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
@@ -281,6 +313,17 @@ class CatalogDatasheetRuleRuntime:
                 passive_hit_reroll_descriptor_for_clause
             )
         )
+        conditional = tuple(
+            AttackRerollPermissionBinding(
+                modifier_id=f"{source.binding_id}:conditional-attack-rerolls",
+                source_id=source.rule_ir.source_id,
+                handler=self._conditional_attack_reroll_permission_handler(source, descriptor),
+            )
+            for source, descriptor in self._described_sources(
+                conditional_attack_reroll_descriptor_for_clause
+            )
+        )
+        return (*passive, *conditional)
 
     def failed_save_damage_replacement_bindings(
         self,
@@ -684,6 +727,150 @@ class CatalogDatasheetRuleRuntime:
                             descriptor.full_reroll_if_target_within_objective_range
                         ),
                     },
+                },
+            )
+
+        return handler
+
+    def _movement_action_grant_movement_handler(
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogMovementActionGrantDescriptor,
+    ) -> Callable[[MovementBudgetModifierContext], float]:
+        def handler(context: MovementBudgetModifierContext) -> float:
+            if not _source_applies_to_rules_unit(
+                source=source,
+                context_unit_id=context.unit_instance_id,
+                state=context.state,
+            ):
+                return context.current_movement_inches
+            rules_unit = rules_unit_view_by_id(
+                state=context.state, unit_instance_id=context.unit_instance_id
+            )
+            if context.model_instance_id not in {
+                model.model_instance_id for model in rules_unit.alive_models()
+            }:
+                return context.current_movement_inches
+            for effect in context.state.persisting_effects_for_unit(rules_unit.unit_instance_id):
+                payload = effect.effect_payload
+                if (
+                    isinstance(payload, dict)
+                    and payload.get("effect_kind") == "catalog_movement_action_grant"
+                    and payload.get("source_rule_id") == source.rule_ir.source_id
+                ):
+                    value = payload.get("movement_characteristic")
+                    if type(value) is not int or value != descriptor.movement_characteristic:
+                        raise GameLifecycleError(
+                            "Catalog movement action grant characteristic drifted."
+                        )
+                    return float(value)
+            return context.current_movement_inches
+
+        return handler
+
+    def _movement_action_grant_handler(
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogMovementActionGrantDescriptor,
+    ) -> Callable[[AdvanceMoveContext], AdvanceMoveGrant | None]:
+        def handler(context: AdvanceMoveContext) -> AdvanceMoveGrant | None:
+            if (
+                context.player_id != source.player_id
+                or context.movement_phase_action != descriptor.movement_action
+                or not _source_applies_to_rules_unit(
+                    source=source,
+                    context_unit_id=context.unit_instance_id,
+                    state=context.state,
+                )
+            ):
+                return None
+            return AdvanceMoveGrant(
+                hook_id=f"{source.binding_id}:movement-action-grant",
+                source_id=source.rule_ir.source_id,
+                label=source.record.definition.name,
+                granted_ranged_weapon_keywords=(),
+                automatic=False,
+                replay_payload={
+                    "consumer_id": "catalog-ir:movement-action-grant",
+                    "catalog_record_id": source.record.record_id,
+                    "source_rule_id": source.rule_ir.source_id,
+                    "source_unit_instance_id": source.unit.unit_instance_id,
+                    "rules_unit_instance_id": context.unit_instance_id,
+                    "clause_id": source.clause.clause_id,
+                },
+                unit_effect_payload={
+                    "effect_kind": "catalog_movement_action_grant",
+                    "catalog_record_id": source.record.record_id,
+                    "source_rule_id": source.rule_ir.source_id,
+                    "source_unit_instance_id": source.unit.unit_instance_id,
+                    "rules_unit_instance_id": context.unit_instance_id,
+                    "clause_id": source.clause.clause_id,
+                    "movement_characteristic": descriptor.movement_characteristic,
+                    "charge_forbidden": descriptor.charge_forbidden,
+                    "phase_end_mortal_wounds": {
+                        "roll_expression": "D6",
+                        "roll_count_scope": "each_model_in_this_unit_at_phase_end",
+                        "success_value": descriptor.phase_end_roll_success_value,
+                        "mortal_wounds_per_success": descriptor.mortal_wounds_per_success,
+                    },
+                },
+                unit_effect_expiration="end_turn",
+            )
+
+        return handler
+
+    def _conditional_attack_reroll_permission_handler(
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogConditionalAttackRerollDescriptor,
+    ) -> Callable[[AttackRerollPermissionContext], SourceBackedRerollPermissionContext | None]:
+        def handler(
+            context: AttackRerollPermissionContext,
+        ) -> SourceBackedRerollPermissionContext | None:
+            roll_type_by_context = {
+                "attack_sequence.hit": "hit_roll",
+                "attack_sequence.wound": "wound_roll",
+            }
+            descriptor_roll_type = roll_type_by_context.get(context.roll_type)
+            if context.roll_type.startswith("random_characteristic.damage."):
+                descriptor_roll_type = "damage_roll"
+            if (
+                context.player_id != source.player_id
+                or context.source_phase.value != descriptor.phase
+                or context.timing_window != context.roll_type
+                or descriptor_roll_type not in descriptor.roll_types
+                or not _source_applies_to_rules_unit(
+                    source=source,
+                    context_unit_id=context.attacking_unit_instance_id,
+                    state=context.state,
+                )
+                or context.attacker_model_instance_id is None
+                or context.attacker_model_instance_id
+                not in _current_source_model_ids(state=context.state, source=source)
+                or not _rules_unit_has_any_keyword(
+                    rules_unit_view_by_id(
+                        state=context.state,
+                        unit_instance_id=context.target_unit_instance_id,
+                    ),
+                    descriptor.required_target_keywords,
+                )
+            ):
+                return None
+            return SourceBackedRerollPermissionContext(
+                permission=RerollPermission(
+                    source_id=f"{source.binding_id}:{descriptor_roll_type}",
+                    timing_window=context.timing_window,
+                    owning_player_id=context.player_id,
+                    eligible_roll_type=context.roll_type,
+                    component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+                ),
+                source_payload={
+                    "effect_kind": "catalog_conditional_attack_reroll",
+                    "catalog_record_id": source.record.record_id,
+                    "source_rule_id": source.rule_ir.source_id,
+                    "source_unit_instance_id": source.unit.unit_instance_id,
+                    "required_target_keywords": list(descriptor.required_target_keywords),
+                    "roll_type": descriptor_roll_type,
                 },
             )
 
@@ -1211,6 +1398,16 @@ def _rules_unit_has_required_aura_keyword(view: RulesUnitView, clause: RuleClaus
     }
     keywords = {*view.keywords, *view.faction_keywords}
     return required.issubset(keywords)
+
+
+def _rules_unit_has_any_keyword(view: RulesUnitView, required_keywords: tuple[str, ...]) -> bool:
+    required = {_canonical_keyword(keyword) for keyword in required_keywords}
+    keywords = {_canonical_keyword(keyword) for keyword in (*view.keywords, *view.faction_keywords)}
+    return bool(required & keywords)
+
+
+def _canonical_keyword(keyword: str) -> str:
+    return keyword.replace("_", " ").replace("-", " ").upper()
 
 
 def _clause_distance(clause: RuleClause) -> float:

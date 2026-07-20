@@ -19,6 +19,7 @@ from warhammer40k_core.engine.catalog_descriptor_consumption import (
     catalog_descriptor_consumption_for,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_rule_ir_clause_wide_consumer_ids,
     catalog_rule_ir_consumer_ids_for_effect,
     catalog_rule_ir_consumers_for_clause,
     catalog_rule_ir_consumers_for_rule,
@@ -923,8 +924,14 @@ def _effect_runtime_consumer_ids(
     if len(clause.effects) == 1:
         return (tuple(sorted(runtime_consumer_ids)),)
     consumers = frozenset(runtime_consumer_ids)
+    clause_wide_consumers = consumers.intersection(catalog_rule_ir_clause_wide_consumer_ids(clause))
     return tuple(
-        tuple(sorted(consumers.intersection(catalog_rule_ir_consumer_ids_for_effect(effect))))
+        tuple(
+            sorted(
+                clause_wide_consumers
+                | consumers.intersection(catalog_rule_ir_consumer_ids_for_effect(effect))
+            )
+        )
         for effect in clause.effects
     )
 

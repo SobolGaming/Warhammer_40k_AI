@@ -126,6 +126,15 @@ def _target_binding_error(
         return "unknown_target_unit"
     if target_owner != target_binding.target_player_id:
         return "target_owner_drift"
+    if (
+        target_spec.target_policy_id == EXPLOSIVES_TARGET_POLICY_ID
+        and _target_unit_has_forbidden_stratagem_handler_effect(
+            state=state,
+            target_unit_instance_id=_require_target_unit_id(target_binding),
+            handler_id=CORE_EXPLOSIVES_HANDLER_ID,
+        )
+    ):
+        return "stratagem_target_forbidden_by_effect"
     permission = friendly_stratagem_target_permission(
         player_id=player_id,
         target_player_id=target_owner,
@@ -511,6 +520,32 @@ def _target_unit_satisfies_required_keywords(
         raise GameLifecycleError("Stratagem target unit is unknown.")
     stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
     return required.issubset(stored)
+
+
+def _target_unit_has_forbidden_stratagem_handler_effect(
+    *,
+    state: GameState,
+    target_unit_instance_id: str,
+    handler_id: str,
+) -> bool:
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    requested_handler_id = _validate_identifier("handler_id", handler_id)
+    for effect in state.persisting_effects_for_unit(target_id):
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        raw_handler_ids = payload.get("forbidden_stratagem_handler_ids")
+        if raw_handler_ids is None:
+            continue
+        if not isinstance(raw_handler_ids, list) or not all(
+            type(value) is str for value in raw_handler_ids
+        ):
+            raise GameLifecycleError(
+                "Stratagem target restriction handler IDs must be a string list."
+            )
+        if requested_handler_id in cast(list[str], raw_handler_ids):
+            return True
+    return False
 
 
 def _target_unit_satisfies_required_keywords_any(

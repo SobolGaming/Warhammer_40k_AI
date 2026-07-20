@@ -6,12 +6,14 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import WeaponProfileError, weapon_keyword_from_token
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     clause_uses_exact_datasheet_runtime_template,
+    conditional_attack_reroll_descriptor_for_clause,
     conditional_invulnerable_save_descriptor_for_clause,
     conditional_proximity_effects_descriptor_for_clause,
     exact_datasheet_runtime_descriptor_for_clause,
     fight_on_death_descriptor_for_clause,
     first_failed_save_damage_replacement_descriptor_for_clause,
     invulnerable_save_descriptor_for_clause,
+    movement_action_grant_descriptor_for_clause,
     passive_hit_reroll_descriptor_for_clause,
 )
 from warhammer40k_core.engine.catalog_tracked_target_selection_descriptors import (
@@ -61,6 +63,10 @@ CATALOG_IR_BALLISTIC_SKILL_CHARACTERISTIC_MODIFIER_CONSUMER_ID = (
 CATALOG_IR_WEAPON_SKILL_CHARACTERISTIC_MODIFIER_CONSUMER_ID = (
     "catalog-ir:weapon-skill-characteristic-modifier"
 )
+CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID = "catalog-ir:hit-roll-reroll"
+CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = "catalog-ir:wound-roll-reroll"
+CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:damage-roll-reroll"
+CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID = "catalog-ir:movement-action-grant"
 
 
 def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool:
@@ -93,6 +99,16 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID)
     if clause_is_passive_hit_reroll(clause):
         consumer_ids.add(CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID)
+    if conditional_attack_reroll_descriptor_for_clause(clause) is not None:
+        consumer_ids.update(
+            {
+                CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+                CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+                CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
+            }
+        )
+    if movement_action_grant_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID)
     if clause_is_first_failed_save_damage_replacement(clause):
         consumer_ids.add(CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID)
     if conditional_invulnerable_save_descriptor_for_clause(clause) is not None:
@@ -153,6 +169,10 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_LEADERSHIP_CHARACTERISTIC_QUERY_CONSUMER_ID,
                 CATALOG_IR_BALLISTIC_SKILL_CHARACTERISTIC_MODIFIER_CONSUMER_ID,
                 CATALOG_IR_WEAPON_SKILL_CHARACTERISTIC_MODIFIER_CONSUMER_ID,
+                CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+                CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+                CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
+                CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
             }
         )
     )

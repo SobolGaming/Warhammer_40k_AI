@@ -17,6 +17,12 @@ PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:passive-model-character
 FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_TEMPLATE_ID = "phase17c:first-failed-save-damage-replacement"
 CONDITIONAL_MODEL_FIGHT_ON_DEATH_TEMPLATE_ID = "phase17c:conditional-model-fight-on-death"
 CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID = "phase17c:conditional-ranged-invulnerable-save"
+CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID = (
+    "phase17l:conditional-ranged-attack-full-rerolls"
+)
+OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID = (
+    "phase17l:optional-normal-move-characteristic-set-and-phase-end-risk"
+)
 EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
     {
         CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID,
@@ -24,6 +30,8 @@ EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
         FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_TEMPLATE_ID,
         CONDITIONAL_MODEL_FIGHT_ON_DEATH_TEMPLATE_ID,
         CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID,
+        CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID,
+        OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID,
     }
 )
 
@@ -68,6 +76,23 @@ class CatalogConditionalInvulnerableSaveDescriptor:
     attack_kind: str
 
 
+@dataclass(frozen=True, slots=True)
+class CatalogConditionalAttackRerollDescriptor:
+    attack_kind: str
+    phase: str
+    required_target_keywords: tuple[str, ...]
+    roll_types: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogMovementActionGrantDescriptor:
+    movement_action: str
+    movement_characteristic: int
+    charge_forbidden: bool
+    phase_end_roll_success_value: int
+    mortal_wounds_per_success: int
+
+
 CatalogDatasheetRuntimeDescriptor = (
     CatalogInvulnerableSaveDescriptor
     | CatalogPassiveHitRerollDescriptor
@@ -75,6 +100,8 @@ CatalogDatasheetRuntimeDescriptor = (
     | CatalogConditionalProximityEffectsDescriptor
     | CatalogFightOnDeathDescriptor
     | CatalogConditionalInvulnerableSaveDescriptor
+    | CatalogConditionalAttackRerollDescriptor
+    | CatalogMovementActionGrantDescriptor
 )
 
 
@@ -95,10 +122,134 @@ def exact_datasheet_runtime_descriptor_for_clause(
         return fight_on_death_descriptor_for_clause(clause)
     if clause.template_id == CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID:
         return conditional_invulnerable_save_descriptor_for_clause(clause)
+    if clause.template_id == CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID:
+        return conditional_attack_reroll_descriptor_for_clause(clause)
+    if clause.template_id == OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID:
+        return movement_action_grant_descriptor_for_clause(clause)
     proximity = conditional_proximity_effects_descriptor_for_clause(clause)
     if proximity is not None:
         return proximity
     return None
+
+
+def movement_action_grant_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogMovementActionGrantDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.UNIT_SELECTED
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.target.parameters
+        or clause.conditions
+        or clause.duration is None
+        or len(clause.effects) != 3
+    ):
+        return None
+    trigger = parameter_payload(clause.trigger.parameters)
+    duration = parameter_payload(clause.duration.parameters)
+    movement_effect, charge_effect, mortal_effect = clause.effects
+    movement_parameters = parameter_payload(movement_effect.parameters)
+    charge_parameters = parameter_payload(charge_effect.parameters)
+    mortal_parameters = parameter_payload(mortal_effect.parameters)
+    if (
+        trigger
+        != {
+            "action": "normal_move",
+            "owner": "active_player",
+            "optional": True,
+            "phase": "movement",
+            "subject": "this_unit",
+            "timing_window": "selected_to_make_movement_action",
+        }
+        or clause.duration.kind.value != "until_timing_endpoint"
+        or duration != {"endpoint": "turn"}
+        or movement_effect.kind is not RuleEffectKind.SET_CHARACTERISTIC
+        or movement_parameters
+        != {
+            "characteristic": "movement",
+            "target_scope": "models_in_this_unit",
+            "value": 24,
+        }
+        or charge_effect.kind is not RuleEffectKind.GRANT_ABILITY
+        or charge_parameters != {"ability": "charge_forbidden", "target_scope": "this_unit"}
+        or mortal_effect.kind is not RuleEffectKind.INFLICT_MORTAL_WOUNDS
+        or mortal_parameters
+        != {
+            "damage_kind": "mortal_wounds",
+            "mortal_wounds_expression": "1",
+            "roll_count_scope": "each_model_in_this_unit_at_phase_end",
+            "roll_expression": "D6",
+            "success_values": ("1",),
+            "target_scope": "this_unit",
+            "timing_window": "end_of_phase",
+        }
+    ):
+        return None
+    return CatalogMovementActionGrantDescriptor(
+        movement_action="normal_move",
+        movement_characteristic=24,
+        charge_forbidden=True,
+        phase_end_roll_success_value=1,
+        mortal_wounds_per_success=1,
+    )
+
+
+def conditional_attack_reroll_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogConditionalAttackRerollDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.target.parameters
+        or clause.duration is not None
+        or len(clause.conditions) != 1
+        or len(clause.effects) != 3
+    ):
+        return None
+    trigger = parameter_payload(clause.trigger.parameters)
+    roll_types = trigger.get("roll_types")
+    condition = clause.conditions[0]
+    condition_parameters = parameter_payload(condition.parameters)
+    required_keywords = condition_parameters.get("required_keywords")
+    if (
+        trigger.get("attack_kind") != "ranged"
+        or trigger.get("owner") != "active_player"
+        or trigger.get("phase") != "shooting"
+        or trigger.get("subject") != "this_unit"
+        or roll_types != ("hit", "wound", "damage")
+        or condition.kind is not RuleConditionKind.KEYWORD_GATE
+        or condition_parameters.get("gate_subject") != "target_unit"
+        or condition_parameters.get("keyword_match") != "any"
+        or required_keywords != ("MONSTER", "VEHICLE")
+    ):
+        return None
+    effect_roll_types: list[str] = []
+    for effect in clause.effects:
+        parameters = parameter_payload(effect.parameters)
+        roll_type = parameters.get("roll_type")
+        if (
+            effect.kind is not RuleEffectKind.REROLL_PERMISSION
+            or parameters.get("selection") != "whole_roll"
+            or roll_type not in {"hit_roll", "wound_roll", "damage_roll"}
+            or set(parameters) != {"roll_type", "selection"}
+        ):
+            return None
+        effect_roll_types.append(str(roll_type))
+    if tuple(effect_roll_types) != ("hit_roll", "wound_roll", "damage_roll"):
+        return None
+    return CatalogConditionalAttackRerollDescriptor(
+        attack_kind="ranged",
+        phase="shooting",
+        required_target_keywords=("MONSTER", "VEHICLE"),
+        roll_types=tuple(effect_roll_types),
+    )
 
 
 def conditional_proximity_effects_descriptor_for_clause(

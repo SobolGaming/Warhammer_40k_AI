@@ -1,0 +1,571 @@
+{
+  "artifact_schema": "core-v2-aeldari-aspect-warriors-rule-ir-v1",
+  "datasheets": {
+    "000000596": "Fire Dragons",
+    "000000600": "Swooping Hawks",
+    "000000601": "Warp Spiders"
+  },
+  "package_hash": "17baafd1a74f9d4fbf95c984022c31cee6700cac6252653d149d0ebc51067c9a",
+  "records": {
+    "000000596:2": {
+      "ability_name": "Assured Destruction",
+      "normalized_text_sha256": "7513509f84fb650125c42177681b9510abfc256ee8b93cace9501cef98c293cc",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17l:aeldari:aspect-warriors:000000596:2:clause:001",
+            "conditions": [
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "target_unit"
+                  },
+                  {
+                    "key": "keyword_match",
+                    "value": "any"
+                  },
+                  {
+                    "key": "required_keywords",
+                    "value": [
+                      "MONSTER",
+                      "VEHICLE"
+                    ]
+                  }
+                ],
+                "source_span": {
+                  "end": 115,
+                  "start": 82,
+                  "text": "targets a MONSTER or VEHICLE unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "roll_type",
+                    "value": "hit_roll"
+                  },
+                  {
+                    "key": "selection",
+                    "value": "whole_roll"
+                  }
+                ],
+                "source_span": {
+                  "end": 145,
+                  "start": 125,
+                  "text": "re-roll the Hit roll"
+                }
+              },
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "roll_type",
+                    "value": "wound_roll"
+                  },
+                  {
+                    "key": "selection",
+                    "value": "whole_roll"
+                  }
+                ],
+                "source_span": {
+                  "end": 177,
+                  "start": 155,
+                  "text": "re-roll the Wound roll"
+                }
+              },
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "roll_type",
+                    "value": "damage_roll"
+                  },
+                  {
+                    "key": "selection",
+                    "value": "whole_roll"
+                  }
+                ],
+                "source_span": {
+                  "end": 213,
+                  "start": 190,
+                  "text": "re-roll the Damage roll"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 214,
+              "start": 0,
+              "text": "In your Shooting phase, each time a model in this unit makes a ranged attack that targets a MONSTER or VEHICLE unit, you can re-roll the Hit roll, you can re-roll the Wound roll and you can re-roll the Damage roll."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 54,
+                "start": 34,
+                "text": "a model in this unit"
+              }
+            },
+            "template_id": "phase17l:conditional-ranged-attack-full-rerolls",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "attack_kind",
+                  "value": "ranged"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "roll_types",
+                  "value": [
+                    "hit",
+                    "wound",
+                    "damage"
+                  ]
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                }
+              ],
+              "source_span": {
+                "end": 76,
+                "start": 24,
+                "text": "each time a model in this unit makes a ranged attack"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "5ae66196d2432c6673379ac20e1138b3df2ea1d3df31bc584083f07ffd248066",
+        "normalized_text": "In your Shooting phase, each time a model in this unit makes a ranged attack that targets a MONSTER or VEHICLE unit, you can re-roll the Hit roll, you can re-roll the Wound roll and you can re-roll the Damage roll.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17l:aeldari:aspect-warriors:datasheet:000000596:2",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-aspect-warriors-datasheets-2026-06-14:datasheet:000000596:2"
+      }
+    },
+    "000000600:3": {
+      "ability_name": "Grenade Pack Flyover",
+      "normalized_text_sha256": "1d8bcac32eb8b8e0e7e9b87c9c46cda09fe43996ec606b8750ce74319b001ed8",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17l:aeldari:aspect-warriors:000000600:3:clause:001",
+            "conditions": [
+              {
+                "kind": "frequency_limit",
+                "parameters": [
+                  {
+                    "key": "limit",
+                    "value": 1
+                  },
+                  {
+                    "key": "period",
+                    "value": "turn"
+                  }
+                ],
+                "source_span": {
+                  "end": 13,
+                  "start": 0,
+                  "text": "Once per turn"
+                }
+              },
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": 8
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "unit"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within"
+                  },
+                  {
+                    "key": "subject",
+                    "value": "selected_enemy_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 199,
+                  "start": 187,
+                  "text": "within 8\" of"
+                }
+              },
+              {
+                "kind": "visibility_predicate",
+                "parameters": [
+                  {
+                    "key": "object_reference",
+                    "value": "this_unit"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "visible_to"
+                  },
+                  {
+                    "key": "subject",
+                    "value": "selected_enemy_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 224,
+                  "start": 204,
+                  "text": "visible to this unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "endpoint",
+                  "value": "turn"
+                }
+              ],
+              "source_span": {
+                "end": 436,
+                "start": 411,
+                "text": "until the end of the turn"
+              }
+            },
+            "effects": [
+              {
+                "kind": "inflict_mortal_wounds",
+                "parameters": [
+                  {
+                    "key": "damage_kind",
+                    "value": "mortal_wounds"
+                  },
+                  {
+                    "key": "maximum_mortal_wounds",
+                    "value": 6
+                  },
+                  {
+                    "key": "mortal_wounds_expression",
+                    "value": "1"
+                  },
+                  {
+                    "key": "required_model_keyword",
+                    "value": "SWOOPING HAWKS"
+                  },
+                  {
+                    "key": "roll_count_scope",
+                    "value": "each_model_in_this_unit"
+                  },
+                  {
+                    "key": "roll_expression",
+                    "value": "D6"
+                  },
+                  {
+                    "key": "success_threshold",
+                    "value": 4
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "selected_enemy_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 370,
+                  "start": 285,
+                  "text": "for each 4+, that enemy unit suffers 1 mortal wound (to a maximum of 6 mortal wounds)"
+                }
+              },
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "stratagem_target_restriction"
+                  },
+                  {
+                    "key": "forbidden_stratagem_handler_ids",
+                    "value": [
+                      "core:explosives"
+                    ]
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 492,
+                  "start": 438,
+                  "text": "you cannot target this unit with the Grenade Stratagem"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 493,
+              "start": 0,
+              "text": "Once per turn, in your Movement phase, when this unit is set up on the battlefield or ends a Normal, Advance or Fall Back move, it can use this ability. If it does, select one enemy unit within 8\" of and visible to this unit and roll one D6 for each Swooping Hawks model in this unit: for each 4+, that enemy unit suffers 1 mortal wound (to a maximum of 6 mortal wounds). Each time this unit uses this ability, until the end of the turn, you cannot target this unit with the Grenade Stratagem."
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "selection",
+                  "value": "one"
+                }
+              ],
+              "source_span": {
+                "end": 186,
+                "start": 165,
+                "text": "select one enemy unit"
+              }
+            },
+            "template_id": "phase17l:optional-movement-or-setup-flyover-mortal-wounds",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "actions",
+                  "value": [
+                    "set_up",
+                    "normal_move",
+                    "advance",
+                    "fall_back"
+                  ]
+                },
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "optional",
+                  "value": true
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "movement"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "movement_move_end_or_setup"
+                }
+              ],
+              "source_span": {
+                "end": 126,
+                "start": 39,
+                "text": "when this unit is set up on the battlefield or ends a Normal, Advance or Fall Back move"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "2c86fdc322aa23fa316878cbef488f077aa398288ee7bd974261eab3aeb64e92",
+        "normalized_text": "Once per turn, in your Movement phase, when this unit is set up on the battlefield or ends a Normal, Advance or Fall Back move, it can use this ability. If it does, select one enemy unit within 8\" of and visible to this unit and roll one D6 for each Swooping Hawks model in this unit: for each 4+, that enemy unit suffers 1 mortal wound (to a maximum of 6 mortal wounds). Each time this unit uses this ability, until the end of the turn, you cannot target this unit with the Grenade Stratagem.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17l:aeldari:aspect-warriors:datasheet:000000600:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-aspect-warriors-datasheets-2026-06-14:datasheet:000000600:3"
+      }
+    },
+    "000000601:3": {
+      "ability_name": "Flickerjump",
+      "normalized_text_sha256": "f3515b6437a92803b3770b40b20a35bf263bc4013fd573cf2143ab815137626c",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17l:aeldari:aspect-warriors:000000601:3:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "endpoint",
+                  "value": "turn"
+                }
+              ],
+              "source_span": {
+                "end": 141,
+                "start": 116,
+                "text": "until the end of the turn"
+              }
+            },
+            "effects": [
+              {
+                "kind": "set_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "movement"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "models_in_this_unit"
+                  },
+                  {
+                    "key": "value",
+                    "value": 24
+                  }
+                ],
+                "source_span": {
+                  "end": 239,
+                  "start": 193,
+                  "text": "models in it have a Move characteristic of 24\""
+                }
+              },
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "charge_forbidden"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 188,
+                  "start": 143,
+                  "text": "this unit is not eligible to declare a charge"
+                }
+              },
+              {
+                "kind": "inflict_mortal_wounds",
+                "parameters": [
+                  {
+                    "key": "damage_kind",
+                    "value": "mortal_wounds"
+                  },
+                  {
+                    "key": "mortal_wounds_expression",
+                    "value": "1"
+                  },
+                  {
+                    "key": "roll_count_scope",
+                    "value": "each_model_in_this_unit_at_phase_end"
+                  },
+                  {
+                    "key": "roll_expression",
+                    "value": "D6"
+                  },
+                  {
+                    "key": "success_values",
+                    "value": [
+                      "1"
+                    ]
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_unit"
+                  },
+                  {
+                    "key": "timing_window",
+                    "value": "end_of_phase"
+                  }
+                ],
+                "source_span": {
+                  "end": 390,
+                  "start": 346,
+                  "text": "for each 1, this unit suffers 1 mortal wound"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 391,
+              "start": 0,
+              "text": "In your Movement phase, each time this unit is selected to make a Normal move, it can use this ability. If it does, until the end of the turn, this unit is not eligible to declare a charge and models in it have a Move characteristic of 24\". Each time this unit uses this ability, at the end of the phase, roll one D6 for each model in this unit: for each 1, this unit suffers 1 mortal wound."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 43,
+                "start": 34,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17l:optional-normal-move-characteristic-set-and-phase-end-risk",
+            "trigger": {
+              "kind": "unit_selected",
+              "parameters": [
+                {
+                  "key": "action",
+                  "value": "normal_move"
+                },
+                {
+                  "key": "optional",
+                  "value": true
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "movement"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "selected_to_make_movement_action"
+                }
+              ],
+              "source_span": {
+                "end": 77,
+                "start": 24,
+                "text": "each time this unit is selected to make a Normal move"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "07872410efc9449f3139674f83523c36cd97e75e0b257ecad4d10780c863b317",
+        "normalized_text": "In your Movement phase, each time this unit is selected to make a Normal move, it can use this ability. If it does, until the end of the turn, this unit is not eligible to declare a charge and models in it have a Move characteristic of 24\". Each time this unit uses this ability, at the end of the phase, roll one D6 for each model in this unit: for each 1, this unit suffers 1 mortal wound.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17l:aeldari:aspect-warriors:datasheet:000000601:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-aspect-warriors-datasheets-2026-06-14:datasheet:000000601:3"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-aeldari-aspect-warriors-datasheets-2026-06-14",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}

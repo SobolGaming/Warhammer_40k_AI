@@ -2089,6 +2089,7 @@ def test_relentless_raiders_and_void_thieves_consume_phase_end_objective_control
     assert effect.target_player_id == "player-b"
     assert effect.rolling_player_id == "player-a"
     assert effect.roll_threshold == 2
+    assert isinstance(effect.mortal_wounds_expression, DiceExpression)
     assert effect.mortal_wounds_expression.quantity == 1
     assert effect.mortal_wounds_expression.sides == 3
 

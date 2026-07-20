@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from warhammer40k_core.engine import (
     attack_sequence_damage_resolution as attack_sequence_damage_resolution,
+    attack_sequence_damage_rerolls as attack_sequence_damage_rerolls,
     attack_sequence_destroyed_transport as attack_sequence_destroyed_transport,
     attack_sequence_dice_rerolls as attack_sequence_dice_rerolls,
     attack_sequence_dispatch as attack_sequence_dispatch,
@@ -20,6 +21,7 @@ from warhammer40k_core.engine import (
 )
 from warhammer40k_core.engine.attack_sequence_bindings import bind_attack_sequence_modules
 from warhammer40k_core.engine.attack_sequence_damage_resolution import *
+from warhammer40k_core.engine.attack_sequence_damage_rerolls import *
 from warhammer40k_core.engine.attack_sequence_destroyed_transport import *
 from warhammer40k_core.engine.attack_sequence_dice_rerolls import *
 from warhammer40k_core.engine.attack_sequence_dispatch import *
@@ -223,6 +225,7 @@ __all__ = (
     "_request_command_reroll_for_attack_roll_if_available",
     "_request_destroyed_transport_disembark_placement",
     "_request_destroyed_transport_disembark_placement_retry",
+    "_request_source_backed_damage_reroll_if_available",
     "_request_source_backed_hit_reroll_if_available",
     "_request_source_backed_wound_reroll_if_available",
     "_reroll_wound_for_twin_linked_if_needed",

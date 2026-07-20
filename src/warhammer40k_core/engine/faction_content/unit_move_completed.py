@@ -5,11 +5,11 @@ from typing import Protocol
 
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.catalog_rule_consumption import (
-    catalog_unit_move_completed_mortal_wound_hook_bindings,
-)
 from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_runtime import (
     catalog_unit_move_completed_battle_shock_hook_bindings,
+)
+from warhammer40k_core.engine.catalog_unit_move_completed_mortal_wounds_runtime import (
+    catalog_unit_move_completed_mortal_wound_hook_bindings,
 )
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedBattleShockHookRegistry,

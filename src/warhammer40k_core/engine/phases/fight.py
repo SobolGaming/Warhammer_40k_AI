@@ -492,6 +492,7 @@ class FightPhaseHandler:
                 state=state,
                 result=result,
                 decisions=decisions,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         raise GameLifecycleError("Fight phase received unsupported decision type.")
 
@@ -3187,6 +3188,7 @@ def _apply_fight_dice_reroll_decision(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_fight_phase_state(state)
     fight_state = _require_fight_state(state)
@@ -3200,6 +3202,7 @@ def _apply_fight_dice_reroll_decision(
         attack_sequence=attack_sequence,
         expected_phase=BattlePhase.FIGHT,
         phase_label="Fight",
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     return None
 

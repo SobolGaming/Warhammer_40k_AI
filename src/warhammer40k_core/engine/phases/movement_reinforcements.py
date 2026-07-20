@@ -555,6 +555,7 @@ def _apply_valid_reinforcement_placement(
             "phase": BattlePhase.MOVEMENT.value,
             "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "unit_instance_id": arrived_state.unit_instance_id,
+            "movement_phase_action": "set_up",
             "component_unit_instance_ids": list(
                 placement.candidate.attempted_rules_unit_placement.component_unit_instance_ids
             ),

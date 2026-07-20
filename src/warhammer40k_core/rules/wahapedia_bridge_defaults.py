@@ -158,6 +158,75 @@ AELDARI_RANGERS_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_ASPECT_WARRIORS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000596",
+        model_name="Fire Dragons",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:fire-dragons:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000596",
+        model_name="Fire Dragon Exarch",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:fire-dragon-exarch:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000600",
+        model_name="Swooping Hawks",
+        height=2.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:swooping-hawks:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (32mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000600",
+        model_name="Swooping Hawk Exarch",
+        height=2.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:swooping-hawk-exarch:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (32mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000601",
+        model_name="Warp Spiders",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:warp-spiders:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000601",
+        model_name="Warp Spider Exarch",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:warp-spider-exarch:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+)
+
 AELDARI_SHROUD_RUNNERS_WRAITHBLADES_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000002533",

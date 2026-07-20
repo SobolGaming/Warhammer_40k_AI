@@ -13,7 +13,8 @@ from warhammer40k_core.rules.wahapedia_replacement_option_bridge import replacem
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
 
 NAMED_REPLACEMENT_CHOICES_RE = re.compile(
-    r"^The (?P<model>.+?)'s (?P<replaced>.+?) can be replaced with one of the following:\n"
+    r"^The (?P<model>.+?)(?: model)?'s (?P<replaced>.+?) can be replaced with "
+    r"(?:one|1) of the following:\n"
     r"(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
     re.IGNORECASE,
 )
@@ -635,11 +636,27 @@ def _append_named_replacement(
     replaced_id = _required_wargear_id(
         wargear_ids_by_name, match.group("replaced"), error_type=error_type
     )
-    choice_ids = tuple(
-        _required_wargear_id(wargear_ids_by_name, choice.name, error_type=error_type)
-        for choice in replacement_choices(match.group("choices"), error_type=error_type)
-    )
+    choices = replacement_choices(match.group("choices"), error_type=error_type)
+    choice_groups = tuple(_replacement_choice_wargear_names(choice.name) for choice in choices)
     source_line = _required_field(row, "line", error_type=error_type)
+    if any(len(choice_group) > 1 for choice_group in choice_groups):
+        _append_named_paired_replacement_choices(
+            row=row,
+            datasheet_id=datasheet_id,
+            model_profile_id=model_profile_id,
+            model_name=match.group("model"),
+            replaced_id=replaced_id,
+            choice_groups=choice_groups,
+            wargear_ids_by_name=wargear_ids_by_name,
+            source_line=source_line,
+            bridged_rows=bridged_rows,
+            error_type=error_type,
+        )
+        return
+    choice_ids = tuple(
+        _required_wargear_id(wargear_ids_by_name, names[0], error_type=error_type)
+        for names in choice_groups
+    )
     common = _option_common(
         row=row,
         datasheet_id=datasheet_id,
@@ -660,6 +677,69 @@ def _append_named_replacement(
         }
         for index, choice_id in enumerate(choice_ids, start=1)
     )
+
+
+def _replacement_choice_wargear_names(choice_name: str) -> tuple[str, ...]:
+    paired_match = re.fullmatch(r"(?P<first>.+?) and 1 (?P<second>.+)", choice_name)
+    if paired_match is None:
+        return (choice_name,)
+    return paired_match.group("first"), paired_match.group("second")
+
+
+def _append_named_paired_replacement_choices(
+    *,
+    row: NormalizedSourceRow,
+    datasheet_id: str,
+    model_profile_id: str,
+    model_name: str,
+    replaced_id: str,
+    choice_groups: tuple[tuple[str, ...], ...],
+    wargear_ids_by_name: dict[str, str],
+    source_line: str,
+    bridged_rows: dict[str, list[dict[str, str]]],
+    error_type: type[ValueError],
+) -> None:
+    selection_group_id = f"{datasheet_id}:named-replacement-option-{source_line}"
+    for choice_index, choice_names in enumerate(choice_groups, start=1):
+        choice_ids = tuple(
+            _required_wargear_id(wargear_ids_by_name, name, error_type=error_type)
+            for name in choice_names
+        )
+        option_id = (
+            f"{datasheet_id}:{_name_key(model_name)}-replacement-"
+            f"{'-'.join(_name_key(name) for name in choice_names)}:option-{source_line}"
+        )
+        common = {
+            **_option_common(
+                row=row,
+                datasheet_id=datasheet_id,
+                option_id=option_id,
+                model_profile_id=model_profile_id,
+                allowed_wargear_ids=choice_ids,
+                max_selections=len(choice_ids),
+            ),
+            **_selection_limit_fields(
+                selection_group_id=selection_group_id,
+                group_max_per_model=1,
+                option_max_per_model=1,
+            ),
+        }
+        bridged_rows["Datasheets_options"].extend(
+            {
+                **common,
+                "line": f"{source_line}.{choice_index}.{effect_index}",
+                "effect_kind": (
+                    WargearOptionEffectKind.REPLACE_WARGEAR.value
+                    if effect_index == 1
+                    else WargearOptionEffectKind.ADD_WARGEAR.value
+                ),
+                "effect_wargear_id": choice_id,
+                "effect_replaced_wargear_id": replaced_id if effect_index == 1 else "",
+                "effect_model_count": "1",
+                "effect_wargear_count": "1",
+            }
+            for effect_index, choice_id in enumerate(choice_ids, start=1)
+        )
 
 
 def _append_additive(

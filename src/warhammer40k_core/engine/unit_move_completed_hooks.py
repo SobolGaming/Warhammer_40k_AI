@@ -142,7 +142,9 @@ class UnitMoveCompletedMortalWoundEffect:
     rolling_player_id: str
     trigger_event_id: str
     roll_threshold: int
-    mortal_wounds_expression: DiceExpression
+    mortal_wounds_expression: DiceExpression | int
+    maximum_total_mortal_wounds: int | None = None
+    mortal_wound_cap_group_id: str | None = None
     replay_payload: JsonValue = None
 
     def __post_init__(self) -> None:
@@ -178,9 +180,27 @@ class UnitMoveCompletedMortalWoundEffect:
             "roll_threshold",
             _validate_d6_threshold("roll_threshold", self.roll_threshold),
         )
-        if type(self.mortal_wounds_expression) is not DiceExpression:
+        if type(self.mortal_wounds_expression) not in {DiceExpression, int} or (
+            type(self.mortal_wounds_expression) is int and self.mortal_wounds_expression <= 0
+        ):
             raise GameLifecycleError(
-                "Unit move completed mortal wound effect requires DiceExpression."
+                "Unit move completed mortal wound effect requires DiceExpression or a positive "
+                "fixed integer."
+            )
+        if self.maximum_total_mortal_wounds is not None and (
+            type(self.maximum_total_mortal_wounds) is not int
+            or self.maximum_total_mortal_wounds <= 0
+        ):
+            raise GameLifecycleError("Unit move completed mortal wound maximum must be positive.")
+        if (self.maximum_total_mortal_wounds is None) != (self.mortal_wound_cap_group_id is None):
+            raise GameLifecycleError(
+                "Unit move completed mortal wound cap requires a cap group ID."
+            )
+        if self.mortal_wound_cap_group_id is not None:
+            object.__setattr__(
+                self,
+                "mortal_wound_cap_group_id",
+                _validate_identifier("mortal_wound_cap_group_id", self.mortal_wound_cap_group_id),
             )
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
 
@@ -697,6 +717,8 @@ def _resolve_mortal_wound_effect(
         "target_player_id": effect.target_player_id,
         "rolling_player_id": effect.rolling_player_id,
         "roll_threshold": effect.roll_threshold,
+        "maximum_total_mortal_wounds": effect.maximum_total_mortal_wounds,
+        "mortal_wound_cap_group_id": effect.mortal_wound_cap_group_id,
         "trigger_roll": roll_payload,
         "replay_payload": effect.replay_payload,
     }
@@ -713,22 +735,49 @@ def _resolve_mortal_wound_effect(
             },
         )
         return None
-    damage_roll = manager.roll(
-        DiceRollSpec(
-            expression=effect.mortal_wounds_expression,
-            reason=(
-                "Unit move completed mortal wounds "
-                f"{effect.source_rule_id} for {effect.target_unit_instance_id}"
-            ),
-            roll_type="unit_move_completed_mortal_wounds.damage",
-            actor_id=effect.rolling_player_id,
-        )
+    previous_mortal_wounds = _mortal_wounds_for_cap_group(
+        decisions=decisions,
+        cap_group_id=effect.mortal_wound_cap_group_id,
     )
+    if (
+        effect.maximum_total_mortal_wounds is not None
+        and previous_mortal_wounds >= effect.maximum_total_mortal_wounds
+    ):
+        decisions.event_log.append(
+            UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_IGNORED_EVENT,
+            {**base_payload, "ignored_reason": "mortal_wound_cap_reached"},
+        )
+        return None
+    damage_roll_payload: JsonValue = None
+    mortal_wounds_expression = effect.mortal_wounds_expression
+    if isinstance(mortal_wounds_expression, int):
+        mortal_wounds = mortal_wounds_expression
+    else:
+        damage_roll = manager.roll(
+            DiceRollSpec(
+                expression=mortal_wounds_expression,
+                reason=(
+                    "Unit move completed mortal wounds "
+                    f"{effect.source_rule_id} for {effect.target_unit_instance_id}"
+                ),
+                roll_type="unit_move_completed_mortal_wounds.damage",
+                actor_id=effect.rolling_player_id,
+            )
+        )
+        mortal_wounds = damage_roll.current_total
+        damage_roll_payload = validate_json_value(damage_roll.to_payload())
+    if effect.maximum_total_mortal_wounds is not None:
+        mortal_wounds = min(
+            mortal_wounds,
+            effect.maximum_total_mortal_wounds - previous_mortal_wounds,
+        )
     source_context: dict[str, JsonValue] = {
         **base_payload,
         "source_kind": UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_SOURCE_KIND,
-        "damage_roll": validate_json_value(damage_roll.to_payload()),
-        "mortal_wounds": damage_roll.current_total,
+        "damage_roll": damage_roll_payload,
+        "mortal_wounds": mortal_wounds,
+        "maximum_total_mortal_wounds": effect.maximum_total_mortal_wounds,
+        "mortal_wound_cap_group_id": effect.mortal_wound_cap_group_id,
     }
     progress = MortalWoundApplicationProgress.start(
         application_id=(
@@ -740,7 +789,7 @@ def _resolve_mortal_wound_effect(
         source_context=source_context,
         target_unit_instance_id=effect.target_unit_instance_id,
         defender_player_id=effect.target_player_id,
-        mortal_wounds=damage_roll.current_total,
+        mortal_wounds=mortal_wounds,
         spill_over=True,
     )
     routed = continue_mortal_wound_application(
@@ -952,6 +1001,34 @@ def _processed_effect_keys(decisions: DecisionController) -> set[str]:
     return processed
 
 
+def _mortal_wounds_for_cap_group(
+    *,
+    decisions: DecisionController,
+    cap_group_id: str | None,
+) -> int:
+    if cap_group_id is None:
+        return 0
+    requested_group_id = _validate_identifier("mortal_wound_cap_group_id", cap_group_id)
+    mortal_wounds_by_effect_key: dict[str, int] = {}
+    for record in decisions.event_log.records:
+        if record.event_type not in {
+            UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_PENDING_EVENT,
+            UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT,
+        }:
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict) or payload.get("mortal_wound_cap_group_id") != (
+            requested_group_id
+        ):
+            continue
+        effect_key = payload.get("effect_key")
+        mortal_wounds = payload.get("mortal_wounds")
+        if type(effect_key) is not str or type(mortal_wounds) is not int or mortal_wounds < 0:
+            raise GameLifecycleError("Move-completed mortal wound cap payload is malformed.")
+        mortal_wounds_by_effect_key[effect_key] = mortal_wounds
+    return sum(mortal_wounds_by_effect_key.values())
+
+
 def _processed_battle_shock_effect_keys(decisions: DecisionController) -> set[str]:
     processed: set[str] = set()
     for record in decisions.event_log.records:
@@ -1037,6 +1114,8 @@ def _source_context_event_payload(source_context: dict[str, JsonValue]) -> dict[
         "trigger_roll": source_context["trigger_roll"],
         "damage_roll": source_context["damage_roll"],
         "mortal_wounds": source_context["mortal_wounds"],
+        "maximum_total_mortal_wounds": source_context.get("maximum_total_mortal_wounds"),
+        "mortal_wound_cap_group_id": source_context.get("mortal_wound_cap_group_id"),
         "replay_payload": source_context["replay_payload"],
     }
 

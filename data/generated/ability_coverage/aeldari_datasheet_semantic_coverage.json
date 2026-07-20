@@ -1261,14 +1261,13 @@
         {
           "ability_id": "000000596:assured-destruction",
           "ability_name": "Assured Destruction",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "7513509f84fb650125c42177681b9510abfc256ee8b93cace9501cef98c293cc",
           "raw_text": "In your Shooting phase, each time a model in this unit makes a ranged attack that targets a MONSTER or VEHICLE unit, you can re-roll the Hit roll, you can re-roll the Wound roll and you can re-roll the Damage roll.",
           "raw_text_sha256": "7513509f84fb650125c42177681b9510abfc256ee8b93cace9501cef98c293cc",
           "runtime_consumer_ids": [
+            "catalog-ir:damage-roll-reroll",
             "catalog-ir:hit-roll-reroll",
             "catalog-ir:wound-roll-reroll"
           ],
@@ -1277,19 +1276,21 @@
               "runtime_consumer_ids": [
                 "catalog-ir:hit-roll-reroll"
               ],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:2:description:clause:001:effect:0",
+              "semantic_id": "phase17l:aeldari:aspect-warriors:000000596:2:clause:001:effect:0",
               "semantic_kind": "reroll_permission"
             },
             {
               "runtime_consumer_ids": [
                 "catalog-ir:wound-roll-reroll"
               ],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:2:description:clause:001:effect:1",
+              "semantic_id": "phase17l:aeldari:aspect-warriors:000000596:2:clause:001:effect:1",
               "semantic_kind": "reroll_permission"
             },
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:2:description:clause:001:effect:2",
+              "runtime_consumer_ids": [
+                "catalog-ir:damage-roll-reroll"
+              ],
+              "semantic_id": "phase17l:aeldari:aspect-warriors:000000596:2:clause:001:effect:2",
               "semantic_kind": "reroll_permission"
             }
           ],
@@ -1298,7 +1299,7 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000596:2",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000596:aspect-shrine-token",
@@ -1332,7 +1333,7 @@
       "datasheet_name": "Fire Dragons",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "rules_update"
     },
     {
@@ -1544,21 +1545,36 @@
         {
           "ability_id": "000000600:grenade-pack-flyover",
           "ability_name": "Grenade Pack Flyover",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "1d8bcac32eb8b8e0e7e9b87c9c46cda09fe43996ec606b8750ce74319b001ed8",
           "raw_text": "Once per turn, in your Movement phase, when this unit is set up on the battlefield or ends a Normal, Advance or Fall Back move, it can use this ability. If it does, select one enemy unit within 8\" of and visible to this unit and roll one D6 for each Swooping Hawks model in this unit: for each 4+, that enemy unit suffers 1 mortal wound (to a maximum of 6 mortal wounds). Each time this unit uses this ability, until the end of the turn, you cannot target this unit with the Grenade Stratagem.",
           "raw_text_sha256": "1d8bcac32eb8b8e0e7e9b87c9c46cda09fe43996ec606b8750ce74319b001ed8",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:unit-move-completed-mortal-wounds"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:unit-move-completed-mortal-wounds"
+              ],
+              "semantic_id": "phase17l:aeldari:aspect-warriors:000000600:3:clause:001:effect:0",
+              "semantic_kind": "inflict_mortal_wounds"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:unit-move-completed-mortal-wounds"
+              ],
+              "semantic_id": "phase17l:aeldari:aspect-warriors:000000600:3:clause:001:effect:1",
+              "semantic_kind": "grant_ability"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000600:3"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000600:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000600:aspect-shrine-token",
@@ -1592,7 +1608,7 @@
       "datasheet_name": "Swooping Hawks",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "rules_update"
     },
     {
@@ -1600,21 +1616,43 @@
         {
           "ability_id": "000000601:flickerjump",
           "ability_name": "Flickerjump",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "f3515b6437a92803b3770b40b20a35bf263bc4013fd573cf2143ab815137626c",
           "raw_text": "In your Movement phase, each time this unit is selected to make a Normal move, it can use this ability. If it does, until the end of the turn, this unit is not eligible to declare a charge and models in it have a Move characteristic of 24\". Each time this unit uses this ability, at the end of the phase, roll one D6 for each model in this unit: for each 1, this unit suffers 1 mortal wound.",
           "raw_text_sha256": "f3515b6437a92803b3770b40b20a35bf263bc4013fd573cf2143ab815137626c",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-action-grant"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-action-grant"
+              ],
+              "semantic_id": "phase17l:aeldari:aspect-warriors:000000601:3:clause:001:effect:0",
+              "semantic_kind": "set_characteristic"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-action-grant"
+              ],
+              "semantic_id": "phase17l:aeldari:aspect-warriors:000000601:3:clause:001:effect:1",
+              "semantic_kind": "grant_ability"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-action-grant"
+              ],
+              "semantic_id": "phase17l:aeldari:aspect-warriors:000000601:3:clause:001:effect:2",
+              "semantic_kind": "inflict_mortal_wounds"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000601:3"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000601:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000601:aspect-shrine-token",
@@ -1648,7 +1686,7 @@
       "datasheet_name": "Warp Spiders",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "rules_update"
     },
     {
@@ -3301,10 +3339,14 @@
           "normalized_text_sha256": "08c62bf136cca6b9e7e554b47787eb5fe79707a227d2130aa0739383d6370452",
           "raw_text": "Each time this model makes an attack with its D-cannon, re-roll a Damage roll of 1. If that attack targets a TITANIC unit, you can re-roll the Damage roll instead.",
           "raw_text_sha256": "08c62bf136cca6b9e7e554b47787eb5fe79707a227d2130aa0739383d6370452",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:damage-roll-reroll"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
+              "runtime_consumer_ids": [
+                "catalog-ir:damage-roll-reroll"
+              ],
               "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003910:2:description:clause:001:effect:0",
               "semantic_kind": "reroll_permission"
             },
@@ -4217,9 +4259,9 @@
   "release_hash": "508a406f5c32a5093f11536f29dbd8b48c2711c1d69f9390497e0b45ef183420",
   "schema_version": "aeldari-datasheet-semantic-coverage-v3",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 14,
+    "All exact abilities consumed": 17,
     "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 50
+    "Exact ability IR unsupported": 47
   },
   "source_artifact_hashes": {
     "Abilities": "dd7d779531e88bd2c30ee2405275b41dba0e5d56007c43a7fcf8bb7c105032e0",
