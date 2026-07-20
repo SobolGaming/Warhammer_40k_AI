@@ -63,6 +63,7 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_model_scope import scoped_roll_model_ids_for_effect
 from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
     CatalogWeaponKeywordGrant as CatalogWeaponKeywordGrant,
 )
@@ -1835,6 +1836,16 @@ def _catalog_unit_move_completed_mortal_wounds_group_from_clause(
         )
     effect_index, effect = supported_effects[0]
     parameters = parameter_payload(effect.parameters)
+    scoped_roll_model_ids = scoped_roll_model_ids_for_effect(
+        source_rules_unit=rules_unit_view_by_id(
+            state=context.state,
+            unit_instance_id=source_rules_unit_id,
+        ),
+        current_roll_model_instance_ids=roll_model_ids,
+        effect_parameters=parameters,
+    )
+    if not scoped_roll_model_ids:
+        return None
     target_candidates = _unit_move_completed_mortal_wounds_target_candidates_for_clause(
         state=context.state,
         ruleset_descriptor=context.ruleset_descriptor,
@@ -1879,7 +1890,7 @@ def _catalog_unit_move_completed_mortal_wounds_group_from_clause(
         forbidden_stratagem_handler_ids=tuple(forbidden_handler_ids),
         target_range_inches=_unit_move_completed_target_range_inches(clause),
         target_requires_visibility=_unit_move_completed_target_requires_visibility(clause),
-        roll_model_instance_ids=roll_model_ids,
+        roll_model_instance_ids=scoped_roll_model_ids,
         trigger_event_id=context.trigger_event_id,
         movement_action=context.movement_action,
         options=tuple(

@@ -1054,15 +1054,15 @@ def test_source_backed_reroll_target_filter_and_payload_validation() -> None:
             effect_id=f"{reroll_effect.effect_id}:duplicate",
         )
     )
-    with pytest.raises(GameLifecycleError, match="Multiple source-backed reroll"):
-        source_backed_reroll_permission_context_for_unit(
-            state=state,
-            player_id="player-a",
-            unit_instance_id=SPACE_MARINES_UNIT_ID,
-            roll_type="attack_sequence.hit",
-            timing_window="attack_sequence.hit",
-            target_unit_instance_id=ENEMY_TARGET_ID,
-        )
+    deduplicated_context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=SPACE_MARINES_UNIT_ID,
+        roll_type="attack_sequence.hit",
+        timing_window="attack_sequence.hit",
+        target_unit_instance_id=ENEMY_TARGET_ID,
+    )
+    assert deduplicated_context == permission_context
 
     malformed_lifecycle = _battle_ready_lifecycle()
     malformed_request = malformed_lifecycle.advance_until_decision_or_terminal().decision_request

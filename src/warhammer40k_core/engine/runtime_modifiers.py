@@ -12,6 +12,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
+    select_source_backed_reroll_permission_context,
 )
 
 if TYPE_CHECKING:
@@ -973,16 +974,21 @@ class RuntimeModifierRegistry:
         self,
         context: AttackRerollPermissionContext,
     ) -> SourceBackedRerollPermissionContext | None:
+        return select_source_backed_reroll_permission_context(
+            self.attack_reroll_permission_contexts(context)
+        )
+
+    def attack_reroll_permission_contexts(
+        self,
+        context: AttackRerollPermissionContext,
+    ) -> tuple[SourceBackedRerollPermissionContext, ...]:
         if type(context) is not AttackRerollPermissionContext:
             raise GameLifecycleError("Attack reroll permissions require a context.")
-        candidates = tuple(
+        return tuple(
             candidate
             for binding in self.attack_reroll_permission_bindings
             if (candidate := binding.handler(context)) is not None
         )
-        if len(candidates) > 1:
-            raise GameLifecycleError("Multiple attack reroll permissions are available.")
-        return candidates[0] if candidates else None
 
     def failed_save_damage_replacement(
         self,

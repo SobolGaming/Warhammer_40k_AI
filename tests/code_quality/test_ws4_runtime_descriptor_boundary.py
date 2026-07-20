@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
+CATALOG_DATASHEET_RUNTIME = ENGINE_ROOT / "catalog_datasheet_rule_runtime.py"
 
 RULE_NAME_NORMALIZER_NAMES = frozenset(
     {
@@ -63,6 +64,18 @@ def test_engine_runtime_does_not_compare_ability_display_names() -> None:
         "Engine runtime must not gate behavior on DatasheetAbilityDescriptor.name:\n"
         + "\n".join(violations)
     )
+
+
+def test_catalog_datasheet_runtime_does_not_renormalize_keyword_tokens() -> None:
+    tree = ast.parse(
+        CATALOG_DATASHEET_RUNTIME.read_text(encoding="utf-8"),
+        filename=str(CATALOG_DATASHEET_RUNTIME),
+    )
+
+    assert not any(
+        isinstance(node, ast.FunctionDef) and node.name == "_canonical_keyword"
+        for node in ast.walk(tree)
+    ), "Catalog runtime must compare canonical catalog keyword tokens directly."
 
 
 def _engine_trees() -> tuple[tuple[Path, ast.Module], ...]:

@@ -201,19 +201,20 @@ class MovementPhaseHandler:
         if move_completed_status is not None:
             return move_completed_status
 
-        setup_completed_status = resolve_unit_move_completed_mortal_wound_hooks(
-            state=state,
-            decisions=decisions,
-            registry=self.unit_move_completed_mortal_wound_hooks,
-            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
-            runtime_modifier_registry=self.runtime_modifier_registry,
-            completed_phase=BattlePhase.MOVEMENT,
-            event_type="reinforcement_unit_arrived",
-            movement_actions=("set_up",),
-            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
-        )
-        if setup_completed_status is not None:
-            return setup_completed_status
+        for setup_event_type in ("reinforcement_unit_arrived", "unit_disembarked"):
+            setup_completed_status = resolve_unit_move_completed_mortal_wound_hooks(
+                state=state,
+                decisions=decisions,
+                registry=self.unit_move_completed_mortal_wound_hooks,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                runtime_modifier_registry=self.runtime_modifier_registry,
+                completed_phase=BattlePhase.MOVEMENT,
+                event_type=setup_event_type,
+                movement_actions=("set_up",),
+                ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            )
+            if setup_completed_status is not None:
+                return setup_completed_status
 
         fell_back_stratagem_status = _request_friendly_unit_fell_back_stratagem_if_available(
             state=state,

@@ -19,7 +19,13 @@ from tools.generate_aeldari_aspect_warriors_rule_ir import (
 )
 
 from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollState
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    DiceRollState,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
+)
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.ability_catalog import (
@@ -28,12 +34,16 @@ from warhammer40k_core.engine.ability_catalog import (
 )
 from warhammer40k_core.engine.advance_hooks import AdvanceMoveContext, AdvanceMoveHookRegistry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attack_sequence import (
     _request_source_backed_damage_reroll_if_available,
     _request_source_backed_hit_reroll_if_available,
     _request_source_backed_wound_reroll_if_available,
 )
-from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import (
+    CatalogDatasheetRuleRuntime,
+    _rules_unit_has_any_keyword,  # pyright: ignore[reportPrivateUsage]
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
 )
@@ -53,6 +63,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -67,13 +78,18 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.movement import MovementPhaseHandler
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionContext,
     MovementBudgetModifierContext,
     RuntimeModifierRegistry,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
+from warhammer40k_core.engine.source_backed_rerolls import (
+    source_backed_reroll_permission_effect_payload,
+)
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT,
@@ -96,6 +112,7 @@ FIRE_DRAGONS_ID = "000000596"
 SWOOPING_HAWKS_ID = "000000600"
 WARP_SPIDERS_ID = "000000601"
 WRAITHLORD_ID = "000000613"
+PRINCE_YRIEL_ID = "000004193"
 
 
 @cache
@@ -212,7 +229,7 @@ def test_catalog_preserves_aspect_warrior_profiles_geometry_loadouts_and_options
     )
 
 
-def test_assured_destruction_gates_all_three_rerolls_and_builds_replay_safe_requests() -> None:
+def test_assured_destruction_composes_all_three_rerolls_and_builds_replay_safe_requests() -> None:
     fixture = _runtime_fixture(phase=BattlePhase.SHOOTING)
     runtime = CatalogDatasheetRuleRuntime(fixture.indexes, fixture.armies)
     registry = RuntimeModifierRegistry.from_bindings(
@@ -272,6 +289,17 @@ def test_assured_destruction_gates_all_three_rerolls_and_builds_replay_safe_requ
         )
         is None
     )
+
+    for roll_type in (
+        "attack_sequence.hit",
+        "attack_sequence.wound",
+        "random_characteristic.damage.assured-destruction",
+    ):
+        _record_overlapping_attack_reroll_permission(
+            fixture.state,
+            unit_instance_id=attacker.unit_instance_id,
+            roll_type=roll_type,
+        )
 
     request_builders: tuple[
         tuple[str, Callable[[DiceRollState, DecisionController], LifecycleStatus | None]], ...
@@ -348,6 +376,46 @@ def test_assured_destruction_gates_all_three_rerolls_and_builds_replay_safe_requ
         )
 
 
+def test_assured_destruction_applies_to_attached_leader_attacks() -> None:
+    fixture = _runtime_fixture(
+        phase=BattlePhase.SHOOTING,
+        attach_leader_to="fire_dragons",
+    )
+    assert fixture.attached_leader is not None
+    runtime = CatalogDatasheetRuleRuntime(fixture.indexes, fixture.armies)
+    registry = RuntimeModifierRegistry.from_bindings(
+        attack_reroll_permission_bindings=runtime.attack_reroll_permission_bindings()
+    )
+
+    permission = registry.attack_reroll_permission_context(
+        AttackRerollPermissionContext(
+            state=fixture.state,
+            player_id="player-a",
+            attacking_unit_instance_id=fixture.fire_dragons_rules_unit_id,
+            attacker_model_instance_id=fixture.attached_leader.own_models[0].model_instance_id,
+            target_unit_instance_id=fixture.enemy_monster.unit_instance_id,
+            source_phase=BattlePhase.SHOOTING,
+            roll_type="attack_sequence.hit",
+            timing_window="attack_sequence.hit",
+        )
+    )
+
+    assert permission is not None
+    assert permission.source_payload["roll_type"] == "hit_roll"
+
+
+def test_assured_destruction_requires_exact_canonical_target_keyword_tokens() -> None:
+    fixture = _runtime_fixture(phase=BattlePhase.SHOOTING)
+    target_view = rules_unit_view_by_id(
+        state=fixture.state,
+        unit_instance_id=fixture.enemy_monster.unit_instance_id,
+    )
+
+    assert _rules_unit_has_any_keyword(target_view, ("MONSTER",))
+    assert not _rules_unit_has_any_keyword(target_view, ("monster",))
+    assert not _rules_unit_has_any_keyword(target_view, ("MONSTER-UNIT",))
+
+
 @pytest.mark.parametrize(
     ("event_type", "movement_action"),
     [
@@ -394,6 +462,78 @@ def test_grenade_pack_requests_optional_visible_target_for_move_and_setup(
     assert payload["target_range_inches"] == 8
     assert payload["target_requires_visibility"] is True
     assert payload["maximum_mortal_wounds"] == 6
+
+
+def test_grenade_pack_rolls_only_for_surviving_keyworded_models_in_attached_unit() -> None:
+    fixture = _runtime_fixture(
+        phase=BattlePhase.MOVEMENT,
+        swooping_hawk_count=5,
+        attach_leader_to="swooping_hawks",
+    )
+    assert fixture.attached_leader is not None
+    destroyed_hawk_id = fixture.swooping_hawks.own_models[0].model_instance_id
+    _mark_model_destroyed(fixture.state, model_instance_id=destroyed_hawk_id)
+    decisions, registry = _grenade_pack_runtime(fixture)
+    _record_move_completed_event(
+        fixture.state,
+        decisions,
+        event_type="movement_activation_completed",
+        movement_action="normal_move",
+        unit_instance_id=fixture.swooping_hawks_rules_unit_id,
+    )
+
+    status = resolve_unit_move_completed_mortal_wound_hooks(
+        state=fixture.state,
+        decisions=decisions,
+        registry=registry,
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.MOVEMENT,
+        event_type="movement_activation_completed",
+        movement_actions=("normal_move",),
+        ability_indexes_by_player_id=fixture.indexes,
+    )
+
+    assert status is not None
+    assert status.decision_request is not None
+    payload = cast(dict[str, Any], status.decision_request.payload)
+    assert payload["roll_model_instance_ids"] == sorted(
+        model.model_instance_id
+        for model in fixture.swooping_hawks.own_models
+        if model.model_instance_id != destroyed_hawk_id
+    )
+    assert (
+        fixture.attached_leader.own_models[0].model_instance_id
+        not in payload["roll_model_instance_ids"]
+    )
+
+
+@pytest.mark.parametrize("transport_movement_status", ["not_moved", "normal_move"])
+def test_grenade_pack_consumes_pre_and_post_move_disembark_as_setup(
+    transport_movement_status: str,
+) -> None:
+    fixture = _runtime_fixture(phase=BattlePhase.MOVEMENT)
+    decisions, registry = _grenade_pack_runtime(fixture)
+    _record_move_completed_event(
+        fixture.state,
+        decisions,
+        event_type="unit_disembarked",
+        movement_action=None,
+        transport_movement_status=transport_movement_status,
+    )
+    handler = MovementPhaseHandler(
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        unit_move_completed_mortal_wound_hooks=registry,
+        ability_indexes_by_player_id=fixture.indexes,
+    )
+
+    status = handler.begin_phase(state=fixture.state, decisions=decisions)
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    payload = cast(dict[str, Any], status.decision_request.payload)
+    assert payload["movement_action"] == "set_up"
+    assert payload["trigger_event_id"] == decisions.event_log.records[0].event_id
 
 
 def test_grenade_pack_resolves_per_hawk_caps_damage_restricts_grenades_and_is_once_per_turn() -> (
@@ -595,6 +735,9 @@ class _RuntimeFixture:
         warp_spiders: UnitInstance,
         enemy_monster: UnitInstance,
         enemy_infantry: UnitInstance,
+        fire_dragons_rules_unit_id: str,
+        swooping_hawks_rules_unit_id: str,
+        attached_leader: UnitInstance | None,
     ) -> None:
         self.armies = armies
         self.state = state
@@ -604,12 +747,16 @@ class _RuntimeFixture:
         self.warp_spiders = warp_spiders
         self.enemy_monster = enemy_monster
         self.enemy_infantry = enemy_infantry
+        self.fire_dragons_rules_unit_id = fire_dragons_rules_unit_id
+        self.swooping_hawks_rules_unit_id = swooping_hawks_rules_unit_id
+        self.attached_leader = attached_leader
 
 
 def _runtime_fixture(
     *,
     phase: BattlePhase,
     swooping_hawk_count: int = 5,
+    attach_leader_to: str | None = None,
 ) -> _RuntimeFixture:
     package = _package()
     catalog = package.army_catalog
@@ -645,12 +792,57 @@ def _runtime_fixture(
         selection_id="enemy-fire-dragons",
         datasheet_id=FIRE_DRAGONS_ID,
     )
+    attached_leader = None
+    attached_units: tuple[AttachedUnitFormation, ...] = ()
+    fire_dragons_rules_unit_id = fire_dragons.unit_instance_id
+    swooping_hawks_rules_unit_id = swooping_hawks.unit_instance_id
+    player_a_units = [fire_dragons, swooping_hawks, warp_spiders]
+    if attach_leader_to is not None:
+        attached_leader = _instantiate(
+            factory,
+            army_id="army-a",
+            selection_id=f"{attach_leader_to}-leader",
+            datasheet_id=PRINCE_YRIEL_ID,
+        )
+        source_unit = {
+            "fire_dragons": fire_dragons,
+            "swooping_hawks": swooping_hawks,
+        }.get(attach_leader_to)
+        if source_unit is None:
+            raise ValueError("Unsupported attached Aspect Warrior source.")
+        attached_rules_unit_id = f"attached-unit:army-a:{attach_leader_to}-leader"
+        attached_units = (
+            AttachedUnitFormation(
+                attached_unit_instance_id=attached_rules_unit_id,
+                bodyguard_unit_instance_id=source_unit.unit_instance_id,
+                leader_unit_instance_ids=(attached_leader.unit_instance_id,),
+                component_unit_instance_ids=tuple(
+                    sorted((source_unit.unit_instance_id, attached_leader.unit_instance_id))
+                ),
+                source_id=f"test:{attach_leader_to}:attachment",
+                attachment_source_ids=(f"test:{attach_leader_to}:leader-eligibility",),
+            ),
+        )
+        if attach_leader_to == "fire_dragons":
+            fire_dragons_rules_unit_id = attached_rules_unit_id
+        else:
+            swooping_hawks_rules_unit_id = attached_rules_unit_id
+        player_a_units.append(attached_leader)
     armies = (
-        _army(catalog, "army-a", "player-a", (fire_dragons, swooping_hawks, warp_spiders)),
+        _army(
+            catalog,
+            "army-a",
+            "player-a",
+            tuple(player_a_units),
+            attached_units=attached_units,
+        ),
         _army(catalog, "army-b", "player-b", (enemy_monster, enemy_infantry)),
     )
     state = _state(armies, phase=phase)
     _move_unit(state, swooping_hawks.unit_instance_id, x=10.0, y=10.0)
+    if attach_leader_to == "swooping_hawks":
+        assert attached_leader is not None
+        _move_unit(state, attached_leader.unit_instance_id, x=10.0, y=20.0)
     _move_unit(state, enemy_monster.unit_instance_id, x=15.0, y=10.0)
     _move_unit(state, enemy_infantry.unit_instance_id, x=50.0, y=10.0)
     records = catalog_ability_records_from_catalog(catalog)
@@ -667,6 +859,9 @@ def _runtime_fixture(
         warp_spiders=warp_spiders,
         enemy_monster=enemy_monster,
         enemy_infantry=enemy_infantry,
+        fire_dragons_rules_unit_id=fire_dragons_rules_unit_id,
+        swooping_hawks_rules_unit_id=swooping_hawks_rules_unit_id,
+        attached_leader=attached_leader,
     )
 
 
@@ -708,6 +903,8 @@ def _army(
     army_id: str,
     player_id: str,
     units: tuple[UnitInstance, ...],
+    *,
+    attached_units: tuple[AttachedUnitFormation, ...] = (),
 ) -> ArmyDefinition:
     return ArmyDefinition(
         army_id=army_id,
@@ -721,6 +918,7 @@ def _army(
         ),
         force_disposition_id="purge-the-foe",
         units=units,
+        attached_units=attached_units,
     )
 
 
@@ -766,19 +964,84 @@ def _record_move_completed_event(
     decisions: DecisionController,
     *,
     event_type: str,
-    movement_action: str,
+    movement_action: str | None,
+    unit_instance_id: str = "army-a:swooping-hawks",
+    transport_movement_status: str | None = None,
 ) -> None:
+    payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "phase": BattlePhase.MOVEMENT.value,
+        "active_player_id": "player-a",
+        "unit_instance_id": unit_instance_id,
+    }
+    if movement_action is not None:
+        payload["movement_phase_action"] = movement_action
+    if transport_movement_status is not None:
+        payload["transport_unit_instance_id"] = "army-a:test-transport"
+        payload["transport_movement_status"] = transport_movement_status
     decisions.event_log.append(
         event_type,
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "phase": BattlePhase.MOVEMENT.value,
-            "active_player_id": "player-a",
-            "unit_instance_id": "army-a:swooping-hawks",
-            "movement_phase_action": movement_action,
-        },
+        payload,
     )
+
+
+def _record_overlapping_attack_reroll_permission(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    roll_type: str,
+) -> None:
+    source_id = f"zzzz:test:overlapping-reroll:{roll_type}"
+    permission = RerollPermission(
+        source_id=source_id,
+        timing_window=roll_type,
+        owning_player_id="player-a",
+        eligible_roll_type=roll_type,
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id=f"{source_id}:effect",
+            source_rule_id=source_id,
+            owner_player_id="player-a",
+            target_unit_instance_ids=(unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.SHOOTING,
+            expiration=EffectExpiration.end_turn(
+                battle_round=state.battle_round,
+                player_id="player-a",
+            ),
+            effect_payload=source_backed_reroll_permission_effect_payload(
+                target_unit_instance_ids=(unit_instance_id,),
+                permission=permission,
+                source_payload={
+                    "effect_kind": "test_overlapping_attack_reroll",
+                    "attack_kind": "ranged",
+                },
+            ),
+        )
+    )
+
+
+def _mark_model_destroyed(state: GameState, *, model_instance_id: str) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    found = False
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            updated_models = tuple(
+                replace(model, wounds_remaining=0)
+                if model.model_instance_id == model_instance_id
+                else model
+                for model in unit.own_models
+            )
+            if updated_models != unit.own_models:
+                found = True
+            updated_units.append(replace(unit, own_models=updated_models))
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    assert found
+    state.replace_army_definitions(updated_armies)
 
 
 def _move_unit(state: GameState, unit_instance_id: str, *, x: float, y: float) -> None:

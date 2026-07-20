@@ -585,7 +585,7 @@ def _request_source_backed_hit_reroll_if_available(
     actor_id = roll_state.original_result.spec.actor_id
     if actor_id is None:
         return None
-    permission_context = source_backed_reroll_permission_context_for_unit(
+    permission_contexts = source_backed_reroll_permission_contexts_for_unit(
         state=state,
         player_id=actor_id,
         unit_instance_id=attacking_unit_instance_id,
@@ -602,9 +602,9 @@ def _request_source_backed_hit_reroll_if_available(
     )
     if type(registry) is not RuntimeModifierRegistry:
         raise GameLifecycleError("Attack hit reroll requires RuntimeModifierRegistry.")
-    catalog_permission_context = None
+    catalog_permission_contexts: tuple[SourceBackedRerollPermissionContext, ...] = ()
     if target_unit_instance_id is not None:
-        catalog_permission_context = registry.attack_reroll_permission_context(
+        catalog_permission_contexts = registry.attack_reroll_permission_contexts(
             AttackRerollPermissionContext(
                 state=state,
                 player_id=actor_id,
@@ -616,20 +616,20 @@ def _request_source_backed_hit_reroll_if_available(
                 timing_window="attack_sequence.hit",
             )
         )
-    if permission_context is not None and catalog_permission_context is not None:
-        raise GameLifecycleError("Multiple source-backed hit reroll permissions are available.")
-    if catalog_permission_context is not None:
-        permission_context = catalog_permission_context
+    applicable_contexts: list[SourceBackedRerollPermissionContext] = []
+    for candidate in (*permission_contexts, *catalog_permission_contexts):
+        candidate_permission = _source_backed_hit_permission_for_attack(
+            permission_context=candidate,
+            roll_state=roll_state,
+            state=state,
+            target_unit_instance_id=target_unit_instance_id,
+        )
+        if candidate_permission is not None:
+            applicable_contexts.append(replace(candidate, permission=candidate_permission))
+    permission_context = select_source_backed_reroll_permission_context(tuple(applicable_contexts))
     if permission_context is None:
         return None
-    permission = _source_backed_hit_permission_for_attack(
-        permission_context=permission_context,
-        roll_state=roll_state,
-        state=state,
-        target_unit_instance_id=target_unit_instance_id,
-    )
-    if permission is None:
-        return None
+    permission = permission_context.permission
     if _source_backed_reroll_already_answered(
         decisions=decisions,
         roll_id=roll_state.original_result.roll_id,
@@ -740,7 +740,7 @@ def _request_source_backed_save_reroll_if_available(
         return None
     if type(save_kind) is not SaveKind:
         raise GameLifecycleError("Source-backed save reroll requires a SaveKind.")
-    permission_context = source_backed_reroll_permission_context_for_unit(
+    permission_contexts = source_backed_reroll_permission_contexts_for_unit(
         state=state,
         player_id=actor_id,
         unit_instance_id=attacking_unit_instance_id,
@@ -749,14 +749,18 @@ def _request_source_backed_save_reroll_if_available(
         attack_kind=_source_backed_attack_kind_for_phase(source_phase),
         target_unit_instance_id=target_unit_instance_id,
     )
+    applicable_contexts: list[SourceBackedRerollPermissionContext] = []
+    for candidate in permission_contexts:
+        candidate_permission = _source_backed_save_permission_for_attack(
+            permission_context=candidate,
+            roll_state=roll_state,
+        )
+        if candidate_permission is not None:
+            applicable_contexts.append(replace(candidate, permission=candidate_permission))
+    permission_context = select_source_backed_reroll_permission_context(tuple(applicable_contexts))
     if permission_context is None:
         return None
-    permission = _source_backed_save_permission_for_attack(
-        permission_context=permission_context,
-        roll_state=roll_state,
-    )
-    if permission is None:
-        return None
+    permission = permission_context.permission
     if _source_backed_reroll_already_answered(
         decisions=decisions,
         roll_id=roll_state.original_result.roll_id,
@@ -1030,7 +1034,7 @@ def _request_source_backed_wound_reroll_if_available(
     actor_id = roll_state.original_result.spec.actor_id
     if actor_id is None:
         return None
-    permission_context = source_backed_reroll_permission_context_for_unit(
+    permission_contexts = source_backed_reroll_permission_contexts_for_unit(
         state=state,
         player_id=actor_id,
         unit_instance_id=attacking_unit_instance_id,
@@ -1041,7 +1045,7 @@ def _request_source_backed_wound_reroll_if_available(
         target_unit_instance_id=pool.target_unit_instance_id,
     )
     registry = _runtime_modifier_registry(runtime_modifier_registry)
-    catalog_permission_context = registry.attack_reroll_permission_context(
+    catalog_permission_contexts = registry.attack_reroll_permission_contexts(
         AttackRerollPermissionContext(
             state=state,
             player_id=actor_id,
@@ -1053,21 +1057,21 @@ def _request_source_backed_wound_reroll_if_available(
             timing_window="attack_sequence.wound",
         )
     )
-    if permission_context is not None and catalog_permission_context is not None:
-        raise GameLifecycleError("Multiple source-backed wound reroll permissions are available.")
-    if catalog_permission_context is not None:
-        permission_context = catalog_permission_context
+    applicable_contexts: list[SourceBackedRerollPermissionContext] = []
+    for candidate in (*permission_contexts, *catalog_permission_contexts):
+        candidate_permission = _source_backed_wound_permission_for_attack(
+            state=state,
+            permission_context=candidate,
+            roll_state=roll_state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            attacker_keywords=attacker_keywords,
+        )
+        if candidate_permission is not None:
+            applicable_contexts.append(replace(candidate, permission=candidate_permission))
+    permission_context = select_source_backed_reroll_permission_context(tuple(applicable_contexts))
     if permission_context is None:
         return None
-    permission = _source_backed_wound_permission_for_attack(
-        state=state,
-        permission_context=permission_context,
-        roll_state=roll_state,
-        target_unit_instance_id=pool.target_unit_instance_id,
-        attacker_keywords=attacker_keywords,
-    )
-    if permission is None:
-        return None
+    permission = permission_context.permission
     if _source_backed_reroll_already_answered(
         decisions=decisions,
         roll_id=roll_state.original_result.roll_id,

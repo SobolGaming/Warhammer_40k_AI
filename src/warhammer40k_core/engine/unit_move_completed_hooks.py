@@ -60,6 +60,12 @@ UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT = "unit_move_completed_mortal_w
 UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_ROLLED_EVENT = "unit_move_completed_mortal_wounds_rolled"
 UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_IGNORED_EVENT = "unit_move_completed_mortal_wounds_ignored"
 UNIT_MOVE_COMPLETED_BATTLE_SHOCK_RESOLVED_EVENT = "unit_move_completed_battle_shock_resolved"
+_SETUP_COMPLETION_ACTION_BY_EVENT_TYPE = MappingProxyType(
+    {
+        "reinforcement_unit_arrived": "set_up",
+        "unit_disembarked": "set_up",
+    }
+)
 _DEFAULT_BATTLE_SHOCK_REASON: BattleShockTestReason = cast(
     "BattleShockTestReason",
     "forced_by_army_rule",
@@ -477,7 +483,10 @@ def resolve_unit_move_completed_mortal_wound_hooks(
     ):
         triggering_unit_id = _payload_string(payload, "unit_instance_id")
         triggering_player_id = _payload_string(payload, "active_player_id")
-        movement_action = _movement_action_from_payload(payload)
+        movement_action = _movement_action_from_payload(
+            payload,
+            event_type=requested_event_type,
+        )
         context = UnitMoveCompletedContext(
             state=state,
             ruleset_descriptor=ruleset_descriptor,
@@ -554,7 +563,10 @@ def resolve_unit_move_completed_battle_shock_hooks(
     ):
         triggering_unit_id = _payload_string(payload, "unit_instance_id")
         triggering_player_id = _payload_string(payload, "active_player_id")
-        movement_action = _movement_action_from_payload(payload)
+        movement_action = _movement_action_from_payload(
+            payload,
+            event_type=requested_event_type,
+        )
         context = UnitMoveCompletedContext(
             state=state,
             ruleset_descriptor=ruleset_descriptor,
@@ -977,7 +989,7 @@ def _unprocessed_move_completion_events(
             continue
         if payload.get("phase") != completed_phase.value:
             continue
-        if _movement_action_from_payload(payload) not in movement_actions:
+        if _movement_action_from_payload(payload, event_type=event_type) not in movement_actions:
             continue
         events.append((record.event_id, payload))
     return tuple(events)
@@ -1079,10 +1091,25 @@ def _battle_shock_effect_digest(effect: UnitMoveCompletedBattleShockEffect) -> s
     return hashlib.sha256(_battle_shock_effect_key(effect).encode("utf-8")).hexdigest()[:16]
 
 
-def _movement_action_from_payload(payload: dict[str, JsonValue]) -> str:
+def _movement_action_from_payload(
+    payload: dict[str, JsonValue],
+    *,
+    event_type: str,
+) -> str:
+    requested_event_type = _validate_identifier("event_type", event_type)
     movement_action = payload.get("movement_phase_action")
-    if type(movement_action) is str:
-        return _validate_identifier("movement_phase_action", movement_action)
+    payload_action = (
+        None
+        if movement_action is None
+        else _validate_identifier("movement_phase_action", movement_action)
+    )
+    setup_action = _SETUP_COMPLETION_ACTION_BY_EVENT_TYPE.get(requested_event_type)
+    if setup_action is not None:
+        if payload_action is not None and payload_action != setup_action:
+            raise GameLifecycleError("Setup completion event movement action drifted.")
+        return setup_action
+    if payload_action is not None:
+        return payload_action
     phase = payload.get("phase")
     if phase == BattlePhase.CHARGE.value:
         return "charge_move"

@@ -846,7 +846,10 @@ class CatalogDatasheetRuleRuntime:
                 )
                 or context.attacker_model_instance_id is None
                 or context.attacker_model_instance_id
-                not in _current_source_model_ids(state=context.state, source=source)
+                not in _alive_rules_unit_model_ids(
+                    state=context.state,
+                    unit_instance_id=context.attacking_unit_instance_id,
+                )
                 or not _rules_unit_has_any_keyword(
                     rules_unit_view_by_id(
                         state=context.state,
@@ -1292,6 +1295,22 @@ def _current_source_model_ids(*, state: object, source: _CatalogClauseSource) ->
     )
 
 
+def _alive_rules_unit_model_ids(*, state: object, unit_instance_id: str) -> tuple[str, ...]:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Catalog datasheet rules-unit query requires GameState.")
+    return tuple(
+        sorted(
+            model.model_instance_id
+            for model in rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=unit_instance_id,
+            ).alive_models()
+        )
+    )
+
+
 def _static_source_model_ids(source: _CatalogClauseSource) -> tuple[str, ...]:
     model_ids = source.unit.own_model_ids()
     if source.record.source_kind is not AbilitySourceKind.WARGEAR:
@@ -1401,13 +1420,8 @@ def _rules_unit_has_required_aura_keyword(view: RulesUnitView, clause: RuleClaus
 
 
 def _rules_unit_has_any_keyword(view: RulesUnitView, required_keywords: tuple[str, ...]) -> bool:
-    required = {_canonical_keyword(keyword) for keyword in required_keywords}
-    keywords = {_canonical_keyword(keyword) for keyword in (*view.keywords, *view.faction_keywords)}
-    return bool(required & keywords)
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return keyword.replace("_", " ").replace("-", " ").upper()
+    keywords = frozenset((*view.keywords, *view.faction_keywords))
+    return any(keyword in keywords for keyword in required_keywords)
 
 
 def _clause_distance(clause: RuleClause) -> float:

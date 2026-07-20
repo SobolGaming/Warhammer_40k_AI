@@ -3,9 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, cast
 
-from warhammer40k_core.core.dice import RerollPermission, RerollPermissionPayload
+from warhammer40k_core.core.dice import (
+    RerollComponentSelectionPolicy,
+    RerollPermission,
+    RerollPermissionPayload,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 SOURCE_BACKED_REROLL_PERMISSION_EFFECT_KIND = "source_backed_reroll_permission"
@@ -88,12 +92,37 @@ def source_backed_reroll_permission_context_for_unit(
     attack_kind: str | None = None,
     target_unit_instance_id: str | None = None,
 ) -> SourceBackedRerollPermissionContext | None:
+    return select_source_backed_reroll_permission_context(
+        source_backed_reroll_permission_contexts_for_unit(
+            state=state,
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+            model_instance_id=model_instance_id,
+            roll_type=roll_type,
+            timing_window=timing_window,
+            attack_kind=attack_kind,
+            target_unit_instance_id=target_unit_instance_id,
+        )
+    )
+
+
+def source_backed_reroll_permission_contexts_for_unit(
+    *,
+    state: object,
+    player_id: str,
+    unit_instance_id: str,
+    model_instance_id: str | None = None,
+    roll_type: str,
+    timing_window: str,
+    attack_kind: str | None = None,
+    target_unit_instance_id: str | None = None,
+) -> tuple[SourceBackedRerollPermissionContext, ...]:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
-        generic_rule_reroll_permission_context_for_unit,
+        generic_rule_reroll_permission_contexts_for_unit,
     )
     from warhammer40k_core.engine.tracked_targets import (
-        tracked_target_reroll_permission_context_for_unit,
+        tracked_target_reroll_permission_contexts_for_unit,
     )
 
     if type(state) is not GameState:
@@ -140,7 +169,7 @@ def source_backed_reroll_permission_context_for_unit(
         ):
             continue
         permissions.append(permission_context)
-    generic_context = generic_rule_reroll_permission_context_for_unit(
+    generic_contexts = generic_rule_reroll_permission_contexts_for_unit(
         state=state,
         player_id=requested_player_id,
         unit_instance_id=requested_unit_id,
@@ -149,28 +178,75 @@ def source_backed_reroll_permission_context_for_unit(
         timing_window=requested_timing_window,
         target_unit_instance_id=requested_target_unit_id,
     )
-    if generic_context is not None:
+    for generic_context in generic_contexts:
         permissions.append(
             SourceBackedRerollPermissionContext(
                 permission=generic_context.permission,
                 source_payload=generic_context.source_payload,
             )
         )
-    tracked_context = tracked_target_reroll_permission_context_for_unit(
-        state=state,
-        player_id=requested_player_id,
-        unit_instance_id=requested_unit_id,
-        model_instance_id=requested_model_id,
-        roll_type=requested_roll_type,
-        timing_window=requested_timing_window,
-        attack_kind=requested_attack_kind,
-        target_unit_instance_id=requested_target_unit_id,
+    permissions.extend(
+        tracked_target_reroll_permission_contexts_for_unit(
+            state=state,
+            player_id=requested_player_id,
+            unit_instance_id=requested_unit_id,
+            model_instance_id=requested_model_id,
+            roll_type=requested_roll_type,
+            timing_window=requested_timing_window,
+            attack_kind=requested_attack_kind,
+            target_unit_instance_id=requested_target_unit_id,
+        )
     )
-    if tracked_context is not None:
-        permissions.append(tracked_context)
-    if len(permissions) > 1:
-        raise GameLifecycleError("Multiple source-backed reroll permissions are available.")
-    return permissions[0] if permissions else None
+    return tuple(permissions)
+
+
+def select_source_backed_reroll_permission_context(
+    candidates: tuple[SourceBackedRerollPermissionContext, ...],
+) -> SourceBackedRerollPermissionContext | None:
+    if type(candidates) is not tuple:
+        raise GameLifecycleError("Reroll permission candidates must be a tuple.")
+    if not candidates:
+        return None
+    unique_by_source_id: dict[str, SourceBackedRerollPermissionContext] = {}
+    for candidate in candidates:
+        if type(candidate) is not SourceBackedRerollPermissionContext:
+            raise GameLifecycleError("Reroll permission candidates require source contexts.")
+        existing = unique_by_source_id.get(candidate.permission.source_id)
+        if existing is not None and existing != candidate:
+            raise GameLifecycleError("Reroll permission source identity drifted.")
+        unique_by_source_id[candidate.permission.source_id] = candidate
+    unique = tuple(unique_by_source_id.values())
+    first = unique[0].permission
+    for candidate in unique[1:]:
+        permission = candidate.permission
+        if (
+            permission.timing_window != first.timing_window
+            or permission.owning_player_id != first.owning_player_id
+            or permission.eligible_roll_type != first.eligible_roll_type
+        ):
+            raise GameLifecycleError("Reroll permission candidate request identity drifted.")
+    return min(unique, key=_reroll_permission_candidate_sort_key)
+
+
+def _reroll_permission_candidate_sort_key(
+    context: SourceBackedRerollPermissionContext,
+) -> tuple[int, int, str, str]:
+    permission = context.permission
+    if permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL:
+        policy_rank = 0
+        selection_rank = 0
+    else:
+        policy_rank = 1
+        selections = permission.allowed_component_selections
+        if selections is None:
+            raise GameLifecycleError("Component reroll permission selections are missing.")
+        selection_rank = -len(selections)
+    return (
+        policy_rank,
+        selection_rank,
+        permission.source_id,
+        canonical_json(context.source_payload),
+    )
 
 
 def source_payload_from_reroll_effect_payload(effect_payload: JsonValue) -> dict[str, JsonValue]:
