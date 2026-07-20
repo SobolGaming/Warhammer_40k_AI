@@ -69,6 +69,15 @@ from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_from_armies,
 )
+from warhammer40k_core.engine.scout_abilities import (
+    CORE_SCOUTS_SOURCE_RULE_ID,
+)
+from warhammer40k_core.engine.scout_abilities import (
+    ScoutAbilityInstance as ScoutAbilityInstance,
+)
+from warhammer40k_core.engine.scout_abilities import (
+    scout_ability_instances_for_rules_unit as scout_ability_instances_for_rules_unit,
+)
 from warhammer40k_core.engine.sequencing import (
     SequencingConflictContext,
     SequencingParticipant,
@@ -78,10 +87,6 @@ from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
     TimingWindow,
     TimingWindowDescriptor,
-)
-from warhammer40k_core.engine.unit_abilities import (
-    scouts_ability_descriptors_for_unit,
-    scouts_distance_inches_from_descriptor,
 )
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyContext,
@@ -109,7 +114,6 @@ SCOUT_MOVE_PROPOSAL_KIND = "scout_move"
 SCOUT_RESERVE_SETUP_PROPOSAL_KIND = "scout_reserve_setup"
 
 CORE_REDEPLOY_SOURCE_RULE_ID = "core_rules:redeploy"
-CORE_SCOUTS_SOURCE_RULE_ID = "core_rules:scouts"
 SCOUT_ENEMY_DISTANCE_INCHES = 8.0
 PREBATTLE_SEQUENCING_EVENT_TYPE = "sequencing_order_resolved"
 _EPSILON = 1e-9
@@ -148,12 +152,6 @@ class PreBattleViolationCode(StrEnum):
     SCOUT_ENEMY_DISTANCE = "scout_enemy_distance"
     DEDICATED_TRANSPORT_REQUIRED = "dedicated_transport_required"
     TRANSPORT_CARGO_NOT_ALL_SCOUTS = "transport_cargo_not_all_scouts"
-
-
-class ScoutAbilityInstancePayload(TypedDict):
-    model_instance_id: str
-    distance_inches: float
-    source_id: str
 
 
 class PreBattleTimingWindowStatePayload(TypedDict):
@@ -233,45 +231,6 @@ class PreBattleResolutionPayload(TypedDict):
     transition_batch: dict[str, JsonValue] | None
     removal_batch: dict[str, JsonValue] | None
     placement_batch: dict[str, JsonValue] | None
-
-
-@dataclass(frozen=True, slots=True)
-class ScoutAbilityInstance:
-    model_instance_id: str
-    distance_inches: float
-    source_id: str = CORE_SCOUTS_SOURCE_RULE_ID
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "model_instance_id",
-            _validate_identifier("ScoutAbilityInstance model_instance_id", self.model_instance_id),
-        )
-        object.__setattr__(
-            self,
-            "distance_inches",
-            _validate_positive_number("ScoutAbilityInstance distance_inches", self.distance_inches),
-        )
-        object.__setattr__(
-            self,
-            "source_id",
-            _validate_identifier("ScoutAbilityInstance source_id", self.source_id),
-        )
-
-    def to_payload(self) -> ScoutAbilityInstancePayload:
-        return {
-            "model_instance_id": self.model_instance_id,
-            "distance_inches": self.distance_inches,
-            "source_id": self.source_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: ScoutAbilityInstancePayload) -> Self:
-        return cls(
-            model_instance_id=payload["model_instance_id"],
-            distance_inches=payload["distance_inches"],
-            source_id=payload["source_id"],
-        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -1664,7 +1623,11 @@ def scout_reserve_setup_candidates_for_player(
             armies=tuple(state.army_definitions),
             unit_instance_id=reserve_state.unit_instance_id,
         )
-        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
+        if not _rules_unit_all_components_have_scouts(
+            state=state,
+            view=view,
+            army_catalog=army_catalog,
+        ):
             continue
         if _unit_action_record_exists(
             state=state,
@@ -1696,7 +1659,11 @@ def scout_move_candidates_for_player(
     unavailable_ids = set(state.unarrived_reserve_model_ids()) | set(state.embarked_model_ids())
     candidates: list[RulesUnitView] = []
     for view in _rules_unit_views_for_player(state=state, player_id=requested_player_id):
-        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
+        if not _rules_unit_all_components_have_scouts(
+            state=state,
+            view=view,
+            army_catalog=army_catalog,
+        ):
             continue
         if _unit_action_record_exists(
             state=state,
@@ -2268,7 +2235,11 @@ def _append_action_eligibility_violations(
                     field="unit_instance_id",
                 )
             )
-        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
+        if not _rules_unit_all_components_have_scouts(
+            state=state,
+            view=view,
+            army_catalog=army_catalog,
+        ):
             violations.append(
                 PreBattleViolation(
                     violation_code=PreBattleViolationCode.UNIT_NOT_ELIGIBLE,
@@ -2277,7 +2248,11 @@ def _append_action_eligibility_violations(
                 )
             )
     elif request.action_kind is PreBattleActionKind.SCOUT_MOVE:
-        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
+        if not _rules_unit_all_components_have_scouts(
+            state=state,
+            view=view,
+            army_catalog=army_catalog,
+        ):
             violations.append(
                 PreBattleViolation(
                     violation_code=PreBattleViolationCode.UNIT_NOT_ELIGIBLE,
@@ -2677,6 +2652,7 @@ def _prebattle_selection_payload(
         )
     else:
         scout_instances = scout_ability_instances_for_rules_unit(
+            state=state,
             view=view,
             army_catalog=army_catalog,
         )
@@ -2716,45 +2692,6 @@ def _prebattle_selection_payload(
     return validate_json_value(payload)
 
 
-def scout_ability_instances_for_rules_unit(
-    *,
-    view: RulesUnitView,
-    army_catalog: ArmyCatalog,
-) -> tuple[ScoutAbilityInstance, ...]:
-    if type(view) is not RulesUnitView:
-        raise GameLifecycleError("Scouts ability lookup requires a RulesUnitView.")
-    if type(army_catalog) is not ArmyCatalog:
-        raise GameLifecycleError("Scouts ability lookup requires an ArmyCatalog.")
-    instances: list[ScoutAbilityInstance] = []
-    for component in view.components:
-        descriptors = scouts_ability_descriptors_for_unit(component.unit)
-        if not descriptors:
-            if _unit_has_keyword(component.unit, "SCOUTS"):
-                raise GameLifecycleError(
-                    "Scouts keyword requires a structured datasheet ability descriptor."
-                )
-            return ()
-        for model in component.unit.alive_own_models():
-            for descriptor in descriptors:
-                instances.append(
-                    ScoutAbilityInstance(
-                        model_instance_id=model.model_instance_id,
-                        distance_inches=scouts_distance_inches_from_descriptor(descriptor),
-                        source_id=descriptor.source_id,
-                    )
-                )
-    return tuple(
-        sorted(
-            instances,
-            key=lambda instance: (
-                instance.model_instance_id,
-                instance.distance_inches,
-                instance.source_id,
-            ),
-        )
-    )
-
-
 def _proposal_request_from_selection(
     *,
     state: GameState,
@@ -2787,6 +2724,7 @@ def _proposal_request_from_selection(
         PreBattleActionKind.DEDICATED_TRANSPORT_SCOUT_MOVE,
     }:
         instances = scout_ability_instances_for_rules_unit(
+            state=state,
             view=view,
             army_catalog=army_catalog,
         )
@@ -2800,6 +2738,7 @@ def _proposal_request_from_selection(
             model_instance_ids=tuple(model.model_instance_id for model in view.alive_models()),
             ability_instances=(
                 scout_ability_instances_for_rules_unit(
+                    state=state,
                     view=view,
                     army_catalog=army_catalog,
                 )
@@ -3101,7 +3040,11 @@ def _transport_cargo_all_scouts(
             armies=tuple(state.army_definitions),
             unit_instance_id=unit_id,
         )
-        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
+        if not _rules_unit_all_components_have_scouts(
+            state=state,
+            view=view,
+            army_catalog=army_catalog,
+        ):
             return False
     return True
 
@@ -3124,7 +3067,11 @@ def _dedicated_transport_cargo_scout_instances(
             unit_instance_id=unit_id,
         )
         instances.extend(
-            scout_ability_instances_for_rules_unit(view=view, army_catalog=army_catalog)
+            scout_ability_instances_for_rules_unit(
+                state=state,
+                view=view,
+                army_catalog=army_catalog,
+            )
         )
     if not instances:
         raise GameLifecycleError("Dedicated Transport Scout Move requires Scouts cargo.")
@@ -3263,10 +3210,17 @@ def _rules_unit_all_components_have_keyword(view: RulesUnitView, keyword: str) -
 
 def _rules_unit_all_components_have_scouts(
     *,
+    state: GameState,
     view: RulesUnitView,
     army_catalog: ArmyCatalog,
 ) -> bool:
-    return bool(scout_ability_instances_for_rules_unit(view=view, army_catalog=army_catalog))
+    return bool(
+        scout_ability_instances_for_rules_unit(
+            state=state,
+            view=view,
+            army_catalog=army_catalog,
+        )
+    )
 
 
 def _rules_unit_any_component_has_keyword(view: RulesUnitView, keyword: str) -> bool:

@@ -6,6 +6,7 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
+    RuleDurationKind,
     RuleEffectKind,
     RuleTargetKind,
     RuleTriggerKind,
@@ -23,6 +24,11 @@ CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID = (
 OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID = (
     "phase17l:optional-normal-move-characteristic-set-and-phase-end-risk"
 )
+CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID = (
+    "phase17m:conditional-leading-bodyguard-ability-grant"
+)
+AGILE_MANOEUVRE_ROLL_REROLL_TEMPLATE_ID = "phase17m:agile-manoeuvre-roll-reroll"
+FACTION_RESOURCE_REFUND_ROLL_TEMPLATE_ID = "phase17m:faction-resource-refund-roll"
 EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
     {
         CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID,
@@ -32,6 +38,9 @@ EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
         CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID,
         CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID,
         OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID,
+        CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID,
+        AGILE_MANOEUVRE_ROLL_REROLL_TEMPLATE_ID,
+        FACTION_RESOURCE_REFUND_ROLL_TEMPLATE_ID,
     }
 )
 
@@ -93,6 +102,26 @@ class CatalogMovementActionGrantDescriptor:
     mortal_wounds_per_success: int
 
 
+@dataclass(frozen=True, slots=True)
+class CatalogConditionalLeaderAbilityGrantDescriptor:
+    ability: str
+    required_bodyguard_keyword: str
+    distance_inches: float | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogConditionalLeadingRollRerollDescriptor:
+    roll_type: str
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogFactionResourceRefundRollDescriptor:
+    resource_kind: str
+    amount: int
+    roll_expression: str
+    success_threshold: int
+
+
 CatalogDatasheetRuntimeDescriptor = (
     CatalogInvulnerableSaveDescriptor
     | CatalogPassiveHitRerollDescriptor
@@ -102,6 +131,9 @@ CatalogDatasheetRuntimeDescriptor = (
     | CatalogConditionalInvulnerableSaveDescriptor
     | CatalogConditionalAttackRerollDescriptor
     | CatalogMovementActionGrantDescriptor
+    | CatalogConditionalLeaderAbilityGrantDescriptor
+    | CatalogConditionalLeadingRollRerollDescriptor
+    | CatalogFactionResourceRefundRollDescriptor
 )
 
 
@@ -126,10 +158,163 @@ def exact_datasheet_runtime_descriptor_for_clause(
         return conditional_attack_reroll_descriptor_for_clause(clause)
     if clause.template_id == OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID:
         return movement_action_grant_descriptor_for_clause(clause)
+    if clause.template_id == CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID:
+        return conditional_leader_ability_grant_descriptor_for_clause(clause)
+    if clause.template_id == AGILE_MANOEUVRE_ROLL_REROLL_TEMPLATE_ID:
+        return conditional_leading_roll_reroll_descriptor_for_clause(clause)
+    if clause.template_id == FACTION_RESOURCE_REFUND_ROLL_TEMPLATE_ID:
+        return faction_resource_refund_roll_descriptor_for_clause(clause)
     proximity = conditional_proximity_effects_descriptor_for_clause(clause)
     if proximity is not None:
         return proximity
     return None
+
+
+def conditional_leader_ability_grant_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogConditionalLeaderAbilityGrantDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID
+        or clause.trigger is not None
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or clause.target.parameters
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.WHILE_CONDITION_TRUE
+        or clause.duration.parameters
+        or len(clause.conditions) != 2
+        or len(clause.effects) != 1
+    ):
+        return None
+    relationship_conditions = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+    )
+    keyword_conditions = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.KEYWORD_GATE
+    )
+    if len(relationship_conditions) != 1 or len(keyword_conditions) != 1:
+        return None
+    relationship = parameter_payload(relationship_conditions[0].parameters)
+    keyword_gate = parameter_payload(keyword_conditions[0].parameters)
+    effect = clause.effects[0]
+    parameters = parameter_payload(effect.parameters)
+    ability = parameters.get("ability")
+    required_keyword = keyword_gate.get("required_keyword")
+    distance = parameters.get("distance_inches")
+    if (
+        relationship != {"relationship": "this_model_leading_unit"}
+        or keyword_gate.get("gate_subject") != "bodyguard_unit"
+        or set(keyword_gate) != {"gate_subject", "required_keyword"}
+        or type(required_keyword) is not str
+        or not required_keyword
+        or effect.kind is not RuleEffectKind.GRANT_ABILITY
+        or type(ability) is not str
+        or ability not in {"fights_first", "infiltrators", "scouts", "stealth"}
+        or parameters.get("target_scope") != "this_model"
+    ):
+        return None
+    if ability == "scouts":
+        if not isinstance(distance, int | float) or type(distance) is bool or distance <= 0:
+            return None
+        if set(parameters) != {"ability", "distance_inches", "target_scope"}:
+            return None
+        distance_inches: float | None = float(distance)
+    else:
+        if set(parameters) != {"ability", "target_scope"}:
+            return None
+        distance_inches = None
+    return CatalogConditionalLeaderAbilityGrantDescriptor(
+        ability=ability,
+        required_bodyguard_keyword=required_keyword,
+        distance_inches=distance_inches,
+    )
+
+
+def conditional_leading_roll_reroll_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogConditionalLeadingRollRerollDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != AGILE_MANOEUVRE_ROLL_REROLL_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.SELECTED_UNIT
+        or len(clause.effects) != 1
+        or not _clause_has_leading_relationship(clause)
+    ):
+        return None
+    trigger = parameter_payload(clause.trigger.parameters)
+    effect = clause.effects[0]
+    effect_parameters = parameter_payload(effect.parameters)
+    roll_type = trigger.get("roll_type")
+    if (
+        trigger.get("edge") != "after"
+        or trigger.get("subject") != "selected_unit"
+        or roll_type != "agile_manoeuvre_roll"
+        or effect.kind is not RuleEffectKind.REROLL_PERMISSION
+        or effect_parameters != {"roll_type": roll_type, "selection": "whole_roll"}
+    ):
+        return None
+    return CatalogConditionalLeadingRollRerollDescriptor(roll_type="agile_manoeuvre_roll")
+
+
+def faction_resource_refund_roll_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogFactionResourceRefundRollDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != FACTION_RESOURCE_REFUND_ROLL_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.SELECTED_UNIT
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.IMMEDIATE
+        or len(clause.effects) != 1
+        or not _clause_has_leading_relationship(clause)
+    ):
+        return None
+    trigger = parameter_payload(clause.trigger.parameters)
+    effect = clause.effects[0]
+    parameters = parameter_payload(effect.parameters)
+    if (
+        trigger
+        != {
+            "edge": "after",
+            "resource_kind": "battle_focus_token",
+            "timing_window": "faction_resource_spent",
+        }
+        or effect.kind is not RuleEffectKind.MODIFY_FACTION_RESOURCE
+        or parameters
+        != {
+            "amount": 1,
+            "operation": "gain",
+            "resource_kind": "battle_focus_token",
+            "roll_expression": "D6",
+            "success_threshold": 3,
+        }
+    ):
+        return None
+    return CatalogFactionResourceRefundRollDescriptor(
+        resource_kind="battle_focus_token",
+        amount=1,
+        roll_expression="D6",
+        success_threshold=3,
+    )
+
+
+def _clause_has_leading_relationship(clause: RuleClause) -> bool:
+    return any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters) == {"relationship": "this_model_leading_unit"}
+        for condition in clause.conditions
+    )
 
 
 def movement_action_grant_descriptor_for_clause(

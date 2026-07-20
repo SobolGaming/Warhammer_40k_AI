@@ -254,6 +254,7 @@ from warhammer40k_core.engine.catalog_unit_move_completed_mortal_wounds_runtime 
     invalid_catalog_unit_move_completed_mortal_wounds_target_status,
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
+from warhammer40k_core.engine.charge_roll_permissions import charge_reroll_permission_for_unit
 from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -341,9 +342,6 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
-)
-from warhammer40k_core.engine.phases.charge import (
-    _charge_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.phases.movement import (
     _ability_index_for_player,
@@ -2974,7 +2972,7 @@ def test_phase17k_leading_model_reroll_text_uses_generic_advance_charge_rerolls(
         ability_index=player_index,
         current_model_instance_ids=current_model_ids,
     )
-    charge_phase_permission = _charge_reroll_permission_for_unit(
+    charge_phase_permission = charge_reroll_permission_for_unit(
         state=state,
         player_id=army.player_id,
         unit_instance_id=unit.unit_instance_id,
@@ -6820,7 +6818,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Exact ability bridge blocked |"
     ) in aeldari_markdown
     assert (
-        "| Craftworlds / Asuryani | Fire Dragons (`000000596`)<br>"
+        "| Craftworlds / Asuryani | Autarch (`000000577`)<br>"
+        "Autarch Wayleaper (`000002759`)<br>Fire Dragons (`000000596`)<br>"
         "Night Spinner (`000000611`)<br>"
         "Rangers (`000000592`)<br>"
         "Shroud Runners (`000002533`)<br>Striking Scorpions (`000000595`)<br>"
@@ -7025,6 +7024,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Daemon Prince of Chaos",
         "Soul Grinder",
         "Daemon Prince Of Chaos With Wings",
+        "Autarch Wayleaper",
         "Corsair Skyreavers",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Collar of Khorne"]) == (

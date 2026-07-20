@@ -4,6 +4,22 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/faction/000009894/none",
+        "datasheet_id": "000000577",
+        "datasheet_name": "Autarch",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/faction/000009894/none",
+        "datasheet_id": "000002759",
+        "datasheet_name": "Autarch Wayleaper",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
         "datasheet_id": "000004196",
         "datasheet_name": "Corsair Skyreavers",
@@ -119,8 +135,10 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 14,
+    "coverage_row_count": 16,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000577/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000002759/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004196/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
@@ -137,6 +155,8 @@
       "chaos-daemons-bridge-catalog/000000601/faction/000009894/none"
     ],
     "datasheet_names": [
+      "Autarch",
+      "Autarch Wayleaper",
       "Corsair Skyreavers",
       "Corsair Voidreavers",
       "Corsair Voidscarred",
@@ -161,7 +181,7 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 14
+      "faction": 16
     },
     "support_stages": [
       "engine_consumed"
@@ -1084,6 +1104,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000577:aspect-training",
+        "ability_name": "ASPECT TRAINING",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:aspect-training/none",
+        "datasheet_id": "000000577",
+        "datasheet_name": "Autarch",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000001149:daemonic-lord",
         "ability_name": "Daemonic Lord",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
@@ -1101,26 +1129,33 @@
       }
     ],
     "ability_names": [
+      "ASPECT TRAINING",
       "Daemonic Lord",
       "Malevolent Souls"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_model",
     "category_name": "Datasheet Rule Ir Grant Ability This Model",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:aspect-training/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
       "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none"
     ],
     "datasheet_names": [
+      "Autarch",
       "Daemon Prince of Chaos",
       "Wraithblades"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:conditional-ability:lone-operative",
+      "catalog-ir:conditional-leading-ability:fights-first",
+      "catalog-ir:conditional-leading-ability:infiltrators",
+      "catalog-ir:conditional-leading-ability:scouts",
+      "catalog-ir:conditional-leading-ability:stealth",
       "catalog-ir:fight-on-death-source"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -1552,6 +1587,82 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000577:path-of-command",
+        "ability_name": "Path of Command",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:path-of-command/none",
+        "datasheet_id": "000000577",
+        "datasheet_name": "Autarch",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000002759:path-of-command",
+        "ability_name": "Path of Command",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/datasheet/000002759:path-of-command/none",
+        "datasheet_id": "000002759",
+        "datasheet_name": "Autarch Wayleaper",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Path of Command"
+    ],
+    "category_id": "datasheet.rule_ir.modify_command_points.unscoped",
+    "category_name": "Datasheet Rule Ir Modify Command Points Unscoped",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:path-of-command/none",
+      "chaos-daemons-bridge-catalog/000002759/datasheet/000002759:path-of-command/none"
+    ],
+    "datasheet_names": [
+      "Autarch",
+      "Autarch Wayleaper"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:stratagem-cost-modifier"
+    ],
+    "source_kind_counts": {
+      "datasheet": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002759:indomitable-strength-of-will",
+        "ability_name": "Indomitable Strength of Will",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/datasheet/000002759:indomitable-strength-of-will/none",
+        "datasheet_id": "000002759",
+        "datasheet_name": "Autarch Wayleaper",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Indomitable Strength of Will"
+    ],
+    "category_id": "datasheet.rule_ir.modify_faction_resource.selected_unit",
+    "category_name": "Datasheet Rule Ir Modify Faction Resource Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002759/datasheet/000002759:indomitable-strength-of-will/none"
+    ],
+    "datasheet_names": [
+      "Autarch Wayleaper"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:faction-resource-refund-roll"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001151:scuttling-walker",
         "ability_name": "Scuttling Walker",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/datasheet/000001151:scuttling-walker/none",
@@ -1908,6 +2019,40 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000577:superlative-strategist",
+        "ability_name": "Superlative Strategist",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:superlative-strategist/none",
+        "datasheet_id": "000000577",
+        "datasheet_name": "Autarch",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Superlative Strategist"
+    ],
+    "category_id": "datasheet.rule_ir.reroll_permission.selected_unit",
+    "category_name": "Datasheet Rule Ir Reroll Permission Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:superlative-strategist/none"
+    ],
+    "datasheet_names": [
+      "Autarch"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:advance-roll-reroll",
+      "catalog-ir:agile-manoeuvre-roll-reroll"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000000613:fated-hero",
         "ability_name": "Fated Hero",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:fated-hero/none",
@@ -2246,6 +2391,14 @@
       {
         "ability_id": "000008343",
         "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/core/000008343/none",
+        "datasheet_id": "000002759",
+        "datasheet_name": "Autarch Wayleaper",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
         "datasheet_id": "000001148",
         "datasheet_name": "Be'lakor",
@@ -2329,8 +2482,9 @@
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
-    "coverage_row_count": 10,
+    "coverage_row_count": 11,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002759/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001114/core/000008343/none",
@@ -2343,6 +2497,7 @@
       "chaos-daemons-bridge-catalog/000000601/core/000008343/none"
     ],
     "datasheet_names": [
+      "Autarch Wayleaper",
       "Be'lakor",
       "Bloodcrushers",
       "Bloodletters",
@@ -2359,7 +2514,7 @@
       "descriptor:reserve-declaration:deep-strike"
     ],
     "source_kind_counts": {
-      "core": 10
+      "core": 11
     },
     "support_stages": [
       "engine_consumed"
@@ -3009,6 +3164,22 @@
       {
         "ability_id": "000008346",
         "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/core/000008346/none",
+        "datasheet_id": "000000577",
+        "datasheet_name": "Autarch",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/core/000008346/none",
+        "datasheet_id": "000002759",
+        "datasheet_name": "Autarch Wayleaper",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
@@ -3028,12 +3199,16 @@
     ],
     "category_id": "core.leader",
     "category_name": "Leader",
-    "coverage_row_count": 2,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000577/core/000008346/none",
+      "chaos-daemons-bridge-catalog/000002759/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004193/core/000008346/none"
     ],
     "datasheet_names": [
+      "Autarch",
+      "Autarch Wayleaper",
       "Kharseth",
       "Prince Yriel"
     ],
@@ -3041,7 +3216,7 @@
       "descriptor:army-mustering:leader-attachment"
     ],
     "source_kind_counts": {
-      "core": 2
+      "core": 4
     },
     "support_stages": [
       "engine_consumed"

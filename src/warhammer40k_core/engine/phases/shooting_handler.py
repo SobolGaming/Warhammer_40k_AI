@@ -781,6 +781,12 @@ class ShootingPhaseHandler:
             )
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
             reroll_record = decisions.record_for_result(result)
+            if is_triggered_movement_distance_reroll_request(reroll_record.request):
+                return apply_triggered_movement_distance_reroll_decision(
+                    state=state,
+                    result=result,
+                    decisions=decisions,
+                )
             if is_catalog_selected_target_battle_shock_reroll_request(reroll_record.request):
                 return apply_catalog_selected_target_battle_shock_reroll_decision(
                     state=state,

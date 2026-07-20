@@ -347,6 +347,7 @@ def _request_advance_move_grant_decision_if_available(
             for grant in automatic_grants
             for effect in _record_movement_action_grant_effects(
                 state=state,
+                decisions=decisions,
                 player_id=pending_action.player_id,
                 unit_instance_id=pending_action.unit_instance_id,
                 source_request_id=pending_action.request_id,
@@ -574,6 +575,7 @@ def _apply_advance_move_grant_decision(
         for grant in selected_grants
         for effect in _record_movement_action_grant_effects(
             state=state,
+            decisions=decisions,
             player_id=active_player_id,
             unit_instance_id=pending_action.unit_instance_id,
             source_request_id=result.request_id,
@@ -648,6 +650,7 @@ def _assert_advance_move_grant_still_available(
 def _record_movement_action_grant_effects(
     *,
     state: GameState,
+    decisions: DecisionController,
     player_id: str,
     unit_instance_id: str,
     source_request_id: str,
@@ -678,6 +681,11 @@ def _record_movement_action_grant_effects(
             ),
         )
         state.record_persisting_effect(spend_effect)
+        resolve_faction_resource_refund_roll(
+            state=state,
+            decisions=decisions,
+            spend_effect=spend_effect,
+        )
         effects.append(spend_effect)
     if grant.unit_effect_payload is not None:
         unit_effect = PersistingEffect(

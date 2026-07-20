@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
@@ -30,6 +30,9 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     CatalogAnyPhaseOncePerBattleRuntime,
+)
+from warhammer40k_core.engine.catalog_conditional_leader_queries import (
+    catalog_granted_stealth_hit_roll_modifier,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     CatalogConditionalAttackRerollDescriptor,
@@ -92,9 +95,6 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
 )
-from warhammer40k_core.engine.generic_rule_effect_payloads import (
-    generic_rule_effect_payload_grants_ability,
-)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
@@ -151,6 +151,9 @@ from warhammer40k_core.rules.rule_ir import (
     RuleIR,
     parameter_payload,
 )
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 
 @dataclass(frozen=True, slots=True)
@@ -232,6 +235,17 @@ class CatalogDatasheetRuleRuntime:
                 )
                 recorded.append((model_id, reaction))
         return tuple(sorted(recorded, key=lambda item: (item[0], item[1].source_id)))
+
+    def record_static_sources(self, *, state: GameState) -> None:
+        from warhammer40k_core.engine.catalog_conditional_leader_abilities import (
+            CatalogConditionalLeaderAbilityRuntime,
+        )
+
+        self.record_static_destruction_reaction_sources(state=state)
+        CatalogConditionalLeaderAbilityRuntime(
+            self.ability_indexes_by_player_id,
+            self.armies,
+        ).record_static_effects(state=state)
 
     def event_handler_bindings(self) -> tuple[RuntimeContentEventHandlerBinding, ...]:
         return CatalogAnyPhaseOncePerBattleRuntime(
@@ -1006,23 +1020,7 @@ class CatalogDatasheetRuleRuntime:
         return handler
 
     def _granted_stealth_handler(self, context: HitRollModifierContext) -> int:
-        if context.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
-            return 0
-        target = rules_unit_view_by_id(
-            state=context.state,
-            unit_instance_id=context.target_unit_instance_id,
-        )
-        return (
-            -1
-            if any(
-                isinstance(effect.effect_payload, dict)
-                and generic_rule_effect_payload_grants_ability(
-                    effect.effect_payload, ability="stealth"
-                )
-                for effect in context.state.persisting_effects_for_unit(target.unit_instance_id)
-            )
-            else 0
-        )
+        return catalog_granted_stealth_hit_roll_modifier(context)
 
     def _stealth_handler(
         self, sources: tuple[_CatalogClauseSource, ...]

@@ -234,7 +234,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | Hook / consumer | Abilities / rules |
 | --- | --- |
 | `army-mustering:required-datasheet-option` | No current generated rows |
-| `catalog-ir:advance-roll-reroll` | No current generated rows |
+| `catalog-ir:advance-roll-reroll` | Superlative Strategist |
+| `catalog-ir:agile-manoeuvre-roll-reroll` | Superlative Strategist |
 | `catalog-ir:armor-penetration-characteristic-modifier` | No current generated rows |
 | `catalog-ir:armor-penetration-characteristic-query` | No current generated rows |
 | `catalog-ir:attacks-characteristic-modifier` | Daemon Prince of Tzeentch |
@@ -253,6 +254,10 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
 | `catalog-ir:charge-roll-reroll` | No current generated rows |
 | `catalog-ir:conditional-ability:lone-operative` | Daemonic Lord |
+| `catalog-ir:conditional-leading-ability:fights-first` | ASPECT TRAINING |
+| `catalog-ir:conditional-leading-ability:infiltrators` | ASPECT TRAINING |
+| `catalog-ir:conditional-leading-ability:scouts` | ASPECT TRAINING |
+| `catalog-ir:conditional-leading-ability:stealth` | ASPECT TRAINING |
 | `catalog-ir:critical-hit-value-modifier` | No current generated rows |
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |
@@ -263,6 +268,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:detection-range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
 | `catalog-ir:dice-result-override` | Aspect Shrine Token |
+| `catalog-ir:faction-resource-refund-roll` | Indomitable Strength of Will |
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
 | `catalog-ir:fight-activation-movement-distance` | No current generated rows |
@@ -311,6 +317,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:shooting-start-selected-target-effect` | Hallucinogen Grenades |
 | `catalog-ir:shooting-target-range-restriction` | Wreathed in Shadows (Aura, Psychic) |
 | `catalog-ir:start-battle-keyword-choice` | Fated Hero |
+| `catalog-ir:stratagem-cost-modifier` | Path of Command |
 | `catalog-ir:strength-characteristic-modifier` | Daemon Prince of Khorne |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
 | `catalog-ir:toughness-characteristic-modifier` | Daemon Prince of Nurgle |

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from types import MappingProxyType
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import WeaponProfileError, weapon_keyword_from_token
@@ -8,8 +9,11 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     clause_uses_exact_datasheet_runtime_template,
     conditional_attack_reroll_descriptor_for_clause,
     conditional_invulnerable_save_descriptor_for_clause,
+    conditional_leader_ability_grant_descriptor_for_clause,
+    conditional_leading_roll_reroll_descriptor_for_clause,
     conditional_proximity_effects_descriptor_for_clause,
     exact_datasheet_runtime_descriptor_for_clause,
+    faction_resource_refund_roll_descriptor_for_clause,
     fight_on_death_descriptor_for_clause,
     first_failed_save_damage_replacement_descriptor_for_clause,
     invulnerable_save_descriptor_for_clause,
@@ -28,6 +32,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleConditionKind,
     RuleDurationKind,
     RuleEffectKind,
+    RuleEffectSpec,
     RuleTargetKind,
     RuleTriggerKind,
     parameter_payload,
@@ -67,6 +72,36 @@ CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID = "catalog-ir:hit-roll-reroll"
 CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = "catalog-ir:wound-roll-reroll"
 CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:damage-roll-reroll"
 CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID = "catalog-ir:movement-action-grant"
+CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:agile-manoeuvre-roll-reroll"
+CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID = "catalog-ir:faction-resource-refund-roll"
+CATALOG_IR_CONDITIONAL_LEADER_ABILITY_CONSUMER_IDS = MappingProxyType(
+    {
+        "fights_first": "catalog-ir:conditional-leading-ability:fights-first",
+        "infiltrators": "catalog-ir:conditional-leading-ability:infiltrators",
+        "scouts": "catalog-ir:conditional-leading-ability:scouts",
+        "stealth": "catalog-ir:conditional-leading-ability:stealth",
+    }
+)
+
+
+def consumer_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Datasheet RuleIR support requires RuleEffectSpec.")
+    parameters = parameter_payload(effect.parameters)
+    if effect.kind is RuleEffectKind.REROLL_PERMISSION and parameters == {
+        "roll_type": "agile_manoeuvre_roll",
+        "selection": "whole_roll",
+    }:
+        return (CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID,)
+    if effect.kind is RuleEffectKind.MODIFY_FACTION_RESOURCE and parameters == {
+        "amount": 1,
+        "operation": "gain",
+        "resource_kind": "battle_focus_token",
+        "roll_expression": "D6",
+        "success_threshold": 3,
+    }:
+        return (CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID,)
+    return ()
 
 
 def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool:
@@ -109,6 +144,15 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         )
     if movement_action_grant_descriptor_for_clause(clause) is not None:
         consumer_ids.add(CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID)
+    conditional_leader_grant = conditional_leader_ability_grant_descriptor_for_clause(clause)
+    if conditional_leader_grant is not None:
+        consumer_ids.add(
+            CATALOG_IR_CONDITIONAL_LEADER_ABILITY_CONSUMER_IDS[conditional_leader_grant.ability]
+        )
+    if conditional_leading_roll_reroll_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID)
+    if faction_resource_refund_roll_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID)
     if clause_is_first_failed_save_damage_replacement(clause):
         consumer_ids.add(CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID)
     if conditional_invulnerable_save_descriptor_for_clause(clause) is not None:
@@ -173,6 +217,9 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
                 CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
                 CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
+                CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID,
+                CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID,
+                *CATALOG_IR_CONDITIONAL_LEADER_ABILITY_CONSUMER_IDS.values(),
             }
         )
     )
@@ -274,6 +321,9 @@ def clause_is_stealth_aura(clause: RuleClause) -> bool:
 
 
 def clause_is_granted_stealth_effect(clause: RuleClause) -> bool:
+    conditional = conditional_leader_ability_grant_descriptor_for_clause(clause)
+    if conditional is not None:
+        return conditional.ability == "stealth"
     return (
         clause.is_supported
         and clause.target is not None

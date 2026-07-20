@@ -30,6 +30,12 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.deployment_ability_queries import (
+    rules_unit_has_infiltrators as _rules_unit_has_infiltrators,
+)
+from warhammer40k_core.engine.deployment_ability_queries import (
+    rules_unit_has_mixed_infiltrators as _rules_unit_has_mixed_infiltrators,
+)
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
     terrain_endpoint_placement_violation,
@@ -52,7 +58,6 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_id_for_unit_id,
     rules_unit_view_from_armies,
 )
-from warhammer40k_core.engine.unit_abilities import unit_has_infiltrators
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyContext,
     UnitCoherencyResult,
@@ -1246,7 +1251,7 @@ def _append_geometry_violations(
     own_model_ids = {model.model_id for model in models}
     blockers = tuple(model for model in placed_models if model.model_id not in own_model_ids)
     markers = tuple(marker.to_objective_marker() for marker in mission_setup.objective_markers)
-    all_infiltrators = _rules_unit_has_infiltrators(view)
+    all_infiltrators = _rules_unit_has_infiltrators(state=state, view=view)
     any_outside_zone = False
     for model in models:
         if not _model_is_within_battlefield(
@@ -1363,7 +1368,7 @@ def _append_geometry_violations(
                 field="model_placements",
             )
         )
-        if _rules_unit_has_mixed_infiltrators(view):
+        if _rules_unit_has_mixed_infiltrators(state=state, view=view):
             violations.append(
                 DeploymentPlacementViolation(
                     violation_code=DeploymentPlacementViolationCode.INFILTRATORS_KEYWORD_REQUIRED,
@@ -1589,15 +1594,6 @@ def _unit_for_model(*, view: RulesUnitView, model_instance_id: str) -> UnitInsta
         ):
             return component.unit
     raise GameLifecycleError("model_instance_id is not in the rules unit.")
-
-
-def _rules_unit_has_infiltrators(view: RulesUnitView) -> bool:
-    return all(unit_has_infiltrators(component.unit) for component in view.components)
-
-
-def _rules_unit_has_mixed_infiltrators(view: RulesUnitView) -> bool:
-    states = tuple(unit_has_infiltrators(component.unit) for component in view.components)
-    return any(states) and not all(states)
 
 
 def _rules_unit_has_keyword(view: RulesUnitView, keyword: str) -> bool:

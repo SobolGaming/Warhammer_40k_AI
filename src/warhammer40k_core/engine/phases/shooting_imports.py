@@ -11,6 +11,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
+    DiceRollState,
 )
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -181,6 +182,8 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
     TriggeredMovementEligibleUnit,
     TriggeredMovementKind,
+    apply_triggered_movement_distance_reroll_decision,
+    is_triggered_movement_distance_reroll_request,
     triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_abilities import (
@@ -264,6 +267,7 @@ __all__ = (
     "DiceExpression",
     "DiceRollManager",
     "DiceRollSpec",
+    "DiceRollState",
     "DistanceMeasurementContext",
     "EffectExpiration",
     "FIRE_OVERWATCH_RULE_ID",
@@ -334,6 +338,7 @@ __all__ = (
     "TriggeredMovementDescriptor",
     "TriggeredMovementEligibleUnit",
     "TriggeredMovementKind",
+    "apply_triggered_movement_distance_reroll_decision",
     "TriggeredReactionWindow",
     "TypedDict",
     "UnitInstance",
@@ -375,6 +380,7 @@ __all__ = (
     "geometry_model_for_placement",
     "has_close_quarters_weapon_keyword",
     "has_weapon_keyword",
+    "is_triggered_movement_distance_reroll_request",
     "heavy_rule_id",
     "hidden_unit_effect_ids",
     "is_destroyed_transport_disembark_proposal_request",

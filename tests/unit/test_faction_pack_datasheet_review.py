@@ -225,6 +225,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
 
     non_daemons_rows = tuple(row for row in support_rows if row.faction_id != "chaos-daemons")
     assert {(row.faction_id, row.datasheet_id, row.overall) for row in non_daemons_rows} == {
+        ("aeldari", "000000577", "Playable"),
         ("aeldari", "000000592", "Playable"),
         ("aeldari", "000000596", "Playable"),
         ("aeldari", "000000600", "Playable"),
@@ -237,6 +238,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("aeldari", "000002531", "Playable"),
         ("aeldari", "000002532", "Playable"),
         ("aeldari", "000002533", "Playable"),
+        ("aeldari", "000002759", "Playable"),
         ("aeldari", "000004193", "Playable"),
         ("aeldari", "000004194", "Playable"),
         ("aeldari", "000004195", "Playable"),
@@ -341,9 +343,9 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 18,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 20,
         SEMANTIC_BUCKET_HOST_NEEDED: 6,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 46,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 44,
     }
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED

@@ -5897,6 +5897,8 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
     parameters = parameter_payload(effect.parameters)
+    if datasheet_consumer_ids := _datasheet.consumer_ids_for_effect(effect):
+        return datasheet_consumer_ids
     if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
         return _catalog_ir_roll_modifier_hook_ids(parameters)
     if effect.kind is RuleEffectKind.OVERRIDE_DICE_ROLL_RESULT:

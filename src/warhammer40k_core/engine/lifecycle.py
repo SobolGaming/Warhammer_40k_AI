@@ -2523,7 +2523,7 @@ class GameLifecycle:
             state, self.decision_controller
         )
         catalog_rules = CatalogDatasheetRuleRuntime(ability_indexes, armies)
-        catalog_rules.record_static_destruction_reaction_sources(state=state)
+        catalog_rules.record_static_sources(state=state)
         self._runtime_content_bundle = bundle
         self._setup_flow = replace(
             self._setup_flow,
