@@ -38,32 +38,18 @@ def _request_source_backed_damage_reroll_if_available(
     if actor_id is None:
         return None
     roll_type = roll_state.original_result.spec.roll_type
-    permission_contexts = source_backed_reroll_permission_contexts_for_unit(
+    permission_contexts = unified_attack_reroll_permission_contexts_for_unit(
         state=state,
         player_id=actor_id,
-        unit_instance_id=attacking_unit_instance_id,
-        model_instance_id=attacker_model_instance_id,
-        roll_type=roll_type,
-        timing_window=roll_type,
-        attack_kind=_source_backed_attack_kind_for_phase(source_phase),
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        attacker_model_instance_id=attacker_model_instance_id,
         target_unit_instance_id=target_unit_instance_id,
+        source_phase=source_phase,
+        attack_kind=_source_backed_attack_kind_for_phase(source_phase),
+        roll_type=roll_type,
+        registry=_runtime_modifier_registry(runtime_modifier_registry),
     )
-    registry = _runtime_modifier_registry(runtime_modifier_registry)
-    catalog_permission_contexts = registry.attack_reroll_permission_contexts(
-        AttackRerollPermissionContext(
-            state=state,
-            player_id=actor_id,
-            attacking_unit_instance_id=attacking_unit_instance_id,
-            attacker_model_instance_id=attacker_model_instance_id,
-            target_unit_instance_id=target_unit_instance_id,
-            source_phase=source_phase,
-            roll_type=roll_type,
-            timing_window=roll_type,
-        )
-    )
-    permission_context = select_source_backed_reroll_permission_context(
-        (*permission_contexts, *catalog_permission_contexts)
-    )
+    permission_context = select_source_backed_reroll_permission_context(permission_contexts)
     if permission_context is None:
         return None
     permission = permission_context.permission

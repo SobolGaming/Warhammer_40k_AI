@@ -176,6 +176,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     SaveOptionModifierContext,
     UnitCharacteristicModifierContext,
     WoundRollModifierContext,
+    unified_attack_reroll_permission_contexts_for_unit,
 )
 from warhammer40k_core.engine.saves import (
     SaveKind,
@@ -466,6 +467,7 @@ __all__ = (
     "source_backed_reroll_permission_contexts_for_unit",
     "select_source_backed_reroll_permission_context",
     "sustained_hits_generated_hits",
+    "unified_attack_reroll_permission_contexts_for_unit",
     "unit_by_id",
     "unit_effect_hit_roll_modifier",
     "unit_effect_invulnerable_save",

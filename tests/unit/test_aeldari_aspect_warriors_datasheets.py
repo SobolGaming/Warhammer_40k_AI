@@ -36,9 +36,15 @@ from warhammer40k_core.engine.advance_hooks import AdvanceMoveContext, AdvanceMo
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    AttackSequenceStep,
     _request_source_backed_damage_reroll_if_available,
     _request_source_backed_hit_reroll_if_available,
     _request_source_backed_wound_reroll_if_available,
+    apply_source_backed_attack_dice_reroll_decision,
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+    resolve_attack_sequence_until_blocked,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import (
     CatalogDatasheetRuleRuntime,
@@ -86,6 +92,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     MovementBudgetModifierContext,
     RuntimeModifierRegistry,
 )
+from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_effect_payload,
@@ -374,6 +381,158 @@ def test_assured_destruction_composes_all_three_rerolls_and_builds_replay_safe_r
             cast(dict[str, Any], payload["attack_context"])["source_payload"]["effect_kind"]
             == "catalog_conditional_attack_reroll"
         )
+
+
+@pytest.mark.parametrize(
+    "accepted_roll_type",
+    [
+        "attack_sequence.hit",
+        "attack_sequence.wound",
+        "random_characteristic.damage",
+    ],
+)
+def test_assured_destruction_overlapping_reroll_submits_and_continues_attack_sequence(
+    accepted_roll_type: str,
+) -> None:
+    fixture = _runtime_fixture(phase=BattlePhase.SHOOTING)
+    runtime = CatalogDatasheetRuleRuntime(fixture.indexes, fixture.armies)
+    registry = RuntimeModifierRegistry.from_bindings(
+        attack_reroll_permission_bindings=runtime.attack_reroll_permission_bindings()
+    )
+    attacker = fixture.fire_dragons
+    attacker_model = attacker.own_models[0]
+    target = fixture.enemy_monster
+    target_model = target.own_models[0]
+    profile = _profile_for_wargear(f"{FIRE_DRAGONS_ID}:exarchs-dragon-fusion-gun")
+    pool = _ranged_pool(attacker_model, target, profile)
+    sequence = AttackSequence.start(
+        sequence_id=f"assured-destruction:{accepted_roll_type}",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(pool,),
+    )
+    attack_context_id = sequence.attack_context_id()
+    decisions = DecisionController()
+    manager = DiceRollManager(fixture.state.game_id, event_log=decisions.event_log)
+    manager.roll_fixed(
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id=profile.profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [6],
+    )
+    manager.roll_fixed(
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id=profile.profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [6],
+    )
+    manager.roll_fixed(
+        saving_throw_roll_spec(
+            save_kind=SaveKind.INVULNERABLE,
+            player_id="player-b",
+            allocated_model_id=target_model.model_instance_id,
+            attack_context_id=attack_context_id,
+        ),
+        [1],
+    )
+    for roll_type in (
+        "attack_sequence.hit",
+        "attack_sequence.wound",
+        "random_characteristic.damage",
+    ):
+        _record_overlapping_attack_reroll_permission(
+            fixture.state,
+            unit_instance_id=attacker.unit_instance_id,
+            roll_type=(
+                roll_type
+                if roll_type != "random_characteristic.damage"
+                else f"random_characteristic.damage.per_attack.{attack_context_id}:damage"
+            ),
+        )
+
+    current_sequence: AttackSequence | None = sequence
+    allocated_model_ids: tuple[str, ...] = ()
+    for decision_index, expected_roll_type in enumerate(
+        (
+            "attack_sequence.hit",
+            "attack_sequence.wound",
+            "random_characteristic.damage",
+        )
+    ):
+        assert current_sequence is not None
+        current_sequence, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
+            state=fixture.state,
+            decisions=decisions,
+            ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+            attack_sequence=current_sequence,
+            already_allocated_model_ids=allocated_model_ids,
+            dice_manager=manager,
+            runtime_modifier_registry=registry,
+        )
+        assert status is not None
+        request = status.decision_request
+        assert request is not None
+        payload = cast(dict[str, Any], request.payload)
+        emitted_roll_type = cast(str, payload["roll_type"])
+        if expected_roll_type == "random_characteristic.damage":
+            assert emitted_roll_type.startswith("random_characteristic.damage.")
+        else:
+            assert emitted_roll_type == expected_roll_type
+        assert cast(str, payload["source_rule_id"]).startswith("catalog-ir:datasheet:")
+        assert (
+            cast(dict[str, Any], payload["attack_context"])["source_payload"]["effect_kind"]
+            == "catalog_conditional_attack_reroll"
+        )
+        selected_option_id = "reroll:0" if expected_roll_type == accepted_roll_type else "decline"
+        result = DecisionResult.for_request(
+            result_id=f"assured-destruction:{accepted_roll_type}:{decision_index}",
+            request=request,
+            selected_option_id=selected_option_id,
+        )
+        decisions.submit_result(result)
+        assert current_sequence is not None
+        apply_source_backed_attack_dice_reroll_decision(
+            state=fixture.state,
+            result=result,
+            decisions=decisions,
+            attack_sequence=current_sequence,
+            expected_phase=BattlePhase.SHOOTING,
+            phase_label="Shooting",
+            runtime_modifier_registry=registry,
+        )
+        if expected_roll_type == accepted_roll_type:
+            break
+
+    assert (
+        sum(event.event_type == "dice_reroll_resolved" for event in decisions.event_log.records)
+        == 1
+    )
+    continuation_event_index = len(decisions.event_log.records)
+    assert current_sequence is not None
+    resolve_attack_sequence_until_blocked(
+        state=fixture.state,
+        decisions=decisions,
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        attack_sequence=current_sequence,
+        already_allocated_model_ids=allocated_model_ids,
+        dice_manager=manager,
+        runtime_modifier_registry=registry,
+    )
+    continuation_events = decisions.event_log.records[continuation_event_index:]
+    assert any(
+        event.event_type == "attack_sequence_step"
+        and cast(dict[str, Any], event.payload)["step"]
+        in {
+            AttackSequenceStep.HIT.value,
+            AttackSequenceStep.WOUND.value,
+            AttackSequenceStep.DAMAGE.value,
+        }
+        for event in continuation_events
+    )
 
 
 def test_assured_destruction_applies_to_attached_leader_attacks() -> None:
