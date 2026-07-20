@@ -35,6 +35,8 @@ class DecisionDispatchContract:
             raise GameLifecycleError("Decision dispatch contract requires interaction kinds.")
         if any(type(value) is not str or not value for value in self.interaction_kinds):
             raise GameLifecycleError("Decision dispatch interaction kinds must be identifiers.")
+        if len(self.interaction_kinds) != len(set(self.interaction_kinds)):
+            raise GameLifecycleError("Decision dispatch interaction kinds must be unique.")
 
 
 @dataclass(frozen=True, slots=True)

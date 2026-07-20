@@ -5687,10 +5687,12 @@ construct every supported finite/parameterized submission without importing
 engine code or hard-coding rules mutations by `decision_type`.
 
 This gate is met. Every registered finite/parameterized family resolves to one
-standard renderer kind and a canonical submission schema reference, every
+or more exact standard renderer kinds and canonical submission schema references, every
 currently supported parameterized wire shape is present in the public typed
 union, and the generated TypeScript selector is exhaustive over the published
-interaction enum.
+interaction enum. A fail-closed audit requires every conformance request's
+submission-variant renderer union to match its dispatch contract, family
+inventory, and support-profile row exactly.
 
 ## Phase 18J: battlefield rendering and coordinate contract
 

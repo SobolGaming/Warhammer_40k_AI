@@ -428,7 +428,8 @@
     {
       "decision_type": "submit_cult_ambush_marker_placement",
       "interaction_kinds": [
-        "battlefield_point_placement"
+        "battlefield_point_placement",
+        "confirmation"
       ],
       "submission_kind": "parameterized"
     },

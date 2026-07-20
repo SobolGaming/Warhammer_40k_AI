@@ -573,7 +573,8 @@
       "decision_type": "submit_cult_ambush_marker_placement",
       "example_path": null,
       "interaction_kinds": [
-        "battlefield_point_placement"
+        "battlefield_point_placement",
+        "confirmation"
       ],
       "registry_scope": "registered",
       "submission_kind": "parameterized"

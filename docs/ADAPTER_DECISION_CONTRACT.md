@@ -74,8 +74,11 @@ engine cannot state a safe exact cardinality from request metadata, not one.
 
 Interaction registration is fail closed. The decision dispatch contract exposes
 one or more interaction kinds for every registered decision family, the
-registry-derived `family-coverage.json` artifact records exact coverage, and CI
-compares that inventory with the engine enum and JSON Schema. The documented
+registry-derived `family-coverage.json` artifact records exact coverage, and the
+support profile publishes the same set. CI collects the renderer-kind union from
+every conformance request's `submission_variants` and requires that exact set to
+match the dispatch contract, family inventory, and support-profile row, in
+addition to comparing the global inventory with the engine enum and JSON Schema. The documented
 nested weapon-ability request carries the same descriptor inside the parent
 proposal and in the typed top-level `nested_interaction_requests` projection
 field. The canonical parameterized union includes distinct Cult Ambush
@@ -1549,6 +1552,8 @@ Required Phase 17K charge-end catalog mortal-wound tests:
 
 Phase 17G implements the 11th Edition Genestealer Cults `Cult Ambush` army rule update. During `declare_battle_formations`, the setup hook grants Resurgence points through the faction-resource ledger based on battle size: Incursion 6, Strike Force 10, and Onslaught 14. This grant is automatic and emits no adapter choice.
 
+The [2026 Warhammer Open Tacoma FAQ](source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf) (SHA-256 `5beadb2c29e100a31bb7ee54f429498555e07430997063111aa4694556568f97`) is formally scoped to that event while the late-July rules update is pending. CORE V2 adopts its Cult Ambush correction under stable source ID `warhammer_40000_11th:event_faq:tacoma_2026:cult_ambush_attached_character_exclusions`: attached `CHARACTER` models are excluded when checking Cult Ambush eligibility, calculating Starting Strength for the Resurgence cost, and constructing the identical replacement unit. A destroyed attached `CHARACTER` component alone does not create a replacement.
+
 When an eligible Genestealer Cults unit is destroyed, the engine may emit the finite decision type `select_cult_ambush_resurgence`. The pending request payload contains source rule ID, model-destroyed event ID, destroyed unit ID, destroyed player ID, destroying player ID, battle round, phase, starting strength, Resurgence cost, and current Resurgence points. Current option IDs are:
 
 - `genestealer_cults:cult_ambush:decline:<destroyed_unit_instance_id>`;
@@ -1597,6 +1602,7 @@ Required Phase 17G Cult Ambush tests:
 - initial Resurgence grant by battle size is idempotent and replay-safe;
 - valid spend and decline choices through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
 - replacement units are deterministic, full-wound, source-backed Cult Ambush Strategic Reserves;
+- attached `CHARACTER` components are excluded from eligibility, Resurgence cost, and replacement composition;
 - marker placement accepts valid parameterized payloads and rejects stale, drifted, malformed, or illegal positions;
 - enemy non-AIRCRAFT marker removal and AIRCRAFT exclusion are event-driven and replay-safe;
 - valid marker ingress selection emits `cult_ambush_placement` and first-round placement can arrive through the shared placement proposal contract;

@@ -1168,6 +1168,79 @@ def _verify_decision_and_proposal_coverage() -> None:
     if len(actual_case_ids) != len(conformance_cases) or actual_case_ids != expected_case_ids:
         raise ExternalContractError("Interaction conformance case inventory drifted.")
 
+    support_profile = _json_object(
+        _read_json(EXAMPLE_DIR / "support-profile.json"),
+        "support profile",
+    )
+    support_rows = tuple(
+        _json_object(row, "decision interaction support row")
+        for row in _json_list(
+            support_profile["decision_interaction_support_rows"],
+            "decision interaction support rows",
+        )
+    )
+    support_rows_by_type = {_required_string(row, "decision_type"): row for row in support_rows}
+    if len(support_rows_by_type) != len(support_rows):
+        raise ExternalContractError("Decision interaction support rows must be unique.")
+
+    for case in conformance_cases:
+        request = _json_object(case["request"], "interaction conformance request")
+        decision_type = _required_string(request, "decision_type")
+        interaction = _json_object(
+            request["interaction"],
+            "interaction conformance descriptor",
+        )
+        variants = tuple(
+            _json_object(variant, "interaction conformance submission variant")
+            for variant in _json_list(
+                interaction["submission_variants"],
+                "interaction conformance submission variants",
+            )
+        )
+        variant_interaction_kinds = _exact_interaction_kind_set(
+            [variant["interaction_kind"] for variant in variants],
+            "interaction conformance submission variant kinds",
+        )
+        family_row = rows_by_type.get(decision_type)
+        if family_row is None:
+            raise ExternalContractError(
+                "Interaction conformance request is missing its family coverage row."
+            )
+        support_row = support_rows_by_type.get(decision_type)
+        if support_row is None:
+            raise ExternalContractError(
+                "Interaction conformance request is missing its support-profile row."
+            )
+        family_interaction_kinds = _exact_interaction_kind_set(
+            family_row["interaction_kinds"],
+            "decision family interaction kinds",
+        )
+        support_interaction_kinds = _exact_interaction_kind_set(
+            support_row["interaction_kinds"],
+            "decision support interaction kinds",
+        )
+        contract = registered_contract_by_type.get(decision_type)
+        if contract is None:
+            if decision_type != WEAPON_ABILITY_SELECTION_DECISION_TYPE:
+                raise ExternalContractError(
+                    "Interaction conformance request has no dispatch contract."
+                )
+            contract_interaction_kinds = variant_interaction_kinds
+        else:
+            contract_interaction_kinds = _exact_interaction_kind_set(
+                list(contract.interaction_kinds),
+                "decision dispatch interaction kinds",
+            )
+        if not (
+            variant_interaction_kinds
+            == contract_interaction_kinds
+            == family_interaction_kinds
+            == support_interaction_kinds
+        ):
+            raise ExternalContractError(
+                f"Interaction conformance renderer-kind inventories drifted for {decision_type}."
+            )
+
 
 def _verify_openapi(schemas: dict[str, Schema]) -> None:
     openapi = _json_object(_read_json(OPENAPI_PATH), "OpenAPI document")
@@ -1756,6 +1829,20 @@ def _json_list(value: JsonValue, field_name: str) -> list[JsonValue]:
     if not isinstance(value, list):
         raise ExternalContractError(f"{field_name} must be a JSON list.")
     return value
+
+
+def _exact_interaction_kind_set(value: JsonValue, field_name: str) -> frozenset[str]:
+    values = _json_list(value, field_name)
+    interaction_kinds: list[str] = []
+    for item in values:
+        if type(item) is not str or not item:
+            raise ExternalContractError(f"{field_name} must contain interaction-kind strings.")
+        interaction_kinds.append(item)
+    if not interaction_kinds:
+        raise ExternalContractError(f"{field_name} must not be empty.")
+    if len(interaction_kinds) != len(set(interaction_kinds)):
+        raise ExternalContractError(f"{field_name} must not contain duplicates.")
+    return frozenset(interaction_kinds)
 
 
 def _required_string(payload: dict[str, JsonValue], key: str) -> str:

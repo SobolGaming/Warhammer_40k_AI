@@ -22,6 +22,7 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     RosterLegalityReport,
 )
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -31,6 +32,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.cult_ambush import (
+    ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID,
     GENESTEALER_CULTS_FACTION_ID,
     RESURGENCE_RESOURCE_KIND,
     SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE,
@@ -109,6 +111,8 @@ GSC_ARMY_ID = "army-gsc"
 ENEMY_ARMY_ID = "army-enemy"
 ACOLYTE_UNIT_ID = f"{GSC_ARMY_ID}:acolyte-hybrids"
 NEOPHYTE_UNIT_ID = f"{GSC_ARMY_ID}:neophyte-hybrids"
+GSC_CHARACTER_UNIT_ID = f"{GSC_ARMY_ID}:primus"
+GSC_ATTACHED_UNIT_ID = f"attached-unit:{GSC_ARMY_ID}:neophytes-with-primus"
 ENEMY_UNIT_ID = f"{ENEMY_ARMY_ID}:enemy-unit"
 ONE_SHOT_WARGEAR_ID = "demo-charge"
 ONE_SHOT_PROFILE_ID = "demo-charge-profile"
@@ -236,6 +240,82 @@ def test_destroyed_unit_spends_resurgence_and_creates_cult_ambush_reserve() -> N
     assert marker_request.decision_type == SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE
     assert marker_request.actor_id == GSC_PLAYER_ID
     assert json.loads(json.dumps(marker_request.to_payload())) == marker_request.to_payload()
+
+
+def test_cult_ambush_excludes_attached_character_from_eligibility_cost_and_return() -> None:
+    state, bodyguard, _enemy_unit = _battle_state(
+        gsc_unit_id=NEOPHYTE_UNIT_ID,
+        gsc_datasheet_id="neophyte-hybrids",
+        gsc_unit_name="Neophyte Hybrids",
+        gsc_model_count=10,
+        phase=BattlePhase.SHOOTING,
+        active_player_id=ENEMY_PLAYER_ID,
+        attach_character_without_cult_ambush=True,
+    )
+    character = _unit_by_id(state, GSC_CHARACTER_UNIT_ID)
+    assert character.datasheet_abilities == ()
+    assert cult_ambush_resurgence_cost_for_unit(state, bodyguard) == 3
+    assert cult_ambush_resurgence_cost_for_unit(state, character) is None
+
+    decisions = DecisionController()
+    _run_resurgence_hook(
+        state=state,
+        decisions=decisions,
+        destroyed_unit=bodyguard,
+        destroyed_unit_instance_id=GSC_ATTACHED_UNIT_ID,
+    )
+    request = _next_request(decisions)
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["destroyed_unit_instance_id"] == GSC_ATTACHED_UNIT_ID
+    assert request_payload["starting_strength"] == 10
+    assert request_payload["resurgence_cost"] == 3
+
+    result = DecisionResult.for_request(
+        result_id="phase17g-gsc-attached-character-exclusion",
+        request=request,
+        selected_option_id=_option_by_selection(request, "spend").option_id,
+    )
+    assert (
+        invalid_cult_ambush_resurgence_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+        is None
+    )
+    decisions.submit_result(result)
+    apply_cult_ambush_resurgence_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        result=result,
+    )
+
+    replacement = _unit_by_id(state, f"{bodyguard.unit_instance_id}:cult-ambush-001")
+    assert replacement.datasheet_id == bodyguard.datasheet_id
+    assert len(replacement.own_models) == 10
+    assert all(model.datasheet_id == bodyguard.datasheet_id for model in replacement.own_models)
+    assert all(model.datasheet_id != character.datasheet_id for model in replacement.own_models)
+    reserve_state = state.reserve_state_for_unit(replacement.unit_instance_id)
+    assert reserve_state is not None
+    assert ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID in reserve_state.source_rule_ids
+
+    character_only_state, _bodyguard, _enemy_unit = _battle_state(
+        gsc_unit_id=NEOPHYTE_UNIT_ID,
+        gsc_datasheet_id="neophyte-hybrids",
+        gsc_unit_name="Neophyte Hybrids",
+        gsc_model_count=10,
+        phase=BattlePhase.SHOOTING,
+        active_player_id=ENEMY_PLAYER_ID,
+        attach_character_without_cult_ambush=True,
+    )
+    character_only_decisions = DecisionController()
+    _run_resurgence_hook(
+        state=character_only_state,
+        decisions=character_only_decisions,
+        destroyed_unit=_unit_by_id(character_only_state, GSC_CHARACTER_UNIT_ID),
+    )
+    assert list(character_only_decisions.queue.pending_requests) == []
 
 
 def test_destroyed_unit_declines_resurgence_without_mutation() -> None:
@@ -1868,6 +1948,7 @@ def _battle_state(
     enemy_y: float = 40.0,
     enemy_aircraft: bool = False,
     gsc_has_cult_ambush: bool = True,
+    attach_character_without_cult_ambush: bool = False,
 ) -> tuple[GameState, UnitInstance, UnitInstance]:
     descriptor = _ruleset_descriptor()
     battle_phase_sequence = tuple(descriptor.battle_phase_sequence.phases)
@@ -1886,12 +1967,40 @@ def _battle_state(
         has_cult_ambush=False,
         keywords=("AIRCRAFT",) if enemy_aircraft else ("INFANTRY",),
     )
+    gsc_units: tuple[UnitInstance, ...] = (gsc_unit,)
+    attached_units: tuple[AttachedUnitFormation, ...] = ()
+    if attach_character_without_cult_ambush:
+        character = replace(
+            _unit(
+                unit_instance_id=GSC_CHARACTER_UNIT_ID,
+                datasheet_id="primus",
+                name="Primus",
+                model_count=1,
+                has_cult_ambush=False,
+                keywords=("CHARACTER", "INFANTRY"),
+            ),
+            faction_keywords=("GENESTEALER CULTS",),
+        )
+        gsc_units = (gsc_unit, character)
+        attached_units = (
+            AttachedUnitFormation(
+                attached_unit_instance_id=GSC_ATTACHED_UNIT_ID,
+                bodyguard_unit_instance_id=gsc_unit.unit_instance_id,
+                leader_unit_instance_ids=(character.unit_instance_id,),
+                component_unit_instance_ids=tuple(
+                    sorted((gsc_unit.unit_instance_id, character.unit_instance_id))
+                ),
+                source_id="phase17g-gsc-attached-character-formation",
+                attachment_source_ids=("phase17g-gsc-primus-leader-source",),
+            ),
+        )
     gsc_army = _army(
         army_id=GSC_ARMY_ID,
         player_id=GSC_PLAYER_ID,
         faction_id=GENESTEALER_CULTS_FACTION_ID,
         battle_size=BattleSize.STRIKE_FORCE,
-        units=(gsc_unit,),
+        units=gsc_units,
+        attached_units=attached_units,
     )
     enemy_army = _army(
         army_id=ENEMY_ARMY_ID,
@@ -2075,9 +2184,11 @@ def _run_resurgence_hook(
     state: GameState,
     decisions: DecisionController,
     destroyed_unit: UnitInstance,
+    destroyed_unit_instance_id: str | None = None,
     destroying_player_id: str = ENEMY_PLAYER_ID,
     destroyed_player_id: str = GSC_PLAYER_ID,
 ) -> None:
+    target_unit_instance_id = destroyed_unit_instance_id or destroyed_unit.unit_instance_id
     event = decisions.event_log.append(
         "model_destroyed",
         validate_json_value(
@@ -2089,7 +2200,7 @@ def _run_resurgence_hook(
                 if state.current_battle_phase is not None
                 else BattlePhase.SHOOTING.value,
                 "destroying_player_id": destroying_player_id,
-                "target_unit_instance_id": destroyed_unit.unit_instance_id,
+                "target_unit_instance_id": target_unit_instance_id,
                 "model_instance_id": destroyed_unit.own_models[-1].model_instance_id,
             }
         ),
@@ -2102,7 +2213,7 @@ def _run_resurgence_hook(
             model_destroyed_event_id=event.event_id,
             model_destroyed_payload=cast(dict[str, JsonValue], event.payload),
             destroying_player_id=destroying_player_id,
-            destroyed_unit_instance_id=destroyed_unit.unit_instance_id,
+            destroyed_unit_instance_id=target_unit_instance_id,
             destroyed_player_id=destroyed_player_id,
         )
     )
@@ -2181,6 +2292,7 @@ def _army(
     faction_id: str,
     battle_size: BattleSize,
     units: tuple[UnitInstance, ...],
+    attached_units: tuple[AttachedUnitFormation, ...] = (),
 ) -> ArmyDefinition:
     descriptor = _ruleset_descriptor()
     return ArmyDefinition(
@@ -2195,6 +2307,7 @@ def _army(
         ),
         force_disposition_id="purge-the-foe",
         units=units,
+        attached_units=attached_units,
         roster_legality_report=RosterLegalityReport(battle_size=battle_size),
         battle_size=battle_size,
     )

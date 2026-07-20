@@ -94,6 +94,7 @@ class InteractionAnnotatedDecisionRequestPayload(TypedDict):
 class InteractionSpec:
     interaction_kind: InteractionKind
     entity_kinds: tuple[str, ...] = ()
+    alternative_interaction_kinds: tuple[InteractionKind, ...] = ()
 
     def __post_init__(self) -> None:
         if type(self.interaction_kind) is not InteractionKind:
@@ -102,6 +103,20 @@ class InteractionSpec:
             type(value) is not str or not value for value in self.entity_kinds
         ):
             raise GameLifecycleError("InteractionSpec entity kinds must be identifiers.")
+        if type(self.alternative_interaction_kinds) is not tuple or any(
+            type(value) is not InteractionKind for value in self.alternative_interaction_kinds
+        ):
+            raise GameLifecycleError(
+                "InteractionSpec alternative interaction kinds must be interaction kinds."
+            )
+        if self.interaction_kind in self.alternative_interaction_kinds or len(
+            self.alternative_interaction_kinds
+        ) != len(set(self.alternative_interaction_kinds)):
+            raise GameLifecycleError("InteractionSpec interaction kinds must be unique.")
+
+    @property
+    def interaction_kinds(self) -> tuple[InteractionKind, ...]:
+        return (self.interaction_kind, *self.alternative_interaction_kinds)
 
 
 _FINITE_INTERACTION_SPECS = MappingProxyType(
@@ -247,6 +262,7 @@ _PARAMETERIZED_INTERACTION_SPECS = MappingProxyType(
         "submit_cult_ambush_marker_placement": InteractionSpec(
             InteractionKind.BATTLEFIELD_POINT_PLACEMENT,
             ("marker",),
+            (InteractionKind.CONFIRMATION,),
         ),
         "submit_deployment_placement": InteractionSpec(
             InteractionKind.MULTI_MODEL_PLACEMENT,
@@ -357,7 +373,7 @@ def interaction_kinds_for_decision_type(
     submission_kind: str,
 ) -> tuple[str, ...]:
     spec = _interaction_spec(decision_type=decision_type, submission_kind=submission_kind)
-    return (spec.interaction_kind.value,)
+    return tuple(kind.value for kind in spec.interaction_kinds)
 
 
 def interaction_descriptor_for_request(request: DecisionRequest) -> InteractionDescriptorPayload:
@@ -455,7 +471,7 @@ def decision_interaction_support_rows() -> list[DecisionInteractionSupportPayloa
         DecisionInteractionSupportPayload(
             decision_type=decision_type,
             submission_kind="finite",
-            interaction_kinds=[spec.interaction_kind.value],
+            interaction_kinds=[kind.value for kind in spec.interaction_kinds],
         )
         for decision_type, spec in _FINITE_INTERACTION_SPECS.items()
     ]
@@ -463,7 +479,7 @@ def decision_interaction_support_rows() -> list[DecisionInteractionSupportPayloa
         DecisionInteractionSupportPayload(
             decision_type=decision_type,
             submission_kind="parameterized",
-            interaction_kinds=[spec.interaction_kind.value],
+            interaction_kinds=[kind.value for kind in spec.interaction_kinds],
         )
         for decision_type, spec in _PARAMETERIZED_INTERACTION_SPECS.items()
     )

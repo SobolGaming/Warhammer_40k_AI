@@ -43,6 +43,70 @@ def test_registered_decision_families_have_exact_interaction_metadata_coverage()
         *registered_types,
         WEAPON_ABILITY_SELECTION_DECISION_TYPE,
     }
+    cult_ambush = next(
+        contract
+        for contract in contracts
+        if contract.decision_type == "submit_cult_ambush_marker_placement"
+    )
+    assert cult_ambush.interaction_kinds == (
+        InteractionKind.BATTLEFIELD_POINT_PLACEMENT.value,
+        InteractionKind.CONFIRMATION.value,
+    )
+
+
+def test_conformance_variant_renderer_unions_match_every_published_inventory() -> None:
+    contracts_by_type = {
+        contract.decision_type: contract for contract in GameLifecycle().decision_dispatch_contracts
+    }
+    coverage = _json_object(
+        json.loads(
+            (ROOT / "contracts" / "examples" / "decisions" / "family-coverage.json").read_text(
+                encoding="utf-8"
+            )
+        )
+    )
+    support_profile = _json_object(
+        json.loads(
+            (ROOT / "contracts" / "examples" / "support-profile.json").read_text(encoding="utf-8")
+        )
+    )
+    conformance = _json_object(
+        json.loads(
+            (
+                ROOT / "contracts" / "examples" / "decisions" / "interaction-conformance.json"
+            ).read_text(encoding="utf-8")
+        )
+    )
+    family_rows = {
+        _json_string(row["decision_type"]): row
+        for value in _json_list(coverage["families"])
+        if (row := _json_object(value))["registry_scope"] != "redaction"
+    }
+    support_rows = {
+        _json_string(row["decision_type"]): row
+        for value in _json_list(support_profile["decision_interaction_support_rows"])
+        if (row := _json_object(value))
+    }
+
+    for value in _json_list(conformance["cases"]):
+        case = _json_object(value)
+        request = _json_object(case["request"])
+        decision_type = _json_string(request["decision_type"])
+        interaction = _json_object(request["interaction"])
+        variant_kinds = {
+            _json_string(_json_object(variant)["interaction_kind"])
+            for variant in _json_list(interaction["submission_variants"])
+        }
+        family_kinds = _unique_string_set(family_rows[decision_type]["interaction_kinds"])
+        support_kinds = _unique_string_set(support_rows[decision_type]["interaction_kinds"])
+        contract = contracts_by_type.get(decision_type)
+        contract_kinds = (
+            _unique_string_set(list(contract.interaction_kinds))
+            if contract is not None
+            else variant_kinds
+        )
+
+        assert variant_kinds == contract_kinds == family_kinds == support_kinds
 
 
 def test_published_interaction_kind_inventory_matches_engine_enum() -> None:
@@ -119,3 +183,10 @@ def _json_list(value: JsonValue) -> list[JsonValue]:
 def _json_string(value: JsonValue) -> str:
     assert type(value) is str
     return value
+
+
+def _unique_string_set(value: JsonValue) -> set[str]:
+    values = [_json_string(item) for item in _json_list(value)]
+    assert values
+    assert len(values) == len(set(values))
+    return set(values)

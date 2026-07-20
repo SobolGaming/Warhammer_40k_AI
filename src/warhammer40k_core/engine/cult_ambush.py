@@ -14,6 +14,14 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.cult_ambush_resurgence import (
+    cult_ambush_resurgence_cost_for_unit as _cult_ambush_resurgence_cost_for_unit,
+)
+from warhammer40k_core.engine.cult_ambush_resurgence import (
+    cult_ambush_return_candidate,
+    replacement_unit_for_destroyed_unit,
+    resurgence_cost,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -72,6 +80,9 @@ if TYPE_CHECKING:
 
 GENESTEALER_CULTS_FACTION_ID = "genestealer-cults"
 SOURCE_RULE_ID = "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush"
+ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID = (
+    "warhammer_40000_11th:event_faq:tacoma_2026:cult_ambush_attached_character_exclusions"
+)
 BATTLE_FORMATION_HOOK_ID = f"{SOURCE_RULE_ID}:initial_resurgence"
 UNIT_DESTROYED_HOOK_ID = f"{SOURCE_RULE_ID}:unit_destroyed"
 TURN_END_HOOK_ID = f"{SOURCE_RULE_ID}:marker_ingress"
@@ -85,29 +96,10 @@ CULT_AMBUSH_MARKER_ENEMY_DISTANCE_INCHES = 9.0
 CULT_AMBUSH_MARKER_REMOVAL_DISTANCE_INCHES = 8.0
 CULT_AMBUSH_INGRESS_WHOLLY_WITHIN_INCHES = 3.0
 
-_CULT_AMBUSH_ABILITY_IDS = {"cult-ambush"}
 _RESURGENCE_POINTS_BY_BATTLE_SIZE = {
     BattleSize.INCURSION: 6,
     BattleSize.STRIKE_FORCE: 10,
     BattleSize.ONSLAUGHT: 14,
-}
-_RESURGENCE_COSTS_BY_DATASHEET_ID = {
-    "aberrants": {5: 4, 10: 8},
-    "acolyte-hybrids-with-autopistols": {5: 2, 10: 4},
-    "acolyte-hybrids-with-hand-flamers": {5: 2, 10: 4},
-    "atalan-jackals": {5: 2, 10: 6},
-    "hybrid-metamorphs": {5: 2, 10: 4},
-    "neophyte-hybrids": {10: 3, 20: 6},
-    "purestrain-genestealers": {5: 2, 10: 6},
-}
-_RESURGENCE_COSTS_BY_UNIT_NAME = {
-    "ABERRANTS": {5: 4, 10: 8},
-    "ACOLYTE HYBRIDS WITH AUTOPISTOLS": {5: 2, 10: 4},
-    "ACOLYTE HYBRIDS WITH HAND FLAMERS": {5: 2, 10: 4},
-    "ATALAN JACKALS": {5: 2, 10: 6},
-    "HYBRID METAMORPHS": {5: 2, 10: 4},
-    "NEOPHYTE HYBRIDS": {10: 3, 20: 6},
-    "PURESTRAIN GENESTEALERS": {5: 2, 10: 6},
 }
 _PROCESSED_MARKER_REMOVAL_MOVE_EVENTS = {
     "movement_activation_completed",
@@ -243,6 +235,10 @@ def starting_resurgence_points_for_battle_size(battle_size: BattleSize) -> int:
     return _RESURGENCE_POINTS_BY_BATTLE_SIZE[resolved]
 
 
+def cult_ambush_resurgence_cost_for_unit(state: GameState, unit: UnitInstance) -> int | None:
+    return _cult_ambush_resurgence_cost_for_unit(state, unit)
+
+
 def grant_initial_resurgence_points(
     context: BattleFormationRequestContext,
 ) -> DecisionRequest | None:
@@ -295,10 +291,17 @@ def request_cult_ambush_resurgence(context: UnitDestroyedContext) -> None:
         destroyed_unit_instance_id=context.destroyed_unit_instance_id,
     ):
         return
-    unit = _unit_by_id(context.state, context.destroyed_unit_instance_id)
-    if not _unit_has_cult_ambush_ability(unit):
+    candidate = cult_ambush_return_candidate(
+        context.state,
+        destroyed_unit_instance_id=context.destroyed_unit_instance_id,
+    )
+    if candidate is None:
         return
-    cost = cult_ambush_resurgence_cost_for_unit(context.state, unit)
+    unit = candidate.unit
+    cost = resurgence_cost(
+        unit=unit,
+        starting_strength=candidate.starting_strength,
+    )
     if cost is None:
         return
     total = context.state.faction_resource_total(
@@ -307,19 +310,16 @@ def request_cult_ambush_resurgence(context: UnitDestroyedContext) -> None:
     )
     if total < cost:
         return
-    starting_strength = context.state.starting_strength_record_for_unit(
-        unit.unit_instance_id
-    ).starting_model_count
     payload = validate_json_value(
         {
             "source_rule_id": SOURCE_RULE_ID,
             "model_destroyed_event_id": context.model_destroyed_event_id,
-            "destroyed_unit_instance_id": unit.unit_instance_id,
+            "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
             "destroyed_player_id": context.destroyed_player_id,
             "destroying_player_id": context.destroying_player_id,
             "battle_round": context.state.battle_round,
             "phase": context.completed_phase.value,
-            "starting_strength": starting_strength,
+            "starting_strength": candidate.starting_strength,
             "resurgence_cost": cost,
             "current_resurgence_points": total,
         }
@@ -331,22 +331,26 @@ def request_cult_ambush_resurgence(context: UnitDestroyedContext) -> None:
         payload=payload,
         options=(
             DecisionOption(
-                option_id=f"genestealer_cults:cult_ambush:decline:{unit.unit_instance_id}",
+                option_id=(
+                    f"genestealer_cults:cult_ambush:decline:{context.destroyed_unit_instance_id}"
+                ),
                 label="Decline Cult Ambush",
                 payload={
                     "selection": "decline",
                     "source_rule_id": SOURCE_RULE_ID,
-                    "destroyed_unit_instance_id": unit.unit_instance_id,
+                    "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
                     "model_destroyed_event_id": context.model_destroyed_event_id,
                 },
             ),
             DecisionOption(
-                option_id=f"genestealer_cults:cult_ambush:spend:{unit.unit_instance_id}",
+                option_id=(
+                    f"genestealer_cults:cult_ambush:spend:{context.destroyed_unit_instance_id}"
+                ),
                 label="Spend Resurgence Points",
                 payload={
                     "selection": "spend",
                     "source_rule_id": SOURCE_RULE_ID,
-                    "destroyed_unit_instance_id": unit.unit_instance_id,
+                    "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
                     "model_destroyed_event_id": context.model_destroyed_event_id,
                     "resurgence_cost": cost,
                 },
@@ -364,7 +368,7 @@ def request_cult_ambush_resurgence(context: UnitDestroyedContext) -> None:
                 "phase": context.completed_phase.value,
                 "player_id": context.destroyed_player_id,
                 "request_id": request.request_id,
-                "destroyed_unit_instance_id": unit.unit_instance_id,
+                "destroyed_unit_instance_id": context.destroyed_unit_instance_id,
                 "model_destroyed_event_id": context.model_destroyed_event_id,
                 "resurgence_cost": cost,
                 "current_resurgence_points": total,
@@ -400,15 +404,21 @@ def invalid_cult_ambush_resurgence_status(
             "selection",
         )
     destroyed_unit_id = _payload_string(result_payload, "destroyed_unit_instance_id")
-    unit = _unit_by_id(state, destroyed_unit_id)
-    if not _unit_has_cult_ambush_ability(unit):
+    candidate = cult_ambush_return_candidate(
+        state,
+        destroyed_unit_instance_id=destroyed_unit_id,
+    )
+    if candidate is None:
         return _invalid(
             state,
             "Destroyed unit no longer has Cult Ambush.",
             "ability_drift",
             "destroyed_unit_instance_id",
         )
-    current_cost = cult_ambush_resurgence_cost_for_unit(state, unit)
+    current_cost = resurgence_cost(
+        unit=candidate.unit,
+        starting_strength=candidate.starting_strength,
+    )
     if current_cost is None:
         return _invalid(
             state,
@@ -468,7 +478,12 @@ def apply_cult_ambush_resurgence_decision(
         return
     if selection != "spend":
         raise GameLifecycleError("Cult Ambush result was not prevalidated.")
-    destroyed_unit = _unit_by_id(state, destroyed_unit_id)
+    candidate = cult_ambush_return_candidate(
+        state,
+        destroyed_unit_instance_id=destroyed_unit_id,
+    )
+    if candidate is None:
+        raise GameLifecycleError("Cult Ambush return unit was not prevalidated.")
     cost = _payload_int(payload, "resurgence_cost")
     spend = state.spend_faction_resource(
         player_id=player_id,
@@ -478,7 +493,7 @@ def apply_cult_ambush_resurgence_decision(
     )
     if spend.status is not FactionResourceStatus.APPLIED:
         raise GameLifecycleError("Cult Ambush spend was not prevalidated.")
-    replacement = _replacement_unit_for_destroyed_unit(state, destroyed_unit)
+    replacement = replacement_unit_for_destroyed_unit(state, candidate.unit)
     starting_strength_record = state.add_unit_to_army(
         player_id=player_id,
         unit=replacement,
@@ -495,7 +510,7 @@ def apply_cult_ambush_resurgence_decision(
         destruction_deadline_policy=ReserveDestructionTimingPolicy.from_mission_policy(
             state.runtime_ruleset_descriptor().mission_policy
         ),
-        source_rule_ids=(SOURCE_RULE_ID,),
+        source_rule_ids=(SOURCE_RULE_ID, ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID),
     )
     state.record_reserve_state(reserve_state)
     event_payload = validate_json_value(
@@ -507,7 +522,7 @@ def apply_cult_ambush_resurgence_decision(
             "player_id": player_id,
             "request_id": result.request_id,
             "result_id": result.result_id,
-            "destroyed_unit_instance_id": destroyed_unit.unit_instance_id,
+            "destroyed_unit_instance_id": destroyed_unit_id,
             "replacement_unit_instance_id": replacement.unit_instance_id,
             "resurgence_cost": cost,
             "faction_resource_result": spend.to_payload(),
@@ -538,7 +553,7 @@ def apply_cult_ambush_resurgence_decision(
                     "player_id": player_id,
                     "marker_id": marker_id,
                     "replacement_unit_instance_id": replacement.unit_instance_id,
-                    "destroyed_unit_instance_id": destroyed_unit.unit_instance_id,
+                    "destroyed_unit_instance_id": destroyed_unit_id,
                     "reason": "no_legal_marker_position",
                     "source_rule_id": SOURCE_RULE_ID,
                 }
@@ -551,7 +566,7 @@ def apply_cult_ambush_resurgence_decision(
         player_id=player_id,
         marker_id=marker_id,
         replacement_unit_instance_id=replacement.unit_instance_id,
-        destroyed_unit_instance_id=destroyed_unit.unit_instance_id,
+        destroyed_unit_instance_id=destroyed_unit_id,
         source_request_id=result.request_id,
         source_result_id=result.result_id,
     )
@@ -1157,20 +1172,6 @@ def resolve_cult_ambush_marker_removal_for_completed_moves(
                 )
 
 
-def cult_ambush_resurgence_cost_for_unit(state: GameState, unit: UnitInstance) -> int | None:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Cult Ambush cost requires UnitInstance.")
-    starting_strength = state.starting_strength_record_for_unit(
-        unit.unit_instance_id
-    ).starting_model_count
-    costs = _RESURGENCE_COSTS_BY_DATASHEET_ID.get(unit.datasheet_id)
-    if costs is None:
-        costs = _RESURGENCE_COSTS_BY_UNIT_NAME.get(unit.name.upper())
-    if costs is None:
-        return None
-    return costs.get(starting_strength)
-
-
 def reserve_state_is_cult_ambush(reserve_state: ReserveState) -> bool:
     if type(reserve_state) is not ReserveState:
         raise GameLifecycleError("Cult Ambush reserve lookup requires ReserveState.")
@@ -1326,37 +1327,6 @@ def _request_cult_ambush_placement_retry(
     return request
 
 
-def _replacement_unit_for_destroyed_unit(
-    state: GameState,
-    destroyed_unit: UnitInstance,
-) -> UnitInstance:
-    new_unit_id = _next_replacement_unit_id(state, destroyed_unit.unit_instance_id)
-    new_models: list[ModelInstance] = []
-    for index, model in enumerate(destroyed_unit.own_models, start=1):
-        new_models.append(
-            replace(
-                model,
-                model_instance_id=f"{new_unit_id}:model-{index:03d}",
-                wounds_remaining=model.starting_wounds,
-            )
-        )
-    return replace(
-        destroyed_unit,
-        unit_instance_id=new_unit_id,
-        own_models=tuple(new_models),
-    )
-
-
-def _next_replacement_unit_id(state: GameState, destroyed_unit_id: str) -> str:
-    existing_ids = {unit.unit_instance_id for army in state.army_definitions for unit in army.units}
-    index = 1
-    while True:
-        candidate = f"{destroyed_unit_id}:cult-ambush-{index:03d}"
-        if candidate not in existing_ids:
-            return candidate
-        index += 1
-
-
 def _marker_id(
     *,
     state: GameState,
@@ -1367,14 +1337,6 @@ def _marker_id(
     return (
         f"cult-ambush-marker:{state.game_id}:round-{state.battle_round:02d}:"
         f"{player_id}:{replacement_unit_instance_id}:{source_result_id}"
-    )
-
-
-def _unit_has_cult_ambush_ability(unit: UnitInstance) -> bool:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Cult Ambush eligibility requires UnitInstance.")
-    return any(
-        ability.ability_id in _CULT_AMBUSH_ABILITY_IDS for ability in unit.datasheet_abilities
     )
 
 
