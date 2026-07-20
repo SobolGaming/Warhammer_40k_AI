@@ -6,12 +6,9 @@ from typing import cast
 
 import msgspec
 
-from warhammer40k_core.rules.attachment_wargear_requirements import (
-    AttachmentWargearRequirement,
-)
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRError, RuleIRPayload
 
-AELDARI_AUTARCHS_RULE_IR_ARTIFACT_SCHEMA = "core-v2-aeldari-autarchs-rule-ir-v2"
+AELDARI_AUTARCHS_RULE_IR_ARTIFACT_SCHEMA = "core-v2-aeldari-autarchs-rule-ir-v1"
 EXPECTED_SOURCE_PACKAGE_ID = "gw-11e-aeldari-autarchs-datasheets-2026-06-14"
 EXPECTED_DATASHEETS = {
     "000000577": "Autarch",
@@ -21,15 +18,6 @@ EXPECTED_SOURCE_ROW_IDS = {
     "000000577:3",
     "000000577:5",
     "000002759:4",
-}
-EXPECTED_ATTACHMENT_SOURCE_FILENAMES = {
-    "Datasheets_leader.json",
-    "Datasheets_options.json",
-    "Datasheets_wargear.json",
-}
-EXPECTED_ATTACHMENT_REQUIREMENTS = {
-    ("000000577", "000000594"): ("000000577:banshee-blade",),
-    ("000000577", "000000595"): ("000000577:scorpion-chainsword",),
 }
 
 
@@ -75,33 +63,6 @@ class _AeldariAutarchsRuleIrRecordArtifact(
         return rule_ir
 
 
-class _AeldariAutarchAttachmentWargearRequirementArtifact(
-    msgspec.Struct,
-    frozen=True,
-    forbid_unknown_fields=True,
-):
-    leader_datasheet_id: str
-    bodyguard_datasheet_id: str
-    required_wargear_ids: list[str]
-    source_ids: list[str]
-
-    def validated_requirement(self) -> AttachmentWargearRequirement:
-        requirement = AttachmentWargearRequirement(
-            leader_datasheet_id=self.leader_datasheet_id,
-            bodyguard_datasheet_id=self.bodyguard_datasheet_id,
-            required_wargear_ids=tuple(self.required_wargear_ids),
-            source_ids=tuple(self.source_ids),
-        )
-        expected_wargear_ids = EXPECTED_ATTACHMENT_REQUIREMENTS.get(
-            (requirement.leader_datasheet_id, requirement.bodyguard_datasheet_id)
-        )
-        if requirement.required_wargear_ids != expected_wargear_ids:
-            raise AeldariAutarchsRuleIrArtifactError(
-                "Aeldari Autarch attachment wargear requirement drifted."
-            )
-        return requirement
-
-
 class AeldariAutarchsRuleIrPackageArtifact(
     msgspec.Struct,
     frozen=True,
@@ -112,9 +73,6 @@ class AeldariAutarchsRuleIrPackageArtifact(
     source_snapshot_filename: str
     source_snapshot_sha256: str
     source_artifact_hash: str
-    attachment_source_snapshot_sha256s: dict[str, str]
-    attachment_source_artifact_hashes: dict[str, str]
-    attachment_wargear_requirements: list[_AeldariAutarchAttachmentWargearRequirementArtifact]
     datasheets: dict[str, str]
     records: dict[str, _AeldariAutarchsRuleIrRecordArtifact]
     package_hash: str
@@ -134,18 +92,6 @@ class AeldariAutarchsRuleIrPackageArtifact(
             )
         _validate_sha256("source_snapshot_sha256", self.source_snapshot_sha256)
         _validate_sha256("source_artifact_hash", self.source_artifact_hash)
-        if set(self.attachment_source_snapshot_sha256s) != EXPECTED_ATTACHMENT_SOURCE_FILENAMES:
-            raise AeldariAutarchsRuleIrArtifactError(
-                "Aeldari Autarch attachment source snapshot inventory drifted."
-            )
-        if set(self.attachment_source_artifact_hashes) != EXPECTED_ATTACHMENT_SOURCE_FILENAMES:
-            raise AeldariAutarchsRuleIrArtifactError(
-                "Aeldari Autarch attachment source artifact inventory drifted."
-            )
-        for filename, value in self.attachment_source_snapshot_sha256s.items():
-            _validate_sha256(f"{filename} snapshot SHA-256", value)
-        for filename, value in self.attachment_source_artifact_hashes.items():
-            _validate_sha256(f"{filename} artifact hash", value)
         if self.datasheets != EXPECTED_DATASHEETS:
             raise AeldariAutarchsRuleIrArtifactError(
                 "Aeldari Autarchs datasheet inventory drifted."
@@ -153,19 +99,6 @@ class AeldariAutarchsRuleIrPackageArtifact(
         if set(self.records) != EXPECTED_SOURCE_ROW_IDS:
             raise AeldariAutarchsRuleIrArtifactError(
                 "Aeldari Autarchs RuleIR source-row inventory drifted."
-            )
-        requirements = tuple(
-            record.validated_requirement() for record in self.attachment_wargear_requirements
-        )
-        requirement_keys = tuple(
-            (requirement.leader_datasheet_id, requirement.bodyguard_datasheet_id)
-            for requirement in requirements
-        )
-        if len(set(requirement_keys)) != len(requirement_keys) or set(requirement_keys) != set(
-            EXPECTED_ATTACHMENT_REQUIREMENTS
-        ):
-            raise AeldariAutarchsRuleIrArtifactError(
-                "Aeldari Autarch attachment requirement inventory drifted."
             )
         _validate_sha256("package_hash", self.package_hash)
         if self.package_hash != _package_hash(self):
@@ -186,19 +119,6 @@ class AeldariAutarchsRuleIrPackageArtifact(
             source_row_id=source_row_id,
             source_package_id=self.source_package_id,
         ).to_payload()
-
-    def validated_attachment_wargear_requirements(
-        self,
-    ) -> tuple[AttachmentWargearRequirement, ...]:
-        return tuple(
-            sorted(
-                (record.validated_requirement() for record in self.attachment_wargear_requirements),
-                key=lambda requirement: (
-                    requirement.leader_datasheet_id,
-                    requirement.bodyguard_datasheet_id,
-                ),
-            )
-        )
 
 
 def aeldari_autarchs_rule_ir_package_artifact_from_json_bytes(

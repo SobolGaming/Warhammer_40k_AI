@@ -148,9 +148,6 @@ from warhammer40k_core.rules.source_overlay import (
     apply_source_release_overlays,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_autarchs_2026_06 as aeldari_autarchs_source,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_defiler_datasheet_overlay_2026_06 as chaos_defiler_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -1497,7 +1494,6 @@ def _ability_support_catalog_package(
             + FLESH_HOUNDS_HEIGHT_OVERRIDES
             + CHAOS_DEFILER_HEIGHT_OVERRIDES
         ),
-        attachment_wargear_requirements=(aeldari_autarchs_source.attachment_wargear_requirements()),
     )
     return build_canonical_catalog_package(
         package_id=_catalog_package_id(),

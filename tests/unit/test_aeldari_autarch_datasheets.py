@@ -31,7 +31,6 @@ from warhammer40k_core.engine.ability_catalog import (
 from warhammer40k_core.engine.advance_hooks import AdvanceMoveContext
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
-    ArmyMusteringError,
     ArmyMusterRequest,
     muster_army,
 )
@@ -110,6 +109,7 @@ HAWKS_ID = "000000600"
 WRAITHBLADES_ID = "000000598"
 AUTARCH_BANSHEE_BLADE_ID = "000000577:banshee-blade"
 AUTARCH_SCORPION_CHAINSWORD_ID = "000000577:scorpion-chainsword"
+AUTARCH_STAR_GLAIVE_ID = "000000577:star-glaive"
 AUTARCH_ATTACHED_ID = "attached-unit:army-a:autarch-bodyguard"
 WAYLEAPER_ATTACHED_ID = "attached-unit:army-a:wayleaper-bodyguard"
 TEST_DETACHMENT_ID = "autarch-aspect-training-test"
@@ -405,6 +405,15 @@ def test_catalog_preserves_autarch_stats_geometry_abilities_weapons_and_leader_t
     }
     assert _leader_target_ids(wayleaper) == {HAWKS_ID, "000000601"}
     assert {
+        target.bodyguard_datasheet_id: target.required_wargear_ids
+        for eligibility in autarch.attachment_eligibilities
+        for target in eligibility.targets
+    } == {
+        HOWLING_BANSHEES_ID: (),
+        STRIKING_SCORPIONS_ID: (),
+        "000000596": (),
+    }
+    assert {
         (override.datasheet_id, override.model_name, override.height)
         for override in AELDARI_AUTARCHS_HEIGHT_OVERRIDES
     } == {
@@ -414,19 +423,24 @@ def test_catalog_preserves_autarch_stats_geometry_abilities_weapons_and_leader_t
 
 
 @pytest.mark.parametrize(
-    ("bodyguard_datasheet_id", "required_wargear_id"),
+    "bodyguard_datasheet_id",
+    [HOWLING_BANSHEES_ID, STRIKING_SCORPIONS_ID],
+)
+@pytest.mark.parametrize(
+    "autarch_wargear_id",
     [
-        (HOWLING_BANSHEES_ID, AUTARCH_BANSHEE_BLADE_ID),
-        (STRIKING_SCORPIONS_ID, AUTARCH_SCORPION_CHAINSWORD_ID),
+        None,
+        AUTARCH_BANSHEE_BLADE_ID,
+        AUTARCH_SCORPION_CHAINSWORD_ID,
     ],
 )
-def test_autarch_aspect_attachments_are_mustered_only_with_source_required_wargear(
+def test_autarch_aspect_attachments_accept_every_legal_melee_loadout(
     bodyguard_datasheet_id: str,
-    required_wargear_id: str,
+    autarch_wargear_id: str | None,
 ) -> None:
     legal = _muster_autarch_army(
         bodyguard_datasheet_id=bodyguard_datasheet_id,
-        autarch_wargear_id=required_wargear_id,
+        autarch_wargear_id=autarch_wargear_id,
         include_wayleaper=False,
     )
 
@@ -434,23 +448,16 @@ def test_autarch_aspect_attachments_are_mustered_only_with_source_required_warge
     formation = legal.attached_units[0]
     assert formation.attached_unit_instance_id == AUTARCH_ATTACHED_ID
     assert any("Datasheets_leader:000000577:" in value for value in formation.attachment_source_ids)
-    assert required_wargear_id in legal.unit_by_id("army-a:autarch").own_models[0].wargear_ids
-
-    with pytest.raises(
-        ArmyMusteringError,
-        match="does not satisfy the target wargear requirements",
-    ):
-        _muster_autarch_army(
-            bodyguard_datasheet_id=bodyguard_datasheet_id,
-            autarch_wargear_id=None,
-            include_wayleaper=False,
-        )
+    expected_wargear_id = (
+        AUTARCH_STAR_GLAIVE_ID if autarch_wargear_id is None else autarch_wargear_id
+    )
+    assert expected_wargear_id in legal.unit_by_id("army-a:autarch").own_models[0].wargear_ids
 
 
 def test_aspect_training_is_live_attachment_and_bodyguard_keyword_scoped() -> None:
     scorpions = _runtime_fixture(
         autarch_bodyguard_datasheet_id=STRIKING_SCORPIONS_ID,
-        autarch_wargear_id=AUTARCH_SCORPION_CHAINSWORD_ID,
+        autarch_wargear_id=None,
     )
     view = rules_unit_view_by_id(
         state=scorpions.state,
@@ -478,7 +485,7 @@ def test_aspect_training_is_live_attachment_and_bodyguard_keyword_scoped() -> No
 
     banshees = _runtime_fixture(
         autarch_bodyguard_datasheet_id=HOWLING_BANSHEES_ID,
-        autarch_wargear_id=AUTARCH_BANSHEE_BLADE_ID,
+        autarch_wargear_id=None,
     )
     assert FightsFirstRegistry.from_state(banshees.state).has_unit(AUTARCH_ATTACHED_ID)
     assert not conditional_granted_ability_effects_for_rules_unit(
@@ -489,7 +496,7 @@ def test_aspect_training_is_live_attachment_and_bodyguard_keyword_scoped() -> No
 
     detached = _runtime_fixture(
         autarch_bodyguard_datasheet_id=STRIKING_SCORPIONS_ID,
-        autarch_wargear_id=AUTARCH_SCORPION_CHAINSWORD_ID,
+        autarch_wargear_id=None,
         attach_autarch=False,
     )
     assert not conditional_granted_ability_effects_for_rules_unit(
@@ -499,7 +506,7 @@ def test_aspect_training_is_live_attachment_and_bodyguard_keyword_scoped() -> No
     )
     dead = _runtime_fixture(
         autarch_bodyguard_datasheet_id=STRIKING_SCORPIONS_ID,
-        autarch_wargear_id=AUTARCH_SCORPION_CHAINSWORD_ID,
+        autarch_wargear_id=None,
         autarch_alive=False,
     )
     assert not conditional_granted_ability_effects_for_rules_unit(
@@ -730,7 +737,7 @@ def _runtime_fixture(
     *,
     game_id: str = "aeldari-autarch-test",
     autarch_bodyguard_datasheet_id: str = STRIKING_SCORPIONS_ID,
-    autarch_wargear_id: str = AUTARCH_SCORPION_CHAINSWORD_ID,
+    autarch_wargear_id: str | None = None,
     attach_autarch: bool = True,
     autarch_alive: bool = True,
 ) -> _RuntimeFixture:

@@ -402,6 +402,9 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.attachment_wargear_requirements import (
+    AttachmentWargearRequirement,
+)
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
@@ -8260,6 +8263,54 @@ def test_phase17k_support_ability_marks_attachment_eligibility_role_as_support()
     ) == ("test-bodyguard-unit",)
     assert len(support.attachment_eligibilities[0].targets[0].source_ids) == 1
     assert "Datasheets_leader" in support.attachment_eligibilities[0].targets[0].source_ids[0]
+    assert support.attachment_eligibilities[0].targets[0].required_wargear_ids == ()
+
+
+def test_phase17k_bridge_emits_only_explicit_attachment_wargear_requirements() -> None:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_support_attachment_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-support-unit", "test-bodyguard-unit"),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-support-unit",
+                model_name="Support",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:support-height",
+                height_document_reference="test-doc:support-height",
+            ),
+            ModelHeightOverride(
+                datasheet_id="test-bodyguard-unit",
+                model_name="Bodyguard",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:bodyguard-height",
+                height_document_reference="test-doc:bodyguard-height",
+            ),
+        ),
+        attachment_wargear_requirements=(
+            AttachmentWargearRequirement(
+                leader_datasheet_id="test-support-unit",
+                bodyguard_datasheet_id="test-bodyguard-unit",
+                required_wargear_ids=("test-support-unit:support-blade",),
+                source_ids=("test-source:explicit-attachment-wargear-restriction",),
+            ),
+        ),
+    )
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=bridge_artifacts,
+    )
+    target = (
+        package.army_catalog.datasheet_by_id("test-support-unit")
+        .attachment_eligibilities[0]
+        .targets[0]
+    )
+
+    assert target.required_wargear_ids == ("test-support-unit:support-blade",)
+    assert "test-source:explicit-attachment-wargear-restriction" in target.source_ids
 
 
 def test_phase17k_bridge_omits_attachment_edges_with_an_excluded_bodyguard_endpoint() -> None:
