@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import hashlib
-import json
 import math
 from dataclasses import dataclass, field
 from datetime import date
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256, validate_sha256_hex
 from warhammer40k_core.core.objectives import ObjectiveAnchorKind
 from warhammer40k_core.core.ruleset import RulesetId, RulesetIdPayload
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -315,6 +314,7 @@ class RulesetDescriptorPayload(TypedDict):
     source_date: str
     descriptor_version: str
     descriptor_hash: str
+    rules_overlay_ids: list[str]
     engagement_policy: EngagementPolicyDescriptorPayload
     movement_policy: MovementPolicyDescriptorPayload
     charge_policy: ChargePolicyDescriptorPayload
@@ -1827,6 +1827,7 @@ class RulesetDescriptor:
     mission_policy: MissionPolicyDescriptor
     setup_sequence: SetupSequenceDescriptor
     battle_phase_sequence: BattlePhaseSequenceDescriptor
+    rules_overlay_ids: tuple[str, ...] = ()
     descriptor_hash: str = ""
 
     def __post_init__(self) -> None:
@@ -1898,6 +1899,10 @@ class RulesetDescriptor:
             self.battle_phase_sequence,
             BattlePhaseSequenceDescriptor,
         )
+        rules_overlay_ids = _validate_identifier_tuple(
+            "RulesetDescriptor rules_overlay_ids", self.rules_overlay_ids
+        )
+        object.__setattr__(self, "rules_overlay_ids", rules_overlay_ids)
 
         expected_hash = _descriptor_hash(self._payload_without_hash())
         if self.descriptor_hash:
@@ -2007,6 +2012,7 @@ class RulesetDescriptor:
             source_date=payload["source_date"],
             descriptor_version=payload["descriptor_version"],
             descriptor_hash=payload["descriptor_hash"],
+            rules_overlay_ids=tuple(payload["rules_overlay_ids"]),
             engagement_policy=EngagementPolicyDescriptor.from_payload(payload["engagement_policy"]),
             movement_policy=MovementPolicyDescriptor.from_payload(payload["movement_policy"]),
             charge_policy=ChargePolicyDescriptor.from_payload(payload["charge_policy"]),
@@ -2033,6 +2039,7 @@ class RulesetDescriptor:
             "source_date": str(self.source_date),
             "descriptor_version": self.descriptor_version,
             "descriptor_hash": "",
+            "rules_overlay_ids": list(self.rules_overlay_ids),
             "engagement_policy": self.engagement_policy.to_payload(),
             "movement_policy": self.movement_policy.to_payload(),
             "charge_policy": self.charge_policy.to_payload(),
@@ -2556,23 +2563,15 @@ def _terrain_feature_visibility_policies_for_eleventh(
 def _descriptor_hash(payload: RulesetDescriptorPayload) -> str:
     clean_payload = dict(payload)
     clean_payload["descriptor_hash"] = ""
-    encoded = json.dumps(clean_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+    return canonical_payload_sha256(clean_payload, omit_empty_lists=("rules_overlay_ids",))
 
 
 def _validate_descriptor_hash(value: object) -> str:
-    if type(value) is not str:
-        raise RulesetDescriptorError("RulesetDescriptor descriptor_hash must be a string.")
-    stripped = value.strip()
-    if len(stripped) != 64:
-        raise RulesetDescriptorError(
-            "RulesetDescriptor descriptor_hash must be a SHA-256 hex digest."
-        )
-    if any(character not in "0123456789abcdef" for character in stripped):
-        raise RulesetDescriptorError(
-            "RulesetDescriptor descriptor_hash must be a lowercase SHA-256 hex digest."
-        )
-    return stripped
+    return validate_sha256_hex(
+        value,
+        field_name="RulesetDescriptor descriptor_hash",
+        error_type=RulesetDescriptorError,
+    )
 
 
 def _validate_descriptor_part(

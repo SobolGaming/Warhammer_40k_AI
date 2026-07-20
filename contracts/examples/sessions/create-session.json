@@ -3586,6 +3586,7 @@
         ],
         "terrain_objective_control_policy": "terrain_area_occupancy"
       },
+      "rules_overlay_ids": [],
       "ruleset_id": {
         "edition": "11e",
         "game": "warhammer_40000",

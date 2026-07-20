@@ -2439,6 +2439,8 @@ Required tests:
 
 - static audit rejects active runtime/test references to retired edition IDs;
 - ruleset descriptor hash is deterministic and 11th Edition-only;
+- event/rules overlay IDs are explicit descriptor inputs, participate in the descriptor hash,
+  serialize through lifecycle state, and remain visible in session and replay source identity;
 - source package payloads round-trip with 11th Edition IDs;
 - no compatibility shim can instantiate a retired ruleset.
 

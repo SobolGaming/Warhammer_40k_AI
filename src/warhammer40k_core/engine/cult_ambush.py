@@ -73,6 +73,7 @@ from warhammer40k_core.geometry.measurement import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model as GeometryModel
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -81,7 +82,7 @@ if TYPE_CHECKING:
 GENESTEALER_CULTS_FACTION_ID = "genestealer-cults"
 SOURCE_RULE_ID = "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush"
 ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID = (
-    "warhammer_40000_11th:event_faq:tacoma_2026:cult_ambush_attached_character_exclusions"
+    tacoma_open_2026.CULT_AMBUSH_ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID
 )
 BATTLE_FORMATION_HOOK_ID = f"{SOURCE_RULE_ID}:initial_resurgence"
 UNIT_DESTROYED_HOOK_ID = f"{SOURCE_RULE_ID}:unit_destroyed"
@@ -510,7 +511,7 @@ def apply_cult_ambush_resurgence_decision(
         destruction_deadline_policy=ReserveDestructionTimingPolicy.from_mission_policy(
             state.runtime_ruleset_descriptor().mission_policy
         ),
-        source_rule_ids=(SOURCE_RULE_ID, ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID),
+        source_rule_ids=(SOURCE_RULE_ID, *candidate.source_rule_ids),
     )
     state.record_reserve_state(reserve_state)
     event_payload = validate_json_value(

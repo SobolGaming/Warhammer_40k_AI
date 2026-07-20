@@ -64,6 +64,7 @@ from warhammer40k_core.engine.replay import (
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PLAYER_A = "player-a"
@@ -80,6 +81,24 @@ class _PayloadValidator(Protocol):
     def validate(self, instance: object) -> None: ...
 
     def iter_errors(self, instance: object) -> Iterator[object]: ...
+
+
+def test_phase18f_session_source_identity_publishes_active_rules_overlay() -> None:
+    config = canonical_setup_prebattle_smoke_config(game_id="phase18f-tacoma-overlay")
+    descriptor = tacoma_open_2026.apply_rules_overlay(config.ruleset_descriptor)
+    config = replace(config, ruleset_descriptor=descriptor)
+
+    created = _request(
+        AdapterGameServer(),
+        "POST",
+        "/sessions",
+        body=_session_create_body_from_config(config),
+        expected_status=201,
+    )
+
+    _schema_validator("session-metadata.schema.json").validate(created)
+    assert created["ruleset_descriptor_hash"] == descriptor.descriptor_hash
+    assert created["rules_overlay_ids"] == [tacoma_open_2026.RULES_OVERLAY_ID]
 
 
 def test_phase18f_command_is_idempotent_and_enforces_revision_ordering() -> None:

@@ -14,6 +14,12 @@
       "$ref": "https://warhammer40k-core.local/contracts/v1/lifecycle-status.schema.json#/$defs/status"
     },
     "projection_state_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "rules_overlay_ids": {
+      "items": {"minLength": 1, "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "ruleset_descriptor_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "ruleset_id": {"minProperties": 1, "type": "object"},
     "schema_version": {"const": "session-metadata-v3-contract", "type": "string"},
     "server_contract_version": {"pattern": "^3\\.[0-9]+\\.[0-9]+$", "type": "string"},

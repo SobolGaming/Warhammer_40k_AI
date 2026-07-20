@@ -3341,6 +3341,8 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     expected_hash = config.ruleset_descriptor.descriptor_hash
     if state.ruleset_descriptor_hash != expected_hash:
         raise GameLifecycleError("Lifecycle state ruleset hash does not match config.")
+    if state.rules_overlay_ids != config.ruleset_descriptor.rules_overlay_ids:
+        raise GameLifecycleError("Lifecycle state rules overlays do not match config.")
     expected_setup = tuple(config.ruleset_descriptor.setup_sequence.steps)
     if state.setup_sequence != expected_setup:
         raise GameLifecycleError("Lifecycle state setup sequence does not match config.")

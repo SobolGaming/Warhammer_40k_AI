@@ -3,6 +3,7 @@ from __future__ import annotations
 # pyright: reportPrivateUsage=false
 import json
 import re
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -86,6 +87,7 @@ from warhammer40k_core.engine.wargear_selections import (
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 pytestmark = pytest.mark.replay
 
@@ -121,6 +123,28 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["decision_records"]
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
+
+
+def test_replay_source_identity_verifies_active_rules_overlay() -> None:
+    config = _setup_config(game_id="phase18b-tacoma-overlay")
+    descriptor = tacoma_open_2026.apply_rules_overlay(config.ruleset_descriptor)
+    lifecycle = GameLifecycle()
+    lifecycle.start(replace(config, ruleset_descriptor=descriptor))
+    initial_payload = _lifecycle_payload_copy(lifecycle)
+    artifact = ReplayArtifact.capture(
+        artifact_id="phase18b-tacoma-overlay",
+        initial_lifecycle_payload=initial_payload,
+        final_lifecycle=lifecycle,
+    )
+
+    payload = _artifact_payload_copy(artifact)
+    assert payload["source_identity"]["ruleset_descriptor_hash"] == descriptor.descriptor_hash
+    assert payload["source_identity"]["rules_overlay_ids"] == [tacoma_open_2026.RULES_OVERLAY_ID]
+    assert ReplayArtifact.from_payload(payload) == artifact
+
+    payload["source_identity"]["rules_overlay_ids"] = []
+    with pytest.raises(ReplayArtifactError, match="source identity drifted from snapshot"):
+        ReplayArtifact.from_payload(payload)
 
 
 @pytest.mark.parametrize("field_name", ["seed", "history", "draw_count"])

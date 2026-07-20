@@ -16,6 +16,7 @@ from external_contract_session_examples import phase18e_session_examples
 from jsonschema import Draft202012Validator
 from referencing import Resource
 from referencing.jsonschema import DRAFT202012, EMPTY_REGISTRY, Schema, SchemaRegistry
+from tacoma_2026_source_audit import audit_tacoma_2026_sources
 
 from warhammer40k_core.adapters.access_control import (
     DEV_ADMIN_TOKEN,
@@ -210,6 +211,7 @@ def main() -> int:
 
 
 def write_contract_examples() -> None:
+    audit_tacoma_2026_sources(ROOT)
     export_ui_contract_files(output_root=ROOT)
     _write_missing_proposal_examples()
 
@@ -274,6 +276,7 @@ def write_contract_examples() -> None:
 
 
 def verify_contract_bundle(*, base_ref: str | None = None) -> None:
+    audit_tacoma_2026_sources(ROOT)
     schemas = _schema_payloads()
     if set(schemas) != set(_schema_file_names()):
         raise ExternalContractError("External contract schema discovery drifted.")

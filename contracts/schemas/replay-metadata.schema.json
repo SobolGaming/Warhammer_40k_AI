@@ -58,6 +58,11 @@
         "game_config_hash": {"minLength": 64, "type": "string"},
         "game_id": {"minLength": 1, "type": "string"},
         "ruleset_descriptor_hash": {"minLength": 64, "type": "string"},
+        "rules_overlay_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "type": "array",
+          "uniqueItems": true
+        },
         "source_ids": {"items": {"type": "string"}, "type": "array"},
         "source_package_id": {"minLength": 1, "type": "string"}
       },

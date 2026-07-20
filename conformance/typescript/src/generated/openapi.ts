@@ -284,6 +284,8 @@ export interface components {
             last_activity_at: string;
             lifecycle_status: components["schemas"]["lifecycle-status--status.schema"];
             projection_state_hash: string;
+            rules_overlay_ids?: string[];
+            ruleset_descriptor_hash?: string;
             ruleset_id: Record<string, never>;
             /** @constant */
             schema_version: "session-metadata-v3-contract";
@@ -835,6 +837,7 @@ export interface components {
             game_config_hash: string;
             game_id: string;
             ruleset_descriptor_hash: string;
+            rules_overlay_ids?: string[];
             source_ids: string[];
             source_package_id: string;
         };

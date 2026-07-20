@@ -34,6 +34,8 @@
       "status_kind": "waiting_for_decision"
     },
     "projection_state_hash": "476761d59a70ad209127faada42a86e75771b1a0fede12965161cad2957d6b21",
+    "rules_overlay_ids": [],
+    "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
     "ruleset_id": {
       "edition": "11e",
       "game": "warhammer_40000",

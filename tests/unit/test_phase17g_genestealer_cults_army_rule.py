@@ -104,6 +104,7 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 GSC_PLAYER_ID = "player-gsc"
 ENEMY_PLAYER_ID = "player-enemy"
@@ -242,7 +243,7 @@ def test_destroyed_unit_spends_resurgence_and_creates_cult_ambush_reserve() -> N
     assert json.loads(json.dumps(marker_request.to_payload())) == marker_request.to_payload()
 
 
-def test_cult_ambush_excludes_attached_character_from_eligibility_cost_and_return() -> None:
+def test_default_ruleset_does_not_activate_tacoma_cult_ambush_exclusions() -> None:
     state, bodyguard, _enemy_unit = _battle_state(
         gsc_unit_id=NEOPHYTE_UNIT_ID,
         gsc_datasheet_id="neophyte-hybrids",
@@ -252,7 +253,38 @@ def test_cult_ambush_excludes_attached_character_from_eligibility_cost_and_retur
         active_player_id=ENEMY_PLAYER_ID,
         attach_character_without_cult_ambush=True,
     )
+    assert state.rules_overlay_ids == ()
+    assert cult_ambush_resurgence_cost_for_unit(state, bodyguard) is None
+
+    decisions = DecisionController()
+    _run_resurgence_hook(
+        state=state,
+        decisions=decisions,
+        destroyed_unit=bodyguard,
+        destroyed_unit_instance_id=GSC_ATTACHED_UNIT_ID,
+    )
+
+    assert list(decisions.queue.pending_requests) == []
+    assert all(
+        ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID not in reserve.source_rule_ids
+        for reserve in state.reserve_states
+    )
+
+
+def test_tacoma_overlay_excludes_attached_character_from_cult_ambush() -> None:
+    state, bodyguard, _enemy_unit = _battle_state(
+        gsc_unit_id=NEOPHYTE_UNIT_ID,
+        gsc_datasheet_id="neophyte-hybrids",
+        gsc_unit_name="Neophyte Hybrids",
+        gsc_model_count=10,
+        phase=BattlePhase.SHOOTING,
+        active_player_id=ENEMY_PLAYER_ID,
+        attach_character_without_cult_ambush=True,
+        tacoma_overlay=True,
+    )
     character = _unit_by_id(state, GSC_CHARACTER_UNIT_ID)
+    assert state.rules_overlay_ids == (tacoma_open_2026.RULES_OVERLAY_ID,)
+    assert state.runtime_ruleset_descriptor().rules_overlay_ids == state.rules_overlay_ids
     assert character.datasheet_abilities == ()
     assert cult_ambush_resurgence_cost_for_unit(state, bodyguard) == 3
     assert cult_ambush_resurgence_cost_for_unit(state, character) is None
@@ -308,6 +340,7 @@ def test_cult_ambush_excludes_attached_character_from_eligibility_cost_and_retur
         phase=BattlePhase.SHOOTING,
         active_player_id=ENEMY_PLAYER_ID,
         attach_character_without_cult_ambush=True,
+        tacoma_overlay=True,
     )
     character_only_decisions = DecisionController()
     _run_resurgence_hook(
@@ -1949,8 +1982,9 @@ def _battle_state(
     enemy_aircraft: bool = False,
     gsc_has_cult_ambush: bool = True,
     attach_character_without_cult_ambush: bool = False,
+    tacoma_overlay: bool = False,
 ) -> tuple[GameState, UnitInstance, UnitInstance]:
-    descriptor = _ruleset_descriptor()
+    descriptor = _ruleset_descriptor(tacoma_overlay=tacoma_overlay)
     battle_phase_sequence = tuple(descriptor.battle_phase_sequence.phases)
     gsc_unit = _unit(
         unit_instance_id=gsc_unit_id,
@@ -2012,6 +2046,7 @@ def _battle_state(
     state = GameState(
         game_id="phase17g-genestealer-cults-battle",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
+        rules_overlay_ids=descriptor.rules_overlay_ids,
         stage=GameLifecycleStage.BATTLE,
         setup_sequence=tuple(descriptor.setup_sequence.steps),
         battle_phase_sequence=battle_phase_sequence,
@@ -2485,10 +2520,11 @@ def _violation_codes(result: ProposalValidationResult) -> set[str]:
     return {violation.violation_code for violation in result.violations}
 
 
-def _ruleset_descriptor() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_eleventh(
+def _ruleset_descriptor(*, tacoma_overlay: bool = False) -> RulesetDescriptor:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh(
         descriptor_version="core-v2-phase17g-genestealer-cults-test"
     )
+    return tacoma_open_2026.apply_rules_overlay(descriptor) if tacoma_overlay else descriptor
 
 
 def _config_for_context(game_id: str) -> GameConfig:

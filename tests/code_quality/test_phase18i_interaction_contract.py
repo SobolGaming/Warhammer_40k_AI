@@ -6,6 +6,8 @@ import re
 from pathlib import Path
 from typing import cast
 
+from scripts.tacoma_2026_source_audit import audit_tacoma_2026_sources
+
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.interaction_metadata import (
     InteractionKind,
@@ -14,6 +16,7 @@ from warhammer40k_core.engine.interaction_metadata import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.weapon_abilities import WEAPON_ABILITY_SELECTION_DECISION_TYPE
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 ROOT = Path(__file__).resolve().parents[2]
 INTERACTION_MODULE = ROOT / "src" / "warhammer40k_core" / "engine" / "interaction_metadata.py"
@@ -132,6 +135,14 @@ def test_published_interaction_kind_inventory_matches_engine_enum() -> None:
     assert schema_values == engine_values
     assert coverage["standard_interaction_kinds"] == sorted(engine_values)
     assert coverage["interaction_kind_count"] == len(engine_values)
+
+
+def test_tacoma_overlay_provenance_and_attachment_assumption_fail_closed() -> None:
+    audit = audit_tacoma_2026_sources(ROOT)
+
+    assert audit.source_pdf_sha256 == tacoma_open_2026.SOURCE_PDF_SHA256
+    assert len(audit.cult_ambush_datasheet_ids) == 7
+    assert audit.eligible_attaching_datasheet_ids
 
 
 def test_visual_consumers_do_not_branch_on_decision_type() -> None:

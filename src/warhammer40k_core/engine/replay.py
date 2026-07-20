@@ -57,6 +57,7 @@ class ReplaySourceIdentityPayload(TypedDict):
     game_id: str
     game_config_hash: str
     ruleset_descriptor_hash: str
+    rules_overlay_ids: list[str]
     catalog_id: str
     catalog_hash: str
     source_package_id: str
@@ -119,6 +120,7 @@ class ReplaySourceIdentity:
     game_id: str
     game_config_hash: str
     ruleset_descriptor_hash: str
+    rules_overlay_ids: tuple[str, ...]
     catalog_id: str
     catalog_hash: str
     source_package_id: str
@@ -135,6 +137,11 @@ class ReplaySourceIdentity:
             self,
             "ruleset_descriptor_hash",
             _validate_sha256("ruleset_descriptor_hash", self.ruleset_descriptor_hash),
+        )
+        object.__setattr__(
+            self,
+            "rules_overlay_ids",
+            _validate_identifier_tuple("rules_overlay_ids", self.rules_overlay_ids),
         )
         object.__setattr__(self, "catalog_id", _validate_identifier("catalog_id", self.catalog_id))
         object.__setattr__(
@@ -162,6 +169,7 @@ class ReplaySourceIdentity:
             game_id=config.game_id,
             game_config_hash=_payload_hash(config.to_payload()),
             ruleset_descriptor_hash=config.ruleset_descriptor.descriptor_hash,
+            rules_overlay_ids=config.ruleset_descriptor.rules_overlay_ids,
             catalog_id=catalog.catalog_id,
             catalog_hash=_payload_hash(catalog.to_payload()),
             source_package_id=catalog.source_package_id,
@@ -173,6 +181,7 @@ class ReplaySourceIdentity:
             "game_id": self.game_id,
             "game_config_hash": self.game_config_hash,
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
+            "rules_overlay_ids": list(self.rules_overlay_ids),
             "catalog_id": self.catalog_id,
             "catalog_hash": self.catalog_hash,
             "source_package_id": self.source_package_id,
@@ -185,6 +194,7 @@ class ReplaySourceIdentity:
             game_id=payload["game_id"],
             game_config_hash=payload["game_config_hash"],
             ruleset_descriptor_hash=payload["ruleset_descriptor_hash"],
+            rules_overlay_ids=tuple(payload["rules_overlay_ids"]),
             catalog_id=payload["catalog_id"],
             catalog_hash=payload["catalog_hash"],
             source_package_id=payload["source_package_id"],

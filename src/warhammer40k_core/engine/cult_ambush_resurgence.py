@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitComponent, rules_unit_view_by_id
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -35,6 +36,7 @@ _RESURGENCE_COSTS_BY_UNIT_NAME = {
 class CultAmbushReturnCandidate:
     unit: UnitInstance
     starting_strength: int
+    source_rule_ids: tuple[str, ...] = ()
 
 
 def cult_ambush_return_candidate(
@@ -55,18 +57,19 @@ def cult_ambush_return_candidate(
         ).starting_model_count
         return CultAmbushReturnCandidate(unit=unit, starting_strength=starting_strength)
 
-    if destroyed_unit_instance_id == rules_unit.unit_instance_id:
+    tacoma_overlay_active = tacoma_open_2026.is_active(state.rules_overlay_ids)
+    if destroyed_unit_instance_id == rules_unit.unit_instance_id or not tacoma_overlay_active:
         included_components = tuple(
             component
             for component in rules_unit.components
-            if not _is_attached_character_component(component)
+            if not (tacoma_overlay_active and _is_attached_character_component(component))
         )
     else:
         included_components = tuple(
             component
             for component in rules_unit.components
             if component.unit.unit_instance_id == destroyed_unit_instance_id
-            and not _is_attached_character_component(component)
+            and not (tacoma_overlay_active and _is_attached_character_component(component))
         )
     if not included_components:
         return None
@@ -77,7 +80,18 @@ def cult_ambush_return_candidate(
             "Cult Ambush cannot return an attached unit with multiple non-CHARACTER components."
         )
     unit = included_components[0].unit
-    return CultAmbushReturnCandidate(unit=unit, starting_strength=len(unit.own_models))
+    excluded_attached_character = tacoma_overlay_active and len(included_components) != len(
+        rules_unit.components
+    )
+    return CultAmbushReturnCandidate(
+        unit=unit,
+        starting_strength=sum(len(component.unit.own_models) for component in included_components),
+        source_rule_ids=(
+            (tacoma_open_2026.CULT_AMBUSH_ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID,)
+            if excluded_attached_character
+            else ()
+        ),
+    )
 
 
 def cult_ambush_resurgence_cost_for_unit(state: GameState, unit: UnitInstance) -> int | None:
