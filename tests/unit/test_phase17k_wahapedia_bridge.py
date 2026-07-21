@@ -6863,7 +6863,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "| Datasheet | Overall | Catalog | Models / geometry |" not in (
         aeldari_datasheet_support
     )
-    assert aeldari_datasheet_support.count("No known catalog blocker.") == 24
+    assert aeldari_datasheet_support.count("No known catalog blocker.") == 23
     assert (
         aeldari_datasheet_support.count(
             "No generated DatasheetSupportRow; catalog/model/wargear/geometry playability "
@@ -6872,16 +6872,26 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         == 46
     )
     assert (
-        "A once-per-battle named-weapon Damage/Anti-Infantry/Devastating Wounds grant; "
-        "and a post-shoot 6-inch Normal move"
+        aeldari_datasheet_support.count("Generated playability evidence records a host limitation:")
+        == 1
+    )
+    assert (
+        "Hand of Asuryan (`000000571:hand-of-asuryan`): A once-per-battle activation "
+        "must grant the Bloody Twins Damage 3, Anti-Infantry 5+, and Devastating Wounds"
     ) in aeldari_datasheet_support
     assert (
-        "Post-shoot hit-target tracking tied to models that disembarked from this Transport "
-        "this turn"
+        "Fire Support (`000000609:fire-support`): Post-shoot target tracking and Wound "
+        "rerolls are parsed; the same-Transport disembark predicate"
     ) in aeldari_datasheet_support
     assert (
-        "PathWitness-backed moved-over enemy selection and per-model mortal wounds"
+        "Eviscerating Fly-by (`000003919:eviscerating-fly-by`): PathWitness-backed "
+        "moved-over enemy selection and per-model mortal wounds"
     ) in aeldari_datasheet_support
+    assert "| Prince Yriel (`000004193`) | PDF pages 12-13;" in aeldari_datasheet_support
+    assert "| Kharseth (`000004194`) | PDF pages 14-15;" in aeldari_datasheet_support
+    assert "| Vypers (`000000605`) | PDF pages 16-17;" in aeldari_datasheet_support
+    assert "| Starfangs (`000004195`) | PDF pages 18-19;" in aeldari_datasheet_support
+    assert "| Corsair Skyreavers (`000004196`) | PDF pages 20-21;" in (aeldari_datasheet_support)
     assert (
         "IR still needed: Harlequins Charge moves through enemy models and mustering-time "
         "exclusive ACROBATIC detachment-tag validation."

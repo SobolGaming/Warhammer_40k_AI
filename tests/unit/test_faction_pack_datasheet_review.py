@@ -2,10 +2,18 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, cast
 
 import pytest
+from tools.aeldari_ability_semantic_descriptions import (
+    DESCRIPTION_ARTIFACT_PATH,
+    DOCUMENTATION_BUCKET_STILL_NEEDED,
+    DOCUMENTATION_BUCKET_SUPPORTED,
+    aeldari_ability_semantic_descriptions,
+    load_aeldari_ability_semantic_descriptions,
+)
 from tools.aeldari_datasheet_semantic_coverage import (
     COVERAGE_PATH,
     OVERLAY_PACK_PATH,
@@ -21,6 +29,7 @@ from tools.aeldari_datasheet_semantic_coverage import (
     aeldari_datasheet_semantic_coverage,
     load_aeldari_datasheet_semantic_coverage,
 )
+from tools.aeldari_support_report import aeldari_datasheet_support_markdown
 from tools.faction_pack_datasheet_review import (
     SOURCE_DATASHEETS_PATH,
     DatasheetSourceTreatment,
@@ -30,9 +39,13 @@ from tools.faction_pack_datasheet_review import (
     reviewed_faction_ids,
 )
 from tools.generate_ability_support_matrix import (
+    DatasheetSupportRow,
     ability_support_matrix_rows,
     datasheet_support_rows,
     faction_support_markdown_files,
+)
+from tools.generate_aeldari_ability_semantic_descriptions import (
+    generated_aeldari_ability_semantic_descriptions,
 )
 from tools.generate_aeldari_datasheet_semantic_coverage import (
     generated_aeldari_datasheet_semantic_coverage,
@@ -99,6 +112,13 @@ AELDARI_UPDATE_IDS = frozenset(
         "000003921",
     }
 )
+AELDARI_COMPLETE_PAGE_REFERENCES = {
+    "000000605": "Complete Datasheets, physical PDF pages 16-17",
+    "000004193": "Complete Datasheets, physical PDF pages 12-13",
+    "000004194": "Complete Datasheets, physical PDF pages 14-15",
+    "000004195": "Complete Datasheets, physical PDF pages 18-19",
+    "000004196": "Complete Datasheets, physical PDF pages 20-21",
+}
 
 
 def test_reviews_cover_every_non_daemons_faction_pack() -> None:
@@ -180,6 +200,10 @@ def test_aeldari_treatments_are_the_exact_reviewed_sets() -> None:
         DatasheetSourceTreatment.RULES_UPDATE: 24,
         DatasheetSourceTreatment.UNCHANGED_PREDECESSOR: 41,
     }
+    assert {
+        cast(str, row.datasheet_id): row.pdf_page_reference
+        for row in review.rows_for(DatasheetSourceTreatment.COMPLETE_PDF)
+    } == AELDARI_COMPLETE_PAGE_REFERENCES
 
 
 def test_aeldari_markdown_preserves_groups_provenance_and_exclusions() -> None:
@@ -275,7 +299,16 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
             )
         else:
             assert f"| {row.datasheet_name} (`{row.datasheet_id}`) | `{row.overall}` |" in markdown
-        if row.faction_id != "aeldari":
+        if row.faction_id == "aeldari":
+            semantic_row = next(
+                semantic_row
+                for semantic_row in aeldari_datasheet_semantic_coverage().rows
+                if semantic_row.datasheet_id == row.datasheet_id
+            )
+            support_markdown = markdown.split("## Datasheet / Unit Support", 1)[1]
+            for ability in semantic_row.abilities:
+                assert support_markdown.count(f"`{ability.ability_id}`") == 1
+        else:
             for coverage_row_id in row.ability_coverage_row_ids:
                 coverage_row = ability_rows_by_id[coverage_row_id]
                 assert (
@@ -363,6 +396,11 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
         SEMANTIC_BUCKET_HOST_NEEDED: 6,
         SEMANTIC_BUCKET_UNSUPPORTED_IR: 39,
     }
+    assert {
+        row.datasheet_id: row.pdf_page_reference
+        for row in artifact.rows
+        if row.treatment == DatasheetSourceTreatment.COMPLETE_PDF.value
+    } == AELDARI_COMPLETE_PAGE_REFERENCES
     assert rows_by_id["000000597"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert rows_by_id["000000603"].semantic_bucket == SEMANTIC_BUCKET_HOST_NEEDED
     assert rows_by_id["000000571"].semantic_bucket == SEMANTIC_BUCKET_UNSUPPORTED_IR
@@ -572,6 +610,112 @@ def test_aeldari_semantic_coverage_artifacts_are_current() -> None:
     assert json.loads(RELEASE_MANIFEST_PATH.read_text(encoding="utf-8")) == (
         release_manifest.to_payload()
     )
+    assert json.loads(DESCRIPTION_ARTIFACT_PATH.read_text(encoding="utf-8")) == (
+        generated_aeldari_ability_semantic_descriptions()
+    )
+
+
+def test_aeldari_semantic_descriptions_exactly_partition_every_reviewed_ability() -> None:
+    coverage = aeldari_datasheet_semantic_coverage()
+    descriptions = aeldari_ability_semantic_descriptions()
+    descriptions_by_identity = {row.identity: row for row in descriptions.rows}
+    expected_by_identity = {
+        (datasheet.datasheet_id, ability.source_row_id, ability.ability_id): ability
+        for datasheet in coverage.rows
+        for ability in datasheet.abilities
+    }
+
+    assert len(descriptions.rows) == 145
+    assert descriptions_by_identity.keys() == expected_by_identity.keys()
+    assert Counter(row.documentation_bucket for row in descriptions.rows) == {
+        DOCUMENTATION_BUCKET_SUPPORTED: 55,
+        DOCUMENTATION_BUCKET_STILL_NEEDED: 90,
+    }
+    support_markdown = faction_support_markdown_files()["aeldari.md"].split(
+        "## Datasheet / Unit Support", 1
+    )[1]
+    for description in descriptions.rows:
+        assert support_markdown.count(f"`{description.ability_id}`") == 1
+        assert description.description in support_markdown
+
+
+@pytest.mark.parametrize(
+    ("field_name", "replacement"),
+    [
+        ("raw_text_sha256", "0" * 64),
+        ("semantic_consumers", []),
+        ("runtime_consumer_ids", []),
+        ("diagnostic_reasons", ["mutated-diagnostic"]),
+    ],
+)
+def test_aeldari_semantic_description_loader_rejects_exact_evidence_drift(
+    tmp_path: Path,
+    field_name: str,
+    replacement: object,
+) -> None:
+    payload = _mutable_aeldari_description_payload()
+    descriptions = cast(list[dict[str, Any]], payload["descriptions"])
+    descriptions[0][field_name] = replacement
+    description_path = _write_aeldari_description_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match="prose drifted from exact ability evidence"):
+        load_aeldari_ability_semantic_descriptions(
+            description_path=description_path,
+            coverage=aeldari_datasheet_semantic_coverage(),
+        )
+
+
+def test_aeldari_semantic_description_loader_rejects_support_stage_drift(
+    tmp_path: Path,
+) -> None:
+    payload = _mutable_aeldari_description_payload()
+    descriptions = cast(list[dict[str, Any]], payload["descriptions"])
+    descriptions[0]["support_stage"] = "generic_ir_executable"
+    descriptions[0]["documentation_bucket"] = DOCUMENTATION_BUCKET_STILL_NEEDED
+    description_path = _write_aeldari_description_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match="prose drifted from exact ability evidence"):
+        load_aeldari_ability_semantic_descriptions(
+            description_path=description_path,
+            coverage=aeldari_datasheet_semantic_coverage(),
+        )
+
+
+def test_aeldari_semantic_description_loader_rejects_ability_partition_drift(
+    tmp_path: Path,
+) -> None:
+    payload = _mutable_aeldari_description_payload()
+    descriptions = cast(list[dict[str, Any]], payload["descriptions"])
+    descriptions.pop()
+    payload["exact_ability_count"] = len(descriptions)
+    description_path = _write_aeldari_description_payload(tmp_path, payload)
+
+    with pytest.raises(ValueError, match="exactly partition reviewed abilities"):
+        load_aeldari_ability_semantic_descriptions(
+            description_path=description_path,
+            coverage=aeldari_datasheet_semantic_coverage(),
+        )
+
+
+def test_aeldari_catalog_blocker_claim_requires_explicit_accepted_support_states() -> None:
+    support_rows = tuple(row for row in datasheet_support_rows() if row.faction_id == "aeldari")
+    rows_by_id: dict[str, DatasheetSupportRow] = {row.datasheet_id: row for row in support_rows}
+    autarch = rows_by_id["000000577"]
+    rows_by_id[autarch.datasheet_id] = replace(
+        autarch,
+        overall="Partial",
+        model_geometry_status="Partial",
+        notes="Exact model geometry remains under review.",
+    )
+
+    markdown = "\n".join(
+        aeldari_datasheet_support_markdown(support_rows_by_datasheet_id=rows_by_id)
+    )
+    autarch_row = next(line for line in markdown.splitlines() if line.startswith("| Autarch (`"))
+
+    assert "No known catalog blocker." not in autarch_row
+    assert "overall `Partial`; models/geometry `Partial`" in autarch_row
+    assert "Exact model geometry remains under review." in autarch_row
 
 
 def test_aeldari_aspect_shrine_token_wargear_entitlement_rows_are_exact() -> None:
@@ -742,3 +886,19 @@ def _write_aeldari_coverage_payload(
     coverage_path = tmp_path / "aeldari-datasheet-semantic-coverage.json"
     coverage_path.write_text(json.dumps(payload), encoding="utf-8")
     return coverage_path
+
+
+def _mutable_aeldari_description_payload() -> dict[str, Any]:
+    return cast(
+        dict[str, Any],
+        json.loads(DESCRIPTION_ARTIFACT_PATH.read_text(encoding="utf-8")),
+    )
+
+
+def _write_aeldari_description_payload(
+    tmp_path: Path,
+    payload: dict[str, Any],
+) -> Path:
+    description_path = tmp_path / "aeldari-ability-semantic-descriptions.json"
+    description_path.write_text(json.dumps(payload), encoding="utf-8")
+    return description_path

@@ -3222,8 +3222,7 @@ def _faction_datasheet_support_markdown(
     if faction_row.faction_id == AELDARI_FACTION_ID:
         lines.extend(
             aeldari_datasheet_support_markdown(
-                generated_datasheet_ids=frozenset(row.datasheet_id for row in sorted_rows),
-                leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
+                support_rows_by_datasheet_id={row.datasheet_id: row for row in sorted_rows},
             )
         )
         return lines

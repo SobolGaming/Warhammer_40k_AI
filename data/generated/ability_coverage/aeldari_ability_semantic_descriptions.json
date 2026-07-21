@@ -1,0 +1,4114 @@
+{
+  "coverage_schema_version": "aeldari-datasheet-semantic-coverage-v4",
+  "coverage_sha256": "1c95ad1430d781576e7e01f2f65b81acfc121b902d01e6cb6b984e07a7a11bcb",
+  "description_text_sha256": "da4d51cc929f32b2c43a9df7242334b0a10b1d82d4cac385c5ff269cdce15e0e",
+  "descriptions": [
+    {
+      "ability_id": "000000568:diviner-of-futures",
+      "ability_name": "Diviner of Futures",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000568",
+      "datasheet_name": "Eldrad Ulthran",
+      "description": "The Command-phase roll that gains 1CP is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "f53bf62cce84ea848957905282622b513c5110c420d974763fee5298368f0ea5",
+      "raw_text_sha256": "f53bf62cce84ea848957905282622b513c5110c420d974763fee5298368f0ea5",
+      "runtime_consumer_ids": [
+        "catalog-ir:command-point-gain"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:command-point-gain"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000568:3:description:clause:001:effect:0",
+          "semantic_kind": "modify_command_points"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000568:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000568:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000568:doom-psychic",
+      "ability_name": "Doom (Psychic)",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000568",
+      "datasheet_name": "Eldrad Ulthran",
+      "description": "The visible enemy selection and +1 Wound effect are parsed; a Movement-phase-end selection host, persistence through the next Command phase, and the friendly Aeldari wound-roll query are still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "8f0eb2b0639eacdca856a024eed860ff3648c39dc5804225bc7ac822ae9bdafa",
+      "raw_text_sha256": "8f0eb2b0639eacdca856a024eed860ff3648c39dc5804225bc7ac822ae9bdafa",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000568:4:description:clause:002:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000568:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000568:4",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000000571:hand-of-asuryan",
+      "ability_name": "Hand of Asuryan",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000571",
+      "datasheet_name": "Asurmen",
+      "description": "A once-per-battle activation must grant the Bloody Twins Damage 3, Anti-Infantry 5+, and Devastating Wounds until phase end.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "45f04b8a3f587110517c68d3575f679897cfd8f394bec349ae6d41eac4a93f38",
+      "raw_text_sha256": "83c0f9e7b19a4e5c0c229f08d5ddbb1a30b68bcc41ca1d1d3aa97dab02f17146",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000571:4:description:clause:002:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000571:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000571:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000571:tactical-acumen",
+      "ability_name": "Tactical Acumen",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000571",
+      "datasheet_name": "Asurmen",
+      "description": "A led unit needs a post-shoot 6-inch Normal move followed by a turn-long charge restriction.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "e328cbd25289d5ff90bd30815a95a3db077d7ddbbfa579013fddc0af3b2f0339",
+      "raw_text_sha256": "e328cbd25289d5ff90bd30815a95a3db077d7ddbbfa579013fddc0af3b2f0339",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000571:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000571:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000572:storm-of-silence",
+      "ability_name": "Storm of Silence",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000572",
+      "datasheet_name": "Jain Zar",
+      "description": "Character-target wound-roll rerolls for the led unit are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "fc9f01b133012e2615add0b0aae36f3c353d5e50691ca1d77413ab67a285a0a9",
+      "raw_text_sha256": "fc9f01b133012e2615add0b0aae36f3c353d5e50691ca1d77413ab67a285a0a9",
+      "runtime_consumer_ids": [
+        "catalog-ir:wound-roll-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:wound-roll-reroll"
+          ],
+          "semantic_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000572:5:clause:001:effect:0",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000572:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000572:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000572:whirling-death",
+      "ability_name": "Whirling Death",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000572",
+      "datasheet_name": "Jain Zar",
+      "description": "The led unit's fixed 6-inch Advance and vertical-distance exception are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "499d2fd591bd65b78ae09bf5f43d62ae453ba90bf1080dd20b0164f150c2de98",
+      "raw_text_sha256": "499d2fd591bd65b78ae09bf5f43d62ae453ba90bf1080dd20b0164f150c2de98",
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-leading-fixed-advance",
+        "catalog-ir:dice-result-override"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-fixed-advance",
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_id": "phase17n:aeldari:000000572:4:clause:001:effect:0",
+          "semantic_kind": "override_dice_roll_result"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-fixed-advance"
+          ],
+          "semantic_id": "phase17n:aeldari:000000572:4:clause:001:effect:1",
+          "semantic_kind": "modify_move_distance"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-fixed-advance"
+          ],
+          "semantic_id": "phase17n:aeldari:000000572:4:clause:001:effect:2",
+          "semantic_kind": "movement_transit_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000572:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000572:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000574:burning-lance",
+      "ability_name": "Burning Lance",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000574",
+      "datasheet_name": "Fuegan",
+      "description": "The led unit's Melta range modifier is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "ae87c1c5314475e059373757f51af938c5196a0ce2557490f38da64865a7cf7d",
+      "raw_text_sha256": "ae87c1c5314475e059373757f51af938c5196a0ce2557490f38da64865a7cf7d",
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-leading-weapon-range-modifier"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-weapon-range-modifier"
+          ],
+          "semantic_id": "phase17n:aeldari:000000574:3:clause:001:effect:0",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000574:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000574:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000574:unquenchable-resolve",
+      "ability_name": "Unquenchable Resolve",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000574",
+      "datasheet_name": "Fuegan",
+      "description": "The once-per-battle first-death return at full wounds is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "c98c55dcbb97f717863f1461bf37ba17538d1c5552590fccde55ec1fc72e71ce",
+      "raw_text_sha256": "c98c55dcbb97f717863f1461bf37ba17538d1c5552590fccde55ec1fc72e71ce",
+      "runtime_consumer_ids": [
+        "catalog-ir:first-death-return"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:first-death-return"
+          ],
+          "semantic_id": "phase17n:aeldari:000000574:4:clause:001:effect:0",
+          "semantic_kind": "return_destroyed_target"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000574:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000574:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000575:cloudstrider",
+      "ability_name": "Cloudstrider",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000575",
+      "datasheet_name": "Baharroth",
+      "description": "The led unit needs end-of-opponent-turn return to Strategic Reserves and a 6-inch Deep Strike option with a turn-long charge restriction.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "c1a4324d6822a3194eb21a61cdeefee862edb01babbb9ba0e97c6fc3b72641e5",
+      "raw_text_sha256": "c1a4324d6822a3194eb21a61cdeefee862edb01babbb9ba0e97c6fc3b72641e5",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000575:4:description:clause:001:effect:0",
+          "semantic_kind": "placement_permission"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000575:4:description:clause:003:effect:0",
+          "semantic_kind": "placement_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000575:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000575:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000575:cry-of-the-wind",
+      "ability_name": "Cry of the Wind",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000575",
+      "datasheet_name": "Baharroth",
+      "description": "A setup-this-turn attack modifier must make every successful Hit roll a Critical Hit.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "7fb2daf611318874dfe6817235627fc19540ed6105b70a13719a42f6b6d2b6ed",
+      "raw_text_sha256": "7fb2daf611318874dfe6817235627fc19540ed6105b70a13719a42f6b6d2b6ed",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000575:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000575:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000576:face-of-death",
+      "ability_name": "Face of Death",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000576",
+      "datasheet_name": "Maugan Ra",
+      "description": "A post-shoot forced Battle-shock test with a -1 test modifier is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "6571cfff68216b830fd207cc253e0b62fe941784e6c5dc3b6328c69ce50ee424",
+      "raw_text_sha256": "6571cfff68216b830fd207cc253e0b62fe941784e6c5dc3b6328c69ce50ee424",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000576:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000576:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000576:harvester-of-souls",
+      "ability_name": "Harvester of Souls",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000576",
+      "datasheet_name": "Maugan Ra",
+      "description": "Attack declaration must be limited to one target, then each nearby enemy unit needs 3-inch splash D3 mortal wounds on a 5+ after attacks resolve.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "088643b56273e9ef16e0c3a480170bcfe488d11280931661e02115cd829f9ef1",
+      "raw_text_sha256": "088643b56273e9ef16e0c3a480170bcfe488d11280931661e02115cd829f9ef1",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000576:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000576:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000577:aspect-training",
+      "ability_name": "ASPECT TRAINING",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000577",
+      "datasheet_name": "Autarch",
+      "description": "Leader-conditioned Fights First, Infiltrators, Scouts, and Stealth grants are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "59fe1f6d799b3d16dab1f4cfcca1c04c27b3da3012697dad163716155fa9aec8",
+      "raw_text_sha256": "59fe1f6d799b3d16dab1f4cfcca1c04c27b3da3012697dad163716155fa9aec8",
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-leading-ability:fights-first",
+        "catalog-ir:conditional-leading-ability:infiltrators",
+        "catalog-ir:conditional-leading-ability:scouts",
+        "catalog-ir:conditional-leading-ability:stealth"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-ability:fights-first"
+          ],
+          "semantic_id": "phase17m:aeldari:autarchs:000000577:5:clause:001:effect:0",
+          "semantic_kind": "grant_ability"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-ability:infiltrators"
+          ],
+          "semantic_id": "phase17m:aeldari:autarchs:000000577:5:clause:002:effect:0",
+          "semantic_kind": "grant_ability"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-ability:scouts"
+          ],
+          "semantic_id": "phase17m:aeldari:autarchs:000000577:5:clause:003:effect:0",
+          "semantic_kind": "grant_ability"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-ability:stealth"
+          ],
+          "semantic_id": "phase17m:aeldari:autarchs:000000577:5:clause:004:effect:0",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000577:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000577:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000577:path-of-command",
+      "ability_name": "Path of Command",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000577",
+      "datasheet_name": "Autarch",
+      "description": "The Stratagem CP-cost reduction is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "a1885dda43588e06e9bbde5918c9220fa86c8fe26b73b12b6021467d1514822b",
+      "raw_text_sha256": "a1885dda43588e06e9bbde5918c9220fa86c8fe26b73b12b6021467d1514822b",
+      "runtime_consumer_ids": [
+        "catalog-ir:stratagem-cost-modifier"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:stratagem-cost-modifier"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000577:4:description:clause:001:effect:0",
+          "semantic_kind": "modify_command_points"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000577:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000577:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000577:superlative-strategist",
+      "ability_name": "Superlative Strategist",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000577",
+      "datasheet_name": "Autarch",
+      "description": "Advance-roll and Agile Manoeuvre-roll rerolls are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "6f537ee77f649bf03d0dcdfdff2cfc7ab3f73eda55a4a17f0162294e596b040b",
+      "raw_text_sha256": "6f537ee77f649bf03d0dcdfdff2cfc7ab3f73eda55a4a17f0162294e596b040b",
+      "runtime_consumer_ids": [
+        "catalog-ir:advance-roll-reroll",
+        "catalog-ir:agile-manoeuvre-roll-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:advance-roll-reroll"
+          ],
+          "semantic_id": "phase17m:aeldari:autarchs:000000577:3:clause:001:effect:0",
+          "semantic_kind": "reroll_permission"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:agile-manoeuvre-roll-reroll"
+          ],
+          "semantic_id": "phase17m:aeldari:autarchs:000000577:3:clause:002:effect:0",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000577:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000577:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000581:molten-form",
+      "ability_name": "Molten Form",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000581",
+      "datasheet_name": "Avatar of Khaine",
+      "description": "Allocated attack Damage must be halved for this model.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "5bdff9c31b7c7ebd1187708f98725d20548398b12d995662c92338e09a18779f",
+      "raw_text_sha256": "5bdff9c31b7c7ebd1187708f98725d20548398b12d995662c92338e09a18779f",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000581:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000581:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000581:the-bloody-handed-aura",
+      "ability_name": "The Bloody-Handed (Aura)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000581",
+      "datasheet_name": "Avatar of Khaine",
+      "description": "A 6-inch friendly Aeldari aura that adds 1 to Advance and Charge rolls is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "24ee34f7b6c409b5893fdb36f4eb9b9d603f738f2ca9f399b68f8c339e5c22ca",
+      "raw_text_sha256": "24ee34f7b6c409b5893fdb36f4eb9b9d603f738f2ca9f399b68f8c339e5c22ca",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000581:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000581:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000582:branching-fates-psychic",
+      "ability_name": "Branching Fates (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000582",
+      "datasheet_name": "Farseer",
+      "description": "A once-per-phase led-unit Hit, Wound, or Damage result override to an unmodified 6 is needed, with the Support Weapon exclusion enforced.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "2181889cd3bcb865816bfd2de65fc1191e357ce372f5d5a7a280d9dd1213ed8f",
+      "raw_text_sha256": "2181889cd3bcb865816bfd2de65fc1191e357ce372f5d5a7a280d9dd1213ed8f",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000582:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000582:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000582:guide-psychic",
+      "ability_name": "Guide (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000582",
+      "datasheet_name": "Farseer",
+      "description": "The visible enemy selection is parsed; a persistent tracked target and friendly Aeldari +1 Hit query are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "1a33cc9710c1d91e182b078fb156657f8440b0f3a31926e5dab942216f37bf77",
+      "raw_text_sha256": "1a33cc9710c1d91e182b078fb156657f8440b0f3a31926e5dab942216f37bf77",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000582:4:description:clause:002:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000582:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000582:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000583:branching-fates-psychic",
+      "ability_name": "Branching Fates (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000583",
+      "datasheet_name": "Farseer Skyrunner",
+      "description": "A once-per-phase led-unit Hit, Wound, or Damage result override to an unmodified 6 is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "6c2168bad23a93bc265082739b73bd99e70a937c1fc70238e3e5e1836b195ba3",
+      "raw_text_sha256": "6c2168bad23a93bc265082739b73bd99e70a937c1fc70238e3e5e1836b195ba3",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000583:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000583:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000583:misfortune-psychic",
+      "ability_name": "Misfortune (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000583",
+      "datasheet_name": "Farseer Skyrunner",
+      "description": "The visible enemy selection is parsed; a persistent tracked target whose attacks suffer -1 to Wound is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "1f8149300ef75ffe523e67db2bd81a23ddd4c01e3e9eff8d52c724b789036373",
+      "raw_text_sha256": "1f8149300ef75ffe523e67db2bd81a23ddd4c01e3e9eff8d52c724b789036373",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000583:4:description:clause:002:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000583:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000583:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000584:protect-psychic",
+      "ability_name": "Protect (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000584",
+      "datasheet_name": "Warlock Conclave",
+      "description": "A Farseer-leading predicate and defensive -1 Wound modifier are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "fedb91006366ec450ead757f9b6d313ef90778b8eec2477f0c08a388a83652f9",
+      "raw_text_sha256": "fedb91006366ec450ead757f9b6d313ef90778b8eec2477f0c08a388a83652f9",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000584:3:description:clause:001:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000584:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000584:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000584:psychic-communion-psychic",
+      "ability_name": "Psychic Communion (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000584",
+      "datasheet_name": "Warlock Conclave",
+      "description": "Per-model nearby-Psyker counting must scale each Destructor's Attacks and Strength to a +2 cap.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "70c7a0de23e38f240adfdc74b5891888d9543fb438c11dcc8df7b3aa85869d0f",
+      "raw_text_sha256": "70c7a0de23e38f240adfdc74b5891888d9543fb438c11dcc8df7b3aa85869d0f",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000584:4:description:clause:001:effect:0",
+          "semantic_kind": "modify_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000584:4:description:clause:001:effect:1",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000584:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000584:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000585:psychic-communion-psychic",
+      "ability_name": "Psychic Communion (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000585",
+      "datasheet_name": "Warlock",
+      "description": "A selected-to-shoot nearby-Psyker count must scale this model's Destructor Attacks and Strength to a +2 cap.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "94a3c3bdb3155fe085e0503d0cd81f4a61893bb2485db026456ac062d6b5b54d",
+      "raw_text_sha256": "94a3c3bdb3155fe085e0503d0cd81f4a61893bb2485db026456ac062d6b5b54d",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000585:4:description:clause:001:effect:0",
+          "semantic_kind": "modify_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000585:4:description:clause:001:effect:1",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000585:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000585:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000585:runes-of-fortune-psychic",
+      "ability_name": "Runes of Fortune (Psychic)",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000585",
+      "datasheet_name": "Warlock",
+      "description": "The charge-declaration reaction and Charge-roll modifier are parsed; the reaction/query host is still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "794322df53e8f98d49c397f1373aa978413fc8c1b9be656ba306d6e6e8c5125b",
+      "raw_text_sha256": "794322df53e8f98d49c397f1373aa978413fc8c1b9be656ba306d6e6e8c5125b",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000585:3:description:clause:001:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000585:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000585:3",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000000587:psychic-communion-psychic",
+      "ability_name": "Psychic Communion (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000587",
+      "datasheet_name": "Warlock Skyrunners",
+      "description": "Per-model selected-to-shoot nearby-Psyker counting must scale each Destructor's Attacks and Strength to a +2 cap.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "70c7a0de23e38f240adfdc74b5891888d9543fb438c11dcc8df7b3aa85869d0f",
+      "raw_text_sha256": "70c7a0de23e38f240adfdc74b5891888d9543fb438c11dcc8df7b3aa85869d0f",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000587:4:description:clause:001:effect:0",
+          "semantic_kind": "modify_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000587:4:description:clause:001:effect:1",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000587:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000587:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000587:runes-of-battle-psychic",
+      "ability_name": "Runes of Battle (Psychic)",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000587",
+      "datasheet_name": "Warlock Skyrunners",
+      "description": "The unit-wide Ignores Cover weapon grant is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "7800c2edf45280294fa07e7df9fc5fee105d6f23022e3f6c15b35d404ddc6847",
+      "raw_text_sha256": "8ed08799e57f5093995819fb3a6f4db6cb56601f3709a329a715c4e16deaa5ae",
+      "runtime_consumer_ids": [
+        "catalog-ir:weapon-keyword-grant",
+        "catalog-ir:weapon-keyword-grant:ignores-cover"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:ignores-cover"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000587:3:description:clause:001:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000587:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000587:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000588:spirit-mark-psychic",
+      "ability_name": "Spirit Mark (Psychic)",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000588",
+      "datasheet_name": "Spiritseer",
+      "description": "Wraith target selection and the Sustained Hits grant are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "f5569a4213c017d22562c46dd03a37d0bb13146773f077f8e8b8fd6c46ba5e07",
+      "raw_text_sha256": "9e27f99bcfa36917297d17beab32b19fcff3d7813408685707d7415c8f0898b5",
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-friendly-enemy-target-pair"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-friendly-enemy-target-pair"
+          ],
+          "semantic_id": "phase17n:aeldari:000000588:4:clause:001:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000588:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000588:spiritseer",
+      "ability_name": "Spiritseer",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000588",
+      "datasheet_name": "Spiritseer",
+      "description": "The conditional Lone Operative grant is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "fe614455f5fdcd6184cee58072c6caaf91595b6db6140d229346ae7bc91d3d7e",
+      "raw_text_sha256": "fe614455f5fdcd6184cee58072c6caaf91595b6db6140d229346ae7bc91d3d7e",
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-ability:lone-operative"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-ability:lone-operative"
+          ],
+          "semantic_id": "phase17n:aeldari:000000588:3:clause:001:effect:0",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000588:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000588:tears-of-isha-psychic",
+      "ability_name": "Tears of Isha (Psychic)",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000588",
+      "datasheet_name": "Spiritseer",
+      "description": "The healing or destroyed-model return command effect is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "6ec75b82e437b6cd531b0a064b562e39bbbd2df7bf16c6b9dcb8172fd0b983f0",
+      "raw_text_sha256": "6ec75b82e437b6cd531b0a064b562e39bbbd2df7bf16c6b9dcb8172fd0b983f0",
+      "runtime_consumer_ids": [
+        "catalog-ir:command-restoration"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:command-restoration"
+          ],
+          "semantic_id": "phase17n:aeldari:000000588:5:clause:001:effect:0",
+          "semantic_kind": "return_destroyed_target"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:command-restoration"
+          ],
+          "semantic_id": "phase17n:aeldari:000000588:5:clause:001:effect:1",
+          "semantic_kind": "restore_lost_wounds"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000588:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000589:crewed-platform",
+      "ability_name": "Crewed Platform",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000589",
+      "datasheet_name": "Guardian Defenders",
+      "description": "The dependent platform must be destroyed when the last Guardian model is destroyed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "b910c455e23b6467e17dccfe57080274a5933e67fb294b44fe64707f3fcf2f02",
+      "raw_text_sha256": "b910c455e23b6467e17dccfe57080274a5933e67fb294b44fe64707f3fcf2f02",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000589:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000589:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000589:fleet-of-foot",
+      "ability_name": "Fleet of Foot",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000589",
+      "datasheet_name": "Guardian Defenders",
+      "description": "A no-token extra Fade Back use that bypasses the normal once-per-phase Battle Focus limit is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "4c9929ee9e22a1488129269b95a143a5febc6694554aa48f3679d66f58b0bb1e",
+      "raw_text_sha256": "4c9929ee9e22a1488129269b95a143a5febc6694554aa48f3679d66f58b0bb1e",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000589:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000589:2",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000590:crewed-platform",
+      "ability_name": "Crewed Platform",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000590",
+      "datasheet_name": "Storm Guardians",
+      "description": "The dependent Serpent's Scale Platform must be destroyed when the last Guardian model is destroyed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "00bf94b7ed13c864fcce8189bdda8d395cb100c6c8d9a08971a9052342f7e0cc",
+      "raw_text_sha256": "00bf94b7ed13c864fcce8189bdda8d395cb100c6c8d9a08971a9052342f7e0cc",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000590:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000590:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000590:stormblades",
+      "ability_name": "Stormblades",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000590",
+      "datasheet_name": "Storm Guardians",
+      "description": "Sticky objective control while this unit or its Transport is in range is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "39388fff1412b450acbc8496290358669a2198a41ca9cf399f48a9a1a0b39def",
+      "raw_text_sha256": "39388fff1412b450acbc8496290358669a2198a41ca9cf399f48a9a1a0b39def",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000590:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000590:2",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000590:serpent-shield",
+      "ability_name": "Serpent Shield",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000590",
+      "datasheet_name": "Storm Guardians",
+      "description": "A bearer-unit 5+ invulnerable save grant is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "a36a1c07e9a9948e6ac3217f383dd15233d595628cd7e5d53afcd352069368d0",
+      "raw_text_sha256": "a36a1c07e9a9948e6ac3217f383dd15233d595628cd7e5d53afcd352069368d0",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000590:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000590:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000591:swift-demise",
+      "ability_name": "Swift Demise",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000591",
+      "datasheet_name": "Windriders",
+      "description": "Ranged Hit-roll rerolls of 1 are partly parsed; the closest-eligible-target predicate and upgrade to full Hit rerolls still need a query host.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "764832c925bbb6f4fc37379b62f00ec2b81e6a10ad89cd9ae8a0f711fa56511d",
+      "raw_text_sha256": "764832c925bbb6f4fc37379b62f00ec2b81e6a10ad89cd9ae8a0f711fa56511d",
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-reroll"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000591:2:description:clause:001:effect:0",
+          "semantic_kind": "reroll_permission"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000591:2:description:clause:002:effect:0",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000591:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000591:2",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000592:path-of-the-outcast",
+      "ability_name": "Path of the Outcast",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000592",
+      "datasheet_name": "Rangers",
+      "description": "The optional D6-inch reactive Normal move is consumed through the shared movement proposal and PathWitness path.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "fe4df2ee69573da7b744c83d873508ce047c76096938f0a845d36b3109cb42ff",
+      "raw_text_sha256": "fe4df2ee69573da7b744c83d873508ce047c76096938f0a845d36b3109cb42ff",
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-end-reactive-normal-move"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-end-reactive-normal-move"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000592:4:description:clause:001:effect:0",
+          "semantic_kind": "out_of_phase_action"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000592:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000592:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000593:bladestorm",
+      "ability_name": "Bladestorm",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000593",
+      "datasheet_name": "Dire Avengers",
+      "description": "A half-range predicate must grant ranged weapons Sustained Hits 1.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "be65500f6c7378cedbb0f089059abd12f29a3bd3fd98a2990d0cdbdb53e17790",
+      "raw_text_sha256": "6a043cea4b27107de9969c0670ebc101ad85545a92c2bb7a84395e3453ac9188",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:2:description:clause:001:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000593:2",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000593:aspect-shrine-token",
+      "ability_name": "Aspect Shrine Token",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000593",
+      "datasheet_name": "Dire Avengers",
+      "description": "The once-per-battle Hit or Wound result override is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "runtime_consumer_ids": [
+        "catalog-ir:dice-result-override"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:4:description:clause:001:effect:0",
+          "semantic_kind": "override_dice_roll_result"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000593:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000593:shimmershield",
+      "ability_name": "Shimmershield",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000593",
+      "datasheet_name": "Dire Avengers",
+      "description": "A bearer-only 4+ invulnerable save is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:3"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000593:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000594:acrobatic",
+      "ability_name": "Acrobatic",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000594",
+      "datasheet_name": "Howling Banshees",
+      "description": "Charge-after-Advance-or-Fall-Back eligibility is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "f520c1f429cf78546e2257341425ec04f859501a90ea884d47f14cbdfd2d7ba6",
+      "raw_text_sha256": "f520c1f429cf78546e2257341425ec04f859501a90ea884d47f14cbdfd2d7ba6",
+      "runtime_consumer_ids": [
+        "catalog-ir:can-advance-and-charge",
+        "catalog-ir:can-fallback-and-charge"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:can-advance-and-charge"
+          ],
+          "semantic_id": "phase17n:aeldari:000000594:3:clause:001:effect:0",
+          "semantic_kind": "grant_ability"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:can-fallback-and-charge"
+          ],
+          "semantic_id": "phase17n:aeldari:000000594:3:clause:001:effect:1",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000594:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000594:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000594:aspect-shrine-token",
+      "ability_name": "Aspect Shrine Token",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000594",
+      "datasheet_name": "Howling Banshees",
+      "description": "The once-per-battle Hit or Wound result override is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "runtime_consumer_ids": [
+        "catalog-ir:dice-result-override"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000594:4:description:clause:001:effect:0",
+          "semantic_kind": "override_dice_roll_result"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000594:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000594:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000595:mandiblasters",
+      "ability_name": "Mandiblasters",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000595",
+      "datasheet_name": "Striking Scorpions",
+      "description": "The charge-conditioned Critical Hit threshold is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "55f674f20930c259e3ac194a3e71069fe0bcabaf4aea9d71445fce561e76044d",
+      "raw_text_sha256": "55f674f20930c259e3ac194a3e71069fe0bcabaf4aea9d71445fce561e76044d",
+      "runtime_consumer_ids": [
+        "catalog-ir:minimum-unmodified-hit-success"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:minimum-unmodified-hit-success"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000595:5:description:clause:001:effect:0",
+          "semantic_kind": "set_contextual_status"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000595:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000595:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000595:aspect-shrine-token",
+      "ability_name": "Aspect Shrine Token",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000595",
+      "datasheet_name": "Striking Scorpions",
+      "description": "The once-per-battle Hit or Wound result override is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "runtime_consumer_ids": [
+        "catalog-ir:dice-result-override"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000595:6:description:clause:001:effect:0",
+          "semantic_kind": "override_dice_roll_result"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000595:6"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000595:6",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000596:assured-destruction",
+      "ability_name": "Assured Destruction",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000596",
+      "datasheet_name": "Fire Dragons",
+      "description": "Monster/Vehicle Hit, Wound, and Damage rerolls are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "7513509f84fb650125c42177681b9510abfc256ee8b93cace9501cef98c293cc",
+      "raw_text_sha256": "7513509f84fb650125c42177681b9510abfc256ee8b93cace9501cef98c293cc",
+      "runtime_consumer_ids": [
+        "catalog-ir:damage-roll-reroll",
+        "catalog-ir:hit-roll-reroll",
+        "catalog-ir:wound-roll-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-reroll"
+          ],
+          "semantic_id": "phase17l:aeldari:aspect-warriors:000000596:2:clause:001:effect:0",
+          "semantic_kind": "reroll_permission"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:wound-roll-reroll"
+          ],
+          "semantic_id": "phase17l:aeldari:aspect-warriors:000000596:2:clause:001:effect:1",
+          "semantic_kind": "reroll_permission"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:damage-roll-reroll"
+          ],
+          "semantic_id": "phase17l:aeldari:aspect-warriors:000000596:2:clause:001:effect:2",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000596:2",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000596:aspect-shrine-token",
+      "ability_name": "Aspect Shrine Token",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000596",
+      "datasheet_name": "Fire Dragons",
+      "description": "The once-per-battle Hit or Wound result override is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "runtime_consumer_ids": [
+        "catalog-ir:dice-result-override"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:3:description:clause:001:effect:0",
+          "semantic_kind": "override_dice_roll_result"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:3"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000596:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000597:psychic-guidance",
+      "ability_name": "Psychic Guidance",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000597",
+      "datasheet_name": "Wraithguard",
+      "description": "Nearby-Psyker Leadership and Hit modifiers are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "c6eff90440253cd6cb9a67f1de08dec706e462f4afb736f1e0d7b54f9d86de6c",
+      "raw_text_sha256": "c6eff90440253cd6cb9a67f1de08dec706e462f4afb736f1e0d7b54f9d86de6c",
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-modifier",
+        "catalog-ir:leadership-characteristic-query"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:leadership-characteristic-query"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000597:2:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-modifier"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000597:2:description:clause:001:effect:1",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000597:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000597:2",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000597:war-construct",
+      "ability_name": "War Construct",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000597",
+      "datasheet_name": "Wraithguard",
+      "description": "Shoot-after-Fall-Back eligibility is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "96df54244db5c204b71ace9ca295541cd1ac8ea5b726ee151811b18ae75cd099",
+      "raw_text_sha256": "96df54244db5c204b71ace9ca295541cd1ac8ea5b726ee151811b18ae75cd099",
+      "runtime_consumer_ids": [
+        "catalog-ir:can-fallback-and-shoot"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:can-fallback-and-shoot"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000597:1:description:clause:001:effect:0",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000597:1"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000597:1",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000598:malevolent-souls",
+      "ability_name": "Malevolent Souls",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000598",
+      "datasheet_name": "Wraithblades",
+      "description": "Fight-on-death eligibility is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "d5ed4c90b6b4b86faeb2157916e95ba15feb8cd1ba576184ebe23b45152545c9",
+      "raw_text_sha256": "d5ed4c90b6b4b86faeb2157916e95ba15feb8cd1ba576184ebe23b45152545c9",
+      "runtime_consumer_ids": [
+        "catalog-ir:fight-on-death-source"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:fight-on-death-source"
+          ],
+          "semantic_id": "phase17k:aeldari:shroud-runners-wraithblades:000000598:1:clause:001:effect:0",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:1"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000598:1",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000598:psychic-guidance",
+      "ability_name": "Psychic Guidance",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000598",
+      "datasheet_name": "Wraithblades",
+      "description": "Nearby-Psyker Leadership and Hit modifiers are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "c6eff90440253cd6cb9a67f1de08dec706e462f4afb736f1e0d7b54f9d86de6c",
+      "raw_text_sha256": "c6eff90440253cd6cb9a67f1de08dec706e462f4afb736f1e0d7b54f9d86de6c",
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-modifier",
+        "catalog-ir:leadership-characteristic-query"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:leadership-characteristic-query"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:2:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-modifier"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:2:description:clause:001:effect:1",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000598:2",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000598:forceshield",
+      "ability_name": "Forceshield",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000598",
+      "datasheet_name": "Wraithblades",
+      "description": "The invulnerable-save characteristic is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "runtime_consumer_ids": [
+        "catalog-ir:invulnerable-save-characteristic-query"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_id": "phase17k:aeldari:shroud-runners-wraithblades:000000598:3:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:3"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000598:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000599:wave-serpent-shield",
+      "ability_name": "Wave Serpent Shield",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000599",
+      "datasheet_name": "Wave Serpent",
+      "description": "The Strength-greater-than-Toughness predicate and defensive Wound-roll modifier are parsed; the ranged-target query host is still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "5f19cc50422fd3728338d071a161419db4e1fcdf9983112e7758557a7f135d92",
+      "raw_text_sha256": "5f19cc50422fd3728338d071a161419db4e1fcdf9983112e7758557a7f135d92",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000599:3:description:clause:001:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000599:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000599:3",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000000600:grenade-pack-flyover",
+      "ability_name": "Grenade Pack Flyover",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000600",
+      "datasheet_name": "Swooping Hawks",
+      "description": "Setup/move-completed mortal wounds and the Grenade restriction are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "1d8bcac32eb8b8e0e7e9b87c9c46cda09fe43996ec606b8750ce74319b001ed8",
+      "raw_text_sha256": "1d8bcac32eb8b8e0e7e9b87c9c46cda09fe43996ec606b8750ce74319b001ed8",
+      "runtime_consumer_ids": [
+        "catalog-ir:unit-move-completed-mortal-wounds"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:unit-move-completed-mortal-wounds"
+          ],
+          "semantic_id": "phase17l:aeldari:aspect-warriors:000000600:3:clause:001:effect:0",
+          "semantic_kind": "inflict_mortal_wounds"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:unit-move-completed-mortal-wounds"
+          ],
+          "semantic_id": "phase17l:aeldari:aspect-warriors:000000600:3:clause:001:effect:1",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000600:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000600:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000600:aspect-shrine-token",
+      "ability_name": "Aspect Shrine Token",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000600",
+      "datasheet_name": "Swooping Hawks",
+      "description": "The once-per-battle Hit or Wound result override is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "runtime_consumer_ids": [
+        "catalog-ir:dice-result-override"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000600:4:description:clause:001:effect:0",
+          "semantic_kind": "override_dice_roll_result"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000600:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000600:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000601:flickerjump",
+      "ability_name": "Flickerjump",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000601",
+      "datasheet_name": "Warp Spiders",
+      "description": "The movement-action choice, fixed Move, charge restriction, and mortal wounds are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "f3515b6437a92803b3770b40b20a35bf263bc4013fd573cf2143ab815137626c",
+      "raw_text_sha256": "f3515b6437a92803b3770b40b20a35bf263bc4013fd573cf2143ab815137626c",
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-action-grant"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-action-grant"
+          ],
+          "semantic_id": "phase17l:aeldari:aspect-warriors:000000601:3:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-action-grant"
+          ],
+          "semantic_id": "phase17l:aeldari:aspect-warriors:000000601:3:clause:001:effect:1",
+          "semantic_kind": "grant_ability"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-action-grant"
+          ],
+          "semantic_id": "phase17l:aeldari:aspect-warriors:000000601:3:clause:001:effect:2",
+          "semantic_kind": "inflict_mortal_wounds"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000601:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000601:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000601:aspect-shrine-token",
+      "ability_name": "Aspect Shrine Token",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000601",
+      "datasheet_name": "Warp Spiders",
+      "description": "The once-per-battle Hit or Wound result override is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "runtime_consumer_ids": [
+        "catalog-ir:dice-result-override"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000601:4:description:clause:001:effect:0",
+          "semantic_kind": "override_dice_roll_result"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000601:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000601:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000602:extreme-mobility",
+      "ability_name": "Extreme Mobility",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000602",
+      "datasheet_name": "Shining Spears",
+      "description": "Normal, Advance, Fall Back, and Charge movement must ignore vertical distance while retaining PathWitness validation.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "4fd436eef921177ed798a6a14e93060a9f285e21aa595238ed045297a0ddeb33",
+      "raw_text_sha256": "4fd436eef921177ed798a6a14e93060a9f285e21aa595238ed045297a0ddeb33",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000602:2",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000602:shimmershield",
+      "ability_name": "Shimmershield",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000602",
+      "datasheet_name": "Shining Spears",
+      "description": "A bearer-only 4+ invulnerable save is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:3"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000602:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000603:skyhunter",
+      "ability_name": "Skyhunter",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000603",
+      "datasheet_name": "Crimson Hunter",
+      "description": "The Fly target predicate and +1 Hit/+1 Wound modifiers are parsed; the ranged attack modifier query host is still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "6a0ee41c7af3d36c979c2b3e47903f0ec4daff14d5afd01aadaba215eb3d7768",
+      "raw_text_sha256": "6a0ee41c7af3d36c979c2b3e47903f0ec4daff14d5afd01aadaba215eb3d7768",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000603:1:description:clause:001:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000603:1:description:clause:001:effect:1",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000603:1"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000603:1",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000000605:harassment-fire",
+      "ability_name": "Harassment Fire",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000605",
+      "datasheet_name": "Vypers",
+      "description": "Post-shoot hit-target tracking and the suppressed-unit Hit-roll modifier are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "0edca599329b50c2dcb043dba31fbf7dea4d8894766ab3f6a9e8f51fac5fbda8",
+      "raw_text_sha256": "0edca599329b50c2dcb043dba31fbf7dea4d8894766ab3f6a9e8f51fac5fbda8",
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-effect"
+          ],
+          "semantic_id": "phase17k:aeldari:datasheet:000000605:3:clause:002:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000605:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000605:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000606:mindshock-pod-aura-psychic",
+      "ability_name": "Mindshock Pod (Aura, Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000606",
+      "datasheet_name": "Hemlock Wraithfighter",
+      "description": "A 9-inch enemy aura that subtracts 1 from Battle-shock and Leadership tests is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "ff68119b039af0ad8da9aa5634940ba25ea2624a5f327158dd3b8c1021402a5b",
+      "raw_text_sha256": "ff68119b039af0ad8da9aa5634940ba25ea2624a5f327158dd3b8c1021402a5b",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000606:1"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000606:1",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000607:inescapable-accuracy",
+      "ability_name": "Inescapable Accuracy",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000607",
+      "datasheet_name": "Dark Reapers",
+      "description": "Ballistic Skill and Hit-modifier ignore semantics are parsed; an attack-sequence query host is still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "ca8abb047a85a19d508eec6d82dd4554a4e7ef95266d47fb2c2995094215db79",
+      "raw_text_sha256": "ca8abb047a85a19d508eec6d82dd4554a4e7ef95266d47fb2c2995094215db79",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000607:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000607:2",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000000607:aspect-shrine-token",
+      "ability_name": "Aspect Shrine Token",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000607",
+      "datasheet_name": "Dark Reapers",
+      "description": "The once-per-battle Hit or Wound result override is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "raw_text_sha256": "cd8d08e39af629c8da7e7cb8a7b1377960717d6dfbdd712f48d240924d5451cd",
+      "runtime_consumer_ids": [
+        "catalog-ir:dice-result-override"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:dice-result-override"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000607:3:description:clause:001:effect:0",
+          "semantic_kind": "override_dice_roll_result"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000607:3"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000607:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000609:fire-support",
+      "ability_name": "Fire Support",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000609",
+      "datasheet_name": "Falcon",
+      "description": "Post-shoot target tracking and Wound rerolls are parsed; the same-Transport disembark predicate and turn-long query host are still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "3e36b949094a56050a1e2e063a452be5f7ca0d7647105501eb58d1e5651c0bb8",
+      "raw_text_sha256": "3e36b949094a56050a1e2e063a452be5f7ca0d7647105501eb58d1e5651c0bb8",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000609:4:description:clause:002:effect:0",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000609:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000609:4",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000000610:crystal-matrix",
+      "ability_name": "Crystal Matrix",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000610",
+      "datasheet_name": "Fire Prism",
+      "description": "One Hit-roll and one Wound-roll reroll per shooting activation are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "03f859d794148f1adba2ab24cbeb9761837456df9bceddb2bc1c1d25a5785037",
+      "raw_text_sha256": "03f859d794148f1adba2ab24cbeb9761837456df9bceddb2bc1c1d25a5785037",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000610:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000610:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000610:linked-fire",
+      "ability_name": "Linked Fire",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000610",
+      "datasheet_name": "Fire Prism",
+      "description": "Range and visibility origin substitution through a visible Fire Prism, with Attacks fixed to 1, is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "720adf6351c822c3c2fcd24377964c98d9636b5e243018bfd175964cbb796963",
+      "raw_text_sha256": "720adf6351c822c3c2fcd24377964c98d9636b5e243018bfd175964cbb796963",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000610:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000610:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000611:monofilament-web",
+      "ability_name": "Monofilament Web",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000611",
+      "datasheet_name": "Night Spinner",
+      "description": "Post-hit pinned state plus Move and Charge modifiers are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "216df69d884389595d0f70a17fffb9cebe0261971dc512b52180608a0de6db79",
+      "raw_text_sha256": "216df69d884389595d0f70a17fffb9cebe0261971dc512b52180608a0de6db79",
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-effect"
+          ],
+          "semantic_id": "phase17k:aeldari:night-spinner:datasheet:000000611:3:clause:002:effect:0",
+          "semantic_kind": "modify_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-effect"
+          ],
+          "semantic_id": "phase17k:aeldari:night-spinner:datasheet:000000611:3:clause:003:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000611:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000611:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000612:crystalline-targeting",
+      "ability_name": "Crystalline Targeting",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000612",
+      "datasheet_name": "War Walkers",
+      "description": "Post-shoot target tracking and the friendly Aeldari Armour Penetration modifier are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "2ae2949671cf7b853c5cf7786affa9cddf32c1a31c18efaf7909be023a69b89f",
+      "raw_text_sha256": "2ae2949671cf7b853c5cf7786affa9cddf32c1a31c18efaf7909be023a69b89f",
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-effect"
+          ],
+          "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000612:3:clause:002:effect:0",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000612:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000612:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000613:fated-hero",
+      "ability_name": "Fated Hero",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000613",
+      "datasheet_name": "Wraithlord",
+      "description": "The battle-start keyword choice and target-conditioned Hit/Wound rerolls are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "6b9ca020806a9dd8524e29e5e2797480bd90c7d6bad50c4699202009aab0917f",
+      "raw_text_sha256": "6b9ca020806a9dd8524e29e5e2797480bd90c7d6bad50c4699202009aab0917f",
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-reroll",
+        "catalog-ir:start-battle-keyword-choice",
+        "catalog-ir:wound-roll-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-reroll"
+          ],
+          "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:2:clause:001:effect:0",
+          "semantic_kind": "reroll_permission"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:wound-roll-reroll"
+          ],
+          "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:2:clause:001:effect:1",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000613:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000613:2",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000613:psychic-guidance",
+      "ability_name": "Psychic Guidance",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000000613",
+      "datasheet_name": "Wraithlord",
+      "description": "Nearby-Psyker Weapon Skill, Ballistic Skill, and Leadership modifiers are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "a7b5a2feb92f0b0f759d3b1dd55709b9413bd9fc916dc4a483be785a10ed4290",
+      "raw_text_sha256": "a7b5a2feb92f0b0f759d3b1dd55709b9413bd9fc916dc4a483be785a10ed4290",
+      "runtime_consumer_ids": [
+        "catalog-ir:ballistic-skill-characteristic-modifier",
+        "catalog-ir:leadership-characteristic-query",
+        "catalog-ir:weapon-skill-characteristic-modifier"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:ballistic-skill-characteristic-modifier"
+          ],
+          "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:3:clause:001:effect:0",
+          "semantic_kind": "modify_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-skill-characteristic-modifier"
+          ],
+          "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:3:clause:001:effect:1",
+          "semantic_kind": "modify_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:leadership-characteristic-query"
+          ],
+          "semantic_id": "phase17k:aeldari:war-walkers-wraithlord:000000613:3:clause:001:effect:2",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000613:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000613:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000000614:point-blank-devastation",
+      "ability_name": "Point-blank Devastation",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000614",
+      "datasheet_name": "Wraithknight",
+      "description": "Half-range attack-count rerolls for the named weapons are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "3061ec5b3a4c8476c4b679a3ace960f30339f5f6ced4b23aca2d848dde1c5833",
+      "raw_text_sha256": "877841101c6007b8cb4db5b717d04127b1f50136d73f9da0745362bb28c9b134",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000614:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000614:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000614:titanic-strides",
+      "ability_name": "Titanic Strides",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000614",
+      "datasheet_name": "Wraithknight",
+      "description": "Model/terrain transit needs PathWitness and Engagement Range validation plus the tall-terrain Battle-shock risk.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "f8ed34201e37336888165af9ae1ad56fdbf99ecb27043b8a644079a1c09d569f",
+      "raw_text_sha256": "f8ed34201e37336888165af9ae1ad56fdbf99ecb27043b8a644079a1c09d569f",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000614:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000000614:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000000614:scattershield",
+      "ability_name": "Scattershield",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000000614",
+      "datasheet_name": "Wraithknight",
+      "description": "The 4+ invulnerable save is parsed; allocated-attack Damage reduction still needs a defensive query host.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
+      "raw_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000614:5:description:clause:001:effect:0",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000614:5"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000000614:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002531:reavers-of-the-void",
+      "ability_name": "Reavers of the Void",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002531",
+      "datasheet_name": "Corsair Voidreavers",
+      "description": "Objective-conditioned Hit rerolls are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "cfbfaeea3f3b92051700a6ba37fbb6cb2c68b18d76d70ffc55a8cba4114e3642",
+      "raw_text_sha256": "cfbfaeea3f3b92051700a6ba37fbb6cb2c68b18d76d70ffc55a8cba4114e3642",
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-reroll",
+        "catalog-ir:passive-hit-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-reroll",
+            "catalog-ir:passive-hit-reroll"
+          ],
+          "semantic_id": "phase17k:aeldari:corsair-void-units:000002531:3:clause:001:effect:0",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002531:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002531:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000002531:mistshield",
+      "ability_name": "Mistshield",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002531",
+      "datasheet_name": "Corsair Voidreavers",
+      "description": "The invulnerable-save characteristic is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "runtime_consumer_ids": [
+        "catalog-ir:invulnerable-save-characteristic-query"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_id": "phase17k:aeldari:corsair-void-units:000002531:4:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002531:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000002531:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000002532:piratical-raiders",
+      "ability_name": "Piratical Raiders",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002532",
+      "datasheet_name": "Corsair Voidscarred",
+      "description": "Quarry selection and Lethal Hits/Precision grants are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "1759330eb2d694390c8c5574f7652dbd45277a524e7c147891bec78efed7e4f7",
+      "raw_text_sha256": "13a15de5421db6bd4c31d598b2d8757f286aec0a8a3b1c75a2e42cdae3c302a3",
+      "runtime_consumer_ids": [
+        "catalog-ir:tracked-target-selection",
+        "catalog-ir:weapon-keyword-grant",
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+        "catalog-ir:weapon-keyword-grant:precision"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:tracked-target-selection"
+          ],
+          "semantic_id": "phase17k:aeldari:corsair-void-units:000002532:3:clause:001:effect:0",
+          "semantic_kind": "select_tracked_target"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:lethal-hits"
+          ],
+          "semantic_id": "phase17k:aeldari:corsair-void-units:000002532:3:clause:002:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:precision"
+          ],
+          "semantic_id": "phase17k:aeldari:corsair-void-units:000002532:3:clause:003:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002532:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002532:3",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000002532:channeller-stones",
+      "ability_name": "Channeller Stones",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002532",
+      "datasheet_name": "Corsair Voidscarred",
+      "description": "The first-failed-save Damage replacement is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "d1c2e17b8a4066aa45126f5c055f8919d391df0d953827717feb820cca7c398f",
+      "raw_text_sha256": "d1c2e17b8a4066aa45126f5c055f8919d391df0d953827717feb820cca7c398f",
+      "runtime_consumer_ids": [
+        "catalog-ir:first-failed-save-damage-replacement"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:first-failed-save-damage-replacement"
+          ],
+          "semantic_id": "phase17k:aeldari:corsair-void-units:000002532:4:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002532:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000002532:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000002532:faolchu",
+      "ability_name": "Faolch\u00fa",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002532",
+      "datasheet_name": "Corsair Voidscarred",
+      "description": "The Ignores Cover weapon grant is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "17655de8147af872c4589fd2ac6f22450426ecf20abeebcb9c6fc0fb1b1554d0",
+      "raw_text_sha256": "b4ffe713e15291d6c3db65d3fadfb7e8d766041ba9d5b95ec96f3cf0528fccf0",
+      "runtime_consumer_ids": [
+        "catalog-ir:weapon-keyword-grant",
+        "catalog-ir:weapon-keyword-grant:ignores-cover"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:ignores-cover"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002532:5:description:clause:001:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002532:5"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000002532:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000002532:mistshield",
+      "ability_name": "Mistshield",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002532",
+      "datasheet_name": "Corsair Voidscarred",
+      "description": "The invulnerable-save characteristic is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
+      "runtime_consumer_ids": [
+        "catalog-ir:invulnerable-save-characteristic-query"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_id": "phase17k:aeldari:corsair-void-units:000002532:6:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002532:6"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000002532:6",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000002533:target-acquisition",
+      "ability_name": "Target Acquisition",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002533",
+      "datasheet_name": "Shroud Runners",
+      "description": "Long-rifle hit tracking and Benefit of Cover denial are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "c2968e27284a9e0215893019a44477a6eb5f8e3018f73606ea1e6309becc8739",
+      "raw_text_sha256": "c2968e27284a9e0215893019a44477a6eb5f8e3018f73606ea1e6309becc8739",
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-status"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-status"
+          ],
+          "semantic_id": "phase17k:aeldari:shroud-runners-wraithblades:000002533:4:clause:001:effect:0",
+          "semantic_kind": "set_contextual_status"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002533:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002533:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000002534:cegorachs-favour",
+      "ability_name": "Cegorach\u2019s Favour",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002534",
+      "datasheet_name": "Troupe Master",
+      "description": "Melee Hit rerolls and the Wound-roll modifier are parsed; the attack-query host is still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "f10645d91be769ab796ab70325208ed78073ce92a85f4c7112e52bb11c790595",
+      "raw_text_sha256": "f10645d91be769ab796ab70325208ed78073ce92a85f4c7112e52bb11c790595",
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-reroll"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002534:5:description:clause:001:effect:0",
+          "semantic_kind": "reroll_permission"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002534:5:description:clause:001:effect:1",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002534:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002534:5",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000002534:choreographer-of-war",
+      "ability_name": "Choreographer of War",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002534",
+      "datasheet_name": "Troupe Master",
+      "description": "Six-inch Pile-in and Consolidation movement needs closest-unit constraints rather than closest-model constraints.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "24a70796a2f7afda0f0f7b6ecb5c06ce5571dad5e3ab8b1db2c2732fe8a64f17",
+      "raw_text_sha256": "24a70796a2f7afda0f0f7b6ecb5c06ce5571dad5e3ab8b1db2c2732fe8a64f17",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002534:4:description:clause:001:effect:0",
+          "semantic_kind": "modify_move_distance"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002534:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002534:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002534:travelling-players",
+      "ability_name": "TRAVELLING PLAYERS",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002534",
+      "datasheet_name": "Troupe Master",
+      "description": "A one-model army cap is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "77dd5078d7f6418aa87acd3040a46ad394d330591bc7f7d051f4000408fbd1fa",
+      "raw_text_sha256": "77dd5078d7f6418aa87acd3040a46ad394d330591bc7f7d051f4000408fbd1fa",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002534:6"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002534:6",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002534:flip-belt",
+      "ability_name": "Flip Belt",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002534",
+      "datasheet_name": "Troupe Master",
+      "description": "Vertical-distance-free bearer movement with PathWitness validation is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "raw_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002534:7"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000002534:7",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002535:fog-of-dreams-psychic",
+      "ability_name": "Fog of Dreams (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002535",
+      "datasheet_name": "Shadowseer",
+      "description": "An 18-inch ranged target restriction for the led unit is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "6d8635b399441a81ac36ee06469462c3a326920fd094ad7de3eb014f503e3513",
+      "raw_text_sha256": "6d8635b399441a81ac36ee06469462c3a326920fd094ad7de3eb014f503e3513",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002535:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002535:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002535:travelling-players",
+      "ability_name": "TRAVELLING PLAYERS",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002535",
+      "datasheet_name": "Shadowseer",
+      "description": "A one-model army cap is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "77dd5078d7f6418aa87acd3040a46ad394d330591bc7f7d051f4000408fbd1fa",
+      "raw_text_sha256": "77dd5078d7f6418aa87acd3040a46ad394d330591bc7f7d051f4000408fbd1fa",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002535:8"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002535:8",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002535:treacherous-illusion-psychic",
+      "ability_name": "Treacherous Illusion (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002535",
+      "datasheet_name": "Shadowseer",
+      "description": "The Hazardous grant is partly parsed; enemy melee-weapon targeting and duration still need a host.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "4c3f5723a0e790c9505eaf6537d2c1a18cd7b5c3342eadf951c29d4d4ab8fe8e",
+      "raw_text_sha256": "16d8be27bbfd219d0b5a52ea87fd328e13ddb36793ae1e23bdc81bb6b4b2a523",
+      "runtime_consumer_ids": [
+        "catalog-ir:weapon-keyword-grant",
+        "catalog-ir:weapon-keyword-grant:hazardous"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:hazardous"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002535:6:description:clause:001:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002535:6"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002535:6",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002535:flip-belt",
+      "ability_name": "Flip Belt",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002535",
+      "datasheet_name": "Shadowseer",
+      "description": "Vertical-distance-free bearer movement with PathWitness validation is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "raw_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002535:7"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000002535:7",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002536:dance-of-death",
+      "ability_name": "Dance of Death",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002536",
+      "datasheet_name": "Troupe",
+      "description": "A Fight-phase-start finite choice among Hit rerolls, +1 Wound, or defensive -1 Hit is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "508203f21e5bab760ce4882cd032dc3da41933e36f1cc578163dea54775ea546",
+      "raw_text_sha256": "508203f21e5bab760ce4882cd032dc3da41933e36f1cc578163dea54775ea546",
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-reroll"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002536:3:description:clause:002:effect:0",
+          "semantic_kind": "reroll_permission"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002536:3:description:clause:003:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002536:3:description:clause:004:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002536:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002536:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002536:flip-belt",
+      "ability_name": "Flip Belt",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002536",
+      "datasheet_name": "Troupe",
+      "description": "Vertical-distance-free bearer movement with PathWitness validation is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "raw_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002536:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000002536:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002537:cruel-amusement",
+      "ability_name": "Cruel Amusement",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002537",
+      "datasheet_name": "Death Jester",
+      "description": "A selected-to-shoot finite choice among Ignores Cover, Precision, or Sustained Hits 3 is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "584f45fce84735f8acc8636ff5eb642347d1e1b473c8ab7a0f2c87bf657107d8",
+      "raw_text_sha256": "37f370d1461ef4021a31b3342f98ce9632f3ebe730342ee7924aafeafa9cdc3c",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002537:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002537:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002537:death-is-not-enough",
+      "ability_name": "Death is Not Enough",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002537",
+      "datasheet_name": "Death Jester",
+      "description": "Post-shoot Battle-shock with a destroyed-model test modifier is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "496572e1228b3a6fe19c19c4c24355862b19a782c69f6826fabcfd023e1d5d44",
+      "raw_text_sha256": "496572e1228b3a6fe19c19c4c24355862b19a782c69f6826fabcfd023e1d5d44",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002537:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002537:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002537:travelling-players",
+      "ability_name": "TRAVELLING PLAYERS",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002537",
+      "datasheet_name": "Death Jester",
+      "description": "A one-model army cap is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "77dd5078d7f6418aa87acd3040a46ad394d330591bc7f7d051f4000408fbd1fa",
+      "raw_text_sha256": "77dd5078d7f6418aa87acd3040a46ad394d330591bc7f7d051f4000408fbd1fa",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002537:7"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002537:7",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002537:flip-belt",
+      "ability_name": "Flip Belt",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002537",
+      "datasheet_name": "Death Jester",
+      "description": "Vertical-distance-free bearer movement with PathWitness validation is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "raw_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002537:6"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000002537:6",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002538:blitz",
+      "ability_name": "Blitz",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002538",
+      "datasheet_name": "Solitaire",
+      "description": "A once-per-battle pre-move 2D6-inch Move and +3 Attacks modifier through turn end are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "f448046c569cf50472f22eb24e23694891bdb1ce2259330b42a76ec79ec5bc9d",
+      "raw_text_sha256": "f448046c569cf50472f22eb24e23694891bdb1ce2259330b42a76ec79ec5bc9d",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:6:description:clause:002:effect:0",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:6"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002538:6",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002538:blur-of-movement",
+      "ability_name": "Blur of Movement",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002538",
+      "datasheet_name": "Solitaire",
+      "description": "Charge-after-Advance eligibility is parsed; the movement/charge query host is still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "c12db118b5fdabb537def15f7f957529eaba99d020a3f7703fbce50aa4087f61",
+      "raw_text_sha256": "c12db118b5fdabb537def15f7f957529eaba99d020a3f7703fbce50aa4087f61",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:7:description:clause:001:effect:0",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:7"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002538:7",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000002538:path-of-damnation",
+      "ability_name": "PATH OF DAMNATION",
+      "catalog_support": "descriptor_only",
+      "datasheet_id": "000002538",
+      "datasheet_name": "Solitaire",
+      "description": "The Warlord restriction is consumed by army mustering.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "68f9f2b4114e7651ffa6f574d7fca75f35602236e3b1921225a33ec03423b752",
+      "raw_text_sha256": "68f9f2b4114e7651ffa6f574d7fca75f35602236e3b1921225a33ec03423b752",
+      "runtime_consumer_ids": [
+        "army-mustering:warlord-restriction"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "army-mustering:warlord-restriction"
+          ],
+          "semantic_id": "descriptor:000002538:path-of-damnation",
+          "semantic_kind": "descriptor"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:8"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002538:8",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000002538:flip-belt",
+      "ability_name": "Flip Belt",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002538",
+      "datasheet_name": "Solitaire",
+      "description": "Vertical-distance-free bearer movement with PathWitness validation is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "raw_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:9"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000002538:9",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002539:acrobatic-grace",
+      "ability_name": "Acrobatic Grace",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002539",
+      "datasheet_name": "Skyweavers",
+      "description": "The incoming-attack -1 Hit modifier is parsed; the attack-query host is still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "d8235b4e3443ef997cf78b2fb42ad5dad6f153bc4179ff9c929448956a075376",
+      "raw_text_sha256": "d8235b4e3443ef997cf78b2fb42ad5dad6f153bc4179ff9c929448956a075376",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002539:3:description:clause:001:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002539:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002539:3",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000002540:polychromatic-camouflage",
+      "ability_name": "Polychromatic Camouflage",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002540",
+      "datasheet_name": "Voidweaver",
+      "description": "An 18-inch ranged target restriction is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "62f0e86fb4056d990be1e7cb6610598feb41764378a6899546092f266ff74b74",
+      "raw_text_sha256": "62f0e86fb4056d990be1e7cb6610598feb41764378a6899546092f266ff74b74",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002540:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002540:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002541:rapid-embarkation",
+      "ability_name": "Rapid Embarkation",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002541",
+      "datasheet_name": "Starweaver",
+      "description": "Fight-end conditional Transport embarkation needs same-turn re-embarkation, capacity, unit-shape, distance, and Engagement Range validation.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "07c19c75d8bd70c5b0c1218f7235faff17e8a516d16a612cbb0de0f3c3910767",
+      "raw_text_sha256": "07c19c75d8bd70c5b0c1218f7235faff17e8a516d16a612cbb0de0f3c3910767",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002541:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002541:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002542:herald-of-ynnead",
+      "ability_name": "Herald of Ynnead",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002542",
+      "datasheet_name": "Yvraine",
+      "description": "Fight-phase enemy selection and friendly Aeldari Wound rerolls are parsed; the phase selection and query host are still needed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "a22b789adde654c5c26df7f43ecf53a398f568cf0b3b0698c528ca2db21c1e26",
+      "raw_text_sha256": "a22b789adde654c5c26df7f43ecf53a398f568cf0b3b0698c528ca2db21c1e26",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002542:5:description:clause:002:effect:0",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002542:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002542:5",
+      "support_stage": "generic_ir_executable"
+    },
+    {
+      "ability_id": "000002542:servant-of-the-whispering-god",
+      "ability_name": "SERVANT OF THE WHISPERING GOD",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002542",
+      "datasheet_name": "Yvraine",
+      "description": "Yvraine/Epic Hero mutual-exclusion mustering is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "f47c3208e5119974c3b6c012730fff98cb708a55f9c7a3ab6a984e3a7902939e",
+      "raw_text_sha256": "f47c3208e5119974c3b6c012730fff98cb708a55f9c7a3ab6a984e3a7902939e",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002542:6"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002542:6",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002542:word-of-the-phoenix-psychic",
+      "ability_name": "Word of the Phoenix (Psychic)",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002542",
+      "datasheet_name": "Yvraine",
+      "description": "A Command-phase D3+1 Bodyguard model return on 2+, excluding Support Weapon models, is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "55b016f4dcbe49061fea56d7f501fee6ee61cbe3f5c209351871b3d6e1a3ba8c",
+      "raw_text_sha256": "55b016f4dcbe49061fea56d7f501fee6ee61cbe3f5c209351871b3d6e1a3ba8c",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002542:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002542:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002543:servant-of-the-whispering-god",
+      "ability_name": "SERVANT OF THE WHISPERING GOD",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002543",
+      "datasheet_name": "The Visarch",
+      "description": "Visarch/Epic Hero mutual-exclusion mustering is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "296df7a89148f5de9cd2eb00e45119592c058d5e0bbe25b66454c875bc1e55cf",
+      "raw_text_sha256": "296df7a89148f5de9cd2eb00e45119592c058d5e0bbe25b66454c875bc1e55cf",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002543:6"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002543:6",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002543:way-of-the-blade",
+      "ability_name": "Way of the Blade",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002543",
+      "datasheet_name": "The Visarch",
+      "description": "A led-unit Fights First grant is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "71154d51a7128c7cff8c8ae9f158479d2a80d1cfa428649fe4997727f14db8ab",
+      "raw_text_sha256": "71154d51a7128c7cff8c8ae9f158479d2a80d1cfa428649fe4997727f14db8ab",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002543:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002543:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002543:yvraines-champion",
+      "ability_name": "Yvraine\u2019s Champion",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002543",
+      "datasheet_name": "The Visarch",
+      "description": "Feel No Pain 4+ for other attached Character models is partly parsed and still needs a damage-query host.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "ccdda8787398738875d679742713f274084e421cbb5e7d9e2b854fafbb3d576d",
+      "raw_text_sha256": "ccdda8787398738875d679742713f274084e421cbb5e7d9e2b854fafbb3d576d",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002543:5:description:clause:001:effect:0",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002543:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002543:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002544:avatar-of-the-whispering-god",
+      "ability_name": "AVATAR OF THE WHISPERING GOD",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002544",
+      "datasheet_name": "The Yncarne",
+      "description": "Yncarne/Epic Hero mutual-exclusion mustering is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "552bf63829431ef7388416a2a10c95328a98c48a6655da7c846839bab331b3e0",
+      "raw_text_sha256": "552bf63829431ef7388416a2a10c95328a98c48a6655da7c846839bab331b3e0",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002544:7"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002544:7",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002544:ethereal-form",
+      "ability_name": "Ethereal Form",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002544",
+      "datasheet_name": "The Yncarne",
+      "description": "D3 lost-wound restoration after this model destroys a unit is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "18377e99f8622ada3cac8bb70ef0b09900578f6478a7775956049285da40e139",
+      "raw_text_sha256": "18377e99f8622ada3cac8bb70ef0b09900578f6478a7775956049285da40e139",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002544:6"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002544:6",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002544:inevitable-death",
+      "ability_name": "Inevitable Death",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000002544",
+      "datasheet_name": "The Yncarne",
+      "description": "A once-per-opponent-turn teleport setup at a destroyed friendly unit's location is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "b20c3feef7db3e55c431e108f51e7f0224d316a0de3ac014bfeddcb6b7cb0d36",
+      "raw_text_sha256": "b20c3feef7db3e55c431e108f51e7f0224d316a0de3ac014bfeddcb6b7cb0d36",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002544:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002544:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000002759:indomitable-strength-of-will",
+      "ability_name": "Indomitable Strength of Will",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002759",
+      "datasheet_name": "Autarch Wayleaper",
+      "description": "The Battle Focus token refund roll is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "bea2b1c451a9d69a41cf1dbf113ff5d9311a62b61d830534475d2b6a4bebbb6c",
+      "raw_text_sha256": "bea2b1c451a9d69a41cf1dbf113ff5d9311a62b61d830534475d2b6a4bebbb6c",
+      "runtime_consumer_ids": [
+        "catalog-ir:faction-resource-refund-roll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:faction-resource-refund-roll"
+          ],
+          "semantic_id": "phase17m:aeldari:autarchs:000002759:4:clause:001:effect:0",
+          "semantic_kind": "modify_faction_resource"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002759:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002759:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000002759:path-of-command",
+      "ability_name": "Path of Command",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000002759",
+      "datasheet_name": "Autarch Wayleaper",
+      "description": "The Stratagem CP-cost reduction is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "a1885dda43588e06e9bbde5918c9220fa86c8fe26b73b12b6021467d1514822b",
+      "raw_text_sha256": "a1885dda43588e06e9bbde5918c9220fa86c8fe26b73b12b6021467d1514822b",
+      "runtime_consumer_ids": [
+        "catalog-ir:stratagem-cost-modifier"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:stratagem-cost-modifier"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002759:5:description:clause:001:effect:0",
+          "semantic_kind": "modify_command_points"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002759:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000002759:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000003909:empyric-ambush",
+      "ability_name": "Empyric Ambush",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000003909",
+      "datasheet_name": "Lhykhis",
+      "description": "Flickerjump charge eligibility for the led unit is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "dbdf75d66da9b9afe50e935b07bf69335401e2240711132496aa5f88ffa7e8c0",
+      "raw_text_sha256": "dbdf75d66da9b9afe50e935b07bf69335401e2240711132496aa5f88ffa7e8c0",
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-leading-charge-after-movement-action"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-charge-after-movement-action"
+          ],
+          "semantic_id": "phase17n:aeldari:000003909:4:clause:001:effect:0",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003909:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003909:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000003909:whispering-web",
+      "ability_name": "Whispering Web",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000003909",
+      "datasheet_name": "Lhykhis",
+      "description": "Post-shoot target tracking and the Critical Hit threshold are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
+      "raw_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
+      "runtime_consumer_ids": [
+        "catalog-ir:minimum-unmodified-hit-success"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:minimum-unmodified-hit-success"
+          ],
+          "semantic_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5:clause:002:effect:0",
+          "semantic_kind": "set_contextual_status"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003909:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003909:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000003910:structural-collapse",
+      "ability_name": "Structural Collapse",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003910",
+      "datasheet_name": "D-cannon Platform",
+      "description": "Damage rerolls of 1 are partly parsed; the Titanic predicate and upgrade to full Damage rerolls still need a query host.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "08c62bf136cca6b9e7e554b47787eb5fe79707a227d2130aa0739383d6370452",
+      "raw_text_sha256": "08c62bf136cca6b9e7e554b47787eb5fe79707a227d2130aa0739383d6370452",
+      "runtime_consumer_ids": [
+        "catalog-ir:damage-roll-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:damage-roll-reroll"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003910:2:description:clause:001:effect:0",
+          "semantic_kind": "reroll_permission"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003910:2:description:clause:002:effect:0",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003910:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003910:2",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003910:support-artillery",
+      "ability_name": "SUPPORT ARTILLERY",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003910",
+      "datasheet_name": "D-cannon Platform",
+      "description": "Prebattle joining, Starting Strength, and Transport restrictions for Support Artillery are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "e9d8feaeafd5625b248a3eb3e790373bbab8fc5b3f5e5ee59917055280a88b6c",
+      "raw_text_sha256": "e9d8feaeafd5625b248a3eb3e790373bbab8fc5b3f5e5ee59917055280a88b6c",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003910:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003910:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003910:support-weapon",
+      "ability_name": "Support Weapon",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003910",
+      "datasheet_name": "D-cannon Platform",
+      "description": "Conditional Toughness 3 for the joined platform is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "985d3f46e5b142a0d255e521035466c4299d679a3a69a17c20275658f10029f4",
+      "raw_text_sha256": "985d3f46e5b142a0d255e521035466c4299d679a3a69a17c20275658f10029f4",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003910:1:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003910:1"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003910:1",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003911:monofilament-snare",
+      "ability_name": "Monofilament Snare",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003911",
+      "datasheet_name": "Shadow Weaver Platform",
+      "description": "A persistent snared target and per-model mortal wounds on later Normal, Advance, or Fall Back moves are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "764f006fb9cf4ac6de5d71e55f25df4ad43c4abac48b909a8def61374dc303c3",
+      "raw_text_sha256": "764f006fb9cf4ac6de5d71e55f25df4ad43c4abac48b909a8def61374dc303c3",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003911:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003911:2",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003911:support-artillery",
+      "ability_name": "SUPPORT ARTILLERY",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003911",
+      "datasheet_name": "Shadow Weaver Platform",
+      "description": "Prebattle joining, Starting Strength, and Transport restrictions for Support Artillery are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "e9d8feaeafd5625b248a3eb3e790373bbab8fc5b3f5e5ee59917055280a88b6c",
+      "raw_text_sha256": "e9d8feaeafd5625b248a3eb3e790373bbab8fc5b3f5e5ee59917055280a88b6c",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003911:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003911:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003911:support-weapon",
+      "ability_name": "Support Weapon",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003911",
+      "datasheet_name": "Shadow Weaver Platform",
+      "description": "Conditional Toughness 3 for the joined platform is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "985d3f46e5b142a0d255e521035466c4299d679a3a69a17c20275658f10029f4",
+      "raw_text_sha256": "985d3f46e5b142a0d255e521035466c4299d679a3a69a17c20275658f10029f4",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003911:1:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003911:1"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003911:1",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003912:sonic-destruction",
+      "ability_name": "Sonic Destruction",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003912",
+      "datasheet_name": "Vibro Cannon Platform",
+      "description": "Same-phase allied Vibro Cannon target counting must scale Strength, Armour Penetration, and Damage.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "3ff50f7217f350fe1a3c862924d44ef0d906b416770a9a301709dac4c5252b53",
+      "raw_text_sha256": "3ff50f7217f350fe1a3c862924d44ef0d906b416770a9a301709dac4c5252b53",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003912:2:description:clause:001:effect:0",
+          "semantic_kind": "modify_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003912:2:description:clause:001:effect:1",
+          "semantic_kind": "modify_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003912:2:description:clause:001:effect:2",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003912:2"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003912:2",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003912:support-artillery",
+      "ability_name": "SUPPORT ARTILLERY",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003912",
+      "datasheet_name": "Vibro Cannon Platform",
+      "description": "Prebattle joining, Starting Strength, and Transport restrictions for Support Artillery are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "e9d8feaeafd5625b248a3eb3e790373bbab8fc5b3f5e5ee59917055280a88b6c",
+      "raw_text_sha256": "e9d8feaeafd5625b248a3eb3e790373bbab8fc5b3f5e5ee59917055280a88b6c",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003912:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003912:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003912:support-weapon",
+      "ability_name": "Support Weapon",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003912",
+      "datasheet_name": "Vibro Cannon Platform",
+      "description": "Conditional Toughness 3 for the joined platform is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "985d3f46e5b142a0d255e521035466c4299d679a3a69a17c20275658f10029f4",
+      "raw_text_sha256": "985d3f46e5b142a0d255e521035466c4299d679a3a69a17c20275658f10029f4",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003912:1:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003912:1"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003912:1",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003913:titanic-agility",
+      "ability_name": "Titanic Agility",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003913",
+      "datasheet_name": "Wraithknight with Ghostglaive",
+      "description": "Model/terrain transit needs PathWitness and Engagement Range endpoint validation.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "a95211d079abadcba774c029a79cdee22deee172ef810c4491735bd10f758103",
+      "raw_text_sha256": "a95211d079abadcba774c029a79cdee22deee172ef810c4491735bd10f758103",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003913:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003913:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003913:scattershield",
+      "ability_name": "Scattershield",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003913",
+      "datasheet_name": "Wraithknight with Ghostglaive",
+      "description": "The 4+ invulnerable save is parsed; allocated-attack Damage reduction still needs a defensive query host.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
+      "raw_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003913:4:description:clause:001:effect:0",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003913:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000003913:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003914:overlord",
+      "ability_name": "Overlord",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003914",
+      "datasheet_name": "Ynnari Archon",
+      "description": "Led-unit Wound rerolls of 1 are partly parsed; the below-Starting-Strength predicate and upgrade to full rerolls still need a query host.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "bda0e2de7ee533e0913968cfa812b487ffc73865e32d1992294570eebefab1ea",
+      "raw_text_sha256": "bda0e2de7ee533e0913968cfa812b487ffc73865e32d1992294570eebefab1ea",
+      "runtime_consumer_ids": [
+        "catalog-ir:wound-roll-reroll"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:wound-roll-reroll"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003914:4:description:clause:001:effect:0",
+          "semantic_kind": "reroll_permission"
+        },
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003914:4:description:clause:002:effect:0",
+          "semantic_kind": "reroll_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003914:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003914:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003914:reborn-mastermind",
+      "ability_name": "Reborn Mastermind",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000003914",
+      "datasheet_name": "Ynnari Archon",
+      "description": "The once-per-round Stratagem CP-cost reduction is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "a1885dda43588e06e9bbde5918c9220fa86c8fe26b73b12b6021467d1514822b",
+      "raw_text_sha256": "a1885dda43588e06e9bbde5918c9220fa86c8fe26b73b12b6021467d1514822b",
+      "runtime_consumer_ids": [
+        "catalog-ir:stratagem-cost-modifier"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:stratagem-cost-modifier"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003914:5:description:clause:001:effect:0",
+          "semantic_kind": "modify_command_points"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003914:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003914:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000003914:shadow-field",
+      "ability_name": "Shadow Field",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003914",
+      "datasheet_name": "Ynnari Archon",
+      "description": "A save state that forbids save rerolls and permanently removes the save after its first failure is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "1cefc236754b4933b44a9e23d2ad37d24f0a71c1e3431016ed653407caa7db9e",
+      "raw_text_sha256": "1cefc236754b4933b44a9e23d2ad37d24f0a71c1e3431016ed653407caa7db9e",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003914:6"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000003914:6",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003915:empowered-by-death",
+      "ability_name": "Empowered by Death",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003915",
+      "datasheet_name": "Ynnari Succubus",
+      "description": "A Fight-phase-start below-Starting-Strength predicate that grants Fights First is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "8636177c458973f516a96f63a0a4a3c6a13a5e9224d86c9d490d493af36a7896",
+      "raw_text_sha256": "8636177c458973f516a96f63a0a4a3c6a13a5e9224d86c9d490d493af36a7896",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003915:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003915:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003915:storm-of-blades",
+      "ability_name": "Storm of Blades",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000003915",
+      "datasheet_name": "Ynnari Succubus",
+      "description": "The led-unit melee Sustained Hits 1 grant is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "74ae57e2416ec23d815f2f98bd75d3c347a0dcb0f94453349b80b4bf73afa57c",
+      "raw_text_sha256": "76fd91737fba0c8e5baee208291f440c31832da925a8a3916ecbdacc8db2f1b3",
+      "runtime_consumer_ids": [
+        "catalog-ir:weapon-keyword-grant",
+        "catalog-ir:weapon-keyword-grant:sustained-hits"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:sustained-hits"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003915:4:description:clause:001:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003915:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003915:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000003916:sadistic-raiders",
+      "ability_name": "Sadistic Raiders",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003916",
+      "datasheet_name": "Ynnari Kabalite Warriors",
+      "description": "Sticky objective control while this unit or its Transport is in range is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "bc15084884c907be8f32a87ddf7cebcdca5c58f2a67e7a4065f181c630a562cc",
+      "raw_text_sha256": "bc15084884c907be8f32a87ddf7cebcdca5c58f2a67e7a4065f181c630a562cc",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003916:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003916:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003916:phantasm-grenade-launcher",
+      "ability_name": "Phantasm Grenade Launcher",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003916",
+      "datasheet_name": "Ynnari Kabalite Warriors",
+      "description": "A wargear-based Grenades keyword grant is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "ef8519051be3bf29ed80d0be56d9fc02da97a7eb9048f441c06ea5c9293997ac",
+      "raw_text_sha256": "ef8519051be3bf29ed80d0be56d9fc02da97a7eb9048f441c06ea5c9293997ac",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003916:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000003916:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003917:no-escape",
+      "ability_name": "No Escape",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003917",
+      "datasheet_name": "Ynnari Wyches",
+      "description": "Eligible nearby enemies that Fall Back need forced Desperate Escape tests, with the Battle-shocked modifier and Monster/Vehicle exclusions.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "8cf337a0aa0c261a48a24a4f354f9567d984bf944916a3363cd2daa21ba6a6fe",
+      "raw_text_sha256": "8cf337a0aa0c261a48a24a4f354f9567d984bf944916a3363cd2daa21ba6a6fe",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003917:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003917:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003918:tormentors",
+      "ability_name": "Tormentors",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003918",
+      "datasheet_name": "Ynnari Incubi",
+      "description": "Fight-phase-start forced Battle-shock tests for every enemy unit in Engagement Range are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "5a97e7b5a592f06c4a045d70b1e6e4ea4df7607d72e84a6a00b8668bf5b2a5f7",
+      "raw_text_sha256": "5a97e7b5a592f06c4a045d70b1e6e4ea4df7607d72e84a6a00b8668bf5b2a5f7",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003918:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003918:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003919:eviscerating-fly-by",
+      "ability_name": "Eviscerating Fly-by",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003919",
+      "datasheet_name": "Ynnari Reavers",
+      "description": "PathWitness-backed moved-over enemy selection and per-model mortal wounds are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "c706155ceffa4290e402c81162f85c9b8151072f30b9feca4b935a79acf8ceb5",
+      "raw_text_sha256": "c706155ceffa4290e402c81162f85c9b8151072f30b9feca4b935a79acf8ceb5",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003919:3"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003919:3",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003919:cluster-caltrops",
+      "ability_name": "Cluster Caltrops",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003919",
+      "datasheet_name": "Ynnari Reavers",
+      "description": "Bearer-specific rerolls for Eviscerating Fly-by mortal-wound dice are still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "daa5159937d439166e6cb28c03eb369abd7df053700271d49e1063c96d6ca59c",
+      "raw_text_sha256": "daa5159937d439166e6cb28c03eb369abd7df053700271d49e1063c96d6ca59c",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003919:4"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000003919:4",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003919:grav-talon",
+      "ability_name": "Grav-talon",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003919",
+      "datasheet_name": "Ynnari Reavers",
+      "description": "A bearer melee Lance grant is partly parsed and still needs the bearer/weapon entitlement host.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "cffb803deeaa31ca3dab156b94ede125169dfa84cbff7394638754ec10b289f4",
+      "raw_text_sha256": "a241c1e69692a42bb5d973eff9720f557228bddeeae7a1cf69252e7ae838d0a2",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003919:5:description:clause:001:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003919:5"
+      ],
+      "source_kind": "wargear",
+      "source_row_id": "000003919:5",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003920:aethersails",
+      "ability_name": "Aethersails",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003920",
+      "datasheet_name": "Ynnari Raider",
+      "description": "A fixed 6-inch Advance result that replaces the Advance roll is still needed.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "f33ee3478a1da6b80613b99637ab3821b69a9ec57c26a477f48ba241ae6946e7",
+      "raw_text_sha256": "f33ee3478a1da6b80613b99637ab3821b69a9ec57c26a477f48ba241ae6946e7",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003920:6:description:clause:002:effect:0",
+          "semantic_kind": "modify_move_distance"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003920:6"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003920:6",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000003921:lithe-embarkation",
+      "ability_name": "Lithe Embarkation",
+      "catalog_support": "unsupported",
+      "datasheet_id": "000003921",
+      "datasheet_name": "Ynnari Venom",
+      "description": "Fight-end conditional Transport embarkation needs Ynnari unit-shape, same-turn re-embarkation, capacity, distance, and Engagement Range validation.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
+      "documentation_bucket": "still_needed",
+      "normalized_text_sha256": "eaa733345863d992218ed9a2618374862d284214575a5b63880eac1cde542ed3",
+      "raw_text_sha256": "eaa733345863d992218ed9a2618374862d284214575a5b63880eac1cde542ed3",
+      "runtime_consumer_ids": [],
+      "semantic_consumers": [],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003921:7"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000003921:7",
+      "support_stage": "ir_compiled_unsupported"
+    },
+    {
+      "ability_id": "000004193:piratical-hero",
+      "ability_name": "Piratical Hero",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000004193",
+      "datasheet_name": "Prince Yriel",
+      "description": "The led-unit Sustained Hits grant and Hit modifier are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "a63430bf0577ca4ba2df10e81496f8cd34ec2fc52603db795e15f39cf35c6aad",
+      "raw_text_sha256": "36829d62aca616cdeccc35f5afc516ee64fb42c13540db601422f77ef38fb388",
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-modifier",
+        "catalog-ir:weapon-keyword-grant",
+        "catalog-ir:weapon-keyword-grant:sustained-hits"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:sustained-hits"
+          ],
+          "semantic_id": "phase17k:aeldari:datasheet:000004193:4:clause:001:effect:0",
+          "semantic_kind": "grant_weapon_ability"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-modifier"
+          ],
+          "semantic_id": "phase17k:aeldari:datasheet:000004193:4:clause:002:effect:0",
+          "semantic_kind": "modify_dice_roll"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004193:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000004193:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000004193:prince-of-corsairs",
+      "ability_name": "Prince of Corsairs",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000004193",
+      "datasheet_name": "Prince Yriel",
+      "description": "Post-deployment redeploy and Strategic Reserves permission are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "47668e6eb7c385ed6fec664be841c978e3ca1226fffa1d221925fdb4831be50b",
+      "raw_text_sha256": "47668e6eb7c385ed6fec664be841c978e3ca1226fffa1d221925fdb4831be50b",
+      "runtime_consumer_ids": [
+        "catalog-ir:prebattle-redeploy-permission"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:prebattle-redeploy-permission"
+          ],
+          "semantic_id": "phase17k:aeldari:datasheet:000004193:5:clause:001:effect:0",
+          "semantic_kind": "placement_permission"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:prebattle-redeploy-permission"
+          ],
+          "semantic_id": "phase17k:aeldari:datasheet:000004193:5:clause:001:effect:1",
+          "semantic_kind": "placement_permission"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004193:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000004193:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000004194:aethersense-psychic",
+      "ability_name": "Aethersense (Psychic)",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000004194",
+      "datasheet_name": "Kharseth",
+      "description": "The reserve-arrival exclusion is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "325e0851686fcd845d6b4e7ba59aa7a8a601770534aa40376df9e8a82059088b",
+      "raw_text_sha256": "325e0851686fcd845d6b4e7ba59aa7a8a601770534aa40376df9e8a82059088b",
+      "runtime_consumer_ids": [
+        "catalog-ir:reserve-arrival-restriction"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:reserve-arrival-restriction"
+          ],
+          "semantic_id": "phase17k:aeldari:kharseth:000004194:4:clause:001:effect:0",
+          "semantic_kind": "placement_restriction"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004194:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000004194:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000004194:fury-of-the-void-psychic",
+      "ability_name": "Fury of the Void (Psychic)",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000004194",
+      "datasheet_name": "Kharseth",
+      "description": "Post-shoot riven-target tracking and the friendly Aeldari Strength modifier are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "7651b8d389eef31ad5d08ffe743e3ced3ff6752a4eabb5b1ab9eb5a051fa9b85",
+      "raw_text_sha256": "7651b8d389eef31ad5d08ffe743e3ced3ff6752a4eabb5b1ab9eb5a051fa9b85",
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:post-shoot-hit-target-effect"
+          ],
+          "semantic_id": "phase17k:aeldari:kharseth:000004194:5:clause:002:effect:0",
+          "semantic_kind": "modify_characteristic"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004194:5"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000004194:5",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000004195:hallucinogen-grenades",
+      "ability_name": "Hallucinogen Grenades",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000004195",
+      "datasheet_name": "Starfangs",
+      "description": "Opponent-Shooting-phase friendly Infantry selection and the temporary Stealth grant are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "a2ff2f5b9d5571f2053ef9688dd57a23a053cdcd81f54e3ff63cc2f0f4e72dcd",
+      "raw_text_sha256": "a2ff2f5b9d5571f2053ef9688dd57a23a053cdcd81f54e3ff63cc2f0f4e72dcd",
+      "runtime_consumer_ids": [
+        "catalog-ir:shooting-start-selected-target-effect"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:shooting-start-selected-target-effect"
+          ],
+          "semantic_id": "phase17k:aeldari:datasheet:000004195:4:clause:002:effect:0",
+          "semantic_kind": "grant_ability"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004195:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000004195:4",
+      "support_stage": "engine_consumed"
+    },
+    {
+      "ability_id": "000004196:raid-and-run",
+      "ability_name": "Raid and Run",
+      "catalog_support": "generic_rule_ir",
+      "datasheet_id": "000004196",
+      "datasheet_name": "Corsair Skyreavers",
+      "description": "Fight-end eligibility and D3+3-inch Normal/Fall Back movement are consumed through the shared triggered-movement path.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "normalized_text_sha256": "415adedbde9aeee5438c705dcb48a9639edbe27c4acfa31f570af3f5782a3db9",
+      "raw_text_sha256": "415adedbde9aeee5438c705dcb48a9639edbe27c4acfa31f570af3f5782a3db9",
+      "runtime_consumer_ids": [
+        "catalog-ir:fight-end-triggered-movement"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:fight-end-triggered-movement"
+          ],
+          "semantic_id": "phase17k:aeldari:corsair-skyreavers:000004196:4:clause:001:effect:0",
+          "semantic_kind": "out_of_phase_action"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:fight-end-triggered-movement"
+          ],
+          "semantic_id": "phase17k:aeldari:corsair-skyreavers:000004196:4:clause:001:effect:1",
+          "semantic_kind": "out_of_phase_action"
+        }
+      ],
+      "source_ids": [
+        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004196:4"
+      ],
+      "source_kind": "datasheet",
+      "source_row_id": "000004196:4",
+      "support_stage": "engine_consumed"
+    }
+  ],
+  "exact_ability_count": 145,
+  "generated_by": "uv run python tools/generate_aeldari_ability_semantic_descriptions.py",
+  "schema_version": "aeldari-ability-semantic-descriptions-v1"
+}
