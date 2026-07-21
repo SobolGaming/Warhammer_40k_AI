@@ -6796,6 +6796,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     tyranids_markdown = generated_faction_markdown["tyranids.md"]
     assert "## Detachment Rule Support" in aeldari_markdown
     assert "## Detachment Rule Support" in chaos_daemons_markdown
+    detachment_support_header = "| Detachment | Overall support | Engine support | Tests | Notes |"
+    assert detachment_support_header in aeldari_markdown
+    assert detachment_support_header in chaos_daemons_markdown
     assert "| Supported detachment rules |" in chaos_daemons_markdown
     assert "| 8 | 0 | 20 | 30 | 1 |" in adepta_sororitas_markdown
     assert "| 9 | 0 | 24 | 36 | 3 |" in adeptus_custodes_markdown
@@ -6847,6 +6850,56 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in aeldari_markdown
     assert "| Harlequins | None | Skyweavers (`000002539`) |" in aeldari_markdown
     assert "| Ynnari | None | None | The Visarch" in aeldari_markdown
+    aeldari_datasheet_support = aeldari_markdown.split("## Datasheet / Unit Support", 1)[1]
+    chaos_daemons_datasheet_support = chaos_daemons_markdown.split(
+        "## Datasheet / Unit Support", 1
+    )[1]
+    datasheet_support_header = (
+        "| Datasheet | Source basis | IR coverage | Supported semantics | "
+        "IR semantics still needed | Bridge / catalog blockers |"
+    )
+    assert aeldari_datasheet_support.count(datasheet_support_header) == 4
+    assert chaos_daemons_datasheet_support.count(datasheet_support_header) == 5
+    assert "| Datasheet | Overall | Catalog | Models / geometry |" not in (
+        aeldari_datasheet_support
+    )
+    assert aeldari_datasheet_support.count("No known catalog blocker.") == 23
+    assert (
+        aeldari_datasheet_support.count(
+            "No generated DatasheetSupportRow; catalog/model/wargear/geometry playability "
+            "remains unproven."
+        )
+        == 46
+    )
+    assert (
+        aeldari_datasheet_support.count("Generated playability evidence records a host limitation:")
+        == 1
+    )
+    assert (
+        "Hand of Asuryan (`000000571:hand-of-asuryan`): A once-per-battle activation "
+        "must grant the Bloody Twins Damage 3, Anti-Infantry 5+, and Devastating Wounds"
+    ) in aeldari_datasheet_support
+    assert (
+        "Fire Support (`000000609:fire-support`): Post-shoot target tracking and Wound "
+        "rerolls are parsed; the same-Transport disembark predicate"
+    ) in aeldari_datasheet_support
+    assert (
+        "Eviscerating Fly-by (`000003919:eviscerating-fly-by`): PathWitness-backed "
+        "moved-over enemy selection and per-model mortal wounds"
+    ) in aeldari_datasheet_support
+    assert "| Prince Yriel (`000004193`) | PDF pages 12-13;" in aeldari_datasheet_support
+    assert "| Kharseth (`000004194`) | PDF pages 14-15;" in aeldari_datasheet_support
+    assert "| Vypers (`000000605`) | PDF pages 16-17;" in aeldari_datasheet_support
+    assert "| Starfangs (`000004195`) | PDF pages 18-19;" in aeldari_datasheet_support
+    assert "| Corsair Skyreavers (`000004196`) | PDF pages 20-21;" in (aeldari_datasheet_support)
+    assert (
+        "IR still needed: Harlequins Charge moves through enemy models and mustering-time "
+        "exclusive ACROBATIC detachment-tag validation."
+    ) in aeldari_markdown
+    assert (
+        "IR still needed: battle-size-scaled Fate dice generation, a replay-safe Fate dice "
+        "pool, and value-matched dice discard"
+    ) in aeldari_markdown
     for group_name in (
         "Craftworlds / Asuryani",
         "Anhrathe / Corsairs",
