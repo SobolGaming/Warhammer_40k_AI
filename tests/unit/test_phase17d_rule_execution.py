@@ -651,7 +651,7 @@ def test_phase17d_catalog_setup_reactive_charge_submits_through_lifecycle() -> N
     action_request = status.decision_request
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id="phase17d-lifecycle-setup-reactive-charge-action",
+            result_id="phase17d-setup-reactive-charge-action",
             request=action_request,
             selected_option_id="charge",
         )
@@ -1313,7 +1313,7 @@ def _setup_reactive_charge_move_request(
     assert status is not None
     assert status.decision_request is not None
     action_result = DecisionResult.for_request(
-        result_id="phase17d-setup-reactive-charge-action-for-request",
+        result_id="phase17d-setup-reactive-charge-action",
         request=status.decision_request,
         selected_option_id="charge",
     )

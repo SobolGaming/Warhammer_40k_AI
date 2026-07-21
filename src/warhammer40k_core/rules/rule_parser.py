@@ -8,6 +8,10 @@ from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_toke
 from warhammer40k_core.rules import (
     rule_parser_selected_target_extensions as _selected_target_extensions,
 )
+from warhammer40k_core.rules.allocated_attack_rule_parser import (
+    allocated_attack_clause_split_offsets,
+    parse_allocated_attack_trigger,
+)
 from warhammer40k_core.rules.attack_target_parser import (
     has_this_model_attack_target,
     parse_this_model_attack_target_conditions,
@@ -92,28 +96,8 @@ from warhammer40k_core.rules.rule_parser_token_helpers import (
 from warhammer40k_core.rules.rule_parser_token_helpers import (
     subject_token as _subject_token,
 )
-from warhammer40k_core.rules.rule_templates import (
-    AURA_TEMPLATE_ID,
-    CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
-    CHARACTERISTIC_SET_TEMPLATE_ID,
-    CONTEXTUAL_STATUS_TEMPLATE_ID,
-    DESPERATE_ESCAPE_TEMPLATE_ID,
-    DICE_ROLL_MODIFIER_TEMPLATE_ID,
-    DICE_ROLL_OVERRIDE_TEMPLATE_ID,
-    DISTANCE_PREDICATE_TEMPLATE_ID,
-    GRANT_ABILITY_TEMPLATE_ID,
-    KEYWORD_GATE_TEMPLATE_ID,
-    MOVEMENT_DISTANCE_TEMPLATE_ID,
-    OUT_OF_PHASE_ACTION_TEMPLATE_ID,
-    PLACEMENT_TEMPLATE_ID,
-    REROLL_PERMISSION_TEMPLATE_ID,
-    RESOURCE_MODIFIER_TEMPLATE_ID,
-    RETURN_ON_DEATH_TEMPLATE_ID,
-    SELECTED_TARGET_TEMPLATE_ID,
-    TIMING_WINDOW_TEMPLATE_ID,
-    TRACKED_TARGET_SELECTION_TEMPLATE_ID,
-    WEAPON_ABILITY_GRANT_TEMPLATE_ID,
-    rule_template_by_id,
+from warhammer40k_core.rules.rule_template_classifier import (
+    template_id_for_clause as _template_id_for_clause,
 )
 from warhammer40k_core.rules.rule_token_normalization import (
     keyword_any_tokens as _keyword_any_tokens,
@@ -135,7 +119,7 @@ from warhammer40k_core.rules.triggered_action_parser import (
     compile_triggered_action_clause,
 )
 
-RULE_PARSER_VERSION = "phase17c-rule-parser-v2"
+RULE_PARSER_VERSION = "phase17c-rule-parser-v3"
 
 _PHASES = "command|movement|shooting|charge|fight"
 _ROLL_TYPES = (
@@ -719,6 +703,18 @@ def _semicolon_inside_ability_choice_list(
 def _split_repeated_trigger_anchors(clause_text: _ClauseText) -> tuple[_ClauseText, ...]:
     anchors = tuple(_CLAUSE_TRIGGER_ANCHOR_RE.finditer(clause_text.text))
     if len(anchors) < 2:
+        allocated_attack_offsets = allocated_attack_clause_split_offsets(clause_text.text)
+        if allocated_attack_offsets is not None:
+            return tuple(
+                _ClauseText(
+                    span=TextSpan(
+                        text=clause_text.text[start:end],
+                        start=clause_text.start + start,
+                        end=clause_text.start + end,
+                    )
+                )
+                for start, end in allocated_attack_offsets
+            )
         return (clause_text,)
     clauses: list[_ClauseText] = []
     start = clause_text.span.start
@@ -893,6 +889,9 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
     attack_target_trigger = parse_this_model_attack_target_trigger(clause_text.span)
     if attack_target_trigger is not None:
         return attack_target_trigger
+    allocated_attack_trigger = parse_allocated_attack_trigger(clause_text.span)
+    if allocated_attack_trigger is not None:
+        return allocated_attack_trigger
     destroys_enemy_match = _THIS_MODEL_DESTROYS_ENEMY_KEYWORD_UNIT_RE.search(clause_text.text)
     if destroys_enemy_match is not None:
         return RuleTrigger(
@@ -2586,71 +2585,6 @@ def _is_meaningful_residual_token(token: str) -> bool:
     if not normalized or normalized in _RESIDUAL_CONNECTOR_TOKENS:
         return False
     return not normalized.isdigit()
-
-
-def _template_id_for_clause(
-    *,
-    trigger: RuleTrigger | None,
-    conditions: tuple[RuleCondition, ...],
-    target: RuleTargetSpec | None,
-    effects: tuple[RuleEffectSpec, ...],
-) -> str | None:
-    candidates: list[str] = []
-    if any(condition.kind is RuleConditionKind.AURA for condition in conditions):
-        candidates.append(AURA_TEMPLATE_ID)
-    for effect in effects:
-        if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
-            candidates.append(WEAPON_ABILITY_GRANT_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.GRANT_ABILITY:
-            candidates.append(GRANT_ABILITY_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS:
-            candidates.append(CONTEXTUAL_STATUS_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS:
-            candidates.append(DESPERATE_ESCAPE_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
-            candidates.append(DICE_ROLL_MODIFIER_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.OVERRIDE_DICE_ROLL_RESULT:
-            candidates.append(DICE_ROLL_OVERRIDE_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.REROLL_PERMISSION:
-            candidates.append(REROLL_PERMISSION_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:
-            candidates.append(CHARACTERISTIC_MODIFIER_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.SET_CHARACTERISTIC:
-            candidates.append(CHARACTERISTIC_SET_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.MODIFY_MOVE_DISTANCE:
-            candidates.append(MOVEMENT_DISTANCE_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.OUT_OF_PHASE_ACTION:
-            candidates.append(OUT_OF_PHASE_ACTION_TEMPLATE_ID)
-        elif effect.kind in {
-            RuleEffectKind.MODIFY_COMMAND_POINTS,
-            RuleEffectKind.ADD_VICTORY_POINTS,
-        }:
-            candidates.append(RESOURCE_MODIFIER_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.RETURN_DESTROYED_TARGET:
-            candidates.append(RETURN_ON_DEATH_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.SELECT_TRACKED_TARGET:
-            candidates.append(TRACKED_TARGET_SELECTION_TEMPLATE_ID)
-        elif effect.kind is RuleEffectKind.INFLICT_MORTAL_WOUNDS:
-            candidates.append(TIMING_WINDOW_TEMPLATE_ID)
-        elif effect.kind in {
-            RuleEffectKind.PLACEMENT_PERMISSION,
-            RuleEffectKind.PLACEMENT_RESTRICTION,
-        }:
-            candidates.append(PLACEMENT_TEMPLATE_ID)
-    if target is not None:
-        candidates.append(SELECTED_TARGET_TEMPLATE_ID)
-    for condition in conditions:
-        if condition.kind is RuleConditionKind.KEYWORD_GATE:
-            candidates.append(KEYWORD_GATE_TEMPLATE_ID)
-        elif condition.kind is RuleConditionKind.DISTANCE_PREDICATE:
-            candidates.append(DISTANCE_PREDICATE_TEMPLATE_ID)
-    if trigger is not None:
-        candidates.append(TIMING_WINDOW_TEMPLATE_ID)
-    if not candidates:
-        return None
-    template_id = candidates[0]
-    rule_template_by_id(template_id)
-    return template_id
 
 
 def _dedupe_conditions(conditions: tuple[RuleCondition, ...]) -> tuple[RuleCondition, ...]:

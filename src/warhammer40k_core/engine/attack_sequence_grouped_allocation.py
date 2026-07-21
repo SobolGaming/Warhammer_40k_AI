@@ -108,6 +108,13 @@ def _continue_grouped_allocation_for_wound_contexts(
                     precision_selection=precision_selection,
                 )
             )
+    allocation_groups = _allocation_groups_by_effective_save_profile(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        allocation_groups=allocation_groups,
+        wounded_contexts=wounded_contexts,
+        runtime_modifier_registry=runtime_modifiers,
+    )
     allocation_orders = legal_allocation_group_orders(
         allocation_groups,
         priority_group_ids=priority_group_ids,
@@ -201,6 +208,135 @@ def _continue_grouped_allocation_for_wound_contexts(
         stratagem_index=stratagem_index,
         runtime_modifier_registry=runtime_modifiers,
     )
+
+
+def _allocation_groups_by_effective_save_profile(
+    *,
+    state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
+    allocation_groups: tuple[AllocationGroup, ...],
+    wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> tuple[AllocationGroup, ...]:
+    refined_groups: list[AllocationGroup] = []
+    for allocation_group in allocation_groups:
+        models_by_signature: dict[str, list[str]] = {}
+        for model_id in allocation_group.model_ids:
+            signature = _effective_save_profile_signature(
+                state=state,
+                ruleset_descriptor=ruleset_descriptor,
+                model_id=model_id,
+                wounded_contexts=wounded_contexts,
+                runtime_modifier_registry=runtime_modifier_registry,
+            )
+            models_by_signature.setdefault(signature, []).append(model_id)
+        if len(models_by_signature) == 1:
+            refined_groups.append(allocation_group)
+            continue
+        for signature, model_ids in models_by_signature.items():
+            subgroup_model_ids = tuple(model_ids)
+            subgroup_model_id_set = set(subgroup_model_ids)
+            signature_hash = sha256(signature.encode("utf-8")).hexdigest()
+            subgroup_wounded_ids = tuple(
+                model_id
+                for model_id in allocation_group.wounded_model_ids
+                if model_id in subgroup_model_id_set
+            )
+            subgroup_allocated_ids = tuple(
+                model_id
+                for model_id in allocation_group.already_allocated_model_ids
+                if model_id in subgroup_model_id_set
+            )
+            refined_groups.append(
+                replace(
+                    allocation_group,
+                    group_id=(f"{allocation_group.group_id}:effective-save:{signature_hash}"),
+                    model_ids=subgroup_model_ids,
+                    wounded_model_ids=subgroup_wounded_ids,
+                    already_allocated_model_ids=subgroup_allocated_ids,
+                    bodyguard_model_ids=tuple(
+                        model_id
+                        for model_id in allocation_group.bodyguard_model_ids
+                        if model_id in subgroup_model_id_set
+                    ),
+                    character_model_ids=tuple(
+                        model_id
+                        for model_id in allocation_group.character_model_ids
+                        if model_id in subgroup_model_id_set
+                    ),
+                    legality_reasons=tuple(
+                        reason
+                        for reason in allocation_group.legality_reasons
+                        if reason != "wounded_group_priority" or bool(subgroup_wounded_ids)
+                        if reason != "already_allocated_group_priority"
+                        or bool(subgroup_allocated_ids)
+                    ),
+                )
+            )
+    return tuple(refined_groups)
+
+
+def _effective_save_profile_signature(
+    *,
+    state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
+    model_id: str,
+    wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> str:
+    attack_signatures: list[JsonValue] = []
+    for wounded_sequence, attack_context in wounded_contexts:
+        save_options = _save_options_for_allocation(
+            state=state,
+            ruleset_descriptor=ruleset_descriptor,
+            attack_sequence=wounded_sequence,
+            attack_context=attack_context,
+            allocated_model_id=model_id,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        mandatory_option = mandatory_save_option(save_options)
+        reroll_contexts: tuple[SourceBackedRerollPermissionContext, ...] = ()
+        if mandatory_option is not None:
+            roll_type = f"attack_sequence.save.{mandatory_option.save_kind.value}"
+            reroll_contexts = source_backed_reroll_permission_contexts_for_unit(
+                state=state,
+                player_id=attack_context["defender_player_id"],
+                unit_instance_id=attack_context["attacking_unit_instance_id"],
+                roll_type=roll_type,
+                timing_window=roll_type,
+                attack_kind=_source_backed_attack_kind_for_phase(
+                    battle_phase_kind_from_token(attack_context["source_phase"])
+                ),
+                target_unit_instance_id=attack_context["target_unit_instance_id"],
+            )
+        reroll_signatures = sorted(
+            canonical_json(
+                validate_json_value(
+                    {
+                        "permission": context.permission.to_payload(),
+                        "source_payload": context.source_payload,
+                    }
+                )
+            )
+            for context in reroll_contexts
+        )
+        attack_signatures.append(
+            validate_json_value(
+                {
+                    "attack_context_id": attack_context["attack_context_id"],
+                    "save_options": [option.to_payload() for option in save_options],
+                    "mandatory_save_option": (
+                        None if mandatory_option is None else mandatory_option.to_payload()
+                    ),
+                    "source_backed_reroll_opportunities": reroll_signatures,
+                    # A possible source-backed save reroll is resolved before exact
+                    # allocation, so keep those candidates model-scoped even when
+                    # their current source payloads happen to be identical.
+                    "reroll_model_scope": model_id if reroll_signatures else None,
+                }
+            )
+        )
+    return canonical_json(attack_signatures)
 
 
 def _continue_after_grouped_allocation_order(
@@ -504,6 +640,22 @@ def _resolve_grouped_damage_from(
                 state=state,
                 unit_instance_id=pool.target_unit_instance_id,
             ).keywords,
+        )
+        damage_amount = max(
+            1,
+            damage_amount
+            + runtime_modifiers.allocated_attack_damage_modifier(
+                AllocatedAttackDamageModifierContext(
+                    state=state,
+                    source_phase=save_attack_sequence.source_phase,
+                    attacking_unit_instance_id=(save_attack_sequence.attacking_unit_instance_id),
+                    attacker_model_instance_id=pool.attacker_model_instance_id,
+                    target_unit_instance_id=pool.target_unit_instance_id,
+                    allocated_model_instance_id=current_model_id,
+                    weapon_profile=pool.weapon_profile,
+                    current_value=damage_amount,
+                )
+            ),
         )
         _next_sequence, resolved_allocated_ids, status = _resolve_lost_wound_stage(
             state=state,

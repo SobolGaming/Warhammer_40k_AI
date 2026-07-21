@@ -1,7 +1,7 @@
 {
   "coverage_schema_version": "aeldari-datasheet-semantic-coverage-v4",
-  "coverage_sha256": "1c95ad1430d781576e7e01f2f65b81acfc121b902d01e6cb6b984e07a7a11bcb",
-  "description_text_sha256": "fbae8a1002511484bc36e1f58d0cc0469c1a2ce896e15c4cac0132ce6c28d553",
+  "coverage_sha256": "3e33fcfb2e67fff5aace9d0cd5dc8dee2153162085646452bad8adf2cf1d641d",
+  "description_text_sha256": "9470539aa7b2f84888400022925ee92d1f2c039d576e93d923b61edec0f1ff37",
   "descriptions": [
     {
       "ability_id": "000000568:diviner-of-futures",
@@ -1017,25 +1017,33 @@
     {
       "ability_id": "000000590:serpent-shield",
       "ability_name": "Serpent Shield",
-      "catalog_support": "unsupported",
+      "catalog_support": "generic_rule_ir",
       "datasheet_id": "000000590",
       "datasheet_name": "Storm Guardians",
-      "description": "A bearer-unit 5+ invulnerable save grant is still needed.",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "07608aebf5cae41704c334a62e5f4e3e80106e43cf833dcea5ac09f5ecd6d99b",
+      "description": "The bearer-unit 5+ invulnerable-save grant is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "evidence_sha256": "b8ce59986be761d4a1e16a71fe17565b1695ed9493fa11f8e36fe6ca8cd15c5c",
       "normalized_text_sha256": "a36a1c07e9a9948e6ac3217f383dd15233d595628cd7e5d53afcd352069368d0",
       "raw_text_sha256": "a36a1c07e9a9948e6ac3217f383dd15233d595628cd7e5d53afcd352069368d0",
-      "runtime_consumer_ids": [],
-      "semantic_consumers": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:invulnerable-save-characteristic-query"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000590:4:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
       "source_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000590:4"
       ],
       "source_kind": "wargear",
       "source_row_id": "000000590:4",
-      "support_stage": "ir_compiled_unsupported"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000000591:swift-demise",
@@ -1169,25 +1177,33 @@
     {
       "ability_id": "000000593:shimmershield",
       "ability_name": "Shimmershield",
-      "catalog_support": "unsupported",
+      "catalog_support": "generic_rule_ir",
       "datasheet_id": "000000593",
       "datasheet_name": "Dire Avengers",
-      "description": "A bearer-only 4+ invulnerable save is still needed.",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "5f910b623d47d8f90e1a556f7797715a44b4aeaab82d80d950756afcff20383d",
+      "description": "The bearer-only 4+ invulnerable-save grant is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "evidence_sha256": "e57353de97860887f6db2d57dde3238df7ac7b1b78816c343657853c246b5c55",
       "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
       "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
-      "runtime_consumer_ids": [],
-      "semantic_consumers": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:invulnerable-save-characteristic-query"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:3:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
       "source_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:3"
       ],
       "source_kind": "wargear",
       "source_row_id": "000000593:3",
-      "support_stage": "ir_compiled_unsupported"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000000594:acrobatic",
@@ -1768,25 +1784,33 @@
     {
       "ability_id": "000000602:shimmershield",
       "ability_name": "Shimmershield",
-      "catalog_support": "unsupported",
+      "catalog_support": "generic_rule_ir",
       "datasheet_id": "000000602",
       "datasheet_name": "Shining Spears",
-      "description": "A bearer-only 4+ invulnerable save is still needed.",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "178860dca6088a30ab4ec010d9b788a9cc755e70461c16f63f67da194374fb62",
+      "description": "The bearer-only 4+ invulnerable-save grant is consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "evidence_sha256": "30c79d9e50f6a7e12fd8b6f14147dd274c059de0a0055e1fd6f5d7fccbc5f5f3",
       "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
       "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
-      "runtime_consumer_ids": [],
-      "semantic_consumers": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:invulnerable-save-characteristic-query"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:3:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        }
+      ],
       "source_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:3"
       ],
       "source_kind": "wargear",
       "source_row_id": "000000602:3",
-      "support_stage": "ir_compiled_unsupported"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000000603:skyhunter",
@@ -2204,22 +2228,32 @@
     {
       "ability_id": "000000614:scattershield",
       "ability_name": "Scattershield",
-      "catalog_support": "unsupported",
+      "catalog_support": "generic_rule_ir",
       "datasheet_id": "000000614",
       "datasheet_name": "Wraithknight",
-      "description": "The 4+ invulnerable save is parsed; allocated-attack Damage reduction still needs a defensive query host.",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "c5969e1206f2e1654e67670e7716d75d27381754adc912b5ccc054352f525131",
+      "description": "The bearer-only 4+ invulnerable-save grant and allocated-attack Damage reduction are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "evidence_sha256": "dba62a05fb0325da6f4628b5dcceb5e5e210b11898b2ca1e50d1287cca9cbaf3",
       "normalized_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
       "raw_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:damage-characteristic-modifier",
+        "catalog-ir:invulnerable-save-characteristic-query"
+      ],
       "semantic_consumers": [
         {
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
           "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000614:5:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:damage-characteristic-modifier"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000614:5:description:clause:002:effect:0",
           "semantic_kind": "modify_characteristic"
         }
       ],
@@ -2228,7 +2262,7 @@
       ],
       "source_kind": "wargear",
       "source_row_id": "000000614:5",
-      "support_stage": "ir_compiled_unsupported"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000002531:reavers-of-the-void",
@@ -3649,22 +3683,32 @@
     {
       "ability_id": "000003913:scattershield",
       "ability_name": "Scattershield",
-      "catalog_support": "unsupported",
+      "catalog_support": "generic_rule_ir",
       "datasheet_id": "000003913",
       "datasheet_name": "Wraithknight with Ghostglaive",
-      "description": "The 4+ invulnerable save is parsed; allocated-attack Damage reduction still needs a defensive query host.",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "d415e0b05f9fe76b86c6c0bcb9c5f861e003197f2802f64a315d4481234f5a34",
+      "description": "The bearer-only 4+ invulnerable-save grant and allocated-attack Damage reduction are consumed.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "evidence_sha256": "5ca64235a6b3b60eaed9e5c89ab127473e78a2cc207e9ad0f950b3eccf892f2e",
       "normalized_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
       "raw_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:damage-characteristic-modifier",
+        "catalog-ir:invulnerable-save-characteristic-query"
+      ],
       "semantic_consumers": [
         {
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
           "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003913:4:description:clause:001:effect:0",
+          "semantic_kind": "set_characteristic"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:damage-characteristic-modifier"
+          ],
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003913:4:description:clause:002:effect:0",
           "semantic_kind": "modify_characteristic"
         }
       ],
@@ -3673,7 +3717,7 @@
       ],
       "source_kind": "wargear",
       "source_row_id": "000003913:4",
-      "support_stage": "ir_compiled_unsupported"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000003914:overlord",

@@ -630,8 +630,8 @@ def test_aeldari_semantic_descriptions_exactly_partition_every_reviewed_ability(
     assert len(descriptions.rows) == 145
     assert descriptions_by_identity.keys() == expected_by_identity.keys()
     assert Counter(row.documentation_bucket for row in descriptions.rows) == {
-        DOCUMENTATION_BUCKET_SUPPORTED: 55,
-        DOCUMENTATION_BUCKET_STILL_NEEDED: 90,
+        DOCUMENTATION_BUCKET_SUPPORTED: 60,
+        DOCUMENTATION_BUCKET_STILL_NEEDED: 85,
     }
     prose_payload = cast(
         dict[str, Any],

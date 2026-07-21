@@ -45,6 +45,10 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_support import (
+    CATALOG_IR_ALLOCATED_ATTACK_DAMAGE_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
@@ -248,6 +252,47 @@ def test_phase17k_catalog_ir_shadow_of_chaos_aura_classifies_contextual_status()
         CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
     }
     assert CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID in set(catalog_rule_ir_registered_hook_ids())
+
+
+@pytest.mark.parametrize(
+    ("source_id", "raw_text", "expected_consumers"),
+    [
+        (
+            "000000593:shimmershield",
+            "The bearer has a 4+ invulnerable save.",
+            (CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,),
+        ),
+        (
+            "000000590:serpent-shield",
+            "Models in the bearer's unit have a 5+ invulnerable save.",
+            (CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,),
+        ),
+        (
+            "000003913:scattershield",
+            "The bearer has a 4+ invulnerable save and each time an attack is allocated "
+            "to the bearer, subtract 1 from the Damage characteristic of that attack.",
+            (
+                CATALOG_IR_ALLOCATED_ATTACK_DAMAGE_MODIFIER_CONSUMER_ID,
+                CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,
+            ),
+        ),
+    ],
+)
+def test_phase17k_structural_shield_rule_ir_is_fully_consumed(
+    source_id: str,
+    raw_text: str,
+    expected_consumers: tuple[str, ...],
+) -> None:
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(source_id=source_id, raw_text=raw_text),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
+
+    assert rule_ir.is_supported
+    assert rule_ir.diagnostics == ()
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == expected_consumers
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) >= set(expected_consumers)
+    assert set(catalog_rule_ir_registered_hook_ids()) >= set(expected_consumers)
 
 
 def test_phase17k_movement_phase_ability_index_mapping_is_fail_fast() -> None:

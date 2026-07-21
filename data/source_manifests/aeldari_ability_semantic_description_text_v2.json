@@ -173,8 +173,8 @@
     },
     {
       "ability_id": "000000590:serpent-shield",
-      "description": "A bearer-unit 5+ invulnerable save grant is still needed.",
-      "evidence_sha256": "07608aebf5cae41704c334a62e5f4e3e80106e43cf833dcea5ac09f5ecd6d99b"
+      "description": "The bearer-unit 5+ invulnerable-save grant is consumed.",
+      "evidence_sha256": "b8ce59986be761d4a1e16a71fe17565b1695ed9493fa11f8e36fe6ca8cd15c5c"
     },
     {
       "ability_id": "000000591:swift-demise",
@@ -198,8 +198,8 @@
     },
     {
       "ability_id": "000000593:shimmershield",
-      "description": "A bearer-only 4+ invulnerable save is still needed.",
-      "evidence_sha256": "5f910b623d47d8f90e1a556f7797715a44b4aeaab82d80d950756afcff20383d"
+      "description": "The bearer-only 4+ invulnerable-save grant is consumed.",
+      "evidence_sha256": "e57353de97860887f6db2d57dde3238df7ac7b1b78816c343657853c246b5c55"
     },
     {
       "ability_id": "000000594:acrobatic",
@@ -288,8 +288,8 @@
     },
     {
       "ability_id": "000000602:shimmershield",
-      "description": "A bearer-only 4+ invulnerable save is still needed.",
-      "evidence_sha256": "178860dca6088a30ab4ec010d9b788a9cc755e70461c16f63f67da194374fb62"
+      "description": "The bearer-only 4+ invulnerable-save grant is consumed.",
+      "evidence_sha256": "30c79d9e50f6a7e12fd8b6f14147dd274c059de0a0055e1fd6f5d7fccbc5f5f3"
     },
     {
       "ability_id": "000000603:skyhunter",
@@ -363,8 +363,8 @@
     },
     {
       "ability_id": "000000614:scattershield",
-      "description": "The 4+ invulnerable save is parsed; allocated-attack Damage reduction still needs a defensive query host.",
-      "evidence_sha256": "c5969e1206f2e1654e67670e7716d75d27381754adc912b5ccc054352f525131"
+      "description": "The bearer-only 4+ invulnerable-save grant and allocated-attack Damage reduction are consumed.",
+      "evidence_sha256": "dba62a05fb0325da6f4628b5dcceb5e5e210b11898b2ca1e50d1287cca9cbaf3"
     },
     {
       "ability_id": "000002531:reavers-of-the-void",
@@ -623,8 +623,8 @@
     },
     {
       "ability_id": "000003913:scattershield",
-      "description": "The 4+ invulnerable save is parsed; allocated-attack Damage reduction still needs a defensive query host.",
-      "evidence_sha256": "d415e0b05f9fe76b86c6c0bcb9c5f861e003197f2802f64a315d4481234f5a34"
+      "description": "The bearer-only 4+ invulnerable-save grant and allocated-attack Damage reduction are consumed.",
+      "evidence_sha256": "5ca64235a6b3b60eaed9e5c89ab127473e78a2cc207e9ad0f950b3eccf892f2e"
     },
     {
       "ability_id": "000003914:overlord",

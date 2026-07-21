@@ -1770,6 +1770,9 @@ class RuntimeContentBundle:
                 validated_contributions,
                 lambda contribution: contribution.wound_roll_modifier_bindings,
             ),
+            allocated_attack_damage_modifier_bindings=(
+                catalog_rules.allocated_attack_damage_modifier_bindings()
+            ),
             save_option_modifier_bindings=(
                 catalog_rules.save_option_modifier_bindings()
                 + generic_rule_lifecycle_hooks.save_option_modifier_bindings(

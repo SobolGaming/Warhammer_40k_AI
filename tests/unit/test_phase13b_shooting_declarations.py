@@ -103,6 +103,18 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfilePayload,
 )
+from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    AbilityCatalogIndex,
+    AbilityCatalogRecord,
+    AbilityDefinition,
+    AbilitySourceKind,
+    AbilityTimingDescriptor,
+)
+from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
+    AllocatedAttackDamageModifierBinding,
+    AllocatedAttackDamageModifierContext,
+)
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
@@ -123,6 +135,7 @@ from warhammer40k_core.engine.attack_sequence import (
     PendingGroupedDamage,
     SaveDieEntryPayload,
     WoundRoll,
+    apply_allocation_order_decision,
     apply_destroyed_transport_disembark_proposal_decision,
     attack_sequence_hit_roll_spec,
     attack_sequence_step_from_token,
@@ -145,6 +158,7 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacedArmy,
     UnitPlacement,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     record_core_feel_no_pain_sources_for_unit,
 )
@@ -246,6 +260,9 @@ from warhammer40k_core.engine.phases.shooting import (
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+)
 from warhammer40k_core.engine.saves import (
     PlungingFireModifier,
     PlungingFireModifierResult,
@@ -273,6 +290,7 @@ from warhammer40k_core.engine.shooting_types import (
 )
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import STRATAGEM_WINDOW_DECLINED_EVENT_TYPE
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     DisembarkedUnitState,
@@ -311,6 +329,11 @@ from warhammer40k_core.geometry.terrain import (
 )
 from warhammer40k_core.geometry.visibility import (
     BenefitOfCoverResult,
+)
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
 
 
@@ -3784,6 +3807,199 @@ def test_phase14e_allocation_order_request_after_grouped_wound_pool() -> None:
         LifecycleStatusKind.UNSUPPORTED,
     }
     assert sum(1 for event in final_attack_events if event["step"] == "damage") >= 2
+
+
+def test_grouped_allocation_splits_real_shimmershield_bearer_before_save_rolls() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    source_id = "000000593:shimmershield"
+    wargear_id = "test:aeldari:grouped-shimmershield"
+    bearer = replace(
+        defender.own_models[0],
+        wargear_ids=(*defender.own_models[0].wargear_ids, wargear_id),
+    )
+    defender = replace(defender, own_models=(bearer, *defender.own_models[1:]))
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id=source_id,
+            raw_text="The bearer has a 4+ invulnerable save.",
+        ),
+        source_keyword_sequence_parts=(
+            datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+        ),
+    ).rule_ir
+    record = AbilityCatalogRecord(
+        record_id=f"record:{source_id}:grouped",
+        definition=AbilityDefinition(
+            ability_id=f"ability:{source_id}:grouped",
+            name="Shimmershield",
+            source_id=source_id,
+            when_descriptor="During an attack allocation.",
+            effect_descriptor="The bearer has a 4+ invulnerable save.",
+            restrictions_descriptor="Wargear bearer only.",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.DURING_PHASE),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": rule_ir.to_payload()}),
+        ),
+        source_kind=AbilitySourceKind.WARGEAR,
+        datasheet_id=defender.datasheet_id,
+        wargear_id=wargear_id,
+    )
+    defender_army = next(
+        army
+        for army in state.army_definitions
+        if any(unit.unit_instance_id == defender.unit_instance_id for unit in army.units)
+    )
+    attacker_army = next(
+        army
+        for army in state.army_definitions
+        if any(unit.unit_instance_id == attacker.unit_instance_id for unit in army.units)
+    )
+    runtime = CatalogDatasheetRuleRuntime(
+        ability_indexes_by_player_id={
+            defender_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            attacker_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=tuple(state.army_definitions),
+    )
+    registry = RuntimeModifierRegistry.from_bindings(
+        save_option_modifier_bindings=runtime.save_option_modifier_bindings(),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="grouped-real-shimmershield",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -10),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    sequence_id = "grouped-real-shimmershield"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id=attacker_army.player_id,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attacker_player_id=attacker_army.player_id,
+        attack_context_id=attack_context_id,
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attacker_player_id=attacker_army.player_id,
+        attack_context_id=attack_context_id,
+    )
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound",
+                    spec=wound_spec,
+                    value=6,
+                ),
+            ),
+        ),
+        runtime_modifier_registry=registry,
+    )
+    assert remaining_sequence is not None
+    assert allocated_ids == ()
+    request = _decision_request(cast(LifecycleStatus, status))
+    request_payload = cast(dict[str, object], request.payload)
+    allocation_groups = cast(list[dict[str, object]], request_payload["allocation_groups"])
+    bearer_group = next(
+        group
+        for group in allocation_groups
+        if cast(list[str], group["model_ids"]) == [bearer.model_instance_id]
+    )
+    non_bearer_group = next(
+        group
+        for group in allocation_groups
+        if bearer.model_instance_id not in cast(list[str], group["model_ids"])
+    )
+    rolled_before_order = _event_payloads(lifecycle, "dice_rolled")
+
+    assert request.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE
+    assert len(allocation_groups) == 2
+    assert len(cast(list[str], non_bearer_group["model_ids"])) >= 1
+    assert all(
+        not cast(str, cast(dict[str, object], payload["spec"])["roll_type"]).startswith(
+            "attack_sequence.save."
+        )
+        for payload in rolled_before_order
+    )
+    assert not any(
+        cast(str, cast(dict[str, object], payload["spec"])["roll_type"])
+        == "attack_sequence.damage_order"
+        for payload in rolled_before_order
+    )
+
+    bearer_first_option = next(
+        option
+        for option in request.options
+        if cast(list[str], cast(dict[str, object], option.payload)["ordered_group_ids"])[0]
+        == bearer_group["group_id"]
+    )
+    result = DecisionResult.for_request(
+        result_id=f"{sequence_id}:bearer-first",
+        request=request,
+        selected_option_id=bearer_first_option.option_id,
+    )
+    lifecycle.decision_controller.submit_result(result)
+    _updated_sequence, _updated_allocated_ids, resumed_status = apply_allocation_order_decision(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=remaining_sequence,
+        result=result,
+        already_allocated_model_ids=(),
+        runtime_modifier_registry=registry,
+    )
+    save_event = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.SAVE,
+    )
+    save_payload = cast(dict[str, object], save_event["payload"])
+    save_roll_state = cast(dict[str, object], save_payload["roll_state"])
+    original_result = cast(dict[str, object], save_roll_state["original_result"])
+    rolled_spec = cast(dict[str, object], original_result["spec"])
+    save_options = cast(list[dict[str, object]], save_payload["save_options"])
+    shield_option = next(
+        option for option in save_options if option["save_kind"] == SaveKind.INVULNERABLE.value
+    )
+
+    assert resumed_status is None
+    assert save_payload["allocated_model_id"] == bearer.model_instance_id
+    assert save_payload["allocation_group_id"] == bearer_group["group_id"]
+    assert rolled_spec["roll_type"] == "attack_sequence.save.invulnerable"
+    assert shield_option["source_rule_ids"] == [source_id]
+    assert not any(
+        record.request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+        for record in lifecycle.decision_controller.records
+    )
 
 
 def test_phase14e_grouped_failed_saves_transition_to_next_ordered_group() -> None:
@@ -10200,6 +10416,109 @@ def test_phase13c_forced_single_source_feel_no_pain_reduces_failed_save_damage()
     assert status is None
     assert fnp_payload["ignored_wounds"] == 1
     assert application["requested_damage"] == 1
+    assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
+
+
+def test_allocated_attack_damage_modifier_runs_after_model_allocation() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(2),
+    )
+    attack_context_id = "allocated-damage-modifier:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    observed_contexts: list[AllocatedAttackDamageModifierContext] = []
+
+    def allocated_damage_modifier(context: AllocatedAttackDamageModifierContext) -> int:
+        observed_contexts.append(context)
+        return -1
+
+    registry = RuntimeModifierRegistry.from_bindings(
+        allocated_attack_damage_modifier_bindings=(
+            AllocatedAttackDamageModifierBinding(
+                modifier_id="test:allocated-damage-modifier",
+                source_id="test:allocated-damage-rule",
+                handler=allocated_damage_modifier,
+            ),
+        )
+    )
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="allocated-damage-modifier",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "allocated-damage-modifier",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="allocated-damage-modifier-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="allocated-damage-modifier-wound",
+                    spec=wound_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="allocated-damage-modifier-save",
+                    spec=save_spec,
+                    value=1,
+                ),
+            ),
+        ),
+        runtime_modifier_registry=registry,
+    )
+    updated_model = model_by_id(
+        state=state,
+        model_instance_id=defender_model.model_instance_id,
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert len(observed_contexts) == 1
+    assert observed_contexts[0].allocated_model_instance_id == defender_model.model_instance_id
+    assert observed_contexts[0].current_value == 2
     assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
 
 

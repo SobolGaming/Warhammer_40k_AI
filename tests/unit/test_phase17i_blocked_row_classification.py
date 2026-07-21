@@ -94,7 +94,7 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         "detachment_stratagem": 1048,
         "faction_army_rule": 5,
     }
-    assert summary_by_family["unrepresented_rule_language"].row_count == 1877
+    assert summary_by_family["unrepresented_rule_language"].row_count == 1874
     assert summary_by_family["stratagem_activation_and_targeting"].coverage_kind_counts == {
         "detachment_stratagem": 1048
     }
@@ -126,7 +126,7 @@ def test_phase17i_existing_template_report_uses_phase17c_template_families() -> 
     phase17c_family_values = {family.value for family in RuleTemplateFamily}
 
     assert set(template_summary_by_family) <= phase17c_family_values
-    assert template_summary_by_family["selected_target_constraint"].row_count == 1159
+    assert template_summary_by_family["selected_target_constraint"].row_count == 1155
     assert template_summary_by_family["keyword_gate"].row_count == 743
     assert template_summary_by_family["dice_roll_modification"].row_count == 180
     assert template_summary_by_family["conditional_weapon_ability_grant"].row_count == 157

@@ -14,6 +14,10 @@ from warhammer40k_core.rules.rule_ir import (
     parameter_payload,
 )
 
+ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID = (
+    "phase17c:allocated-attack-damage-characteristic-modifier"
+)
+CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:characteristic-set"
 CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID = "phase17c:conditional-objective-hit-reroll"
 PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:passive-model-characteristic-set"
 FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_TEMPLATE_ID = "phase17c:first-failed-save-damage-replacement"
@@ -32,6 +36,7 @@ AGILE_MANOEUVRE_ROLL_REROLL_TEMPLATE_ID = "phase17m:agile-manoeuvre-roll-reroll"
 FACTION_RESOURCE_REFUND_ROLL_TEMPLATE_ID = "phase17m:faction-resource-refund-roll"
 EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
     {
+        ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID,
         CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID,
         PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID,
         FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_TEMPLATE_ID,
@@ -49,6 +54,12 @@ EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
 @dataclass(frozen=True, slots=True)
 class CatalogInvulnerableSaveDescriptor:
     target_number: int
+    target_kind: RuleTargetKind
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogAllocatedAttackDamageModifierDescriptor:
+    delta: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -125,6 +136,7 @@ class CatalogFactionResourceRefundRollDescriptor:
 
 CatalogDatasheetRuntimeDescriptor = (
     CatalogInvulnerableSaveDescriptor
+    | CatalogAllocatedAttackDamageModifierDescriptor
     | CatalogPassiveHitRerollDescriptor
     | CatalogFirstFailedSaveDamageReplacementDescriptor
     | CatalogConditionalProximityEffectsDescriptor
@@ -145,6 +157,12 @@ def clause_uses_exact_datasheet_runtime_template(clause: RuleClause) -> bool:
 def exact_datasheet_runtime_descriptor_for_clause(
     clause: RuleClause,
 ) -> CatalogDatasheetRuntimeDescriptor | None:
+    invulnerable_save = invulnerable_save_descriptor_for_clause(clause)
+    if invulnerable_save is not None:
+        return invulnerable_save
+    allocated_damage = allocated_attack_damage_modifier_descriptor_for_clause(clause)
+    if allocated_damage is not None:
+        return allocated_damage
     if clause.template_id == CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID:
         return passive_hit_reroll_descriptor_for_clause(clause)
     if clause.template_id == PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID:
@@ -708,10 +726,14 @@ def invulnerable_save_descriptor_for_clause(
 ) -> CatalogInvulnerableSaveDescriptor | None:
     if (
         not clause.is_supported
-        or clause.template_id != PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID
+        or clause.template_id
+        not in {
+            PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID,
+            CHARACTERISTIC_SET_TEMPLATE_ID,
+        }
         or clause.trigger is not None
         or clause.target is None
-        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or clause.target.kind not in {RuleTargetKind.THIS_MODEL, RuleTargetKind.THIS_UNIT}
         or clause.target.parameters
         or clause.duration is not None
         or clause.conditions
@@ -729,7 +751,46 @@ def invulnerable_save_descriptor_for_clause(
         or not 2 <= value <= 6
     ):
         return None
-    return CatalogInvulnerableSaveDescriptor(target_number=value)
+    return CatalogInvulnerableSaveDescriptor(
+        target_number=value,
+        target_kind=clause.target.kind,
+    )
+
+
+def allocated_attack_damage_modifier_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogAllocatedAttackDamageModifierDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW
+        or parameter_payload(clause.trigger.parameters)
+        != {
+            "edge": "during",
+            "subject": "incoming_attack",
+            "timing_window": "attack_allocated",
+        }
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or clause.target.parameters
+        or clause.duration is not None
+        or clause.conditions
+        or len(clause.effects) != 1
+    ):
+        return None
+    effect = clause.effects[0]
+    parameters = parameter_payload(effect.parameters)
+    delta = parameters.get("delta")
+    if (
+        effect.kind is not RuleEffectKind.MODIFY_CHARACTERISTIC
+        or parameters.get("characteristic") != Characteristic.DAMAGE.value
+        or set(parameters) != {"characteristic", "delta"}
+        or type(delta) is not int
+        or delta >= 0
+    ):
+        return None
+    return CatalogAllocatedAttackDamageModifierDescriptor(delta=delta)
 
 
 def passive_hit_reroll_descriptor_for_clause(
