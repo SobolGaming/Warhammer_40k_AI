@@ -2,13 +2,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
+from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollState
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 FACTION_RESOURCE_SPEND_EFFECT_KIND = "faction_resource_spend"
+FACTION_RESOURCE_REFUND_ROLL_PAYLOAD_KEY = "faction_resource_refund_roll"
+FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID = "catalog-ir:faction-resource-refund-roll"
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.decision_controller import DecisionController
+    from warhammer40k_core.engine.effects import PersistingEffect
 
 
 def _empty_resource_totals() -> dict[str, int]:
@@ -86,6 +93,41 @@ class FactionResourceSpendEffectPayload(TypedDict):
     resource_kind: str
     amount: int
     reason: str
+
+
+class _FactionResourceRefundRollDescriptor(TypedDict):
+    source_effect_id: str
+    source_rule_id: str
+    resource_kind: str
+    amount: int
+    success_threshold: int
+
+
+@dataclass(frozen=True, slots=True)
+class FactionResourceRefundRollResolution:
+    descriptor_source_rule_id: str
+    descriptor_source_effect_id: str
+    resource_kind: str
+    amount: int
+    success_threshold: int
+    roll_state: DiceRollState
+    resource_result: FactionResourceResult | None
+
+    def to_payload(self) -> JsonValue:
+        return validate_json_value(
+            {
+                "descriptor_source_rule_id": self.descriptor_source_rule_id,
+                "descriptor_source_effect_id": self.descriptor_source_effect_id,
+                "resource_kind": self.resource_kind,
+                "amount": self.amount,
+                "success_threshold": self.success_threshold,
+                "roll_state": self.roll_state.to_payload(),
+                "succeeded": self.roll_state.current_total >= self.success_threshold,
+                "resource_result": (
+                    None if self.resource_result is None else self.resource_result.to_payload()
+                ),
+            }
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -508,6 +550,121 @@ def faction_resource_result_enriched_payload(
             "faction_resource_result": validate_json_value(result.to_payload()),
         }
     )
+
+
+def resolve_faction_resource_refund_roll(
+    *,
+    state: object,
+    decisions: DecisionController,
+    spend_effect: PersistingEffect,
+) -> FactionResourceRefundRollResolution | None:
+    from warhammer40k_core.engine.decision import DiceRollManager
+    from warhammer40k_core.engine.decision_controller import DecisionController
+    from warhammer40k_core.engine.effects import PersistingEffect
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Faction resource refund roll requires GameState.")
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Faction resource refund roll requires DecisionController.")
+    if type(spend_effect) is not PersistingEffect:
+        raise GameLifecycleError("Faction resource refund roll requires PersistingEffect.")
+    effect_payload = spend_effect.effect_payload
+    if not isinstance(effect_payload, dict):
+        raise GameLifecycleError("Faction resource spend effect payload must be an object.")
+    descriptor_payload = effect_payload.get(FACTION_RESOURCE_REFUND_ROLL_PAYLOAD_KEY)
+    if descriptor_payload is None:
+        return None
+    descriptor = _faction_resource_refund_roll_descriptor(descriptor_payload)
+    roll_state = DiceRollManager(
+        state.game_id,
+        event_log=decisions.event_log,
+    ).roll(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=(
+                "Faction resource refund "
+                f"{descriptor['source_rule_id']} after {spend_effect.effect_id}"
+            ),
+            roll_type=f"faction_resource_refund.{descriptor['resource_kind']}",
+            actor_id=spend_effect.owner_player_id,
+        )
+    )
+    resource_result = None
+    if roll_state.current_total >= descriptor["success_threshold"]:
+        resource_result = state.gain_faction_resource(
+            player_id=spend_effect.owner_player_id,
+            resource_kind=descriptor["resource_kind"],
+            amount=descriptor["amount"],
+            source_id=(f"{descriptor['source_rule_id']}:{spend_effect.effect_id}:refund"),
+        )
+    resolution = FactionResourceRefundRollResolution(
+        descriptor_source_rule_id=descriptor["source_rule_id"],
+        descriptor_source_effect_id=descriptor["source_effect_id"],
+        resource_kind=descriptor["resource_kind"],
+        amount=descriptor["amount"],
+        success_threshold=descriptor["success_threshold"],
+        roll_state=roll_state,
+        resource_result=resource_result,
+    )
+    decisions.event_log.append(
+        "faction_resource_refund_roll_resolved",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "player_id": spend_effect.owner_player_id,
+                "battle_round": state.battle_round,
+                "spend_effect_id": spend_effect.effect_id,
+                "resolution": resolution.to_payload(),
+            }
+        ),
+    )
+    return resolution
+
+
+def _faction_resource_refund_roll_descriptor(
+    payload: JsonValue,
+) -> _FactionResourceRefundRollDescriptor:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Faction resource refund roll descriptor must be an object.")
+    expected_keys = {
+        "amount",
+        "descriptor_id",
+        "operation",
+        "resource_kind",
+        "roll_expression",
+        "source_effect_id",
+        "source_rule_id",
+        "success_threshold",
+    }
+    if set(payload) != expected_keys:
+        raise GameLifecycleError("Faction resource refund roll descriptor fields drifted.")
+    if payload.get("descriptor_id") != FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID:
+        raise GameLifecycleError("Faction resource refund roll descriptor_id drifted.")
+    if payload.get("operation") != "gain" or payload.get("roll_expression") != "D6":
+        raise GameLifecycleError("Faction resource refund roll operation is unsupported.")
+    amount = payload.get("amount")
+    threshold = payload.get("success_threshold")
+    if type(amount) is not int or amount <= 0:
+        raise GameLifecycleError("Faction resource refund amount must be positive.")
+    if type(threshold) is not int or not 2 <= threshold <= 6:
+        raise GameLifecycleError("Faction resource refund success threshold is invalid.")
+    return {
+        "source_effect_id": _validate_identifier(
+            "source_effect_id",
+            payload.get("source_effect_id"),
+        ),
+        "source_rule_id": _validate_identifier(
+            "source_rule_id",
+            payload.get("source_rule_id"),
+        ),
+        "resource_kind": _validate_identifier(
+            "resource_kind",
+            payload.get("resource_kind"),
+        ),
+        "amount": amount,
+        "success_threshold": threshold,
+    }
 
 
 def _faction_resource_spend_payload(

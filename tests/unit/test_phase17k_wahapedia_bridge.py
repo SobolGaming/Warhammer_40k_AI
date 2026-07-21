@@ -254,6 +254,7 @@ from warhammer40k_core.engine.catalog_unit_move_completed_mortal_wounds_runtime 
     invalid_catalog_unit_move_completed_mortal_wounds_target_status,
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
+from warhammer40k_core.engine.charge_roll_permissions import charge_reroll_permission_for_unit
 from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -342,9 +343,6 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
-from warhammer40k_core.engine.phases.charge import (
-    _charge_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
-)
 from warhammer40k_core.engine.phases.movement import (
     _ability_index_for_player,
     _advance_reroll_permission_for_unit,
@@ -404,6 +402,9 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.attachment_wargear_requirements import (
+    AttachmentWargearRequirement,
+)
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
@@ -2974,7 +2975,7 @@ def test_phase17k_leading_model_reroll_text_uses_generic_advance_charge_rerolls(
         ability_index=player_index,
         current_model_instance_ids=current_model_ids,
     )
-    charge_phase_permission = _charge_reroll_permission_for_unit(
+    charge_phase_permission = charge_reroll_permission_for_unit(
         state=state,
         player_id=army.player_id,
         unit_instance_id=unit.unit_instance_id,
@@ -6820,7 +6821,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Exact ability bridge blocked |"
     ) in aeldari_markdown
     assert (
-        "| Craftworlds / Asuryani | Fire Dragons (`000000596`)<br>"
+        "| Craftworlds / Asuryani | Autarch (`000000577`)<br>"
+        "Autarch Wayleaper (`000002759`)<br>Fire Dragons (`000000596`)<br>"
         "Night Spinner (`000000611`)<br>"
         "Rangers (`000000592`)<br>"
         "Shroud Runners (`000002533`)<br>Striking Scorpions (`000000595`)<br>"
@@ -7025,6 +7027,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Daemon Prince of Chaos",
         "Soul Grinder",
         "Daemon Prince Of Chaos With Wings",
+        "Autarch Wayleaper",
         "Corsair Skyreavers",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Collar of Khorne"]) == (
@@ -8260,6 +8263,54 @@ def test_phase17k_support_ability_marks_attachment_eligibility_role_as_support()
     ) == ("test-bodyguard-unit",)
     assert len(support.attachment_eligibilities[0].targets[0].source_ids) == 1
     assert "Datasheets_leader" in support.attachment_eligibilities[0].targets[0].source_ids[0]
+    assert support.attachment_eligibilities[0].targets[0].required_wargear_ids == ()
+
+
+def test_phase17k_bridge_emits_only_explicit_attachment_wargear_requirements() -> None:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_support_attachment_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-support-unit", "test-bodyguard-unit"),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-support-unit",
+                model_name="Support",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:support-height",
+                height_document_reference="test-doc:support-height",
+            ),
+            ModelHeightOverride(
+                datasheet_id="test-bodyguard-unit",
+                model_name="Bodyguard",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:bodyguard-height",
+                height_document_reference="test-doc:bodyguard-height",
+            ),
+        ),
+        attachment_wargear_requirements=(
+            AttachmentWargearRequirement(
+                leader_datasheet_id="test-support-unit",
+                bodyguard_datasheet_id="test-bodyguard-unit",
+                required_wargear_ids=("test-support-unit:support-blade",),
+                source_ids=("test-source:explicit-attachment-wargear-restriction",),
+            ),
+        ),
+    )
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=bridge_artifacts,
+    )
+    target = (
+        package.army_catalog.datasheet_by_id("test-support-unit")
+        .attachment_eligibilities[0]
+        .targets[0]
+    )
+
+    assert target.required_wargear_ids == ("test-support-unit:support-blade",)
+    assert "test-source:explicit-attachment-wargear-restriction" in target.source_ids
 
 
 def test_phase17k_bridge_omits_attachment_edges_with_an_excluded_bodyguard_endpoint() -> None:

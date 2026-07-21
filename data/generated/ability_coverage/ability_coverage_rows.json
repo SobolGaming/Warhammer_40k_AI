@@ -1,5 +1,109 @@
 [
   {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/core/000008346/none",
+    "datasheet_id": "000000577",
+    "datasheet_name": "Autarch",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000577:aspect-training",
+    "ability_name": "ASPECT TRAINING",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:aspect-training/none",
+    "datasheet_id": "000000577",
+    "datasheet_name": "Autarch",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-ability:fights-first",
+      "catalog-ir:conditional-leading-ability:infiltrators",
+      "catalog-ir:conditional-leading-ability:scouts",
+      "catalog-ir:conditional-leading-ability:stealth"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000577:path-of-command",
+    "ability_name": "Path of Command",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:path-of-command/none",
+    "datasheet_id": "000000577",
+    "datasheet_name": "Autarch",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:stratagem-cost-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_command_points.unscoped"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000577:superlative-strategist",
+    "ability_name": "Superlative Strategist",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:superlative-strategist/none",
+    "datasheet_id": "000000577",
+    "datasheet_name": "Autarch",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:advance-roll-reroll",
+      "catalog-ir:agile-manoeuvre-roll-reroll"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.reroll_permission.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/faction/000009894/none",
+    "datasheet_id": "000000577",
+    "datasheet_name": "Autarch",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008345",
     "ability_name": "Infiltrators",
     "catalog_id": "chaos-daemons-bridge-catalog",
@@ -97,6 +201,204 @@
     ],
     "source_kind": "faction",
     "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008340",
+    "ability_name": "Fights First",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
+    "datasheet_id": "000000594",
+    "datasheet_name": "Howling Banshees",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [],
+    "semantic_categories": [
+      "unknown.ability_text"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "descriptor_only"
+  },
+  {
+    "ability_id": "000000594:acrobatic",
+    "ability_name": "Acrobatic",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "unsupported",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:acrobatic/none",
+    "datasheet_id": "000000594",
+    "datasheet_name": "Howling Banshees",
+    "diagnostic_reasons": [
+      "unsupported_language"
+    ],
+    "runtime_consumer_ids": [],
+    "semantic_categories": [
+      "unknown.ability_text"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "ir_compiled_unsupported"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/faction/000009894/none",
+    "datasheet_id": "000000594",
+    "datasheet_name": "Howling Banshees",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000594:aspect-shrine-token",
+    "ability_name": "Aspect Shrine Token",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/wargear/000000594:aspect-shrine-token/000000594:aspect-shrine-token",
+    "datasheet_id": "000000594",
+    "datasheet_name": "Howling Banshees",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:dice-result-override"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.override_dice_roll_result.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000000594:aspect-shrine-token",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008345",
+    "ability_name": "Infiltrators",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/core/000008345/none",
+    "datasheet_id": "000000595",
+    "datasheet_name": "Striking Scorpions",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:infiltrators"
+    ],
+    "semantic_categories": [
+      "core.infiltrators"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008344",
+    "ability_name": "Scouts",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/core/000008344/none",
+    "datasheet_id": "000000595",
+    "datasheet_name": "Striking Scorpions",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:scouts"
+    ],
+    "semantic_categories": [
+      "core.scouts"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008337",
+    "ability_name": "Stealth",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/core/000008337/none",
+    "datasheet_id": "000000595",
+    "datasheet_name": "Striking Scorpions",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "core:stealth"
+    ],
+    "semantic_categories": [
+      "core.stealth"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000595:mandiblasters",
+    "ability_name": "Mandiblasters",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none",
+    "datasheet_id": "000000595",
+    "datasheet_name": "Striking Scorpions",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:minimum-unmodified-hit-success"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/faction/000009894/none",
+    "datasheet_id": "000000595",
+    "datasheet_name": "Striking Scorpions",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000595:aspect-shrine-token",
+    "ability_name": "Aspect Shrine Token",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/wargear/000000595:aspect-shrine-token/000000595:aspect-shrine-token",
+    "datasheet_id": "000000595",
+    "datasheet_name": "Striking Scorpions",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:dice-result-override"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.override_dice_roll_result.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000000595:aspect-shrine-token",
     "support_stage": "engine_consumed"
   },
   {
@@ -1989,6 +2291,107 @@
     ],
     "semantic_categories": [
       "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/core/000008343/none",
+    "datasheet_id": "000002759",
+    "datasheet_name": "Autarch Wayleaper",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/core/000008346/none",
+    "datasheet_id": "000002759",
+    "datasheet_name": "Autarch Wayleaper",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002759:indomitable-strength-of-will",
+    "ability_name": "Indomitable Strength of Will",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/datasheet/000002759:indomitable-strength-of-will/none",
+    "datasheet_id": "000002759",
+    "datasheet_name": "Autarch Wayleaper",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:faction-resource-refund-roll"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_faction_resource.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002759:path-of-command",
+    "ability_name": "Path of Command",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/datasheet/000002759:path-of-command/none",
+    "datasheet_id": "000002759",
+    "datasheet_name": "Autarch Wayleaper",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:stratagem-cost-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_command_points.unscoped"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/faction/000009894/none",
+    "datasheet_id": "000002759",
+    "datasheet_name": "Autarch Wayleaper",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
     ],
     "source_kind": "faction",
     "source_wargear_id": null,

@@ -86,6 +86,9 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
     model_displacement_kind_from_token,
 )
+from warhammer40k_core.engine.catalog_conditional_leader_queries import (
+    conditional_leading_roll_reroll_permission,
+)
 from warhammer40k_core.engine.catalog_desperate_escape import (
     catalog_forced_desperate_escape_sources_for_unit,
 )
@@ -108,6 +111,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_resources import (
     apply_faction_resource_spend_effect,
     faction_resource_result_enriched_payload,
+    resolve_faction_resource_refund_roll,
 )
 from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityContext,
@@ -241,6 +245,8 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
     TriggeredMovementEligibleUnit,
     TriggeredMovementKind,
+    apply_triggered_movement_distance_reroll_decision,
+    is_triggered_movement_distance_reroll_request,
     triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
@@ -432,6 +438,7 @@ __all__ = (
     "TriggeredMovementDescriptor",
     "TriggeredMovementEligibleUnit",
     "TriggeredMovementKind",
+    "apply_triggered_movement_distance_reroll_decision",
     "TriggeredReactionWindow",
     "TypedDict",
     "UnitCoherencyResult",
@@ -454,15 +461,18 @@ __all__ = (
     "cast",
     "catalog_advance_roll_reroll_permission_for_unit",
     "catalog_forced_desperate_escape_sources_for_unit",
+    "conditional_leading_roll_reroll_permission",
     "combinations",
     "create_stratagem_use_decision_request",
     "dataclass",
     "disembark_mode_kind_from_token",
     "eleventh_edition_stratagem_index",
     "faction_resource_result_enriched_payload",
+    "resolve_faction_resource_refund_roll",
     "field",
     "geometry_model_for_placement",
     "interrupt_mission_action_for_battlefield_departure",
+    "is_triggered_movement_distance_reroll_request",
     "interrupt_mission_action_for_displacement",
     "math",
     "model_displacement_kind_from_token",

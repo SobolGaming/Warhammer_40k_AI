@@ -210,6 +210,10 @@ The shared contract uses these objects and payloads:
   `attachment_source_ids` field carries the sorted source IDs of the exact catalog
   attachment targets accepted by the engine. Adapters and replay consumers may display or
   audit this evidence but must not infer, add, or mutate attachment legality from it.
+  Each catalog attachment-target payload also carries sorted `required_wargear_ids`; an empty
+  list means the target has no loadout gate. List-validation and mustering compare those IDs
+  with the engine-instantiated source unit before creating a formation. Adapters may render the
+  requirement but must not decide that a loadout satisfies it or fabricate a formation locally.
 - `FactionRuleState`: deterministic replay-safe setup state for faction-rule selections, keyed by player, faction, source rule, state kind, setup request, and setup result.
 - `FactionRuleSetupSelection`: finite setup answer selecting one engine-emitted option from a faction runtime hook during `declare_battle_formations`.
 - `ReserveDeclarationRequest`: finite setup request context for declaring Strategic Reserves or Deep Strike units during `declare_battle_formations`.
@@ -539,6 +543,23 @@ Move through a PathWitness-validated proposal. Adapters must not roll the D6
 locally, invent candidate units, move models from the finite option payload,
 spend source resources locally, or continue the Movement phase while either
 request is pending.
+
+When a selected triggered movement carries a source-backed whole-roll reroll,
+the finite selection does not proceed directly to the movement proposal. The
+engine first emits the existing `select_dice_reroll` request with
+`context_kind: "triggered_movement_distance_reroll"`, the original
+`distance_roll_state`, the typed reroll permission, the selected eligible-unit
+payload, the triggered-movement descriptor, and the source selection
+request/result IDs. Accepting or declining one engine-emitted reroll option
+then emits `submit_movement_proposal` with the final distance in its descriptor.
+Aeldari Autarch Superlative Strategist uses this path for Opportunity Seized
+and Fade Back. If an Autarch Wayleaper is currently leading the selected unit,
+the Battle Focus spend payload also carries the source-backed Indomitable
+Strength of Will refund descriptor; after the engine records the spend, it
+rolls one D6 and records any 3+ token gain through the faction-resource ledger.
+The refund roll is not an adapter choice. Adapters must not reroll movement
+distance, alter the final distance, roll the refund, or mutate Battle Focus
+tokens locally.
 
 Shooting phase after-shot surge rules reuse `select_triggered_movement` and the
 same `surge_move` proposal contract. After an enemy unit has shot, runtime

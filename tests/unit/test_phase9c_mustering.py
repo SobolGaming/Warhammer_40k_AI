@@ -1517,6 +1517,83 @@ def test_attachment_declarations_form_runtime_attached_unit_from_structured_cata
     assert ArmyDefinition.from_payload(payload).to_payload() == army.to_payload()
 
 
+def test_attachment_declarations_enforce_only_explicit_source_wargear_requirements() -> None:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    leader = base_catalog.datasheet_by_id("core-character-leader")
+    eligibility = leader.attachment_eligibilities[0]
+    target = eligibility.targets[0]
+
+    def catalog_requiring(wargear_id: str) -> ArmyCatalog:
+        restricted_leader = replace(
+            leader,
+            attachment_eligibilities=(
+                replace(
+                    eligibility,
+                    targets=(
+                        replace(
+                            target,
+                            required_wargear_ids=(wargear_id,),
+                            source_ids=(
+                                *target.source_ids,
+                                "test-source:explicit-attachment-wargear-restriction",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        return replace(
+            base_catalog,
+            datasheets=tuple(
+                restricted_leader
+                if datasheet.datasheet_id == restricted_leader.datasheet_id
+                else datasheet
+                for datasheet in base_catalog.datasheets
+            ),
+        )
+
+    unit_selections = (
+        _unit_selection(unit_selection_id="bodyguard-unit"),
+        _unit_selection(
+            unit_selection_id="leader-unit",
+            datasheet_id="core-character-leader",
+            model_profile_id="core-character-leader",
+            model_count=1,
+        ),
+    )
+    attachment_declarations = (
+        AttachmentDeclaration(
+            source_unit_selection_id="leader-unit",
+            bodyguard_unit_selection_id="bodyguard-unit",
+        ),
+    )
+    legal_catalog = catalog_requiring("core-leader-blade")
+    legal = muster_army(
+        catalog=legal_catalog,
+        request=_muster_request(
+            legal_catalog,
+            unit_selections=unit_selections,
+            attachment_declarations=attachment_declarations,
+        ),
+    )
+
+    assert len(legal.attached_units) == 1
+
+    illegal_catalog = catalog_requiring("core-bolt-rifle")
+    with pytest.raises(
+        ArmyMusteringError,
+        match="does not satisfy the target wargear requirements",
+    ):
+        muster_army(
+            catalog=illegal_catalog,
+            request=_muster_request(
+                illegal_catalog,
+                unit_selections=unit_selections,
+                attachment_declarations=attachment_declarations,
+            ),
+        )
+
+
 def test_support_units_must_be_declared_attached_but_leaders_can_muster_solo() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     support_request = _muster_request(

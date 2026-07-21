@@ -701,7 +701,11 @@ def _request_shooting_end_surge_if_available(
             state=state,
             player_id=reacting_player_id,
             descriptor=descriptor,
-            eligible_units=_eligible_triggered_movement_units_from_shooting_grants(grants),
+            eligible_units=_eligible_triggered_movement_units_from_shooting_grants(
+                grants=grants,
+                roll_state=roll_state,
+                distance_bonus_inches=max_distance_bonus_inches,
+            ),
         )
         decisions.request_decision(request)
         decisions.event_log.append(
@@ -743,7 +747,10 @@ def _request_shooting_end_surge_if_available(
 
 
 def _eligible_triggered_movement_units_from_shooting_grants(
+    *,
     grants: tuple[ShootingEndSurgeGrant, ...],
+    roll_state: DiceRollState,
+    distance_bonus_inches: int,
 ) -> tuple[TriggeredMovementEligibleUnit, ...]:
     return tuple(
         TriggeredMovementEligibleUnit(
@@ -752,6 +759,13 @@ def _eligible_triggered_movement_units_from_shooting_grants(
             source_id=grant.source_id,
             replay_payload=grant.replay_payload,
             decision_effect_payload=grant.decision_effect_payload,
+            distance_roll_state=(
+                roll_state if grant.distance_reroll_permission is not None else None
+            ),
+            distance_roll_bonus_inches=(
+                distance_bonus_inches if grant.distance_reroll_permission is not None else 0
+            ),
+            distance_reroll_permission=grant.distance_reroll_permission,
         )
         for grant in grants
     )

@@ -343,21 +343,53 @@
         {
           "ability_id": "000000577:aspect-training",
           "ability_name": "ASPECT TRAINING",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "59fe1f6d799b3d16dab1f4cfcca1c04c27b3da3012697dad163716155fa9aec8",
           "raw_text": "- While this model is leading a Howling Banshees unit, it has the Fights First ability.\n- While this model is leading a Striking Scorpions unit, it has the Infiltrators, Scouts 7\" and Stealth abilities.",
           "raw_text_sha256": "59fe1f6d799b3d16dab1f4cfcca1c04c27b3da3012697dad163716155fa9aec8",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-ability:fights-first",
+            "catalog-ir:conditional-leading-ability:infiltrators",
+            "catalog-ir:conditional-leading-ability:scouts",
+            "catalog-ir:conditional-leading-ability:stealth"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-leading-ability:fights-first"
+              ],
+              "semantic_id": "phase17m:aeldari:autarchs:000000577:5:clause:001:effect:0",
+              "semantic_kind": "grant_ability"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-leading-ability:infiltrators"
+              ],
+              "semantic_id": "phase17m:aeldari:autarchs:000000577:5:clause:002:effect:0",
+              "semantic_kind": "grant_ability"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-leading-ability:scouts"
+              ],
+              "semantic_id": "phase17m:aeldari:autarchs:000000577:5:clause:003:effect:0",
+              "semantic_kind": "grant_ability"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-leading-ability:stealth"
+              ],
+              "semantic_id": "phase17m:aeldari:autarchs:000000577:5:clause:004:effect:0",
+              "semantic_kind": "grant_ability"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000577:5"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000577:5",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000577:path-of-command",
@@ -389,22 +421,28 @@
         {
           "ability_id": "000000577:superlative-strategist",
           "ability_name": "Superlative Strategist",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "6f537ee77f649bf03d0dcdfdff2cfc7ab3f73eda55a4a17f0162294e596b040b",
           "raw_text": "While this model is leading a unit, you can re-roll Advance rolls made for that unit, and you can re-roll any rolls made for that unit while it is performing an Agile Manoeuvre.",
           "raw_text_sha256": "6f537ee77f649bf03d0dcdfdff2cfc7ab3f73eda55a4a17f0162294e596b040b",
           "runtime_consumer_ids": [
-            "catalog-ir:advance-roll-reroll"
+            "catalog-ir:advance-roll-reroll",
+            "catalog-ir:agile-manoeuvre-roll-reroll"
           ],
           "semantic_consumers": [
             {
               "runtime_consumer_ids": [
                 "catalog-ir:advance-roll-reroll"
               ],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000577:3:description:clause:001:effect:0",
+              "semantic_id": "phase17m:aeldari:autarchs:000000577:3:clause:001:effect:0",
+              "semantic_kind": "reroll_permission"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:agile-manoeuvre-roll-reroll"
+              ],
+              "semantic_id": "phase17m:aeldari:autarchs:000000577:3:clause:002:effect:0",
               "semantic_kind": "reroll_permission"
             }
           ],
@@ -413,14 +451,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000577:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000577",
       "datasheet_name": "Autarch",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -3229,21 +3267,29 @@
         {
           "ability_id": "000002759:indomitable-strength-of-will",
           "ability_name": "Indomitable Strength of Will",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "bea2b1c451a9d69a41cf1dbf113ff5d9311a62b61d830534475d2b6a4bebbb6c",
           "raw_text": "While this model is leading a unit, each time you spend a Battle Focus token to enable that unit to perform an Agile Manoeuvre, roll one D6: on a 3+, you gain 1 Battle Focus token.",
           "raw_text_sha256": "bea2b1c451a9d69a41cf1dbf113ff5d9311a62b61d830534475d2b6a4bebbb6c",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:faction-resource-refund-roll"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:faction-resource-refund-roll"
+              ],
+              "semantic_id": "phase17m:aeldari:autarchs:000002759:4:clause:001:effect:0",
+              "semantic_kind": "modify_faction_resource"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002759:4"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000002759:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000002759:path-of-command",
@@ -3277,7 +3323,7 @@
       "datasheet_name": "Autarch Wayleaper",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -4271,9 +4317,9 @@
   "release_hash": "379616e1abaf64a4e6de5c9614d452b146783a0efccab03c18f3cb82e07e6eed",
   "schema_version": "aeldari-datasheet-semantic-coverage-v4",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 18,
+    "All exact abilities consumed": 20,
     "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 46
+    "Exact ability IR unsupported": 44
   },
   "source_artifact_hashes": {
     "Abilities": "c3f7d3ed3f27041a13cc46835ba8c8d4d6b731edc9cfbc70e9e92fe8a7c229c4",

@@ -1508,6 +1508,7 @@ def test_leaping_shadows_grants_scouts_nine_to_bearers_attached_rules_unit() -> 
     leader_scouts = scouts_ability_descriptors_for_unit(refreshed_leader)
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id)
     scout_instances = scout_ability_instances_for_rules_unit(
+        state=state,
         view=rules_unit,
         army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
     )

@@ -172,7 +172,76 @@ AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_AUTARCHS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000577",
+        model_name="Autarch",
+        height=2.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:autarch:height",
+        height_document_reference=(
+            "Aeldari Autarch assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (32mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000002759",
+        model_name="Autarch Wayleaper",
+        height=3.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:autarch-wayleaper:height",
+        height_document_reference=(
+            "Aeldari Autarch Wayleaper assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (32mm base)"
+        ),
+    ),
+)
+
 AELDARI_ASPECT_WARRIORS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000594",
+        model_name="Howling Banshees",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:howling-banshee:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000594",
+        model_name="Howling Banshee Exarch",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:howling-banshee-exarch:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000595",
+        model_name="Striking Scorpions",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:striking-scorpion:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.60 (28.5mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000595",
+        model_name="Striking Scorpion Exarch",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:striking-scorpion-exarch:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.60 (28.5mm base)"
+        ),
+    ),
     ModelHeightOverride(
         datasheet_id="000000596",
         model_name="Fire Dragons",

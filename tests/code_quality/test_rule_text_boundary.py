@@ -8,6 +8,7 @@ ENGINE = ROOT / "src" / "warhammer40k_core" / "engine"
 SOURCE = ROOT / "src" / "warhammer40k_core"
 _DAMAGED_DESCRIPTION_BOUNDARY_FILES = {
     "src/warhammer40k_core/rules/wahapedia_bridge.py",
+    "src/warhammer40k_core/rules/wahapedia_bridge_columns.py",
     "src/warhammer40k_core/rules/wahapedia_schema.py",
 }
 

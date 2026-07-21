@@ -62,6 +62,7 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
     ChargeDeclarationContext,
 )
+from warhammer40k_core.engine.charge_roll_permissions import charge_reroll_permission_for_unit
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartContext,
     CommandPhaseStartHandler,
@@ -129,7 +130,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.charge import (
     ChargingUnitSelection,
-    _charge_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
     _record_charge_declaration_grant_effects,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
@@ -341,6 +341,7 @@ def test_lithe_agility_advance_grant_spends_pain_token_and_empowers_unit() -> No
     assert grant is not None
     effects = _record_movement_action_grant_effects(
         state=state,
+        decisions=DecisionController(),
         player_id="player-a",
         unit_instance_id=unit.unit_instance_id,
         source_request_id="drukhari-test:lithe-advance-grant-request",
@@ -395,6 +396,7 @@ def test_lithe_agility_charge_grant_spends_pain_token_and_unlocks_charge_reroll(
     assert grant is not None
     _record_charge_declaration_grant_effects(
         state=state,
+        decisions=DecisionController(),
         result=DecisionResult(
             result_id="drukhari-test:lithe-charge-grant-result",
             request_id="drukhari-test:lithe-charge-grant-request",
@@ -407,7 +409,7 @@ def test_lithe_agility_charge_grant_spends_pain_token_and_unlocks_charge_reroll(
         grant=grant,
     )
 
-    permission = _charge_reroll_permission_for_unit(
+    permission = charge_reroll_permission_for_unit(
         state=state,
         player_id="player-a",
         unit_instance_id=unit.unit_instance_id,

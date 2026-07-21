@@ -18,6 +18,11 @@ NAMED_REPLACEMENT_CHOICES_RE = re.compile(
     r"(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
     re.IGNORECASE,
 )
+NAMED_MULTIPLE_SINGLE_REPLACEMENT_RE = re.compile(
+    r"^The (?P<model>.+?)(?: model)?'s (?P<replaced>.+?) can be replaced with "
+    r"1 (?P<replacement>.+?)\.$",
+    re.IGNORECASE,
+)
 NAMED_ADDITIVE_RE = re.compile(
     r"^The (?P<model>.+?) can be equipped with(?::\n-)? 1 (?P<granted>.+?)\.?$",
     re.IGNORECASE,
@@ -179,6 +184,29 @@ def append_unit_wargear_option_rows(
             model_profile_by_name=model_profile_by_name,
             wargear_ids_by_name=wargear_ids_by_name,
             match=named_replacement,
+            bridged_rows=bridged_rows,
+            error_type=error_type,
+        )
+        return True
+    named_multiple_single_replacement = NAMED_MULTIPLE_SINGLE_REPLACEMENT_RE.fullmatch(description)
+    if named_multiple_single_replacement is not None:
+        replaced_names = _multiple_wargear_names(
+            named_multiple_single_replacement.group("replaced")
+        )
+        if len(replaced_names) < 2:
+            return False
+        _append_named_multiple_replacement_choices(
+            row=row,
+            datasheet_id=datasheet_id,
+            model_profile_id=_required_model_profile_id(
+                model_profile_by_name,
+                named_multiple_single_replacement.group("model"),
+                error_type=error_type,
+            ),
+            model_name=named_multiple_single_replacement.group("model"),
+            replaced_names=replaced_names,
+            choice_groups=((named_multiple_single_replacement.group("replacement"),),),
+            wargear_ids_by_name=wargear_ids_by_name,
             bridged_rows=bridged_rows,
             error_type=error_type,
         )
@@ -633,12 +661,27 @@ def _append_named_replacement(
     model_profile_id = _required_model_profile_id(
         model_profile_by_name, match.group("model"), error_type=error_type
     )
-    replaced_id = _required_wargear_id(
-        wargear_ids_by_name, match.group("replaced"), error_type=error_type
-    )
+    replaced_names = _multiple_wargear_names(match.group("replaced"))
+    replaced_name = next(iter(replaced_names), None)
+    if replaced_name is None:
+        raise error_type("Named replacement must identify replaced wargear.")
     choices = replacement_choices(match.group("choices"), error_type=error_type)
     choice_groups = tuple(_replacement_choice_wargear_names(choice.name) for choice in choices)
     source_line = _required_field(row, "line", error_type=error_type)
+    if len(replaced_names) > 1:
+        _append_named_multiple_replacement_choices(
+            row=row,
+            datasheet_id=datasheet_id,
+            model_profile_id=model_profile_id,
+            model_name=match.group("model"),
+            replaced_names=replaced_names,
+            choice_groups=choice_groups,
+            wargear_ids_by_name=wargear_ids_by_name,
+            bridged_rows=bridged_rows,
+            error_type=error_type,
+        )
+        return
+    replaced_id = _required_wargear_id(wargear_ids_by_name, replaced_name, error_type=error_type)
     if any(len(choice_group) > 1 for choice_group in choice_groups):
         _append_named_paired_replacement_choices(
             row=row,
@@ -684,6 +727,91 @@ def _replacement_choice_wargear_names(choice_name: str) -> tuple[str, ...]:
     if paired_match is None:
         return (choice_name,)
     return paired_match.group("first"), paired_match.group("second")
+
+
+def _multiple_wargear_names(value: str) -> tuple[str, ...]:
+    normalized = value.replace(", and ", ", ")
+    return tuple(part.strip() for part in re.split(r", | and ", normalized) if part.strip())
+
+
+def _append_named_multiple_replacement_choices(
+    *,
+    row: NormalizedSourceRow,
+    datasheet_id: str,
+    model_profile_id: str,
+    model_name: str,
+    replaced_names: tuple[str, ...],
+    choice_groups: tuple[tuple[str, ...], ...],
+    wargear_ids_by_name: dict[str, str],
+    bridged_rows: dict[str, list[dict[str, str]]],
+    error_type: type[ValueError],
+) -> None:
+    replaced_ids = tuple(
+        _required_wargear_id(wargear_ids_by_name, name, error_type=error_type)
+        for name in replaced_names
+    )
+    source_line = _required_field(row, "line", error_type=error_type)
+    selection_group_id = f"{datasheet_id}:named-multiple-replacement-option-{source_line}"
+    for choice_index, choice_names in enumerate(choice_groups, start=1):
+        choice_ids = tuple(
+            _required_wargear_id(wargear_ids_by_name, name, error_type=error_type)
+            for name in choice_names
+        )
+        option_id = (
+            f"{datasheet_id}:{_name_key(model_name)}-multiple-replacement-"
+            f"{'-'.join(_name_key(name) for name in choice_names)}:option-{source_line}"
+        )
+        common = {
+            **_option_common(
+                row=row,
+                datasheet_id=datasheet_id,
+                option_id=option_id,
+                model_profile_id=model_profile_id,
+                allowed_wargear_ids=choice_ids,
+                max_selections=len(choice_ids),
+            ),
+            **_selection_limit_fields(
+                selection_group_id=selection_group_id,
+                group_max_per_model=1,
+                option_max_per_model=1,
+            ),
+        }
+        effects: list[dict[str, str]] = [
+            {
+                **common,
+                "line": f"{source_line}.{choice_index}.1",
+                "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
+                "effect_wargear_id": choice_ids[0],
+                "effect_replaced_wargear_id": replaced_ids[0],
+                "effect_model_count": "1",
+                "effect_wargear_count": "1",
+            }
+        ]
+        effects.extend(
+            {
+                **common,
+                "line": f"{source_line}.{choice_index}.{effect_index}",
+                "effect_kind": WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED.value,
+                "effect_wargear_id": choice_id,
+                "effect_replaced_wargear_id": "",
+                "effect_model_count": "1",
+                "effect_wargear_count": "1",
+            }
+            for effect_index, choice_id in enumerate(choice_ids[1:], start=2)
+        )
+        effects.extend(
+            {
+                **common,
+                "line": f"{source_line}.{choice_index}.{effect_index}",
+                "effect_kind": WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED.value,
+                "effect_wargear_id": choice_ids[0],
+                "effect_replaced_wargear_id": replaced_id,
+                "effect_model_count": "1",
+                "effect_wargear_count": "0",
+            }
+            for effect_index, replaced_id in enumerate(replaced_ids[1:], start=len(choice_ids) + 1)
+        )
+        bridged_rows["Datasheets_options"].extend(effects)
 
 
 def _append_named_paired_replacement_choices(

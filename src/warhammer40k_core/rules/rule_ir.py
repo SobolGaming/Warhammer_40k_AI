@@ -129,6 +129,7 @@ class RuleEffectKind(StrEnum):
     MODIFY_CHARACTERISTIC = "modify_characteristic"
     MODIFY_COMMAND_POINTS = "modify_command_points"
     MODIFY_DICE_ROLL = "modify_dice_roll"
+    MODIFY_FACTION_RESOURCE = "modify_faction_resource"
     OVERRIDE_DICE_ROLL_RESULT = "override_dice_roll_result"
     MODIFY_MOVE_DISTANCE = "modify_move_distance"
     MUSTERING_SELECTION = "mustering_selection"

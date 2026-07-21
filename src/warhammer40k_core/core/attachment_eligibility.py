@@ -19,6 +19,7 @@ class AttachmentRole(StrEnum):
 class AttachmentTargetEligibilityPayload(TypedDict):
     bodyguard_datasheet_id: str
     source_ids: list[str]
+    required_wargear_ids: list[str]
 
 
 class AttachmentEligibilityPayload(TypedDict):
@@ -30,6 +31,7 @@ class AttachmentEligibilityPayload(TypedDict):
 class AttachmentTargetEligibility:
     bodyguard_datasheet_id: str
     source_ids: tuple[str, ...]
+    required_wargear_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -49,11 +51,21 @@ class AttachmentTargetEligibility:
                 min_length=1,
             ),
         )
+        object.__setattr__(
+            self,
+            "required_wargear_ids",
+            _validate_identifier_tuple(
+                "AttachmentTargetEligibility required_wargear_ids",
+                self.required_wargear_ids,
+                min_length=0,
+            ),
+        )
 
     def to_payload(self) -> AttachmentTargetEligibilityPayload:
         return {
             "bodyguard_datasheet_id": self.bodyguard_datasheet_id,
             "source_ids": list(self.source_ids),
+            "required_wargear_ids": list(self.required_wargear_ids),
         }
 
     @classmethod
@@ -61,6 +73,7 @@ class AttachmentTargetEligibility:
         return cls(
             bodyguard_datasheet_id=payload["bodyguard_datasheet_id"],
             source_ids=tuple(payload["source_ids"]),
+            required_wargear_ids=tuple(payload["required_wargear_ids"]),
         )
 
 

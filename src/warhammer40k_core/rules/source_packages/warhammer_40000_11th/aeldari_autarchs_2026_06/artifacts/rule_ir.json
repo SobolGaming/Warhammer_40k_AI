@@ -1,0 +1,689 @@
+{
+  "artifact_schema": "core-v2-aeldari-autarchs-rule-ir-v1",
+  "datasheets": {
+    "000000577": "Autarch",
+    "000002759": "Autarch Wayleaper"
+  },
+  "package_hash": "cf07556046e8afedaceb7e8bfdce9232d0d0c1a636d9a184492b5a3a18b7285d",
+  "records": {
+    "000000577:3": {
+      "ability_name": "Superlative Strategist",
+      "normalized_text_sha256": "6f537ee77f649bf03d0dcdfdff2cfc7ab3f73eda55a4a17f0162294e596b040b",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17m:aeldari:autarchs:000000577:3:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 34,
+                  "start": 6,
+                  "text": "this model is leading a unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "roll_type",
+                    "value": "advance_roll"
+                  },
+                  {
+                    "key": "selection",
+                    "value": "whole_roll"
+                  }
+                ],
+                "source_span": {
+                  "end": 65,
+                  "start": 44,
+                  "text": "re-roll Advance rolls"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 84,
+              "start": 36,
+              "text": "you can re-roll Advance rolls made for that unit"
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "this_model_leading_unit"
+                }
+              ],
+              "source_span": {
+                "end": 84,
+                "start": 75,
+                "text": "that unit"
+              }
+            },
+            "template_id": "phase17c:roll-reroll-permission",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "roll_type",
+                  "value": "advance_roll"
+                },
+                {
+                  "key": "subject",
+                  "value": "selected_unit"
+                }
+              ],
+              "source_span": {
+                "end": 65,
+                "start": 52,
+                "text": "Advance rolls"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17m:aeldari:autarchs:000000577:3:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 34,
+                  "start": 6,
+                  "text": "this model is leading a unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "roll_type",
+                    "value": "agile_manoeuvre_roll"
+                  },
+                  {
+                    "key": "selection",
+                    "value": "whole_roll"
+                  }
+                ],
+                "source_span": {
+                  "end": 176,
+                  "start": 98,
+                  "text": "re-roll any rolls made for that unit while it is performing an Agile Manoeuvre"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 176,
+              "start": 90,
+              "text": "you can re-roll any rolls made for that unit while it is performing an Agile Manoeuvre"
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "this_model_leading_unit"
+                }
+              ],
+              "source_span": {
+                "end": 84,
+                "start": 75,
+                "text": "that unit"
+              }
+            },
+            "template_id": "phase17m:agile-manoeuvre-roll-reroll",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "roll_type",
+                  "value": "agile_manoeuvre_roll"
+                },
+                {
+                  "key": "subject",
+                  "value": "selected_unit"
+                }
+              ],
+              "source_span": {
+                "end": 115,
+                "start": 106,
+                "text": "any rolls"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "7d585bf0119cc4e2ab32416e9fb3d9abf1f1ab498637b1d494f05ea0fc108749",
+        "normalized_text": "While this model is leading a unit, you can re-roll Advance rolls made for that unit, and you can re-roll any rolls made for that unit while it is performing an Agile Manoeuvre.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17m:aeldari:autarchs:datasheet:000000577:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-autarchs-datasheets-2026-06-14:datasheet:000000577:3"
+      }
+    },
+    "000000577:5": {
+      "ability_name": "ASPECT TRAINING",
+      "normalized_text_sha256": "59fe1f6d799b3d16dab1f4cfcca1c04c27b3da3012697dad163716155fa9aec8",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17m:aeldari:autarchs:000000577:5:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 53,
+                  "start": 2,
+                  "text": "While this model is leading a Howling Banshees unit"
+                }
+              },
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "bodyguard_unit"
+                  },
+                  {
+                    "key": "required_keyword",
+                    "value": "HOWLING BANSHEES"
+                  }
+                ],
+                "source_span": {
+                  "end": 48,
+                  "start": 32,
+                  "text": "Howling Banshees"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 53,
+                "start": 2,
+                "text": "While this model is leading a Howling Banshees unit"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "fights_first"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 86,
+                  "start": 66,
+                  "text": "Fights First ability"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 87,
+              "start": 2,
+              "text": "While this model is leading a Howling Banshees unit, it has the Fights First ability."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 18,
+                "start": 8,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17m:conditional-leading-bodyguard-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17m:aeldari:autarchs:000000577:5:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 143,
+                  "start": 90,
+                  "text": "While this model is leading a Striking Scorpions unit"
+                }
+              },
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "bodyguard_unit"
+                  },
+                  {
+                    "key": "required_keyword",
+                    "value": "STRIKING SCORPIONS"
+                  }
+                ],
+                "source_span": {
+                  "end": 138,
+                  "start": 120,
+                  "text": "Striking Scorpions"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 143,
+                "start": 90,
+                "text": "While this model is leading a Striking Scorpions unit"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "infiltrators"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 168,
+                  "start": 156,
+                  "text": "Infiltrators"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 202,
+              "start": 90,
+              "text": "While this model is leading a Striking Scorpions unit, it has the Infiltrators, Scouts 7\" and Stealth abilities."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 18,
+                "start": 8,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17m:conditional-leading-bodyguard-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17m:aeldari:autarchs:000000577:5:clause:003",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 143,
+                  "start": 90,
+                  "text": "While this model is leading a Striking Scorpions unit"
+                }
+              },
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "bodyguard_unit"
+                  },
+                  {
+                    "key": "required_keyword",
+                    "value": "STRIKING SCORPIONS"
+                  }
+                ],
+                "source_span": {
+                  "end": 138,
+                  "start": 120,
+                  "text": "Striking Scorpions"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 143,
+                "start": 90,
+                "text": "While this model is leading a Striking Scorpions unit"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "scouts"
+                  },
+                  {
+                    "key": "distance_inches",
+                    "value": 7.0
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 179,
+                  "start": 170,
+                  "text": "Scouts 7\""
+                }
+              }
+            ],
+            "source_span": {
+              "end": 202,
+              "start": 90,
+              "text": "While this model is leading a Striking Scorpions unit, it has the Infiltrators, Scouts 7\" and Stealth abilities."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 18,
+                "start": 8,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17m:conditional-leading-bodyguard-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17m:aeldari:autarchs:000000577:5:clause:004",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 143,
+                  "start": 90,
+                  "text": "While this model is leading a Striking Scorpions unit"
+                }
+              },
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "bodyguard_unit"
+                  },
+                  {
+                    "key": "required_keyword",
+                    "value": "STRIKING SCORPIONS"
+                  }
+                ],
+                "source_span": {
+                  "end": 138,
+                  "start": 120,
+                  "text": "Striking Scorpions"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 143,
+                "start": 90,
+                "text": "While this model is leading a Striking Scorpions unit"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "stealth"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 191,
+                  "start": 184,
+                  "text": "Stealth"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 202,
+              "start": 90,
+              "text": "While this model is leading a Striking Scorpions unit, it has the Infiltrators, Scouts 7\" and Stealth abilities."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 18,
+                "start": 8,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17m:conditional-leading-bodyguard-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "360fe24a4562adc9404ca0fd64f2b87ffa97b0dff355ab1b085449fc3e90a3ef",
+        "normalized_text": "- While this model is leading a Howling Banshees unit, it has the Fights First ability.\n- While this model is leading a Striking Scorpions unit, it has the Infiltrators, Scouts 7\" and Stealth abilities.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17m:aeldari:autarchs:datasheet:000000577:5",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-autarchs-datasheets-2026-06-14:datasheet:000000577:5"
+      }
+    },
+    "000002759:4": {
+      "ability_name": "Indomitable Strength of Will",
+      "normalized_text_sha256": "bea2b1c451a9d69a41cf1dbf113ff5d9311a62b61d830534475d2b6a4bebbb6c",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17m:aeldari:autarchs:000002759:4:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 34,
+                  "start": 6,
+                  "text": "this model is leading a unit"
+                }
+              },
+              {
+                "kind": "dice_roll_gate",
+                "parameters": [
+                  {
+                    "key": "comparison",
+                    "value": "greater_than_or_equal"
+                  },
+                  {
+                    "key": "threshold",
+                    "value": 3
+                  }
+                ],
+                "source_span": {
+                  "end": 148,
+                  "start": 141,
+                  "text": "on a 3+"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "immediate",
+              "parameters": [],
+              "source_span": {
+                "end": 179,
+                "start": 154,
+                "text": "gain 1 Battle Focus token"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_faction_resource",
+                "parameters": [
+                  {
+                    "key": "amount",
+                    "value": 1
+                  },
+                  {
+                    "key": "operation",
+                    "value": "gain"
+                  },
+                  {
+                    "key": "resource_kind",
+                    "value": "battle_focus_token"
+                  },
+                  {
+                    "key": "roll_expression",
+                    "value": "D6"
+                  },
+                  {
+                    "key": "success_threshold",
+                    "value": 3
+                  }
+                ],
+                "source_span": {
+                  "end": 179,
+                  "start": 154,
+                  "text": "gain 1 Battle Focus token"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 180,
+              "start": 0,
+              "text": "While this model is leading a unit, each time you spend a Battle Focus token to enable that unit to perform an Agile Manoeuvre, roll one D6: on a 3+, you gain 1 Battle Focus token."
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "this_model_leading_unit"
+                }
+              ],
+              "source_span": {
+                "end": 96,
+                "start": 87,
+                "text": "that unit"
+              }
+            },
+            "template_id": "phase17m:faction-resource-refund-roll",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "resource_kind",
+                  "value": "battle_focus_token"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "faction_resource_spent"
+                }
+              ],
+              "source_span": {
+                "end": 76,
+                "start": 36,
+                "text": "each time you spend a Battle Focus token"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "65575659948fa3075a0282e83d648181d06a949566e2c53ac767cf510f016239",
+        "normalized_text": "While this model is leading a unit, each time you spend a Battle Focus token to enable that unit to perform an Agile Manoeuvre, roll one D6: on a 3+, you gain 1 Battle Focus token.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17m:aeldari:autarchs:datasheet:000002759:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-autarchs-datasheets-2026-06-14:datasheet:000002759:4"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-aeldari-autarchs-datasheets-2026-06-14",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}

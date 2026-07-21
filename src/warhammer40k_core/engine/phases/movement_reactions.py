@@ -769,7 +769,11 @@ def _request_movement_end_surge_if_available(
                     state=state,
                     player_id=reacting_player_id,
                     descriptor=descriptor,
-                    eligible_units=_eligible_triggered_movement_units_from_grants(reaction_grants),
+                    eligible_units=_eligible_triggered_movement_units_from_grants(
+                        grants=reaction_grants,
+                        roll_state=roll_state,
+                        distance_bonus_inches=max_distance_bonus_inches,
+                    ),
                 )
                 decisions.request_decision(request)
                 decisions.event_log.append(
@@ -827,7 +831,10 @@ def _movement_end_surge_distance_roll_spec(
 
 
 def _eligible_triggered_movement_units_from_grants(
+    *,
     grants: tuple[MovementEndSurgeGrant, ...],
+    roll_state: DiceRollState,
+    distance_bonus_inches: int,
 ) -> tuple[TriggeredMovementEligibleUnit, ...]:
     units: list[TriggeredMovementEligibleUnit] = []
     for grant in grants:
@@ -838,6 +845,13 @@ def _eligible_triggered_movement_units_from_grants(
                 source_id=grant.descriptor_source_rule_id or grant.source_id,
                 replay_payload=grant.replay_payload,
                 decision_effect_payload=grant.decision_effect_payload,
+                distance_roll_state=(
+                    roll_state if grant.distance_reroll_permission is not None else None
+                ),
+                distance_roll_bonus_inches=(
+                    distance_bonus_inches if grant.distance_reroll_permission is not None else 0
+                ),
+                distance_reroll_permission=grant.distance_reroll_permission,
             )
         )
     return tuple(sorted(units, key=lambda unit: unit.unit_instance_id))

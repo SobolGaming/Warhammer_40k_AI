@@ -33,7 +33,6 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_charge_roll_modifiers_for_unit,
-    catalog_charge_roll_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.charge_declaration import (
     CHARGE_MOVE_PENDING_STATUS,
@@ -56,6 +55,12 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationHookRegistry,
 )
 from warhammer40k_core.engine.charge_effects import charge_after_advance_allowed_by_effects
+from warhammer40k_core.engine.charge_roll_permissions import (
+    charge_reroll_permission_for_unit as _charge_reroll_permission_for_unit,
+)
+from warhammer40k_core.engine.charge_roll_permissions import (
+    current_model_instance_ids_for_charge_unit as _current_model_instance_ids_for_charge_unit,
+)
 from warhammer40k_core.engine.charge_rule_effects import (
     charge_path_context_with_rule_effect_permissions,
     enemy_vehicle_monster_model_ids_for_player,
@@ -74,6 +79,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_resources import (
     apply_faction_resource_spend_effect,
     faction_resource_result_enriched_payload,
+    resolve_faction_resource_refund_roll,
 )
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
@@ -96,9 +102,6 @@ from warhammer40k_core.engine.phases.charge_move_completed_hooks import (
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     RuntimeModifierRegistry,
-)
-from warhammer40k_core.engine.source_backed_rerolls import (
-    source_backed_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.target_restriction_hooks import (
     ChargeTargetRestrictionContext,
@@ -1558,6 +1561,7 @@ def _apply_charge_declaration_grant_decision(
         for grant in selected_grants
         for effect in _record_charge_declaration_grant_effects(
             state=state,
+            decisions=decisions,
             result=result,
             selection=selection,
             grant=grant,
@@ -1641,6 +1645,7 @@ def _validate_selected_charge_declaration_grants(
 def _record_charge_declaration_grant_effects(
     *,
     state: GameState,
+    decisions: DecisionController,
     result: DecisionResult,
     selection: ChargingUnitSelection,
     grant: ChargeDeclarationGrant,
@@ -1667,6 +1672,11 @@ def _record_charge_declaration_grant_effects(
             ),
         )
         state.record_persisting_effect(spend_effect)
+        resolve_faction_resource_refund_roll(
+            state=state,
+            decisions=decisions,
+            spend_effect=spend_effect,
+        )
         effects.append(spend_effect)
     if grant.unit_effect_payload is None:
         if not effects:
@@ -1940,57 +1950,6 @@ def _apply_charge_roll_reroll_decision(
         ruleset_descriptor=ruleset_descriptor,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
-
-
-def _charge_reroll_permission_for_unit(
-    *,
-    state: GameState,
-    player_id: str,
-    unit_instance_id: str,
-    ability_index: AbilityCatalogIndex,
-) -> RerollPermission | None:
-    unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
-    catalog_permission = catalog_charge_roll_reroll_permission_for_unit(
-        ability_index=ability_index,
-        unit=unit,
-        current_model_instance_ids=_current_model_instance_ids_for_charge_unit(
-            state=state,
-            unit=unit,
-        ),
-        player_id=player_id,
-    )
-    source_backed_permission = source_backed_reroll_permission_for_unit(
-        state=state,
-        player_id=player_id,
-        unit_instance_id=unit_instance_id,
-        roll_type="charge_roll",
-        timing_window="after_charge_roll",
-    )
-    if catalog_permission is not None and source_backed_permission is not None:
-        raise GameLifecycleError("Multiple charge reroll permissions are available.")
-    return catalog_permission if catalog_permission is not None else source_backed_permission
-
-
-def _current_model_instance_ids_for_charge_unit(
-    *,
-    state: GameState,
-    unit: UnitInstance,
-) -> tuple[str, ...]:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Charge roll current model evidence requires a UnitInstance.")
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Charge roll current model evidence requires battlefield_state.")
-    placement = battlefield_state.unit_placement_by_id(unit.unit_instance_id)
-    known_model_ids = {model.model_instance_id for model in unit.own_models}
-    current_ids: list[str] = []
-    for model_placement in placement.model_placements:
-        if model_placement.model_instance_id not in known_model_ids:
-            raise GameLifecycleError("Charge roll unit placement contains unknown models.")
-        current_ids.append(model_placement.model_instance_id)
-    if not current_ids:
-        raise GameLifecycleError("Charge roll current model evidence must not be empty.")
-    return tuple(sorted(current_ids))
 
 
 def _request_charge_move_proposal(

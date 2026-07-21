@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
+from warhammer40k_core.core.dice import RerollPermission, RerollPermissionPayload
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
@@ -20,6 +21,7 @@ class ShootingEndSurgeGrantPayload(TypedDict):
     max_distance_bonus_inches: int
     replay_payload: JsonValue
     decision_effect_payload: JsonValue
+    distance_reroll_permission: RerollPermissionPayload | None
 
 
 type ShootingEndSurgeHandler = Callable[
@@ -84,6 +86,7 @@ class ShootingEndSurgeGrant:
     max_distance_bonus_inches: int = 0
     replay_payload: JsonValue = None
     decision_effect_payload: JsonValue = None
+    distance_reroll_permission: RerollPermission | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
@@ -107,6 +110,13 @@ class ShootingEndSurgeGrant:
             "decision_effect_payload",
             validate_json_value(self.decision_effect_payload),
         )
+        if (
+            self.distance_reroll_permission is not None
+            and type(self.distance_reroll_permission) is not RerollPermission
+        ):
+            raise GameLifecycleError(
+                "Shooting-end surge distance reroll permission must be RerollPermission."
+            )
 
     def to_payload(self) -> ShootingEndSurgeGrantPayload:
         return {
@@ -116,6 +126,11 @@ class ShootingEndSurgeGrant:
             "max_distance_bonus_inches": self.max_distance_bonus_inches,
             "replay_payload": self.replay_payload,
             "decision_effect_payload": self.decision_effect_payload,
+            "distance_reroll_permission": (
+                None
+                if self.distance_reroll_permission is None
+                else self.distance_reroll_permission.to_payload()
+            ),
         }
 
 

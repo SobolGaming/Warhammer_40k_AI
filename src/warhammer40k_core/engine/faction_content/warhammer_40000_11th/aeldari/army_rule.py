@@ -18,15 +18,20 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_conditional_leader_queries import (
+    conditional_faction_resource_refund_roll_payload,
+    conditional_leading_roll_reroll_permission,
+)
 from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationContext,
     ChargeDeclarationGrant,
     ChargeDeclarationHookBinding,
 )
 from warhammer40k_core.engine.effects import PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
+from warhammer40k_core.engine.faction_resources import FactionResourceTransactionKind
 from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
@@ -282,14 +287,19 @@ def flitting_shadows_charge_declaration_grant(
             "selection_request_id": context.selection_request_id,
             "selection_result_id": context.selection_result_id,
         },
-        decision_effect_payload={
-            "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
-            "maneuver": FLITTING_SHADOWS_MANEUVER,
-            "unit_instance_id": unit.unit_instance_id,
-            "battle_focus_token_cost": 1,
-            "selection_request_id": context.selection_request_id,
-            "selection_result_id": context.selection_result_id,
-        },
+        decision_effect_payload=_battle_focus_spend_payload_with_refund(
+            state=context.state,
+            player_id=context.player_id,
+            unit=unit,
+            payload={
+                "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
+                "maneuver": FLITTING_SHADOWS_MANEUVER,
+                "unit_instance_id": unit.unit_instance_id,
+                "battle_focus_token_cost": 1,
+                "selection_request_id": context.selection_request_id,
+                "selection_result_id": context.selection_result_id,
+            },
+        ),
         unit_effect_payload={
             "effect_kind": AGILE_MANOEUVRE_EFFECT_KIND,
             "maneuver": FLITTING_SHADOWS_MANEUVER,
@@ -427,10 +437,20 @@ def opportunity_seized_surge_grants(
                     "movement_phase_action": context.movement_phase_action,
                 },
                 decision_effect_payload=_surge_battle_focus_spend_payload(
+                    state=context.state,
+                    player_id=context.reacting_player_id,
                     maneuver=OPPORTUNITY_SEIZED_MANEUVER,
                     unit=unit,
                     trigger_event_id=context.trigger_event_id,
                     triggering_unit_instance_id=context.triggering_unit_instance_id,
+                ),
+                distance_reroll_permission=conditional_leading_roll_reroll_permission(
+                    state=context.state,
+                    rules_unit_instance_id=unit.unit_instance_id,
+                    player_id=context.reacting_player_id,
+                    rule_roll_type="agile_manoeuvre_roll",
+                    eligible_roll_type="movement_end_surge.distance",
+                    timing_window="after_agile_manoeuvre_distance_roll",
                 ),
             )
         )
@@ -486,10 +506,20 @@ def fade_back_surge_grants(
                     "trigger_event_id": context.trigger_event_id,
                 },
                 decision_effect_payload=_surge_battle_focus_spend_payload(
+                    state=context.state,
+                    player_id=context.reacting_player_id,
                     maneuver=FADE_BACK_MANEUVER,
                     unit=unit,
                     trigger_event_id=context.trigger_event_id,
                     triggering_unit_instance_id=context.shooting_unit_instance_id,
+                ),
+                distance_reroll_permission=conditional_leading_roll_reroll_permission(
+                    state=context.state,
+                    rules_unit_instance_id=unit.unit_instance_id,
+                    player_id=context.reacting_player_id,
+                    rule_roll_type="agile_manoeuvre_roll",
+                    eligible_roll_type="shooting_end_surge.distance",
+                    timing_window="after_agile_manoeuvre_distance_roll",
                 ),
             )
         )
@@ -544,14 +574,19 @@ def sudden_strike_fight_activation_option(
             "pile_in_distance_inches": _SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
             "consolidate_distance_inches": _SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
         },
-        decision_effect_payload={
-            "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
-            "maneuver": SUDDEN_STRIKE_MANEUVER,
-            "unit_instance_id": unit.unit_instance_id,
-            "battle_focus_token_cost": 1,
-            "activation_request_id": context.activation.request_id,
-            "activation_result_id": context.activation.result_id,
-        },
+        decision_effect_payload=_battle_focus_spend_payload_with_refund(
+            state=context.state,
+            player_id=context.player_id,
+            unit=unit,
+            payload={
+                "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
+                "maneuver": SUDDEN_STRIKE_MANEUVER,
+                "unit_instance_id": unit.unit_instance_id,
+                "battle_focus_token_cost": 1,
+                "activation_request_id": context.activation.request_id,
+                "activation_result_id": context.activation.result_id,
+            },
+        ),
     )
 
 
@@ -597,14 +632,38 @@ def _battle_focus_spend_payload_for_context(
     unit: UnitInstance,
     context: AdvanceMoveContext,
 ) -> JsonValue:
-    return {
-        "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
-        "maneuver": maneuver,
-        "unit_instance_id": unit.unit_instance_id,
-        "battle_focus_token_cost": 1,
-        "movement_action_request_id": context.movement_request_id,
-        "movement_action_result_id": context.movement_result_id,
-    }
+    return _battle_focus_spend_payload_with_refund(
+        state=context.state,
+        player_id=context.player_id,
+        unit=unit,
+        payload={
+            "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
+            "maneuver": maneuver,
+            "unit_instance_id": unit.unit_instance_id,
+            "battle_focus_token_cost": 1,
+            "movement_action_request_id": context.movement_request_id,
+            "movement_action_result_id": context.movement_result_id,
+        },
+    )
+
+
+def _battle_focus_spend_payload_with_refund(
+    *,
+    state: GameState,
+    player_id: str,
+    unit: UnitInstance,
+    payload: dict[str, JsonValue],
+) -> JsonValue:
+    refund_roll = conditional_faction_resource_refund_roll_payload(
+        state=state,
+        rules_unit_instance_id=unit.unit_instance_id,
+        player_id=player_id,
+        resource_kind="battle_focus_token",
+    )
+    enriched = dict(payload)
+    if refund_roll is not None:
+        enriched["faction_resource_refund_roll"] = refund_roll
+    return validate_json_value(enriched)
 
 
 def _battle_focus_tokens_remaining(*, state: GameState, army: ArmyDefinition) -> int:
@@ -614,7 +673,14 @@ def _battle_focus_tokens_remaining(*, state: GameState, army: ArmyDefinition) ->
         for effect in _battle_focus_spend_effects(state=state, player_id=army.player_id)
         if effect.started_battle_round == state.battle_round
     )
-    return max(0, tokens - spent)
+    refunded = sum(
+        transaction.amount
+        for transaction in state.faction_resource_ledger_for_player(army.player_id).transactions
+        if transaction.battle_round == state.battle_round
+        and transaction.resource_kind == "battle_focus_token"
+        and transaction.transaction_kind is FactionResourceTransactionKind.GAIN
+    )
+    return max(0, tokens + refunded - spent)
 
 
 def _battle_focus_token_count(army: ArmyDefinition) -> int:
@@ -707,7 +773,11 @@ def _army_for_player(state: GameState, *, player_id: str) -> ArmyDefinition:
     return army
 
 
-def _unit_is_eligible_agile_manoeuvre_unit(*, army: ArmyDefinition, unit: UnitInstance) -> bool:
+def _unit_is_eligible_agile_manoeuvre_unit(
+    *,
+    army: ArmyDefinition,
+    unit: UnitInstance,
+) -> bool:
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Aeldari Agile Manoeuvres army must be an ArmyDefinition.")
     if type(unit) is not UnitInstance:
@@ -813,22 +883,29 @@ def _geometry_models_for_unit_placement(
 
 def _surge_battle_focus_spend_payload(
     *,
+    state: GameState,
+    player_id: str,
     maneuver: str,
     unit: UnitInstance,
     trigger_event_id: str,
     triggering_unit_instance_id: str,
 ) -> JsonValue:
-    return {
-        "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
-        "maneuver": _validate_identifier("maneuver", maneuver),
-        "unit_instance_id": unit.unit_instance_id,
-        "battle_focus_token_cost": 1,
-        "trigger_event_id": _validate_identifier("trigger_event_id", trigger_event_id),
-        "triggering_unit_instance_id": _validate_identifier(
-            "triggering_unit_instance_id",
-            triggering_unit_instance_id,
-        ),
-    }
+    return _battle_focus_spend_payload_with_refund(
+        state=state,
+        player_id=player_id,
+        unit=unit,
+        payload={
+            "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,
+            "maneuver": _validate_identifier("maneuver", maneuver),
+            "unit_instance_id": unit.unit_instance_id,
+            "battle_focus_token_cost": 1,
+            "trigger_event_id": _validate_identifier("trigger_event_id", trigger_event_id),
+            "triggering_unit_instance_id": _validate_identifier(
+                "triggering_unit_instance_id",
+                triggering_unit_instance_id,
+            ),
+        },
+    )
 
 
 def _army_contains_unit(*, army: ArmyDefinition, unit: UnitInstance) -> bool:

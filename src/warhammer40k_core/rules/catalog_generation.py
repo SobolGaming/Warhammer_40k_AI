@@ -864,11 +864,25 @@ def _attachment_eligibilities_from_rows(
                 AttachmentTargetEligibility(
                     bodyguard_datasheet_id=bodyguard_id,
                     source_ids=_source_ids_from_rows(tuple(rows_by_bodyguard_id[bodyguard_id])),
+                    required_wargear_ids=_attachment_required_wargear_ids(
+                        tuple(rows_by_bodyguard_id[bodyguard_id])
+                    ),
                 )
                 for bodyguard_id in sorted(rows_by_bodyguard_id)
             ),
         ),
     )
+
+
+def _attachment_required_wargear_ids(
+    rows: tuple[NormalizedSourceRow, ...],
+) -> tuple[str, ...]:
+    requirements = tuple(_optional_split_field(row, "required_wargear_ids") for row in rows)
+    if len(set(requirements)) != 1:
+        raise CatalogGenerationError(
+            "Attachment eligibility rows disagree on required wargear IDs."
+        )
+    return requirements[0]
 
 
 def _attachment_role_from_ability_rows(

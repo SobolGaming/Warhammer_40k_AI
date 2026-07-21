@@ -69,6 +69,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_resources import (
     apply_faction_resource_spend_effect,
     faction_resource_result_enriched_payload,
+    resolve_faction_resource_refund_roll,
 )
 from warhammer40k_core.engine.fight_activation_abilities import (
     DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
@@ -2984,6 +2985,7 @@ def _apply_fight_unit_selected_grant_decision(
         for grant in selected_grants
         for effect in _record_fight_unit_selected_grant_effects(
             state=state,
+            decisions=decisions,
             result=result,
             activation=activation,
             grant=grant,
@@ -3054,6 +3056,7 @@ def _validate_selected_fight_unit_grants(
 def _record_fight_unit_selected_grant_effects(
     *,
     state: GameState,
+    decisions: DecisionController,
     result: DecisionResult,
     activation: FightActivationSelection,
     grant: FightUnitSelectedGrant,
@@ -3080,6 +3083,11 @@ def _record_fight_unit_selected_grant_effects(
             ),
         )
         state.record_persisting_effect(spend_effect)
+        resolve_faction_resource_refund_roll(
+            state=state,
+            decisions=decisions,
+            spend_effect=spend_effect,
+        )
         effects.append(spend_effect)
     if grant.unit_effect_payload is None:
         if not effects:
@@ -3287,6 +3295,11 @@ def _apply_fight_activation_ability_decision(
             effect_payload=ability_use.decision_effect_payload,
         )
         state.record_persisting_effect(spend_effect)
+        resolve_faction_resource_refund_roll(
+            state=state,
+            decisions=decisions,
+            spend_effect=spend_effect,
+        )
     decisions.event_log.append(
         "fight_activation_ability_used",
         validate_json_value(

@@ -5,7 +5,6 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attachment_eligibility import (
-    AttachmentEligibility,
     AttachmentRole,
     AttachmentTargetEligibility,
 )
@@ -22,6 +21,7 @@ from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import attachment_mustering_validation as _attachment_mustering
 from warhammer40k_core.engine import roster_points
 from warhammer40k_core.engine.attached_unit_formation import (
     AttachedUnitFormation,
@@ -3157,11 +3157,22 @@ def _resolve_attached_unit_formations(
             raise ArmyMusteringError("AttachmentDeclaration bodyguard unit was not mustered.")
         source_datasheet = datasheets_by_selection_id[declaration.source_unit_selection_id]
         bodyguard_datasheet = datasheets_by_selection_id[declaration.bodyguard_unit_selection_id]
-        eligibility = _attachment_eligibility_for_datasheet(source_datasheet)
+        eligibility = _attachment_mustering.required_attachment_eligibility(
+            source_datasheet,
+            error_type=ArmyMusteringError,
+        )
         target = eligibility.target_for_bodyguard_datasheet_id(bodyguard_datasheet.datasheet_id)
         if target is None:
             raise ArmyMusteringError(
                 "AttachmentDeclaration bodyguard datasheet is not allowed by source datasheet."
+            )
+        selected_source_wargear_ids = {
+            wargear_id for model in source_unit.own_models for wargear_id in model.wargear_ids
+        }
+        if not set(target.required_wargear_ids).issubset(selected_source_wargear_ids):
+            raise ArmyMusteringError(
+                "AttachmentDeclaration source unit does not satisfy the target wargear "
+                "requirements."
             )
         role_group = grouped.setdefault(declaration.bodyguard_unit_selection_id, {})
         if eligibility.role in role_group:
@@ -3272,27 +3283,6 @@ def _datasheet_has_attachment_role(
     if type(role) is not AttachmentRole:
         raise ArmyMusteringError("Attachment role lookup requires an AttachmentRole.")
     return any(eligibility.role is role for eligibility in datasheet.attachment_eligibilities)
-
-
-def _attachment_eligibility_for_datasheet(
-    datasheet: DatasheetDefinition,
-) -> AttachmentEligibility:
-    if type(datasheet) is not DatasheetDefinition:
-        raise ArmyMusteringError("Attachment eligibility lookup requires a DatasheetDefinition.")
-    eligibilities: tuple[AttachmentEligibility, ...] = datasheet.attachment_eligibilities
-    if not eligibilities:
-        raise ArmyMusteringError(
-            "AttachmentDeclaration source datasheet has no attachment eligibility."
-        )
-    if len(eligibilities) > 1:
-        raise ArmyMusteringError(
-            "AttachmentDeclaration source datasheet must declare exactly one attachment role."
-        )
-    for eligibility in eligibilities:
-        return eligibility
-    raise ArmyMusteringError(
-        "AttachmentDeclaration source datasheet has no attachment eligibility."
-    )
 
 
 def _unit_with_attached_role_evidence(

@@ -1,8 +1,8 @@
 {
   "accepted": true,
   "checkpoint": {
-    "event_cursor": "YHQwOBdIjmSHITK9qUZJb4-cdhQhQlcTdOmXnEeUze7B2rL_agYVcT7iOvCLmyMU",
-    "projection_state_hash": "476761d59a70ad209127faada42a86e75771b1a0fede12965161cad2957d6b21",
+    "event_cursor": "Rx5xUtvFzGwGISmywYTi52Pu_QCSOJ6lGhfUhnn_KakwrtL7PmZKr1GIrg0nuUgl",
+    "projection_state_hash": "eb4c3a08b1dc18c92edc145789bf8ab2afb964c6266d243e728ce9cfcb07ace0",
     "session_revision": 2,
     "viewer_player_id": null,
     "visibility_role": "administrator"
@@ -10,8 +10,8 @@
   "command_id": "phase18f-contract-command-000001",
   "committed": true,
   "event_range": {
-    "from_cursor": "zC4YUhDRqf8TBK_a3SLtH6kd9pvXFHzykSG-bl-8vuif21hhKkHltruRpsqarFP8",
-    "to_cursor": "YHQwOBdIjmSHITK9qUZJb4-cdhQhQlcTdOmXnEeUze7B2rL_agYVcT7iOvCLmyMU"
+    "from_cursor": "jHmr-BmhqblSidgl11BkIqki7u8XsizUpNWw37UO74-Eq8l2I9ByAhkwDpnfytCf",
+    "to_cursor": "Rx5xUtvFzGwGISmywYTi52Pu_QCSOJ6lGhfUhnn_KakwrtL7PmZKr1GIrg0nuUgl"
   },
   "operation": "close_session",
   "outcome_code": "command_committed",
@@ -21,7 +21,7 @@
     "created_at": "2026-07-18T20:00:00Z",
     "engine_build_id": "warhammer40k-core-v2:0.1.0",
     "engine_version": "0.1.0",
-    "event_cursor": "YHQwOBdIjmSHITK9qUZJb4-cdhQhQlcTdOmXnEeUze7B2rL_agYVcT7iOvCLmyMU",
+    "event_cursor": "Rx5xUtvFzGwGISmywYTi52Pu_QCSOJ6lGhfUhnn_KakwrtL7PmZKr1GIrg0nuUgl",
     "game_id": "phase18e-contract-session",
     "last_activity_at": "2026-07-18T20:00:00Z",
     "lifecycle_status": {
@@ -33,7 +33,7 @@
       "stage": "setup",
       "status_kind": "waiting_for_decision"
     },
-    "projection_state_hash": "476761d59a70ad209127faada42a86e75771b1a0fede12965161cad2957d6b21",
+    "projection_state_hash": "eb4c3a08b1dc18c92edc145789bf8ab2afb964c6266d243e728ce9cfcb07ace0",
     "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
     "ruleset_id": {
@@ -46,7 +46,7 @@
     "session_id": "session-phase18e-contract-session",
     "session_revision": 2,
     "session_state": "closed",
-    "source_hash": "f21547e82d783bb1b43d0e0b2e931d044bf26eafd78e997c7a6a0952b37f8a74",
+    "source_hash": "24846bc075bda480343623eeaeec61238d52bae950b069a3a24336c5aef3955d",
     "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
     "terminal_reason": {
       "code": "session_closed",

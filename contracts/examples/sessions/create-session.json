@@ -154,6 +154,7 @@
               "targets": [
                 {
                   "bodyguard_datasheet_id": "core-intercessor-like-infantry",
+                  "required_wargear_ids": [],
                   "source_ids": [
                     "datasheet:core-character-leader:attachment:leader"
                   ]
@@ -301,6 +302,7 @@
               "targets": [
                 {
                   "bodyguard_datasheet_id": "core-intercessor-like-infantry",
+                  "required_wargear_ids": [],
                   "source_ids": [
                     "datasheet:core-character-support:attachment:support"
                   ]

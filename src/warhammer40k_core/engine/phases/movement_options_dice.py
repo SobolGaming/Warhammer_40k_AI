@@ -373,9 +373,26 @@ def _advance_reroll_permission_for_unit(
         roll_type="advance_roll",
         timing_window="after_advance_roll",
     )
-    if catalog_permission is not None and source_backed_permission is not None:
+    conditional_leader_permission = conditional_leading_roll_reroll_permission(
+        state=state,
+        rules_unit_instance_id=unit_instance_id,
+        player_id=player_id,
+        rule_roll_type="advance_roll",
+        eligible_roll_type="advance_roll",
+        timing_window="after_advance_roll",
+    )
+    permissions = tuple(
+        permission
+        for permission in (
+            catalog_permission,
+            source_backed_permission,
+            conditional_leader_permission,
+        )
+        if permission is not None
+    )
+    if len(permissions) > 1:
         raise GameLifecycleError("Multiple advance reroll permissions are available.")
-    return catalog_permission if catalog_permission is not None else source_backed_permission
+    return permissions[0] if permissions else None
 
 
 def _roll_desperate_escape_dice(
