@@ -197,6 +197,53 @@ AELDARI_AUTARCHS_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_BANSHEES_PHOENIX_LORDS_SPIRITSEER_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000572",
+        model_name="Jain Zar - EPIC HERO",
+        height=2.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:jain-zar:height",
+        height_document_reference=(
+            "Aeldari Jain Zar assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (40mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000574",
+        model_name="Fuegan - EPIC HERO",
+        height=2.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:fuegan:height",
+        height_document_reference=(
+            "Aeldari Fuegan assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (40mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000588",
+        model_name="Spiritseer",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:spiritseer:height",
+        height_document_reference=(
+            "Aeldari Spiritseer assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (25mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000003909",
+        model_name="Lhykhis - EPIC HERO",
+        height=3.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:lhykhis:height",
+        height_document_reference=(
+            "Aeldari Lhykhis assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (40mm base)"
+        ),
+    ),
+)
+
 AELDARI_ASPECT_WARRIORS_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000000594",

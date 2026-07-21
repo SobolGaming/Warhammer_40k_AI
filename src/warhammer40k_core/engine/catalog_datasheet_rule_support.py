@@ -20,6 +20,16 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     movement_action_grant_descriptor_for_clause,
     passive_hit_reroll_descriptor_for_clause,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
+    charge_after_movement_actions_descriptor_for_clause,
+    clause_uses_exact_extended_datasheet_template,
+    command_restoration_descriptor_for_clause,
+    conditional_leading_charge_after_movement_action_descriptor_for_clause,
+    conditional_leading_fixed_advance_descriptor_for_clause,
+    conditional_leading_weapon_range_descriptor_for_clause,
+    extended_datasheet_descriptor_for_clause,
+    movement_target_pair_descriptor_for_clause,
+)
 from warhammer40k_core.engine.catalog_tracked_target_selection_descriptors import (
     clause_has_invalid_exact_tracked_target_selection_shape,
 )
@@ -74,6 +84,21 @@ CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:damage-roll-reroll"
 CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID = "catalog-ir:movement-action-grant"
 CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:agile-manoeuvre-roll-reroll"
 CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID = "catalog-ir:faction-resource-refund-roll"
+CATALOG_IR_FIXED_ADVANCE_CONSUMER_ID = "catalog-ir:conditional-leading-fixed-advance"
+CATALOG_IR_WEAPON_RANGE_MODIFIER_CONSUMER_ID = (
+    "catalog-ir:conditional-leading-weapon-range-modifier"
+)
+CATALOG_IR_CHARGE_AFTER_MOVEMENT_ACTION_CONSUMER_ID = (
+    "catalog-ir:conditional-leading-charge-after-movement-action"
+)
+CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID = "catalog-ir:movement-friendly-enemy-target-pair"
+CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID = "catalog-ir:command-restoration"
+CATALOG_IR_CLAUSE_WIDE_COMPOUND_CONSUMER_IDS = (
+    CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
+    CATALOG_IR_FIXED_ADVANCE_CONSUMER_ID,
+    CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
+    CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID,
+)
 CATALOG_IR_CONDITIONAL_LEADER_ABILITY_CONSUMER_IDS = MappingProxyType(
     {
         "fights_first": "catalog-ir:conditional-leading-ability:fights-first",
@@ -109,6 +134,10 @@ def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool
         (
             clause_uses_exact_datasheet_runtime_template(clause)
             and exact_datasheet_runtime_descriptor_for_clause(clause) is None
+        )
+        or (
+            clause_uses_exact_extended_datasheet_template(clause)
+            and extended_datasheet_descriptor_for_clause(clause) is None
         )
         or clause_has_invalid_exact_tracked_target_weapon_grant_shape(clause)
         or clause_has_invalid_exact_tracked_target_selection_shape(clause)
@@ -153,6 +182,23 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID)
     if faction_resource_refund_roll_descriptor_for_clause(clause) is not None:
         consumer_ids.add(CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID)
+    if conditional_leading_fixed_advance_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_FIXED_ADVANCE_CONSUMER_ID)
+    if conditional_leading_weapon_range_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_WEAPON_RANGE_MODIFIER_CONSUMER_ID)
+    if conditional_leading_charge_after_movement_action_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_CHARGE_AFTER_MOVEMENT_ACTION_CONSUMER_ID)
+    if movement_target_pair_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID)
+    if command_restoration_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID)
+    if charge_after_movement_actions_descriptor_for_clause(clause) is not None:
+        for effect in clause.effects:
+            ability = parameter_payload(effect.parameters).get("ability")
+            if ability == "can_advance_and_charge":
+                consumer_ids.add("catalog-ir:can-advance-and-charge")
+            elif ability == "can_fall_back_and_charge":
+                consumer_ids.add("catalog-ir:can-fallback-and-charge")
     if clause_is_first_failed_save_damage_replacement(clause):
         consumer_ids.add(CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID)
     if conditional_invulnerable_save_descriptor_for_clause(clause) is not None:
@@ -219,6 +265,11 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
                 CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID,
                 CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID,
+                CATALOG_IR_FIXED_ADVANCE_CONSUMER_ID,
+                CATALOG_IR_WEAPON_RANGE_MODIFIER_CONSUMER_ID,
+                CATALOG_IR_CHARGE_AFTER_MOVEMENT_ACTION_CONSUMER_ID,
+                CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID,
+                CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
                 *CATALOG_IR_CONDITIONAL_LEADER_ABILITY_CONSUMER_IDS.values(),
             }
         )

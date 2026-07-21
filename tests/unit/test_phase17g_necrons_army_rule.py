@@ -10,6 +10,7 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine import healing_geometry
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
@@ -479,7 +480,7 @@ def test_reanimation_fail_fast_guards_and_revival_geometry_edges() -> None:
         raise AssertionError("battlefield_state is required")
     state.battlefield_state = state.battlefield_state.without_unit_placement(NECRON_UNIT_1_ID)
     with pytest.raises(GameLifecycleError, match="requires placed anchors"):
-        army_rule._revival_placements_for_rules_unit(
+        healing_geometry.healing_revival_placements_for_rules_unit(
             state=state,
             army=army,
             rules_unit=removed_rules_unit,
@@ -491,14 +492,14 @@ def test_reanimation_fail_fast_guards_and_revival_geometry_edges() -> None:
         raise AssertionError("battlefield_state is required")
     anchor_model_id = _unit_by_id(geometry_state, NECRON_UNIT_1_ID).own_models[0].model_instance_id
     anchor = battlefield.model_placement_by_id(anchor_model_id)
-    bounded_pose = army_rule._candidate_revival_pose(
+    bounded_pose = healing_geometry._candidate_revival_pose(
         battlefield=replace(battlefield, battlefield_width_inches=anchor.pose.position.x),
         anchor=anchor,
         index=0,
     )
     assert bounded_pose.position.x < anchor.pose.position.x
     with pytest.raises(GameLifecycleError, match="could not derive revival placement"):
-        army_rule._candidate_revival_pose(
+        healing_geometry._candidate_revival_pose(
             battlefield=replace(
                 battlefield,
                 battlefield_width_inches=0.1,
@@ -529,14 +530,14 @@ def test_reanimation_fail_fast_guards_and_revival_geometry_edges() -> None:
         army_rule._rules_unit_label(cast(RulesUnitView, object()))
     state.player_ids = ("player-a", "player-b", "player-c")
     with pytest.raises(GameLifecycleError, match="requires one opposing player"):
-        army_rule._opposing_player_id(state=state, player_id="player-a")
+        healing_geometry.healing_opposing_player_id(state=state, player_id="player-a")
 
     state.battlefield_state = None
     with pytest.raises(GameLifecycleError, match="requires battlefield_state"):
-        army_rule._battlefield_state(state)
+        healing_geometry.healing_battlefield_state(state)
     state.battlefield_state = cast(BattlefieldRuntimeState, object())
     with pytest.raises(GameLifecycleError, match="battlefield_state is invalid"):
-        army_rule._battlefield_state(state)
+        healing_geometry.healing_battlefield_state(state)
 
     with pytest.raises(GameLifecycleError, match="event payload must be an object"):
         army_rule._event_payload_object(
@@ -773,7 +774,11 @@ def test_reanimation_phase_start_engagement_ignores_destroyed_enemy_placements()
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=NECRON_UNIT_1_ID)
 
     assert (
-        army_rule._phase_start_enemy_engagement_model_ids(state=state, rules_unit=rules_unit) == ()
+        healing_geometry.healing_phase_start_enemy_engagement_model_ids(
+            state=state,
+            rules_unit=rules_unit,
+        )
+        == ()
     )
 
 

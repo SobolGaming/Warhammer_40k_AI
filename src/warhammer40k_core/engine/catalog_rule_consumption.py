@@ -3856,7 +3856,7 @@ def catalog_rule_ir_clause_wide_consumer_ids(clause: RuleClause) -> tuple[str, .
         raise GameLifecycleError("Catalog clause-wide classification requires RuleClause.")
     compound_consumer_ids = {
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
-        _datasheet.CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
+        *_datasheet.CATALOG_IR_CLAUSE_WIDE_COMPOUND_CONSUMER_IDS,
     }
     return tuple(
         sorted(compound_consumer_ids.intersection(catalog_rule_ir_consumers_for_clause(clause)))

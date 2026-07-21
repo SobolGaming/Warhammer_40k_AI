@@ -31,6 +31,9 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_conditional_leader_queries import (
+    conditional_charge_after_movement_action_allowed,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_charge_roll_modifiers_for_unit,
 )
@@ -2494,7 +2497,14 @@ def _charge_forbidden_by_effects(*, state: GameState, unit_instance_id: str) -> 
         payload = effect.effect_payload
         if not isinstance(payload, dict):
             continue
-        if payload.get("charge_forbidden") is True:
+        if payload.get("charge_forbidden") is True and not (
+            type(payload.get("effect_kind")) is str
+            and conditional_charge_after_movement_action_allowed(
+                state=state,
+                rules_unit_instance_id=requested_unit_id,
+                movement_action_effect_kind=str(payload["effect_kind"]),
+            )
+        ):
             return True
     return False
 

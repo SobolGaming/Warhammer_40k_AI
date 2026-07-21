@@ -12,12 +12,18 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID,
+    CONDITIONAL_LEADING_CHARGE_AFTER_MOVEMENT_ACTION_DESCRIPTOR_ID,
     CONDITIONAL_LEADING_ROLL_REROLL_DESCRIPTOR_ID,
+    CONDITIONAL_LEADING_WEAPON_RANGE_DESCRIPTOR_ID,
     FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     conditional_leader_ability_grant_descriptor_for_clause,
     faction_resource_refund_roll_descriptor_for_clause,
+)
+from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
+    conditional_leading_charge_after_movement_action_descriptor_for_clause,
+    conditional_leading_weapon_range_descriptor_for_clause,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
@@ -189,6 +195,10 @@ def _conditional_descriptor_id_for_clause(clause: RuleClause) -> str | None:
         return CONDITIONAL_LEADING_ROLL_REROLL_DESCRIPTOR_ID
     if faction_resource_refund_roll_descriptor_for_clause(clause) is not None:
         return FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID
+    if conditional_leading_weapon_range_descriptor_for_clause(clause) is not None:
+        return CONDITIONAL_LEADING_WEAPON_RANGE_DESCRIPTOR_ID
+    if conditional_leading_charge_after_movement_action_descriptor_for_clause(clause) is not None:
+        return CONDITIONAL_LEADING_CHARGE_AFTER_MOVEMENT_ACTION_DESCRIPTOR_ID
     return None
 
 

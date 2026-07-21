@@ -155,6 +155,18 @@ class MovementPhaseHandler:
         active_selection = movement_state.active_selection
         if active_selection is not None:
             if movement_state.pending_action is not None:
+                from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
+                    request_catalog_movement_target_pair_start_if_available,
+                )
+
+                target_pair_status = request_catalog_movement_target_pair_start_if_available(
+                    state=state,
+                    decisions=decisions,
+                    pending_action=movement_state.pending_action,
+                    ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                )
+                if target_pair_status is not None:
+                    return target_pair_status
                 return _request_pending_movement_action_proposal(
                     state=state,
                     decisions=decisions,
@@ -361,6 +373,21 @@ class MovementPhaseHandler:
         decisions: DecisionController,
         reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
+            SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE,
+            apply_catalog_movement_target_pair_result,
+        )
+
+        if result.decision_type == SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE:
+            record = decisions.record_for_result(result)
+            apply_catalog_movement_target_pair_result(
+                state=state,
+                decisions=decisions,
+                request=record.request,
+                result=result,
+                ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            )
+            return None
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
             reroll_record = decisions.record_for_result(result)
             if is_triggered_movement_distance_reroll_request(reroll_record.request):

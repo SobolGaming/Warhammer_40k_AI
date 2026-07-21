@@ -23,6 +23,66 @@ if TYPE_CHECKING:
 CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID = "catalog-ir:conditional-leading-bodyguard-ability-grant"
 CONDITIONAL_LEADING_ROLL_REROLL_DESCRIPTOR_ID = "catalog-ir:conditional-leading-roll-reroll"
 FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID = "catalog-ir:faction-resource-refund-roll"
+CONDITIONAL_LEADING_WEAPON_RANGE_DESCRIPTOR_ID = (
+    "catalog-ir:conditional-leading-weapon-range-modifier"
+)
+CONDITIONAL_LEADING_CHARGE_AFTER_MOVEMENT_ACTION_DESCRIPTOR_ID = (
+    "catalog-ir:conditional-leading-charge-after-movement-action"
+)
+
+
+def conditional_leading_weapon_range_effects(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+) -> tuple[PersistingEffect, ...]:
+    _require_game_state(state)
+    effects = tuple(
+        effect
+        for effect in state.persisting_effects
+        if isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("descriptor_id")
+        == CONDITIONAL_LEADING_WEAPON_RANGE_DESCRIPTOR_ID
+        and _conditional_leading_source_applies(
+            state=state,
+            effect=effect,
+            rules_unit_instance_id=rules_unit_instance_id,
+        )
+    )
+    return tuple(sorted(effects, key=lambda effect: effect.effect_id))
+
+
+def conditional_charge_after_movement_action_allowed(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+    movement_action_effect_kind: str,
+) -> bool:
+    _require_game_state(state)
+    requested_kind = _required_string(
+        "movement_action_effect_kind",
+        movement_action_effect_kind,
+    )
+    for effect in state.persisting_effects:
+        payload = effect.effect_payload
+        if (
+            not isinstance(payload, dict)
+            or payload.get("descriptor_id")
+            != CONDITIONAL_LEADING_CHARGE_AFTER_MOVEMENT_ACTION_DESCRIPTOR_ID
+            or not _conditional_leading_source_applies(
+                state=state,
+                effect=effect,
+                rules_unit_instance_id=rules_unit_instance_id,
+            )
+        ):
+            continue
+        if (
+            _rule_effect_parameter(payload, key="ability") != "can_charge_after_movement_action"
+            or _rule_effect_parameter(payload, key="movement_action_effect_kind") != requested_kind
+        ):
+            raise GameLifecycleError("Conditional movement-action charge descriptor drift.")
+        return True
+    return False
 
 
 def conditional_granted_ability_effects_for_unit(

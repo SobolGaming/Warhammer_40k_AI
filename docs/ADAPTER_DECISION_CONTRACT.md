@@ -190,6 +190,7 @@ The shared contract uses these objects and payloads:
 - `CatalogPostShootHitTargetStatusSelection`: finite post-attack catalog RuleIR answer selecting one engine-emitted enemy unit hit by the just-completed Shooting attack sequence for a source-backed contextual status denial.
 - `CatalogPostShootHitTargetEffectSelection`: finite post-attack catalog RuleIR answer selecting one engine-emitted enemy unit hit by the just-completed Shooting attack sequence for generic source-backed phase-scoped RuleIR effects.
 - `CatalogUnitMoveCompletedMortalWoundsTargetSelection`: finite Movement or Charge phase catalog RuleIR answer selecting one engine-emitted eligible enemy rules unit, or declining an optional ability, after a source unit is set up or completes a supported move for per-model mortal-wound resolution.
+- `CatalogMovementTargetPairSelection`: finite Movement phase catalog RuleIR answer selecting one engine-emitted eligible friendly/enemy rules-unit pair, or declining the current timing edge, when a source model starts or ends a move.
 - `CatalogSetupReactiveShootChargeSelection`: finite opponent-Movement-end catalog RuleIR answer selecting `decline`, `shoot`, or `charge` for a source-backed setup-reactive ability after an enemy unit is set up within the source range.
 - `ShootingUnitSelectedGrantSelection`: finite selected-to-shoot grant answer selecting one engine-emitted optional grant option or the deterministic decline option before shooting type selection.
 - `FightMovementProposal`: Fight phase Pile In or Consolidate movement answer containing proposal kind `pile_in` or `consolidate`, the selected fight movement mode/action, selected target unit or objective context, and a `PathWitness` unless the player submits the no-move choice.
@@ -521,6 +522,24 @@ application, and any pending Feel No Pain continuation are deterministic and
 replay-safe. Adapters must not alter the movement budget, mark the unit unable
 to Charge, roll the phase-end dice, choose damaged models, or apply wounds
 locally.
+
+Aeldari Spiritseer's Spirit Mark uses the finite decision type
+`select_catalog_movement_target_pair` when the source model starts or ends a
+move. Each use option identifies one engine-enumerated friendly non-TITANIC
+WRAITH CONSTRUCT rules unit within 6 inches and one enemy rules unit currently
+visible to the source model. The request and option payloads carry the source
+catalog record, source rule and RuleIR hashes, clause, source rules-unit/unit/model
+IDs, timing edge, movement action, and the movement action result or completion
+event that opened the window. The deterministic decline option defers the
+ability at the start edge and closes it at the end edge. An accepted pair creates
+an engine-owned persisting RuleIR effect through the start of the selecting
+player's next Movement phase; that effect grants Sustained Hits 1 only to the
+selected friendly unit and only while it targets the selected enemy unit. The
+lifecycle recomputes source presence, range, excluded keywords, visibility,
+once-per-turn use, and movement-event context before queue pop. Stale, drifted,
+malformed, or invented pairs return a typed invalid status without mutation.
+Adapters must not enumerate pairs, infer visibility, grant weapon abilities, or
+advance the movement action while the request is pending.
 
 Phase 17G Movement-end surge and generic RuleIR reactive-movement rules use the
 same finite/proposal split as other physical movement. After an enemy unit
@@ -1778,7 +1797,23 @@ Required Phase 17G battle-round faction-rule tests:
 
 Phase 17G also adds opt-in Command phase start decisions for faction runtime content. These decisions are emitted only when the mustered army's faction runtime contribution registers a Command phase start hook for the current Command phase window; most hooks are active-player choices, while Tyranids Shadow in the Warp can be emitted for the Tyranids player in either player's Command phase. Command-start faction-rule hooks run after the active player receives their Command point and after `command_step_started` is emitted, but before later Command step work such as scoring and Battle-shock decisions proceeds. The current implemented hooks are Space Marines Oath of Moment, Necrons Reanimation Protocols, Orks Waaagh!, Astra Militarum Voice of Command, Imperial Knights Bondsman, and Tyranids Shadow in the Warp.
 
-Phase 17G exposes the finite decision type `select_faction_rule_command_phase_start_option`. The pending request payload contains game ID, battle round, phase `command`, active player ID, player ID, faction ID, source rule ID, hook ID, effect kind, selection kind, any explicit `actor_may_be_non_active` flag, and the eligible target, rules-unit, source model/ability, source unit, or enemy unit IDs for that hook. Adapters answer by selecting one emitted option ID and must not invent target IDs, rules-unit IDs, source model IDs, ability IDs, source unit IDs, enemy unit IDs, mutation payloads, reroll permissions, healing choices, Battle-shock tests, or wound modifiers locally.
+Phase 17G exposes the finite decision type `select_faction_rule_command_phase_start_option`. The pending request payload contains game ID, battle round, phase `command`, active player ID, player ID, faction ID when applicable, source rule ID, hook ID, effect kind or generic selection kind, any explicit `actor_may_be_non_active` flag, and the eligible target, rules-unit, source model/ability, source unit, or enemy unit IDs for that hook. Adapters answer by selecting one emitted option ID and must not invent target IDs, rules-unit IDs, source model IDs, ability IDs, source unit IDs, enemy unit IDs, mutation payloads, reroll permissions, healing choices, Battle-shock tests, or wound modifiers locally.
+
+Aeldari Spiritseer's Tears of Isha uses that shared Command-start finite surface
+with `selection_kind: "catalog_command_restoration"`. Each option binds the
+source catalog record, source rule and RuleIR hashes, clause, source
+rules-unit/unit/model IDs, and one engine-enumerated friendly WRAITH CONSTRUCT
+rules unit within 6 inches. The lifecycle recomputes the option before queue pop
+and rejects a stale source, out-of-range target, wrong keyword, wrong player, or
+target already selected for this ability during the turn. After acceptance the
+engine uses the shared healing path: if the target has a destroyed model that
+was removed from the battlefield, it returns one model at full wounds with an
+engine-validated placement; otherwise it rolls D3 and restores lost wounds to
+one wounded model. Any nested model or placement choice remains an ordinary
+healing `DecisionRequest`. The selected event records the source identity, D3
+result when applicable, healing effect, and pending nested request ID. Adapters
+must not choose the restoration branch, roll the D3, select or place a model,
+or mutate wounds locally.
 
 Current Space Marines option IDs use the form `space_marines:oath_of_moment:<target_unit_instance_id>`. Option payloads include the common request payload plus `target_owner_player_id`, `target_unit_instance_id`, and `target_unit_name`. The target list contains eligible live enemy units only. It is public table information in the current Phase 17G rules scope.
 

@@ -3,13 +3,6 @@ from __future__ import annotations
 from warhammer40k_core.core.dice import D3RollResult, DiceExpression, DiceRollSpec
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldRuntimeState,
-    BattlefieldScenario,
-    ModelPlacement,
-    UnitPlacement,
-    geometry_model_for_placement,
-)
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartHookBinding,
@@ -31,10 +24,17 @@ from warhammer40k_core.engine.faction_content.common import (
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
+from warhammer40k_core.engine.healing_geometry import (
+    healing_battlefield_state,
+    healing_opposing_player_id,
+    healing_phase_start_enemy_engagement_model_ids,
+    healing_phase_start_model_ids,
+    healing_revival_placements_for_rules_unit,
+    healing_rules_unit_placements,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.geometry.pose import Pose
 
 _event_payload_object = event_payload_object
 _payload_object = payload_object
@@ -255,16 +255,22 @@ def _reanimation_healing_effect(
         ),
         target_unit_instance_id=rules_unit.unit_instance_id,
         amount=d3_result.value,
-        opposing_player_id=_opposing_player_id(state=state, player_id=army.player_id),
+        opposing_player_id=healing_opposing_player_id(
+            state=state,
+            player_id=army.player_id,
+        ),
         selection_actor_player_id=army.player_id,
         source_rule_id=SOURCE_RULE_ID,
         source_context=source_context,
-        phase_start_model_ids=_phase_start_model_ids(state=state, rules_unit=rules_unit),
-        phase_start_enemy_engagement_model_ids=_phase_start_enemy_engagement_model_ids(
+        phase_start_model_ids=healing_phase_start_model_ids(
             state=state,
             rules_unit=rules_unit,
         ),
-        revival_placements=_revival_placements_for_rules_unit(
+        phase_start_enemy_engagement_model_ids=healing_phase_start_enemy_engagement_model_ids(
+            state=state,
+            rules_unit=rules_unit,
+        ),
+        revival_placements=healing_revival_placements_for_rules_unit(
             state=state,
             army=army,
             rules_unit=rules_unit,
@@ -281,7 +287,7 @@ def _eligible_reanimation_rules_units(
         raise GameLifecycleError("Reanimation Protocols lookup requires GameState.")
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Reanimation Protocols lookup requires ArmyDefinition.")
-    _battlefield_state(state)
+    healing_battlefield_state(state)
     rules_units: list[RulesUnitView] = []
     seen: set[str] = set()
     for unit in army.units:
@@ -415,158 +421,6 @@ def _roll_reanimation_d3(
     return D3RollResult.from_source_d6_result(roll_state.original_result)
 
 
-def _phase_start_model_ids(
-    *,
-    state: GameState,
-    rules_unit: RulesUnitView,
-) -> tuple[str, ...]:
-    return tuple(
-        sorted(
-            placement.model_instance_id
-            for placement in _rules_unit_placements(state=state, rules_unit=rules_unit)
-        )
-    )
-
-
-def _phase_start_enemy_engagement_model_ids(
-    *,
-    state: GameState,
-    rules_unit: RulesUnitView,
-) -> tuple[str, ...]:
-    battlefield = _battlefield_state(state)
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=battlefield,
-    )
-    ruleset_descriptor = state.runtime_ruleset_descriptor()
-    own_placements = _rules_unit_placements(state=state, rules_unit=rules_unit)
-    engaged_enemy_ids: set[str] = set()
-    for own_placement in own_placements:
-        own_model_instance = scenario.model_instance_for_placement(own_placement)
-        if not own_model_instance.is_alive:
-            continue
-        own_model = geometry_model_for_placement(model=own_model_instance, placement=own_placement)
-        for placed_army in battlefield.placed_armies:
-            if placed_army.player_id == rules_unit.owner_player_id:
-                continue
-            for unit_placement in placed_army.unit_placements:
-                for enemy_placement in unit_placement.model_placements:
-                    enemy_model_instance = scenario.model_instance_for_placement(enemy_placement)
-                    if not enemy_model_instance.is_alive:
-                        continue
-                    enemy_model = geometry_model_for_placement(
-                        model=enemy_model_instance,
-                        placement=enemy_placement,
-                    )
-                    if own_model.is_within_engagement_range(
-                        enemy_model,
-                        horizontal_inches=(ruleset_descriptor.engagement_policy.horizontal_inches),
-                        vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-                    ):
-                        engaged_enemy_ids.add(enemy_placement.model_instance_id)
-    return tuple(sorted(engaged_enemy_ids))
-
-
-def _revival_placements_for_rules_unit(
-    *,
-    state: GameState,
-    army: ArmyDefinition,
-    rules_unit: RulesUnitView,
-) -> tuple[ModelPlacement, ...]:
-    battlefield = _battlefield_state(state)
-    removed_model_ids = set(battlefield.removed_model_ids)
-    missing_models = tuple(
-        sorted(
-            (
-                model
-                for model in rules_unit.own_models
-                if not model.is_alive and model.model_instance_id in removed_model_ids
-            ),
-            key=lambda model: model.model_instance_id,
-        )
-    )
-    if not missing_models:
-        return ()
-    anchors = _rules_unit_placements(state=state, rules_unit=rules_unit)
-    if not anchors:
-        raise GameLifecycleError("Reanimation Protocols revival requires placed anchors.")
-    placements: list[ModelPlacement] = []
-    for index, model in enumerate(missing_models):
-        anchor = anchors[index % len(anchors)]
-        placements.append(
-            ModelPlacement(
-                army_id=army.army_id,
-                player_id=army.player_id,
-                unit_instance_id=rules_unit.component_unit_id_for_model(model.model_instance_id),
-                model_instance_id=model.model_instance_id,
-                pose=_candidate_revival_pose(
-                    battlefield=battlefield,
-                    anchor=anchor,
-                    index=index,
-                ),
-            )
-        )
-    return tuple(placements)
-
-
-def _candidate_revival_pose(
-    *,
-    battlefield: BattlefieldRuntimeState,
-    anchor: ModelPlacement,
-    index: int,
-) -> Pose:
-    offset = 0.5 + (index * 0.1)
-    anchor_position = anchor.pose.position
-    candidate_x = anchor_position.x + offset
-    candidate_y = anchor_position.y
-    if candidate_x > battlefield.battlefield_width_inches:
-        candidate_x = anchor_position.x - offset
-    if candidate_x < 0:
-        candidate_x = anchor_position.x
-        candidate_y = anchor_position.y + offset
-    if candidate_y > battlefield.battlefield_depth_inches:
-        candidate_y = anchor_position.y - offset
-    if candidate_y < 0:
-        raise GameLifecycleError("Reanimation Protocols could not derive revival placement.")
-    return Pose.at(candidate_x, candidate_y, anchor_position.z)
-
-
-def _rules_unit_placements(
-    *,
-    state: GameState,
-    rules_unit: RulesUnitView,
-) -> tuple[ModelPlacement, ...]:
-    battlefield = _battlefield_state(state)
-    component_ids = set(rules_unit.component_unit_instance_ids)
-    model_ids = {model.model_instance_id for model in rules_unit.own_models}
-    placements: list[ModelPlacement] = []
-    for placed_army in battlefield.placed_armies:
-        if placed_army.player_id != rules_unit.owner_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            _append_component_placements(
-                placements=placements,
-                unit_placement=unit_placement,
-                component_ids=component_ids,
-                model_ids=model_ids,
-            )
-    return tuple(sorted(placements, key=lambda placement: placement.model_instance_id))
-
-
-def _append_component_placements(
-    *,
-    placements: list[ModelPlacement],
-    unit_placement: UnitPlacement,
-    component_ids: set[str],
-    model_ids: set[str],
-) -> None:
-    if unit_placement.unit_instance_id not in component_ids:
-        return
-    for placement in unit_placement.model_placements:
-        if placement.model_instance_id in model_ids:
-            placements.append(placement)
-
-
 def _rules_unit_is_on_battlefield(
     *,
     state: GameState,
@@ -576,7 +430,7 @@ def _rules_unit_is_on_battlefield(
         return False
     placed_model_ids = {
         placement.model_instance_id
-        for placement in _rules_unit_placements(state=state, rules_unit=rules_unit)
+        for placement in healing_rules_unit_placements(state=state, rules_unit=rules_unit)
     }
     return any(model.model_instance_id in placed_model_ids for model in rules_unit.alive_models())
 
@@ -617,22 +471,6 @@ def _rules_unit_label(rules_unit: RulesUnitView) -> str:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Reanimation Protocols label requires rules unit.")
     return " + ".join(component.unit.name for component in rules_unit.components)
-
-
-def _opposing_player_id(*, state: GameState, player_id: str) -> str:
-    opponents = tuple(sorted(candidate for candidate in state.player_ids if candidate != player_id))
-    if len(opponents) != 1:
-        raise GameLifecycleError("Reanimation Protocols healing requires one opposing player.")
-    return opponents[0]
-
-
-def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Reanimation Protocols requires battlefield_state.")
-    if type(battlefield) is not BattlefieldRuntimeState:
-        raise GameLifecycleError("Reanimation Protocols battlefield_state is invalid.")
-    return battlefield
 
 
 def _reanimation_option_id(rules_unit_instance_id: str) -> str:

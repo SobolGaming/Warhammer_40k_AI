@@ -246,18 +246,22 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:battle-shock-failed-heal` | Pall of Despair (Aura, Psychic) |
 | `catalog-ir:battle-shock-forced-test` | Pall of Despair (Aura, Psychic) |
 | `catalog-ir:battle-shock-reroll` | No current generated rows |
-| `catalog-ir:can-advance-and-charge` | No current generated rows |
+| `catalog-ir:can-advance-and-charge` | Acrobatic |
 | `catalog-ir:can-advance-and-shoot-and-charge` | No current generated rows |
 | `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
-| `catalog-ir:can-fallback-and-charge` | No current generated rows |
+| `catalog-ir:can-fallback-and-charge` | Acrobatic |
 | `catalog-ir:can-fallback-and-shoot` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
 | `catalog-ir:charge-roll-reroll` | No current generated rows |
-| `catalog-ir:conditional-ability:lone-operative` | Daemonic Lord |
+| `catalog-ir:command-restoration` | Tears of Isha (Psychic) |
+| `catalog-ir:conditional-ability:lone-operative` | Daemonic Lord<br>Spiritseer |
 | `catalog-ir:conditional-leading-ability:fights-first` | ASPECT TRAINING |
 | `catalog-ir:conditional-leading-ability:infiltrators` | ASPECT TRAINING |
 | `catalog-ir:conditional-leading-ability:scouts` | ASPECT TRAINING |
 | `catalog-ir:conditional-leading-ability:stealth` | ASPECT TRAINING |
+| `catalog-ir:conditional-leading-charge-after-movement-action` | Empyric Ambush |
+| `catalog-ir:conditional-leading-fixed-advance` | Whirling Death |
+| `catalog-ir:conditional-leading-weapon-range-modifier` | Burning Lance |
 | `catalog-ir:critical-hit-value-modifier` | No current generated rows |
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |
@@ -267,7 +271,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:destroyed-unit-restore-lost-wounds` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
-| `catalog-ir:dice-result-override` | Aspect Shrine Token |
+| `catalog-ir:dice-result-override` | Aspect Shrine Token<br>Whirling Death |
 | `catalog-ir:faction-resource-refund-roll` | Indomitable Strength of Will |
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
@@ -275,7 +279,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:fight-end-triggered-movement` | Raid and Run |
 | `catalog-ir:fight-on-death-source` | Malevolent Souls |
 | `catalog-ir:fight-selected-weapon-ability-choice` | Harbinger of Death |
-| `catalog-ir:first-death-return` | No current generated rows |
+| `catalog-ir:first-death-return` | Unquenchable Resolve |
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |
 | `catalog-ir:first-failed-save-damage-replacement` | Channeller Stones |
 | `catalog-ir:force-desperate-escape` | Bane of Cowards |
@@ -290,11 +294,12 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon<br>Psychic Guidance |
-| `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures<br>Mandiblasters |
+| `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures<br>Mandiblasters<br>Whispering Web |
 | `catalog-ir:movement-action-grant` | Flickerjump |
 | `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
 | `catalog-ir:movement-end-reactive-normal-move` | Path of the Outcast |
+| `catalog-ir:movement-friendly-enemy-target-pair` | Spirit Mark (Psychic) |
 | `catalog-ir:movement-transit-permission` | Scuttling Walker |
 | `catalog-ir:named-weapon-ability-choice` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
@@ -354,7 +359,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-skill-characteristic-modifier` | Psychic Guidance |
 | `catalog-ir:weapon-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:wound-roll-modifier` | No current generated rows |
-| `catalog-ir:wound-roll-reroll` | Assured Destruction<br>Fated Hero |
+| `catalog-ir:wound-roll-reroll` | Assured Destruction<br>Fated Hero<br>Storm of Silence |
 | `catalog-ir:wounds-characteristic-modifier` | No current generated rows |
 | `catalog-ir:wounds-characteristic-query` | No current generated rows |
 | `core:command-reroll` | Command Re-roll |
@@ -372,6 +377,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:army-mustering:leader-attachment` | Leader |
 | `descriptor:destruction-reaction:deadly-demise-resolution` | Deadly Demise |
 | `descriptor:destruction-reaction:deadly-demise-source` | Deadly Demise |
+| `descriptor:fight-order:fights-first` | Fights First |
 | `descriptor:lost-wound:feel-no-pain-resolution` | Feel No Pain |
 | `descriptor:lost-wound:feel-no-pain-source` | Feel No Pain |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |

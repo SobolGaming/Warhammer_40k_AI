@@ -133,7 +133,7 @@
               "runtime_consumer_ids": [
                 "catalog-ir:wound-roll-reroll"
               ],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000572:5:description:clause:001:effect:0",
+              "semantic_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000572:5:clause:001:effect:0",
               "semantic_kind": "reroll_permission"
             }
           ],
@@ -147,19 +147,37 @@
         {
           "ability_id": "000000572:whirling-death",
           "ability_name": "Whirling Death",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "499d2fd591bd65b78ae09bf5f43d62ae453ba90bf1080dd20b0164f150c2de98",
           "raw_text": "While this model is leading a unit, each time that unit Advances, do not make an Advance roll. Instead, until the end of the phase, add 6\" to the Move characteristic of models in that unit and each time a model in that unit makes an Advance move, ignore any vertical distance when determining the total distance that model can be moved during that move.",
           "raw_text_sha256": "499d2fd591bd65b78ae09bf5f43d62ae453ba90bf1080dd20b0164f150c2de98",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-fixed-advance",
+            "catalog-ir:dice-result-override"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000572:4:description:clause:002:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-leading-fixed-advance",
+                "catalog-ir:dice-result-override"
+              ],
+              "semantic_id": "phase17n:aeldari:000000572:4:clause:001:effect:0",
+              "semantic_kind": "override_dice_roll_result"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-leading-fixed-advance"
+              ],
+              "semantic_id": "phase17n:aeldari:000000572:4:clause:001:effect:1",
               "semantic_kind": "modify_move_distance"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-leading-fixed-advance"
+              ],
+              "semantic_id": "phase17n:aeldari:000000572:4:clause:001:effect:2",
+              "semantic_kind": "movement_transit_permission"
             }
           ],
           "source_ids": [
@@ -167,14 +185,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000572:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000572",
       "datasheet_name": "Jain Zar",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -182,18 +200,20 @@
         {
           "ability_id": "000000574:burning-lance",
           "ability_name": "Burning Lance",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "ae87c1c5314475e059373757f51af938c5196a0ce2557490f38da64865a7cf7d",
           "raw_text": "While this model is leading a unit, add 6\" to the Range characteristic of Melta weapons equipped by models in that unit.",
           "raw_text_sha256": "ae87c1c5314475e059373757f51af938c5196a0ce2557490f38da64865a7cf7d",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-weapon-range-modifier"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000574:3:description:clause:001:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-leading-weapon-range-modifier"
+              ],
+              "semantic_id": "phase17n:aeldari:000000574:3:clause:001:effect:0",
               "semantic_kind": "modify_characteristic"
             }
           ],
@@ -202,33 +222,41 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000574:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000574:unquenchable-resolve",
           "ability_name": "Unquenchable Resolve",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "c98c55dcbb97f717863f1461bf37ba17538d1c5552590fccde55ec1fc72e71ce",
           "raw_text": "The first time this model is destroyed, at the end of the phase, roll one D6: on a 2+, set this model back up on the battlefield as close as possible to where it was destroyed and not within Engagement Range of one or more enemy units, with its full wounds remaining.",
           "raw_text_sha256": "c98c55dcbb97f717863f1461bf37ba17538d1c5552590fccde55ec1fc72e71ce",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:first-death-return"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:first-death-return"
+              ],
+              "semantic_id": "phase17n:aeldari:000000574:4:clause:001:effect:0",
+              "semantic_kind": "return_destroyed_target"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000574:4"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000574:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000574",
       "datasheet_name": "Fuegan",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -819,18 +847,20 @@
         {
           "ability_id": "000000588:spirit-mark-psychic",
           "ability_name": "Spirit Mark (Psychic)",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "f5569a4213c017d22562c46dd03a37d0bb13146773f077f8e8b8fd6c46ba5e07",
           "raw_text": "Once per turn, in your Movement phase, when this model starts or ends a move, select one friendly Wraith Construct unit within 6\" of this model (excluding TITANIC units) and one enemy unit visible to this model. Until the start of your next Movement phase, weapons equipped by models in that friendly unit have the [SUSTAINED HITS 1] ability while targeting that enemy unit.",
           "raw_text_sha256": "9e27f99bcfa36917297d17beab32b19fcff3d7813408685707d7415c8f0898b5",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-friendly-enemy-target-pair"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:4:description:clause:002:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-friendly-enemy-target-pair"
+              ],
+              "semantic_id": "phase17n:aeldari:000000588:4:clause:001:effect:0",
               "semantic_kind": "grant_weapon_ability"
             }
           ],
@@ -839,52 +869,75 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000588:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000588:spiritseer",
           "ability_name": "Spiritseer",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "fe614455f5fdcd6184cee58072c6caaf91595b6db6140d229346ae7bc91d3d7e",
           "raw_text": "While this model is within 3\" of one or more friendly Wraith Construct units, this model has the Lone Operative ability.",
           "raw_text_sha256": "fe614455f5fdcd6184cee58072c6caaf91595b6db6140d229346ae7bc91d3d7e",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-ability:lone-operative"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-ability:lone-operative"
+              ],
+              "semantic_id": "phase17n:aeldari:000000588:3:clause:001:effect:0",
+              "semantic_kind": "grant_ability"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:3"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000588:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000588:tears-of-isha-psychic",
           "ability_name": "Tears of Isha (Psychic)",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "6ec75b82e437b6cd531b0a064b562e39bbbd2df7bf16c6b9dcb8172fd0b983f0",
           "raw_text": "In your Command phase, select one friendly Wraith Construct unit within 6\" of this model. If one or more models in that unit are destroyed, you can return one destroyed model to that unit. Otherwise, one model in that unit regains up to D3 lost wounds. Each unit can only be selected for this ability once per turn.",
           "raw_text_sha256": "6ec75b82e437b6cd531b0a064b562e39bbbd2df7bf16c6b9dcb8172fd0b983f0",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:command-restoration"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:command-restoration"
+              ],
+              "semantic_id": "phase17n:aeldari:000000588:5:clause:001:effect:0",
+              "semantic_kind": "return_destroyed_target"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:command-restoration"
+              ],
+              "semantic_id": "phase17n:aeldari:000000588:5:clause:001:effect:1",
+              "semantic_kind": "restore_lost_wounds"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:5"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000588:5",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000588",
       "datasheet_name": "Spiritseer",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -1169,22 +1222,28 @@
         {
           "ability_id": "000000594:acrobatic",
           "ability_name": "Acrobatic",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "f520c1f429cf78546e2257341425ec04f859501a90ea884d47f14cbdfd2d7ba6",
           "raw_text": "This unit is eligible to declare a charge in a turn in which it Advanced or Fell Back.",
           "raw_text_sha256": "f520c1f429cf78546e2257341425ec04f859501a90ea884d47f14cbdfd2d7ba6",
           "runtime_consumer_ids": [
-            "catalog-ir:can-advance-and-charge"
+            "catalog-ir:can-advance-and-charge",
+            "catalog-ir:can-fallback-and-charge"
           ],
           "semantic_consumers": [
             {
               "runtime_consumer_ids": [
                 "catalog-ir:can-advance-and-charge"
               ],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000594:3:description:clause:001:effect:0",
+              "semantic_id": "phase17n:aeldari:000000594:3:clause:001:effect:0",
+              "semantic_kind": "grant_ability"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:can-fallback-and-charge"
+              ],
+              "semantic_id": "phase17n:aeldari:000000594:3:clause:001:effect:1",
               "semantic_kind": "grant_ability"
             }
           ],
@@ -1193,7 +1252,7 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000594:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000594:aspect-shrine-token",
@@ -1227,7 +1286,7 @@
       "datasheet_name": "Howling Banshees",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "rules_update"
     },
     {
@@ -3331,21 +3390,29 @@
         {
           "ability_id": "000003909:empyric-ambush",
           "ability_name": "Empyric Ambush",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "dbdf75d66da9b9afe50e935b07bf69335401e2240711132496aa5f88ffa7e8c0",
           "raw_text": "While this model is leading a unit, that unit is eligible to declare a charge in a turn in which it used its Flickerjump ability.",
           "raw_text_sha256": "dbdf75d66da9b9afe50e935b07bf69335401e2240711132496aa5f88ffa7e8c0",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:conditional-leading-charge-after-movement-action"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:conditional-leading-charge-after-movement-action"
+              ],
+              "semantic_id": "phase17n:aeldari:000003909:4:clause:001:effect:0",
+              "semantic_kind": "grant_ability"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003909:4"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000003909:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000003909:whispering-web",
@@ -3363,7 +3430,7 @@
               "runtime_consumer_ids": [
                 "catalog-ir:minimum-unmodified-hit-success"
               ],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003909:5:description:clause:002:effect:0",
+              "semantic_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5:clause:002:effect:0",
               "semantic_kind": "set_contextual_status"
             }
           ],
@@ -3379,7 +3446,7 @@
       "datasheet_name": "Lhykhis",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -4317,9 +4384,9 @@
   "release_hash": "379616e1abaf64a4e6de5c9614d452b146783a0efccab03c18f3cb82e07e6eed",
   "schema_version": "aeldari-datasheet-semantic-coverage-v4",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 20,
+    "All exact abilities consumed": 25,
     "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 44
+    "Exact ability IR unsupported": 39
   },
   "source_artifact_hashes": {
     "Abilities": "c3f7d3ed3f27041a13cc46835ba8c8d4d6b731edc9cfbc70e9e92fe8a7c229c4",

@@ -235,6 +235,10 @@ def _apply_movement_proposal_decision(
                 player_id=active_player_id,
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
+            ignores_vertical_distance=any(
+                grant.ignores_vertical_distance
+                for grant in _advance_move_grants_from_context(proposal_request.context or {})
+            ),
         )
         if not advance_resolution.is_valid:
             violation_code = _normal_move_violation_code(advance_resolution)

@@ -1,0 +1,1457 @@
+{
+  "artifact_schema": "core-v2-aeldari-banshees-phoenix-lords-spiritseer-rule-ir-v1",
+  "datasheets": {
+    "000000572": "Jain Zar",
+    "000000574": "Fuegan",
+    "000000588": "Spiritseer",
+    "000000594": "Howling Banshees",
+    "000003909": "Lhykhis"
+  },
+  "package_hash": "197de27af2b13a5c84986c4f839c216ef1ae05fda802c35613ea9c6b927f56fc",
+  "records": {
+    "000000572:4": {
+      "ability_name": "Whirling Death",
+      "normalized_text_sha256": "499d2fd591bd65b78ae09bf5f43d62ae453ba90bf1080dd20b0164f150c2de98",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:aeldari:000000572:4:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 34,
+                  "start": 6,
+                  "text": "this model is leading a unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "endpoint",
+                  "value": "phase"
+                }
+              ],
+              "source_span": {
+                "end": 130,
+                "start": 104,
+                "text": "until the end of the phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "override_dice_roll_result",
+                "parameters": [
+                  {
+                    "key": "fixed_result",
+                    "value": 6
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "advance"
+                  },
+                  {
+                    "key": "skip_roll",
+                    "value": true
+                  }
+                ],
+                "source_span": {
+                  "end": 93,
+                  "start": 66,
+                  "text": "do not make an Advance roll"
+                }
+              },
+              {
+                "kind": "modify_move_distance",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "movement"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 6
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "models_in_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 165,
+                  "start": 132,
+                  "text": "add 6\" to the Move characteristic"
+                }
+              },
+              {
+                "kind": "movement_transit_permission",
+                "parameters": [
+                  {
+                    "key": "movement_action",
+                    "value": "advance"
+                  },
+                  {
+                    "key": "permission",
+                    "value": "ignore_vertical_distance"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "models_in_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 275,
+                  "start": 247,
+                  "text": "ignore any vertical distance"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 353,
+              "start": 0,
+              "text": "While this model is leading a unit, each time that unit Advances, do not make an Advance roll. Instead, until the end of the phase, add 6\" to the Move characteristic of models in that unit and each time a model in that unit makes an Advance move, ignore any vertical distance when determining the total distance that model can be moved during that move."
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "this_model_leading_unit"
+                }
+              ],
+              "source_span": {
+                "end": 55,
+                "start": 46,
+                "text": "that unit"
+              }
+            },
+            "template_id": "phase17n:conditional-leading-fixed-advance",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "bbf2d1f714a86df86fc4c390093914a45119ded4642e9f6cba027b8ec56908e8",
+        "normalized_text": "While this model is leading a unit, each time that unit Advances, do not make an Advance roll. Instead, until the end of the phase, add 6\" to the Move characteristic of models in that unit and each time a model in that unit makes an Advance move, ignore any vertical distance when determining the total distance that model can be moved during that move.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:aeldari:datasheet:000000572:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000572:4"
+      }
+    },
+    "000000572:5": {
+      "ability_name": "Storm of Silence",
+      "normalized_text_sha256": "fc9f01b133012e2615add0b0aae36f3c353d5e50691ca1d77413ab67a285a0a9",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000572:5:clause:001",
+            "conditions": [
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "attack_target"
+                  },
+                  {
+                    "key": "required_keyword_any",
+                    "value": [
+                      "CHARACTER"
+                    ]
+                  }
+                ],
+                "source_span": {
+                  "end": 66,
+                  "start": 0,
+                  "text": "Each time this model makes an attack that targets a CHARACTER unit"
+                }
+              },
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "attack_target"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "this_model_makes_attack"
+                  }
+                ],
+                "source_span": {
+                  "end": 66,
+                  "start": 0,
+                  "text": "Each time this model makes an attack that targets a CHARACTER unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "roll_type",
+                    "value": "wound"
+                  }
+                ],
+                "source_span": {
+                  "end": 98,
+                  "start": 68,
+                  "text": "you can re-roll the Wound roll"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 99,
+              "start": 0,
+              "text": "Each time this model makes an attack that targets a CHARACTER unit, you can re-roll the Wound roll."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 20,
+                "start": 10,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17c:reroll-permission",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "actor",
+                  "value": "this_model"
+                },
+                {
+                  "key": "roll_type",
+                  "value": "wound"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "attack_sequence.wound"
+                }
+              ],
+              "source_span": {
+                "end": 66,
+                "start": 0,
+                "text": "Each time this model makes an attack that targets a CHARACTER unit"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "5ce43803f09cac47dc32750bdc8d3866f9da34c40c4e7a3bdaae3d102aca1a11",
+        "normalized_text": "Each time this model makes an attack that targets a CHARACTER unit, you can re-roll the Wound roll.",
+        "parser_version": "phase17c-rule-parser-v2",
+        "rule_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000572:5",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000572:5"
+      }
+    },
+    "000000574:3": {
+      "ability_name": "Burning Lance",
+      "normalized_text_sha256": "ae87c1c5314475e059373757f51af938c5196a0ce2557490f38da64865a7cf7d",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:aeldari:000000574:3:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 34,
+                  "start": 6,
+                  "text": "this model is leading a unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 34,
+                "start": 0,
+                "text": "While this model is leading a unit"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "range"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 6
+                  },
+                  {
+                    "key": "required_weapon_keyword",
+                    "value": "MELTA"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "weapons_equipped_by_models_in_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 70,
+                  "start": 36,
+                  "text": "add 6\" to the Range characteristic"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 120,
+              "start": 0,
+              "text": "While this model is leading a unit, add 6\" to the Range characteristic of Melta weapons equipped by models in that unit."
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "this_model_leading_unit"
+                }
+              ],
+              "source_span": {
+                "end": 119,
+                "start": 110,
+                "text": "that unit"
+              }
+            },
+            "template_id": "phase17n:conditional-leading-weapon-range-modifier",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "06f12708c9980225333365a079b4aa1af7c42be3c98845d9776089394e2a5c86",
+        "normalized_text": "While this model is leading a unit, add 6\" to the Range characteristic of Melta weapons equipped by models in that unit.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:aeldari:datasheet:000000574:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000574:3"
+      }
+    },
+    "000000574:4": {
+      "ability_name": "Unquenchable Resolve",
+      "normalized_text_sha256": "c98c55dcbb97f717863f1461bf37ba17538d1c5552590fccde55ec1fc72e71ce",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:aeldari:000000574:4:clause:001",
+            "conditions": [
+              {
+                "kind": "frequency_limit",
+                "parameters": [
+                  {
+                    "key": "event",
+                    "value": "target_destroyed"
+                  },
+                  {
+                    "key": "event_order",
+                    "value": "first"
+                  },
+                  {
+                    "key": "scope",
+                    "value": "battle"
+                  }
+                ],
+                "source_span": {
+                  "end": 14,
+                  "start": 0,
+                  "text": "The first time"
+                }
+              },
+              {
+                "kind": "dice_roll_gate",
+                "parameters": [
+                  {
+                    "key": "comparison",
+                    "value": "greater_or_equal"
+                  },
+                  {
+                    "key": "roll_count",
+                    "value": 1
+                  },
+                  {
+                    "key": "roll_expression",
+                    "value": "D6"
+                  },
+                  {
+                    "key": "success_threshold",
+                    "value": 2
+                  }
+                ],
+                "source_span": {
+                  "end": 85,
+                  "start": 78,
+                  "text": "on a 2+"
+                }
+              },
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": null
+                  },
+                  {
+                    "key": "negated",
+                    "value": true
+                  },
+                  {
+                    "key": "object_allegiance",
+                    "value": "enemy"
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "unit"
+                  },
+                  {
+                    "key": "object_quantity",
+                    "value": "one_or_more"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within_engagement_range"
+                  },
+                  {
+                    "key": "qualifier",
+                    "value": null
+                  },
+                  {
+                    "key": "range_kind",
+                    "value": "engagement_range"
+                  }
+                ],
+                "source_span": {
+                  "end": 234,
+                  "start": 180,
+                  "text": "not within Engagement Range of one or more enemy units"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "immediate",
+              "parameters": [],
+              "source_span": {
+                "end": 63,
+                "start": 40,
+                "text": "at the end of the phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "return_destroyed_target",
+                "parameters": [
+                  {
+                    "key": "action",
+                    "value": "set_back_up"
+                  },
+                  {
+                    "key": "placement_anchor",
+                    "value": "destroyed_position"
+                  },
+                  {
+                    "key": "placement_kind",
+                    "value": "battlefield_set_up"
+                  },
+                  {
+                    "key": "placement_preference",
+                    "value": "as_close_as_possible"
+                  },
+                  {
+                    "key": "restore_wounds_mode",
+                    "value": "full_health"
+                  },
+                  {
+                    "key": "target",
+                    "value": "this_model"
+                  },
+                  {
+                    "key": "target_lifecycle",
+                    "value": "destroyed"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "destroyed_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 128,
+                  "start": 87,
+                  "text": "set this model back up on the battlefield"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 267,
+              "start": 0,
+              "text": "The first time this model is destroyed, at the end of the phase, roll one D6: on a 2+, set this model back up on the battlefield as close as possible to where it was destroyed and not within Engagement Range of one or more enemy units, with its full wounds remaining."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 25,
+                "start": 15,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17c:first-death-return-full-wounds",
+            "trigger": {
+              "kind": "model_destroyed",
+              "parameters": [
+                {
+                  "key": "destroyed_target",
+                  "value": "this_model"
+                },
+                {
+                  "key": "event_order",
+                  "value": "first"
+                },
+                {
+                  "key": "resolution_timing",
+                  "value": "phase_end"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "phase_end_after_destroyed"
+                }
+              ],
+              "source_span": {
+                "end": 38,
+                "start": 15,
+                "text": "this model is destroyed"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "db4ff4b66ca305d9a95edd943b14a934242da79de8561cb8c09c341dee22cb90",
+        "normalized_text": "The first time this model is destroyed, at the end of the phase, roll one D6: on a 2+, set this model back up on the battlefield as close as possible to where it was destroyed and not within Engagement Range of one or more enemy units, with its full wounds remaining.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:aeldari:datasheet:000000574:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000574:4"
+      }
+    },
+    "000000588:3": {
+      "ability_name": "Spiritseer",
+      "normalized_text_sha256": "fe614455f5fdcd6184cee58072c6caaf91595b6db6140d229346ae7bc91d3d7e",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:aeldari:000000588:3:clause:001",
+            "conditions": [
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "allegiance",
+                    "value": "friendly"
+                  },
+                  {
+                    "key": "distance_inches",
+                    "value": 3
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "unit"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within"
+                  },
+                  {
+                    "key": "required_keyword_sequence",
+                    "value": [
+                      "WRAITH CONSTRUCT"
+                    ]
+                  }
+                ],
+                "source_span": {
+                  "end": 76,
+                  "start": 20,
+                  "text": "within 3\" of one or more friendly Wraith Construct units"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 26,
+                "start": 0,
+                "text": "While this model is within"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "lone_operative"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 119,
+                  "start": 97,
+                  "text": "Lone Operative ability"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 120,
+              "start": 0,
+              "text": "While this model is within 3\" of one or more friendly Wraith Construct units, this model has the Lone Operative ability."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 16,
+                "start": 6,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17c:conditional-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "8f0a063885fb3263a78d037ee482ebc3972a5d6757910437d87c0314431ed54a",
+        "normalized_text": "While this model is within 3\" of one or more friendly Wraith Construct units, this model has the Lone Operative ability.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:aeldari:datasheet:000000588:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000588:3"
+      }
+    },
+    "000000588:4": {
+      "ability_name": "Spirit Mark (Psychic)",
+      "normalized_text_sha256": "9e27f99bcfa36917297d17beab32b19fcff3d7813408685707d7415c8f0898b5",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:aeldari:000000588:4:clause:001",
+            "conditions": [
+              {
+                "kind": "frequency_limit",
+                "parameters": [
+                  {
+                    "key": "limit",
+                    "value": 1
+                  },
+                  {
+                    "key": "period",
+                    "value": "turn"
+                  }
+                ],
+                "source_span": {
+                  "end": 13,
+                  "start": 0,
+                  "text": "Once per turn"
+                }
+              },
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": 6
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "unit"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within"
+                  },
+                  {
+                    "key": "subject",
+                    "value": "selected_friendly_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 143,
+                  "start": 120,
+                  "text": "within 6\" of this model"
+                }
+              },
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "excluded_keywords",
+                    "value": [
+                      "TITANIC"
+                    ]
+                  },
+                  {
+                    "key": "gate_subject",
+                    "value": "selected_friendly_unit"
+                  },
+                  {
+                    "key": "required_keyword_sequence",
+                    "value": [
+                      "WRAITH CONSTRUCT"
+                    ]
+                  }
+                ],
+                "source_span": {
+                  "end": 119,
+                  "start": 98,
+                  "text": "Wraith Construct unit"
+                }
+              },
+              {
+                "kind": "visibility_predicate",
+                "parameters": [
+                  {
+                    "key": "object_reference",
+                    "value": "this_model"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "visible_to"
+                  },
+                  {
+                    "key": "subject",
+                    "value": "selected_enemy_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 210,
+                  "start": 189,
+                  "text": "visible to this model"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "boundary",
+                  "value": "start"
+                },
+                {
+                  "key": "endpoint",
+                  "value": "next_movement_phase"
+                }
+              ],
+              "source_span": {
+                "end": 255,
+                "start": 212,
+                "text": "Until the start of your next Movement phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_weapon_ability",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "selected_friendly_unit"
+                  },
+                  {
+                    "key": "target_unit_scope",
+                    "value": "selected_enemy_unit"
+                  },
+                  {
+                    "key": "weapon_ability",
+                    "value": "Sustained Hits"
+                  },
+                  {
+                    "key": "weapon_ability_value",
+                    "value": 1
+                  }
+                ],
+                "source_span": {
+                  "end": 341,
+                  "start": 315,
+                  "text": "[SUSTAINED HITS 1] ability"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 374,
+              "start": 0,
+              "text": "Once per turn, in your Movement phase, when this model starts or ends a move, select one friendly Wraith Construct unit within 6\" of this model (excluding TITANIC units) and one enemy unit visible to this model. Until the start of your next Movement phase, weapons equipped by models in that friendly unit have the [SUSTAINED HITS 1] ability while targeting that enemy unit."
+            },
+            "target": {
+              "kind": "friendly_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "friendly"
+                },
+                {
+                  "key": "paired_target",
+                  "value": "one_visible_enemy_unit"
+                },
+                {
+                  "key": "selection",
+                  "value": "one"
+                }
+              ],
+              "source_span": {
+                "end": 119,
+                "start": 85,
+                "text": "one friendly Wraith Construct unit"
+              }
+            },
+            "template_id": "phase17n:movement-start-or-end-friendly-enemy-target-pair",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edges",
+                  "value": [
+                    "start",
+                    "end"
+                  ]
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "movement"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "model_starts_or_ends_move"
+                }
+              ],
+              "source_span": {
+                "end": 76,
+                "start": 39,
+                "text": "when this model starts or ends a move"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "2f3eb00581d160fe5a21662fa42a36729091e5312f2538a1f165111c7c70d813",
+        "normalized_text": "Once per turn, in your Movement phase, when this model starts or ends a move, select one friendly Wraith Construct unit within 6\" of this model (excluding TITANIC units) and one enemy unit visible to this model. Until the start of your next Movement phase, weapons equipped by models in that friendly unit have the [SUSTAINED HITS 1] ability while targeting that enemy unit.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:aeldari:datasheet:000000588:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000588:4"
+      }
+    },
+    "000000588:5": {
+      "ability_name": "Tears of Isha (Psychic)",
+      "normalized_text_sha256": "6ec75b82e437b6cd531b0a064b562e39bbbd2df7bf16c6b9dcb8172fd0b983f0",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:aeldari:000000588:5:clause:001",
+            "conditions": [
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": 6
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "unit"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within"
+                  },
+                  {
+                    "key": "subject",
+                    "value": "selected_friendly_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 88,
+                  "start": 65,
+                  "text": "within 6\" of this model"
+                }
+              },
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "selected_friendly_unit"
+                  },
+                  {
+                    "key": "required_keyword_sequence",
+                    "value": [
+                      "WRAITH CONSTRUCT"
+                    ]
+                  }
+                ],
+                "source_span": {
+                  "end": 64,
+                  "start": 43,
+                  "text": "Wraith Construct unit"
+                }
+              },
+              {
+                "kind": "frequency_limit",
+                "parameters": [
+                  {
+                    "key": "limit",
+                    "value": 1
+                  },
+                  {
+                    "key": "period",
+                    "value": "turn"
+                  },
+                  {
+                    "key": "scope",
+                    "value": "selected_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 314,
+                  "start": 253,
+                  "text": "Each unit can only be selected for this ability once per turn"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "immediate",
+              "parameters": [],
+              "source_span": {
+                "end": 21,
+                "start": 0,
+                "text": "In your Command phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "return_destroyed_target",
+                "parameters": [
+                  {
+                    "key": "amount",
+                    "value": 1
+                  },
+                  {
+                    "key": "condition",
+                    "value": "unit_has_destroyed_models"
+                  },
+                  {
+                    "key": "restore_wounds_mode",
+                    "value": "full_health"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "selected_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 187,
+                  "start": 148,
+                  "text": "return one destroyed model to that unit"
+                }
+              },
+              {
+                "kind": "restore_lost_wounds",
+                "parameters": [
+                  {
+                    "key": "amount_expression",
+                    "value": "D3"
+                  },
+                  {
+                    "key": "condition",
+                    "value": "unit_has_no_destroyed_models"
+                  },
+                  {
+                    "key": "maximum_models",
+                    "value": 1
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "selected_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 251,
+                  "start": 200,
+                  "text": "one model in that unit regains up to D3 lost wounds"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 315,
+              "start": 0,
+              "text": "In your Command phase, select one friendly Wraith Construct unit within 6\" of this model. If one or more models in that unit are destroyed, you can return one destroyed model to that unit. Otherwise, one model in that unit regains up to D3 lost wounds. Each unit can only be selected for this ability once per turn."
+            },
+            "target": {
+              "kind": "friendly_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "friendly"
+                },
+                {
+                  "key": "selection",
+                  "value": "one"
+                }
+              ],
+              "source_span": {
+                "end": 64,
+                "start": 30,
+                "text": "one friendly Wraith Construct unit"
+              }
+            },
+            "template_id": "phase17n:command-phase-friendly-unit-restoration",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "start"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "command"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "command_phase_start"
+                }
+              ],
+              "source_span": {
+                "end": 21,
+                "start": 0,
+                "text": "In your Command phase"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "a66619242580125d2c2657ae2d194c564d0b7bdd4b9c40bb01d55fb67cb6a7f1",
+        "normalized_text": "In your Command phase, select one friendly Wraith Construct unit within 6\" of this model. If one or more models in that unit are destroyed, you can return one destroyed model to that unit. Otherwise, one model in that unit regains up to D3 lost wounds. Each unit can only be selected for this ability once per turn.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:aeldari:datasheet:000000588:5",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000588:5"
+      }
+    },
+    "000000594:3": {
+      "ability_name": "Acrobatic",
+      "normalized_text_sha256": "f520c1f429cf78546e2257341425ec04f859501a90ea884d47f14cbdfd2d7ba6",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:aeldari:000000594:3:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "permanent",
+              "parameters": [],
+              "source_span": {
+                "end": 9,
+                "start": 0,
+                "text": "This unit"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "can_advance_and_charge"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 72,
+                  "start": 42,
+                  "text": "in a turn in which it Advanced"
+                }
+              },
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "can_fall_back_and_charge"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 85,
+                  "start": 73,
+                  "text": "or Fell Back"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 86,
+              "start": 0,
+              "text": "This unit is eligible to declare a charge in a turn in which it Advanced or Fell Back."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 9,
+                "start": 0,
+                "text": "This unit"
+              }
+            },
+            "template_id": "phase17n:charge-after-movement-actions",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "ff8aee403f628a3591eaab1ad9610fa929ddb9622ef38c138f417930c6e618ad",
+        "normalized_text": "This unit is eligible to declare a charge in a turn in which it Advanced or Fell Back.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:aeldari:datasheet:000000594:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000594:3"
+      }
+    },
+    "000003909:4": {
+      "ability_name": "Empyric Ambush",
+      "normalized_text_sha256": "dbdf75d66da9b9afe50e935b07bf69335401e2240711132496aa5f88ffa7e8c0",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:aeldari:000003909:4:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 34,
+                  "start": 6,
+                  "text": "this model is leading a unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 34,
+                "start": 0,
+                "text": "While this model is leading a unit"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "can_charge_after_movement_action"
+                  },
+                  {
+                    "key": "movement_action_effect_kind",
+                    "value": "catalog_movement_action_grant"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 77,
+                  "start": 49,
+                  "text": "eligible to declare a charge"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 129,
+              "start": 0,
+              "text": "While this model is leading a unit, that unit is eligible to declare a charge in a turn in which it used its Flickerjump ability."
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "this_model_leading_unit"
+                }
+              ],
+              "source_span": {
+                "end": 45,
+                "start": 36,
+                "text": "that unit"
+              }
+            },
+            "template_id": "phase17n:conditional-leading-charge-after-movement-action",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "3f13c4999f3184f8a3a86511800cf77352a61e6dc7d5029dd2a88127cc37501d",
+        "normalized_text": "While this model is leading a unit, that unit is eligible to declare a charge in a turn in which it used its Flickerjump ability.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:aeldari:datasheet:000003909:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:4"
+      }
+    },
+    "000003909:5": {
+      "ability_name": "Whispering Web",
+      "normalized_text_sha256": "15db9ab0d9f420ce9a350f1d40d8da9c60001f2ec7457334b39dbb57508aa60f",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [],
+            "source_span": {
+              "end": 109,
+              "start": 0,
+              "text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks."
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 108,
+                "start": 0,
+                "text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks"
+              }
+            },
+            "template_id": "phase17c:selected-target-constraint",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "just_after_friendly_unit_has_shot"
+                }
+              ],
+              "source_span": {
+                "end": 108,
+                "start": 0,
+                "text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5:clause:002",
+            "conditions": [
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "required_keyword",
+                    "value": "AELDARI"
+                  }
+                ],
+                "source_span": {
+                  "end": 171,
+                  "start": 149,
+                  "text": "friendly Aeldari model"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "endpoint",
+                  "value": "turn"
+                }
+              ],
+              "source_span": {
+                "end": 135,
+                "start": 110,
+                "text": "Until the end of the turn"
+              }
+            },
+            "effects": [
+              {
+                "kind": "set_contextual_status",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "minimum_unmodified_success",
+                    "value": 5
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "hit"
+                  },
+                  {
+                    "key": "status",
+                    "value": "minimum_unmodified_hit_success"
+                  }
+                ],
+                "source_span": {
+                  "end": 262,
+                  "start": 215,
+                  "text": "unmodified Hit roll of 5+ scores a Critical Hit"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 263,
+              "start": 110,
+              "text": "Until the end of the turn, each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll of 5+ scores a Critical Hit."
+            },
+            "target": {
+              "kind": "friendly_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "friendly"
+                },
+                {
+                  "key": "required_keyword",
+                  "value": "AELDARI"
+                }
+              ],
+              "source_span": {
+                "end": 171,
+                "start": 149,
+                "text": "friendly Aeldari model"
+              }
+            },
+            "template_id": "phase17c:contextual-status",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "roll_type",
+                  "value": "hit"
+                }
+              ],
+              "source_span": {
+                "end": 234,
+                "start": 137,
+                "text": "each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "935116444906d81676d276b0368671da0b8bbd496b2022e005513a0798706da9",
+        "normalized_text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks. Until the end of the turn, each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll of 5+ scores a Critical Hit.",
+        "parser_version": "phase17c-rule-parser-v2",
+        "rule_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}
