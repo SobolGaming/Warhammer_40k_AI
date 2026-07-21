@@ -21,6 +21,7 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
     model_displacement_kind_from_token,
 )
+from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -532,6 +533,45 @@ def unit_placement_coherency_result(
         model_instance = scenario.model_instance_for_placement(placement)
         if scenario.model_is_present_at_placement(placement):
             models.append(geometry_model_for_placement(model=model_instance, placement=placement))
+    return context.validate_models(tuple(models))
+
+
+def rules_unit_coherency_result(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    rules_unit: RulesUnitView,
+) -> UnitCoherencyResult:
+    if type(scenario) is not BattlefieldScenario:
+        raise UnitCoherencyError("rules_unit_coherency_result scenario must be a scenario.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise UnitCoherencyError(
+            "rules_unit_coherency_result requires an explicit RulesetDescriptor."
+        )
+    if type(rules_unit) is not RulesUnitView:
+        raise UnitCoherencyError("rules_unit_coherency_result requires a RulesUnitView.")
+    context = UnitCoherencyContext.from_ruleset_descriptor(
+        ruleset_descriptor,
+        unit_instance_id=rules_unit.unit_instance_id,
+    )
+    models: list[Model] = []
+    for component in rules_unit.components:
+        placement = scenario.battlefield_state.unit_placement_or_none(
+            component.unit.unit_instance_id
+        )
+        if placement is None:
+            if any(model.is_alive for model in component.unit.own_models):
+                raise UnitCoherencyError("Living rules-unit component is not on the battlefield.")
+            continue
+        for model_placement in placement.model_placements:
+            model_instance = scenario.model_instance_for_placement(model_placement)
+            if scenario.model_is_present_at_placement(model_placement):
+                models.append(
+                    geometry_model_for_placement(
+                        model=model_instance,
+                        placement=model_placement,
+                    )
+                )
     return context.validate_models(tuple(models))
 
 

@@ -46,6 +46,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.phases.movement_model import MovementPhaseActionKind
 from warhammer40k_core.engine.phases.movement_state import PendingMovementActionSelection
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
@@ -78,6 +79,19 @@ CATALOG_MOVEMENT_TARGET_PAIR_EFFECT_KIND = "catalog_movement_target_pair"
 _START_EDGE = "start"
 _END_EDGE = "end"
 _DECLINE_OPTION_SUFFIX = "decline"
+_TRIGGERING_MOVEMENT_ACTIONS = frozenset(
+    {
+        MovementPhaseActionKind.NORMAL_MOVE,
+        MovementPhaseActionKind.ADVANCE,
+        MovementPhaseActionKind.FALL_BACK,
+    }
+)
+_TRIGGERING_MOVEMENT_ACTION_TOKENS = frozenset(
+    action.value for action in _TRIGGERING_MOVEMENT_ACTIONS
+)
+_NON_TRIGGERING_MOVEMENT_ACTION_TOKENS = frozenset(
+    {MovementPhaseActionKind.REMAIN_STATIONARY.value, "set_up"}
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,6 +166,8 @@ class CatalogMovementTargetPairRuntime:
         _validate_movement_state(state)
         if pending_action.player_id != state.active_player_id:
             raise GameLifecycleError("Catalog movement target-pair active player drift.")
+        if not _movement_action_triggers_target_pair(pending_action.movement_phase_action):
+            return None
         for source in self._sources_for_triggering_rules_unit(
             state=state,
             triggering_unit_instance_id=pending_action.unit_instance_id,
@@ -183,6 +199,8 @@ class CatalogMovementTargetPairRuntime:
         if context.decisions is None:
             raise GameLifecycleError("Catalog movement target-pair end requires decisions.")
         if context.completed_phase is not BattlePhase.MOVEMENT:
+            return None
+        if not _movement_action_triggers_target_pair(context.movement_action):
             return None
         for source in self._sources_for_triggering_rules_unit(
             state=context.state,
@@ -913,6 +931,9 @@ def _request_context_is_current(
     ):
         return False
     edge = _payload_edge(payload)
+    movement_action = payload.get("movement_action")
+    if not _movement_action_triggers_target_pair(movement_action):
+        return False
     if edge == _START_EDGE:
         movement_state = state.movement_phase_state
         pending = None if movement_state is None else movement_state.pending_action
@@ -963,6 +984,18 @@ def _validate_movement_state(state: object) -> None:
         or state.active_player_id is None
     ):
         raise GameLifecycleError("Catalog movement target-pair requires active Movement phase.")
+
+
+def _movement_action_triggers_target_pair(value: object) -> bool:
+    if type(value) is MovementPhaseActionKind:
+        return value in _TRIGGERING_MOVEMENT_ACTIONS
+    if type(value) is not str or not value:
+        raise GameLifecycleError("Catalog movement target-pair action must be an identifier.")
+    if value in _TRIGGERING_MOVEMENT_ACTION_TOKENS:
+        return True
+    if value in _NON_TRIGGERING_MOVEMENT_ACTION_TOKENS:
+        return False
+    raise GameLifecycleError(f"Catalog movement target-pair action is unsupported: {value}.")
 
 
 def _payload_object(value: JsonValue) -> dict[str, JsonValue]:

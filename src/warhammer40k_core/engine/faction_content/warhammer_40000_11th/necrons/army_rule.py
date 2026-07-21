@@ -29,7 +29,6 @@ from warhammer40k_core.engine.healing_geometry import (
     healing_opposing_player_id,
     healing_phase_start_enemy_engagement_model_ids,
     healing_phase_start_model_ids,
-    healing_revival_placements_for_rules_unit,
     healing_rules_unit_placements,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
@@ -268,11 +267,6 @@ def _reanimation_healing_effect(
         ),
         phase_start_enemy_engagement_model_ids=healing_phase_start_enemy_engagement_model_ids(
             state=state,
-            rules_unit=rules_unit,
-        ),
-        revival_placements=healing_revival_placements_for_rules_unit(
-            state=state,
-            army=army,
             rules_unit=rules_unit,
         ),
     )

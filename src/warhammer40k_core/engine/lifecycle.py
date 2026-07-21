@@ -129,11 +129,11 @@ from warhammer40k_core.engine.game_state import (
     GameState,
     GameStatePayload,
 )
-from warhammer40k_core.engine.healing import (
-    SELECT_HEALING_MODEL_DECISION_TYPE,
-    apply_recorded_healing_model_decision,
-    healing_effect_from_request,
-    invalid_healing_model_decision_status,
+from warhammer40k_core.engine.healing_decision_dispatch import (
+    HEALING_DECISION_TYPES,
+    PARAMETERIZED_HEALING_DECISION_TYPES,
+    apply_recorded_healing_decision,
+    invalid_healing_decision_status,
 )
 from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
     state_allows_battlefield_state as _state_allows_battlefield_state,
@@ -466,7 +466,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         DICE_RESULT_OVERRIDE_DECISION_TYPE,
-        SELECT_HEALING_MODEL_DECISION_TYPE,
+        *HEALING_DECISION_TYPES,
     )
 )
 _SETUP_DECISION_TYPES = frozenset(
@@ -499,6 +499,7 @@ _PARAMETERIZED_DISPATCH_DECISION_TYPES = frozenset(
         PLACEMENT_PROPOSAL_DECISION_TYPE,
         SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE,
         SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+        *PARAMETERIZED_HEALING_DECISION_TYPES,
         SUBMIT_SCOUT_MOVE_DECISION_TYPE,
         SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
@@ -1019,10 +1020,13 @@ class GameLifecycle:
                     pre_validator=self._pre_validate_cult_ambush_marker_placement_decision,
                     applier=self._apply_cult_ambush_marker_placement_decision,
                 ),
-                DecisionDispatchHandler(
-                    decision_type=SELECT_HEALING_MODEL_DECISION_TYPE,
-                    pre_validator=self._pre_validate_healing_model_decision,
-                    applier=self._apply_healing_model_decision,
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_healing_decision,
+                        applier=self._apply_healing_decision,
+                    )
+                    for decision_type in HEALING_DECISION_TYPES
                 ),
                 DecisionDispatchHandler(
                     decision_type=SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
@@ -2175,41 +2179,40 @@ class GameLifecycle:
         )
         return self.advance_until_decision_or_terminal()
 
-    def _pre_validate_healing_model_decision(
+    def _pre_validate_healing_decision(
         self,
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         if self._result_resolves_active_reaction_frame(result):
             self.reaction_queue.validate_result(result)
-        return invalid_healing_model_decision_status(
+        return invalid_healing_decision_status(
             state=self._require_state(),
             request=request,
             result=result,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
         )
 
-    def _apply_healing_model_decision(
+    def _apply_healing_decision(
         self,
         record: DecisionRecord,
         result: DecisionResult,
     ) -> LifecycleStatus:
         state = self._require_state()
         resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-        healing_effect = healing_effect_from_request(request=record.request)
-        _updated_effect, follow_up_request = apply_recorded_healing_model_decision(
+        healing_effect, follow_up_request = apply_recorded_healing_decision(
             state=state,
             decisions=self.decision_controller,
             ruleset_descriptor=self._require_config().ruleset_descriptor,
             request=record.request,
             result=result,
-            effect=healing_effect,
         )
         if follow_up_request is not None:
             healing_status = LifecycleStatus.waiting_for_decision(
                 stage=state.stage,
                 decision_request=follow_up_request,
                 payload={
-                    "decision_type": SELECT_HEALING_MODEL_DECISION_TYPE,
+                    "decision_type": follow_up_request.decision_type,
                     "effect_id": healing_effect.effect_id,
                     "target_unit_instance_id": healing_effect.target_unit_instance_id,
                 },

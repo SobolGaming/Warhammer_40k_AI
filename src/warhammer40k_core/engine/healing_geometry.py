@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
@@ -12,7 +11,6 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
-from warhammer40k_core.geometry.pose import Pose
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -73,48 +71,6 @@ def healing_phase_start_enemy_engagement_model_ids(
     return tuple(sorted(engaged_enemy_ids))
 
 
-def healing_revival_placements_for_rules_unit(
-    *,
-    state: GameState,
-    army: ArmyDefinition,
-    rules_unit: RulesUnitView,
-) -> tuple[ModelPlacement, ...]:
-    battlefield = healing_battlefield_state(state)
-    removed_model_ids = set(battlefield.removed_model_ids)
-    missing_models = tuple(
-        sorted(
-            (
-                model
-                for model in rules_unit.own_models
-                if not model.is_alive and model.model_instance_id in removed_model_ids
-            ),
-            key=lambda model: model.model_instance_id,
-        )
-    )
-    if not missing_models:
-        return ()
-    anchors = healing_rules_unit_placements(state=state, rules_unit=rules_unit)
-    if not anchors:
-        raise GameLifecycleError("Healing revival requires placed anchors.")
-    placements: list[ModelPlacement] = []
-    for index, model in enumerate(missing_models):
-        anchor = anchors[index % len(anchors)]
-        placements.append(
-            ModelPlacement(
-                army_id=army.army_id,
-                player_id=army.player_id,
-                unit_instance_id=rules_unit.component_unit_id_for_model(model.model_instance_id),
-                model_instance_id=model.model_instance_id,
-                pose=_candidate_revival_pose(
-                    battlefield=battlefield,
-                    anchor=anchor,
-                    index=index,
-                ),
-            )
-        )
-    return tuple(placements)
-
-
 def healing_rules_unit_placements(
     *,
     state: GameState,
@@ -169,33 +125,10 @@ def _append_component_placements(
     )
 
 
-def _candidate_revival_pose(
-    *,
-    battlefield: BattlefieldRuntimeState,
-    anchor: ModelPlacement,
-    index: int,
-) -> Pose:
-    offset = 0.5 + (index * 0.1)
-    anchor_position = anchor.pose.position
-    candidate_x = anchor_position.x + offset
-    candidate_y = anchor_position.y
-    if candidate_x > battlefield.battlefield_width_inches:
-        candidate_x = anchor_position.x - offset
-    if candidate_x < 0:
-        candidate_x = anchor_position.x
-        candidate_y = anchor_position.y + offset
-    if candidate_y > battlefield.battlefield_depth_inches:
-        candidate_y = anchor_position.y - offset
-    if candidate_y < 0:
-        raise GameLifecycleError("Healing could not derive revival placement.")
-    return Pose.at(candidate_x, candidate_y, anchor_position.z)
-
-
 __all__ = (
     "healing_battlefield_state",
     "healing_opposing_player_id",
     "healing_phase_start_enemy_engagement_model_ids",
     "healing_phase_start_model_ids",
-    "healing_revival_placements_for_rules_unit",
     "healing_rules_unit_placements",
 )

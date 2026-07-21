@@ -43,7 +43,6 @@ from warhammer40k_core.engine.healing_geometry import (
     healing_opposing_player_id,
     healing_phase_start_enemy_engagement_model_ids,
     healing_phase_start_model_ids,
-    healing_revival_placements_for_rules_unit,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rule_execution import (
@@ -204,7 +203,6 @@ class CatalogCommandRestorationRuntime:
             target_unit_instance_id=target_id,
         ):
             raise GameLifecycleError("Catalog command restoration option ID drift.")
-        army = _army_for_player(self.armies, player_id=context.active_player_id)
         d3_result = None
         if _rules_unit_has_destroyed_models(state=context.state, rules_unit=target):
             amount = source.descriptor.returned_models
@@ -261,11 +259,6 @@ class CatalogCommandRestorationRuntime:
                     state=context.state,
                     rules_unit=target,
                 )
-            ),
-            revival_placements=healing_revival_placements_for_rules_unit(
-                state=context.state,
-                army=army,
-                rules_unit=target,
             ),
         )
         resolved_effect, pending_request = resolve_healing_until_blocked(
@@ -631,17 +624,6 @@ def _common_payload(
             }
         ),
     )
-
-
-def _army_for_player(
-    armies: tuple[ArmyDefinition, ...],
-    *,
-    player_id: str,
-) -> ArmyDefinition:
-    matches = tuple(army for army in armies if army.player_id == player_id)
-    if len(matches) != 1:
-        raise GameLifecycleError("Catalog command restoration army lookup is ambiguous.")
-    return matches[0]
 
 
 def _rules_unit_label(rules_unit: RulesUnitView) -> str:

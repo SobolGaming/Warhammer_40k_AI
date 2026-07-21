@@ -269,6 +269,10 @@ _PARAMETERIZED_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.MULTI_MODEL_PLACEMENT,
             ("unit", "model"),
         ),
+        "submit_healing_revival_placement": InteractionSpec(
+            InteractionKind.MODEL_POSE_PLACEMENT,
+            ("model",),
+        ),
         "submit_melee_declaration": InteractionSpec(
             InteractionKind.WEAPON_ALLOCATION_MATRIX,
             ("attacking_model", "target_unit"),
@@ -318,6 +322,7 @@ _PROPOSAL_SCHEMA_DEFINITION_BY_KIND = MappingProxyType(
         "deployment_placement": "deployment_placement",
         "disembark_placement": "generic_placement",
         "fall_back": "movement",
+        "healing_revival_placement": "generic_placement",
         "melee_declaration": "melee_declaration",
         "normal_move": "movement",
         "pile_in": "fight_movement",
@@ -335,6 +340,7 @@ _PROPOSAL_SCHEMA_DEFINITION_BY_KIND = MappingProxyType(
 _SPECIAL_PROPOSAL_KIND_BY_DECISION_TYPE = MappingProxyType(
     {
         "submit_cult_ambush_marker_placement": "cult_ambush_marker_placement",
+        "submit_healing_revival_placement": "healing_revival_placement",
         "submit_return_on_death_placement": "return_on_death_placement",
     }
 )
@@ -342,6 +348,7 @@ _SPECIAL_PROPOSAL_KIND_BY_DECISION_TYPE = MappingProxyType(
 _SPECIAL_PROPOSAL_SCHEMA_DEFINITION_BY_DECISION_TYPE = MappingProxyType(
     {
         "submit_cult_ambush_marker_placement": "cult_ambush_marker_placement",
+        "submit_healing_revival_placement": "generic_placement",
         "submit_return_on_death_placement": "return_on_death_placement",
     }
 )

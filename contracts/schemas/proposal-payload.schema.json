@@ -268,6 +268,7 @@
             "cult_ambush_placement",
             "deep_strike_placement",
             "disembark_placement",
+            "healing_revival_placement",
             "reinforcement_placement",
             "strategic_reserves_placement"
           ],

@@ -43,7 +43,7 @@ def conditional_leading_weapon_range_effects(
         if isinstance(effect.effect_payload, dict)
         and effect.effect_payload.get("descriptor_id")
         == CONDITIONAL_LEADING_WEAPON_RANGE_DESCRIPTOR_ID
-        and _conditional_leading_source_applies(
+        and conditional_leading_source_applies(
             state=state,
             effect=effect,
             rules_unit_instance_id=rules_unit_instance_id,
@@ -69,7 +69,7 @@ def conditional_charge_after_movement_action_allowed(
             not isinstance(payload, dict)
             or payload.get("descriptor_id")
             != CONDITIONAL_LEADING_CHARGE_AFTER_MOVEMENT_ACTION_DESCRIPTOR_ID
-            or not _conditional_leading_source_applies(
+            or not conditional_leading_source_applies(
                 state=state,
                 effect=effect,
                 rules_unit_instance_id=rules_unit_instance_id,
@@ -171,7 +171,7 @@ def conditional_leader_grant_effect_applies(
         raise GameLifecycleError("Conditional leader ability effect payload must be an object.")
     if payload.get("descriptor_id") != CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID:
         return False
-    if not _conditional_leading_source_applies(
+    if not conditional_leading_source_applies(
         state=state,
         effect=effect,
         rules_unit_instance_id=rules_unit_instance_id,
@@ -210,7 +210,7 @@ def conditional_leading_roll_reroll_permission(
             not isinstance(payload, dict)
             or payload.get("descriptor_id") != CONDITIONAL_LEADING_ROLL_REROLL_DESCRIPTOR_ID
             or effect.owner_player_id != requested_player_id
-            or not _conditional_leading_source_applies(
+            or not conditional_leading_source_applies(
                 state=state,
                 effect=effect,
                 rules_unit_instance_id=rules_unit_instance_id,
@@ -249,7 +249,7 @@ def conditional_faction_resource_refund_roll_payload(
             not isinstance(payload, dict)
             or payload.get("descriptor_id") != FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID
             or effect.owner_player_id != requested_player_id
-            or not _conditional_leading_source_applies(
+            or not conditional_leading_source_applies(
                 state=state,
                 effect=effect,
                 rules_unit_instance_id=rules_unit_instance_id,
@@ -281,7 +281,7 @@ def conditional_granted_ability_distance_inches(effect: PersistingEffect) -> flo
     return float(distance)
 
 
-def _conditional_leading_source_applies(
+def conditional_leading_source_applies(
     *,
     state: GameState,
     effect: PersistingEffect,
@@ -290,7 +290,20 @@ def _conditional_leading_source_applies(
     payload = effect.effect_payload
     if not isinstance(payload, dict):
         raise GameLifecycleError("Conditional leader effect payload must be an object.")
-    source_unit_id = _source_unit_instance_id(payload)
+    return conditional_leading_source_unit_applies(
+        state=state,
+        rules_unit_instance_id=rules_unit_instance_id,
+        source_unit_instance_id=_source_unit_instance_id(payload),
+    )
+
+
+def conditional_leading_source_unit_applies(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+    source_unit_instance_id: str,
+) -> bool:
+    source_unit_id = _required_string("source_unit_instance_id", source_unit_instance_id)
     view = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_instance_id)
     if not view.is_attached_rules_unit:
         return False

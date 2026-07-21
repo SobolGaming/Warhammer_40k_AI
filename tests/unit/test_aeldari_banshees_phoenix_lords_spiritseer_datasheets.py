@@ -16,7 +16,12 @@ from tools.generate_aeldari_banshees_phoenix_lords_spiritseer_rule_ir import (
 )
 
 from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    MovementMode,
+    RulesetDescriptor,
+    TerrainFeatureKind,
+)
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.weapon_profiles import (
     AbilityKind,
     RangeProfileKind,
@@ -30,6 +35,11 @@ from warhammer40k_core.engine.ability_catalog import (
 from warhammer40k_core.engine.advance_hooks import AdvanceMoveContext
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
+    ModelPlacement,
+    UnitPlacement,
+)
 from warhammer40k_core.engine.catalog_command_restoration_runtime import (
     CATALOG_COMMAND_RESTORATION_SELECTED_EVENT,
     CatalogCommandRestorationRuntime,
@@ -57,12 +67,29 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.healing import HealingEffect
+from warhammer40k_core.engine.healing_revival import (
+    SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+    apply_healing_revival_placement_decision,
+    healing_effect_from_revival_request,
+)
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.movement import (
+    FallBackModeKind,
     MovementPhaseActionKind,
     MovementPhaseState,
     MovementUnitSelection,
@@ -74,8 +101,13 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UnitMoveCompletedMortalWoundHookRegistry,
+    resolve_unit_move_completed_mortal_wound_hooks,
+)
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -98,6 +130,7 @@ WRAITHLORD_ID = "000000613"
 JAIN_ATTACHED_ID = "attached-unit:army-a:jain-banshees"
 FUEGAN_ATTACHED_ID = "attached-unit:army-a:fuegan-dragons"
 LHYKHIS_ATTACHED_ID = "attached-unit:army-a:lhykhis-spiders"
+SPIRITSEER_ATTACHED_ID = "attached-unit:army-a:spiritseer-wraithblades"
 
 
 @cache
@@ -249,6 +282,26 @@ def test_live_leader_rules_fix_advance_extend_melta_and_allow_flickerjump_charge
         rules_unit_instance_id=LHYKHIS_ATTACHED_ID,
         movement_action_effect_kind="catalog_movement_action_grant",
     )
+    for model in fixture.howling_banshees.own_models:
+        _remove_model(fixture.state, model_instance_id=model.model_instance_id)
+    assert _model_from_state(
+        fixture.state,
+        fixture.jain_zar.own_models[0].model_instance_id,
+    ).is_alive
+    assert (
+        runtime.fixed_advance_grant(
+            AdvanceMoveContext(
+                state=fixture.state,
+                player_id="player-a",
+                battle_round=1,
+                unit_instance_id=JAIN_ATTACHED_ID,
+                movement_phase_action="advance",
+                movement_request_id="advance-after-bodyguard-destroyed-request",
+                movement_result_id="advance-after-bodyguard-destroyed-result",
+            )
+        )
+        is None
+    )
 
 
 def test_spirit_mark_uses_finite_decision_current_state_validation_and_target_gate() -> None:
@@ -389,12 +442,94 @@ def test_spirit_mark_uses_finite_decision_current_state_validation_and_target_ga
     assert invalid.status_kind is LifecycleStatusKind.INVALID
 
 
+@pytest.mark.parametrize(
+    ("movement_action", "expected_request"),
+    [
+        (MovementPhaseActionKind.NORMAL_MOVE, True),
+        (MovementPhaseActionKind.ADVANCE, True),
+        (MovementPhaseActionKind.FALL_BACK, True),
+        (MovementPhaseActionKind.REMAIN_STATIONARY, False),
+    ],
+)
+def test_spirit_mark_start_edge_requires_an_actual_move(
+    movement_action: MovementPhaseActionKind,
+    expected_request: bool,
+) -> None:
+    fixture = _fixture(phase=BattlePhase.MOVEMENT)
+    runtime = CatalogMovementTargetPairRuntime(fixture.indexes, fixture.armies)
+    decisions = DecisionController()
+    pending = _pending_movement_action(
+        fixture.spiritseer.unit_instance_id,
+        movement_action=movement_action,
+    )
+    fixture.state.replace_movement_phase_state(_movement_state(pending))
+
+    status = runtime.start_move_request(
+        state=fixture.state,
+        decisions=decisions,
+        pending_action=pending,
+    )
+
+    assert (status is not None) is expected_request
+    assert bool(decisions.queue.pending_requests) is expected_request
+
+
+@pytest.mark.parametrize(
+    ("event_type", "movement_action", "expected_request"),
+    [
+        ("movement_activation_completed", "normal_move", True),
+        ("movement_activation_completed", "advance", True),
+        ("movement_activation_completed", "fall_back", True),
+        ("movement_activation_completed", "remain_stationary", False),
+        ("reinforcement_unit_arrived", "set_up", False),
+        ("unit_disembarked", "set_up", False),
+    ],
+)
+def test_spirit_mark_move_completion_registry_rejects_stationary_and_setup_events(
+    event_type: str,
+    movement_action: str,
+    expected_request: bool,
+) -> None:
+    fixture = _fixture(phase=BattlePhase.MOVEMENT)
+    runtime = CatalogMovementTargetPairRuntime(fixture.indexes, fixture.armies)
+    decisions = DecisionController()
+    _record_move_completed_event(
+        state=fixture.state,
+        decisions=decisions,
+        event_type=event_type,
+        movement_action=movement_action,
+        unit_instance_id=fixture.spiritseer.unit_instance_id,
+    )
+    registry = UnitMoveCompletedMortalWoundHookRegistry.from_bindings(
+        runtime.move_completed_bindings()
+    )
+
+    status = resolve_unit_move_completed_mortal_wound_hooks(
+        state=fixture.state,
+        decisions=decisions,
+        registry=registry,
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.MOVEMENT,
+        event_type=event_type,
+        movement_actions=(movement_action,),
+        ability_indexes_by_player_id=fixture.indexes,
+    )
+
+    assert (status is not None) is expected_request
+    assert bool(decisions.queue.pending_requests) is expected_request
+
+
 @pytest.mark.parametrize("destroyed_model", [False, True])
 def test_tears_of_isha_heals_or_returns_one_model_and_is_once_per_target(
     destroyed_model: bool,
 ) -> None:
     fixture = _fixture(phase=BattlePhase.COMMAND)
     target_model = fixture.wraith_construct.own_models[0]
+    assert fixture.state.battlefield_state is not None
+    target_placement = fixture.state.battlefield_state.model_placement_by_id(
+        target_model.model_instance_id
+    )
     if destroyed_model:
         _remove_model(fixture.state, model_instance_id=target_model.model_instance_id)
     else:
@@ -413,6 +548,7 @@ def test_tears_of_isha_heals_or_returns_one_model_and_is_once_per_target(
         )
     )
     assert request is not None
+    decisions.request_decision(request)
     option = next(
         option
         for option in request.options
@@ -430,6 +566,7 @@ def test_tears_of_isha_heals_or_returns_one_model_and_is_once_per_target(
         request=request,
         result=result,
     )
+    decisions.submit_result(result)
     assert runtime.apply_result(
         CommandPhaseStartResultContext(
             state=fixture.state,
@@ -439,6 +576,46 @@ def test_tears_of_isha_heals_or_returns_one_model_and_is_once_per_target(
             active_player_id="player-a",
         )
     )
+    if destroyed_model:
+        placement_request = decisions.queue.peek_next()
+        assert placement_request.decision_type == (SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE)
+        placement_effect = healing_effect_from_revival_request(request=placement_request)
+        assert fixture.state.battlefield_state is not None
+        anchor = fixture.state.battlefield_state.unit_placement_by_id(
+            fixture.wraith_construct.unit_instance_id
+        ).model_placements[0]
+        old_default = target_placement.with_pose(
+            Pose.at(
+                x=anchor.pose.position.x + 0.5,
+                y=anchor.pose.position.y,
+                z=anchor.pose.position.z,
+            )
+        )
+        with pytest.raises(GameLifecycleError, match="overlaps another model"):
+            apply_healing_revival_placement_decision(
+                state=fixture.state,
+                decisions=decisions,
+                ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+                effect=placement_effect,
+                result=_healing_revival_result(
+                    request=placement_request,
+                    placement=old_default,
+                    result_id="tears-overlapping-default-placement-result",
+                ),
+            )
+        assert decisions.queue.pending_requests == (placement_request,)
+        _resolved, follow_up = apply_healing_revival_placement_decision(
+            state=fixture.state,
+            decisions=decisions,
+            ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+            effect=placement_effect,
+            result=_healing_revival_result(
+                request=placement_request,
+                placement=target_placement,
+                result_id="tears-placement-result",
+            ),
+        )
+        assert follow_up is None
     restored = _model_from_state(fixture.state, target_model.model_instance_id)
     if destroyed_model:
         assert restored.wounds_remaining == restored.starting_wounds
@@ -465,6 +642,131 @@ def test_tears_of_isha_heals_or_returns_one_model_and_is_once_per_target(
     )
 
 
+def test_tears_of_isha_revival_rejects_terrain_and_base_crossing_edge() -> None:
+    terrain_fixture = _fixture(phase=BattlePhase.COMMAND)
+    terrain_decisions, terrain_request, terrain_effect, terrain_placement = _start_tears_revival(
+        fixture=terrain_fixture,
+        target_rules_unit_id=terrain_fixture.wraith_construct.unit_instance_id,
+    )
+    terrain_pose = terrain_placement.pose.position
+    terrain = TerrainFeatureDefinition(
+        feature_id="tears-of-isha-adjacent-wall",
+        feature_kind=TerrainFeatureKind.HILLS,
+        footprint_center_x_inches=terrain_pose.x,
+        footprint_center_y_inches=terrain_pose.y,
+        footprint_width_inches=1.0,
+        footprint_depth_inches=1.0,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=terrain_pose.x,
+            center_y_inches=terrain_pose.y,
+            width_inches=1.0,
+            depth_inches=1.0,
+            display_template_id="tears-of-isha-adjacent-wall-display",
+        ),
+        walls=(
+            TerrainWallDefinition(
+                wall_id="tears-of-isha-adjacent-wall-volume",
+                center_x_inches=terrain_pose.x,
+                center_y_inches=terrain_pose.y,
+                bottom_z_inches=0.0,
+                width_inches=0.5,
+                depth_inches=1.0,
+                height_inches=4.0,
+            ),
+        ),
+        source_id="test:tears-of-isha-adjacent-terrain",
+    )
+    battlefield = terrain_fixture.state.battlefield_state
+    assert battlefield is not None
+    terrain_fixture.state.replace_battlefield_state(
+        replace(battlefield, terrain_features=(*battlefield.terrain_features, terrain))
+    )
+    with pytest.raises(GameLifecycleError, match="intersects terrain"):
+        apply_healing_revival_placement_decision(
+            state=terrain_fixture.state,
+            decisions=terrain_decisions,
+            ruleset_descriptor=terrain_fixture.state.runtime_ruleset_descriptor(),
+            effect=terrain_effect,
+            result=_healing_revival_result(
+                request=terrain_request,
+                placement=terrain_placement,
+                result_id="tears-terrain-placement-result",
+            ),
+        )
+    assert terrain_decisions.queue.pending_requests == (terrain_request,)
+
+    edge_fixture = _fixture(phase=BattlePhase.COMMAND)
+    edge_decisions, edge_request, edge_effect, edge_placement = _start_tears_revival(
+        fixture=edge_fixture,
+        target_rules_unit_id=edge_fixture.wraith_construct.unit_instance_id,
+    )
+    with pytest.raises(GameLifecycleError, match="crosses the battlefield edge"):
+        apply_healing_revival_placement_decision(
+            state=edge_fixture.state,
+            decisions=edge_decisions,
+            ruleset_descriptor=edge_fixture.state.runtime_ruleset_descriptor(),
+            effect=edge_effect,
+            result=_healing_revival_result(
+                request=edge_request,
+                placement=edge_placement.with_pose(Pose.at(x=0.1, y=10.0)),
+                result_id="tears-edge-placement-result",
+            ),
+        )
+    assert edge_decisions.queue.pending_requests == (edge_request,)
+
+
+def test_tears_of_isha_attached_wraith_revival_uses_component_ownership() -> None:
+    fixture = _fixture(phase=BattlePhase.COMMAND, attach_spiritseer=True)
+    decisions, request, effect, placement = _start_tears_revival(
+        fixture=fixture,
+        target_rules_unit_id=SPIRITSEER_ATTACHED_ID,
+    )
+    request_payload = cast(dict[str, Any], request.payload)
+    assert request_payload["component_unit_instance_id"] == (
+        fixture.wraith_construct.unit_instance_id
+    )
+    assert fixture.state.battlefield_state is not None
+    wrong_component = fixture.state.battlefield_state.model_placement_by_id(
+        fixture.spiritseer.own_models[0].model_instance_id
+    )
+    with pytest.raises(GameLifecycleError, match=r"attempted_placement unit drift|unit ownership"):
+        apply_healing_revival_placement_decision(
+            state=fixture.state,
+            decisions=decisions,
+            ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+            effect=effect,
+            result=_healing_revival_result(
+                request=request,
+                placement=wrong_component,
+                result_id="tears-attached-wrong-component-result",
+            ),
+        )
+    assert decisions.queue.pending_requests == (request,)
+
+    resolved, follow_up = apply_healing_revival_placement_decision(
+        state=fixture.state,
+        decisions=decisions,
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        effect=effect,
+        result=_healing_revival_result(
+            request=request,
+            placement=placement,
+            result_id="tears-attached-placement-result",
+        ),
+    )
+    assert follow_up is None
+    assert resolved.is_complete()
+    restored = _model_from_state(fixture.state, placement.model_instance_id)
+    assert restored.wounds_remaining == restored.starting_wounds
+    assert fixture.state.battlefield_state is not None
+    assert (
+        fixture.state.battlefield_state.model_placement_by_id(
+            placement.model_instance_id
+        ).unit_instance_id
+        == fixture.wraith_construct.unit_instance_id
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class _Fixture:
     armies: tuple[ArmyDefinition, ...]
@@ -482,7 +784,7 @@ class _Fixture:
     other_enemy: UnitInstance
 
 
-def _fixture(*, phase: BattlePhase) -> _Fixture:
+def _fixture(*, phase: BattlePhase, attach_spiritseer: bool = False) -> _Fixture:
     package = _package()
     catalog = package.army_catalog
     factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
@@ -505,6 +807,11 @@ def _fixture(*, phase: BattlePhase) -> _Fixture:
         _attachment(JAIN_ATTACHED_ID, howling_banshees, jain_zar),
         _attachment(FUEGAN_ATTACHED_ID, fire_dragons, fuegan),
         _attachment(LHYKHIS_ATTACHED_ID, warp_spiders, lhykhis),
+        *(
+            (_attachment(SPIRITSEER_ATTACHED_ID, wraith_construct, spiritseer),)
+            if attach_spiritseer
+            else ()
+        ),
     )
     armies = (
         _army(
@@ -656,7 +963,7 @@ def _move_unit(state: GameState, unit_instance_id: str, *, x: float, y: float) -
             replace(
                 placement,
                 model_placements=tuple(
-                    replace(model, pose=Pose.at(x=x, y=y + (index * 1.5)))
+                    replace(model, pose=Pose.at(x=x, y=y + (index * 2.0)))
                     for index, model in enumerate(placement.model_placements)
                 ),
             )
@@ -683,12 +990,94 @@ def _set_model_wounds(state: GameState, *, model_instance_id: str, wounds: int) 
     state.replace_army_definitions(updated_armies)
 
 
-def _remove_model(state: GameState, *, model_instance_id: str) -> None:
+def _start_tears_revival(
+    *,
+    fixture: _Fixture,
+    target_rules_unit_id: str,
+) -> tuple[DecisionController, DecisionRequest, HealingEffect, ModelPlacement]:
+    target_model = fixture.wraith_construct.own_models[0]
+    placement = _remove_model(
+        fixture.state,
+        model_instance_id=target_model.model_instance_id,
+    )
+    runtime = CatalogCommandRestorationRuntime(fixture.indexes, fixture.armies)
+    decisions = DecisionController()
+    selection_request = runtime.request(
+        CommandPhaseStartRequestContext(
+            state=fixture.state,
+            decisions=decisions,
+            active_player_id="player-a",
+        )
+    )
+    assert selection_request is not None
+    decisions.request_decision(selection_request)
+    option = next(
+        option
+        for option in selection_request.options
+        if cast(dict[str, Any], option.payload)["target_unit_instance_id"] == target_rules_unit_id
+    )
+    selection_result = DecisionResult.for_request(
+        result_id=f"tears-start:{target_rules_unit_id}",
+        request=selection_request,
+        selected_option_id=option.option_id,
+    )
+    decisions.submit_result(selection_result)
+    assert runtime.apply_result(
+        CommandPhaseStartResultContext(
+            state=fixture.state,
+            decisions=decisions,
+            request=selection_request,
+            result=selection_result,
+            active_player_id="player-a",
+        )
+    )
+    placement_request = decisions.queue.peek_next()
+    assert placement_request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
+    return (
+        decisions,
+        placement_request,
+        healing_effect_from_revival_request(request=placement_request),
+        placement,
+    )
+
+
+def _healing_revival_result(
+    *,
+    request: DecisionRequest,
+    placement: ModelPlacement,
+    result_id: str,
+) -> DecisionResult:
+    return DecisionResult(
+        result_id=result_id,
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=validate_json_value(
+            {
+                "proposal_request_id": request.request_id,
+                "proposal_kind": "healing_revival_placement",
+                "unit_instance_id": placement.unit_instance_id,
+                "placement_kind": BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD.value,
+                "attempted_placement": UnitPlacement(
+                    army_id=placement.army_id,
+                    player_id=placement.player_id,
+                    unit_instance_id=placement.unit_instance_id,
+                    model_placements=(placement,),
+                ).to_payload(),
+            }
+        ),
+    )
+
+
+def _remove_model(state: GameState, *, model_instance_id: str) -> ModelPlacement:
     assert state.battlefield_state is not None
+    placement = state.battlefield_state.model_placement_by_id(model_instance_id)
     _set_model_wounds(state, model_instance_id=model_instance_id, wounds=0)
     state.replace_battlefield_state(
         state.battlefield_state.with_removed_models((model_instance_id,))
     )
+    return placement
 
 
 def _model_from_state(state: GameState, model_instance_id: str) -> Any:
@@ -701,17 +1090,31 @@ def _model_from_state(state: GameState, model_instance_id: str) -> Any:
     )
 
 
-def _pending_movement_action(unit_instance_id: str) -> PendingMovementActionSelection:
+def _pending_movement_action(
+    unit_instance_id: str,
+    *,
+    movement_action: MovementPhaseActionKind = MovementPhaseActionKind.NORMAL_MOVE,
+) -> PendingMovementActionSelection:
+    movement_mode = {
+        MovementPhaseActionKind.REMAIN_STATIONARY: MovementMode.NORMAL,
+        MovementPhaseActionKind.NORMAL_MOVE: MovementMode.NORMAL,
+        MovementPhaseActionKind.ADVANCE: MovementMode.ADVANCE,
+        MovementPhaseActionKind.FALL_BACK: MovementMode.FALL_BACK,
+    }[movement_action]
     return PendingMovementActionSelection(
         player_id="player-a",
         battle_round=1,
         unit_instance_id=unit_instance_id,
-        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
-        movement_mode=MovementMode.NORMAL,
-        fall_back_mode=None,
+        movement_phase_action=movement_action,
+        movement_mode=movement_mode,
+        fall_back_mode=(
+            FallBackModeKind.ORDERED_RETREAT
+            if movement_action is MovementPhaseActionKind.FALL_BACK
+            else None
+        ),
         request_id="movement-action-request",
         result_id="movement-action-result",
-        selected_option_id="normal-move",
+        selected_option_id=movement_action.value,
     )
 
 
@@ -729,6 +1132,27 @@ def _movement_state(pending: PendingMovementActionSelection) -> MovementPhaseSta
         selected_unit_ids=(pending.unit_instance_id,),
         active_selection=selection,
         pending_action=pending,
+    )
+
+
+def _record_move_completed_event(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    event_type: str,
+    movement_action: str,
+    unit_instance_id: str,
+) -> None:
+    decisions.event_log.append(
+        event_type,
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": "player-a",
+            "unit_instance_id": unit_instance_id,
+            "movement_phase_action": movement_action,
+        },
     )
 
 

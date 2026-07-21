@@ -22,6 +22,7 @@ from warhammer40k_core.engine.advance_hooks import (
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.catalog_conditional_leader_queries import (
+    conditional_leading_source_unit_applies,
     conditional_leading_weapon_range_effects,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
@@ -205,6 +206,12 @@ class CatalogConditionalLeadingRuntime:
                 unit=unit,
             )
             if not current_model_ids:
+                continue
+            if not conditional_leading_source_unit_applies(
+                state=state,
+                rules_unit_instance_id=view.unit_instance_id,
+                source_unit_instance_id=unit.unit_instance_id,
+            ):
                 continue
             for record in index.all_records():
                 if (

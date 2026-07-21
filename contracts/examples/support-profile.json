@@ -448,6 +448,13 @@
       "submission_kind": "parameterized"
     },
     {
+      "decision_type": "submit_healing_revival_placement",
+      "interaction_kinds": [
+        "model_pose_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
       "decision_type": "submit_melee_declaration",
       "interaction_kinds": [
         "weapon_allocation_matrix"
