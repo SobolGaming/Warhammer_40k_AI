@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Warhammer 40,000 CORE V2 Adapter Contract",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "description": "Authenticated Phase 18G/18H session protocol with the Phase 18I typed interaction contract, mandatory rules-overlay source identity, replay artifact v2, server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
   },
   "servers": [{"url": "http://127.0.0.1:8000"}],

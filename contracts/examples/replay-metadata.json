@@ -4372,7 +4372,7 @@
       "battle_formation_hook_ids": [],
       "battle_round_start_hook_ids": [],
       "battle_shock_hook_ids": [],
-      "bundle_summary_hash": "ee101c5c1557b1b22f9bcece1de4f8b223ca28863baeb3d308bebce9097f9ead",
+      "bundle_summary_hash": "9525abb4e665616518d5f0e864f2f95e932f2e833b764343e2d0fb50962835e7",
       "charge_declaration_hook_ids": [],
       "charge_roll_modifier_ids": [],
       "charge_target_restriction_hook_ids": [],
@@ -4422,7 +4422,9 @@
       "unit_destroyed_hook_ids": [],
       "unit_move_completed_battle_shock_hook_ids": [],
       "unit_move_completed_mortal_wound_hook_ids": [],
-      "weapon_profile_modifier_ids": [],
+      "weapon_profile_modifier_ids": [
+        "catalog-ir:conditional-leading-weapon-range-modifier"
+      ],
       "wound_roll_modifier_ids": []
     },
     "state": {

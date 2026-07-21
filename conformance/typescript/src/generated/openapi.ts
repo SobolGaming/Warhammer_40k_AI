@@ -392,7 +392,7 @@ export interface components {
             large_model_exceptions?: Record<string, never>[];
             placement_kind: components["schemas"]["proposal-payload--identifier.schema"];
             /** @enum {string} */
-            proposal_kind: "cult_ambush_placement" | "deep_strike_placement" | "disembark_placement" | "reinforcement_placement" | "strategic_reserves_placement";
+            proposal_kind: "cult_ambush_placement" | "deep_strike_placement" | "disembark_placement" | "healing_revival_placement" | "reinforcement_placement" | "strategic_reserves_placement";
             proposal_request_id: components["schemas"]["proposal-payload--identifier.schema"];
             restriction_overrides?: Record<string, never>[];
             transport_movement_status?: components["schemas"]["proposal-payload--identifier.schema"];

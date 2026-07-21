@@ -22,7 +22,6 @@ from warhammer40k_core.engine.abilities import (
     AbilityHandlerBinding,
     AbilityHandlerRegistry,
 )
-from warhammer40k_core.engine.ability_catalog import build_player_ability_index
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityHookBinding,
     AdvanceEligibilityHookRegistry,
@@ -66,9 +65,10 @@ from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
     EnhancementEffectRegistry,
 )
+from warhammer40k_core.engine.faction_content import bundle_catalog_indexes as _catalog_indexes
 from warhammer40k_core.engine.faction_content import bundle_payloads as _bundle_payloads
 from warhammer40k_core.engine.faction_content import bundle_validation as _bundle_validation
-from warhammer40k_core.engine.faction_content import catalog_runtime_hooks
+from warhammer40k_core.engine.faction_content import catalog_generic_hooks, catalog_runtime_hooks
 from warhammer40k_core.engine.faction_content import unit_move_completed as _unit_move_completed
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.events import (
@@ -182,7 +182,6 @@ from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlHookBinding,
     PhaseEndObjectiveControlHookRegistry,
 )
-from warhammer40k_core.engine.stratagem_catalog import build_player_stratagem_index
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     StratagemCostChoiceHookBinding,
     StratagemCostChoiceHookRegistry,
@@ -1328,7 +1327,7 @@ class RuntimeContentBundle:
             "contribution_ids",
             tuple(contribution.contribution_id for contribution in validated_contributions),
         )
-        ability_indexes_by_player_id = _ability_indexes_by_player_id(
+        ability_indexes_by_player_id = _catalog_indexes.ability_indexes_by_player_id(
             armies=validated_armies,
             catalog=catalog,
             records=ability_records,
@@ -1415,9 +1414,14 @@ class RuntimeContentBundle:
             )
         )
         command_phase_start_hook_registry = CommandPhaseStartHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.command_phase_start_hook_bindings,
+            (
+                *catalog_generic_hooks.command_start(
+                    ability_indexes_by_player_id, validated_armies
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.command_phase_start_hook_bindings,
+                ),
             )
         )
         fight_phase_start_hook_registry = FightPhaseStartHookRegistry.from_bindings(
@@ -1499,6 +1503,7 @@ class RuntimeContentBundle:
         )
         advance_move_hook_registry = AdvanceMoveHookRegistry.from_bindings(
             catalog_rules.advance_move_hook_bindings()
+            + catalog_generic_hooks.advance(ability_indexes_by_player_id, validated_armies)
             + amh.advance_move_hook_bindings(activation=activation, execution_records=records)
             + _contribution_values(vc, lambda c: c.advance_move_hook_bindings)
         )
@@ -1813,6 +1818,9 @@ class RuntimeContentBundle:
             + catalog_weapon_profile_modifier_bindings(
                 ability_indexes_by_player_id=ability_indexes_by_player_id,
                 armies=validated_armies,
+            )
+            + catalog_generic_hooks.weapon_modifiers(
+                ability_indexes_by_player_id, validated_armies
             ),
             attack_reroll_permission_bindings=(catalog_rules.attack_reroll_permission_bindings()),
             failed_save_damage_replacement_bindings=(
@@ -1822,7 +1830,7 @@ class RuntimeContentBundle:
         return cls(
             activation=activation,
             ability_indexes_by_player_id=ability_indexes_by_player_id,
-            stratagem_indexes_by_player_id=_stratagem_indexes_by_player_id(
+            stratagem_indexes_by_player_id=_catalog_indexes.stratagem_indexes_by_player_id(
                 armies=validated_armies,
                 catalog=catalog,
                 records=stratagem_records,
@@ -1901,52 +1909,6 @@ def _validate_armies(armies: object) -> tuple[ArmyDefinition, ...]:
         seen.add(army.player_id)
         validated.append(army)
     return tuple(sorted(validated, key=lambda army: army.player_id))
-
-
-def _ability_indexes_by_player_id(
-    *,
-    armies: tuple[ArmyDefinition, ...],
-    catalog: ArmyCatalog,
-    records: tuple[AbilityCatalogRecord, ...],
-) -> Mapping[str, AbilityCatalogIndex]:
-    indexes = {
-        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
-        for army in armies
-    }
-    return MappingProxyType(indexes)
-
-
-def _stratagem_indexes_by_player_id(
-    *,
-    armies: tuple[ArmyDefinition, ...],
-    catalog: ArmyCatalog,
-    records: tuple[StratagemCatalogRecord, ...],
-) -> Mapping[str, StratagemCatalogIndex]:
-    indexes = {
-        army.player_id: build_player_stratagem_index(
-            records,
-            detachment_ids=army.detachment_selection.detachment_ids,
-            stratagem_ids=_selected_stratagem_ids_for_army(
-                army=army,
-                catalog=catalog,
-            ),
-        )
-        for army in armies
-    }
-    return MappingProxyType(indexes)
-
-
-def _selected_stratagem_ids_for_army(
-    *,
-    army: ArmyDefinition,
-    catalog: ArmyCatalog,
-) -> tuple[str, ...]:
-    selected: set[str] = set(army.detachment_selection.stratagem_ids)
-    selected_detachment_ids = set(army.detachment_selection.detachment_ids)
-    for detachment in catalog.detachments:
-        if detachment.detachment_id in selected_detachment_ids:
-            selected.update(detachment.stratagem_ids)
-    return tuple(sorted(selected))
 
 
 def _merged_named_handlers(

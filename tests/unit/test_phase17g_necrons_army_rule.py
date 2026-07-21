@@ -10,20 +10,30 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine import healing_geometry
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
     muster_army,
 )
-from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, ModelPlacement
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
+    BattlefieldRuntimeState,
+    ModelPlacement,
+    UnitPlacement,
+)
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionOption,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import EventRecord, JsonValue
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.necrons import army_rule
 from warhammer40k_core.engine.game_state import (
@@ -33,6 +43,9 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionMode,
 )
 from warhammer40k_core.engine.healing import SELECT_HEALING_MODEL_DECISION_TYPE
+from warhammer40k_core.engine.healing_revival import (
+    SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
@@ -122,14 +135,54 @@ def test_reanimation_revive_choice_uses_necron_player_and_json_safe_records() ->
     assert healing_request.actor_id == "player-a"
     assert _healing_option_model_ids(healing_request) == removed_model_ids
     selected_model_id = removed_model_ids[0]
-    lifecycle.submit_decision(
+    placement_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-necrons-revive-model-result",
             request=healing_request,
             selected_option_id=_option_for_model(healing_request, selected_model_id).option_id,
         )
     )
+    placement_request = _require_request(placement_status.decision_request)
+    assert placement_request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
+    selected_placement = next(
+        placement
+        for placement in removed_placements
+        if placement.model_instance_id == selected_model_id
+    )
+    assert state.battlefield_state is not None
+    anchor = state.battlefield_state.unit_placement_by_id(NECRON_UNIT_1_ID).model_placements[0]
+    selected_placement = selected_placement.with_pose(
+        Pose.at(
+            x=anchor.pose.position.x - 1.8,
+            y=anchor.pose.position.y,
+            z=anchor.pose.position.z,
+        )
+    )
+    resolved_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase17g-necrons-revive-placement-result",
+            request_id=placement_request.request_id,
+            decision_type=placement_request.decision_type,
+            actor_id=placement_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(
+                {
+                    "proposal_request_id": placement_request.request_id,
+                    "proposal_kind": "healing_revival_placement",
+                    "unit_instance_id": selected_placement.unit_instance_id,
+                    "placement_kind": BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD.value,
+                    "attempted_placement": UnitPlacement(
+                        army_id=selected_placement.army_id,
+                        player_id=selected_placement.player_id,
+                        unit_instance_id=selected_placement.unit_instance_id,
+                        model_placements=(selected_placement,),
+                    ).to_payload(),
+                }
+            ),
+        )
+    )
 
+    assert resolved_status.status_kind is not LifecycleStatusKind.INVALID
     assert state.battlefield_state is not None
     assert selected_model_id in state.battlefield_state.placed_model_ids()
     assert selected_model_id not in state.battlefield_state.removed_model_ids
@@ -472,42 +525,6 @@ def test_reanimation_fail_fast_guards_and_revival_geometry_edges() -> None:
             rules_unit=rules_unit,
         )
 
-    model = _unit_by_id(state, NECRON_UNIT_1_ID).own_models[0]
-    _remove_model(state, model_instance_id=model.model_instance_id)
-    removed_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=NECRON_UNIT_1_ID)
-    if state.battlefield_state is None:
-        raise AssertionError("battlefield_state is required")
-    state.battlefield_state = state.battlefield_state.without_unit_placement(NECRON_UNIT_1_ID)
-    with pytest.raises(GameLifecycleError, match="requires placed anchors"):
-        army_rule._revival_placements_for_rules_unit(
-            state=state,
-            army=army,
-            rules_unit=removed_rules_unit,
-        )
-
-    geometry_state = _require_state(_battle_ready_lifecycle())
-    battlefield = geometry_state.battlefield_state
-    if battlefield is None:
-        raise AssertionError("battlefield_state is required")
-    anchor_model_id = _unit_by_id(geometry_state, NECRON_UNIT_1_ID).own_models[0].model_instance_id
-    anchor = battlefield.model_placement_by_id(anchor_model_id)
-    bounded_pose = army_rule._candidate_revival_pose(
-        battlefield=replace(battlefield, battlefield_width_inches=anchor.pose.position.x),
-        anchor=anchor,
-        index=0,
-    )
-    assert bounded_pose.position.x < anchor.pose.position.x
-    with pytest.raises(GameLifecycleError, match="could not derive revival placement"):
-        army_rule._candidate_revival_pose(
-            battlefield=replace(
-                battlefield,
-                battlefield_width_inches=0.1,
-                battlefield_depth_inches=0.1,
-            ),
-            anchor=replace(anchor, pose=Pose.at(0.0, 0.0, 0.0)),
-            index=0,
-        )
-
     keyword_lifecycle = _battle_ready_lifecycle(necrons_alpha=False)
     keyword_state = _require_state(keyword_lifecycle)
     _update_unit(
@@ -529,14 +546,14 @@ def test_reanimation_fail_fast_guards_and_revival_geometry_edges() -> None:
         army_rule._rules_unit_label(cast(RulesUnitView, object()))
     state.player_ids = ("player-a", "player-b", "player-c")
     with pytest.raises(GameLifecycleError, match="requires one opposing player"):
-        army_rule._opposing_player_id(state=state, player_id="player-a")
+        healing_geometry.healing_opposing_player_id(state=state, player_id="player-a")
 
     state.battlefield_state = None
     with pytest.raises(GameLifecycleError, match="requires battlefield_state"):
-        army_rule._battlefield_state(state)
+        healing_geometry.healing_battlefield_state(state)
     state.battlefield_state = cast(BattlefieldRuntimeState, object())
     with pytest.raises(GameLifecycleError, match="battlefield_state is invalid"):
-        army_rule._battlefield_state(state)
+        healing_geometry.healing_battlefield_state(state)
 
     with pytest.raises(GameLifecycleError, match="event payload must be an object"):
         army_rule._event_payload_object(
@@ -773,7 +790,11 @@ def test_reanimation_phase_start_engagement_ignores_destroyed_enemy_placements()
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=NECRON_UNIT_1_ID)
 
     assert (
-        army_rule._phase_start_enemy_engagement_model_ids(state=state, rules_unit=rules_unit) == ()
+        healing_geometry.healing_phase_start_enemy_engagement_model_ids(
+            state=state,
+            rules_unit=rules_unit,
+        )
+        == ()
     )
 
 

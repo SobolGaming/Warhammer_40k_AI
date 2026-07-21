@@ -641,6 +641,8 @@ def _parameterized_decision_type(payload_kind: str) -> str:
         return "submit_deployment_placement"
     if payload_kind == "redeploy_placement":
         return "submit_redeploy_placement"
+    if payload_kind == "healing_revival_placement":
+        return "submit_healing_revival_placement"
     if payload_kind == "scout_move":
         return "submit_scout_move"
     if payload_kind == "scout_reserve_setup":
@@ -774,6 +776,13 @@ def _supplemental_proposal_examples() -> dict[str, JsonValue]:
             "movement_phase_action": "fall_back",
             "movement_mode": "ordered_retreat",
             "witness": empty_witness,
+        },
+        "healing_revival_placement": {
+            "proposal_request_id": "contract-healing-revival-request-000001",
+            "proposal_kind": "healing_revival_placement",
+            "unit_instance_id": "army-alpha:unit-1",
+            "placement_kind": "return_to_battlefield",
+            "attempted_placement": placement,
         },
         "pile_in": {
             "proposal_request_id": "contract-pile-in-request-000001",

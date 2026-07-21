@@ -249,6 +249,7 @@ class MovementCapabilitySet:
         current_model_instance_ids: tuple[str, ...] = (),
         unit_persisting_effects: tuple[PersistingEffect, ...] = (),
         owner_player_id: str | None = None,
+        ignores_vertical_distance_override: bool = False,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         normalized_keywords = _validate_keyword_tuple(
@@ -339,7 +340,14 @@ class MovementCapabilitySet:
         desperate_escape_tests_auto_passed = _catalog_desperate_escape_auto_passed(
             catalog_enemy_model_permissions
         ) or _effect_desperate_escape_auto_passed(enemy_model_effect_permissions)
-        ignores_vertical_distance = has_fly and descriptor.fly_policy.ignores_vertical_distance
+        if type(ignores_vertical_distance_override) is not bool:
+            raise MovementLegalityError(
+                "MovementCapabilitySet ignores_vertical_distance_override must be a bool."
+            )
+        ignores_vertical_distance = bool(
+            ignores_vertical_distance_override
+            or (has_fly and descriptor.fly_policy.ignores_vertical_distance)
+        )
         return cls(
             ruleset_descriptor_hash=descriptor.descriptor_hash,
             keywords=normalized_keywords,
@@ -649,6 +657,7 @@ class MovementLegalityContext:
         current_model_instance_ids: tuple[str, ...] = (),
         unit_persisting_effects: tuple[PersistingEffect, ...] = (),
         owner_player_id: str | None = None,
+        ignores_vertical_distance_override: bool = False,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         mode = movement_mode_from_token(movement_mode)
@@ -668,6 +677,7 @@ class MovementLegalityContext:
                 current_model_instance_ids=current_model_instance_ids,
                 unit_persisting_effects=unit_persisting_effects,
                 owner_player_id=owner_player_id,
+                ignores_vertical_distance_override=ignores_vertical_distance_override,
             ),
             engagement_policy=EngagementMovementPolicy.from_ruleset_descriptor(
                 descriptor,

@@ -21,12 +21,18 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     ModelPlacementRecord,
     PlacementError,
+    UnitPlacement,
 )
 from warhammer40k_core.engine.damage_allocation import model_by_id
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionError,
+    DecisionOption,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -46,6 +52,10 @@ from warhammer40k_core.engine.healing import (
     healing_step_kind_from_token,
     invalid_healing_model_decision_status,
     resolve_healing_until_blocked,
+)
+from warhammer40k_core.engine.healing_revival import (
+    SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+    apply_healing_revival_placement_decision,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -84,14 +94,26 @@ def test_healing_iterates_wound_revival_revived_wound_and_no_effect() -> None:
         amount=4,
         opposing_player_id="player-b",
         phase_start_model_ids=_placed_model_ids(state, unit_id),
-        revival_placements=(revival_placement,),
     )
 
-    resolved, request = resolve_healing_until_blocked(
+    blocked, request = resolve_healing_until_blocked(
         state=state,
         decisions=decisions,
         ruleset_descriptor=_ruleset(),
         effect=effect,
+    )
+    assert request is not None
+    assert request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
+    resolved, request = apply_healing_revival_placement_decision(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=blocked,
+        result=_healing_revival_result(
+            request=request,
+            placement=revival_placement,
+            result_id="phase14h-heal-sequence-placement",
+        ),
     )
 
     assert request is None
@@ -222,6 +244,16 @@ def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component
     support = _unit_by_id(state, formation.support_unit_instance_ids[0])
     leader_model = leader.own_models[0]
     support_model = support.own_models[0]
+    _place_unit_model_poses(
+        state,
+        unit_id=leader.unit_instance_id,
+        poses=(Pose.at(x=10.0, y=10.0),),
+    )
+    _place_unit_model_poses(
+        state,
+        unit_id=support.unit_instance_id,
+        poses=(Pose.at(x=11.8, y=10.0),),
+    )
     _set_model_wounds(
         state,
         model_instance_id=leader_model.model_instance_id,
@@ -238,19 +270,16 @@ def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component
         state.battlefield_state.unit_placement_by_id(bodyguard.unit_instance_id)
     leader_placement = state.battlefield_state.model_placement_by_id(leader_model.model_instance_id)
     revived_model = bodyguard.own_models[0]
-    revival_placements = tuple(
-        ModelPlacement(
-            army_id="army-alpha",
-            player_id="player-a",
-            unit_instance_id=bodyguard.unit_instance_id,
-            model_instance_id=model.model_instance_id,
-            pose=Pose.at(
-                leader_placement.pose.position.x + 0.5 + (index * 0.1),
-                leader_placement.pose.position.y,
-                leader_placement.pose.position.z,
-            ),
-        )
-        for index, model in enumerate(bodyguard.own_models)
+    revival_placement = ModelPlacement(
+        army_id="army-alpha",
+        player_id="player-a",
+        unit_instance_id=bodyguard.unit_instance_id,
+        model_instance_id=revived_model.model_instance_id,
+        pose=Pose.at(
+            leader_placement.pose.position.x + 3.6,
+            leader_placement.pose.position.y,
+            leader_placement.pose.position.z,
+        ),
     )
     effect = HealingEffect(
         effect_id="phase14h-real-attached-heal-revive",
@@ -258,7 +287,6 @@ def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component
         amount=2,
         opposing_player_id="player-b",
         phase_start_model_ids=(leader_model.model_instance_id, support_model.model_instance_id),
-        revival_placements=revival_placements,
     )
 
     blocked, request = resolve_healing_until_blocked(
@@ -275,7 +303,7 @@ def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component
         sorted(model.model_instance_id for model in bodyguard.own_models)
     )
 
-    resolved, follow_up = apply_healing_model_decision(
+    placement_effect, follow_up = apply_healing_model_decision(
         state=state,
         decisions=decisions,
         ruleset_descriptor=_ruleset(),
@@ -287,6 +315,19 @@ def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component
                 request,
                 revived_model.model_instance_id,
             ).option_id,
+        ),
+    )
+    assert follow_up is not None
+    assert follow_up.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
+    resolved, follow_up = apply_healing_revival_placement_decision(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=placement_effect,
+        result=_healing_revival_result(
+            request=follow_up,
+            placement=revival_placement,
+            result_id="phase14h-real-attached-heal-revive-placement",
         ),
     )
 
@@ -503,7 +544,6 @@ def test_lifecycle_healing_model_decision_returns_follow_up_request_for_next_cho
         amount=3,
         opposing_player_id="player-b",
         phase_start_model_ids=_placed_model_ids(state, unit_id),
-        revival_placements=removed,
     )
     _blocked, request = resolve_healing_until_blocked(
         state=state,
@@ -526,12 +566,96 @@ def test_lifecycle_healing_model_decision_returns_follow_up_request_for_next_cho
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request == follow_up_request
     assert status.payload == {
-        "decision_type": SELECT_HEALING_MODEL_DECISION_TYPE,
+        "decision_type": SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
         "effect_id": effect.effect_id,
         "target_unit_instance_id": unit_id,
     }
-    assert follow_up_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
+    assert follow_up_request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
+    assert model_by_id(state=state, model_instance_id=selected_model_id).wounds_remaining == 0
+
+    placement_status = lifecycle.submit_decision(
+        _healing_revival_result(
+            request=follow_up_request,
+            placement=removed[2],
+            result_id="phase14h-lifecycle-healing-placement-result",
+        )
+    )
+    next_request = lifecycle.decision_controller.queue.peek_next()
+    assert placement_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert next_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
     assert model_by_id(state=state, model_instance_id=selected_model_id).wounds_remaining == 2
+
+
+def test_lifecycle_healing_revival_rejects_stale_and_malformed_then_round_trips() -> None:
+    state = _battle_state()
+    lifecycle = _lifecycle_for_state(state)
+    lifecycle_state = lifecycle.state
+    assert lifecycle_state is not None
+    state = lifecycle_state
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _unit_by_id(state, unit_id)
+    removed = _remove_model(state, model_instance_id=unit.own_models[0].model_instance_id)
+    effect = HealingEffect(
+        effect_id="phase14h-lifecycle-revival-validation",
+        target_unit_instance_id=unit_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+    )
+    _blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    assert DecisionRequest.from_payload(request.to_payload()) == request
+    valid_result = _healing_revival_result(
+        request=request,
+        placement=removed,
+        result_id="phase14h-lifecycle-revival-validation-result",
+    )
+
+    stale_status = lifecycle.submit_decision(
+        replace(valid_result, request_id="stale-healing-revival-request")
+    )
+    malformed_status = lifecycle.submit_decision(
+        replace(
+            valid_result,
+            result_id="phase14h-lifecycle-revival-malformed-result",
+            payload={
+                "proposal_request_id": request.request_id,
+                "proposal_kind": "healing_revival_placement",
+                "unit_instance_id": removed.unit_instance_id,
+                "placement_kind": BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD.value,
+                "attempted_placement": "not-an-object",
+            },
+        )
+    )
+
+    assert stale_status.status_kind is LifecycleStatusKind.INVALID
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert lifecycle.decision_controller.records == ()
+    assert (
+        model_by_id(
+            state=state,
+            model_instance_id=removed.model_instance_id,
+        ).wounds_remaining
+        == 0
+    )
+
+    round_tripped_result = DecisionResult.from_payload(valid_result.to_payload())
+    assert round_tripped_result == valid_result
+    status = lifecycle.submit_decision(round_tripped_result)
+
+    assert status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+        LifecycleStatusKind.TERMINAL,
+    }
+    assert model_by_id(state=state, model_instance_id=removed.model_instance_id).is_alive
+    assert "<" not in json.dumps(lifecycle.decision_controller.to_payload(), sort_keys=True)
 
 
 def test_healing_lifecycle_validation_helpers_cover_invalid_finite_fields() -> None:
@@ -720,12 +844,6 @@ def test_healing_lifecycle_validation_reports_stale_selection_fields(
     option = _option_for_model(request, leader_id)
     option_payload = dict(cast(dict[str, JsonValue], option.payload))
     option_payload[field_name] = replacement_value
-    if field_name == "selection_kind":
-        assert state.battlefield_state is not None
-        option_payload["revival_placement"] = cast(
-            JsonValue,
-            state.battlefield_state.model_placement_by_id(leader_id).to_payload(),
-        )
     drifted_option = replace(option, payload=option_payload)
     drifted_request = replace(request, options=(drifted_option,))
     result = DecisionResult.for_request(
@@ -882,14 +1000,16 @@ def test_revival_requires_explicit_candidate_placement_without_mutation() -> Non
         phase_start_model_ids=_placed_model_ids(state, unit_id),
     )
 
-    with pytest.raises(GameLifecycleError, match="missing placement"):
-        resolve_healing_until_blocked(
-            state=state,
-            decisions=decisions,
-            ruleset_descriptor=_ruleset(),
-            effect=effect,
-        )
+    blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
 
+    assert blocked.resolved_steps == ()
+    assert request is not None
+    assert request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
     assert state.battlefield_state is not None
     assert removed_placement.model_instance_id in state.battlefield_state.removed_model_ids
     assert (
@@ -899,7 +1019,7 @@ def test_revival_requires_explicit_candidate_placement_without_mutation() -> Non
         ).wounds_remaining
         == 0
     )
-    assert decisions.queue.pending_requests == ()
+    assert decisions.queue.pending_requests == (request,)
 
 
 def test_malformed_healing_selection_rejects_before_queue_pop() -> None:
@@ -938,7 +1058,6 @@ def test_malformed_healing_selection_rejects_before_queue_pop() -> None:
             "legal_model_ids": selected_option.option_id,
             "source_rule_id": blocked.source_rule_id,
             "source_context": blocked.source_context,
-            "revival_placement": None,
         },
     )
 
@@ -968,7 +1087,6 @@ def test_multiple_missing_models_use_opposing_revival_decision() -> None:
         amount=1,
         opposing_player_id="player-b",
         phase_start_model_ids=_placed_model_ids(state, unit_id),
-        revival_placements=(first_removed, second_removed),
     )
 
     blocked, request = resolve_healing_until_blocked(
@@ -985,12 +1103,24 @@ def test_multiple_missing_models_use_opposing_revival_decision() -> None:
         request=request,
         selected_option_id=_option_for_model(request, selected_model_id).option_id,
     )
-    resolved, follow_up = apply_healing_model_decision(
+    placement_effect, follow_up = apply_healing_model_decision(
         state=state,
         decisions=decisions,
         ruleset_descriptor=_ruleset(),
         effect=blocked,
         result=result,
+    )
+    assert follow_up is not None
+    resolved, follow_up = apply_healing_revival_placement_decision(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=placement_effect,
+        result=_healing_revival_result(
+            request=follow_up,
+            placement=second_removed,
+            result_id="phase14h-revive-choice-placement-result",
+        ),
     )
 
     assert follow_up is None
@@ -1018,15 +1148,26 @@ def test_revival_requires_phase_start_coherent_placement_without_mutation() -> N
         amount=1,
         opposing_player_id="player-b",
         phase_start_model_ids=_placed_model_ids(state, unit_id),
-        revival_placements=(invalid_placement,),
     )
 
-    with pytest.raises(GameLifecycleError, match=r"coherency|coherent"):
-        resolve_healing_until_blocked(
+    blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    with pytest.raises(GameLifecycleError, match=r"battlefield edge|coherency|coherent"):
+        apply_healing_revival_placement_decision(
             state=state,
             decisions=decisions,
             ruleset_descriptor=_ruleset(),
-            effect=effect,
+            effect=blocked,
+            result=_healing_revival_result(
+                request=request,
+                placement=invalid_placement,
+                result_id="phase14h-revive-invalid-placement-result",
+            ),
         )
 
     assert (
@@ -1039,6 +1180,8 @@ def test_revival_requires_phase_start_coherent_placement_without_mutation() -> N
     assert state.battlefield_state is not None
     assert removed_placement.model_instance_id in state.battlefield_state.removed_model_ids
     assert removed_placement.model_instance_id not in state.battlefield_state.placed_model_ids()
+    assert decisions.queue.pending_requests == (request,)
+    assert decisions.records == ()
 
 
 def test_revival_engagement_validator_ignores_destroyed_enemy_placements() -> None:
@@ -1070,14 +1213,25 @@ def test_revival_engagement_validator_ignores_destroyed_enemy_placements() -> No
         opposing_player_id="player-b",
         phase_start_model_ids=_placed_model_ids(state, unit_id),
         phase_start_enemy_engagement_model_ids=(),
-        revival_placements=(removed_placement.with_pose(Pose.at(x=10.3, y=10.0)),),
     )
 
-    resolved, follow_up = resolve_healing_until_blocked(
+    blocked, request = resolve_healing_until_blocked(
         state=state,
         decisions=decisions,
         ruleset_descriptor=_ruleset(),
         effect=effect,
+    )
+    assert request is not None
+    resolved, follow_up = apply_healing_revival_placement_decision(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=blocked,
+        result=_healing_revival_result(
+            request=request,
+            placement=removed_placement.with_pose(Pose.at(x=10.3, y=10.0)),
+            result_id="phase14h-revive-dead-enemy-engagement-result",
+        ),
     )
 
     assert follow_up is None
@@ -1170,30 +1324,6 @@ def test_healing_domain_records_fail_fast_on_invalid_payload_shapes() -> None:
             transition_batch=cast(BattlefieldTransitionBatch, object()),
         )
 
-    with pytest.raises(GameLifecycleError, match="revival_placements must be a tuple"):
-        HealingEffect(
-            effect_id="phase14h-invalid-revival-placement-list",
-            target_unit_instance_id=unit_id,
-            amount=1,
-            opposing_player_id="player-b",
-            revival_placements=cast(tuple[ModelPlacement, ...], [placement]),
-        )
-    with pytest.raises(GameLifecycleError, match="must be unique"):
-        HealingEffect(
-            effect_id="phase14h-invalid-revival-placement-duplicate",
-            target_unit_instance_id=unit_id,
-            amount=1,
-            opposing_player_id="player-b",
-            revival_placements=(placement, placement),
-        )
-    with pytest.raises(GameLifecycleError, match="must contain placements"):
-        HealingEffect(
-            effect_id="phase14h-invalid-revival-placement-value",
-            target_unit_instance_id=unit_id,
-            amount=1,
-            opposing_player_id="player-b",
-            revival_placements=cast(tuple[ModelPlacement, ...], (object(),)),
-        )
     with pytest.raises(GameLifecycleError, match="resolved_steps must be a tuple"):
         HealingEffect(
             effect_id="phase14h-invalid-step-list",
@@ -1297,50 +1427,6 @@ def test_healing_domain_records_fail_fast_on_invalid_payload_shapes() -> None:
             legal_model_ids=("phase14h-other-model",),
             source_rule_id="phase14h-selection-source",
             source_context=None,
-        )
-    with pytest.raises(GameLifecycleError, match="revive requires placement"):
-        HealingModelSelection(
-            request_id="phase14h-selection-request",
-            result_id="phase14h-selection-result",
-            player_id="player-b",
-            selection_kind=HealingStepKind.REVIVE_MODEL,
-            effect_id="phase14h-selection-effect",
-            target_unit_instance_id=unit_id,
-            step_index=1,
-            selected_model_id=model_id,
-            legal_model_ids=(model_id,),
-            source_rule_id="phase14h-selection-source",
-            source_context=None,
-        )
-    with pytest.raises(GameLifecycleError, match="revival_placement must be a placement"):
-        HealingModelSelection(
-            request_id="phase14h-selection-request",
-            result_id="phase14h-selection-result",
-            player_id="player-b",
-            selection_kind=HealingStepKind.REVIVE_MODEL,
-            effect_id="phase14h-selection-effect",
-            target_unit_instance_id=unit_id,
-            step_index=1,
-            selected_model_id=model_id,
-            legal_model_ids=(model_id,),
-            source_rule_id="phase14h-selection-source",
-            source_context=None,
-            revival_placement=cast(ModelPlacement, object()),
-        )
-    with pytest.raises(GameLifecycleError, match="heal must not include placement"):
-        HealingModelSelection(
-            request_id="phase14h-selection-request",
-            result_id="phase14h-selection-result",
-            player_id="player-b",
-            selection_kind=HealingStepKind.HEAL_WOUND,
-            effect_id="phase14h-selection-effect",
-            target_unit_instance_id=unit_id,
-            step_index=1,
-            selected_model_id=model_id,
-            legal_model_ids=(model_id,),
-            source_rule_id="phase14h-selection-source",
-            source_context=None,
-            revival_placement=placement,
         )
     wrong_request = DecisionRequest(
         request_id="phase14h-wrong-selection-request",
@@ -1477,6 +1563,35 @@ def _with_attached_role(model: ModelInstance, *, role: str) -> ModelInstance:
     if role in {"leader", "support"}:
         source_ids.add(f"attached-role:{role}")
     return replace(model, source_ids=tuple(sorted(source_ids)))
+
+
+def _healing_revival_result(
+    *,
+    request: DecisionRequest,
+    placement: ModelPlacement,
+    result_id: str,
+) -> DecisionResult:
+    return DecisionResult(
+        result_id=result_id,
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=validate_json_value(
+            {
+                "proposal_request_id": request.request_id,
+                "proposal_kind": "healing_revival_placement",
+                "unit_instance_id": placement.unit_instance_id,
+                "placement_kind": BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD.value,
+                "attempted_placement": UnitPlacement(
+                    army_id=placement.army_id,
+                    player_id=placement.player_id,
+                    unit_instance_id=placement.unit_instance_id,
+                    model_placements=(placement,),
+                ).to_payload(),
+            }
+        ),
+    )
 
 
 def _remove_model(state: GameState, *, model_instance_id: str) -> ModelPlacement:

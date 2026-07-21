@@ -655,6 +655,71 @@
       "submission_variant_id": "finite_option"
     },
     {
+      "case_id": "finite:select_catalog_movement_target_pair",
+      "proposal_payload": null,
+      "request": {
+        "actor_id": "player-a",
+        "decision_type": "select_catalog_movement_target_pair",
+        "interaction": {
+          "constraints": {
+            "candidate_option_ids": [
+              "contract-option"
+            ],
+            "entity_kinds": [],
+            "exact_model_count": null,
+            "maximum_distance_in": null,
+            "maximum_selections": 1,
+            "may_enter_engagement_range": null,
+            "minimum_enemy_distance_in": null,
+            "minimum_selections": 1,
+            "must_preserve_coherency": null,
+            "placement_kinds": [],
+            "proposal_schema_ref": null,
+            "submission_schema_ref": "finite-submission.schema.json"
+          },
+          "display_hints": {
+            "confirm_label": "Confirm Option",
+            "decline_label": null
+          },
+          "interaction_kind": "finite_option_list",
+          "proposal_kind": null,
+          "required_inputs": [
+            "selected_option"
+          ],
+          "schema_version": "interaction-descriptor-v2-variants",
+          "selected_entity_ids": [],
+          "submission_kind": "finite",
+          "submission_variants": [
+            {
+              "display_label": "Confirm Option",
+              "interaction_kind": "finite_option_list",
+              "proposal_schema_ref": null,
+              "required_inputs": [
+                "selected_option"
+              ],
+              "variant_id": "finite_option"
+            }
+          ]
+        },
+        "is_parameterized": false,
+        "options": [
+          {
+            "label": "Contract Option",
+            "option_id": "contract-option",
+            "payload": {
+              "contract_fixture": true
+            }
+          }
+        ],
+        "payload": {
+          "contract_fixture": true
+        },
+        "request_id": "interaction-conformance:select_catalog_movement_target_pair",
+        "schema_version": "annotated-decision-request-v1"
+      },
+      "submission_variant_id": "finite_option"
+    },
+    {
       "case_id": "finite:select_catalog_post_shoot_hit_target_effect",
       "proposal_payload": null,
       "request": {
@@ -4725,6 +4790,103 @@
         "schema_version": "annotated-decision-request-v1"
       },
       "submission_variant_id": "fall_back"
+    },
+    {
+      "case_id": "parameterized:healing_revival_placement",
+      "proposal_payload": {
+        "attempted_placement": {
+          "army_id": "army-alpha",
+          "model_placements": [
+            {
+              "army_id": "army-alpha",
+              "model_instance_id": "army-alpha:unit-1:model-1",
+              "player_id": "player-a",
+              "pose": {
+                "facing": {
+                  "degrees": 0.0
+                },
+                "position": {
+                  "x": 12.0,
+                  "y": 18.0,
+                  "z": 0.0
+                }
+              },
+              "unit_instance_id": "army-alpha:unit-1"
+            }
+          ],
+          "player_id": "player-a",
+          "unit_instance_id": "army-alpha:unit-1"
+        },
+        "placement_kind": "return_to_battlefield",
+        "proposal_kind": "healing_revival_placement",
+        "proposal_request_id": "contract-healing-revival-request-000001",
+        "unit_instance_id": "army-alpha:unit-1"
+      },
+      "request": {
+        "actor_id": "player-a",
+        "decision_type": "submit_healing_revival_placement",
+        "interaction": {
+          "constraints": {
+            "candidate_option_ids": [
+              "submit_parameterized_payload"
+            ],
+            "entity_kinds": [
+              "model"
+            ],
+            "exact_model_count": null,
+            "maximum_distance_in": null,
+            "maximum_selections": 1,
+            "may_enter_engagement_range": null,
+            "minimum_enemy_distance_in": null,
+            "minimum_selections": 1,
+            "must_preserve_coherency": null,
+            "placement_kinds": [],
+            "proposal_schema_ref": "proposal-payload.schema.json#/$defs/generic_placement",
+            "submission_schema_ref": "parameterized-submission.schema.json"
+          },
+          "display_hints": {
+            "confirm_label": "Place Model",
+            "decline_label": null
+          },
+          "interaction_kind": "model_pose_placement",
+          "proposal_kind": "healing_revival_placement",
+          "required_inputs": [
+            "model_pose"
+          ],
+          "schema_version": "interaction-descriptor-v2-variants",
+          "selected_entity_ids": [],
+          "submission_kind": "parameterized",
+          "submission_variants": [
+            {
+              "display_label": "Place Model",
+              "interaction_kind": "model_pose_placement",
+              "proposal_schema_ref": "proposal-payload.schema.json#/$defs/generic_placement",
+              "required_inputs": [
+                "model_pose"
+              ],
+              "variant_id": "healing_revival_placement"
+            }
+          ]
+        },
+        "is_parameterized": true,
+        "options": [
+          {
+            "label": "Submit Parameterized Payload",
+            "option_id": "submit_parameterized_payload",
+            "payload": {
+              "submission_kind": "parameterized"
+            }
+          }
+        ],
+        "payload": {
+          "proposal_request": {
+            "proposal_kind": "healing_revival_placement"
+          }
+        },
+        "request_id": "interaction-conformance:healing_revival_placement",
+        "schema_version": "annotated-decision-request-v1"
+      },
+      "submission_variant_id": "healing_revival_placement"
     },
     {
       "case_id": "parameterized:melee_declaration",

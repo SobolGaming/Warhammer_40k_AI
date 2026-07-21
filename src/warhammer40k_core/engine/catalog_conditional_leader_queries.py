@@ -23,6 +23,66 @@ if TYPE_CHECKING:
 CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID = "catalog-ir:conditional-leading-bodyguard-ability-grant"
 CONDITIONAL_LEADING_ROLL_REROLL_DESCRIPTOR_ID = "catalog-ir:conditional-leading-roll-reroll"
 FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID = "catalog-ir:faction-resource-refund-roll"
+CONDITIONAL_LEADING_WEAPON_RANGE_DESCRIPTOR_ID = (
+    "catalog-ir:conditional-leading-weapon-range-modifier"
+)
+CONDITIONAL_LEADING_CHARGE_AFTER_MOVEMENT_ACTION_DESCRIPTOR_ID = (
+    "catalog-ir:conditional-leading-charge-after-movement-action"
+)
+
+
+def conditional_leading_weapon_range_effects(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+) -> tuple[PersistingEffect, ...]:
+    _require_game_state(state)
+    effects = tuple(
+        effect
+        for effect in state.persisting_effects
+        if isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("descriptor_id")
+        == CONDITIONAL_LEADING_WEAPON_RANGE_DESCRIPTOR_ID
+        and conditional_leading_source_applies(
+            state=state,
+            effect=effect,
+            rules_unit_instance_id=rules_unit_instance_id,
+        )
+    )
+    return tuple(sorted(effects, key=lambda effect: effect.effect_id))
+
+
+def conditional_charge_after_movement_action_allowed(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+    movement_action_effect_kind: str,
+) -> bool:
+    _require_game_state(state)
+    requested_kind = _required_string(
+        "movement_action_effect_kind",
+        movement_action_effect_kind,
+    )
+    for effect in state.persisting_effects:
+        payload = effect.effect_payload
+        if (
+            not isinstance(payload, dict)
+            or payload.get("descriptor_id")
+            != CONDITIONAL_LEADING_CHARGE_AFTER_MOVEMENT_ACTION_DESCRIPTOR_ID
+            or not conditional_leading_source_applies(
+                state=state,
+                effect=effect,
+                rules_unit_instance_id=rules_unit_instance_id,
+            )
+        ):
+            continue
+        if (
+            _rule_effect_parameter(payload, key="ability") != "can_charge_after_movement_action"
+            or _rule_effect_parameter(payload, key="movement_action_effect_kind") != requested_kind
+        ):
+            raise GameLifecycleError("Conditional movement-action charge descriptor drift.")
+        return True
+    return False
 
 
 def conditional_granted_ability_effects_for_unit(
@@ -111,7 +171,7 @@ def conditional_leader_grant_effect_applies(
         raise GameLifecycleError("Conditional leader ability effect payload must be an object.")
     if payload.get("descriptor_id") != CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID:
         return False
-    if not _conditional_leading_source_applies(
+    if not conditional_leading_source_applies(
         state=state,
         effect=effect,
         rules_unit_instance_id=rules_unit_instance_id,
@@ -150,7 +210,7 @@ def conditional_leading_roll_reroll_permission(
             not isinstance(payload, dict)
             or payload.get("descriptor_id") != CONDITIONAL_LEADING_ROLL_REROLL_DESCRIPTOR_ID
             or effect.owner_player_id != requested_player_id
-            or not _conditional_leading_source_applies(
+            or not conditional_leading_source_applies(
                 state=state,
                 effect=effect,
                 rules_unit_instance_id=rules_unit_instance_id,
@@ -189,7 +249,7 @@ def conditional_faction_resource_refund_roll_payload(
             not isinstance(payload, dict)
             or payload.get("descriptor_id") != FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID
             or effect.owner_player_id != requested_player_id
-            or not _conditional_leading_source_applies(
+            or not conditional_leading_source_applies(
                 state=state,
                 effect=effect,
                 rules_unit_instance_id=rules_unit_instance_id,
@@ -221,7 +281,7 @@ def conditional_granted_ability_distance_inches(effect: PersistingEffect) -> flo
     return float(distance)
 
 
-def _conditional_leading_source_applies(
+def conditional_leading_source_applies(
     *,
     state: GameState,
     effect: PersistingEffect,
@@ -230,7 +290,20 @@ def _conditional_leading_source_applies(
     payload = effect.effect_payload
     if not isinstance(payload, dict):
         raise GameLifecycleError("Conditional leader effect payload must be an object.")
-    source_unit_id = _source_unit_instance_id(payload)
+    return conditional_leading_source_unit_applies(
+        state=state,
+        rules_unit_instance_id=rules_unit_instance_id,
+        source_unit_instance_id=_source_unit_instance_id(payload),
+    )
+
+
+def conditional_leading_source_unit_applies(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+    source_unit_instance_id: str,
+) -> bool:
+    source_unit_id = _required_string("source_unit_instance_id", source_unit_instance_id)
     view = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_instance_id)
     if not view.is_attached_rules_unit:
         return False

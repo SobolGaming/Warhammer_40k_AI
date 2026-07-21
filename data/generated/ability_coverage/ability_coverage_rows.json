@@ -1,5 +1,189 @@
 [
   {
+    "ability_id": "000008340",
+    "ability_name": "Fights First",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/core/000008340/none",
+    "datasheet_id": "000000572",
+    "datasheet_name": "Jain Zar",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:fight-order:fights-first"
+    ],
+    "semantic_categories": [
+      "core.fights_first"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/core/000008346/none",
+    "datasheet_id": "000000572",
+    "datasheet_name": "Jain Zar",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000572:storm-of-silence",
+    "ability_name": "Storm of Silence",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:storm-of-silence/none",
+    "datasheet_id": "000000572",
+    "datasheet_name": "Jain Zar",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:wound-roll-reroll"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.reroll_permission.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000572:whirling-death",
+    "ability_name": "Whirling Death",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:whirling-death/none",
+    "datasheet_id": "000000572",
+    "datasheet_name": "Jain Zar",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-fixed-advance",
+      "catalog-ir:dice-result-override"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_move_distance.selected_unit",
+      "datasheet.rule_ir.movement_transit_permission.selected_unit",
+      "datasheet.rule_ir.override_dice_roll_result.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/faction/000009894/none",
+    "datasheet_id": "000000572",
+    "datasheet_name": "Jain Zar",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000574/core/000008346/none",
+    "datasheet_id": "000000574",
+    "datasheet_name": "Fuegan",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000574:burning-lance",
+    "ability_name": "Burning Lance",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000574/datasheet/000000574:burning-lance/none",
+    "datasheet_id": "000000574",
+    "datasheet_name": "Fuegan",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-weapon-range-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000574:unquenchable-resolve",
+    "ability_name": "Unquenchable Resolve",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000574/datasheet/000000574:unquenchable-resolve/none",
+    "datasheet_id": "000000574",
+    "datasheet_name": "Fuegan",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:first-death-return"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.return_destroyed_target.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000574/faction/000009894/none",
+    "datasheet_id": "000000574",
+    "datasheet_name": "Fuegan",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008346",
     "ability_name": "Leader",
     "catalog_id": "chaos-daemons-bridge-catalog",
@@ -87,6 +271,107 @@
     "coverage_row_id": "chaos-daemons-bridge-catalog/000000577/faction/000009894/none",
     "datasheet_id": "000000577",
     "datasheet_name": "Autarch",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008337",
+    "ability_name": "Stealth",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/core/000008337/none",
+    "datasheet_id": "000000588",
+    "datasheet_name": "Spiritseer",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "core:stealth"
+    ],
+    "semantic_categories": [
+      "core.stealth"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000588:spirit-mark-psychic",
+    "ability_name": "Spirit Mark (Psychic)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spirit-mark-psychic/none",
+    "datasheet_id": "000000588",
+    "datasheet_name": "Spiritseer",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-friendly-enemy-target-pair"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_weapon_ability.friendly_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000588:spiritseer",
+    "ability_name": "Spiritseer",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
+    "datasheet_id": "000000588",
+    "datasheet_name": "Spiritseer",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-ability:lone-operative"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000588:tears-of-isha-psychic",
+    "ability_name": "Tears of Isha (Psychic)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:tears-of-isha-psychic/none",
+    "datasheet_id": "000000588",
+    "datasheet_name": "Spiritseer",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-restoration"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.restore_lost_wounds.friendly_unit",
+      "datasheet.rule_ir.return_destroyed_target.friendly_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/faction/000009894/none",
+    "datasheet_id": "000000588",
+    "datasheet_name": "Spiritseer",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:aeldari:army_rule:fade_back",
@@ -212,32 +497,35 @@
     "datasheet_id": "000000594",
     "datasheet_name": "Howling Banshees",
     "diagnostic_reasons": [],
-    "runtime_consumer_ids": [],
+    "runtime_consumer_ids": [
+      "descriptor:fight-order:fights-first"
+    ],
     "semantic_categories": [
-      "unknown.ability_text"
+      "core.fights_first"
     ],
     "source_kind": "core",
     "source_wargear_id": null,
-    "support_stage": "descriptor_only"
+    "support_stage": "engine_consumed"
   },
   {
     "ability_id": "000000594:acrobatic",
     "ability_name": "Acrobatic",
     "catalog_id": "chaos-daemons-bridge-catalog",
-    "catalog_support": "unsupported",
+    "catalog_support": "generic_rule_ir",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:acrobatic/none",
     "datasheet_id": "000000594",
     "datasheet_name": "Howling Banshees",
-    "diagnostic_reasons": [
-      "unsupported_language"
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:can-advance-and-charge",
+      "catalog-ir:can-fallback-and-charge"
     ],
-    "runtime_consumer_ids": [],
     "semantic_categories": [
-      "unknown.ability_text"
+      "datasheet.rule_ir.grant_ability.this_unit"
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,
-    "support_stage": "ir_compiled_unsupported"
+    "support_stage": "engine_consumed"
   },
   {
     "ability_id": "000009894",
@@ -2381,6 +2669,107 @@
     "coverage_row_id": "chaos-daemons-bridge-catalog/000002759/faction/000009894/none",
     "datasheet_id": "000002759",
     "datasheet_name": "Autarch Wayleaper",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/core/000008343/none",
+    "datasheet_id": "000003909",
+    "datasheet_name": "Lhykhis",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/core/000008346/none",
+    "datasheet_id": "000003909",
+    "datasheet_name": "Lhykhis",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000003909:empyric-ambush",
+    "ability_name": "Empyric Ambush",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/datasheet/000003909:empyric-ambush/none",
+    "datasheet_id": "000003909",
+    "datasheet_name": "Lhykhis",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-charge-after-movement-action"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000003909:whispering-web",
+    "ability_name": "Whispering Web",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/datasheet/000003909:whispering-web/none",
+    "datasheet_id": "000003909",
+    "datasheet_name": "Lhykhis",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:minimum-unmodified-hit-success"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.friendly_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/faction/000009894/none",
+    "datasheet_id": "000003909",
+    "datasheet_name": "Lhykhis",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:aeldari:army_rule:fade_back",

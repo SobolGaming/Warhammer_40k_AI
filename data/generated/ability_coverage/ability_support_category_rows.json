@@ -52,6 +52,14 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000574/faction/000009894/none",
+        "datasheet_id": "000000574",
+        "datasheet_name": "Fuegan",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/faction/000009894/none",
         "datasheet_id": "000000594",
         "datasheet_name": "Howling Banshees",
@@ -60,9 +68,25 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/faction/000009894/none",
+        "datasheet_id": "000000572",
+        "datasheet_name": "Jain Zar",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/faction/000009894/none",
+        "datasheet_id": "000003909",
+        "datasheet_name": "Lhykhis",
         "source_kind": "faction"
       },
       {
@@ -95,6 +119,14 @@
         "coverage_row_id": "chaos-daemons-bridge-catalog/000002533/faction/000009894/none",
         "datasheet_id": "000002533",
         "datasheet_name": "Shroud Runners",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/faction/000009894/none",
+        "datasheet_id": "000000588",
+        "datasheet_name": "Spiritseer",
         "source_kind": "faction"
       },
       {
@@ -151,7 +183,7 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 18,
+    "coverage_row_count": 22,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002759/faction/000009894/none",
@@ -159,12 +191,16 @@
       "chaos-daemons-bridge-catalog/000002531/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002532/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000596/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000574/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000594/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000572/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004194/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000003909/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000611/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004193/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000592/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002533/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000000588/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000595/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000600/faction/000009894/none",
@@ -179,12 +215,16 @@
       "Corsair Voidreavers",
       "Corsair Voidscarred",
       "Fire Dragons",
+      "Fuegan",
       "Howling Banshees",
+      "Jain Zar",
       "Kharseth",
+      "Lhykhis",
       "Night Spinner",
       "Prince Yriel",
       "Rangers",
       "Shroud Runners",
+      "Spiritseer",
       "Starfangs",
       "Striking Scorpions",
       "Swooping Hawks",
@@ -201,7 +241,7 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 18
+      "faction": 22
     },
     "support_stages": [
       "engine_consumed"
@@ -591,6 +631,49 @@
     ],
     "source_kind_counts": {
       "core": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000008340",
+        "ability_name": "Fights First",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
+        "datasheet_id": "000000594",
+        "datasheet_name": "Howling Banshees",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008340",
+        "ability_name": "Fights First",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/core/000008340/none",
+        "datasheet_id": "000000572",
+        "datasheet_name": "Jain Zar",
+        "source_kind": "core"
+      }
+    ],
+    "ability_names": [
+      "Fights First"
+    ],
+    "category_id": "core.fights_first",
+    "category_name": "Core Fights First",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
+      "chaos-daemons-bridge-catalog/000000572/core/000008340/none"
+    ],
+    "datasheet_names": [
+      "Howling Banshees",
+      "Jain Zar"
+    ],
+    "runtime_consumer_ids": [
+      "descriptor:fight-order:fights-first"
+    ],
+    "source_kind_counts": {
+      "core": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -1101,6 +1184,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000003909:empyric-ambush",
+        "ability_name": "Empyric Ambush",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/datasheet/000003909:empyric-ambush/none",
+        "datasheet_id": "000003909",
+        "datasheet_name": "Lhykhis",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000004195:hallucinogen-grenades",
         "ability_name": "Hallucinogen Grenades",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004195/datasheet/000004195:hallucinogen-grenades/none",
@@ -1110,22 +1201,26 @@
       }
     ],
     "ability_names": [
+      "Empyric Ambush",
       "Hallucinogen Grenades"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.selected_unit",
     "category_name": "Datasheet Rule Ir Grant Ability Selected Unit",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000003909/datasheet/000003909:empyric-ambush/none",
       "chaos-daemons-bridge-catalog/000004195/datasheet/000004195:hallucinogen-grenades/none"
     ],
     "datasheet_names": [
+      "Lhykhis",
       "Starfangs"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-charge-after-movement-action",
       "catalog-ir:shooting-start-selected-target-effect"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -1150,6 +1245,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000000588:spiritseer",
+        "ability_name": "Spiritseer",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
+        "datasheet_id": "000000588",
+        "datasheet_name": "Spiritseer",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000598:malevolent-souls",
         "ability_name": "Malevolent Souls",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none",
@@ -1161,19 +1264,22 @@
     "ability_names": [
       "ASPECT TRAINING",
       "Daemonic Lord",
-      "Malevolent Souls"
+      "Malevolent Souls",
+      "Spiritseer"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_model",
     "category_name": "Datasheet Rule Ir Grant Ability This Model",
-    "coverage_row_count": 3,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:aspect-training/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
+      "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
       "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none"
     ],
     "datasheet_names": [
       "Autarch",
       "Daemon Prince of Chaos",
+      "Spiritseer",
       "Wraithblades"
     ],
     "runtime_consumer_ids": [
@@ -1185,7 +1291,7 @@
       "catalog-ir:fight-on-death-source"
     ],
     "source_kind_counts": {
-      "datasheet": 3
+      "datasheet": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -1193,6 +1299,14 @@
   },
   {
     "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000594:acrobatic",
+        "ability_name": "Acrobatic",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:acrobatic/none",
+        "datasheet_id": "000000594",
+        "datasheet_name": "Howling Banshees",
+        "source_kind": "datasheet"
+      },
       {
         "ability_id": "000000601:flickerjump",
         "ability_name": "Flickerjump",
@@ -1203,19 +1317,57 @@
       }
     ],
     "ability_names": [
+      "Acrobatic",
       "Flickerjump"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_unit",
     "category_name": "Datasheet Rule Ir Grant Ability This Unit",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:acrobatic/none",
       "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none"
     ],
     "datasheet_names": [
+      "Howling Banshees",
       "Warp Spiders"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:can-advance-and-charge",
+      "catalog-ir:can-fallback-and-charge",
       "catalog-ir:movement-action-grant"
+    ],
+    "source_kind_counts": {
+      "datasheet": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000588:spirit-mark-psychic",
+        "ability_name": "Spirit Mark (Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spirit-mark-psychic/none",
+        "datasheet_id": "000000588",
+        "datasheet_name": "Spiritseer",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Spirit Mark (Psychic)"
+    ],
+    "category_id": "datasheet.rule_ir.grant_weapon_ability.friendly_unit",
+    "category_name": "Datasheet Rule Ir Grant Weapon Ability Friendly Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spirit-mark-psychic/none"
+    ],
+    "datasheet_names": [
+      "Spiritseer"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-friendly-enemy-target-pair"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -1456,6 +1608,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000574:burning-lance",
+        "ability_name": "Burning Lance",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000574/datasheet/000000574:burning-lance/none",
+        "datasheet_id": "000000574",
+        "datasheet_name": "Fuegan",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000611:monofilament-web",
         "ability_name": "Monofilament Web",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none",
@@ -1465,22 +1625,26 @@
       }
     ],
     "ability_names": [
+      "Burning Lance",
       "Monofilament Web"
     ],
     "category_id": "datasheet.rule_ir.modify_characteristic.selected_unit",
     "category_name": "Datasheet Rule Ir Modify Characteristic Selected Unit",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000574/datasheet/000000574:burning-lance/none",
       "chaos-daemons-bridge-catalog/000000611/datasheet/000000611:monofilament-web/none"
     ],
     "datasheet_names": [
+      "Fuegan",
       "Night Spinner"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-weapon-range-modifier",
       "catalog-ir:post-shoot-hit-target-effect"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -1682,6 +1846,74 @@
     ],
     "runtime_consumer_ids": [
       "catalog-ir:faction-resource-refund-roll"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000572:whirling-death",
+        "ability_name": "Whirling Death",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:whirling-death/none",
+        "datasheet_id": "000000572",
+        "datasheet_name": "Jain Zar",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Whirling Death"
+    ],
+    "category_id": "datasheet.rule_ir.modify_move_distance.selected_unit",
+    "category_name": "Datasheet Rule Ir Modify Move Distance Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:whirling-death/none"
+    ],
+    "datasheet_names": [
+      "Jain Zar"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-fixed-advance",
+      "catalog-ir:dice-result-override"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000572:whirling-death",
+        "ability_name": "Whirling Death",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:whirling-death/none",
+        "datasheet_id": "000000572",
+        "datasheet_name": "Jain Zar",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Whirling Death"
+    ],
+    "category_id": "datasheet.rule_ir.movement_transit_permission.selected_unit",
+    "category_name": "Datasheet Rule Ir Movement Transit Permission Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:whirling-death/none"
+    ],
+    "datasheet_names": [
+      "Jain Zar"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-fixed-advance",
+      "catalog-ir:dice-result-override"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -1917,6 +2149,40 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000572:whirling-death",
+        "ability_name": "Whirling Death",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:whirling-death/none",
+        "datasheet_id": "000000572",
+        "datasheet_name": "Jain Zar",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Whirling Death"
+    ],
+    "category_id": "datasheet.rule_ir.override_dice_roll_result.selected_unit",
+    "category_name": "Datasheet Rule Ir Override Dice Roll Result Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:whirling-death/none"
+    ],
+    "datasheet_names": [
+      "Jain Zar"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-fixed-advance",
+      "catalog-ir:dice-result-override"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000004193:prince-of-corsairs",
         "ability_name": "Prince of Corsairs",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:prince-of-corsairs/none",
@@ -2083,6 +2349,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000572:storm-of-silence",
+        "ability_name": "Storm of Silence",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:storm-of-silence/none",
+        "datasheet_id": "000000572",
+        "datasheet_name": "Jain Zar",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000613:fated-hero",
         "ability_name": "Fated Hero",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:fated-hero/none",
@@ -2092,15 +2366,18 @@
       }
     ],
     "ability_names": [
-      "Fated Hero"
+      "Fated Hero",
+      "Storm of Silence"
     ],
     "category_id": "datasheet.rule_ir.reroll_permission.this_model",
     "category_name": "Datasheet Rule Ir Reroll Permission This Model",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:storm-of-silence/none",
       "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:fated-hero/none"
     ],
     "datasheet_names": [
+      "Jain Zar",
       "Wraithlord"
     ],
     "runtime_consumer_ids": [
@@ -2109,7 +2386,7 @@
       "catalog-ir:wound-roll-reroll"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -2188,6 +2465,105 @@
     "runtime_consumer_ids": [
       "catalog-ir:battle-shock-failed-heal",
       "catalog-ir:battle-shock-forced-test"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000588:tears-of-isha-psychic",
+        "ability_name": "Tears of Isha (Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:tears-of-isha-psychic/none",
+        "datasheet_id": "000000588",
+        "datasheet_name": "Spiritseer",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Tears of Isha (Psychic)"
+    ],
+    "category_id": "datasheet.rule_ir.restore_lost_wounds.friendly_unit",
+    "category_name": "Datasheet Rule Ir Restore Lost Wounds Friendly Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:tears-of-isha-psychic/none"
+    ],
+    "datasheet_names": [
+      "Spiritseer"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-restoration"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000588:tears-of-isha-psychic",
+        "ability_name": "Tears of Isha (Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:tears-of-isha-psychic/none",
+        "datasheet_id": "000000588",
+        "datasheet_name": "Spiritseer",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Tears of Isha (Psychic)"
+    ],
+    "category_id": "datasheet.rule_ir.return_destroyed_target.friendly_unit",
+    "category_name": "Datasheet Rule Ir Return Destroyed Target Friendly Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:tears-of-isha-psychic/none"
+    ],
+    "datasheet_names": [
+      "Spiritseer"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-restoration"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000574:unquenchable-resolve",
+        "ability_name": "Unquenchable Resolve",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000574/datasheet/000000574:unquenchable-resolve/none",
+        "datasheet_id": "000000574",
+        "datasheet_name": "Fuegan",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Unquenchable Resolve"
+    ],
+    "category_id": "datasheet.rule_ir.return_destroyed_target.this_model",
+    "category_name": "Datasheet Rule Ir Return Destroyed Target This Model",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000574/datasheet/000000574:unquenchable-resolve/none"
+    ],
+    "datasheet_names": [
+      "Fuegan"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:first-death-return"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -2327,6 +2703,39 @@
     ],
     "source_kind_counts": {
       "datasheet": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000003909:whispering-web",
+        "ability_name": "Whispering Web",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/datasheet/000003909:whispering-web/none",
+        "datasheet_id": "000003909",
+        "datasheet_name": "Lhykhis",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Whispering Web"
+    ],
+    "category_id": "datasheet.rule_ir.set_contextual_status.friendly_unit",
+    "category_name": "Datasheet Rule Ir Set Contextual Status Friendly Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000003909/datasheet/000003909:whispering-web/none"
+    ],
+    "datasheet_names": [
+      "Lhykhis"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:minimum-unmodified-hit-success"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
     },
     "support_stages": [
       "engine_consumed"
@@ -2496,6 +2905,14 @@
       {
         "ability_id": "000008343",
         "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/core/000008343/none",
+        "datasheet_id": "000003909",
+        "datasheet_name": "Lhykhis",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/core/000008343/none",
         "datasheet_id": "000001151",
         "datasheet_name": "Soul Grinder",
@@ -2523,7 +2940,7 @@
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
-    "coverage_row_count": 11,
+    "coverage_row_count": 12,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000002759/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
@@ -2533,6 +2950,7 @@
       "chaos-daemons-bridge-catalog/000002758/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001149/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001112/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000003909/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001151/core/000008343/none",
       "chaos-daemons-bridge-catalog/000000600/core/000008343/none",
       "chaos-daemons-bridge-catalog/000000601/core/000008343/none"
@@ -2546,6 +2964,7 @@
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Flesh Hounds",
+      "Lhykhis",
       "Soul Grinder",
       "Swooping Hawks",
       "Warp Spiders"
@@ -2555,7 +2974,7 @@
       "descriptor:reserve-declaration:deep-strike"
     ],
     "source_kind_counts": {
-      "core": 11
+      "core": 12
     },
     "support_stages": [
       "engine_consumed"
@@ -3221,9 +3640,33 @@
       {
         "ability_id": "000008346",
         "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000574/core/000008346/none",
+        "datasheet_id": "000000574",
+        "datasheet_name": "Fuegan",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000572/core/000008346/none",
+        "datasheet_id": "000000572",
+        "datasheet_name": "Jain Zar",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/core/000008346/none",
+        "datasheet_id": "000003909",
+        "datasheet_name": "Lhykhis",
         "source_kind": "core"
       },
       {
@@ -3240,24 +3683,30 @@
     ],
     "category_id": "core.leader",
     "category_name": "Leader",
-    "coverage_row_count": 4,
+    "coverage_row_count": 7,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/core/000008346/none",
       "chaos-daemons-bridge-catalog/000002759/core/000008346/none",
+      "chaos-daemons-bridge-catalog/000000574/core/000008346/none",
+      "chaos-daemons-bridge-catalog/000000572/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
+      "chaos-daemons-bridge-catalog/000003909/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004193/core/000008346/none"
     ],
     "datasheet_names": [
       "Autarch",
       "Autarch Wayleaper",
+      "Fuegan",
+      "Jain Zar",
       "Kharseth",
+      "Lhykhis",
       "Prince Yriel"
     ],
     "runtime_consumer_ids": [
       "descriptor:army-mustering:leader-attachment"
     ],
     "source_kind_counts": {
-      "core": 4
+      "core": 7
     },
     "support_stages": [
       "engine_consumed"
@@ -3448,6 +3897,14 @@
       {
         "ability_id": "000008337",
         "ability_name": "Stealth",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/core/000008337/none",
+        "datasheet_id": "000000588",
+        "datasheet_name": "Spiritseer",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008337",
+        "ability_name": "Stealth",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/core/000008337/none",
         "datasheet_id": "000000595",
         "datasheet_name": "Striking Scorpions",
@@ -3459,24 +3916,26 @@
     ],
     "category_id": "core.stealth",
     "category_name": "Stealth",
-    "coverage_row_count": 4,
+    "coverage_row_count": 5,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008337/none",
       "chaos-daemons-bridge-catalog/000000592/core/000008337/none",
       "chaos-daemons-bridge-catalog/000002533/core/000008337/none",
+      "chaos-daemons-bridge-catalog/000000588/core/000008337/none",
       "chaos-daemons-bridge-catalog/000000595/core/000008337/none"
     ],
     "datasheet_names": [
       "Be'lakor",
       "Rangers",
       "Shroud Runners",
+      "Spiritseer",
       "Striking Scorpions"
     ],
     "runtime_consumer_ids": [
       "core:stealth"
     ],
     "source_kind_counts": {
-      "core": 4
+      "core": 5
     },
     "support_stages": [
       "engine_consumed"
@@ -3540,54 +3999,30 @@
         "datasheet_id": "000004209",
         "datasheet_name": "Defiler",
         "source_kind": "faction"
-      },
-      {
-        "ability_id": "000008340",
-        "ability_name": "Fights First",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
-        "datasheet_id": "000000594",
-        "datasheet_name": "Howling Banshees",
-        "source_kind": "core"
-      },
-      {
-        "ability_id": "000000594:acrobatic",
-        "ability_name": "Acrobatic",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:acrobatic/none",
-        "datasheet_id": "000000594",
-        "datasheet_name": "Howling Banshees",
-        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
-      "Acrobatic",
       "Blessings of Khorne",
-      "Fights First",
       "Nurgle's Gift (Aura)",
       "Thrill Seekers"
     ],
     "category_id": "unknown.ability_text",
     "category_name": "Unknown Abilities",
-    "coverage_row_count": 5,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
       "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
-      "chaos-daemons-bridge-catalog/000004209/faction/000008396/none",
-      "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
-      "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:acrobatic/none"
+      "chaos-daemons-bridge-catalog/000004209/faction/000008396/none"
     ],
     "datasheet_names": [
-      "Defiler",
-      "Howling Banshees"
+      "Defiler"
     ],
     "runtime_consumer_ids": [],
     "source_kind_counts": {
-      "core": 1,
-      "datasheet": 1,
       "faction": 3
     },
     "support_stages": [
-      "descriptor_only",
-      "ir_compiled_unsupported"
+      "descriptor_only"
     ]
   },
   {

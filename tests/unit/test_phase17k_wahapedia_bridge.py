@@ -6823,9 +6823,12 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         "| Craftworlds / Asuryani | Autarch (`000000577`)<br>"
         "Autarch Wayleaper (`000002759`)<br>Fire Dragons (`000000596`)<br>"
+        "Fuegan (`000000574`)<br>Howling Banshees (`000000594`)<br>"
+        "Jain Zar (`000000572`)<br>Lhykhis (`000003909`)<br>"
         "Night Spinner (`000000611`)<br>"
         "Rangers (`000000592`)<br>"
-        "Shroud Runners (`000002533`)<br>Striking Scorpions (`000000595`)<br>"
+        "Shroud Runners (`000002533`)<br>Spiritseer (`000000588`)<br>"
+        "Striking Scorpions (`000000595`)<br>"
         "Swooping Hawks (`000000600`)<br>Vypers (`000000605`)<br>"
         "War Walkers (`000000612`)<br>Warp Spiders (`000000601`)<br>"
         "Wraithblades (`000000598`)<br>Wraithguard (`000000597`)<br>"
@@ -6909,9 +6912,21 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| `catalog-ir:shooting-start-selected-target-effect` | Hallucinogen Grenades |"
         in generated_markdown
     )
+    assert "| `catalog-ir:can-advance-and-charge` | Acrobatic |" in generated_markdown
+    assert "| `catalog-ir:can-fallback-and-charge` | Acrobatic |" in generated_markdown
     assert (
-        "| `catalog-ir:can-advance-and-charge` | No current generated rows |"
+        "| `catalog-ir:conditional-leading-fixed-advance` | Whirling Death |"
     ) in generated_markdown
+    assert (
+        "| `catalog-ir:conditional-leading-weapon-range-modifier` | Burning Lance |"
+    ) in generated_markdown
+    assert (
+        "| `catalog-ir:conditional-leading-charge-after-movement-action` | Empyric Ambush |"
+    ) in generated_markdown
+    assert (
+        "| `catalog-ir:movement-friendly-enemy-target-pair` | Spirit Mark (Psychic) |"
+    ) in generated_markdown
+    assert "| `catalog-ir:command-restoration` | Tears of Isha (Psychic) |" in (generated_markdown)
     assert (
         "| `catalog-ir:can-fallback-and-shoot` | No current generated rows |"
     ) in generated_markdown
@@ -7028,6 +7043,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Soul Grinder",
         "Daemon Prince Of Chaos With Wings",
         "Autarch Wayleaper",
+        "Lhykhis",
         "Corsair Skyreavers",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Collar of Khorne"]) == (

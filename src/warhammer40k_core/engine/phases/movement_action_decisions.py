@@ -846,6 +846,49 @@ def _resolve_pending_advance_action(
         ability_index=ability_index,
         runtime_modifier_registry=runtime_modifier_registry,
     )
+    fixed_grants = tuple(
+        grant for grant in selected_advance_move_grants if grant.fixed_advance_inches is not None
+    )
+    if len(fixed_grants) > 1:
+        raise GameLifecycleError("Multiple fixed Advance grants are not supported.")
+    if fixed_grants:
+        fixed_grant = fixed_grants[0]
+        fixed_value = fixed_grant.fixed_advance_inches
+        if fixed_value is None:
+            raise GameLifecycleError("Fixed Advance grant value is missing.")
+        fixed_state = _dice_roll_manager_for_state(
+            state=state,
+            decisions=decisions,
+        ).roll_fixed(advance_roll_request.spec, (fixed_value,))
+        decisions.event_log.append(
+            "advance_fixed_value_resolved",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": pending_action.player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": pending_action.unit_instance_id,
+                "source_rule_id": fixed_grant.source_id,
+                "hook_id": fixed_grant.hook_id,
+                "fixed_advance_inches": fixed_value,
+                "advance_roll_request": validate_json_value(advance_roll_request.to_payload()),
+            },
+        )
+        return _resolve_and_apply_advance_move(
+            state=state,
+            decisions=decisions,
+            result=action_result,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            advance_roll=AdvanceRollResult.from_roll_state(
+                request=advance_roll_request,
+                roll_state=fixed_state,
+            ),
+            movement_mode=pending_action.movement_mode,
+            selected_advance_move_grants=selected_advance_move_grants,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
+        )
     advance_roll_state = _roll_advance_dice(
         state=state,
         decisions=decisions,

@@ -36,7 +36,14 @@ from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
     invalid_any_phase_once_per_battle_status,
 )
+from warhammer40k_core.engine.catalog_command_restoration_runtime import (
+    invalid_catalog_command_restoration_status,
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
+from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
+    SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE,
+    invalid_catalog_movement_target_pair_status,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
 )
@@ -122,11 +129,23 @@ from warhammer40k_core.engine.game_state import (
     GameState,
     GameStatePayload,
 )
-from warhammer40k_core.engine.healing import (
-    SELECT_HEALING_MODEL_DECISION_TYPE,
-    apply_recorded_healing_model_decision,
-    healing_effect_from_request,
-    invalid_healing_model_decision_status,
+from warhammer40k_core.engine.healing_decision_dispatch import (
+    HEALING_DECISION_TYPES,
+    PARAMETERIZED_HEALING_DECISION_TYPES,
+    apply_recorded_healing_decision,
+    invalid_healing_decision_status,
+)
+from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
+    state_allows_battlefield_state as _state_allows_battlefield_state,
+)
+from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
+    state_is_before_deploy_armies as _state_is_before_deploy_armies,
+)
+from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
+    state_requires_battlefield_state as _state_requires_battlefield_state,
+)
+from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
+    state_requires_deployed_battlefield_state as _state_requires_deployed_battlefield_state,
 )
 from warhammer40k_core.engine.lifecycle_reaction_queue import (
     validate_reaction_queue_consistency,
@@ -170,7 +189,6 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
     PhaseHandler,
-    SetupStep,
 )
 from warhammer40k_core.engine.phases.charge import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
@@ -334,6 +352,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
         SELECT_DISEMBARK_UNIT_DECISION_TYPE,
         SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
         SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
+        SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -447,7 +466,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         DICE_RESULT_OVERRIDE_DECISION_TYPE,
-        SELECT_HEALING_MODEL_DECISION_TYPE,
+        *HEALING_DECISION_TYPES,
     )
 )
 _SETUP_DECISION_TYPES = frozenset(
@@ -480,6 +499,7 @@ _PARAMETERIZED_DISPATCH_DECISION_TYPES = frozenset(
         PLACEMENT_PROPOSAL_DECISION_TYPE,
         SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE,
         SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+        *PARAMETERIZED_HEALING_DECISION_TYPES,
         SUBMIT_SCOUT_MOVE_DECISION_TYPE,
         SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
@@ -1000,10 +1020,13 @@ class GameLifecycle:
                     pre_validator=self._pre_validate_cult_ambush_marker_placement_decision,
                     applier=self._apply_cult_ambush_marker_placement_decision,
                 ),
-                DecisionDispatchHandler(
-                    decision_type=SELECT_HEALING_MODEL_DECISION_TYPE,
-                    pre_validator=self._pre_validate_healing_model_decision,
-                    applier=self._apply_healing_model_decision,
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_healing_decision,
+                        applier=self._apply_healing_decision,
+                    )
+                    for decision_type in HEALING_DECISION_TYPES
                 ),
                 DecisionDispatchHandler(
                     decision_type=SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
@@ -1135,6 +1158,16 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         state = self._require_state()
+        if request.decision_type == SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE:
+            return invalid_catalog_movement_target_pair_status(
+                state=state,
+                decisions=self.decision_controller,
+                request=request,
+                result=result,
+                ability_indexes_by_player_id=(
+                    self._movement_phase_handler.ability_indexes_by_player_id
+                ),
+            )
         if is_stratagem_placement_proposal_request(request):
             result.validate_for_request(request)
             if self._result_resolves_active_reaction_frame(result):
@@ -1987,6 +2020,15 @@ class GameLifecycle:
         )
         if invalid_status is not None:
             return invalid_status
+        restoration_invalid_status = invalid_catalog_command_restoration_status(
+            state=state,
+            decisions=self.decision_controller,
+            request=request,
+            result=result,
+            ability_indexes_by_player_id=(self._command_phase_handler.ability_indexes_by_player_id),
+        )
+        if restoration_invalid_status is not None:
+            return restoration_invalid_status
         return invalid_command_phase_decision_status(
             state=state,
             request=request,
@@ -2137,41 +2179,40 @@ class GameLifecycle:
         )
         return self.advance_until_decision_or_terminal()
 
-    def _pre_validate_healing_model_decision(
+    def _pre_validate_healing_decision(
         self,
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         if self._result_resolves_active_reaction_frame(result):
             self.reaction_queue.validate_result(result)
-        return invalid_healing_model_decision_status(
+        return invalid_healing_decision_status(
             state=self._require_state(),
             request=request,
             result=result,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
         )
 
-    def _apply_healing_model_decision(
+    def _apply_healing_decision(
         self,
         record: DecisionRecord,
         result: DecisionResult,
     ) -> LifecycleStatus:
         state = self._require_state()
         resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-        healing_effect = healing_effect_from_request(request=record.request)
-        _updated_effect, follow_up_request = apply_recorded_healing_model_decision(
+        healing_effect, follow_up_request = apply_recorded_healing_decision(
             state=state,
             decisions=self.decision_controller,
             ruleset_descriptor=self._require_config().ruleset_descriptor,
             request=record.request,
             result=result,
-            effect=healing_effect,
         )
         if follow_up_request is not None:
             healing_status = LifecycleStatus.waiting_for_decision(
                 stage=state.stage,
                 decision_request=follow_up_request,
                 payload={
-                    "decision_type": SELECT_HEALING_MODEL_DECISION_TYPE,
+                    "decision_type": follow_up_request.decision_type,
                     "effect_id": healing_effect.effect_id,
                     "target_unit_instance_id": healing_effect.target_unit_instance_id,
                 },
@@ -3868,54 +3909,3 @@ def _fully_removed_unit_ids_for_player(*, state: GameState, player_id: str) -> s
             if unit_model_ids and unit_model_ids <= removed_model_ids:
                 fully_removed_unit_ids.add(unit.unit_instance_id)
     return fully_removed_unit_ids
-
-
-def _state_requires_battlefield_state(state: GameState) -> bool:
-    if state.stage is not GameLifecycleStage.SETUP:
-        return True
-    if state.setup_step_index is None:
-        return True
-    create_step_index = _setup_step_index_or_none(state, SetupStep.CREATE_BATTLEFIELD)
-    if create_step_index is None:
-        return False
-    return state.setup_step_index > create_step_index
-
-
-def _state_requires_deployed_battlefield_state(state: GameState) -> bool:
-    if state.stage is not GameLifecycleStage.SETUP:
-        return True
-    if state.setup_step_index is None:
-        return True
-    deploy_step_index = _setup_step_index_or_none(state, SetupStep.DEPLOY_ARMIES)
-    if deploy_step_index is None:
-        return False
-    return state.setup_step_index > deploy_step_index
-
-
-def _state_allows_battlefield_state(state: GameState) -> bool:
-    if state.stage is not GameLifecycleStage.SETUP:
-        return True
-    if state.setup_step_index is None:
-        return True
-    create_step_index = _setup_step_index_or_none(state, SetupStep.CREATE_BATTLEFIELD)
-    if create_step_index is None:
-        return False
-    return state.setup_step_index >= create_step_index
-
-
-def _state_is_before_deploy_armies(state: GameState) -> bool:
-    if state.stage is not GameLifecycleStage.SETUP:
-        return False
-    if state.setup_step_index is None:
-        return False
-    deploy_step_index = _setup_step_index_or_none(state, SetupStep.DEPLOY_ARMIES)
-    if deploy_step_index is None:
-        return False
-    return state.setup_step_index < deploy_step_index
-
-
-def _setup_step_index_or_none(state: GameState, step: SetupStep) -> int | None:
-    for index, candidate in enumerate(state.setup_sequence):
-        if candidate is step:
-            return index
-    return None

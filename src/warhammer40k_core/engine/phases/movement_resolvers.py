@@ -123,6 +123,7 @@ def resolve_advance_move(
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ability_index: AbilityCatalogIndex | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
+    ignores_vertical_distance: bool = False,
 ) -> AdvanceMoveResolution:
     if type(advance_roll) is not AdvanceRollResult:
         raise GameLifecycleError("Advance requires an AdvanceRollResult.")
@@ -150,6 +151,7 @@ def resolve_advance_move(
         runtime_modifier_registry=runtime_modifier_registry,
         ability_index=ability_index,
         temporary_movement_keywords=temporary_movement_keywords,
+        ignores_vertical_distance=ignores_vertical_distance,
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -280,6 +282,7 @@ def _resolve_unit_move(
     runtime_modifier_registry: RuntimeModifierRegistry | None,
     ability_index: AbilityCatalogIndex | None,
     temporary_movement_keywords: tuple[str, ...],
+    ignores_vertical_distance: bool = False,
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError(f"{action_label} requires a BattlefieldScenario.")
@@ -291,6 +294,8 @@ def _resolve_unit_move(
         raise GameLifecycleError(f"{action_label} movement_bonus_inches must be an integer.")
     if movement_bonus_inches < 0:
         raise GameLifecycleError(f"{action_label} movement_bonus_inches must not be negative.")
+    if type(ignores_vertical_distance) is not bool:
+        raise GameLifecycleError(f"{action_label} ignores_vertical_distance must be a bool.")
     validated_temporary_keywords = _validate_identifier_tuple(
         f"{action_label} temporary_movement_keywords",
         temporary_movement_keywords,
@@ -412,6 +417,7 @@ def _resolve_unit_move(
             ),
             unit_persisting_effects=unit_persisting_effects,
             owner_player_id=unit_placement.player_id,
+            ignores_vertical_distance_override=ignores_vertical_distance,
         )
         path_result = legality_context.to_path_validation_context(
             moving_model=moving_model,
@@ -514,6 +520,7 @@ def _resolve_unit_move(
             "movement_distance_modifier_inches": movement_distance_modifier_inches,
             "movement_keywords": list(effective_movement_keywords),
             "temporary_movement_keywords": list(validated_temporary_keywords),
+            "ignores_vertical_distance": ignores_vertical_distance,
             "base_size": model.base_size.to_payload(),
             "start_pose": placement.pose.to_payload(),
             "end_pose": witness.final_pose_for_model(placement.model_instance_id).to_payload(),

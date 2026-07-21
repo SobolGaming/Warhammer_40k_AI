@@ -32,6 +32,9 @@ from warhammer40k_core.engine.movement_proposals import (
     ProposalKind,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.return_placement_legality import (
+    validate_returned_model_endpoints,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 
@@ -531,6 +534,12 @@ def _validate_return_on_death_placement(
         expected_ids = {model.model_instance_id for model in unit.own_models}
         if model_ids != expected_ids:
             raise GameLifecycleError("Return-on-death unit placement must include all models.")
+    validate_returned_model_endpoints(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        placements=placement.model_placements,
+        placement_label="Return-on-death placement",
+    )
     _assert_destroyed_position_anchor(
         state=state,
         pending=pending,

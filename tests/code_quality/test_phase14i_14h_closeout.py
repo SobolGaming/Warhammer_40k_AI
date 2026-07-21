@@ -25,6 +25,7 @@ HAZARD_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "hazard.py"
 GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py"
 UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
 HEALING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing.py"
+HEALING_REVIVAL_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing_revival.py"
 DATASHEET_PATH = ROOT / "src" / "warhammer40k_core" / "core" / "datasheet.py"
 ATTACHMENT_ELIGIBILITY_PATH = (
     ROOT / "src" / "warhammer40k_core" / "core" / "attachment_eligibility.py"
@@ -106,6 +107,7 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     game_state_source = source_for(GAME_STATE_PATH)
     unit_state_source = source_for(UNIT_STATE_PATH)
     healing_source = source_for(HEALING_PATH)
+    healing_revival_source = source_for(HEALING_REVIVAL_PATH)
     datasheet_source = source_for(DATASHEET_PATH)
     attachment_eligibility_source = source_for(ATTACHMENT_ELIGIBILITY_PATH)
     list_validation_source = source_for(LIST_VALIDATION_PATH)
@@ -136,7 +138,7 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "SELECT_HEALING_MODEL_DECISION_TYPE" in healing_source
     assert "resolve_healing_until_blocked" in healing_source
     assert "apply_healing_model_decision" in healing_source
-    assert "with_returned_model_placement" in healing_source
+    assert "with_returned_model_placement" in healing_revival_source
     assert "phase_start_enemy_engagement_model_ids" in healing_source
     assert "attachment_eligibilities" in datasheet_source
     assert "class AttachmentEligibility" in attachment_eligibility_source

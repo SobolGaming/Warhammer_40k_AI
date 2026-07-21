@@ -110,6 +110,16 @@
     },
     {
       "coverage_status": "envelope_only",
+      "decision_type": "select_catalog_movement_target_pair",
+      "example_path": null,
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
       "decision_type": "select_catalog_post_shoot_hit_target_effect",
       "example_path": null,
       "interaction_kinds": [
@@ -591,6 +601,16 @@
     },
     {
       "coverage_status": "envelope_only",
+      "decision_type": "submit_healing_revival_placement",
+      "example_path": null,
+      "interaction_kinds": [
+        "model_pose_placement"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
       "decision_type": "submit_melee_declaration",
       "example_path": null,
       "interaction_kinds": [
@@ -691,9 +711,9 @@
     }
   ],
   "interaction_kind_count": 13,
-  "known_external_token_count": 69,
+  "known_external_token_count": 71,
   "live_scenario_count": 4,
-  "registered_decision_type_count": 67,
+  "registered_decision_type_count": 69,
   "schema_version": "decision-family-coverage-v2-interactions",
   "standard_interaction_kinds": [
     "battlefield_point_placement",

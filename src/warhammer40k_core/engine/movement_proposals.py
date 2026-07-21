@@ -57,6 +57,7 @@ class ProposalKind(StrEnum):
     STRATEGIC_RESERVES = "strategic_reserves_placement"
     DISEMBARK = "disembark_placement"
     CULT_AMBUSH = "cult_ambush_placement"
+    HEALING_REVIVAL = "healing_revival_placement"
 
 
 class ProposalViolationPayload(TypedDict):

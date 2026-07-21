@@ -19,6 +19,8 @@ class AdvanceMoveGrantPayload(TypedDict):
     label: str
     granted_ranged_weapon_keywords: list[str]
     movement_bonus_inches: int
+    fixed_advance_inches: NotRequired[int | None]
+    ignores_vertical_distance: NotRequired[bool]
     automatic: NotRequired[bool]
     replay_payload: JsonValue
     decision_effect_payload: JsonValue
@@ -89,6 +91,8 @@ class AdvanceMoveGrant:
     label: str
     granted_ranged_weapon_keywords: tuple[str, ...]
     movement_bonus_inches: int = 0
+    fixed_advance_inches: int | None = None
+    ignores_vertical_distance: bool = False
     automatic: bool = False
     replay_payload: JsonValue = None
     decision_effect_payload: JsonValue = None
@@ -111,6 +115,17 @@ class AdvanceMoveGrant:
             self,
             "movement_bonus_inches",
             _validate_non_negative_int("movement_bonus_inches", self.movement_bonus_inches),
+        )
+        if self.fixed_advance_inches is not None:
+            object.__setattr__(
+                self,
+                "fixed_advance_inches",
+                _validate_positive_int("fixed_advance_inches", self.fixed_advance_inches),
+            )
+        object.__setattr__(
+            self,
+            "ignores_vertical_distance",
+            _validate_bool("ignores_vertical_distance", self.ignores_vertical_distance),
         )
         object.__setattr__(self, "automatic", _validate_bool("automatic", self.automatic))
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
@@ -141,6 +156,8 @@ class AdvanceMoveGrant:
             "label": self.label,
             "granted_ranged_weapon_keywords": list(self.granted_ranged_weapon_keywords),
             "movement_bonus_inches": self.movement_bonus_inches,
+            "fixed_advance_inches": self.fixed_advance_inches,
+            "ignores_vertical_distance": self.ignores_vertical_distance,
             "automatic": self.automatic,
             "replay_payload": self.replay_payload,
             "decision_effect_payload": self.decision_effect_payload,
@@ -156,6 +173,8 @@ class AdvanceMoveGrant:
             label=payload["label"],
             granted_ranged_weapon_keywords=tuple(payload["granted_ranged_weapon_keywords"]),
             movement_bonus_inches=payload["movement_bonus_inches"],
+            fixed_advance_inches=payload.get("fixed_advance_inches"),
+            ignores_vertical_distance=payload.get("ignores_vertical_distance", False),
             automatic=payload.get("automatic", False),
             replay_payload=payload["replay_payload"],
             decision_effect_payload=payload["decision_effect_payload"],

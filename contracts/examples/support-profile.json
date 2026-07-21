@@ -104,6 +104,13 @@
       "submission_kind": "finite"
     },
     {
+      "decision_type": "select_catalog_movement_target_pair",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
       "decision_type": "select_catalog_post_shoot_hit_target_effect",
       "interaction_kinds": [
         "entity_selection"
@@ -437,6 +444,13 @@
       "decision_type": "submit_deployment_placement",
       "interaction_kinds": [
         "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_healing_revival_placement",
+      "interaction_kinds": [
+        "model_pose_placement"
       ],
       "submission_kind": "parameterized"
     },

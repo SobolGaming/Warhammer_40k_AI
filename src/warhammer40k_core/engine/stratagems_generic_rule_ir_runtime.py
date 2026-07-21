@@ -42,7 +42,6 @@ from warhammer40k_core.engine.stratagems_model import (
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
-from warhammer40k_core.geometry.pose import Pose
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -648,10 +647,6 @@ def _healing_effect(
             state=state,
             rules_unit=rules_unit,
         ),
-        revival_placements=_revival_placements_for_rules_unit(
-            state=state,
-            rules_unit=rules_unit,
-        ),
     )
 
 
@@ -703,50 +698,6 @@ def _phase_start_enemy_engagement_model_ids(
     return tuple(sorted(engaged_enemy_ids))
 
 
-def _revival_placements_for_rules_unit(
-    *,
-    state: GameState,
-    rules_unit: RulesUnitView,
-) -> tuple[ModelPlacement, ...]:
-    battlefield = _battlefield_state(state)
-    removed_model_ids = set(battlefield.removed_model_ids)
-    missing_models = tuple(
-        sorted(
-            (
-                model
-                for model in rules_unit.own_models
-                if not model.is_alive and model.model_instance_id in removed_model_ids
-            ),
-            key=lambda model: model.model_instance_id,
-        )
-    )
-    if not missing_models:
-        return ()
-    anchors = _rules_unit_placements(state=state, rules_unit=rules_unit)
-    if not anchors:
-        raise GameLifecycleError("Generic RuleIR revival requires placed anchors.")
-    army_id = _army_id_for_rules_unit(state=state, rules_unit=rules_unit)
-    placements: list[ModelPlacement] = []
-    for index, model in enumerate(missing_models):
-        anchor = anchors[index % len(anchors)]
-        secondary_anchor = anchors[(index + 1) % len(anchors)] if len(anchors) > 1 else None
-        placements.append(
-            ModelPlacement(
-                army_id=army_id,
-                player_id=rules_unit.owner_player_id,
-                unit_instance_id=rules_unit.component_unit_id_for_model(model.model_instance_id),
-                model_instance_id=model.model_instance_id,
-                pose=_candidate_revival_pose(
-                    battlefield=battlefield,
-                    anchor=anchor,
-                    secondary_anchor=secondary_anchor,
-                    index=index,
-                ),
-            )
-        )
-    return tuple(placements)
-
-
 def _rules_unit_placements(
     *,
     state: GameState,
@@ -768,37 +719,6 @@ def _rules_unit_placements(
                 if placement.model_instance_id in model_ids
             )
     return tuple(sorted(placements, key=lambda placement: placement.model_instance_id))
-
-
-def _candidate_revival_pose(
-    *,
-    battlefield: BattlefieldRuntimeState,
-    anchor: ModelPlacement,
-    secondary_anchor: ModelPlacement | None,
-    index: int,
-) -> Pose:
-    if secondary_anchor is not None:
-        anchor_position = anchor.pose.position
-        secondary_position = secondary_anchor.pose.position
-        return Pose.at(
-            (anchor_position.x + secondary_position.x) / 2.0,
-            (anchor_position.y + secondary_position.y) / 2.0,
-            max(anchor_position.z, secondary_position.z),
-        )
-    offset = 0.5 + (index * 0.1)
-    anchor_position = anchor.pose.position
-    candidate_x = anchor_position.x + offset
-    candidate_y = anchor_position.y
-    if candidate_x > battlefield.battlefield_width_inches:
-        candidate_x = anchor_position.x - offset
-    if candidate_x < 0:
-        candidate_x = anchor_position.x
-        candidate_y = anchor_position.y + offset
-    if candidate_y > battlefield.battlefield_depth_inches:
-        candidate_y = anchor_position.y - offset
-    if candidate_y < 0:
-        raise GameLifecycleError("Generic RuleIR revival could not derive placement.")
-    return Pose.at(candidate_x, candidate_y, anchor_position.z)
 
 
 def _emit_healing_runtime_event(
@@ -973,17 +893,6 @@ def _model_characteristic(model: ModelInstance, *, characteristic: Characteristi
         if candidate.characteristic is characteristic:
             return candidate.final
     raise GameLifecycleError("Generic Battle-shock target model is missing characteristic.")
-
-
-def _army_id_for_rules_unit(*, state: GameState, rules_unit: RulesUnitView) -> str:
-    for army in state.army_definitions:
-        if army.player_id != rules_unit.owner_player_id:
-            continue
-        if any(
-            unit.unit_instance_id in rules_unit.component_unit_instance_ids for unit in army.units
-        ):
-            return army.army_id
-    raise GameLifecycleError("Generic RuleIR rules unit army is unknown.")
 
 
 def _opposing_player_id(*, state: GameState, player_id: str) -> str:

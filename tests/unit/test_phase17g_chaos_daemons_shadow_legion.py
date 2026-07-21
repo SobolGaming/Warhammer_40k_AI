@@ -56,7 +56,11 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
-from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
+    ModelPlacement,
+    UnitPlacement,
+)
 from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSource,
     feel_no_pain_roll_spec,
@@ -64,12 +68,15 @@ from warhammer40k_core.engine.damage_allocation import (
     mortal_wound_feel_no_pain_source_context,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle_for_armies
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion import (  # noqa: E501
@@ -95,6 +102,11 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.healing import HealingStep, HealingStepKind
+from warhammer40k_core.engine.healing_revival import (
+    SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+    apply_healing_revival_placement_decision,
+    healing_effect_from_revival_request,
+)
 from warhammer40k_core.engine.list_validation import (
     BattleSize,
     DetachmentSelection,
@@ -450,6 +462,11 @@ def test_shadow_legion_death_denied_heals_and_revives_tzeentch_model_at_full_wou
         model_instance_id=wounded_model.model_instance_id,
         wounds_remaining=wounded_model.starting_wounds - 1,
     )
+    if state.battlefield_state is None:
+        raise AssertionError("Death Denied fixture requires battlefield state.")
+    destroyed_placement = state.battlefield_state.model_placement_by_id(
+        destroyed_model.model_instance_id
+    )
     _destroy_model(state, model_instance_id=destroyed_model.model_instance_id)
 
     decisions, _use_record = _use_shadow_legion_stratagem(
@@ -458,6 +475,38 @@ def test_shadow_legion_death_denied_heals_and_revives_tzeentch_model_at_full_wou
         target_unit_id=unit.unit_instance_id,
         phase=BattlePhase.COMMAND,
     )
+    placement_request = decisions.queue.peek_next()
+    assert placement_request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
+    placement_effect = healing_effect_from_revival_request(request=placement_request)
+    resolved, follow_up = apply_healing_revival_placement_decision(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        effect=placement_effect,
+        result=DecisionResult(
+            result_id="shadow-legion-death-denied-placement-result",
+            request_id=placement_request.request_id,
+            decision_type=placement_request.decision_type,
+            actor_id=placement_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(
+                {
+                    "proposal_request_id": placement_request.request_id,
+                    "proposal_kind": "healing_revival_placement",
+                    "unit_instance_id": destroyed_placement.unit_instance_id,
+                    "placement_kind": BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD.value,
+                    "attempted_placement": UnitPlacement(
+                        army_id=destroyed_placement.army_id,
+                        player_id=destroyed_placement.player_id,
+                        unit_instance_id=destroyed_placement.unit_instance_id,
+                        model_placements=(destroyed_placement,),
+                    ).to_payload(),
+                }
+            ),
+        ),
+    )
+    assert follow_up is None
+    assert resolved.is_complete()
 
     refreshed = _refreshed_unit(state, unit)
     healed_model = _model_by_id(refreshed, wounded_model.model_instance_id)
@@ -1368,7 +1417,7 @@ def test_shadow_legion_generic_runtime_charge_modifier_payloads_are_validated() 
             )
 
 
-def test_shadow_legion_generic_runtime_mortal_threshold_and_revival_pose_edges() -> None:
+def test_shadow_legion_generic_runtime_mortal_threshold_edges() -> None:
     state = _shadow_legion_state()
     unit = _unit_for_player(state, player_id="player-a")
     use_record = _shadow_legion_use_record_fixture(target_unit_id=unit.unit_instance_id)
@@ -1423,30 +1472,6 @@ def test_shadow_legion_generic_runtime_mortal_threshold_and_revival_pose_edges()
                     ("roll_type", "shadow-legion-spiteful-demise"),
                 )
             ),
-        )
-
-    if state.battlefield_state is None:
-        raise AssertionError("Expected battlefield state.")
-    anchor = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).model_placements[0]
-    cramped_battlefield = replace(
-        state.battlefield_state,
-        battlefield_width_inches=0.25,
-        battlefield_depth_inches=1.0,
-    )
-    candidate = generic_rule_ir_runtime._candidate_revival_pose(
-        battlefield=cramped_battlefield,
-        anchor=replace(anchor, pose=Pose.at(0.0, 0.0)),
-        secondary_anchor=None,
-        index=0,
-    )
-    assert candidate.position.x == 0.0
-    assert candidate.position.y == 0.5
-    with pytest.raises(GameLifecycleError, match="could not derive placement"):
-        generic_rule_ir_runtime._candidate_revival_pose(
-            battlefield=replace(cramped_battlefield, battlefield_depth_inches=0.25),
-            anchor=replace(anchor, pose=Pose.at(0.0, 0.0)),
-            secondary_anchor=None,
-            index=0,
         )
 
 

@@ -5,6 +5,9 @@ from typing import Protocol
 
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
+    catalog_movement_target_pair_move_completed_bindings,
+)
 from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_runtime import (
     catalog_unit_move_completed_battle_shock_hook_bindings,
 )
@@ -34,6 +37,10 @@ def unit_move_completed_mortal_wound_hook_registry(
     return UnitMoveCompletedMortalWoundHookRegistry.from_bindings(
         (
             *catalog_unit_move_completed_mortal_wound_hook_bindings(
+                ability_indexes_by_player_id=ability_indexes_by_player_id,
+                armies=armies,
+            ),
+            *catalog_movement_target_pair_move_completed_bindings(
                 ability_indexes_by_player_id=ability_indexes_by_player_id,
                 armies=armies,
             ),
