@@ -7,7 +7,7 @@
     "000000594": "Howling Banshees",
     "000003909": "Lhykhis"
   },
-  "package_hash": "197de27af2b13a5c84986c4f839c216ef1ae05fda802c35613ea9c6b927f56fc",
+  "package_hash": "fb418922e088fda2a1935aa444cd3efbb63446b37d872a57e1c50ca1c547624c",
   "records": {
     "000000572:4": {
       "ability_name": "Whirling Death",
@@ -254,9 +254,9 @@
           }
         ],
         "diagnostics": [],
-        "ir_hash": "5ce43803f09cac47dc32750bdc8d3866f9da34c40c4e7a3bdaae3d102aca1a11",
+        "ir_hash": "1802074671dc2f332cdd738065dff27f97dd7ee9e24d6af4d06a4509b07bed0a",
         "normalized_text": "Each time this model makes an attack that targets a CHARACTER unit, you can re-roll the Wound roll.",
-        "parser_version": "phase17c-rule-parser-v2",
+        "parser_version": "phase17c-rule-parser-v3",
         "rule_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000572:5",
         "schema_version": "phase17c-rule-ir-v1",
         "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000000572:5"
@@ -1441,9 +1441,9 @@
           }
         ],
         "diagnostics": [],
-        "ir_hash": "935116444906d81676d276b0368671da0b8bbd496b2022e005513a0798706da9",
+        "ir_hash": "f22d79302929590945aa66a62d3acb93642ce37e69c5a710eb05b1838d0f47fc",
         "normalized_text": "In your Shooting phase, after this model has shot, select one enemy unit hit by one or more of those attacks. Until the end of the turn, each time a friendly Aeldari model makes an attack that targets that unit, an unmodified Hit roll of 5+ scores a Critical Hit.",
-        "parser_version": "phase17c-rule-parser-v2",
+        "parser_version": "phase17c-rule-parser-v3",
         "rule_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5",
         "schema_version": "phase17c-rule-ir-v1",
         "source_id": "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14:datasheet:000003909:5"

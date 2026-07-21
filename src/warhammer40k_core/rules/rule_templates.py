@@ -93,6 +93,9 @@ DICE_ROLL_MODIFIER_TEMPLATE_ID = "phase17c:dice-roll-modifier"
 DICE_ROLL_OVERRIDE_TEMPLATE_ID = "phase17c:dice-roll-override"
 REROLL_PERMISSION_TEMPLATE_ID = "phase17c:reroll-permission"
 CHARACTERISTIC_MODIFIER_TEMPLATE_ID = "phase17c:characteristic-modifier"
+ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID = (
+    "phase17c:allocated-attack-damage-characteristic-modifier"
+)
 CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:characteristic-set"
 CONTEXTUAL_STATUS_TEMPLATE_ID = "phase17c:contextual-status"
 DESPERATE_ESCAPE_TEMPLATE_ID = "phase17c:desperate-escape-requirement"
@@ -203,6 +206,15 @@ INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
         family=RuleTemplateFamily.CHARACTERISTIC_MODIFICATION,
         description="Characteristic modifier clauses.",
         canonical_patterns=("add <n> to the <characteristic> characteristic",),
+    ),
+    RuleTemplate(
+        template_id=ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID,
+        family=RuleTemplateFamily.CHARACTERISTIC_MODIFICATION,
+        description="Damage characteristic modifiers applied when an attack is allocated.",
+        canonical_patterns=(
+            "each time an attack is allocated to the bearer, subtract <n> from the Damage "
+            "characteristic of that attack",
+        ),
     ),
     RuleTemplate(
         template_id=CHARACTERISTIC_SET_TEMPLATE_ID,

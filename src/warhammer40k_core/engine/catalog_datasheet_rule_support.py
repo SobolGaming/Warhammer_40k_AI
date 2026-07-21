@@ -6,6 +6,7 @@ from types import MappingProxyType
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import WeaponProfileError, weapon_keyword_from_token
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
+    allocated_attack_damage_modifier_descriptor_for_clause,
     clause_uses_exact_datasheet_runtime_template,
     conditional_attack_reroll_descriptor_for_clause,
     conditional_invulnerable_save_descriptor_for_clause,
@@ -63,6 +64,9 @@ CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID = (
 )
 CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID = (
     "catalog-ir:invulnerable-save-characteristic-query"
+)
+CATALOG_IR_ALLOCATED_ATTACK_DAMAGE_MODIFIER_CONSUMER_ID = (
+    "catalog-ir:damage-characteristic-modifier"
 )
 CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID = "catalog-ir:passive-hit-reroll"
 CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID = (
@@ -161,6 +165,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(f"catalog-ir:{characteristic.value}-characteristic-modifier")
     if clause_is_passive_invulnerable_save_set(clause):
         consumer_ids.add(CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID)
+    if allocated_attack_damage_modifier_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_ALLOCATED_ATTACK_DAMAGE_MODIFIER_CONSUMER_ID)
     if clause_is_passive_hit_reroll(clause):
         consumer_ids.add(CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID)
     if conditional_attack_reroll_descriptor_for_clause(clause) is not None:
@@ -253,6 +259,7 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID,
                 CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,
                 CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,
+                CATALOG_IR_ALLOCATED_ATTACK_DAMAGE_MODIFIER_CONSUMER_ID,
                 CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID,
                 CATALOG_IR_FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_CONSUMER_ID,
                 CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID,

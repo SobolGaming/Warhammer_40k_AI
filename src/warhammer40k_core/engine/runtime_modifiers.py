@@ -8,6 +8,10 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
+from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
+    AllocatedAttackDamageModifierBinding,
+    AllocatedAttackDamageModifierContext,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.source_backed_rerolls import (
@@ -772,6 +776,10 @@ class RuntimeModifierRegistry:
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
     wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = ()
     damage_roll_modifier_bindings: tuple[DamageRollModifierBinding, ...] = ()
+    allocated_attack_damage_modifier_bindings: tuple[
+        AllocatedAttackDamageModifierBinding,
+        ...,
+    ] = ()
     save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
     movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = ()
     objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
@@ -819,6 +827,15 @@ class RuntimeModifierRegistry:
                 "RuntimeModifierRegistry damage_roll_modifier_bindings",
                 self.damage_roll_modifier_bindings,
                 DamageRollModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "allocated_attack_damage_modifier_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry allocated_attack_damage_modifier_bindings",
+                self.allocated_attack_damage_modifier_bindings,
+                AllocatedAttackDamageModifierBinding,
             ),
         )
         object.__setattr__(
@@ -909,6 +926,10 @@ class RuntimeModifierRegistry:
         hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = (),
         wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = (),
         damage_roll_modifier_bindings: tuple[DamageRollModifierBinding, ...] = (),
+        allocated_attack_damage_modifier_bindings: tuple[
+            AllocatedAttackDamageModifierBinding,
+            ...,
+        ] = (),
         save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = (),
         movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = (),
         objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = (),
@@ -926,6 +947,7 @@ class RuntimeModifierRegistry:
             hit_roll_modifier_bindings=hit_roll_modifier_bindings,
             wound_roll_modifier_bindings=wound_roll_modifier_bindings,
             damage_roll_modifier_bindings=damage_roll_modifier_bindings,
+            allocated_attack_damage_modifier_bindings=(allocated_attack_damage_modifier_bindings),
             save_option_modifier_bindings=save_option_modifier_bindings,
             movement_budget_modifier_bindings=movement_budget_modifier_bindings,
             objective_control_modifier_bindings=objective_control_modifier_bindings,
@@ -947,6 +969,11 @@ class RuntimeModifierRegistry:
 
     def all_damage_roll_bindings(self) -> tuple[DamageRollModifierBinding, ...]:
         return self.damage_roll_modifier_bindings
+
+    def all_allocated_attack_damage_bindings(
+        self,
+    ) -> tuple[AllocatedAttackDamageModifierBinding, ...]:
+        return self.allocated_attack_damage_modifier_bindings
 
     def all_save_option_bindings(self) -> tuple[SaveOptionModifierBinding, ...]:
         return self.save_option_modifier_bindings
@@ -1082,6 +1109,20 @@ class RuntimeModifierRegistry:
                 binding.handler(context),
             )
         total += generic_rule_damage_roll_modifier(context)
+        return total
+
+    def allocated_attack_damage_modifier(
+        self,
+        context: AllocatedAttackDamageModifierContext,
+    ) -> int:
+        if type(context) is not AllocatedAttackDamageModifierContext:
+            raise GameLifecycleError("Allocated-attack Damage modifiers require a context.")
+        total = 0
+        for binding in self.allocated_attack_damage_modifier_bindings:
+            total += _validate_int(
+                f"{binding.modifier_id} returned modifier",
+                binding.handler(context),
+            )
         return total
 
     def modified_save_options(
@@ -1243,6 +1284,7 @@ def _validate_bindings[T](
             | HitRollModifierBinding
             | WoundRollModifierBinding
             | DamageRollModifierBinding
+            | AllocatedAttackDamageModifierBinding
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
             | ObjectiveControlModifierBinding
@@ -1267,6 +1309,7 @@ def _modifier_id_for_binding(binding: object) -> str:
         WoundRollModifierBinding,
         SaveOptionModifierBinding,
         DamageRollModifierBinding,
+        AllocatedAttackDamageModifierBinding,
         MovementBudgetModifierBinding,
         ObjectiveControlModifierBinding,
         AdvanceRollModifierBinding,
@@ -1280,6 +1323,7 @@ def _modifier_id_for_binding(binding: object) -> str:
             | HitRollModifierBinding
             | WoundRollModifierBinding
             | DamageRollModifierBinding
+            | AllocatedAttackDamageModifierBinding
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
             | ObjectiveControlModifierBinding

@@ -1031,21 +1031,29 @@
         {
           "ability_id": "000000590:serpent-shield",
           "ability_name": "Serpent Shield",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "a36a1c07e9a9948e6ac3217f383dd15233d595628cd7e5d53afcd352069368d0",
           "raw_text": "Models in the bearer's unit have a 5+ invulnerable save.",
           "raw_text_sha256": "a36a1c07e9a9948e6ac3217f383dd15233d595628cd7e5d53afcd352069368d0",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:invulnerable-save-characteristic-query"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000590:4:description:clause:001:effect:0",
+              "semantic_kind": "set_characteristic"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000590:4"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000590:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000590",
@@ -1193,21 +1201,29 @@
         {
           "ability_id": "000000593:shimmershield",
           "ability_name": "Shimmershield",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
           "raw_text": "The bearer has a 4+ invulnerable save.",
           "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:invulnerable-save-characteristic-query"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:3:description:clause:001:effect:0",
+              "semantic_kind": "set_characteristic"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:3"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000593:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000593",
@@ -1810,21 +1826,29 @@
         {
           "ability_id": "000000602:shimmershield",
           "ability_name": "Shimmershield",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
           "raw_text": "The bearer has a 4+ invulnerable save.",
           "raw_text_sha256": "63aef24e7fc3fbdc3f5cc9bd75f1aec14af3261cf71a69314e7a2c46d823b4c7",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:invulnerable-save-characteristic-query"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:3:description:clause:001:effect:0",
+              "semantic_kind": "set_characteristic"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:3"
           ],
           "source_kind": "wargear",
           "source_row_id": "000000602:3",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000602",
@@ -2286,18 +2310,28 @@
         {
           "ability_id": "000000614:scattershield",
           "ability_name": "Scattershield",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
           "raw_text": "The bearer has a 4+ invulnerable save and each time an attack is allocated to the bearer, subtract 1 from the Damage characteristic of that attack.",
           "raw_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:damage-characteristic-modifier",
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
+              "runtime_consumer_ids": [
+                "catalog-ir:invulnerable-save-characteristic-query"
+              ],
               "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000614:5:description:clause:001:effect:0",
+              "semantic_kind": "set_characteristic"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:damage-characteristic-modifier"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000614:5:description:clause:002:effect:0",
               "semantic_kind": "modify_characteristic"
             }
           ],
@@ -2306,7 +2340,7 @@
           ],
           "source_kind": "wargear",
           "source_row_id": "000000614:5",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000614",
@@ -3723,18 +3757,28 @@
         {
           "ability_id": "000003913:scattershield",
           "ability_name": "Scattershield",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
           "raw_text": "The bearer has a 4+ invulnerable save and each time an attack is allocated to the bearer, subtract 1 from the Damage characteristic of that attack.",
           "raw_text_sha256": "fd6ba5a49737418c20c718de230d10db21513c8827863a7d6e2ab4ade675b8aa",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:damage-characteristic-modifier",
+            "catalog-ir:invulnerable-save-characteristic-query"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
+              "runtime_consumer_ids": [
+                "catalog-ir:invulnerable-save-characteristic-query"
+              ],
               "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003913:4:description:clause:001:effect:0",
+              "semantic_kind": "set_characteristic"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:damage-characteristic-modifier"
+              ],
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003913:4:description:clause:002:effect:0",
               "semantic_kind": "modify_characteristic"
             }
           ],
@@ -3743,7 +3787,7 @@
           ],
           "source_kind": "wargear",
           "source_row_id": "000003913:4",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000003913",

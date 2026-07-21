@@ -14,6 +14,15 @@ Before coding or reviewing, read this file, `README.md`, `pyproject.toml`, and r
 
 If a request conflicts with this file, stop and ask.
 
+## Pull request publishing
+
+When a user says "create a new PR", treat that as a requirement and authorization
+to complete the remote publishing workflow: create or select the scoped branch,
+commit the intended changes, push the branch to the configured repository remote,
+and create the pull request in that repository. A local branch or commit alone does
+not satisfy the request. If remote publication is blocked, report the blocker rather
+than presenting local-only work as a created PR.
+
 ## Build order
 
 Build bottom-up:

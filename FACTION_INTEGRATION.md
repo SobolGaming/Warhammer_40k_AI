@@ -443,7 +443,7 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `518158cda86fd481e627b048a7be62f7eb8941963314a9a1c283d19221111d91`
+  `271a26ebaee50b63e0bb7baa6546a0b2137c7f59cda3ed76b89204a0705e9c0a`
 - upstream Phase 17F checksum:
   `10459e9f1f0f7bf7247786c02784ed15198a650f3917ef81bcf6a16fd25b1c55`
 - bridge source version: `10th-edition-2026-06-14`

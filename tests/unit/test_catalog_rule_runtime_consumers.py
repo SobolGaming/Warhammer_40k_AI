@@ -34,6 +34,9 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     AbilityTimingDescriptor,
 )
+from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
+    AllocatedAttackDamageModifierContext,
+)
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
@@ -240,9 +243,11 @@ from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
+    SaveOptionModifierContext,
     WeaponProfileModifierContext,
     WoundRollModifierContext,
 )
+from warhammer40k_core.engine.saves import SaveKind, SaveOption
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_context_for_unit,
@@ -3428,6 +3433,230 @@ def test_catalog_datasheet_runtime_ignores_wound_modifier_when_source_not_leadin
 
     assert len(bindings) == 1
     assert bindings[0].handler(context) == 0
+
+
+def test_catalog_datasheet_runtime_executes_scoped_shield_wargear_rule_ir() -> None:
+    shield_army, attacking_army = _mustered_core_armies()
+    shield_unit = shield_army.units[0]
+    attacking_unit = attacking_army.units[0]
+    wargear_id = "test:aeldari:shield-wargear"
+    bearer = replace(
+        shield_unit.own_models[0],
+        wargear_ids=(*shield_unit.own_models[0].wargear_ids, wargear_id),
+    )
+    shield_unit = replace(
+        shield_unit,
+        own_models=(bearer, *shield_unit.own_models[1:]),
+    )
+    shield_army = _army_with_unit(shield_army, shield_unit)
+    state = _state_with_battlefield(
+        armies=(shield_army, attacking_army),
+        battlefield=_battlefield_for_units(
+            source_army=shield_army,
+            source_unit=shield_unit,
+            source_x=10.0,
+            target_army=attacking_army,
+            target_unit=attacking_unit,
+            target_x=20.0,
+        ),
+        active_player_id=attacking_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+
+    def runtime_for(*, source_id: str, raw_text: str) -> CatalogDatasheetRuleRuntime:
+        rule_ir = compile_rule_source_text(
+            RuleSourceText.from_raw(source_id=source_id, raw_text=raw_text),
+            source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+        ).rule_ir
+        record = _ability_record(
+            record_id=f"record:{source_id}",
+            rule_ir=rule_ir,
+            trigger_kind=TimingTriggerKind.DURING_PHASE,
+            datasheet_id=shield_unit.datasheet_id,
+            source_kind=AbilitySourceKind.WARGEAR,
+            wargear_id=wargear_id,
+        )
+        return CatalogDatasheetRuleRuntime(
+            ability_indexes_by_player_id={
+                shield_army.player_id: AbilityCatalogIndex.from_records((record,)),
+                attacking_army.player_id: AbilityCatalogIndex.from_records(()),
+            },
+            armies=(shield_army, attacking_army),
+        )
+
+    base_save = SaveOption(
+        save_kind=SaveKind.ARMOUR,
+        target_number=3,
+        characteristic_target_number=3,
+        armor_penetration=0,
+    )
+    save_context = SaveOptionModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=attacking_unit.unit_instance_id,
+        attacker_model_instance_id=attacking_unit.own_models[0].model_instance_id,
+        target_unit_instance_id=shield_unit.unit_instance_id,
+        allocated_model_instance_id=bearer.model_instance_id,
+        weapon_profile=_first_catalog_weapon_profile(),
+        save_options=(base_save,),
+    )
+    shimmershield = runtime_for(
+        source_id="000000593:shimmershield",
+        raw_text="The bearer has a 4+ invulnerable save.",
+    )
+    shimmer_binding = shimmershield.save_option_modifier_bindings()[0]
+    shimmer_bearer_options = shimmer_binding.handler(save_context)
+    shimmer_other_options = shimmer_binding.handler(
+        replace(
+            save_context,
+            allocated_model_instance_id=shield_unit.own_models[1].model_instance_id,
+        )
+    )
+
+    assert tuple(
+        option.target_number
+        for option in shimmer_bearer_options
+        if option.save_kind is SaveKind.INVULNERABLE
+    ) == (4,)
+    assert all(option.save_kind is not SaveKind.INVULNERABLE for option in shimmer_other_options)
+    better_invulnerable_save = SaveOption(
+        save_kind=SaveKind.INVULNERABLE,
+        target_number=3,
+        characteristic_target_number=3,
+        armor_penetration=0,
+        source_rule_ids=("test:better-invulnerable-save",),
+    )
+    existing_better_options = (base_save, better_invulnerable_save)
+    assert (
+        shimmer_binding.handler(replace(save_context, save_options=existing_better_options))
+        == existing_better_options
+    )
+
+    serpent_shield = runtime_for(
+        source_id="000000590:serpent-shield",
+        raw_text="Models in the bearer's unit have a 5+ invulnerable save.",
+    )
+    serpent_options = serpent_shield.save_option_modifier_bindings()[0].handler(
+        replace(
+            save_context,
+            allocated_model_instance_id=shield_unit.own_models[1].model_instance_id,
+        )
+    )
+    assert tuple(
+        option.target_number
+        for option in serpent_options
+        if option.save_kind is SaveKind.INVULNERABLE
+    ) == (5,)
+
+    scattershield = runtime_for(
+        source_id="000003913:scattershield",
+        raw_text=(
+            "The bearer has a 4+ invulnerable save and each time an attack is allocated "
+            "to the bearer, subtract 1 from the Damage characteristic of that attack."
+        ),
+    )
+    scatter_save_bindings = scattershield.save_option_modifier_bindings()
+    scatter_damage_bindings = scattershield.allocated_attack_damage_modifier_bindings()
+    damage_context = AllocatedAttackDamageModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=attacking_unit.unit_instance_id,
+        attacker_model_instance_id=attacking_unit.own_models[0].model_instance_id,
+        target_unit_instance_id=shield_unit.unit_instance_id,
+        allocated_model_instance_id=bearer.model_instance_id,
+        weapon_profile=_first_catalog_weapon_profile(),
+        current_value=2,
+    )
+
+    assert len(scatter_save_bindings) == 1
+    assert len(scatter_damage_bindings) == 1
+    assert scatter_damage_bindings[0].handler(damage_context) == -1
+    assert (
+        scatter_damage_bindings[0].handler(
+            replace(
+                damage_context,
+                allocated_model_instance_id=shield_unit.own_models[1].model_instance_id,
+            )
+        )
+        == 0
+    )
+
+
+def test_catalog_bearer_unit_invulnerable_save_includes_attached_leader() -> None:
+    shield_army, attacking_army = _mustered_attached_once_per_battle_armies()
+    bodyguard = next(
+        unit for unit in shield_army.units if unit.datasheet_id == "core-intercessor-like-infantry"
+    )
+    leader = next(
+        unit for unit in shield_army.units if unit.datasheet_id == "core-character-leader"
+    )
+    attacking_unit = attacking_army.units[0]
+    wargear_id = "test:aeldari:attached-serpent-shield"
+    bearer = replace(
+        bodyguard.own_models[0],
+        wargear_ids=(*bodyguard.own_models[0].wargear_ids, wargear_id),
+    )
+    bodyguard = replace(
+        bodyguard,
+        own_models=(bearer, *bodyguard.own_models[1:]),
+    )
+    shield_army = replace(
+        shield_army,
+        units=tuple(
+            bodyguard if unit.unit_instance_id == bodyguard.unit_instance_id else unit
+            for unit in shield_army.units
+        ),
+    )
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="catalog-attached-serpent-shield",
+        armies=(shield_army, attacking_army),
+    )
+    state = _state_without_battlefield(
+        active_player_id=attacking_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    for army in (shield_army, attacking_army):
+        state.record_army_definition(army)
+    state.battlefield_state = scenario.battlefield_state
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="000000590:serpent-shield:attached-test",
+            raw_text="Models in the bearer's unit have a 5+ invulnerable save.",
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
+    record = _ability_record(
+        record_id="record:000000590:serpent-shield:attached-test",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        datasheet_id=bodyguard.datasheet_id,
+        source_kind=AbilitySourceKind.WARGEAR,
+        wargear_id=wargear_id,
+    )
+    runtime = CatalogDatasheetRuleRuntime(
+        ability_indexes_by_player_id={
+            shield_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            attacking_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(shield_army, attacking_army),
+    )
+    attached_unit_id = shield_army.attached_units[0].attached_unit_instance_id
+    options = runtime.save_option_modifier_bindings()[0].handler(
+        SaveOptionModifierContext(
+            state=state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=attacking_unit.unit_instance_id,
+            attacker_model_instance_id=attacking_unit.own_models[0].model_instance_id,
+            target_unit_instance_id=attached_unit_id,
+            allocated_model_instance_id=leader.own_models[0].model_instance_id,
+            weapon_profile=_first_catalog_weapon_profile(),
+            save_options=(),
+        )
+    )
+
+    assert len(options) == 1
+    assert options[0].save_kind is SaveKind.INVULNERABLE
+    assert options[0].target_number == 5
 
 
 def test_catalog_datasheet_runtime_applies_charge_end_leading_weapon_ability_grant() -> None:

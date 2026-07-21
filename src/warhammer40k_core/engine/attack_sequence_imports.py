@@ -45,6 +45,9 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
     WeaponProfileError,
 )
+from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
+    AllocatedAttackDamageModifierContext,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRemovalKind,
@@ -292,6 +295,7 @@ __all__ = (
     "DamageApplication",
     "DamageApplicationPayload",
     "DamageKind",
+    "AllocatedAttackDamageModifierContext",
     "DamageRollModifierContext",
     "FailedSaveDamageReplacement",
     "FailedSaveDamageReplacementContext",

@@ -145,6 +145,10 @@ from warhammer40k_core.rules.rule_ir import (
     rule_unsupported_reason_from_token,
 )
 from warhammer40k_core.rules.rule_keyword_sequences import keyword_sequence_tokens
+from warhammer40k_core.rules.rule_templates import (
+    ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID,
+    CHARACTERISTIC_SET_TEMPLATE_ID,
+)
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
@@ -322,7 +326,7 @@ def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
         == compiled.to_payload()
     )
     assert compiled.rule_ir.is_supported
-    assert compiled.rule_ir.parser_version == "phase17c-rule-parser-v2"
+    assert compiled.rule_ir.parser_version == "phase17c-rule-parser-v3"
     assert compiled.rule_ir.clauses[0].trigger is not None
     assert compiled.rule_ir.clauses[0].trigger.kind is RuleTriggerKind.TIMING_WINDOW
     assert compiled.rule_ir.clauses[0].target is not None
@@ -2684,6 +2688,48 @@ def test_phase17c_bearer_model_text_is_distinct_from_bearers_unit() -> None:
     assert bearer_unit.clauses[0].target.kind is RuleTargetKind.THIS_UNIT
 
 
+def test_phase17c_invulnerable_save_and_allocated_attack_damage_compile_to_generic_ir() -> None:
+    bearer_save = _compiled("The bearer has a 4+ invulnerable save.").rule_ir
+    unit_save = _compiled("Models in the bearer's unit have a 5+ invulnerable save.").rule_ir
+    combined = _compiled(
+        "The bearer has a 4+ invulnerable save and each time an attack is allocated "
+        "to the bearer, subtract 1 from the Damage characteristic of that attack."
+    ).rule_ir
+
+    assert bearer_save.is_supported
+    assert bearer_save.clauses[0].template_id == CHARACTERISTIC_SET_TEMPLATE_ID
+    assert bearer_save.clauses[0].target is not None
+    assert bearer_save.clauses[0].target.kind is RuleTargetKind.THIS_MODEL
+    assert parameter_payload(bearer_save.clauses[0].effects[0].parameters) == {
+        "characteristic": "invulnerable_save",
+        "value": 4,
+    }
+    assert unit_save.is_supported
+    assert unit_save.clauses[0].target is not None
+    assert unit_save.clauses[0].target.kind is RuleTargetKind.THIS_UNIT
+    assert parameter_payload(unit_save.clauses[0].effects[0].parameters) == {
+        "characteristic": "invulnerable_save",
+        "value": 5,
+    }
+    assert combined.is_supported
+    assert len(combined.clauses) == 2
+    damage_clause = combined.clauses[1]
+    assert damage_clause.template_id == ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID
+    assert damage_clause.trigger is not None
+    assert damage_clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(damage_clause.trigger.parameters) == {
+        "edge": "during",
+        "subject": "incoming_attack",
+        "timing_window": "attack_allocated",
+    }
+    assert damage_clause.target is not None
+    assert damage_clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert parameter_payload(damage_clause.effects[0].parameters) == {
+        "characteristic": "damage",
+        "delta": -1,
+    }
+
+
 def test_phase17c_bearer_feel_no_pain_qualifier_compiles_to_model_source_ir() -> None:
     rule_ir = _compiled(
         "The bearer has the Feel No Pain 3+ ability against Psychic Attacks."
@@ -4093,7 +4139,7 @@ def test_phase17c_compiler_payload_boundary_is_fail_fast() -> None:
     )
     assert identity == {
         "compiler_version": "phase17c-rule-compiler-v2",
-        "parser_version": "phase17c-rule-parser-v2",
+        "parser_version": "phase17c-rule-parser-v3",
         "ir_schema_version": "phase17c-rule-ir-v1",
     }
     assert tuple(

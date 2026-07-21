@@ -505,6 +505,22 @@ def _resolve_grouped_damage_from(
                 unit_instance_id=pool.target_unit_instance_id,
             ).keywords,
         )
+        damage_amount = max(
+            1,
+            damage_amount
+            + runtime_modifiers.allocated_attack_damage_modifier(
+                AllocatedAttackDamageModifierContext(
+                    state=state,
+                    source_phase=save_attack_sequence.source_phase,
+                    attacking_unit_instance_id=(save_attack_sequence.attacking_unit_instance_id),
+                    attacker_model_instance_id=pool.attacker_model_instance_id,
+                    target_unit_instance_id=pool.target_unit_instance_id,
+                    allocated_model_instance_id=current_model_id,
+                    weapon_profile=pool.weapon_profile,
+                    current_value=damage_amount,
+                )
+            ),
+        )
         _next_sequence, resolved_allocated_ids, status = _resolve_lost_wound_stage(
             state=state,
             decisions=decisions,

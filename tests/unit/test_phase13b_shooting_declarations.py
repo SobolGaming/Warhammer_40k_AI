@@ -103,6 +103,10 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfilePayload,
 )
+from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
+    AllocatedAttackDamageModifierBinding,
+    AllocatedAttackDamageModifierContext,
+)
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
@@ -246,6 +250,9 @@ from warhammer40k_core.engine.phases.shooting import (
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+)
 from warhammer40k_core.engine.saves import (
     PlungingFireModifier,
     PlungingFireModifierResult,
@@ -10200,6 +10207,109 @@ def test_phase13c_forced_single_source_feel_no_pain_reduces_failed_save_damage()
     assert status is None
     assert fnp_payload["ignored_wounds"] == 1
     assert application["requested_damage"] == 1
+    assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
+
+
+def test_allocated_attack_damage_modifier_runs_after_model_allocation() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(2),
+    )
+    attack_context_id = "allocated-damage-modifier:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    observed_contexts: list[AllocatedAttackDamageModifierContext] = []
+
+    def allocated_damage_modifier(context: AllocatedAttackDamageModifierContext) -> int:
+        observed_contexts.append(context)
+        return -1
+
+    registry = RuntimeModifierRegistry.from_bindings(
+        allocated_attack_damage_modifier_bindings=(
+            AllocatedAttackDamageModifierBinding(
+                modifier_id="test:allocated-damage-modifier",
+                source_id="test:allocated-damage-rule",
+                handler=allocated_damage_modifier,
+            ),
+        )
+    )
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="allocated-damage-modifier",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "allocated-damage-modifier",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="allocated-damage-modifier-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="allocated-damage-modifier-wound",
+                    spec=wound_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="allocated-damage-modifier-save",
+                    spec=save_spec,
+                    value=1,
+                ),
+            ),
+        ),
+        runtime_modifier_registry=registry,
+    )
+    updated_model = model_by_id(
+        state=state,
+        model_instance_id=defender_model.model_instance_id,
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert len(observed_contexts) == 1
+    assert observed_contexts[0].allocated_model_instance_id == defender_model.model_instance_id
+    assert observed_contexts[0].current_value == 2
     assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
 
 

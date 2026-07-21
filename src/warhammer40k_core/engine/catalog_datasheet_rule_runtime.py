@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from functools import partial
 from types import MappingProxyType
 from typing import TYPE_CHECKING, TypeVar, cast
 
@@ -26,6 +27,10 @@ from warhammer40k_core.engine.advance_hooks import (
     AdvanceMoveGrant,
     AdvanceMoveHookBinding,
 )
+from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
+    AllocatedAttackDamageModifierBinding,
+    AllocatedAttackDamageModifierContext,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
@@ -35,6 +40,7 @@ from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     catalog_granted_stealth_hit_roll_modifier,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
+    CatalogAllocatedAttackDamageModifierDescriptor,
     CatalogConditionalAttackRerollDescriptor,
     CatalogConditionalInvulnerableSaveDescriptor,
     CatalogConditionalProximityEffectsDescriptor,
@@ -43,6 +49,7 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     CatalogInvulnerableSaveDescriptor,
     CatalogMovementActionGrantDescriptor,
     CatalogPassiveHitRerollDescriptor,
+    allocated_attack_damage_modifier_descriptor_for_clause,
     conditional_attack_reroll_descriptor_for_clause,
     conditional_invulnerable_save_descriptor_for_clause,
     conditional_proximity_effects_descriptor_for_clause,
@@ -68,6 +75,11 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     clause_is_leading_unit_wound_roll_modifier,
     clause_is_passive_characteristic_modifier,
     clause_is_stealth_aura,
+)
+from warhammer40k_core.engine.catalog_defensive_rule_runtime import (
+    allocated_attack_damage_modifier_handler,
+    conditional_invulnerable_save_handler,
+    passive_invulnerable_save_handler,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
@@ -126,7 +138,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WoundRollModifierBinding,
     WoundRollModifierContext,
 )
-from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.shooting_selection_range import (
     target_within_shooting_selection_range,
 )
@@ -313,6 +325,20 @@ class CatalogDatasheetRuleRuntime:
             )
         )
         return (*passive, *conditional)
+
+    def allocated_attack_damage_modifier_bindings(
+        self,
+    ) -> tuple[AllocatedAttackDamageModifierBinding, ...]:
+        return tuple(
+            AllocatedAttackDamageModifierBinding(
+                modifier_id=source.binding_id,
+                source_id=source.rule_ir.source_id,
+                handler=self._allocated_attack_damage_modifier_handler(source, descriptor),
+            )
+            for source, descriptor in self._described_sources(
+                allocated_attack_damage_modifier_descriptor_for_clause
+            )
+        )
 
     def attack_reroll_permission_bindings(
         self,
@@ -562,76 +588,36 @@ class CatalogDatasheetRuleRuntime:
         source: _CatalogClauseSource,
         descriptor: CatalogInvulnerableSaveDescriptor,
     ) -> Callable[[SaveOptionModifierContext], tuple[SaveOption, ...]]:
-        def handler(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
-            allocated_model_id = context.allocated_model_instance_id
-            if allocated_model_id is None or not _source_applies_to_rules_unit(
-                source=source,
-                context_unit_id=context.target_unit_instance_id,
-                state=context.state,
-            ):
-                return context.save_options
-            if allocated_model_id not in _current_source_model_ids(
-                state=context.state,
-                source=source,
-            ):
-                return context.save_options
-            replacement = SaveOption(
-                save_kind=SaveKind.INVULNERABLE,
-                target_number=descriptor.target_number,
-                characteristic_target_number=descriptor.target_number,
-                armor_penetration=0,
-                source_rule_ids=(source.rule_ir.source_id,),
-            )
-            return (
-                *tuple(
-                    option
-                    for option in context.save_options
-                    if option.save_kind is not SaveKind.INVULNERABLE
-                ),
-                replacement,
-            )
-
-        return handler
+        return passive_invulnerable_save_handler(
+            descriptor=descriptor,
+            source_rule_id=source.rule_ir.source_id,
+            source_applies_to_rules_unit=partial(_source_applies_to_rules_unit, source=source),
+            source_model_ids=partial(_current_source_model_ids, source=source),
+            alive_rules_unit_model_ids=_alive_rules_unit_model_ids,
+        )
 
     def _conditional_invulnerable_save_handler(
         self,
         source: _CatalogClauseSource,
         descriptor: CatalogConditionalInvulnerableSaveDescriptor,
     ) -> Callable[[SaveOptionModifierContext], tuple[SaveOption, ...]]:
-        def handler(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
-            allocated_model_id = context.allocated_model_instance_id
-            profile = context.weapon_profile
-            if (
-                allocated_model_id is None
-                or profile is None
-                or profile.range_profile.kind is not RangeProfileKind.DISTANCE
-                or descriptor.attack_kind != "ranged"
-                or not _source_applies_to_rules_unit(
-                    source=source,
-                    context_unit_id=context.target_unit_instance_id,
-                    state=context.state,
-                )
-                or allocated_model_id
-                not in _current_source_model_ids(state=context.state, source=source)
-            ):
-                return context.save_options
-            replacement = SaveOption(
-                save_kind=SaveKind.INVULNERABLE,
-                target_number=descriptor.target_number,
-                characteristic_target_number=descriptor.target_number,
-                armor_penetration=0,
-                source_rule_ids=(source.rule_ir.source_id,),
-            )
-            return (
-                *tuple(
-                    option
-                    for option in context.save_options
-                    if option.save_kind is not SaveKind.INVULNERABLE
-                ),
-                replacement,
-            )
+        return conditional_invulnerable_save_handler(
+            descriptor=descriptor,
+            source_rule_id=source.rule_ir.source_id,
+            source_applies_to_rules_unit=partial(_source_applies_to_rules_unit, source=source),
+            source_model_ids=partial(_current_source_model_ids, source=source),
+        )
 
-        return handler
+    def _allocated_attack_damage_modifier_handler(
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogAllocatedAttackDamageModifierDescriptor,
+    ) -> Callable[[AllocatedAttackDamageModifierContext], int]:
+        return allocated_attack_damage_modifier_handler(
+            descriptor=descriptor,
+            source_applies_to_rules_unit=partial(_source_applies_to_rules_unit, source=source),
+            source_model_ids=partial(_current_source_model_ids, source=source),
+        )
 
     def _conditional_proximity_characteristic_handler(
         self,

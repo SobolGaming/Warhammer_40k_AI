@@ -38,6 +38,12 @@ _SET_CHARACTERISTIC_RE = re.compile(
     r"characteristic\s+of\s+(?P<value>[A-Za-z0-9+/-]+)(?=[\s.,;)]|$)",
     re.IGNORECASE,
 )
+_INVULNERABLE_SAVE_RE = re.compile(
+    r"\b(?P<subject>models\s+in\s+(?:the\s+)?bearer'?s\s+unit|"
+    r"(?:the\s+)?bearer|this\s+model|models\s+in\s+this\s+unit)\s+"
+    r"(?:have|has)\s+a\s+(?P<value>[2-6])\+\s+invulnerable\s+save\b",
+    re.IGNORECASE,
+)
 _IMPROVE_CHARACTERISTIC_LIST_RE = re.compile(
     rf"\bimprove\s+(?:the\s+)?(?P<characteristics>(?:{_CHARACTERISTIC_NAMES})"
     rf"(?:(?:\s*,\s*|\s+and\s+)(?:{_CHARACTERISTIC_NAMES}))+)\s+characteristics\s+"
@@ -123,6 +129,19 @@ def parse_characteristic_effects(clause_span: TextSpan) -> tuple[RuleEffectSpec,
                     (
                         ("characteristic", characteristic.value),
                         ("value", match.group("value")),
+                    )
+                ),
+            )
+        )
+    for match in _INVULNERABLE_SAVE_RE.finditer(clause_span.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.SET_CHARACTERISTIC,
+                source_span=_span_from_match(clause_span, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("characteristic", Characteristic.INVULNERABLE_SAVE.value),
+                        ("value", int(match.group("value"))),
                     )
                 ),
             )
