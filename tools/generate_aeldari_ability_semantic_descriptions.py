@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
@@ -11,10 +12,12 @@ if TYPE_CHECKING or __package__:
         DESCRIPTION_TEXT_PATH,
         GENERATED_BY,
         SCHEMA_VERSION,
+        aeldari_ability_evidence_sha256,
         documentation_bucket_for_stage,
     )
     from tools.aeldari_datasheet_semantic_coverage import (
         COVERAGE_PATH,
+        AeldariSemanticCoverageArtifact,
         aeldari_datasheet_semantic_coverage,
     )
     from tools.aeldari_datasheet_semantic_coverage import (
@@ -26,19 +29,27 @@ else:
         DESCRIPTION_TEXT_PATH,
         GENERATED_BY,
         SCHEMA_VERSION,
+        aeldari_ability_evidence_sha256,
         documentation_bucket_for_stage,
     )
     from aeldari_datasheet_semantic_coverage import (
         COVERAGE_PATH,
+        AeldariSemanticCoverageArtifact,
         aeldari_datasheet_semantic_coverage,
     )
     from aeldari_datasheet_semantic_coverage import (
         SCHEMA_VERSION as COVERAGE_SCHEMA_VERSION,
     )
 
-DESCRIPTION_TEXT_SCHEMA_VERSION = "1"
+DESCRIPTION_TEXT_SCHEMA_VERSION = "2"
 _DESCRIPTION_TEXT_ROOT_KEYS = frozenset({"schema_version", "descriptions"})
-_DESCRIPTION_TEXT_ROW_KEYS = frozenset({"ability_id", "description"})
+_DESCRIPTION_TEXT_ROW_KEYS = frozenset({"ability_id", "description", "evidence_sha256"})
+
+
+@dataclass(frozen=True, slots=True)
+class _DescriptionText:
+    evidence_sha256: str
+    description: str
 
 
 def main() -> None:
@@ -50,15 +61,18 @@ def main() -> None:
     )
 
 
-def generated_aeldari_ability_semantic_descriptions() -> dict[str, object]:
+def generated_aeldari_ability_semantic_descriptions(
+    *,
+    coverage: AeldariSemanticCoverageArtifact | None = None,
+) -> dict[str, object]:
     descriptions_by_ability_id = _description_text_by_ability_id()
-    coverage = aeldari_datasheet_semantic_coverage()
+    current_coverage = coverage if coverage is not None else aeldari_datasheet_semantic_coverage()
     abilities_by_id = {
         ability.ability_id: (datasheet, ability)
-        for datasheet in coverage.rows
+        for datasheet in current_coverage.rows
         for ability in datasheet.abilities
     }
-    if len(abilities_by_id) != sum(len(row.abilities) for row in coverage.rows):
+    if len(abilities_by_id) != sum(len(row.abilities) for row in current_coverage.rows):
         raise ValueError("Aeldari reviewed ability IDs must be globally unique.")
     if descriptions_by_ability_id.keys() != abilities_by_id.keys():
         missing = sorted(abilities_by_id.keys() - descriptions_by_ability_id.keys())
@@ -67,9 +81,21 @@ def generated_aeldari_ability_semantic_descriptions() -> dict[str, object]:
             "Aeldari semantic-description text does not exactly partition reviewed abilities; "
             f"missing={missing!r}, unexpected={unexpected!r}."
         )
+    for ability_id, (datasheet, ability) in abilities_by_id.items():
+        actual_evidence_sha256 = aeldari_ability_evidence_sha256(
+            datasheet_id=datasheet.datasheet_id,
+            datasheet_name=datasheet.datasheet_name,
+            ability=ability,
+        )
+        if descriptions_by_ability_id[ability_id].evidence_sha256 != actual_evidence_sha256:
+            raise ValueError(
+                "Aeldari human prose evidence fingerprint drifted from current coverage for "
+                f"{ability_id!r}."
+            )
     rows: list[dict[str, object]] = []
-    for datasheet in coverage.rows:
+    for datasheet in current_coverage.rows:
         for ability in datasheet.abilities:
+            description_text = descriptions_by_ability_id[ability.ability_id]
             rows.append(
                 {
                     "datasheet_id": datasheet.datasheet_id,
@@ -88,8 +114,9 @@ def generated_aeldari_ability_semantic_descriptions() -> dict[str, object]:
                     ],
                     "runtime_consumer_ids": list(ability.runtime_consumer_ids),
                     "diagnostic_reasons": list(ability.diagnostic_reasons),
+                    "evidence_sha256": description_text.evidence_sha256,
                     "documentation_bucket": documentation_bucket_for_stage(ability.support_stage),
-                    "description": descriptions_by_ability_id[ability.ability_id],
+                    "description": description_text.description,
                 }
             )
     return {
@@ -103,7 +130,7 @@ def generated_aeldari_ability_semantic_descriptions() -> dict[str, object]:
     }
 
 
-def _description_text_by_ability_id() -> dict[str, str]:
+def _description_text_by_ability_id() -> dict[str, _DescriptionText]:
     payload = _load_object(DESCRIPTION_TEXT_PATH)
     _require_exact_keys(
         payload,
@@ -116,7 +143,7 @@ def _description_text_by_ability_id() -> dict[str, str]:
         _object(raw, "Aeldari semantic-description text row")
         for raw in _required_list(payload, "descriptions")
     )
-    descriptions: dict[str, str] = {}
+    descriptions: dict[str, _DescriptionText] = {}
     for row in rows:
         _require_exact_keys(
             row,
@@ -126,7 +153,10 @@ def _description_text_by_ability_id() -> dict[str, str]:
         ability_id = _required_text(row, "ability_id")
         if ability_id in descriptions:
             raise ValueError("Aeldari semantic-description text contains duplicate ability IDs.")
-        descriptions[ability_id] = _required_text(row, "description")
+        descriptions[ability_id] = _DescriptionText(
+            evidence_sha256=_required_sha256(row, "evidence_sha256"),
+            description=_required_text(row, "description"),
+        )
     return descriptions
 
 
@@ -166,6 +196,13 @@ def _required_text(payload: dict[str, Any], key: str) -> str:
     value = payload[key]
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{key!r} must be non-empty text.")
+    return value
+
+
+def _required_sha256(payload: dict[str, Any], key: str) -> str:
+    value = _required_text(payload, key)
+    if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
+        raise ValueError(f"{key!r} must be a lowercase SHA-256 digest.")
     return value
 
 

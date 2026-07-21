@@ -35,7 +35,7 @@ from warhammer40k_core.engine.ability_coverage import AbilityCoverageSupportStag
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DESCRIPTION_TEXT_PATH = (
-    REPO_ROOT / "data" / "source_manifests" / "aeldari_ability_semantic_description_text_v1.json"
+    REPO_ROOT / "data" / "source_manifests" / "aeldari_ability_semantic_description_text_v2.json"
 )
 DESCRIPTION_ARTIFACT_PATH = (
     REPO_ROOT
@@ -44,7 +44,7 @@ DESCRIPTION_ARTIFACT_PATH = (
     / "ability_coverage"
     / "aeldari_ability_semantic_descriptions.json"
 )
-SCHEMA_VERSION = "aeldari-ability-semantic-descriptions-v1"
+SCHEMA_VERSION = "aeldari-ability-semantic-descriptions-v2"
 GENERATED_BY = "uv run python tools/generate_aeldari_ability_semantic_descriptions.py"
 DOCUMENTATION_BUCKET_SUPPORTED = "supported"
 DOCUMENTATION_BUCKET_STILL_NEEDED = "still_needed"
@@ -79,6 +79,7 @@ _DESCRIPTION_KEYS = frozenset(
         "semantic_consumers",
         "runtime_consumer_ids",
         "diagnostic_reasons",
+        "evidence_sha256",
         "documentation_bucket",
         "description",
     }
@@ -102,6 +103,7 @@ class AeldariAbilitySemanticDescription:
     semantic_consumers: tuple[ExactSemanticConsumerEvidence, ...]
     runtime_consumer_ids: tuple[str, ...]
     diagnostic_reasons: tuple[str, ...]
+    evidence_sha256: str
     documentation_bucket: str
     description: str
 
@@ -196,6 +198,7 @@ def _parse_description(raw: object) -> AeldariAbilitySemanticDescription:
         ),
         runtime_consumer_ids=_unique_text_tuple(payload, "runtime_consumer_ids"),
         diagnostic_reasons=_unique_text_tuple(payload, "diagnostic_reasons"),
+        evidence_sha256=_required_sha256(payload, "evidence_sha256"),
         documentation_bucket=documentation_bucket,
         description=_required_text(payload, "description"),
     )
@@ -223,6 +226,9 @@ def _validate_exact_partition(
     actual_by_identity = {row.identity: row for row in rows}
     if len(actual_by_identity) != len(rows):
         raise ValueError("Aeldari semantic descriptions contain duplicate ability identities.")
+    ability_ids = tuple(row.ability_id for row in rows)
+    if len(ability_ids) != len(set(ability_ids)):
+        raise ValueError("Aeldari semantic-description ability IDs must be globally unique.")
     expected_by_identity = {
         (datasheet.datasheet_id, ability.source_row_id, ability.ability_id): (
             datasheet,
@@ -267,9 +273,50 @@ def _validate_evidence(
         or description.semantic_consumers != ability.semantic_consumers
         or description.runtime_consumer_ids != ability.runtime_consumer_ids
         or description.diagnostic_reasons != ability.diagnostic_reasons
+        or description.evidence_sha256
+        != aeldari_ability_evidence_sha256(
+            datasheet_id=datasheet_id,
+            datasheet_name=datasheet_name,
+            ability=ability,
+        )
         or description.documentation_bucket != documentation_bucket_for_stage(ability.support_stage)
     ):
         raise ValueError("Aeldari semantic-description prose drifted from exact ability evidence.")
+
+
+def aeldari_ability_evidence_sha256(
+    *,
+    datasheet_id: str,
+    datasheet_name: str,
+    ability: AeldariDatasheetAbilitySemanticCoverage,
+) -> str:
+    if not datasheet_id.strip() or not datasheet_name.strip():
+        raise ValueError("Aeldari ability evidence requires datasheet identity.")
+    if type(ability) is not AeldariDatasheetAbilitySemanticCoverage:
+        raise TypeError("Aeldari ability evidence requires exact semantic coverage.")
+    payload = {
+        "datasheet_id": datasheet_id,
+        "datasheet_name": datasheet_name,
+        "ability_id": ability.ability_id,
+        "ability_name": ability.ability_name,
+        "source_kind": ability.source_kind.value,
+        "source_row_id": ability.source_row_id,
+        "source_ids": list(ability.source_ids),
+        "raw_text_sha256": ability.raw_text_sha256,
+        "normalized_text_sha256": ability.normalized_text_sha256,
+        "catalog_support": ability.catalog_support.value,
+        "support_stage": ability.support_stage.value,
+        "semantic_consumers": [semantic.to_payload() for semantic in ability.semantic_consumers],
+        "runtime_consumer_ids": list(ability.runtime_consumer_ids),
+        "diagnostic_reasons": list(ability.diagnostic_reasons),
+    }
+    canonical_json = json.dumps(
+        payload,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
 
 
 def _load_object(path: Path) -> dict[str, Any]:

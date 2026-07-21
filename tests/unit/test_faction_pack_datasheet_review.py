@@ -9,6 +9,7 @@ from typing import Any, cast
 import pytest
 from tools.aeldari_ability_semantic_descriptions import (
     DESCRIPTION_ARTIFACT_PATH,
+    DESCRIPTION_TEXT_PATH,
     DOCUMENTATION_BUCKET_STILL_NEEDED,
     DOCUMENTATION_BUCKET_SUPPORTED,
     aeldari_ability_semantic_descriptions,
@@ -51,6 +52,7 @@ from tools.generate_aeldari_datasheet_semantic_coverage import (
     generated_aeldari_datasheet_semantic_coverage,
 )
 
+from warhammer40k_core.engine.ability_coverage import AbilityCoverageSupportStage
 from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_support import (
     CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
 )
@@ -631,12 +633,56 @@ def test_aeldari_semantic_descriptions_exactly_partition_every_reviewed_ability(
         DOCUMENTATION_BUCKET_SUPPORTED: 55,
         DOCUMENTATION_BUCKET_STILL_NEEDED: 90,
     }
+    prose_payload = cast(
+        dict[str, Any],
+        json.loads(DESCRIPTION_TEXT_PATH.read_text(encoding="utf-8")),
+    )
+    prose_rows = cast(list[dict[str, Any]], prose_payload["descriptions"])
+    assert prose_payload["schema_version"] == "2"
+    assert len(prose_rows) == 145
+    assert all(
+        set(row) == {"ability_id", "description", "evidence_sha256"}
+        and len(cast(str, row["evidence_sha256"])) == 64
+        for row in prose_rows
+    )
     support_markdown = faction_support_markdown_files()["aeldari.md"].split(
         "## Datasheet / Unit Support", 1
     )[1]
     for description in descriptions.rows:
         assert support_markdown.count(f"`{description.ability_id}`") == 1
         assert description.description in support_markdown
+
+
+@pytest.mark.parametrize("evidence_change", ["source_hash", "support_stage", "runtime_consumer"])
+def test_aeldari_description_generation_rejects_changed_coverage_with_stale_prose_fingerprint(
+    evidence_change: str,
+) -> None:
+    coverage = aeldari_datasheet_semantic_coverage()
+    datasheet = coverage.rows[0]
+    ability = datasheet.abilities[0]
+    if evidence_change == "source_hash":
+        changed_ability = replace(ability, raw_text_sha256="0" * 64)
+    elif evidence_change == "support_stage":
+        changed_ability = replace(
+            ability,
+            support_stage=AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
+        )
+    else:
+        changed_ability = replace(
+            ability,
+            runtime_consumer_ids=(*ability.runtime_consumer_ids, "test:changed-consumer"),
+        )
+    changed_datasheet = replace(
+        datasheet,
+        abilities=(changed_ability, *datasheet.abilities[1:]),
+    )
+    changed_coverage = replace(
+        coverage,
+        rows=(changed_datasheet, *coverage.rows[1:]),
+    )
+
+    with pytest.raises(ValueError, match="human prose evidence fingerprint drifted"):
+        generated_aeldari_ability_semantic_descriptions(coverage=changed_coverage)
 
 
 @pytest.mark.parametrize(
