@@ -12,8 +12,10 @@ from typing import TYPE_CHECKING, TypedDict, cast
 
 if TYPE_CHECKING or __package__:
     from tools import aeldari_datasheet_semantic_coverage
-    from tools.aeldari_datasheet_semantic_snapshot import (
-        aeldari_datasheet_semantic_snapshot_markdown,
+    from tools.aeldari_support_report import (
+        aeldari_datasheet_support_markdown,
+        aeldari_detachment_semantics_needed,
+        aeldari_semantic_snapshot_markdown,
     )
     from tools.faction_pack_datasheet_review import (
         faction_pack_datasheet_review_markdown,
@@ -22,8 +24,10 @@ if TYPE_CHECKING or __package__:
     )
 else:
     import aeldari_datasheet_semantic_coverage
-    from aeldari_datasheet_semantic_snapshot import (
-        aeldari_datasheet_semantic_snapshot_markdown,
+    from aeldari_support_report import (
+        aeldari_datasheet_support_markdown,
+        aeldari_detachment_semantics_needed,
+        aeldari_semantic_snapshot_markdown,
     )
     from faction_pack_datasheet_review import (
         faction_pack_datasheet_review_markdown,
@@ -2899,7 +2903,30 @@ def _faction_support_markdown(
     if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
         lines.extend(_chaos_daemons_semantic_snapshot_markdown())
     if faction_row.faction_id == AELDARI_FACTION_ID:
-        lines.extend(_aeldari_semantic_snapshot_markdown())
+        lines.extend(
+            aeldari_semantic_snapshot_markdown(
+                detachment_rows=tuple(
+                    (row.detachment, _detachment_rule_is_supported(row))
+                    for row in detachment_support_rows
+                ),
+                enhancement_rows=tuple(
+                    (
+                        _required_text(row.detachment_name),
+                        row.rule_name,
+                        _coverage_row_is_engine_consumed(row),
+                    )
+                    for row in enhancement_rows
+                ),
+                stratagem_rows=tuple(
+                    (
+                        _required_text(row.detachment_name),
+                        row.rule_name,
+                        _coverage_row_is_engine_consumed(row),
+                    )
+                    for row in stratagem_rows
+                ),
+            )
+        )
     elif faction_row.faction_id in reviewed_faction_ids():
         lines.extend(faction_pack_datasheet_snapshot_markdown(faction_row.faction_id))
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
@@ -3025,69 +3052,6 @@ def _chaos_daemons_semantic_snapshot_markdown() -> list[str]:
     lines.extend(_chaos_daemons_exact_stratagem_snapshot_markdown())
     lines.extend(_chaos_daemons_datasheet_snapshot_markdown())
     return lines
-
-
-def _aeldari_semantic_snapshot_markdown() -> list[str]:
-    lines = [
-        "",
-        "## Semantic Support Snapshot",
-        "",
-        (
-            "This generated snapshot separates source review from semantic execution. "
-            "Detachment-rule support uses the semantic support table below. Exact "
-            "Enhancement and Stratagem support uses the shared Phase17F execution evidence. "
-            "The Exact Ability Semantic Coverage table groups the reviewed Aeldari source scope "
-            "by tradition. It bridges every effective datasheet and derives each semantic bucket "
-            "from exact datasheet and wargear ability text, parser diagnostics, and runtime "
-            "consumers. It does not report catalog or playability support; the separate Datasheet "
-            "/ Unit Support table remains authoritative for those fields."
-        ),
-    ]
-    lines.extend(_aeldari_detachment_snapshot_markdown())
-    lines.extend(_aeldari_exact_enhancement_snapshot_markdown())
-    lines.extend(_aeldari_exact_stratagem_snapshot_markdown())
-    lines.extend(aeldari_datasheet_semantic_snapshot_markdown())
-    return lines
-
-
-def _aeldari_detachment_snapshot_markdown() -> list[str]:
-    rows = _detachment_rule_support_rows_for_faction(AELDARI_FACTION_ID)
-    fully_supported = tuple(row.detachment for row in rows if _detachment_rule_is_supported(row))
-    needs_support = tuple(row.detachment for row in rows if not _detachment_rule_is_supported(row))
-    return [
-        "",
-        "### Detachments",
-        "",
-        "| Fully supported | Still needs semantic support |",
-        "| --- | --- |",
-        f"| {_markdown_line_list(fully_supported)} | {_markdown_line_list(needs_support)} |",
-    ]
-
-
-def _aeldari_exact_enhancement_snapshot_markdown() -> list[str]:
-    rows = tuple(
-        row
-        for row in faction_coverage_2026_27.coverage_rows()
-        if row.faction_id == AELDARI_FACTION_ID
-        and row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
-    )
-    return _chaos_daemons_exact_source_rows_snapshot_markdown(
-        title="Enhancements",
-        rows=rows,
-    )
-
-
-def _aeldari_exact_stratagem_snapshot_markdown() -> list[str]:
-    rows = tuple(
-        row
-        for row in faction_coverage_2026_27.coverage_rows()
-        if row.faction_id == AELDARI_FACTION_ID
-        and row.coverage_kind is Phase17ECoverageKind.DETACHMENT_STRATAGEM
-    )
-    return _chaos_daemons_exact_source_rows_snapshot_markdown(
-        title="Stratagems",
-        rows=rows,
-    )
 
 
 def _chaos_daemons_detachment_snapshot_markdown() -> list[str]:
@@ -3252,6 +3216,14 @@ def _faction_datasheet_support_markdown(
         lines.extend(
             _chaos_daemons_datasheet_review_markdown(
                 leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids)
+            )
+        )
+        return lines
+    if faction_row.faction_id == AELDARI_FACTION_ID:
+        lines.extend(
+            aeldari_datasheet_support_markdown(
+                generated_datasheet_ids=frozenset(row.datasheet_id for row in sorted_rows),
+                leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
             )
         )
         return lines
@@ -5881,6 +5853,9 @@ def _detachment_rule_support_rows() -> tuple[DetachmentRuleSupportRow, ...]:
             (source_row.faction_id, source_row.detachment_id)
         )
         if override is None:
+            notes = "No semantic detachment-rule hook is implemented."
+            if source_row.faction_id == AELDARI_FACTION_ID:
+                notes = aeldari_detachment_semantics_needed(source_row.detachment_id)
             rows.append(
                 DetachmentRuleSupportRow(
                     faction_id=source_row.faction_id,
@@ -5891,7 +5866,7 @@ def _detachment_rule_support_rows() -> tuple[DetachmentRuleSupportRow, ...]:
                     documentation="Source row and generated module scaffold",
                     tests="Source-row/catalog coverage",
                     overall="None",
-                    notes="No semantic detachment-rule hook is implemented.",
+                    notes=notes,
                 )
             )
         else:

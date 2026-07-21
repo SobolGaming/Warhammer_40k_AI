@@ -265,13 +265,23 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         assert markdown.index("## Datasheet Source Review") < markdown.index(
             "## Datasheet / Unit Support"
         )
-        assert f"| {row.datasheet_name} (`{row.datasheet_id}`) | `{row.overall}` |" in markdown
-        for coverage_row_id in row.ability_coverage_row_ids:
-            coverage_row = ability_rows_by_id[coverage_row_id]
-            assert (
-                f"| {row.datasheet_name} (`{row.datasheet_id}`) | "
-                f"{coverage_row.ability_name} (`{coverage_row.ability_id}`) |"
-            ) in markdown
+        if row.faction_id == "aeldari":
+            support_markdown = markdown.split("## Datasheet / Unit Support", 1)[1]
+            assert f"| {row.datasheet_name} (`{row.datasheet_id}`) |" in support_markdown
+            assert "| All consumed |" in next(
+                line
+                for line in support_markdown.splitlines()
+                if line.startswith(f"| {row.datasheet_name} (`{row.datasheet_id}`) |")
+            )
+        else:
+            assert f"| {row.datasheet_name} (`{row.datasheet_id}`) | `{row.overall}` |" in markdown
+        if row.faction_id != "aeldari":
+            for coverage_row_id in row.ability_coverage_row_ids:
+                coverage_row = ability_rows_by_id[coverage_row_id]
+                assert (
+                    f"| {row.datasheet_name} (`{row.datasheet_id}`) | "
+                    f"{coverage_row.ability_name} (`{coverage_row.ability_id}`) |"
+                ) in markdown
 
     kharseth_support = next(row for row in non_daemons_rows if row.datasheet_id == "000004194")
     assert (

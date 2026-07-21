@@ -6796,6 +6796,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     tyranids_markdown = generated_faction_markdown["tyranids.md"]
     assert "## Detachment Rule Support" in aeldari_markdown
     assert "## Detachment Rule Support" in chaos_daemons_markdown
+    detachment_support_header = "| Detachment | Overall support | Engine support | Tests | Notes |"
+    assert detachment_support_header in aeldari_markdown
+    assert detachment_support_header in chaos_daemons_markdown
     assert "| Supported detachment rules |" in chaos_daemons_markdown
     assert "| 8 | 0 | 20 | 30 | 1 |" in adepta_sororitas_markdown
     assert "| 9 | 0 | 24 | 36 | 3 |" in adeptus_custodes_markdown
@@ -6847,6 +6850,46 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in aeldari_markdown
     assert "| Harlequins | None | Skyweavers (`000002539`) |" in aeldari_markdown
     assert "| Ynnari | None | None | The Visarch" in aeldari_markdown
+    aeldari_datasheet_support = aeldari_markdown.split("## Datasheet / Unit Support", 1)[1]
+    chaos_daemons_datasheet_support = chaos_daemons_markdown.split(
+        "## Datasheet / Unit Support", 1
+    )[1]
+    datasheet_support_header = (
+        "| Datasheet | Source basis | IR coverage | Supported semantics | "
+        "IR semantics still needed | Bridge / catalog blockers |"
+    )
+    assert aeldari_datasheet_support.count(datasheet_support_header) == 4
+    assert chaos_daemons_datasheet_support.count(datasheet_support_header) == 5
+    assert "| Datasheet | Overall | Catalog | Models / geometry |" not in (
+        aeldari_datasheet_support
+    )
+    assert aeldari_datasheet_support.count("No known catalog blocker.") == 24
+    assert (
+        aeldari_datasheet_support.count(
+            "No generated DatasheetSupportRow; catalog/model/wargear/geometry playability "
+            "remains unproven."
+        )
+        == 46
+    )
+    assert (
+        "A once-per-battle named-weapon Damage/Anti-Infantry/Devastating Wounds grant; "
+        "and a post-shoot 6-inch Normal move"
+    ) in aeldari_datasheet_support
+    assert (
+        "Post-shoot hit-target tracking tied to models that disembarked from this Transport "
+        "this turn"
+    ) in aeldari_datasheet_support
+    assert (
+        "PathWitness-backed moved-over enemy selection and per-model mortal wounds"
+    ) in aeldari_datasheet_support
+    assert (
+        "IR still needed: Harlequins Charge moves through enemy models and mustering-time "
+        "exclusive ACROBATIC detachment-tag validation."
+    ) in aeldari_markdown
+    assert (
+        "IR still needed: battle-size-scaled Fate dice generation, a replay-safe Fate dice "
+        "pool, and value-matched dice discard"
+    ) in aeldari_markdown
     for group_name in (
         "Craftworlds / Asuryani",
         "Anhrathe / Corsairs",
