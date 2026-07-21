@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from tests.support.wahapedia_source_fixtures import (
     artifact_from_csv,
     bridge_package_id,
@@ -21,29 +19,6 @@ from warhammer40k_core.rules.wahapedia_bridge import (
 )
 from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaJsonArtifact,
-)
-
-_WAHAPEDIA_10E_JSON = (
-    Path(__file__).resolve().parents[2]
-    / "data"
-    / "source_snapshots"
-    / "wahapedia"
-    / ("1" + "0" + "th-edition")
-    / "2026-06-14"
-    / "json"
-)
-_REQUIRED_TABLES = (
-    "Abilities",
-    "Datasheets",
-    "Datasheets_abilities",
-    "Datasheets_keywords",
-    "Datasheets_leader",
-    "Datasheets_models",
-    "Datasheets_models_cost",
-    "Datasheets_options",
-    "Datasheets_unit_composition",
-    "Datasheets_wargear",
-    "Factions",
 )
 
 
