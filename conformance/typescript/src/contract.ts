@@ -171,8 +171,8 @@ function assertPublishedOpenApi(contractRoot: string): void {
     throw new Error("Conformance requires the published OpenAPI 3.1.0 document.");
   }
   const info = jsonObject(document.info, "OpenAPI info");
-  if (info.version !== "3.0.0") {
-    throw new Error("Conformance requires external contract version 3.0.0.");
+  if (info.version !== "3.1.0") {
+    throw new Error("Conformance requires external contract version 3.1.0.");
   }
   const operationIds = new Set<string>();
   for (const pathValue of Object.values(jsonObject(document.paths, "OpenAPI paths"))) {
