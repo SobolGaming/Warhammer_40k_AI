@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+# pyright: reportPrivateUsage=false
 import json
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
@@ -14,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
+from warhammer40k_core.engine import abilities as abilities_module
 from warhammer40k_core.engine.abilities import (
     CORE_DEADLY_DEMISE_HANDLER_ID,
     CORE_DEEP_STRIKE_HANDLER_ID,
@@ -1030,6 +1032,235 @@ def test_ability_records_context_and_results_round_trip_as_json_payloads() -> No
     assert AbilityCatalogRecord.from_payload(record.to_payload()) == record
     assert AbilityExecutionContext.from_payload(context.to_payload()) == context
     assert AbilityResolutionResult.from_payload(result.to_payload()) == result
+
+
+def test_ability_registry_value_objects_fail_fast_on_invalid_owned_types() -> None:
+    timing = AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+    definition = _ability_record("owned-types").definition
+
+    with pytest.raises(GameLifecycleError, match="AbilityExecutionContext"):
+        timing.matches(cast(AbilityExecutionContext, object()))
+    with pytest.raises(GameLifecycleError, match="timing must be a descriptor"):
+        replace(definition, timing=cast(AbilityTimingDescriptor, object()))
+    with pytest.raises(GameLifecycleError, match="keyword_gate must be"):
+        replace(definition, keyword_gate=cast(KeywordGate, object()))
+    with pytest.raises(GameLifecycleError, match="definition must be"):
+        AbilityCatalogRecord(
+            record_id="record:bad-definition",
+            definition=cast(AbilityDefinition, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="disabled must be a bool"):
+        replace(_ability_record("bad-disabled"), disabled=cast(bool, 1))
+    with pytest.raises(GameLifecycleError, match="battle_round must be at least 1"):
+        replace(_context(trigger_kind=TimingTriggerKind.ANY_PHASE), battle_round=0)
+    with pytest.raises(GameLifecycleError, match="state must be a GameState"):
+        replace(
+            _context(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            state=cast(Any, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="event_log must be an EventLog"):
+        replace(
+            _context(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            event_log=cast(Any, object()),
+        )
+
+    record = _ability_record("result-shape")
+    with pytest.raises(GameLifecycleError, match=r"Applied.*must not include reason"):
+        replace(AbilityResolutionResult.applied(record), reason="unexpected")
+    with pytest.raises(GameLifecycleError, match=r"Non-applied.*requires reason"):
+        AbilityResolutionResult(
+            record_id=record.record_id,
+            ability_id=record.definition.ability_id,
+            handler_id=record.definition.handler_id,
+            source_id=record.definition.source_id,
+            status=AbilityResolutionStatus.INVALID,
+        )
+
+
+def test_ability_registry_collections_and_bindings_reject_ambiguous_shapes() -> None:
+    record = _ability_record("collection")
+    timing = AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+
+    def handler(
+        handled_record: AbilityCatalogRecord,
+        _context_value: AbilityExecutionContext,
+    ) -> AbilityResolutionResult:
+        return AbilityResolutionResult.applied(handled_record)
+
+    binding = AbilityHandlerBinding(
+        handler_id="test:handler",
+        timing=timing,
+        required_input_keys=(),
+        handler=handler,
+    )
+    with pytest.raises(GameLifecycleError, match="cannot register unsupported"):
+        replace(binding, handler_id="unsupported:test")
+    with pytest.raises(GameLifecycleError, match="timing must be a descriptor"):
+        replace(binding, timing=cast(AbilityTimingDescriptor, object()))
+    with pytest.raises(GameLifecycleError, match="handler must be callable"):
+        replace(binding, handler=cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="bindings must be a tuple"):
+        AbilityHandlerRegistry.from_bindings(cast(Any, [binding]))
+    with pytest.raises(GameLifecycleError, match="must contain AbilityHandlerBinding"):
+        AbilityHandlerRegistry.from_bindings(cast(Any, (object(),)))
+    with pytest.raises(GameLifecycleError, match="duplicate IDs"):
+        AbilityHandlerRegistry.from_bindings((binding, binding))
+    with pytest.raises(GameLifecycleError, match="records must be a tuple"):
+        AbilityCatalogIndex.from_records(cast(Any, [record]))
+    with pytest.raises(GameLifecycleError, match="AbilityCatalogRecord values"):
+        AbilityCatalogIndex.from_records(cast(Any, (object(),)))
+    with pytest.raises(GameLifecycleError, match="duplicate IDs"):
+        AbilityCatalogIndex.from_records((record, record))
+    with pytest.raises(GameLifecycleError, match="requires a TimingTriggerKind"):
+        AbilityCatalogIndex.from_records((record,)).records_for(cast(Any, "any_phase"))
+
+
+@pytest.mark.parametrize(
+    ("source_kind", "owner_fields", "message"),
+    [
+        (AbilitySourceKind.CORE, {"faction_id": "owned"}, "cannot own IDs"),
+        (AbilitySourceKind.KEYWORD, {"wargear_id": "owned"}, "cannot own IDs"),
+        (AbilitySourceKind.FACTION, {}, "requires faction_id"),
+        (AbilitySourceKind.DETACHMENT, {}, "requires detachment_id"),
+        (AbilitySourceKind.DATASHEET, {}, "requires datasheet_id"),
+        (AbilitySourceKind.ENHANCEMENT, {}, "requires detachment_id"),
+        (AbilitySourceKind.WARGEAR, {}, "requires wargear_id"),
+        (AbilitySourceKind.WEAPON, {}, "requires weapon_profile_id or keyword gate"),
+    ],
+)
+def test_ability_catalog_records_require_source_owned_identity(
+    source_kind: AbilitySourceKind,
+    owner_fields: dict[str, str],
+    message: str,
+) -> None:
+    with pytest.raises(GameLifecycleError, match=message):
+        cast(Any, _ability_record)("bad-owner", source_kind=source_kind, **owner_fields)
+
+
+def test_ability_validation_helpers_cover_tokens_keywords_and_handler_context() -> None:
+    assert abilities_module.ability_source_kind_from_token(AbilitySourceKind.CORE) is (
+        AbilitySourceKind.CORE
+    )
+    assert (
+        abilities_module.ability_resolution_status_from_token(AbilityResolutionStatus.APPLIED)
+        is AbilityResolutionStatus.APPLIED
+    )
+    for converter in (
+        abilities_module.ability_source_kind_from_token,
+        abilities_module.ability_resolution_status_from_token,
+    ):
+        with pytest.raises(GameLifecycleError, match="must be a string"):
+            converter(1)
+        with pytest.raises(GameLifecycleError, match="Unsupported"):
+            converter("not-supported")
+
+    assert abilities_module._validate_optional_phase("phase", None) is None
+    assert abilities_module._validate_optional_phase("phase", BattlePhaseKind.COMMAND) is (
+        BattlePhaseKind.COMMAND
+    )
+    assert abilities_module._validate_optional_phase("phase", "shooting") is (
+        BattlePhaseKind.SHOOTING
+    )
+    with pytest.raises(GameLifecycleError, match="phase is invalid"):
+        abilities_module._validate_optional_phase("phase", "not-supported")
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        abilities_module._validate_keyword_tuple("keywords", ["INFANTRY"])
+    with pytest.raises(GameLifecycleError, match="duplicate keywords"):
+        abilities_module._validate_keyword_tuple("keywords", ("Deep Strike", "DEEP-STRIKE"))
+    assert abilities_module._validate_keyword("keyword", "Deep Strike") == "DEEP_STRIKE"
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        abilities_module._validate_identifier_tuple("ids", ["id"])
+    assert abilities_module._validate_optional_identifier("id", None) is None
+    with pytest.raises(GameLifecycleError, match="must be an integer"):
+        abilities_module._validate_positive_int("count", True)
+    with pytest.raises(GameLifecycleError, match="at least 1"):
+        abilities_module._validate_positive_int("count", 0)
+    with pytest.raises(GameLifecycleError, match="must be a bool"):
+        abilities_module._validate_bool("flag", 1)
+
+    timing = AbilityTimingDescriptor(
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+        phase=BattlePhaseKind.MOVEMENT,
+        timing_window_id="window-a",
+    )
+    matching_context = replace(
+        _context(trigger_kind=TimingTriggerKind.ANY_PHASE, phase=BattlePhaseKind.MOVEMENT),
+        timing_window_id="window-a",
+    )
+    assert abilities_module._handler_timing_matches(
+        timing=timing,
+        context=matching_context,
+    )
+    assert not abilities_module._handler_timing_matches(
+        timing=timing,
+        context=replace(matching_context, phase=BattlePhaseKind.SHOOTING),
+    )
+    assert not abilities_module._handler_timing_matches(
+        timing=timing,
+        context=replace(matching_context, timing_window_id="window-b"),
+    )
+    with pytest.raises(GameLifecycleError, match="timing requires a descriptor"):
+        abilities_module._handler_timing_matches(
+            timing=cast(Any, object()), context=matching_context
+        )
+    with pytest.raises(GameLifecycleError, match="execution context"):
+        abilities_module._handler_timing_matches(timing=timing, context=cast(Any, object()))
+
+    assert (
+        abilities_module._missing_required_input_keys(
+            context=matching_context,
+            required_input_keys=(),
+        )
+        == ()
+    )
+    assert abilities_module._missing_required_input_keys(
+        context=matching_context,
+        required_input_keys=("target",),
+    ) == ("target",)
+    payload_context = replace(matching_context, trigger_payload={"target": "unit-1"})
+    assert abilities_module._missing_required_input_keys(
+        context=payload_context,
+        required_input_keys=("target", "mode"),
+    ) == ("mode",)
+
+
+def test_ability_result_identity_and_movement_payloads_fail_closed() -> None:
+    record = _ability_record("result-contract")
+    result = AbilityResolutionResult.applied(record)
+    for field_name in ("record_id", "ability_id", "handler_id", "source_id"):
+        with pytest.raises(GameLifecycleError, match="drift"):
+            abilities_module._validate_result_matches_record(
+                result=cast(Any, replace)(result, **{field_name: f"wrong:{field_name}"}),
+                record=record,
+            )
+
+    with pytest.raises(GameLifecycleError, match="require an AbilityResolutionResult"):
+        abilities_module.movement_capability_flags_from_result(cast(Any, object()))
+    assert (
+        abilities_module.movement_capability_flags_from_result(
+            AbilityResolutionResult.unsupported(record, reason="not-applied")
+        )
+        == ()
+    )
+    invalid_payloads: tuple[JsonValue, ...] = (
+        None,
+        {},
+        {"effect_payload": None},
+        {"effect_payload": {}},
+        {"effect_payload": {"movement_capability_flags": "FLY"}},
+    )
+    for payload in invalid_payloads:
+        with pytest.raises(GameLifecycleError, match=r"payload|capability flags"):
+            abilities_module.movement_capability_flags_from_result(
+                AbilityResolutionResult.applied(record, replay_payload=payload)
+            )
+    payload = cast(
+        JsonValue,
+        {"effect_payload": {"movement_capability_flags": ["WALK", "FLY"]}},
+    )
+    assert abilities_module.movement_capability_flags_from_result(
+        AbilityResolutionResult.applied(record, replay_payload=payload)
+    ) == ("FLY", "WALK")
 
 
 def _record_by_ability_id(

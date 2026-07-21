@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+# pyright: reportPrivateUsage=false
 import json
-from typing import cast
+from dataclasses import replace
+from typing import Any, cast
 
 import pytest
 
+from warhammer40k_core.core import dice as dice_module
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
+    D3RollResult,
     DiceExpression,
     DiceRerollRecord,
+    DiceRollComponent,
+    DiceRollInstance,
     DiceRollResult,
     DiceRollResultPayload,
     DiceRollSource,
@@ -15,8 +22,19 @@ from warhammer40k_core.core.dice import (
     DiceRollSpecError,
     DiceRollState,
     DiceRollStatePayload,
+    ModifiedRollResult,
+    RandomCharacteristicRoll,
+    RandomCharacteristicTiming,
     RerollComponentSelectionPolicy,
+    RerollDecisionRequest,
     RerollPermission,
+    RerollRecord,
+    RerollSelection,
+    RollOffPlayerRoll,
+    RollOffRequest,
+    RollOffResult,
+    RollOffRound,
+    UnmodifiedRollResult,
 )
 from warhammer40k_core.engine.decision import (
     DecisionError,
@@ -53,6 +71,28 @@ def _select_unit_request(request_id: str = "decision-request-branch") -> Decisio
                 payload={"selected_unit_id": "unit-b"},
             ),
         ),
+    )
+
+
+def _fixed_result(
+    *,
+    roll_id: str = "roll-contract",
+    values: tuple[int, ...] = (2, 4),
+    sides: int = 6,
+    modifier: int = 0,
+    roll_type: str = "test_roll",
+    actor_id: str | None = "player-a",
+) -> DiceRollResult:
+    return DiceRollResult.from_values(
+        roll_id=roll_id,
+        spec=DiceRollSpec(
+            expression=DiceExpression(quantity=len(values), sides=sides, modifier=modifier),
+            reason="Dice validation contract",
+            roll_type=roll_type,
+            actor_id=actor_id,
+        ),
+        values=values,
+        source="fixed",
     )
 
 
@@ -905,6 +945,396 @@ def test_result_override_forbids_later_rerolls_and_second_overrides() -> None:
             source_rule_id="source:aeldari:aspect-shrine-token",
             replacement_value=6,
         )
+
+
+def test_dice_components_and_roll_instances_reject_invalid_structural_state() -> None:
+    component_cases: tuple[tuple[dict[str, Any], str], ...] = (
+        ({"index": cast(int, True)}, "index must be an integer"),
+        ({"index": -1}, "index must not be negative"),
+        ({"sides": cast(int, True)}, "sides must be an integer"),
+        ({"sides": 1}, "sides must be at least 2"),
+        ({"value": cast(int, True)}, "value must be an integer"),
+        ({"value": 7}, "outside die bounds"),
+        ({"rerolled": cast(bool, 1)}, "rerolled must be a bool"),
+    )
+    for changes, message in component_cases:
+        with pytest.raises(DiceRollSpecError, match=message):
+            DiceRollComponent(
+                component_id="roll:component-0",
+                index=changes.get("index", 0),
+                sides=changes.get("sides", 6),
+                value=changes.get("value", 3),
+                rerolled=changes.get("rerolled", False),
+            )
+
+    result = _fixed_result(values=(2, 4))
+    normalized_result = DiceRollResult(
+        roll_id=result.roll_id,
+        spec=result.spec,
+        values=cast(tuple[int, ...], [2, 4]),
+        total=6,
+        source="fixed",
+    )
+    assert normalized_result.values == (2, 4)
+    instance = DiceRollInstance.from_result(result)
+    normalized_instance = DiceRollInstance(
+        roll_id=instance.roll_id,
+        spec=instance.spec,
+        components=cast(tuple[DiceRollComponent, ...], list(instance.components)),
+        total=instance.total,
+        source=instance.source,
+    )
+    assert normalized_instance.components == instance.components
+
+    invalid_instance_cases: tuple[tuple[dict[str, Any], str], ...] = (
+        ({"spec": cast(DiceRollSpec, object())}, "spec must be"),
+        ({"source": cast(DiceRollSource, "unknown")}, "source is invalid"),
+        ({"components": ()}, "component count"),
+        ({"components": cast(tuple[DiceRollComponent, ...], (object(), object()))}, "must contain"),
+        (
+            {
+                "components": (
+                    replace(instance.components[0], index=1),
+                    instance.components[1],
+                )
+            },
+            "indexes must be sequential",
+        ),
+        (
+            {
+                "components": (
+                    replace(instance.components[0], sides=8),
+                    instance.components[1],
+                )
+            },
+            "sides must match",
+        ),
+        ({"total": 99}, "total does not match"),
+    )
+    for changes, message in invalid_instance_cases:
+        with pytest.raises(DiceRollSpecError, match=message):
+            replace(instance, **changes)
+
+
+def test_d3_results_reject_non_d6_sources_and_drifted_values() -> None:
+    source = _fixed_result(values=(5,))
+    valid = D3RollResult.from_source_d6_result(source)
+    assert valid.value == 3
+
+    invalid_cases: tuple[tuple[dict[str, Any], str], ...] = (
+        ({"source_d6_result": cast(DiceRollResult, object())}, "must be a DiceRollResult"),
+        ({"source_d6_result": _fixed_result(values=(5,), modifier=1)}, "unmodified D6"),
+        ({"value": cast(int, True)}, "value must be an integer"),
+        ({"value": 2}, "rounded up"),
+    )
+    for changes, message in invalid_cases:
+        with pytest.raises(DiceRollSpecError, match=message):
+            replace(valid, **changes)
+
+
+def test_roll_off_value_objects_reject_identity_sequence_and_winner_drift() -> None:
+    request = RollOffRequest(
+        request_id="roll-off-request",
+        purpose="Determine first turn",
+        player_ids=("player-a", "player-b"),
+        resolving_decision_id="decision:first-turn",
+    )
+
+    def player_roll(player_id: str, value: int, suffix: str) -> RollOffPlayerRoll:
+        result = _fixed_result(
+            roll_id=f"roll:{suffix}:{player_id}",
+            values=(value,),
+            roll_type="roll_off",
+            actor_id=player_id,
+        )
+        return RollOffPlayerRoll(player_id=player_id, roll_result=result, value=value)
+
+    tied_round = RollOffRound(
+        round_number=1,
+        player_rolls=(player_roll("player-a", 3, "tie"), player_roll("player-b", 3, "tie")),
+    )
+    winning_round = RollOffRound(
+        round_number=1,
+        player_rolls=(player_roll("player-a", 5, "win"), player_roll("player-b", 2, "win")),
+    )
+    valid_result = RollOffResult(
+        request=request,
+        rounds=(winning_round,),
+        winner_player_id="player-a",
+    )
+    assert RollOffResult.from_payload(valid_result.to_payload()) == valid_result
+
+    player_roll_cases: tuple[tuple[dict[str, Any], str], ...] = (
+        ({"roll_result": cast(DiceRollResult, object())}, "must be a DiceRollResult"),
+        ({"roll_result": _fixed_result(values=(1, 2), roll_type="roll_off")}, "unmodified D6"),
+        ({"roll_result": _fixed_result(values=(3,), roll_type="test_roll")}, "roll_type"),
+        (
+            {"roll_result": _fixed_result(values=(3,), roll_type="roll_off", actor_id="other")},
+            "actor_id",
+        ),
+        ({"value": 4}, "value must match"),
+    )
+    valid_player_roll = player_roll("player-a", 3, "valid")
+    for changes, message in player_roll_cases:
+        with pytest.raises(DiceRollSpecError, match=message):
+            replace(valid_player_roll, **changes)
+
+    round_cases: tuple[tuple[dict[str, Any], str], ...] = (
+        ({"round_number": cast(int, True)}, "round_number must be an integer"),
+        ({"round_number": 0}, "at least 1"),
+        ({"player_rolls": (valid_player_roll,)}, "at least two"),
+        (
+            {"player_rolls": cast(tuple[RollOffPlayerRoll, ...], (object(), object()))},
+            "must contain RollOffPlayerRoll",
+        ),
+        ({"player_rolls": (valid_player_roll, valid_player_roll)}, "unique by player"),
+    )
+    for changes, message in round_cases:
+        with pytest.raises(DiceRollSpecError, match=message):
+            replace(tied_round, **changes)
+    drifted_tie_payload = tied_round.to_payload()
+    drifted_tie_payload["is_tie"] = False
+    with pytest.raises(DiceRollSpecError, match="tie status drifted"):
+        RollOffRound.from_payload(drifted_tie_payload)
+
+    second_winning_round = replace(winning_round, round_number=2)
+    result_cases: tuple[tuple[dict[str, Any], str], ...] = (
+        ({"request": cast(RollOffRequest, object())}, "request must be"),
+        ({"rounds": ()}, "must not be empty"),
+        ({"rounds": cast(tuple[RollOffRound, ...], (object(),))}, "must contain RollOffRound"),
+        ({"rounds": (second_winning_round,)}, "numbers must be sequential"),
+        (
+            {
+                "rounds": (
+                    RollOffRound(
+                        round_number=1,
+                        player_rolls=(
+                            player_roll("player-a", 5, "wrong-players"),
+                            player_roll("player-c", 2, "wrong-players"),
+                        ),
+                    ),
+                )
+            },
+            "player IDs must match",
+        ),
+        ({"rounds": (winning_round, second_winning_round)}, "cannot continue"),
+        ({"rounds": (tied_round,)}, "final round must have a winner"),
+        ({"winner_player_id": "player-b"}, "does not match"),
+    )
+    for changes, message in result_cases:
+        with pytest.raises(DiceRollSpecError, match=message):
+            replace(valid_result, **changes)
+
+
+def test_reroll_permissions_and_state_transitions_fail_closed() -> None:
+    original = _fixed_result(values=(2, 4), roll_type="attack.hit")
+    state = DiceRollState.from_result(original)
+    whole_roll = RerollPermission(
+        source_id="source:reroll",
+        timing_window="attack.hit",
+        owning_player_id="player-a",
+        eligible_roll_type="attack.hit",
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+    component_permission = RerollPermission(
+        source_id="source:component-reroll",
+        timing_window="attack.hit",
+        owning_player_id="player-a",
+        eligible_roll_type="attack.hit",
+        component_selection_policy=RerollComponentSelectionPolicy.COMPONENT_SELECTION,
+        allowed_component_selections=((0,), (1,)),
+    )
+    assert component_permission.legal_selections_for_state(state) == ((0,), (1,))
+    assert component_permission.validate_selection(
+        state, RerollSelection(indices=(0,))
+    ).indices == (0,)
+
+    with pytest.raises(DiceRollSpecError, match="must not supply component selections"):
+        replace(whole_roll, allowed_component_selections=((0,),))
+    with pytest.raises(DiceRollSpecError, match="require explicit selections"):
+        RerollPermission(
+            source_id="source:missing-selections",
+            timing_window="attack.hit",
+            owning_player_id="player-a",
+            eligible_roll_type="attack.hit",
+            component_selection_policy=RerollComponentSelectionPolicy.COMPONENT_SELECTION,
+        )
+    with pytest.raises(DiceRollSpecError, match="state must be a DiceRollState"):
+        whole_roll.legal_selections_for_state(cast(DiceRollState, object()))
+    with pytest.raises(DiceRollSpecError, match="does not match roll"):
+        replace(whole_roll, eligible_roll_type="attack.wound").legal_selections_for_state(state)
+    with pytest.raises(DiceRollSpecError, match="outside the roll"):
+        replace(
+            component_permission,
+            allowed_component_selections=((2,),),
+        ).legal_selections_for_state(state)
+    with pytest.raises(DiceRollSpecError, match="selection must be a RerollSelection"):
+        component_permission.validate_selection(state, cast(RerollSelection, object()))
+    with pytest.raises(DiceRollSpecError, match="not legal"):
+        component_permission.validate_selection(state, RerollSelection(indices=(0, 1)))
+
+    rerolled = state.with_reroll(
+        decision_id="decision:reroll",
+        request_id="request:reroll",
+        selected_indices=(0,),
+        replacement_result=_fixed_result(
+            roll_id="roll:replacement",
+            values=(5,),
+            roll_type="attack.hit",
+        ),
+    )
+    with pytest.raises(DiceRollSpecError, match="cannot reroll a die twice"):
+        whole_roll.legal_selections_for_state(rerolled)
+    with pytest.raises(DiceRollSpecError, match="die size does not match"):
+        state.with_reroll(
+            decision_id="decision:wrong-sides",
+            request_id="request:wrong-sides",
+            selected_indices=(0,),
+            replacement_result=_fixed_result(
+                roll_id="roll:wrong-sides",
+                values=(5,),
+                sides=8,
+                roll_type="attack.hit",
+            ),
+        )
+    with pytest.raises(DiceRollSpecError, match="outside the current dice"):
+        state.with_reroll(
+            decision_id="decision:outside",
+            request_id="request:outside",
+            selected_indices=(2,),
+            replacement_result=_fixed_result(
+                roll_id="roll:outside",
+                values=(5,),
+                roll_type="attack.hit",
+            ),
+        )
+
+    request = RerollDecisionRequest.from_state(state, component_permission)
+    assert RerollDecisionRequest.from_payload(request.to_payload()) == request
+    with pytest.raises(DiceRollSpecError, match="permission must be"):
+        replace(request, permission=cast(RerollPermission, object()))
+    with pytest.raises(DiceRollSpecError, match="request_id must not be empty"):
+        DiceRerollRecord(
+            decision_id="decision:reroll",
+            request_id=" ",
+            selected_indices=(0,),
+            replacement_result=_fixed_result(values=(4,), roll_type="attack.hit"),
+        )
+    with pytest.raises(DiceRollSpecError, match="indices must not be empty"):
+        RerollSelection(indices=())
+    with pytest.raises(DiceRollSpecError, match="original_result must be"):
+        replace(state, original_result=cast(DiceRollResult, object()))
+    with pytest.raises(DiceRollSpecError, match="must contain DiceRerollRecord"):
+        replace(state, rerolls=cast(tuple[DiceRerollRecord, ...], (object(),)))
+    with pytest.raises(DiceRollSpecError, match="result_override must be typed"):
+        replace(state, result_override=cast(Any, object()))
+
+
+def test_roll_result_views_and_random_characteristics_validate_derived_values() -> None:
+    original = _fixed_result(values=(4,), roll_type="characteristic")
+    state = DiceRollState.from_result(original)
+    selection = RerollSelection(indices=(0,))
+    replacement = _fixed_result(
+        roll_id="roll:view-replacement",
+        values=(5,),
+        roll_type="characteristic",
+    )
+    record = RerollRecord(
+        decision_id="decision:view",
+        request_id="request:view",
+        permission=None,
+        selection=selection,
+        original_values=(4,),
+        replacement_result=replacement,
+        final_values=(5,),
+        final_unmodified_value=5,
+    )
+    assert RerollRecord.from_payload(record.to_payload()) == record
+
+    record_cases: tuple[tuple[dict[str, Any], str], ...] = (
+        ({"permission": cast(RerollPermission, object())}, "permission must be"),
+        ({"selection": cast(RerollSelection, object())}, "selection must be"),
+        ({"replacement_result": cast(DiceRollResult, object())}, "replacement_result must be"),
+        ({"final_unmodified_value": cast(int, True)}, "must be an integer"),
+        ({"final_unmodified_value": 4}, "must match final value sum"),
+    )
+    for changes, message in record_cases:
+        with pytest.raises(DiceRollSpecError, match=message):
+            replace(record, **changes)
+
+    unmodified = UnmodifiedRollResult.from_state(state)
+    with pytest.raises(DiceRollSpecError, match="state must be a DiceRollState"):
+        UnmodifiedRollResult.from_state(cast(DiceRollState, object()))
+    with pytest.raises(DiceRollSpecError, match="value must be an integer"):
+        replace(unmodified, value=cast(int, True))
+    modified = ModifiedRollResult.from_unmodified(unmodified)
+    with pytest.raises(DiceRollSpecError, match="unmodified must be"):
+        replace(modified, unmodified=cast(UnmodifiedRollResult, object()))
+    with pytest.raises(DiceRollSpecError, match="must contain RollModifier"):
+        replace(modified, modifiers=cast(Any, (object(),)))
+    with pytest.raises(DiceRollSpecError, match="final_value does not match"):
+        replace(modified, final_value=99)
+    with pytest.raises(DiceRollSpecError, match="applied_modifier_ids do not match"):
+        replace(modified, applied_modifier_ids=("wrong",))
+
+    random_roll = RandomCharacteristicRoll(
+        characteristic=Characteristic.MOVEMENT,
+        timing=RandomCharacteristicTiming.UNIT_WHEN_SELECTED_TO_MOVE,
+        scope_id="unit:test",
+        roll_state=state,
+        value=state.current_total,
+    )
+    assert RandomCharacteristicRoll.from_payload(random_roll.to_payload()) == random_roll
+    random_cases: tuple[tuple[dict[str, Any], str], ...] = (
+        ({"roll_state": cast(DiceRollState, object())}, "roll_state must be"),
+        ({"value": cast(int, True)}, "value must be an integer"),
+        ({"value": 3}, "value must match"),
+        ({"characteristic": Characteristic.TOUGHNESS}, "only valid for Movement"),
+    )
+    for changes, message in random_cases:
+        with pytest.raises(DiceRollSpecError, match=message):
+            replace(random_roll, **changes)
+
+
+def test_reroll_token_and_selection_boundaries_reject_ambiguous_inputs() -> None:
+    assert (
+        dice_module.reroll_component_selection_policy_from_token(
+            RerollComponentSelectionPolicy.WHOLE_ROLL
+        )
+        is RerollComponentSelectionPolicy.WHOLE_ROLL
+    )
+    assert (
+        dice_module.random_characteristic_timing_from_token(
+            RandomCharacteristicTiming.UNIT_WHEN_SELECTED_TO_MOVE
+        )
+        is RandomCharacteristicTiming.UNIT_WHEN_SELECTED_TO_MOVE
+    )
+    for converter in (
+        dice_module.reroll_component_selection_policy_from_token,
+        dice_module.random_characteristic_timing_from_token,
+    ):
+        with pytest.raises(DiceRollSpecError, match="must be a string"):
+            converter(1)
+        with pytest.raises(DiceRollSpecError, match="Unsupported"):
+            converter("not-supported")
+
+    for indices, message in (
+        ((cast(int, "0"),), "must be integers"),
+        ((-1,), "must not be negative"),
+        ((0, 0), "unique and ascending"),
+    ):
+        with pytest.raises(DiceRollSpecError, match=message):
+            dice_module._validate_selected_indices(indices)
+    selection_cases = (
+        (cast(Any, [(0,)]), "must be a tuple"),
+        ((cast(tuple[int, ...], [0]),), "must contain tuple selections"),
+        (((),), "must not contain empty selections"),
+        (((0,), (0,)), "must not contain duplicate selections"),
+        ((), "must not be empty"),
+    )
+    for selections, message in selection_cases:
+        with pytest.raises(DiceRollSpecError, match=message):
+            dice_module._validate_selection_tuple(selections, field_name="selections")
 
 
 def test_unit_resource_ledger_tracks_deterministic_initialization_and_spends() -> None:

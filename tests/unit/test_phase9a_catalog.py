@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+# pyright: reportPrivateUsage=false
 import json
 from dataclasses import replace
 from datetime import date
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
+from warhammer40k_core.core import army_catalog as army_catalog_module
+from warhammer40k_core.core import datasheet as datasheet_module
 from warhammer40k_core.core.army_catalog import (
     ArmyCatalog,
     ArmyCatalogError,
@@ -22,12 +25,21 @@ from warhammer40k_core.core.content_scope import CatalogContentScope
 from warhammer40k_core.core.datasheet import (
     BaseSizeDefinition,
     BaseSizeKind,
+    CatalogAbilitySourceKind,
     CatalogAbilitySupport,
+    DamagedEffectDefinition,
+    DamagedEffectKind,
+    DamagedWeaponScope,
     DatasheetCatalogError,
     DatasheetKeywordSet,
+    DatasheetMusteringOption,
     DatasheetMusteringOptionEffect,
     DatasheetMusteringOptionEffectKind,
     DatasheetWargearOption,
+    DatasheetWargearOptionCondition,
+    DatasheetWargearOptionEffect,
+    WargearOptionConditionKind,
+    WargearOptionEffectKind,
 )
 from warhammer40k_core.core.detachment import (
     DetachmentCatalogError,
@@ -493,6 +505,490 @@ def test_army_catalog_validates_detachment_content_links() -> None:
             detachments=(detachment,),
             stratagems=(stratagem,),
         )
+
+
+def test_army_catalog_collection_validators_fail_fast_for_shape_type_and_identity() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    enhancement = EnhancementDefinition(
+        enhancement_id="test-enhancement",
+        name="Test Enhancement",
+        source_id="source:test-enhancement",
+    )
+    stratagem = StratagemDefinition(
+        stratagem_id="test-stratagem",
+        name="Test Stratagem",
+        source_id="source:test-stratagem",
+        command_point_cost=1,
+    )
+    validator_cases: tuple[tuple[Any, object, bool], ...] = (
+        (army_catalog_module._validate_datasheet_tuple, catalog.datasheets[0], True),
+        (army_catalog_module._validate_wargear_tuple, catalog.wargear[0], True),
+        (army_catalog_module._validate_faction_tuple, catalog.factions[0], True),
+        (army_catalog_module._validate_army_rule_tuple, catalog.army_rules[0], False),
+        (army_catalog_module._validate_detachment_tuple, catalog.detachments[0], False),
+        (army_catalog_module._validate_enhancement_tuple, enhancement, False),
+        (army_catalog_module._validate_stratagem_tuple, stratagem, False),
+    )
+
+    for validator, valid_item, rejects_empty in validator_cases:
+        with pytest.raises(ArmyCatalogError, match="must be a tuple"):
+            cast(Any, validator)("test values", [valid_item])
+        if rejects_empty:
+            with pytest.raises(ArmyCatalogError, match="must not be empty"):
+                cast(Any, validator)("test values", ())
+        with pytest.raises(ArmyCatalogError, match="must contain"):
+            cast(Any, validator)("test values", (object(),))
+        with pytest.raises(ArmyCatalogError, match="duplicate"):
+            cast(Any, validator)("test values", (valid_item, valid_item))
+
+    assert army_catalog_module._validate_identifier_tuple("ids", ("z", "a")) == ("a", "z")
+    with pytest.raises(ArmyCatalogError, match="must be a tuple"):
+        army_catalog_module._validate_identifier_tuple("ids", cast(Any, ["id"]))
+    with pytest.raises(ArmyCatalogError, match="duplicates"):
+        army_catalog_module._validate_identifier_tuple("ids", ("id", "id"))
+    with pytest.raises(ArmyCatalogError, match="stable identity prefix"):
+        army_catalog_module._validate_unprefixed_identifier("catalog_id", "catalog:bad", "catalog:")
+
+
+def test_army_catalog_link_validators_reject_each_unknown_reference_family() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    datasheet = catalog.datasheets[0]
+    model_profile_id = datasheet.model_profiles[0].model_profile_id
+    wargear_id = catalog.wargear[0].wargear_id
+    faction = catalog.factions[0]
+    detachment = catalog.detachments[0]
+    enhancement = EnhancementDefinition(
+        enhancement_id="test-enhancement",
+        name="Test Enhancement",
+        source_id="source:test-enhancement",
+    )
+    stratagem = StratagemDefinition(
+        stratagem_id="test-stratagem",
+        name="Test Stratagem",
+        source_id="source:test-stratagem",
+        command_point_cost=1,
+    )
+
+    for keywords, message in (((), "declare faction"), (("UNKNOWN",), "match a faction")):
+        invalid_datasheet = replace(
+            datasheet,
+            keywords=replace(datasheet.keywords, faction_keywords=keywords),
+        )
+        with pytest.raises(ArmyCatalogError, match=message):
+            army_catalog_module._validate_datasheet_faction_keywords(
+                (invalid_datasheet,),
+                catalog.factions,
+            )
+
+    replacement_effect = DatasheetWargearOptionEffect(
+        kind=WargearOptionEffectKind.REPLACE_WARGEAR,
+        wargear_id=wargear_id,
+        replaced_wargear_id="missing-wargear",
+        model_count=1,
+        wargear_count=1,
+    )
+    replacement_option = DatasheetWargearOption(
+        option_id="broken-replacement",
+        model_profile_id=model_profile_id,
+        default_wargear_ids=(wargear_id,),
+        allowed_wargear_ids=(wargear_id,),
+        effects=(replacement_effect,),
+    )
+    replacement_reference_option = DatasheetWargearOption(
+        option_id="replacement-reference",
+        model_profile_id=model_profile_id,
+        default_wargear_ids=(),
+        allowed_wargear_ids=("missing-wargear",),
+    )
+    with pytest.raises(ArmyCatalogError, match="replacement effect"):
+        army_catalog_module._validate_datasheet_wargear_links(
+            (
+                replace(
+                    datasheet,
+                    wargear_options=(replacement_option, replacement_reference_option),
+                ),
+            ),
+            catalog.wargear,
+        )
+
+    mustering_option = DatasheetMusteringOption(
+        option_id="broken-mustering-wargear",
+        selection_group_id="test-group",
+        label="Broken mustering wargear",
+        model_profile_id=model_profile_id,
+        effects=(
+            DatasheetMusteringOptionEffect(
+                kind=DatasheetMusteringOptionEffectKind.ADD_WARGEAR,
+                wargear_id="missing-wargear",
+                model_count=1,
+                wargear_count=1,
+            ),
+        ),
+    )
+    with pytest.raises(ArmyCatalogError, match="mustering option"):
+        army_catalog_module._validate_datasheet_wargear_links(
+            (replace(datasheet, mustering_options=(mustering_option,)),),
+            catalog.wargear,
+        )
+
+    with pytest.raises(ArmyCatalogError, match="unknown army rule"):
+        army_catalog_module._validate_faction_rule_links(
+            (replace(faction, army_rule_ids=("missing-rule",)),),
+            catalog.army_rules,
+        )
+
+    detachment_link_cases = (
+        (replace(detachment, faction_id="missing-faction"), "unknown faction"),
+        (replace(detachment, unit_datasheet_ids=("missing-datasheet",)), "unknown datasheet"),
+        (replace(detachment, enhancement_ids=("missing-enhancement",)), "unknown enhancement"),
+        (replace(detachment, stratagem_ids=("missing-stratagem",)), "unknown stratagem"),
+    )
+    for invalid_detachment, message in detachment_link_cases:
+        with pytest.raises(ArmyCatalogError, match=message):
+            army_catalog_module._validate_detachment_links(
+                (invalid_detachment,),
+                catalog.datasheets,
+                catalog.factions,
+                (enhancement,),
+                (stratagem,),
+            )
+
+
+def test_army_catalog_rejects_unsupported_scope_for_every_catalog_owner() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    enhancement = EnhancementDefinition(
+        enhancement_id="test-enhancement",
+        name="Test Enhancement",
+        source_id="source:test-enhancement",
+    )
+    stratagem = StratagemDefinition(
+        stratagem_id="test-stratagem",
+        name="Test Stratagem",
+        source_id="source:test-stratagem",
+        command_point_cost=1,
+    )
+    collections: dict[str, Any] = {
+        "datasheets": catalog.datasheets,
+        "factions": catalog.factions,
+        "army_rules": catalog.army_rules,
+        "detachments": catalog.detachments,
+        "enhancements": (enhancement,),
+        "stratagems": (stratagem,),
+    }
+
+    for field_name, values in collections.items():
+        invalid_values = (replace(values[0], content_scope=CatalogContentScope.LEGENDS),)
+        arguments = dict(collections)
+        arguments[field_name] = invalid_values
+        with pytest.raises(
+            ArmyCatalogError, match=f"unsupported {field_name[:-1].replace('_', ' ')}"
+        ):
+            cast(Any, army_catalog_module._validate_supported_content_scopes)(**arguments)
+
+
+def test_army_catalog_payload_boundaries_translate_owned_domain_errors() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    payload = catalog.to_payload()
+    invalid_payload_cases: tuple[tuple[Any, dict[str, object], str], ...] = (
+        (
+            army_catalog_module._ruleset_id_from_payload,
+            {**payload["ruleset_id"], "edition": ""},
+            "ruleset_id payload",
+        ),
+        (
+            army_catalog_module._datasheet_from_payload,
+            {**payload["datasheets"][0], "datasheet_id": "datasheet:bad"},
+            "datasheet payload",
+        ),
+        (
+            army_catalog_module._wargear_from_payload,
+            {**payload["wargear"][0], "wargear_id": "wargear:bad"},
+            "wargear payload",
+        ),
+        (
+            army_catalog_module._faction_from_payload,
+            {**payload["factions"][0], "faction_id": "faction:bad"},
+            "faction payload",
+        ),
+        (
+            army_catalog_module._army_rule_from_payload,
+            {**payload["army_rules"][0], "rule_id": "army-rule:bad"},
+            "army rule payload",
+        ),
+        (
+            army_catalog_module._detachment_from_payload,
+            {**payload["detachments"][0], "detachment_id": "detachment:bad"},
+            "detachment payload",
+        ),
+        (
+            army_catalog_module._enhancement_from_payload,
+            {
+                "enhancement_id": "enhancement:bad",
+                "name": "Bad",
+                "source_id": "source:bad",
+                "content_scope": "matched_play",
+                "subtypes": [],
+                "points": 0,
+                "target_required_keywords": [],
+                "target_required_faction_keywords": [],
+                "ability_descriptor_ids": [],
+            },
+            "enhancement payload",
+        ),
+        (
+            army_catalog_module._stratagem_from_payload,
+            {
+                "stratagem_id": "stratagem:bad",
+                "name": "Bad",
+                "source_id": "source:bad",
+                "content_scope": "matched_play",
+                "command_point_cost": 1,
+                "timing_tags": [],
+                "ability_descriptor_ids": [],
+            },
+            "stratagem payload",
+        ),
+    )
+
+    for loader, invalid_payload, message in invalid_payload_cases:
+        with pytest.raises(ArmyCatalogError, match=message):
+            cast(Any, loader)(invalid_payload)
+
+
+@pytest.mark.parametrize(
+    ("converter", "enum_value"),
+    [
+        (datasheet_module.base_size_kind_from_token, BaseSizeKind.CIRCULAR),
+        (datasheet_module.catalog_ability_support_from_token, CatalogAbilitySupport.UNSUPPORTED),
+        (
+            datasheet_module.catalog_ability_source_kind_from_token,
+            CatalogAbilitySourceKind.DATASHEET,
+        ),
+        (datasheet_module.damaged_effect_kind_from_token, DamagedEffectKind.HIT_ROLL_MODIFIER),
+        (datasheet_module.damaged_weapon_scope_from_token, DamagedWeaponScope.ALL),
+        (
+            datasheet_module.wargear_option_condition_kind_from_token,
+            WargearOptionConditionKind.MODEL_EQUIPPED_WITH,
+        ),
+        (
+            datasheet_module.wargear_option_effect_kind_from_token,
+            WargearOptionEffectKind.ADD_WARGEAR,
+        ),
+        (
+            datasheet_module.datasheet_mustering_option_effect_kind_from_token,
+            DatasheetMusteringOptionEffectKind.ADD_KEYWORD,
+        ),
+    ],
+)
+def test_datasheet_enum_boundaries_accept_members_and_reject_bad_tokens(
+    converter: Any,
+    enum_value: object,
+) -> None:
+    assert converter(enum_value) is enum_value
+    with pytest.raises(DatasheetCatalogError, match="must be a string"):
+        converter(1)
+    with pytest.raises(DatasheetCatalogError, match="Unsupported"):
+        converter("not-supported")
+
+
+def test_datasheet_scalar_and_json_validators_cover_fail_fast_boundaries() -> None:
+    assert datasheet_module.damaged_weapon_scope_from_token(None) is None
+    assert datasheet_module._validate_optional_identifier("id", None) is None
+    assert datasheet_module._validate_optional_int("count", None) is None
+    assert datasheet_module._validate_optional_positive_int("count", None) is None
+    assert datasheet_module._validate_json_value("value", None) is None
+    assert datasheet_module._validate_json_value("value", True) is True
+    assert datasheet_module._validate_json_value("value", 2) == 2
+    assert datasheet_module._validate_json_value("value", "text") == "text"
+    assert datasheet_module._validate_json_value("value", 2.5) == 2.5
+    assert datasheet_module._validate_json_value("value", [1, {"key": False}]) == [
+        1,
+        {"key": False},
+    ]
+    assert datasheet_module._validate_positive_number("size", 2) == 2.0
+    assert datasheet_module._validate_positive_int("count", 2) == 2
+    assert datasheet_module._validate_non_negative_int("count", 0) == 0
+    assert datasheet_module._validate_optional_int("count", 0) == 0
+    assert datasheet_module._validate_optional_positive_int("count", 1) == 1
+
+    invalid_calls: tuple[tuple[Any, tuple[object, ...], str], ...] = (
+        (datasheet_module._validate_json_object, ("value", []), "JSON object"),
+        (datasheet_module._validate_json_value, ("value", float("inf")), "finite"),
+        (datasheet_module._validate_json_value, ("value", (1,)), "JSON-safe"),
+        (datasheet_module._validate_json_object_tuple, ("value", []), "tuple"),
+        (datasheet_module._validate_positive_number, ("size", True), "number"),
+        (datasheet_module._validate_positive_number, ("size", float("nan")), "finite"),
+        (datasheet_module._validate_positive_number, ("size", 0), "greater than 0"),
+        (datasheet_module._validate_positive_int, ("count", True), "integer"),
+        (datasheet_module._validate_positive_int, ("count", 0), "at least 1"),
+        (datasheet_module._validate_non_negative_int, ("count", True), "integer"),
+        (datasheet_module._validate_non_negative_int, ("count", -1), "negative"),
+        (datasheet_module._validate_optional_int, ("count", "1"), "integer"),
+        (datasheet_module._validate_optional_positive_int, ("count", 0), "at least 1"),
+    )
+    for validator, arguments, message in invalid_calls:
+        with pytest.raises(DatasheetCatalogError, match=message):
+            cast(Any, validator)(*arguments)
+
+    with pytest.raises(DatasheetCatalogError, match="stable identity prefix"):
+        datasheet_module._validate_unprefixed_identifier("id", "ability:bad", "ability:")
+    with pytest.raises(DatasheetCatalogError, match="must be a tuple"):
+        datasheet_module._validate_identifier_tuple("ids", cast(Any, ["id"]))
+    with pytest.raises(DatasheetCatalogError, match="at least 1"):
+        datasheet_module._validate_identifier_tuple("ids", (), min_length=1)
+    with pytest.raises(DatasheetCatalogError, match="duplicates"):
+        datasheet_module._validate_identifier_tuple(
+            "ids",
+            ("Jump Pack", "JUMP PACK"),
+            canonicalize_keywords=True,
+        )
+    with pytest.raises(DatasheetCatalogError, match="content_scope is invalid"):
+        datasheet_module._catalog_content_scope_from_token("content_scope", "unsupported")
+    with pytest.raises(DatasheetCatalogError, match="Characteristic token"):
+        datasheet_module._characteristic_from_token("unsupported")
+    with pytest.raises(DatasheetCatalogError, match="CharacteristicValue payload"):
+        datasheet_module._characteristic_value_from_payload(cast(Any, {"characteristic": "bad"}))
+
+
+def test_datasheet_collection_validators_reject_invalid_shapes_and_duplicates() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    datasheet = catalog.datasheets[0]
+    ability = catalog.datasheet_by_id("core-deep-strike-unit").abilities[0]
+    attachment = catalog.datasheet_by_id("core-character-leader").attachment_eligibilities[0]
+    damaged_effect = DamagedEffectDefinition(
+        damaged_effect_id="test-damaged",
+        model_profile_id=datasheet.model_profiles[0].model_profile_id,
+        wounds_min=1,
+        wounds_max=2,
+        effect_kind=DamagedEffectKind.HIT_ROLL_MODIFIER,
+        modifier=-1,
+        source_id="source:test-damaged",
+    )
+    condition = DatasheetWargearOptionCondition(
+        kind=WargearOptionConditionKind.MODEL_EQUIPPED_WITH,
+        wargear_ids=(catalog.wargear[0].wargear_id,),
+    )
+    effect = DatasheetWargearOptionEffect(
+        kind=WargearOptionEffectKind.ADD_WARGEAR,
+        wargear_id=catalog.wargear[0].wargear_id,
+        model_count=1,
+        wargear_count=1,
+    )
+    mustering_effect = DatasheetMusteringOptionEffect(
+        kind=DatasheetMusteringOptionEffectKind.ADD_KEYWORD,
+        keyword="Character",
+    )
+    mustering_option = DatasheetMusteringOption(
+        option_id="test-mustering",
+        selection_group_id="test-group",
+        label="Test mustering",
+        effects=(mustering_effect,),
+    )
+    cases: tuple[tuple[Any, object, bool, bool], ...] = (
+        (datasheet_module._validate_model_profile_tuple, datasheet.model_profiles[0], True, True),
+        (datasheet_module._validate_composition_tuple, datasheet.composition[0], True, True),
+        (
+            datasheet_module._validate_wargear_option_tuple,
+            datasheet.wargear_options[0],
+            False,
+            True,
+        ),
+        (datasheet_module._validate_wargear_option_condition_tuple, condition, False, False),
+        (datasheet_module._validate_wargear_option_effect_tuple, effect, False, False),
+        (datasheet_module._validate_mustering_option_tuple, mustering_option, False, True),
+        (datasheet_module._validate_mustering_option_effect_tuple, mustering_effect, True, False),
+        (datasheet_module._validate_ability_descriptor_tuple, ability, False, True),
+        (datasheet_module._validate_damaged_effect_tuple, damaged_effect, False, True),
+        (datasheet_module._validate_attachment_eligibility_tuple, attachment, False, True),
+    )
+
+    for validator, valid_item, rejects_empty, rejects_duplicate in cases:
+        with pytest.raises(DatasheetCatalogError, match="must be a tuple"):
+            cast(Any, validator)("test values", [valid_item])
+        if rejects_empty:
+            with pytest.raises(DatasheetCatalogError, match="must not be empty"):
+                cast(Any, validator)("test values", ())
+        with pytest.raises(DatasheetCatalogError, match="must contain"):
+            cast(Any, validator)("test values", (object(),))
+        if rejects_duplicate:
+            with pytest.raises(DatasheetCatalogError, match="duplicate"):
+                cast(Any, validator)("test values", (valid_item, valid_item))
+
+
+def test_datasheet_damaged_and_effect_sort_contracts_reject_invalid_combinations() -> None:
+    with pytest.raises(DatasheetCatalogError, match="require weapon scope"):
+        datasheet_module._validate_damaged_weapon_scope(weapon_scope=None, weapon_names=())
+    with pytest.raises(DatasheetCatalogError, match="require weapon_names"):
+        datasheet_module._validate_damaged_weapon_scope(
+            weapon_scope=DamagedWeaponScope.NAMED,
+            weapon_names=(),
+        )
+    datasheet_module._validate_damaged_weapon_scope(
+        weapon_scope=DamagedWeaponScope.NAMED,
+        weapon_names=("test weapon",),
+    )
+    with pytest.raises(DatasheetCatalogError, match="must not include weapon_names"):
+        datasheet_module._validate_damaged_weapon_scope(
+            weapon_scope=DamagedWeaponScope.ALL,
+            weapon_names=("test weapon",),
+        )
+    with pytest.raises(DatasheetCatalogError, match="must not include selection limits"):
+        datasheet_module._validate_no_damaged_selection_limit(
+            max_selections=1,
+            baseline_max_selections=None,
+            selection_group=None,
+        )
+
+    effect_order = (
+        DatasheetWargearOptionEffect(
+            kind=WargearOptionEffectKind.REPLACE_WARGEAR,
+            wargear_id="replacement",
+            replaced_wargear_id="original",
+            model_count=1,
+            wargear_count=1,
+        ),
+        DatasheetWargearOptionEffect(
+            kind=WargearOptionEffectKind.REMOVE_WARGEAR_IF_SELECTED,
+            wargear_id="replacement",
+            replaced_wargear_id="original",
+            model_count=1,
+            wargear_count=0,
+        ),
+        DatasheetWargearOptionEffect(
+            kind=WargearOptionEffectKind.ADD_WARGEAR,
+            wargear_id="replacement",
+            model_count=1,
+            wargear_count=1,
+        ),
+        DatasheetWargearOptionEffect(
+            kind=WargearOptionEffectKind.ADD_WARGEAR_IF_SELECTED,
+            wargear_id="replacement",
+            model_count=1,
+            wargear_count=1,
+        ),
+    )
+    assert tuple(
+        datasheet_module._wargear_option_effect_sort_order(effect.kind) for effect in effect_order
+    ) == (0, 1, 2, 2)
+    with pytest.raises(DatasheetCatalogError, match="Unsupported WargearOptionEffectKind"):
+        datasheet_module._wargear_option_effect_sort_order(cast(Any, "unsupported"))
+
+    keyword_effect = DatasheetMusteringOptionEffect(
+        kind=DatasheetMusteringOptionEffectKind.ADD_KEYWORD,
+        keyword="Character",
+    )
+    wargear_effect = DatasheetMusteringOptionEffect(
+        kind=DatasheetMusteringOptionEffectKind.ADD_WARGEAR,
+        wargear_id="test-wargear",
+        model_count=1,
+        wargear_count=1,
+    )
+    assert datasheet_module._mustering_option_effect_sort_key(keyword_effect)[0] == 0
+    assert datasheet_module._mustering_option_effect_sort_key(wargear_effect)[0] == 1
+    invalid_effect = object.__new__(DatasheetMusteringOptionEffect)
+    object.__setattr__(invalid_effect, "kind", "unsupported")
+    with pytest.raises(DatasheetCatalogError, match="Unsupported DatasheetMustering"):
+        datasheet_module._mustering_option_effect_sort_key(invalid_effect)
 
 
 def test_phase_sequence_descriptors_are_explicit_policy_data() -> None:

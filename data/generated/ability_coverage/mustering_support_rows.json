@@ -11,7 +11,7 @@
     "rule_id": "army-mustering:attachment-declaration",
     "source_id": "core:attachment-eligibility",
     "support_stage": "full",
-    "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog; tests/unit/test_phase17k_wahapedia_bridge.py::test_phase17k_support_ability_marks_attachment_eligibility_role_as_support"
+    "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog; tests/unit/rules/test_wahapedia_bridge_catalog.py::test_phase17k_support_ability_marks_attachment_eligibility_role_as_support"
   },
   {
     "allowed_base_faction_ids": [

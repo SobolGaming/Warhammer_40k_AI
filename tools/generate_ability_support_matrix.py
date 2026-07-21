@@ -1247,7 +1247,7 @@ def mustering_support_rows() -> tuple[MusteringSupportRow, ...]:
             tests_evidence=(
                 "tests/unit/test_phase9c_mustering.py::"
                 "test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog; "
-                "tests/unit/test_phase17k_wahapedia_bridge.py::"
+                "tests/unit/rules/test_wahapedia_bridge_catalog.py::"
                 "test_phase17k_support_ability_marks_attachment_eligibility_role_as_support"
             ),
             notes=(
