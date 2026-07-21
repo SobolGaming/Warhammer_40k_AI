@@ -778,6 +778,7 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 stratagem_index=self.stratagem_index,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
             reroll_record = decisions.record_for_result(result)
@@ -809,6 +810,7 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 stratagem_index=self.stratagem_index,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
 

@@ -430,6 +430,7 @@ def _apply_attack_sequence_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     stratagem_index: StratagemCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     out_of_phase_state = state.out_of_phase_shooting_state
     if out_of_phase_state is not None and out_of_phase_state.attack_sequence is not None:
@@ -441,6 +442,7 @@ def _apply_attack_sequence_decision(
             attack_sequence=out_of_phase_state.attack_sequence,
             already_allocated_model_ids=out_of_phase_state.allocated_model_ids,
             stratagem_index=stratagem_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         state.replace_out_of_phase_shooting_state(
             out_of_phase_state.with_attack_sequence_update(
@@ -460,6 +462,7 @@ def _apply_attack_sequence_decision(
         attack_sequence=shooting_state.attack_sequence,
         already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     state.replace_shooting_phase_state(
         shooting_state.with_attack_sequence_update(
@@ -534,6 +537,7 @@ def _apply_attack_sequence_decision_to_sequence(
     attack_sequence: AttackSequence,
     already_allocated_model_ids: tuple[str, ...],
     stratagem_index: StratagemCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     updated_sequence: AttackSequence | None
     allocated_model_ids: tuple[str, ...]
@@ -556,6 +560,7 @@ def _apply_attack_sequence_decision_to_sequence(
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
             stratagem_index=stratagem_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     elif result.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_damage_allocation_model_decision(
@@ -566,6 +571,7 @@ def _apply_attack_sequence_decision_to_sequence(
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
             stratagem_index=stratagem_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     elif result.decision_type == SELECT_PRECISION_ALLOCATION_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_precision_allocation_decision(
@@ -576,6 +582,7 @@ def _apply_attack_sequence_decision_to_sequence(
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
             stratagem_index=stratagem_index,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     elif result.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_feel_no_pain_decision(
@@ -585,6 +592,7 @@ def _apply_attack_sequence_decision_to_sequence(
             attack_sequence=attack_sequence,
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     elif result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_destruction_reaction_decision(
@@ -594,6 +602,7 @@ def _apply_attack_sequence_decision_to_sequence(
             attack_sequence=attack_sequence,
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     elif (
         result.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE

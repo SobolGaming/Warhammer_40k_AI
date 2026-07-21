@@ -176,9 +176,9 @@ def apply_allocation_order_decision(
     already_allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
-    record = decisions.record_for_result(result)
-    request = record.request
+    request = decisions.record_for_result(result).request
     decision = AllocationOrderDecision.from_result(request=request, result=result)
     request_payload = _payload_object(request.payload)
     raw_attack_contexts = request_payload["attack_contexts"]
@@ -205,6 +205,7 @@ def apply_allocation_order_decision(
         allocated_model_ids=already_allocated_model_ids,
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 
@@ -219,6 +220,7 @@ def apply_damage_allocation_model_decision(
     hooks: AttackSequenceHooks | None = None,
     dice_manager: DiceRollManager | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
     request = record.request
@@ -249,6 +251,7 @@ def apply_damage_allocation_model_decision(
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         selected_model_id=decision.selected_model_id,
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 
@@ -281,6 +284,7 @@ def apply_precision_allocation_decision(
     already_allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
     request = record.request
@@ -343,6 +347,7 @@ def apply_precision_allocation_decision(
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         priority_group_ids=priority_group_ids,
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 
@@ -356,6 +361,7 @@ def apply_feel_no_pain_decision(
     already_allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks | None = None,
     dice_manager: DiceRollManager | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
     request = record.request
@@ -396,6 +402,7 @@ def apply_feel_no_pain_decision(
             status=status,
             hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
             dice_manager=dice_manager,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     decision = FeelNoPainDecision.from_result(request=request, result=result)
     request_payload = _payload_object(request.payload)
@@ -468,6 +475,7 @@ def apply_feel_no_pain_decision(
         status=status,
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         dice_manager=manager,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 
@@ -481,6 +489,7 @@ def apply_destruction_reaction_decision(
     already_allocated_model_ids: tuple[str, ...],
     dice_manager: DiceRollManager | None = None,
     hooks: AttackSequenceHooks | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     resolved_hooks = AttackSequenceHooks.empty() if hooks is None else hooks
     record = decisions.record_for_result(result)
@@ -566,6 +575,7 @@ def apply_destruction_reaction_decision(
             status=status,
             hooks=resolved_hooks,
             dice_manager=manager,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     if attack_sequence.pending_grouped_damage is not None:
         return _continue_grouped_damage_after_interruption(
@@ -577,6 +587,7 @@ def apply_destruction_reaction_decision(
             status=None,
             hooks=resolved_hooks,
             dice_manager=dice_manager,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     updated_sequence = _advance_after_resolved_hit(
         attack_sequence=attack_sequence,
