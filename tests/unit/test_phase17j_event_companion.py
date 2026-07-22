@@ -43,7 +43,7 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
 )
 from warhammer40k_core.rules.mission_pack_import import (
-    warhammer_event_companion_2026_06_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_2026_06 as event_source,
@@ -51,6 +51,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_base_size_rows,
     event_companion_patches,
+    july_rules_updates_2026_07,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_layouts_2026_06 as event_layouts,
@@ -58,19 +59,19 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 
 
 def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     source_package = mission_pack.source_package
     payload = mission_pack.to_payload()
     encoded = json.dumps(payload, sort_keys=True)
     decoded = cast(MissionPackDefinitionPayload, json.loads(encoded))
 
-    assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-06"
+    assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
-        "mission_pack_id": "11e-warhammer-event-companion-2026-06",
-        "source_package_id": "gw-11e-warhammer-event-companion-v1-0-2026-06",
-        "source_title": "Warhammer Event Companion v1.0",
-        "source_version": "1.0",
+        "mission_pack_id": "11e-warhammer-event-companion-2026-07",
+        "source_package_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
+        "source_title": "Warhammer Event Companion v1.1",
+        "source_version": "1.1",
         "source_commit_or_import_hash": source_package.source_commit_or_import_hash,
         "imported_at_schema_version": "core-v2-event-companion-source-v1",
     }
@@ -83,13 +84,82 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
 
     assert event_source.package_identity().to_payload() == {
         "source_kind": "warhammer_event_companion",
-        "document_version": "1.0",
+        "document_version": "1.1",
         "event_mode": "warhammer_event",
         "battlefield_size": "44x60_inches",
         "excludes_deployment_cards": True,
         "excludes_twist_cards": True,
-        "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:package-identity",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:package-identity",
     }
+
+
+def test_phase17j_v1_1_layout_revisions_preserve_deployment_zone_templates() -> None:
+    rows = july_rules_updates_2026_07.changed_event_layouts()
+
+    assert {
+        row.layout_id: (row.source_page, row.deployment_zone_template_number) for row in rows
+    } == {
+        "take-and-hold-vs-purge-the-foe-layout-1": (12, 4),
+        "take-and-hold-vs-purge-the-foe-layout-2": (13, 3),
+        "take-and-hold-vs-purge-the-foe-layout-3": (14, 5),
+        "purge-the-foe-vs-disruption-layout-1": (27, 3),
+        "purge-the-foe-vs-disruption-layout-2": (28, 1),
+        "purge-the-foe-vs-disruption-layout-3": (29, 4),
+        "disruption-vs-reconnaissance-layout-1": (39, 1),
+        "disruption-vs-reconnaissance-layout-3": (41, 3),
+    }
+    assert all(row.terrain_changed for row in rows)
+    assert all(not row.deployment_zones_changed for row in rows)
+    assert {
+        row.layout_id for row in rows if row.layout_id in event_layouts.EXTRACTED_LAYOUT_IDS
+    } == {
+        "disruption-vs-reconnaissance-layout-1",
+        "disruption-vs-reconnaissance-layout-3",
+    }
+
+
+def test_phase17j_v1_1_extracted_layouts_use_revised_terrain_transforms() -> None:
+    layout_a = event_layouts.EXTRACTED_LAYOUTS_BY_ID["disruption-vs-reconnaissance-layout-1"]
+    layout_c = event_layouts.EXTRACTED_LAYOUTS_BY_ID["disruption-vs-reconnaissance-layout-3"]
+    layout_a_specs = {spec[0]: spec[1:] for spec in layout_a.terrain_area_specs}
+    layout_c_specs = {spec[0]: spec[1:] for spec in layout_c.terrain_area_specs}
+
+    assert layout_a_specs["7x11-5-attacker-home"] == (
+        "FOOTPRINT_7X11_5",
+        21.09,
+        42.59,
+        180.0,
+    )
+    assert layout_a_specs["6x2-east-midfield"] == (
+        "FOOTPRINT_6X2",
+        32.74,
+        31.55,
+        -8.0,
+    )
+    assert layout_a_specs["6x4-east-midfield"] == (
+        "FOOTPRINT_6X4",
+        29.08,
+        22.14,
+        82.0,
+    )
+    assert layout_a_specs["8x11-5-polygon-north-center"] == (
+        "FOOTPRINT_8X11_5_POLYGON",
+        30.8,
+        39.5,
+        -125.0,
+    )
+    assert layout_c_specs["8x11-5-polygon-north-east"] == (
+        "FOOTPRINT_8X11_5_POLYGON",
+        34.09,
+        43.83,
+        142.0,
+    )
+    assert layout_c_specs["6x4-south-west-midfield"] == (
+        "FOOTPRINT_6X4",
+        9.52,
+        24.32,
+        -37.5,
+    )
 
 
 def test_phase17j_event_sequence_and_secondary_procedure_are_explicit() -> None:
@@ -168,7 +238,7 @@ def test_phase17j_mission_card_scoring_grammar_records_official_rules() -> None:
 
 
 def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout_ids = {layout.terrain_layout_id for layout in mission_pack.terrain_layout_templates}
     deployment_map_ids = {
         deployment.deployment_map_id for deployment in mission_pack.deployment_maps
@@ -370,7 +440,7 @@ def test_phase17j_take_and_hold_layout_a_terrain_area_specs_are_corner_anchored(
         area_id: (template_id, anchor_x, anchor_y, rotation)
         for area_id, template_id, anchor_x, anchor_y, rotation in (source.terrain_area_specs)
     }
-    layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
+    layout = warhammer_event_companion_2026_07_mission_pack().battlefield_layout(
         "take-and-hold-vs-take-and-hold-layout-1"
     )
     placed_areas = {
@@ -469,7 +539,7 @@ def test_phase17j_take_and_hold_layout_b_terrain_area_specs_are_corner_anchored(
         area_id: (template_id, anchor_x, anchor_y, rotation)
         for area_id, template_id, anchor_x, anchor_y, rotation in (source.terrain_area_specs)
     }
-    layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
+    layout = warhammer_event_companion_2026_07_mission_pack().battlefield_layout(
         "take-and-hold-vs-take-and-hold-layout-2"
     )
     placed_areas = {
@@ -559,7 +629,7 @@ def test_phase17j_take_and_hold_layout_c_terrain_area_specs_are_corner_anchored(
         area_id: (template_id, anchor_x, anchor_y, rotation)
         for area_id, template_id, anchor_x, anchor_y, rotation in (source.terrain_area_specs)
     }
-    layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
+    layout = warhammer_event_companion_2026_07_mission_pack().battlefield_layout(
         "take-and-hold-vs-take-and-hold-layout-3"
     )
     placed_areas = {
@@ -621,7 +691,7 @@ def test_phase17j_take_and_hold_layout_c_terrain_area_specs_are_corner_anchored(
 
 
 def test_phase17j_extracted_terrain_area_specs_anchor_first_vertices() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     for source in event_layouts.EXTRACTED_LAYOUTS:
         assert not any(
             area_id.startswith(("dense-", "light-")) for area_id, *_ in source.terrain_area_specs
@@ -730,7 +800,7 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
         "layout_pair_id": "take-and-hold-vs-take-and-hold",
         "layout_source_page_start": 9,
         "source_id": (
-            "gw-11e-warhammer-event-companion-v1-0-2026-06:"
+            "gw-11e-warhammer-event-companion-v1-1-2026-07:"
             "primary-mission-matrix-source:take-and-hold-vs-take-and-hold"
         ),
     }
@@ -1173,7 +1243,7 @@ def test_phase17j_source_lookup_helpers_fail_closed_for_unknown_ids() -> None:
 
 
 def test_phase17j_take_and_hold_layout_a_encodes_terrain_areas_and_regions() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
     terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
     deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
@@ -1293,7 +1363,7 @@ def test_phase17j_take_and_hold_layout_a_encodes_terrain_areas_and_regions() -> 
 
 
 def test_phase17j_mission_setup_components_resolve_matching_battlefield_layout() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
     setup = MissionSetup.from_components(
         mission_pack=mission_pack,
@@ -1312,7 +1382,7 @@ def test_phase17j_mission_setup_components_resolve_matching_battlefield_layout()
 
 
 def test_phase17j_take_and_hold_layout_b_encodes_terrain_areas_and_regions() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-2")
     terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
     deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
@@ -1432,7 +1502,7 @@ def test_phase17j_take_and_hold_layout_b_encodes_terrain_areas_and_regions() -> 
 
 
 def test_phase17j_take_and_hold_layout_c_encodes_cutout_deployments_and_terrain_areas() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-3")
     terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
     setup = MissionSetup.from_mission_pack(
@@ -1604,7 +1674,7 @@ def test_phase17j_disruption_vs_reconnaissance_layouts_encode_geometry(
     defender_edge: str,
     no_mans_land_polygons: int,
 ) -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout = mission_pack.battlefield_layout(layout_id)
     terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
     deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
@@ -1625,12 +1695,12 @@ def test_phase17j_disruption_vs_reconnaissance_layouts_encode_geometry(
     )
     expected_objectives = {
         "disruption-vs-reconnaissance-layout-1": {
-            "attacker-home": ("attacker_home", 16.98, 49.88),
-            "defender-home": ("defender_home", 26.31, 9.65),
-            "central-south": ("central", 23.0, 25.7),
-            "central-north": ("central", 20.9, 34.1),
+            "attacker-home": ("attacker_home", 17.25, 49.25),
+            "defender-home": ("defender_home", 26.75, 10.75),
+            "central-south": ("central", 17.7, 23.6),
+            "central-north": ("central", 26.3, 36.4),
             "expansion-east": ("expansion", 37.65, 41.4),
-            "expansion-west": ("expansion", 6.21, 18.9),
+            "expansion-west": ("expansion", 6.35, 18.6),
         },
         "disruption-vs-reconnaissance-layout-2": {
             "attacker-home": ("attacker_home", 7.55, 44.17),
@@ -1642,11 +1712,11 @@ def test_phase17j_disruption_vs_reconnaissance_layouts_encode_geometry(
         },
         "disruption-vs-reconnaissance-layout-3": {
             "attacker-home": ("attacker_home", 6.45, 45.39),
-            "defender-home": ("defender_home", 37.4, 14.91),
-            "central-north-west": ("central", 18.49, 33.93),
-            "central-south-east": ("central", 25.52, 26.0),
-            "expansion-north-east": ("expansion", 35.62, 50.96),
-            "expansion-south-west": ("expansion", 8.75, 9.07),
+            "defender-home": ("defender_home", 37.55, 14.61),
+            "central-north-west": ("central", 20.15, 34.65),
+            "central-south-east": ("central", 23.85, 25.35),
+            "expansion-north-east": ("expansion", 31.9, 50.9),
+            "expansion-south-west": ("expansion", 12.1, 9.1),
         },
     }
 
@@ -1764,7 +1834,7 @@ def test_phase17j_disruption_vs_reconnaissance_layouts_encode_geometry(
 
 def test_phase17j_objective_role_payload_is_required() -> None:
     marker = (
-        warhammer_event_companion_2026_06_mission_pack()
+        warhammer_event_companion_2026_07_mission_pack()
         .battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
         .objective_markers[0]
     )
@@ -1781,7 +1851,7 @@ def test_phase17j_centre_and_center_objective_roles_normalize_to_central() -> No
 
 
 def test_phase17j_placed_terrain_area_payload_must_match_template_transform() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
     first_area, second_area, *remaining_areas = layout.terrain_areas
     drifted_area = replace(
@@ -1806,7 +1876,7 @@ def test_phase17j_placed_terrain_area_payload_must_match_template_transform() ->
 
 
 def test_phase17j_layout_region_invariants_fail_closed() -> None:
-    layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
+    layout = warhammer_event_companion_2026_07_mission_pack().battlefield_layout(
         "take-and-hold-vs-take-and-hold-layout-2"
     )
     attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
@@ -1843,7 +1913,7 @@ def test_phase17j_layout_region_invariants_fail_closed() -> None:
 
 
 def test_phase17j_layout_must_match_deployment_map_objective_geometry() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
     deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
     first_marker, *remaining_markers = deployment_map.objective_markers
@@ -1869,7 +1939,7 @@ def test_phase17j_layout_must_match_deployment_map_objective_geometry() -> None:
 
 
 def test_phase17j_layout_must_match_deployment_map_zone_geometry() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-2")
     deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
     defender_zone = next(
@@ -1905,7 +1975,7 @@ def test_phase17j_layout_must_match_deployment_map_zone_geometry() -> None:
 
 
 def test_phase17j_territories_must_contain_their_deployment_zones() -> None:
-    layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
+    layout = warhammer_event_companion_2026_07_mission_pack().battlefield_layout(
         "take-and-hold-vs-take-and-hold-layout-1"
     )
     attacker_territory = next(
@@ -1963,12 +2033,16 @@ def test_phase17j_card_amendments_are_separate_from_faq_patch_rows() -> None:
     assert amendment_set.amendments == ()
     assert amendment_set.source_page == 4
     assert {patch.patch_id for patch in faq_patches} == {
+        "faq-end-of-battle-vp-round-cap-exemption",
+        "faq-operation-marker-removal-clears-status",
         "faq-operation-marker-removal-requires-card-permission",
         "faq-death-trap-trapped-area-scoring-window",
         "faq-surveil-the-foe-same-turn-marker-removal",
         "faq-vital-link-multiple-central-objectives",
     }
     assert {patch.behavior_descriptor for patch in faq_patches} == {
+        "end_of_battle_vp_exempt_from_battle_round_cap",
+        "operation_marker_removal_clears_applied_status",
         "operation_marker_removal_requires_primary_card_permission",
         "death_trap_trapped_area_checked_at_scoring_not_destruction_time",
         "surveil_the_foe_same_turn_marker_removal_allows_scoring",
@@ -1976,7 +2050,7 @@ def test_phase17j_card_amendments_are_separate_from_faq_patch_rows() -> None:
     }
     assert all(patch.source_page == 4 for patch in faq_patches)
     assert all(
-        patch.source_id.startswith("gw-11e-warhammer-event-companion-v1-0-2026-06:faq:")
+        patch.source_id.startswith("gw-11e-warhammer-event-companion-v1-1-2026-07:faq:")
         for patch in faq_patches
     )
 
@@ -2149,7 +2223,7 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
     action_sources = {
         row.mission_action_id: row for row in event_source.primary_mission_action_source_rows()
     }
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
 
     assert set(action_sources) == {
         "commit-sabotage",
@@ -2176,7 +2250,7 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
         "effect_descriptor": "objective_becomes_decoy_if_action_unit_controls_target_at_turn_end",
         "engine_exposure_status": "source_known_engine_pending",
         "source_id": (
-            "gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:decoy-objective"
+            "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:decoy-objective"
         ),
     }
     assert action_sources["triangulate-objective"].start_timing == (
@@ -2197,7 +2271,7 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
         ),
         "engine_exposure_status": "source_known_engine_pending",
         "source_id": (
-            "gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:extract-intelligence"
+            "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:extract-intelligence"
         ),
     }
     assert action_sources["surveil-enemy-unit"].to_payload() == {
@@ -2213,7 +2287,7 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
         "effect_descriptor": "enemy_unit_becomes_surveilled_until_turn_end",
         "engine_exposure_status": "source_known_engine_pending",
         "source_id": (
-            "gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:surveil-enemy-unit"
+            "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:surveil-enemy-unit"
         ),
     }
     assert action_sources["sensor-sweep-locate-and-deny"].target_policy == (
@@ -2237,7 +2311,7 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
         "use_limit": "once_per_turn",
         "effect_descriptor": "unit_secures_asset_if_action_unit_controls_target_at_turn_end",
         "engine_exposure_status": "source_known_engine_pending",
-        "source_id": ("gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:secure-asset"),
+        "source_id": ("gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:secure-asset"),
     }
     assert action_sources["vanguard-operation"].eligible_unit_policy == (
         "active_player_unit_within_terrain_area_in_enemy_territory"
@@ -2251,7 +2325,7 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
 
 
 def test_phase17j_source_known_engine_pending_primary_scoring_fails_closed() -> None:
-    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-06")
+    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
@@ -2267,7 +2341,7 @@ def test_phase17j_source_known_engine_pending_primary_scoring_fails_closed() -> 
 
 
 def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> None:
-    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-06")
+    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
@@ -2293,8 +2367,56 @@ def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> 
         mission_pack_for_id("unsupported-pack")
 
 
+def test_phase17j_end_of_battle_vp_is_exempt_from_round_five_primary_cap() -> None:
+    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    policy = mission_scoring_policy_from_setup(setup)
+    ledger = VictoryPointLedger.initial(player_id="player-alpha")
+    round_five_award = VictoryPointAward(
+        player_id="player-alpha",
+        battle_round=5,
+        phase="command",
+        amount=15,
+        source_kind=VictoryPointSourceKind.PRIMARY,
+        source_id=setup.primary_mission_id,
+        scoring_timing="phase_end",
+        metadata={"scoring_rule_id": "phase17j-round-five-primary"},
+    )
+    applied_amount, metadata = policy.capped_award_for_ledger(
+        ledger=ledger,
+        award=round_five_award,
+    )
+    ledger, _ = ledger.award(
+        round_five_award,
+        applied_amount=applied_amount,
+        metadata=metadata,
+    )
+    end_of_battle_award = VictoryPointAward(
+        player_id="player-alpha",
+        battle_round=5,
+        phase="battle_end",
+        amount=10,
+        source_kind=VictoryPointSourceKind.PRIMARY,
+        source_id=setup.primary_mission_id,
+        scoring_timing="end_of_battle",
+        metadata={"scoring_rule_id": "phase17j-end-of-battle-primary"},
+    )
+
+    applied_amount, _ = policy.capped_award_for_ledger(
+        ledger=ledger,
+        award=end_of_battle_award,
+    )
+
+    assert applied_amount == 10
+
+
 def test_phase17j_final_scoring_uses_event_caps_battle_ready_and_draw_rules() -> None:
-    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-06")
+    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",

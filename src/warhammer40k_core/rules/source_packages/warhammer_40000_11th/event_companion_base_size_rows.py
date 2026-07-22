@@ -13,8 +13,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 _ARTIFACT_SCHEMA: Final = "core-v2-event-companion-base-size-rows-v1"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_base_size_rows.json"
-_SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-0-2026-06"
-_SOURCE_VERSION: Final = "1.0"
+_SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
+_SOURCE_VERSION: Final = "1.1"
 
 
 class _BaseSizeSourceRowArtifact(msgspec.Struct, frozen=True):

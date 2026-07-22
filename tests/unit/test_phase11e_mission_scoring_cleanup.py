@@ -156,7 +156,7 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
-    warhammer_event_companion_2026_06_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
 )
 
 SEEDED_TACTICAL_DRAW_REQUEST_ID = "phase11e-seeded-tactical-draw-request"
@@ -2310,11 +2310,11 @@ def test_event_companion_tactical_secondary_replacement_spends_cp_and_draws_one(
     }
     assert any(card.source_result_id == result_id for card in active_after)
     assert spend_payload["source_id"] == (
-        "gw-11e-warhammer-event-companion-v1-0-2026-06:secondary:"
+        "gw-11e-warhammer-event-companion-v1-1-2026-07:secondary:"
         f"tactical-procedure:replacement:{result_id}:cp-spend"
     )
     assert cast(dict[str, JsonValue], replacement_events[-1].payload)["source_id"] == (
-        "gw-11e-warhammer-event-companion-v1-0-2026-06:secondary:tactical-procedure"
+        "gw-11e-warhammer-event-companion-v1-1-2026-07:secondary:tactical-procedure"
     )
     payload = cast(
         GameStatePayload,
@@ -2421,7 +2421,7 @@ def test_event_companion_tactical_secondary_discard_cp_reward_uses_event_source_
     ]
     command_point_gain = cast(dict[str, JsonValue], command_point_events[-1].payload)
     assert command_point_gain["source_id"] == (
-        "gw-11e-warhammer-event-companion-v1-0-2026-06:secondary:"
+        "gw-11e-warhammer-event-companion-v1-1-2026-07:secondary:"
         f"tactical-procedure:discard:{result_id}:cp-reward"
     )
 
@@ -4897,7 +4897,7 @@ def _mission_setup() -> MissionSetup:
 
 def _event_companion_mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
-        mission_pack=warhammer_event_companion_2026_06_mission_pack(),
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-1",
         attacker_player_id="player-a",
@@ -4945,7 +4945,7 @@ def _event_companion_mission_setup_with_scoring_terrain_feature(
 ) -> MissionSetup:
     return _with_scoring_terrain_feature(
         MissionSetup.from_mission_pack(
-            mission_pack=warhammer_event_companion_2026_06_mission_pack(),
+            mission_pack=warhammer_event_companion_2026_07_mission_pack(),
             mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
             terrain_layout_id="take-and-hold-vs-take-and-hold-layout-1",
             attacker_player_id="player-a",

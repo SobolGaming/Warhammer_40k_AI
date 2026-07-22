@@ -26,7 +26,7 @@ from warhammer40k_core.engine.scoring import (
 )
 from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
-    warhammer_event_companion_2026_06_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
 )
 
 _SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS = frozenset(
@@ -121,7 +121,7 @@ def mission_pack_for_id(mission_pack_id: str) -> MissionPackDefinition:
 def _supported_mission_packs() -> tuple[MissionPackDefinition, ...]:
     return (
         chapter_approved_2026_27_mission_pack(),
-        warhammer_event_companion_2026_06_mission_pack(),
+        warhammer_event_companion_2026_07_mission_pack(),
     )
 
 

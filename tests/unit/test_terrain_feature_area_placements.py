@@ -33,12 +33,12 @@ from warhammer40k_core.geometry.terrain import (
     TerrainWallDefinitionPayload,
 )
 from warhammer40k_core.rules.mission_pack_import import (
-    warhammer_event_companion_2026_06_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
 )
 
 
 def test_event_companion_area_placed_terrain_features_resolve_from_source_data() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout_id = "take-and-hold-vs-take-and-hold-layout-1"
     layout = mission_pack.battlefield_layout(layout_id)
     area = next(
@@ -80,7 +80,7 @@ def test_event_companion_area_placed_terrain_features_resolve_from_source_data()
 
 
 def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -> None:
-    base_pack = warhammer_event_companion_2026_06_mission_pack()
+    base_pack = warhammer_event_companion_2026_07_mission_pack()
     layout_id = "take-and-hold-vs-take-and-hold-layout-1"
     layout = base_pack.battlefield_layout(layout_id)
     area = next(
@@ -175,7 +175,7 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
 
 
 def test_mission_pack_rejects_area_placement_feature_kind_mismatch() -> None:
-    base_pack = warhammer_event_companion_2026_06_mission_pack()
+    base_pack = warhammer_event_companion_2026_07_mission_pack()
     source_preset = base_pack.terrain_feature_presets[0]
     mismatched_preset = replace(source_preset, feature_kind=TerrainFeatureKind.WOODS)
 
@@ -190,7 +190,7 @@ def test_mission_pack_rejects_area_placement_feature_kind_mismatch() -> None:
 
 
 def test_mission_pack_rejects_area_placement_static_feature_id_collision() -> None:
-    base_pack = warhammer_event_companion_2026_06_mission_pack()
+    base_pack = warhammer_event_companion_2026_07_mission_pack()
     layout_id = "take-and-hold-vs-take-and-hold-layout-1"
     battlefield_layout = base_pack.battlefield_layout(layout_id)
     terrain_layout = base_pack.terrain_layout_template(layout_id)
@@ -226,7 +226,7 @@ def test_mission_pack_rejects_area_placement_static_feature_id_collision() -> No
 
 
 def test_area_placed_terrain_feature_payloads_round_trip_and_preserve_rotation() -> None:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     round_tripped_pack = MissionPackDefinition.from_payload(
         cast(
             MissionPackDefinitionPayload,

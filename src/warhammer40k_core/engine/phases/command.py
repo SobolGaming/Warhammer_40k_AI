@@ -85,7 +85,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 TACTICAL_SECONDARY_DRAW_DECISION_TYPE = "draw_tactical_secondary_missions"
 TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE = "replace_tactical_secondary_mission"
 TACTICAL_SECONDARY_REPLACEMENT_DECLINE_OPTION_ID = "decline_tactical_secondary_replacement"
-EVENT_COMPANION_MISSION_PACK_ID = "11e-warhammer-event-companion-2026-06"
+EVENT_COMPANION_MISSION_PACK_ID = "11e-warhammer-event-companion-2026-07"
 
 
 def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:

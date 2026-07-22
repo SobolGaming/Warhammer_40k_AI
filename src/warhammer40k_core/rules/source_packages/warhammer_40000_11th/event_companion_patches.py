@@ -31,6 +31,22 @@ def faq_patch_rows() -> tuple[EventCompanionFaqPatch, ...]:
     source_package_id = event_companion_2026_06.SOURCE_PACKAGE_ID
     return (
         EventCompanionFaqPatch(
+            patch_id="faq-end-of-battle-vp-round-cap-exemption",
+            target_id="mission-scoring:end-of-battle",
+            operation_kind="faq_behavior",
+            behavior_descriptor="end_of_battle_vp_exempt_from_battle_round_cap",
+            source_page=4,
+            source_id=f"{source_package_id}:faq:end-of-battle-vp-cap",
+        ),
+        EventCompanionFaqPatch(
+            patch_id="faq-operation-marker-removal-clears-status",
+            target_id="mission-actions:operation-marker-status",
+            operation_kind="faq_behavior",
+            behavior_descriptor="operation_marker_removal_clears_applied_status",
+            source_page=4,
+            source_id=f"{source_package_id}:faq:operation-marker-status",
+        ),
+        EventCompanionFaqPatch(
             patch_id="faq-operation-marker-removal-requires-card-permission",
             target_id="mission-actions:operation-marker",
             operation_kind="faq_behavior",

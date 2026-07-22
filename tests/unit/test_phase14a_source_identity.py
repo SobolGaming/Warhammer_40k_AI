@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import json
+from pathlib import Path
+
+import pytest
 
 from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -10,6 +14,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities,
     core_rules,
     core_stratagems,
+    july_rules_updates_2026_07,
 )
 
 
@@ -25,23 +30,62 @@ def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() ->
     assert any(
         core_rules.LOCAL_CORE_RULES_PDF in source.raw_text for source in document.source_texts
     )
-    assert {source.source_id for source in document.source_texts} >= {
-        core_rules.NON_CORE_CP_GAIN_CAP_SOURCE_ID,
-        core_rules.UNNAMED_ZERO_CP_STRATAGEM_COST_SOURCE_ID,
-    }
-    assert any(
-        "maximum of 1 CP per battle round" in source.raw_text
-        for source in document.source_texts
-        if source.source_id == core_rules.NON_CORE_CP_GAIN_CAP_SOURCE_ID
-    )
-    assert any(
-        "reduce the CP cost of that use of that Stratagem by 1CP" in source.raw_text
-        for source in document.source_texts
-        if source.source_id == core_rules.UNNAMED_ZERO_CP_STRATAGEM_COST_SOURCE_ID
-    )
+    assert len(document.source_texts) == 1
     assert "<" not in encoded
     assert "object at 0x" not in encoded
     assert SourceCatalog.from_payload(payload).to_payload() == payload
+
+
+def test_july_rules_updates_source_catalog_cites_both_committed_pdfs() -> None:
+    catalog = july_rules_updates_2026_07.source_catalog()
+    payload = catalog.to_payload()
+    encoded = json.dumps(payload, sort_keys=True)
+    source_texts = tuple(
+        source for document in catalog.documents for source in document.source_texts
+    )
+
+    assert len(catalog.documents) == 2
+    assert len(july_rules_updates_2026_07.universal_rule_records()) == 4
+    assert len(july_rules_updates_2026_07.changed_event_layouts()) == 8
+    assert all(
+        not row.deployment_zones_changed
+        for row in july_rules_updates_2026_07.changed_event_layouts()
+    )
+    assert july_rules_updates_2026_07.UNIVERSAL_RULES_LOCAL_PDF in encoded
+    assert july_rules_updates_2026_07.EVENT_COMPANION_LOCAL_PDF in encoded
+    assert july_rules_updates_2026_07.UNIVERSAL_RULES_PDF_SHA256 in encoded
+    assert july_rules_updates_2026_07.EVENT_COMPANION_PDF_SHA256 in encoded
+    assert {rule.source_id for rule in july_rules_updates_2026_07.universal_rule_records()} <= {
+        source.source_id for source in source_texts
+    }
+    assert SourceCatalog.from_payload(payload).to_payload() == payload
+
+    for relative_path, expected_sha256 in (
+        (
+            july_rules_updates_2026_07.UNIVERSAL_RULES_LOCAL_PDF,
+            july_rules_updates_2026_07.UNIVERSAL_RULES_PDF_SHA256,
+        ),
+        (
+            july_rules_updates_2026_07.EVENT_COMPANION_LOCAL_PDF,
+            july_rules_updates_2026_07.EVENT_COMPANION_PDF_SHA256,
+        ),
+    ):
+        assert hashlib.sha256(Path(relative_path).read_bytes()).hexdigest() == expected_sha256
+
+
+def test_july_rules_updates_artifact_rejects_unknown_fields() -> None:
+    payload = json.loads(
+        Path(
+            "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+            "july_rules_updates_2026_07/artifacts/package.json"
+        ).read_text()
+    )
+    payload["unexpected"] = True
+
+    with pytest.raises(july_rules_updates_2026_07.JulyRulesUpdateArtifactError):
+        july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
 
 
 def test_eleventh_source_package_identity_payloads_are_json_safe() -> None:
