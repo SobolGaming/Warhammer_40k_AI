@@ -1,8 +1,385 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import dataclass
 
 EMPERORS_CHILDREN_FACTION_ID = "emperors-children"
+
+_EMPERORS_CHILDREN_GROUP = "Emperor's Children"
+_VEHICLES_GROUP = "Vehicles and Daemon Engines"
+_SLAANESH_DAEMONS_GROUP = "Slaanesh Daemons"
+
+
+@dataclass(frozen=True, slots=True)
+class EmperorsChildrenDatasheetReviewRow:
+    group: str
+    datasheet: str
+    datasheet_id: str
+    ir_coverage: str
+    supported_semantics: str
+    semantics_needed: str
+    catalog_blockers: str
+
+
+_DATASHEET_GROUP_INTROS = {
+    _EMPERORS_CHILDREN_GROUP: (
+        "This table covers Emperor's Children characters and infantry from the pinned "
+        "predecessor source, with the Faction Pack Rules Updates applied where cited."
+    ),
+    _VEHICLES_GROUP: (
+        "This table covers the Emperor's Children transports, vehicles, daemon engines, and "
+        "other non-infantry support units from the pinned predecessor source, plus the complete "
+        "Defiler datasheet reprinted in the Faction Pack."
+    ),
+    _SLAANESH_DAEMONS_GROUP: (
+        "This table covers the Slaanesh Daemon datasheets retained by the Emperor's Children "
+        "source scope. The Faction Pack does not reprint or update these rows, so the pinned "
+        "predecessor rows remain authoritative for this review."
+    ),
+}
+
+_NO_GENERATED_SUPPORT_ROW = (
+    "No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and "
+    "playability evidence is not yet proven."
+)
+
+_DATASHEET_REVIEW_ROWS = (
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Fulgrim",
+        datasheet_id="000004077",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deadly Demise D6, Deep Strike, and the Thrill Seekers army-rule handler are "
+            "implemented generic or faction paths. The source overlay applies the updated "
+            "Serpentine terrain-transit text."
+        ),
+        semantics_needed=(
+            "Daemonic Poisons persistent target state and Command-phase mortal wounds; Daemon "
+            "Primarch mode selection; Beguiling Form hit modifier; Daemonic Speed Fights First; "
+            "Enthralling Hypnosis Fall Back test and denial."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Lord Exultant",
+        datasheet_id="000004078",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Leader and the Thrill Seekers army-rule handler are implemented paths."
+        ),
+        semantics_needed=(
+            "Perfectionists led-unit Lethal Hits grant; once-per-battle Euphoric Strikes Attacks "
+            "and Armour Penetration modifiers; conditional Lord of the Host Infiltrators and "
+            "Scouts 6-inch grants."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Tormentors",
+        datasheet_id="000004079",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Infiltrators and the Thrill Seekers army-rule handler are implemented paths; the "
+            "source overlay applies the updated power sword Strength."
+        ),
+        semantics_needed=(
+            "Objective Defiled sticky-objective control and Icon of Excess end-of-phase "
+            "Leadership test and Command point reward."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Infractors",
+        datasheet_id="000004080",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Scouts 6 inches and the Thrill Seekers army-rule handler are implemented paths; "
+            "the source overlay applies the updated power sword Strength."
+        ),
+        semantics_needed=(
+            "Excessive Assault conditional Wound re-rolls and Icon of Excess end-of-phase "
+            "Leadership test and Command point reward."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Chaos Terminators",
+        datasheet_id="000004081",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deep Strike and the Thrill Seekers army-rule handler are implemented paths; the "
+            "source overlay applies the updated Lethal Obsession text."
+        ),
+        semantics_needed=(
+            "Lethal Obsession must persist the sole shooting target and condition the later "
+            "Charge-roll re-roll on declaring against that target."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Lucius the Eternal",
+        datasheet_id="000004083",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Feel No Pain 5+, Leader, Lone Operative, and the Thrill Seekers army-rule handler "
+            "are implemented paths."
+        ),
+        semantics_needed=(
+            "A Challenge Worthy of Skill keyword-targeted Hit and Wound re-rolls and Duelist's "
+            "Hubris conditional Fights First while not leading a unit."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Lord Kakophonist",
+        datasheet_id="000004084",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Leader and the Thrill Seekers army-rule handler are implemented paths."
+        ),
+        semantics_needed=(
+            "Obsessive Annunciation ranged Sustained Hits 1 grant and Doom Siren post-shoot "
+            "mortal wounds followed by a conditional Battle-shock test."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Sorcerer",
+        datasheet_id="000004085",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Leader and the Thrill Seekers army-rule handler are implemented paths."
+        ),
+        semantics_needed=(
+            "Warped Interference ranged-cover grant and Wracking Agonies persisted Move and "
+            "Charge-roll penalties on a unit hit by Agonising Energies."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Noise Marines",
+        datasheet_id="000004088",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics="The Thrill Seekers army-rule handler is implemented.",
+        semantics_needed=(
+            "Terrifying Crescendo must persist and stack its Battle-shock and Leadership test "
+            "penalty, including the Faction Pack FAQ clarification."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_EMPERORS_CHILDREN_GROUP,
+        datasheet="Flawless Blades",
+        datasheet_id="000004089",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "The Thrill Seekers army-rule handler is implemented; the source overlay applies "
+            "the updated Blissblade Attacks characteristic."
+        ),
+        semantics_needed=(
+            "Daemonic Patrons Critical Wound threshold, phase-scoped state, destroyed-enemy "
+            "attribution, and end-of-Fight self-destruction."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_VEHICLES_GROUP,
+        datasheet="Chaos Land Raider",
+        datasheet_id="000004082",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deadly Demise D6 and the Thrill Seekers army-rule handler are implemented paths; "
+            "the source overlay adds the Frame keyword."
+        ),
+        semantics_needed="Assault Ramp post-Normal-move disembark and Charge eligibility.",
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_VEHICLES_GROUP,
+        datasheet="Chaos Rhino",
+        datasheet_id="000004093",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deadly Demise D3, Firing Deck 2, and the Thrill Seekers army-rule handler are "
+            "implemented paths; the source overlay adds the Frame keyword."
+        ),
+        semantics_needed=(
+            "Assault Vehicle post-Advance disembark, Normal-move treatment, Charge denial, and "
+            "remaining action eligibility."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_VEHICLES_GROUP,
+        datasheet="Chaos Spawn",
+        datasheet_id="000004090",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Feel No Pain 5+ and the Thrill Seekers army-rule handler are implemented paths; "
+            "the source overlay applies the updated Scuttling Horrors trigger text."
+        ),
+        semantics_needed=(
+            "Scuttling Horrors once-per-turn enemy-move trigger and PathWitness-backed Normal "
+            "move of up to 6 inches."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_VEHICLES_GROUP,
+        datasheet="Maulerfiend",
+        datasheet_id="000004091",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deadly Demise D3 and the Thrill Seekers army-rule handler are implemented paths."
+        ),
+        semantics_needed=(
+            "Glutton for Punishment Hit modifier below Starting Strength and additional Wound "
+            "modifier while Below Half-strength."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_VEHICLES_GROUP,
+        datasheet="Heldrake",
+        datasheet_id="000004092",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deadly Demise D3, Hover, and the Thrill Seekers army-rule handler are implemented "
+            "paths; the overlay applies Movement, Save, Objective Control, and Aircraft-removal "
+            "updates."
+        ),
+        semantics_needed=(
+            "Airborne Predator moved-over target detection with PathWitness evidence and its "
+            "Fly-sensitive mortal-wound rolls."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_VEHICLES_GROUP,
+        datasheet="Defiler",
+        datasheet_id="000004208",
+        ir_coverage="IR parsed; host needed",
+        supported_semantics=(
+            "Deadly Demise D6, Revel in Desecration hit modifier, Scuttling Walker movement "
+            "transit, and the Thrill Seekers army-rule behavior are implemented."
+        ),
+        semantics_needed=(
+            "Bind the exact Thrill Seekers source ability row to the existing named army-rule "
+            "handler so generated evidence no longer reports it as descriptor-only."
+        ),
+        catalog_blockers=(
+            "No known catalog blocker; catalog, model geometry, wargear, and weapon-keyword "
+            "evidence are Full in the generated DatasheetSupportRow."
+        ),
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_SLAANESH_DAEMONS_GROUP,
+        datasheet="Daemon Prince of Slaanesh",
+        datasheet_id="000004086",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deadly Demise D3 and the Thrill Seekers army-rule handler are implemented paths."
+        ),
+        semantics_needed=(
+            "Lord of Excess conditional Lone Operative, Excessive Vigour charged-unit melee "
+            "Armour Penetration aura, and Ecstatic Death fight-on-death sequencing."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_SLAANESH_DAEMONS_GROUP,
+        datasheet="Daemon Prince of Slaanesh with Wings",
+        datasheet_id="000004087",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deadly Demise D3, Deep Strike, and the Thrill Seekers army-rule handler are "
+            "implemented paths."
+        ),
+        semantics_needed=(
+            "Daemonic Destruction charge-end mortal wounds capped at six and Stimulated by Pain "
+            "incoming Damage reduction."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_SLAANESH_DAEMONS_GROUP,
+        datasheet="Daemonettes",
+        datasheet_id="000004095",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deep Strike, Fights First, Daemonic Icon Leadership, Instrument of Chaos Charge "
+            "modifier, and Pact of Excess mustering restrictions are implemented paths."
+        ),
+        semantics_needed=(
+            "Horrifying Beauty Fight-start Battle-shock tests with the Below Half-strength "
+            "modifier."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_SLAANESH_DAEMONS_GROUP,
+        datasheet="Fiends",
+        datasheet_id="000004096",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics="Deep Strike and Pact of Excess mustering restrictions are paths.",
+        semantics_needed=(
+            "Soporific Musk Fall Back Desperate Escape tests, Monster/Vehicle exclusions, and "
+            "the Battle-shocked test modifier."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_SLAANESH_DAEMONS_GROUP,
+        datasheet="Keeper of Secrets",
+        datasheet_id="000004097",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deadly Demise D6, Deep Strike, hit-roll modifiers, Shining Aegis Save override, and "
+            "Pact of Excess mustering restrictions are implemented generic paths."
+        ),
+        semantics_needed=(
+            "Daemon Lord of Slaanesh melee Armour Penetration aura for Legions of Excess units "
+            "and exact Mesmerising Form source binding."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_SLAANESH_DAEMONS_GROUP,
+        datasheet="Seekers",
+        datasheet_id="000004098",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deep Strike, Scouts 9 inches, Daemonic Icon Leadership, Instrument of Chaos Charge "
+            "modifier, and Pact of Excess mustering restrictions are implemented paths."
+        ),
+        semantics_needed="Unholy Speed Advance- and Charge-roll re-roll permissions.",
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+    EmperorsChildrenDatasheetReviewRow(
+        group=_SLAANESH_DAEMONS_GROUP,
+        datasheet="Shalaxi Helbane",
+        datasheet_id="000004094",
+        ir_coverage="Bridge/catalog blocked",
+        supported_semantics=(
+            "Deadly Demise D6, Deep Strike, and Pact of Excess mustering restrictions are "
+            "implemented paths."
+        ),
+        semantics_needed=(
+            "No Prey Can Evade Advance and Charge re-rolls and Monarch of the Hunt deterministic "
+            "quarry selection, re-rolls, destruction tracking, and reselection."
+        ),
+        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+    ),
+)
 
 _DETACHMENT_PDF_REFERENCE_BY_ID = {
     "elegant-brutes": "Physical PDF page 2",
@@ -322,6 +699,97 @@ def emperors_children_detachment_semantics_needed(detachment_id: str) -> str:
             "description."
         )
     return description
+
+
+def emperors_children_datasheet_support_markdown(
+    *,
+    review_rows: tuple[tuple[str, str, str, str | None], ...],
+    generated_support_datasheet_ids: frozenset[str],
+) -> list[str]:
+    review_by_id = {row[0]: row for row in review_rows}
+    expected_by_id = {row.datasheet_id: row for row in _DATASHEET_REVIEW_ROWS}
+    if review_by_id.keys() != expected_by_id.keys():
+        raise ValueError(
+            "Emperor's Children datasheet semantic review must cover every manifest row exactly."
+        )
+    if generated_support_datasheet_ids != {"000004208"}:
+        raise ValueError(
+            "Emperor's Children generated support-row inventory changed; review the custom "
+            "datasheet evidence before regenerating documentation."
+        )
+    for datasheet_id, (_, datasheet_name, _, _) in review_by_id.items():
+        if datasheet_name != expected_by_id[datasheet_id].datasheet:
+            raise ValueError(
+                "Emperor's Children datasheet semantic review name drifted from the manifest."
+            )
+
+    lines: list[str] = []
+    for group, intro in _DATASHEET_GROUP_INTROS.items():
+        lines.extend(
+            (
+                f"### {group}",
+                "",
+                (
+                    f"{intro} `All consumed` means every known non-core datasheet or wargear "
+                    "ability is consumed by an engine runtime host. `IR parsed; host needed` "
+                    "means the exact text compiles to structured IR but at least one semantic "
+                    "lacks a phase or query consumer. `Unsupported IR` means at least one exact "
+                    "ability has blocking parser diagnostics. `Bridge/catalog blocked` means "
+                    "source normalization or generated catalog evidence prevents a safe "
+                    "playability claim."
+                ),
+                "",
+                (
+                    "| Datasheet | Source basis | IR coverage | Supported semantics | "
+                    "IR semantics still needed | Bridge / catalog blockers |"
+                ),
+                "| --- | --- | --- | --- | --- | --- |",
+            )
+        )
+        for row in sorted(
+            (review_row for review_row in _DATASHEET_REVIEW_ROWS if review_row.group == group),
+            key=lambda review_row: (review_row.datasheet.lower(), review_row.datasheet_id),
+        ):
+            _, _, treatment, pdf_page_reference = review_by_id[row.datasheet_id]
+            lines.append(
+                "| "
+                + " | ".join(
+                    (
+                        f"{_markdown_text(row.datasheet)} (`{row.datasheet_id}`)",
+                        _markdown_text(
+                            _datasheet_source_basis(
+                                treatment=treatment,
+                                pdf_page_reference=pdf_page_reference,
+                            )
+                        ),
+                        _markdown_text(row.ir_coverage),
+                        _markdown_text(row.supported_semantics),
+                        _markdown_text(row.semantics_needed),
+                        _markdown_text(row.catalog_blockers),
+                    )
+                )
+                + " |"
+            )
+        lines.append("")
+    return lines[:-1]
+
+
+def _datasheet_source_basis(*, treatment: str, pdf_page_reference: str | None) -> str:
+    if treatment == "complete_pdf":
+        expected = "Complete Datasheet, physical PDF pages 7-8"
+        if pdf_page_reference != expected:
+            raise ValueError("Emperor's Children complete datasheet page reference drifted.")
+        return "PDF pages 7-8; supersedes the pinned predecessor row."
+    if treatment == "rules_update":
+        expected = "Rules Updates, physical PDF page 9"
+        if pdf_page_reference != expected:
+            raise ValueError("Emperor's Children Rules Update page reference drifted.")
+        return "Pinned predecessor row plus PDF Rules Updates, physical page 9."
+    if treatment == "unchanged_predecessor":
+        if pdf_page_reference is not None:
+            raise ValueError("Unchanged Emperor's Children rows must not cite a PDF page.")
+        return "Pinned predecessor row; not reprinted or updated in the PDF."
+    raise ValueError(f"Unsupported Emperor's Children datasheet source treatment {treatment!r}.")
 
 
 def _exact_source_rows_snapshot_markdown(

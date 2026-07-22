@@ -1,6 +1,7 @@
 # pyright: reportPrivateUsage=false
 from __future__ import annotations
 
+from tools.faction_pack_datasheet_review import faction_pack_datasheet_review
 from tools.generate_ability_support_matrix import (
     _ability_datasheet_pairs_text,
     _inline_code_list,
@@ -72,7 +73,22 @@ def test_faction_support_renderer_preserves_section_order() -> None:
         < emperors_children.index("## Datasheet / Unit Support")
     )
     assert "Court of the Phoenician | `Full`" in emperors_children
-    assert "### Unit Datasheet Source Treatments" in emperors_children
+    assert "### Unit Datasheet Source Treatments" not in emperors_children
+    assert "### Datasheet Ability Details" not in emperors_children
+    support_markdown = emperors_children.split("## Datasheet / Unit Support", 1)[1]
+    assert "### Emperor's Children" in support_markdown
+    assert "### Vehicles and Daemon Engines" in support_markdown
+    assert "### Slaanesh Daemons" in support_markdown
+    expected_header = (
+        "| Datasheet | Source basis | IR coverage | Supported semantics | "
+        "IR semantics still needed | Bridge / catalog blockers |"
+    )
+    assert support_markdown.count(expected_header) == 3
+    review = faction_pack_datasheet_review("emperors-children")
+    assert len(review.rows) == 23
+    for row in review.rows:
+        assert row.datasheet_id is not None
+        assert support_markdown.count(f"| {row.datasheet_name} (`{row.datasheet_id}`) |") == 1
     assert "## Detachment Rule Coverage Rows" not in emperors_children
 
 
