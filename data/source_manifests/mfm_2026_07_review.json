@@ -1,0 +1,1275 @@
+{
+  "current_source_date": "2026-07-22",
+  "current_source_package_id": "gw-11e-mfm-2026-07",
+  "current_source_payload_checksum_sha256": "2232872565be8652618da1152e6ddb875d8dff2bc74d1e2dcd54d1f16f8cf281",
+  "current_source_version": "v1.1",
+  "excluded_faction_ids": [
+    "chaos-titan-legions",
+    "titan-legions"
+  ],
+  "factions": {
+    "adepta-sororitas": {
+      "current_detachment_record_count": 8,
+      "current_unit_record_count": 33,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "bringers-of-flame",
+        "penitent-host",
+        "sanctified-orators"
+      ],
+      "enhancement_points_changed": [
+        "penitent-host:catechism-of-divine-penitence",
+        "penitent-host:psalm-of-righteous-judgement",
+        "penitent-host:refrain-of-enduring-faith"
+      ],
+      "leader_assignments_changed": [
+        "units-canoness-with-jump-pack"
+      ],
+      "previous_detachment_record_count": 8,
+      "previous_unit_record_count": 33,
+      "status": "changed",
+      "support_assignments_captured": [
+        "units-dialogus",
+        "units-dogmata",
+        "units-hospitaller",
+        "units-imagifier"
+      ],
+      "unit_point_rows_changed": [
+        "units-celestian-sacresants",
+        "units-dominion-squad",
+        "units-hospitaller",
+        "units-imagifier",
+        "units-immolator",
+        "units-intranzia-fraye",
+        "units-junith-eruita",
+        "units-morvenn-vahl",
+        "units-repentia-squad",
+        "units-seraphim-squad",
+        "units-sisters-novitiate-squad",
+        "units-sororitas-rhino",
+        "units-zephyrim-squad"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [],
+      "wargear_costs_changed": []
+    },
+    "adeptus-custodes": {
+      "current_detachment_record_count": 9,
+      "current_unit_record_count": 30,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "might-of-the-moritoi"
+      ],
+      "enhancement_points_changed": [
+        "lions-of-the-emperor:admonimortis",
+        "shield-host:from-the-hall-of-armouries"
+      ],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 9,
+      "previous_unit_record_count": 30,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-aleya",
+        "units-anathema-psykana-rhino",
+        "units-custodian-wardens",
+        "units-venatari-custodians"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [],
+      "wargear_costs_changed": [
+        "units-venatari-custodians"
+      ]
+    },
+    "adeptus-mechanicus": {
+      "current_detachment_record_count": 10,
+      "current_unit_record_count": 34,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "haloscreed-battle-clade"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 10,
+      "previous_unit_record_count": 34,
+      "status": "changed",
+      "support_assignments_captured": [
+        "units-skitarii-marshal",
+        "units-technoarcheologist"
+      ],
+      "unit_point_rows_changed": [
+        "units-hastarii-exterminators",
+        "units-ironstrider-ballistarii",
+        "units-kataphron-breachers",
+        "units-kataphron-destroyers",
+        "units-serberys-raiders",
+        "units-serberys-sulphurhounds",
+        "units-skitarii-vanguard",
+        "units-skorpius-dunerider"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [],
+      "wargear_costs_changed": []
+    },
+    "aeldari": {
+      "current_detachment_record_count": 15,
+      "current_unit_record_count": 71,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "eldritch-raiders",
+        "warhost"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 15,
+      "previous_unit_record_count": 71,
+      "status": "changed",
+      "support_assignments_captured": [
+        "units-warlock"
+      ],
+      "unit_point_rows_changed": [
+        "harlequins-death-jester",
+        "harlequins-shadowseer",
+        "harlequins-skyweavers",
+        "harlequins-starweaver",
+        "units-autarch",
+        "units-autarch-wayleaper",
+        "units-corsair-skyreavers",
+        "units-corsair-voidscarred",
+        "units-farseer",
+        "units-farseer-skyrunner",
+        "units-shining-spears",
+        "units-shroud-runners",
+        "units-swooping-hawks",
+        "units-war-walkers",
+        "units-warlock-skyrunners",
+        "units-warp-spiders",
+        "units-wave-serpent",
+        "units-windriders",
+        "units-wraithknight",
+        "units-wraithknight-with-ghostglaive",
+        "ynnari-ynnari-incubi",
+        "ynnari-ynnari-raider",
+        "ynnari-ynnari-venom"
+      ],
+      "unit_records_added": [
+        "units-avatar-of-khaine"
+      ],
+      "unit_records_removed": [
+        "units-baharroth"
+      ],
+      "wargear_costs_changed": []
+    },
+    "astra-militarum": {
+      "current_detachment_record_count": 11,
+      "current_unit_record_count": 71,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "combined-arms",
+        "mechanised-assault"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 11,
+      "previous_unit_record_count": 71,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-banehammer",
+        "units-banesword",
+        "units-cadian-command-squad",
+        "units-centaur-rsv",
+        "units-chimera",
+        "units-commissar-yarrick",
+        "units-doomhammer",
+        "units-hellhammer",
+        "units-kasrkin",
+        "units-krieg-command-squad",
+        "units-leman-russ-commander",
+        "units-leman-russ-demolisher",
+        "units-militarum-tempestus-command-squad",
+        "units-shadowsword",
+        "units-stormlord",
+        "units-stormsword",
+        "units-taurox",
+        "units-taurox-prime",
+        "units-tempestus-aquilons",
+        "units-tempestus-scions"
+      ],
+      "unit_records_added": [
+        "units-avenger-strike-fighter"
+      ],
+      "unit_records_removed": [
+        "units-baneblade"
+      ],
+      "wargear_costs_changed": [
+        "units-leman-russ-commander"
+      ]
+    },
+    "black-templars": {
+      "current_detachment_record_count": 20,
+      "current_unit_record_count": 89,
+      "detachment_records_added": [
+        "vengeful-hosts"
+      ],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "firestorm-assault-force",
+        "fulguris-task-force",
+        "godhammer-assault-force",
+        "ironstorm-spearhead",
+        "subversion-assets",
+        "the-living-miracle"
+      ],
+      "enhancement_points_changed": [
+        "gladius-task-force:artificer-armour",
+        "ironstorm-spearhead:the-flesh-is-weak"
+      ],
+      "leader_assignments_changed": [
+        "space-marines-captain"
+      ],
+      "previous_detachment_record_count": 19,
+      "previous_unit_record_count": 89,
+      "status": "changed",
+      "support_assignments_captured": [
+        "space-marines-ancient",
+        "space-marines-ancient-in-terminator-armour",
+        "space-marines-apothecary-biologis",
+        "space-marines-bladeguard-ancient",
+        "space-marines-lieutenant",
+        "space-marines-lieutenant-in-phobos-armour",
+        "space-marines-lieutenant-in-reiver-armour",
+        "units-castellan",
+        "units-crusade-ancient"
+      ],
+      "unit_point_rows_changed": [
+        "space-marines-aggressor-squad",
+        "space-marines-drop-pod",
+        "space-marines-eradicator-squad-with-heavy-bolters",
+        "space-marines-inceptor-squad",
+        "space-marines-infernus-squad",
+        "space-marines-land-speeder",
+        "space-marines-lieutenant-with-combi-weapon",
+        "space-marines-razorback",
+        "space-marines-rhino",
+        "space-marines-storm-speeder-hammerstrike",
+        "space-marines-suppressor-squad",
+        "space-marines-vanguard-veteran-squad-with-jump-packs",
+        "units-chaplain-grimaldus",
+        "units-crusade-ancient",
+        "units-emperors-champion",
+        "units-execrator",
+        "units-high-marshal-helbrecht",
+        "units-impulsor",
+        "units-marshal",
+        "units-repulsor-executioner"
+      ],
+      "unit_records_added": [
+        "units-crusader-squad"
+      ],
+      "unit_records_removed": [
+        "space-marines-apothecary"
+      ],
+      "wargear_costs_changed": [
+        "space-marines-centurion-devastator-squad",
+        "units-repulsor-executioner"
+      ]
+    },
+    "blood-angels": {
+      "current_detachment_record_count": 24,
+      "current_unit_record_count": 97,
+      "detachment_records_added": [
+        "vengeful-hosts"
+      ],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "1st-company-task-force",
+        "firestorm-assault-force",
+        "fulguris-task-force",
+        "ironstorm-spearhead",
+        "subversion-assets"
+      ],
+      "enhancement_points_changed": [
+        "gladius-task-force:artificer-armour",
+        "ironstorm-spearhead:the-flesh-is-weak",
+        "librarius-conclave:fusillade",
+        "librarius-conclave:temporal-corridor"
+      ],
+      "leader_assignments_changed": [
+        "space-marines-captain",
+        "space-marines-librarian-in-phobos-armour"
+      ],
+      "previous_detachment_record_count": 23,
+      "previous_unit_record_count": 98,
+      "status": "changed",
+      "support_assignments_captured": [
+        "space-marines-ancient",
+        "space-marines-ancient-in-terminator-armour",
+        "space-marines-apothecary-biologis",
+        "space-marines-bladeguard-ancient",
+        "space-marines-lieutenant",
+        "space-marines-lieutenant-in-phobos-armour",
+        "space-marines-lieutenant-in-reiver-armour",
+        "units-sanguinary-priest"
+      ],
+      "unit_point_rows_changed": [
+        "space-marines-aggressor-squad",
+        "space-marines-drop-pod",
+        "space-marines-eradicator-squad-with-heavy-bolters",
+        "space-marines-impulsor",
+        "space-marines-inceptor-squad",
+        "space-marines-infernus-squad",
+        "space-marines-land-speeder",
+        "space-marines-librarian",
+        "space-marines-lieutenant-with-combi-weapon",
+        "space-marines-razorback",
+        "space-marines-rhino",
+        "space-marines-sternguard-veteran-squad",
+        "space-marines-storm-speeder-hammerstrike",
+        "space-marines-suppressor-squad",
+        "space-marines-vanguard-veteran-squad-with-jump-packs"
+      ],
+      "unit_records_added": [
+        "units-chief-librarian-mephiston"
+      ],
+      "unit_records_removed": [
+        "space-marines-apothecary",
+        "units-commander-dante"
+      ],
+      "wargear_costs_changed": [
+        "space-marines-centurion-devastator-squad",
+        "space-marines-repulsor-executioner"
+      ]
+    },
+    "chaos-daemons": {
+      "current_detachment_record_count": 9,
+      "current_unit_record_count": 53,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "lords-of-the-warp"
+      ],
+      "enhancement_points_changed": [
+        "scintillating-legion:inescapable-eye",
+        "scintillating-legion:infernal-puppeteer",
+        "scintillating-legion:neverblade"
+      ],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 9,
+      "previous_unit_record_count": 52,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-beasts-of-nurgle",
+        "units-bloodcrushers",
+        "units-fluxmaster",
+        "units-kairos-fateweaver",
+        "units-lord-of-change",
+        "units-shalaxi-helbane"
+      ],
+      "unit_records_added": [
+        "units-bloodmaster"
+      ],
+      "unit_records_removed": [],
+      "wargear_costs_changed": []
+    },
+    "chaos-knights": {
+      "current_detachment_record_count": 8,
+      "current_unit_record_count": 20,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "bastions-of-tyranny",
+        "infernal-lance",
+        "lords-of-dread"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 8,
+      "previous_unit_record_count": 19,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-war-dog-huntsman",
+        "units-war-dog-stalker"
+      ],
+      "unit_records_added": [
+        "units-chaos-cerastus-knight-atrapos"
+      ],
+      "unit_records_removed": [],
+      "wargear_costs_changed": []
+    },
+    "chaos-space-marines": {
+      "current_detachment_record_count": 17,
+      "current_unit_record_count": 54,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "murdertalon-raiders",
+        "soulforged-warpack"
+      ],
+      "enhancement_points_changed": [
+        "soulforged-warpack:tempting-addendum"
+      ],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 17,
+      "previous_unit_record_count": 54,
+      "status": "changed",
+      "support_assignments_captured": [
+        "units-master-of-executions",
+        "units-masters-of-the-maelstrom"
+      ],
+      "unit_point_rows_changed": [
+        "units-abaddon-the-despoiler",
+        "units-accursed-cultists",
+        "units-chaos-land-raider",
+        "units-chaos-lord-with-jump-pack",
+        "units-chaos-predator-annihilator",
+        "units-chaos-predator-destructor",
+        "units-chaos-rhino",
+        "units-chaos-terminator-squad",
+        "units-chosen",
+        "units-dark-commune",
+        "units-defiler",
+        "units-huron-blackheart",
+        "units-masters-of-the-maelstrom",
+        "units-mutilators",
+        "units-nemesis-claw",
+        "units-red-corsairs-reave-captain",
+        "units-vashtorr-the-arkifane",
+        "units-venomcrawler"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [],
+      "wargear_costs_changed": [
+        "units-defiler"
+      ]
+    },
+    "dark-angels": {
+      "current_detachment_record_count": 24,
+      "current_unit_record_count": 99,
+      "detachment_records_added": [
+        "vengeful-hosts"
+      ],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "1st-company-task-force",
+        "firestorm-assault-force",
+        "fulguris-task-force",
+        "interrogation-conclave",
+        "ironstorm-spearhead",
+        "subversion-assets"
+      ],
+      "enhancement_points_changed": [
+        "gladius-task-force:artificer-armour",
+        "ironstorm-spearhead:the-flesh-is-weak",
+        "librarius-conclave:fusillade",
+        "librarius-conclave:temporal-corridor",
+        "lions-blade-task-force:stalwart-champion"
+      ],
+      "leader_assignments_changed": [
+        "space-marines-captain",
+        "space-marines-librarian-in-phobos-armour"
+      ],
+      "previous_detachment_record_count": 23,
+      "previous_unit_record_count": 99,
+      "status": "changed",
+      "support_assignments_captured": [
+        "space-marines-ancient",
+        "space-marines-ancient-in-terminator-armour",
+        "space-marines-apothecary-biologis",
+        "space-marines-bladeguard-ancient",
+        "space-marines-lieutenant",
+        "space-marines-lieutenant-in-phobos-armour",
+        "space-marines-lieutenant-in-reiver-armour"
+      ],
+      "unit_point_rows_changed": [
+        "space-marines-aggressor-squad",
+        "space-marines-drop-pod",
+        "space-marines-eradicator-squad-with-heavy-bolters",
+        "space-marines-impulsor",
+        "space-marines-inceptor-squad",
+        "space-marines-infernus-squad",
+        "space-marines-land-speeder",
+        "space-marines-librarian",
+        "space-marines-lieutenant-with-combi-weapon",
+        "space-marines-razorback",
+        "space-marines-rhino",
+        "space-marines-sternguard-veteran-squad",
+        "space-marines-storm-speeder-hammerstrike",
+        "space-marines-suppressor-squad",
+        "space-marines-vanguard-veteran-squad-with-jump-packs",
+        "units-inner-circle-companions",
+        "units-land-speeder-vengeance",
+        "units-lion-eljonson",
+        "units-nephilim-jetfighter",
+        "units-ravenwing-black-knights",
+        "units-ravenwing-command-squad",
+        "units-ravenwing-darkshroud",
+        "units-sammael"
+      ],
+      "unit_records_added": [
+        "units-deathwing-knights"
+      ],
+      "unit_records_removed": [
+        "space-marines-apothecary"
+      ],
+      "wargear_costs_changed": [
+        "space-marines-centurion-devastator-squad",
+        "space-marines-repulsor-executioner"
+      ]
+    },
+    "death-guard": {
+      "current_detachment_record_count": 9,
+      "current_unit_record_count": 35,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "contagion-engines"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 9,
+      "previous_unit_record_count": 35,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-chaos-predator-annihilator",
+        "units-chaos-rhino",
+        "units-deathshroud-terminators",
+        "units-defiler",
+        "units-mortarion",
+        "units-plague-marines"
+      ],
+      "unit_records_added": [
+        "plague-legions-plague-drones"
+      ],
+      "unit_records_removed": [
+        "plague-legions-rotigus"
+      ],
+      "wargear_costs_changed": [
+        "units-defiler"
+      ]
+    },
+    "deathwatch": {
+      "current_detachment_record_count": 17,
+      "current_unit_record_count": 88,
+      "detachment_records_added": [
+        "vengeful-hosts"
+      ],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "1st-company-task-force",
+        "black-spear-task-force",
+        "firestorm-assault-force",
+        "fulguris-task-force",
+        "ironstorm-spearhead",
+        "subversion-assets"
+      ],
+      "enhancement_points_changed": [
+        "gladius-task-force:artificer-armour",
+        "ironstorm-spearhead:the-flesh-is-weak",
+        "librarius-conclave:fusillade",
+        "librarius-conclave:temporal-corridor"
+      ],
+      "leader_assignments_changed": [
+        "space-marines-captain",
+        "space-marines-librarian-in-phobos-armour"
+      ],
+      "previous_detachment_record_count": 16,
+      "previous_unit_record_count": 88,
+      "status": "changed",
+      "support_assignments_captured": [
+        "space-marines-ancient",
+        "space-marines-ancient-in-terminator-armour",
+        "space-marines-apothecary-biologis",
+        "space-marines-bladeguard-ancient",
+        "space-marines-lieutenant",
+        "space-marines-lieutenant-in-phobos-armour",
+        "space-marines-lieutenant-in-reiver-armour"
+      ],
+      "unit_point_rows_changed": [
+        "space-marines-aggressor-squad",
+        "space-marines-drop-pod",
+        "space-marines-eradicator-squad-with-heavy-bolters",
+        "space-marines-impulsor",
+        "space-marines-inceptor-squad",
+        "space-marines-infernus-squad",
+        "space-marines-land-speeder",
+        "space-marines-librarian",
+        "space-marines-lieutenant-with-combi-weapon",
+        "space-marines-razorback",
+        "space-marines-rhino",
+        "space-marines-sternguard-veteran-squad",
+        "space-marines-storm-speeder-hammerstrike",
+        "space-marines-suppressor-squad",
+        "space-marines-vanguard-veteran-squad-with-jump-packs"
+      ],
+      "unit_records_added": [
+        "units-fortis-kill-team"
+      ],
+      "unit_records_removed": [
+        "space-marines-apothecary"
+      ],
+      "wargear_costs_changed": [
+        "space-marines-centurion-devastator-squad",
+        "space-marines-repulsor-executioner"
+      ]
+    },
+    "drukhari": {
+      "current_detachment_record_count": 9,
+      "current_unit_record_count": 22,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "covenite-coterie",
+        "exhibition-of-slaughter",
+        "kabalite-agonysts"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [
+        "units-haemonculus"
+      ],
+      "previous_detachment_record_count": 9,
+      "previous_unit_record_count": 23,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-raider",
+        "units-ravager",
+        "units-venom"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [
+        "units-hand-of-the-archon"
+      ],
+      "wargear_costs_changed": []
+    },
+    "emperors-children": {
+      "current_detachment_record_count": 10,
+      "current_unit_record_count": 23,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "carnival-of-excess",
+        "coterie-of-the-conceited",
+        "frenzied-host",
+        "spectacle-of-slaughter"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 10,
+      "previous_unit_record_count": 21,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-chaos-rhino",
+        "units-defiler",
+        "units-fulgrim",
+        "units-lucius-the-eternal",
+        "units-maulerfiend",
+        "units-sorcerer"
+      ],
+      "unit_records_added": [
+        "legions-of-excess-shalaxi-helbane",
+        "units-daemon-prince-of-slaanesh"
+      ],
+      "unit_records_removed": [],
+      "wargear_costs_changed": [
+        "units-defiler"
+      ]
+    },
+    "genestealer-cults": {
+      "current_detachment_record_count": 9,
+      "current_unit_record_count": 24,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "heroes-of-the-uprising",
+        "xenocult-masses"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 9,
+      "previous_unit_record_count": 24,
+      "status": "changed",
+      "support_assignments_captured": [
+        "units-biophagus",
+        "units-clamavus",
+        "units-locus",
+        "units-nexos"
+      ],
+      "unit_point_rows_changed": [
+        "units-aberrants",
+        "units-achilles-ridgerunners",
+        "units-acolyte-hybrids-with-hand-flamers",
+        "units-atalan-jackals",
+        "units-goliath-truck",
+        "units-hybrid-metamorphs",
+        "units-neophyte-hybrids",
+        "units-purestrain-genestealers",
+        "units-reductus-saboteur"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [],
+      "wargear_costs_changed": []
+    },
+    "grey-knights": {
+      "current_detachment_record_count": 9,
+      "current_unit_record_count": 26,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "argent-assault",
+        "immaterial-interdiction",
+        "warpbane-task-force"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 9,
+      "previous_unit_record_count": 25,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-brotherhood-terminator-squad",
+        "units-grand-master-voldus",
+        "units-razorback",
+        "units-rhino",
+        "units-strike-squad"
+      ],
+      "unit_records_added": [
+        "units-brotherhood-librarian"
+      ],
+      "unit_records_removed": [],
+      "wargear_costs_changed": []
+    },
+    "imperial-agents": {
+      "current_detachment_record_count": 5,
+      "current_unit_record_count": 57,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "imperialis-fleet",
+        "ordo-hereticus-purgation-force",
+        "ordo-malleus-daemon-hunters",
+        "ordo-xenos-alien-hunters",
+        "veiled-blade-elimination-force"
+      ],
+      "enhancement_points_changed": [
+        "veiled-blade-elimination-force:decoy-targets",
+        "veiled-blade-elimination-force:esoteric-explosives",
+        "veiled-blade-elimination-force:introneural-biotech",
+        "veiled-blade-elimination-force:micromelta-rounds"
+      ],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 5,
+      "previous_unit_record_count": 58,
+      "status": "changed",
+      "support_assignments_captured": [
+        "every-model-has-the-imperium-keyword-ministorum-priest",
+        "units-ministorum-priest"
+      ],
+      "unit_point_rows_changed": [
+        "every-model-has-the-imperium-keyword-deathwatch-kill-team",
+        "every-model-has-the-imperium-keyword-eversor-assassin",
+        "every-model-has-the-imperium-keyword-grey-knights-terminator-squad",
+        "every-model-has-the-imperium-keyword-imperial-rhino",
+        "every-model-has-the-imperium-keyword-inquisitorial-chimera",
+        "every-model-has-the-imperium-keyword-sisters-of-battle-immolator",
+        "every-model-has-the-imperium-keyword-sisters-of-battle-squad",
+        "every-model-has-the-imperium-keyword-watch-master",
+        "units-eversor-assassin",
+        "units-grey-knights-terminator-squad",
+        "units-imperial-rhino",
+        "units-inquisitorial-chimera",
+        "units-sisters-of-battle-immolator"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [
+        "every-model-has-the-imperium-keyword-exaction-squad"
+      ],
+      "wargear_costs_changed": []
+    },
+    "imperial-knights": {
+      "current_detachment_record_count": 8,
+      "current_unit_record_count": 21,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "dominus-foebreakers",
+        "freeblade-company",
+        "gate-warden-lance"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 8,
+      "previous_unit_record_count": 22,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-armiger-moirax",
+        "units-knight-castellan"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [
+        "units-armiger-warglaive"
+      ],
+      "wargear_costs_changed": []
+    },
+    "leagues-of-votann": {
+      "current_detachment_record_count": 10,
+      "current_unit_record_count": 22,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [],
+      "enhancement_points_changed": [
+        "armoured-trailblazers:saturation-rounds"
+      ],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 10,
+      "previous_unit_record_count": 22,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-berehk-stornbr-w",
+        "units-br-khyr-iron-master",
+        "units-br-khyr-thunderkyn",
+        "units-buri-aegnirssen",
+        "units-kapricus-carrier",
+        "units-sagitaur"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [],
+      "wargear_costs_changed": []
+    },
+    "necrons": {
+      "current_detachment_record_count": 12,
+      "current_unit_record_count": 52,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "pantheon-of-woe"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 12,
+      "previous_unit_record_count": 52,
+      "status": "changed",
+      "support_assignments_captured": [
+        "units-chronomancer",
+        "units-geomancer",
+        "units-orikan-the-diviner",
+        "units-plasmancer",
+        "units-psychomancer",
+        "units-technomancer"
+      ],
+      "unit_point_rows_changed": [
+        "units-canoptek-reanimator",
+        "units-chronomancer",
+        "units-doomsday-ark",
+        "units-lokhust-destroyers",
+        "units-lokhust-heavy-destroyers",
+        "units-nekrosor-ammentar",
+        "units-skorpekh-lord",
+        "units-tesseract-vault",
+        "units-the-silent-king"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [],
+      "wargear_costs_changed": []
+    },
+    "orks": {
+      "current_detachment_record_count": 13,
+      "current_unit_record_count": 58,
+      "detachment_records_added": [
+        "equatorial-hordes"
+      ],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "dread-mob",
+        "green-tide",
+        "more-dakka",
+        "taktikal-brigade"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 12,
+      "previous_unit_record_count": 57,
+      "status": "changed",
+      "support_assignments_captured": [
+        "units-bannernob",
+        "units-painboy"
+      ],
+      "unit_point_rows_changed": [
+        "units-big-mek-dakkarig",
+        "units-big-mek-with-shokk-attack-gun",
+        "units-boyz",
+        "units-gretchin",
+        "units-mek",
+        "units-painboss",
+        "units-painboy",
+        "units-trukk",
+        "units-warboss"
+      ],
+      "unit_records_added": [
+        "units-beastboss-on-squigosaur"
+      ],
+      "unit_records_removed": [],
+      "wargear_costs_changed": []
+    },
+    "space-marines": {
+      "current_detachment_record_count": 23,
+      "current_unit_record_count": 102,
+      "detachment_records_added": [
+        "vengeful-hosts"
+      ],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "1st-company-task-force",
+        "emperors-shield",
+        "firestorm-assault-force",
+        "forgefathers-seekers",
+        "fulguris-task-force",
+        "hammer-of-avernii",
+        "ironstorm-spearhead",
+        "subversion-assets"
+      ],
+      "enhancement_points_changed": [
+        "blade-of-ultramar:armour-of-antoninus",
+        "gladius-task-force:artificer-armour",
+        "ironstorm-spearhead:the-flesh-is-weak",
+        "librarius-conclave:fusillade",
+        "librarius-conclave:temporal-corridor"
+      ],
+      "leader_assignments_changed": [
+        "units-captain",
+        "units-librarian-in-phobos-armour",
+        "white-scars-uriel-ventris"
+      ],
+      "previous_detachment_record_count": 22,
+      "previous_unit_record_count": 102,
+      "status": "changed",
+      "support_assignments_captured": [
+        "ultramarines-cato-sicarius",
+        "units-ancient",
+        "units-ancient-in-terminator-armour",
+        "units-apothecary-biologis",
+        "units-bladeguard-ancient",
+        "units-lieutenant",
+        "units-lieutenant-in-phobos-armour",
+        "units-lieutenant-in-reiver-armour",
+        "white-scars-wardens-of-ultramar"
+      ],
+      "unit_point_rows_changed": [
+        "ultramarines-captain-titus",
+        "ultramarines-cato-sicarius",
+        "ultramarines-chief-librarian-tigurius",
+        "units-aggressor-squad",
+        "units-drop-pod",
+        "units-eradicator-squad-with-heavy-bolters",
+        "units-impulsor",
+        "units-inceptor-squad",
+        "units-infernus-squad",
+        "units-land-speeder",
+        "units-librarian",
+        "units-lieutenant-with-combi-weapon",
+        "units-razorback",
+        "units-repulsor-executioner",
+        "units-rhino",
+        "units-sternguard-veteran-squad",
+        "units-storm-speeder-hammerstrike",
+        "units-suppressor-squad",
+        "units-vanguard-veteran-squad-with-jump-packs",
+        "white-scars-roboute-guilliman",
+        "white-scars-suboden-khan",
+        "white-scars-uriel-ventris",
+        "white-scars-victrix-honour-guard",
+        "white-scars-wardens-of-ultramar"
+      ],
+      "unit_records_added": [
+        "ultramarines-marneus-calgar-in-armour-of-antilochus"
+      ],
+      "unit_records_removed": [
+        "units-apothecary"
+      ],
+      "wargear_costs_changed": [
+        "units-centurion-devastator-squad",
+        "units-repulsor-executioner",
+        "white-scars-victrix-honour-guard"
+      ]
+    },
+    "space-wolves": {
+      "current_detachment_record_count": 23,
+      "current_unit_record_count": 99,
+      "detachment_records_added": [
+        "vengeful-hosts"
+      ],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "1st-company-task-force",
+        "champions-of-fenris",
+        "firestorm-assault-force",
+        "fulguris-task-force",
+        "ironstorm-spearhead",
+        "subversion-assets"
+      ],
+      "enhancement_points_changed": [
+        "gladius-task-force:artificer-armour",
+        "ironstorm-spearhead:the-flesh-is-weak",
+        "librarius-conclave:fusillade",
+        "librarius-conclave:temporal-corridor"
+      ],
+      "leader_assignments_changed": [
+        "space-marines-captain",
+        "space-marines-librarian-in-phobos-armour"
+      ],
+      "previous_detachment_record_count": 22,
+      "previous_unit_record_count": 101,
+      "status": "changed",
+      "support_assignments_captured": [
+        "space-marines-ancient",
+        "space-marines-ancient-in-terminator-armour",
+        "space-marines-bladeguard-ancient",
+        "space-marines-lieutenant",
+        "space-marines-lieutenant-in-phobos-armour",
+        "space-marines-lieutenant-in-reiver-armour"
+      ],
+      "unit_point_rows_changed": [
+        "space-marines-aggressor-squad",
+        "space-marines-drop-pod",
+        "space-marines-eradicator-squad-with-heavy-bolters",
+        "space-marines-impulsor",
+        "space-marines-inceptor-squad",
+        "space-marines-infernus-squad",
+        "space-marines-land-speeder",
+        "space-marines-librarian",
+        "space-marines-lieutenant-with-combi-weapon",
+        "space-marines-razorback",
+        "space-marines-rhino",
+        "space-marines-sternguard-veteran-squad",
+        "space-marines-storm-speeder-hammerstrike",
+        "space-marines-suppressor-squad",
+        "space-marines-vanguard-veteran-squad-with-jump-packs",
+        "units-arjac-rockfist",
+        "units-iron-priest",
+        "units-logan-grimnar",
+        "units-njal-stormcaller",
+        "units-ragnar-blackmane",
+        "units-wolf-guard-terminators",
+        "units-wolf-scouts"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [
+        "space-marines-assault-intercessor-squad",
+        "units-grey-hunters"
+      ],
+      "wargear_costs_changed": [
+        "space-marines-centurion-devastator-squad",
+        "space-marines-repulsor-executioner"
+      ]
+    },
+    "tau-empire": {
+      "current_detachment_record_count": 7,
+      "current_unit_record_count": 42,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "kauyon",
+        "montka",
+        "retaliation-cadre"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 7,
+      "previous_unit_record_count": 43,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-broadside-battlesuits",
+        "units-commander-farsight",
+        "units-devilfish",
+        "units-ghostkeel-battlesuit",
+        "units-hammerhead-gunship",
+        "units-pathfinder-team",
+        "units-riptide-battlesuit",
+        "units-stormsurge",
+        "units-the-twin-lance",
+        "units-tiger-shark"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [
+        "units-cadre-fireblade"
+      ],
+      "wargear_costs_changed": [
+        "units-ghostkeel-battlesuit",
+        "units-riptide-battlesuit"
+      ]
+    },
+    "thousand-sons": {
+      "current_detachment_record_count": 9,
+      "current_unit_record_count": 34,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "hexwarp-thrallband",
+        "ritual-of-regeneration",
+        "sekhetar-cohort",
+        "warpforged-cabal"
+      ],
+      "enhancement_points_changed": [],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 9,
+      "previous_unit_record_count": 32,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "scintillating-legions-kairos-fateweaver",
+        "scintillating-legions-lord-of-change",
+        "units-chaos-predator-annihilator",
+        "units-chaos-rhino",
+        "units-defiler",
+        "units-scarab-occult-terminators",
+        "units-sekhetar-robots",
+        "units-sorcerer",
+        "units-tzaangor-enlightened",
+        "units-tzaangor-shaman"
+      ],
+      "unit_records_added": [
+        "scintillating-legions-pink-horrors",
+        "units-chaos-predator-destructor"
+      ],
+      "unit_records_removed": [],
+      "wargear_costs_changed": [
+        "units-defiler",
+        "units-forgefiend"
+      ]
+    },
+    "tyranids": {
+      "current_detachment_record_count": 10,
+      "current_unit_record_count": 51,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [],
+      "enhancement_points_changed": [
+        "vanguard-onslaught:hunting-grounds"
+      ],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 10,
+      "previous_unit_record_count": 51,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "units-maleceptor",
+        "units-neurotyrant",
+        "units-toxicrene",
+        "units-tyrannocyte",
+        "units-von-ryans-leapers",
+        "units-zoanthropes"
+      ],
+      "unit_records_added": [
+        "units-deathleaper"
+      ],
+      "unit_records_removed": [
+        "units-exocrine"
+      ],
+      "wargear_costs_changed": []
+    },
+    "world-eaters": {
+      "current_detachment_record_count": 8,
+      "current_unit_record_count": 28,
+      "detachment_records_added": [],
+      "detachment_records_removed": [],
+      "detachment_rules_changed": [
+        "brazen-engines",
+        "butchers-of-khorne"
+      ],
+      "enhancement_points_changed": [
+        "butchers-of-khorne:gore-stained-veterans",
+        "vessels-of-wrath:archslaughterer"
+      ],
+      "leader_assignments_changed": [],
+      "previous_detachment_record_count": 8,
+      "previous_unit_record_count": 30,
+      "status": "changed",
+      "support_assignments_captured": [],
+      "unit_point_rows_changed": [
+        "blood-legions-bloodcrushers",
+        "units-angron",
+        "units-chaos-predator-annihilator",
+        "units-chaos-predator-destructor",
+        "units-chaos-terminators",
+        "units-defiler",
+        "units-eightbound",
+        "units-exalted-eightbound",
+        "units-forgefiend",
+        "units-khorne-berzerkers",
+        "units-lord-invocatus",
+        "units-lord-on-juggernaut",
+        "units-maulerfiend"
+      ],
+      "unit_records_added": [],
+      "unit_records_removed": [
+        "blood-legions-skarbrand",
+        "units-chaos-rhino"
+      ],
+      "wargear_costs_changed": [
+        "units-defiler",
+        "units-forgefiend"
+      ]
+    }
+  },
+  "previous_source_package_id": "gw-11e-mfm-2026-06",
+  "previous_source_payload_checksum_sha256": "4d17fd724718df07840da16ce6d066b42ad2dbf8328d15bd198ebb3b710ee197",
+  "previous_source_version": "v1.0",
+  "review_schema": "core-v2-mfm-update-review-v1",
+  "reviewed_faction_ids": [
+    "adepta-sororitas",
+    "adeptus-custodes",
+    "adeptus-mechanicus",
+    "aeldari",
+    "astra-militarum",
+    "black-templars",
+    "blood-angels",
+    "chaos-daemons",
+    "chaos-knights",
+    "chaos-space-marines",
+    "dark-angels",
+    "death-guard",
+    "deathwatch",
+    "drukhari",
+    "emperors-children",
+    "genestealer-cults",
+    "grey-knights",
+    "imperial-agents",
+    "imperial-knights",
+    "leagues-of-votann",
+    "necrons",
+    "orks",
+    "space-marines",
+    "space-wolves",
+    "tau-empire",
+    "thousand-sons",
+    "tyranids",
+    "world-eaters"
+  ],
+  "source_url": "https://mfm.warhammer-community.com/en/",
+  "summary": {
+    "changed_faction_count": 28,
+    "detachment_records_added": 7,
+    "detachment_records_removed": 0,
+    "detachment_rules_changed": 87,
+    "enhancement_points_changed": 41,
+    "leader_assignments_changed": 14,
+    "reviewed_faction_count": 28,
+    "support_assignments_captured": 69,
+    "unit_point_rows_changed": 320,
+    "unit_records_added": 17,
+    "unit_records_removed": 18,
+    "wargear_costs_changed": 24
+  }
+}

@@ -1,0 +1,1935 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "berzerker-warband",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "battle-lust",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Battle-lust",
+          "points": 20,
+          "raw_name": "Battle-lust",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:berzerker-warband:enhancement:battle-lust"
+        },
+        {
+          "enhancement_id": "berzerker-glaive",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Berzerker Glaive",
+          "points": 35,
+          "raw_name": "Berzerker Glaive",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:berzerker-warband:enhancement:berzerker-glaive"
+        },
+        {
+          "enhancement_id": "favoured-of-khorne",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Favoured of Khorne",
+          "points": 20,
+          "raw_name": "Favoured of Khorne",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:berzerker-warband:enhancement:favoured-of-khorne"
+        },
+        {
+          "enhancement_id": "helm-of-brazen-ire",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Helm of Brazen Ire",
+          "points": 30,
+          "raw_name": "Helm of Brazen Ire",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:berzerker-warband:enhancement:helm-of-brazen-ire"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "BERZERKER WARBAND",
+      "raw_name": "BERZERKER WARBAND",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:berzerker-warband"
+    },
+    {
+      "detachment_id": "brazen-engines",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "murder-forged-entity",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Murder-forged Entity (Upgrade)",
+          "points": 15,
+          "raw_name": "Murder-forged Entity (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:brazen-engines:enhancement:murder-forged-entity"
+        },
+        {
+          "enhancement_id": "talons-of-butchery",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Talons of Butchery (Upgrade)",
+          "points": 20,
+          "raw_name": "Talons of Butchery (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:brazen-engines:enhancement:talons-of-butchery"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "BRAZEN ENGINES",
+      "raw_name": "BRAZEN ENGINES",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:brazen-engines"
+    },
+    {
+      "detachment_id": "butchers-of-khorne",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "gore-stained-veterans",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Gore-stained Veterans (Upgrade)",
+          "points": 20,
+          "raw_name": "Gore-stained Veterans (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:butchers-of-khorne:enhancement:gore-stained-veterans"
+        },
+        {
+          "enhancement_id": "sanctified-in-slaughter",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Sanctified in Slaughter (Upgrade)",
+          "points": 15,
+          "raw_name": "Sanctified in Slaughter (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:butchers-of-khorne:enhancement:sanctified-in-slaughter"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "BUTCHERS OF KHORNE",
+      "raw_name": "BUTCHERS OF KHORNE",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:butchers-of-khorne"
+    },
+    {
+      "detachment_id": "cult-of-blood",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "brazen-form",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Brazen Form",
+          "points": 25,
+          "raw_name": "Brazen Form",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:cult-of-blood:enhancement:brazen-form"
+        },
+        {
+          "enhancement_id": "butcher-lord",
+          "is_upgrade": false,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "GOREMONGERS",
+              "JAKHALS"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "goremongers",
+              "jakhals"
+            ],
+            "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:cult-of-blood:enhancement:butcher-lord:leader"
+          },
+          "name": "Butcher Lord",
+          "points": 10,
+          "raw_name": "Butcher Lord",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:cult-of-blood:enhancement:butcher-lord"
+        },
+        {
+          "enhancement_id": "chosen-of-the-blood-god",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Chosen of the Blood God",
+          "points": 15,
+          "raw_name": "Chosen of the Blood God",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:cult-of-blood:enhancement:chosen-of-the-blood-god"
+        },
+        {
+          "enhancement_id": "strategic-slaughter",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Strategic Slaughter",
+          "points": 20,
+          "raw_name": "Strategic Slaughter",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:cult-of-blood:enhancement:strategic-slaughter"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "CULT OF BLOOD",
+      "raw_name": "CULT OF BLOOD",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:cult-of-blood"
+    },
+    {
+      "detachment_id": "goretrack-onslaught",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "aggressive-deployment",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Aggressive Deployment",
+          "points": 20,
+          "raw_name": "Aggressive Deployment",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:goretrack-onslaught:enhancement:aggressive-deployment"
+        },
+        {
+          "enhancement_id": "infernal-infusion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Infernal Infusion",
+          "points": 25,
+          "raw_name": "Infernal Infusion",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:goretrack-onslaught:enhancement:infernal-infusion"
+        },
+        {
+          "enhancement_id": "murderous-onslaught",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Murderous Onslaught",
+          "points": 5,
+          "raw_name": "Murderous Onslaught",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:goretrack-onslaught:enhancement:murderous-onslaught"
+        },
+        {
+          "enhancement_id": "unleash-hell",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Unleash Hell",
+          "points": 10,
+          "raw_name": "Unleash Hell",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:goretrack-onslaught:enhancement:unleash-hell"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "GORETRACK ONSLAUGHT",
+      "raw_name": "GORETRACK ONSLAUGHT",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:goretrack-onslaught"
+    },
+    {
+      "detachment_id": "khorne-daemonkin",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "blade-of-endless-bloodshed",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blade of Endless Bloodshed",
+          "points": 30,
+          "raw_name": "Blade of Endless Bloodshed",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:khorne-daemonkin:enhancement:blade-of-endless-bloodshed"
+        },
+        {
+          "enhancement_id": "blood-forged-armour",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blood-Forged Armour",
+          "points": 20,
+          "raw_name": "Blood-Forged Armour",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:khorne-daemonkin:enhancement:blood-forged-armour"
+        },
+        {
+          "enhancement_id": "disciple-of-khorne",
+          "is_upgrade": false,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "BLOODCRUSHERS",
+              "FLESH HOUNDS"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "bloodcrushers",
+              "flesh-hounds"
+            ],
+            "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:khorne-daemonkin:enhancement:disciple-of-khorne:leader"
+          },
+          "name": "Disciple of Khorne",
+          "points": 15,
+          "raw_name": "Disciple of Khorne",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:khorne-daemonkin:enhancement:disciple-of-khorne"
+        },
+        {
+          "enhancement_id": "icon-of-war",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Icon of War",
+          "points": 25,
+          "raw_name": "Icon of War",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:khorne-daemonkin:enhancement:icon-of-war"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "KHORNE DAEMONKIN",
+      "raw_name": "KHORNE DAEMONKIN",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:khorne-daemonkin"
+    },
+    {
+      "detachment_id": "possessed-slaughterband",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "frenzied-focus",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Frenzied Focus",
+          "points": 20,
+          "raw_name": "Frenzied Focus",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:possessed-slaughterband:enhancement:frenzied-focus"
+        },
+        {
+          "enhancement_id": "killing-clarity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Killing Clarity",
+          "points": 15,
+          "raw_name": "Killing Clarity",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:possessed-slaughterband:enhancement:killing-clarity"
+        },
+        {
+          "enhancement_id": "malicious-vigour",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Malicious Vigour",
+          "points": 30,
+          "raw_name": "Malicious Vigour",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:possessed-slaughterband:enhancement:malicious-vigour"
+        },
+        {
+          "enhancement_id": "violent-demise",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Violent Demise",
+          "points": 10,
+          "raw_name": "Violent Demise",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:possessed-slaughterband:enhancement:violent-demise"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "POSSESSED SLAUGHTERBAND",
+      "raw_name": "POSSESSED SLAUGHTERBAND",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:possessed-slaughterband"
+    },
+    {
+      "detachment_id": "vessels-of-wrath",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "archslaughterer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Archslaughterer",
+          "points": 30,
+          "raw_name": "Archslaughterer",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:vessels-of-wrath:enhancement:archslaughterer"
+        },
+        {
+          "enhancement_id": "gateways-to-glory",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gateways to Glory",
+          "points": 10,
+          "raw_name": "Gateways to Glory",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:vessels-of-wrath:enhancement:gateways-to-glory"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "VESSELS OF WRATH",
+      "raw_name": "VESSELS OF WRATH",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:detachment:vessels-of-wrath"
+    }
+  ],
+  "faction_id": "world-eaters",
+  "name": "World Eaters",
+  "raw_name": "World Eaters",
+  "source_id": "gw-11e-mfm-2026-07:faction:world-eaters",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodcrushers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodcrushers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodcrushers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodcrushers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodcrushers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodcrushers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLOODCRUSHERS",
+      "raw_name": "BLOODCRUSHERS",
+      "record_id": "blood-legions-bloodcrushers",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodcrushers",
+      "source_section_id": "blood-legions",
+      "source_section_name": "BLOOD LEGIONS",
+      "support_allowance": null,
+      "unit_id": "bloodcrushers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodletters:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodletters:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLOODLETTERS",
+      "raw_name": "BLOODLETTERS",
+      "record_id": "blood-legions-bloodletters",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodletters",
+      "source_section_id": "blood-legions",
+      "source_section_name": "BLOOD LEGIONS",
+      "support_allowance": null,
+      "unit_id": "bloodletters",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 320,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodthirster:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodthirster:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 335,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodthirster:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodthirster:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLOODTHIRSTER",
+      "raw_name": "BLOODTHIRSTER",
+      "record_id": "blood-legions-bloodthirster",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-bloodthirster",
+      "source_section_id": "blood-legions",
+      "source_section_name": "BLOOD LEGIONS",
+      "support_allowance": null,
+      "unit_id": "bloodthirster",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-flesh-hounds:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-flesh-hounds:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-flesh-hounds:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FLESH HOUNDS",
+      "raw_name": "FLESH HOUNDS",
+      "record_id": "blood-legions-flesh-hounds",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:blood-legions-flesh-hounds",
+      "source_section_id": "blood-legions",
+      "source_section_name": "BLOOD LEGIONS",
+      "support_allowance": null,
+      "unit_id": "flesh-hounds",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 330,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-angron:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-angron:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ANGRON",
+      "raw_name": "ANGRON",
+      "record_id": "units-angron",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-angron",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "angron",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-land-raider:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-land-raider:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS LAND RAIDER",
+      "raw_name": "CHAOS LAND RAIDER",
+      "record_id": "units-chaos-land-raider",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-land-raider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-land-raider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-annihilator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-annihilator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-annihilator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-annihilator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS PREDATOR ANNIHILATOR",
+      "raw_name": "CHAOS PREDATOR ANNIHILATOR",
+      "record_id": "units-chaos-predator-annihilator",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-annihilator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-predator-annihilator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-destructor:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-destructor:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-destructor:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-destructor:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS PREDATOR DESTRUCTOR",
+      "raw_name": "CHAOS PREDATOR DESTRUCTOR",
+      "record_id": "units-chaos-predator-destructor",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-predator-destructor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-predator-destructor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-spawn:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-spawn:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS SPAWN",
+      "raw_name": "CHAOS SPAWN",
+      "record_id": "units-chaos-spawn",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-spawn",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-spawn",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-terminators:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 330,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-terminators:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-terminators:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-terminators:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 340,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-terminators:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-terminators:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS TERMINATORS",
+      "raw_name": "CHAOS TERMINATORS",
+      "record_id": "units-chaos-terminators",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-chaos-terminators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-terminators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-daemon-prince-of-khorne:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-daemon-prince-of-khorne:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF KHORNE",
+      "raw_name": "DAEMON PRINCE OF KHORNE",
+      "record_id": "units-daemon-prince-of-khorne",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-daemon-prince-of-khorne",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "daemon-prince-of-khorne",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-daemon-prince-of-khorne-with-wings:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-daemon-prince-of-khorne-with-wings:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF KHORNE WITH WINGS",
+      "raw_name": "DAEMON PRINCE OF KHORNE WITH WINGS",
+      "record_id": "units-daemon-prince-of-khorne-with-wings",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-daemon-prince-of-khorne-with-wings",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "daemon-prince-of-khorne-with-wings",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-defiler:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-defiler:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 310,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-defiler:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-defiler:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEFILER",
+      "raw_name": "DEFILER",
+      "record_id": "units-defiler",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-defiler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "defiler",
+      "wargear_costs": [
+        {
+          "name": "Hades lascannon",
+          "points_per_item": 15,
+          "raw_name": "per Hades lascannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-defiler:wargear:per-hades-lascannon:1",
+          "wargear_id": "hades-lascannon"
+        },
+        {
+          "name": "Heavy reaper autocannon",
+          "points_per_item": 15,
+          "raw_name": "per Heavy reaper autocannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-defiler:wargear:per-heavy-reaper-autocannon:2",
+          "wargear_id": "heavy-reaper-autocannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-eightbound:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 255,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-eightbound:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-eightbound:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-eightbound:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-eightbound:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-eightbound:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "EIGHTBOUND",
+      "raw_name": "EIGHTBOUND",
+      "record_id": "units-eightbound",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-eightbound",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "eightbound",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-exalted-eightbound:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 265,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-exalted-eightbound:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-exalted-eightbound:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-exalted-eightbound:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-exalted-eightbound:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-exalted-eightbound:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "EXALTED EIGHTBOUND",
+      "raw_name": "EXALTED EIGHTBOUND",
+      "record_id": "units-exalted-eightbound",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-exalted-eightbound",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "exalted-eightbound",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-forgefiend:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-forgefiend:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-forgefiend:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-forgefiend:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FORGEFIEND",
+      "raw_name": "FORGEFIEND",
+      "record_id": "units-forgefiend",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-forgefiend",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "forgefiend",
+      "wargear_costs": [
+        {
+          "name": "Ectoplasma cannon",
+          "points_per_item": 5,
+          "raw_name": "per Ectoplasma cannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-forgefiend:wargear:per-ectoplasma-cannon:1",
+          "wargear_id": "ectoplasma-cannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "8 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 8,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "8 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-goremongers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-goremongers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GOREMONGERS",
+      "raw_name": "GOREMONGERS",
+      "record_id": "units-goremongers",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-goremongers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "goremongers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-helbrute:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-helbrute:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELBRUTE",
+      "raw_name": "HELBRUTE",
+      "record_id": "units-helbrute",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-helbrute",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "helbrute",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-heldrake:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-heldrake:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELDRAKE",
+      "raw_name": "HELDRAKE",
+      "record_id": "units-heldrake",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-heldrake",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "heldrake",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-jakhals:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-jakhals:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-jakhals:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "JAKHALS",
+      "raw_name": "JAKHALS",
+      "record_id": "units-jakhals",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-jakhals",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "jakhals",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-kh-rn-the-betrayer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-kh-rn-the-betrayer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "KHORNE BERZERKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "khorne-berzerkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-kh-rn-the-betrayer:leader"
+      },
+      "name": "KH\u00c2RN THE BETRAYER",
+      "raw_name": "KH\u00c2RN THE BETRAYER",
+      "record_id": "units-kh-rn-the-betrayer",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-kh-rn-the-betrayer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "kh-rn-the-betrayer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-khorne-berzerkers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 330,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-khorne-berzerkers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-khorne-berzerkers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KHORNE BERZERKERS",
+      "raw_name": "KHORNE BERZERKERS",
+      "record_id": "units-khorne-berzerkers",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-khorne-berzerkers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "khorne-berzerkers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 505,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-khorne-lord-of-skulls:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-khorne-lord-of-skulls:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 535,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-khorne-lord-of-skulls:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-khorne-lord-of-skulls:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KHORNE LORD OF SKULLS",
+      "raw_name": "KHORNE LORD OF SKULLS",
+      "record_id": "units-khorne-lord-of-skulls",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-khorne-lord-of-skulls",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "khorne-lord-of-skulls",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-lord-invocatus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-lord-invocatus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "EIGHTBOUND",
+          "EXALTED EIGHTBOUND",
+          "KHORNE BERZERKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "eightbound",
+          "exalted-eightbound",
+          "khorne-berzerkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-lord-invocatus:leader"
+      },
+      "name": "LORD INVOCATUS",
+      "raw_name": "LORD INVOCATUS",
+      "record_id": "units-lord-invocatus",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-lord-invocatus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lord-invocatus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-lord-on-juggernaut:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-lord-on-juggernaut:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "EIGHTBOUND",
+          "EXALTED EIGHTBOUND",
+          "KHORNE BERZERKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "eightbound",
+          "exalted-eightbound",
+          "khorne-berzerkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-lord-on-juggernaut:leader"
+      },
+      "name": "LORD ON JUGGERNAUT",
+      "raw_name": "LORD ON JUGGERNAUT",
+      "record_id": "units-lord-on-juggernaut",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-lord-on-juggernaut",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lord-on-juggernaut",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-master-of-executions:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-master-of-executions:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "KHORNE BERZERKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "khorne-berzerkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-master-of-executions:leader"
+      },
+      "name": "MASTER OF EXECUTIONS",
+      "raw_name": "MASTER OF EXECUTIONS",
+      "record_id": "units-master-of-executions",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-master-of-executions",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "master-of-executions",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-maulerfiend:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-maulerfiend:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-maulerfiend:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-maulerfiend:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MAULERFIEND",
+      "raw_name": "MAULERFIEND",
+      "record_id": "units-maulerfiend",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-maulerfiend",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "maulerfiend",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-slaughterbound:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-slaughterbound:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "EIGHTBOUND",
+          "EXALTED EIGHTBOUND"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "eightbound",
+          "exalted-eightbound"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-slaughterbound:leader"
+      },
+      "name": "SLAUGHTERBOUND",
+      "raw_name": "SLAUGHTERBOUND",
+      "record_id": "units-slaughterbound",
+      "source_id": "gw-11e-mfm-2026-07:faction:world-eaters:unit:units-slaughterbound",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "slaughterbound",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/world-eaters"
+}

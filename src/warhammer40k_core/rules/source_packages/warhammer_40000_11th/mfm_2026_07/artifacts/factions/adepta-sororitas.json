@@ -1,0 +1,2208 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "army-of-faith",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "blade-of-saint-ellynor",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blade of Saint Ellynor",
+          "points": 15,
+          "raw_name": "Blade of Saint Ellynor",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:army-of-faith:enhancement:blade-of-saint-ellynor"
+        },
+        {
+          "enhancement_id": "divine-aspect",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Divine Aspect",
+          "points": 5,
+          "raw_name": "Divine Aspect",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:army-of-faith:enhancement:divine-aspect"
+        },
+        {
+          "enhancement_id": "litanies-of-faith",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Litanies of Faith",
+          "points": 10,
+          "raw_name": "Litanies of Faith",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:army-of-faith:enhancement:litanies-of-faith"
+        },
+        {
+          "enhancement_id": "triptych-of-the-macharian-crusade",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Triptych of the Macharian Crusade",
+          "points": 20,
+          "raw_name": "Triptych of the Macharian Crusade",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:army-of-faith:enhancement:triptych-of-the-macharian-crusade"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "ARMY OF FAITH",
+      "raw_name": "ARMY OF FAITH",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:army-of-faith"
+    },
+    {
+      "detachment_id": "bringers-of-flame",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "fire-and-fury",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fire and Fury",
+          "points": 30,
+          "raw_name": "Fire and Fury",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:bringers-of-flame:enhancement:fire-and-fury"
+        },
+        {
+          "enhancement_id": "iron-surplice-of-saint-istalela",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Iron Surplice of Saint Istalela",
+          "points": 10,
+          "raw_name": "Iron Surplice of Saint Istalela",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:bringers-of-flame:enhancement:iron-surplice-of-saint-istalela"
+        },
+        {
+          "enhancement_id": "manual-of-saint-griselda",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Manual of Saint Griselda",
+          "points": 20,
+          "raw_name": "Manual of Saint Griselda",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:bringers-of-flame:enhancement:manual-of-saint-griselda"
+        },
+        {
+          "enhancement_id": "righteous-rage",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Righteous Rage",
+          "points": 15,
+          "raw_name": "Righteous Rage",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:bringers-of-flame:enhancement:righteous-rage"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "BRINGERS OF FLAME",
+      "raw_name": "BRINGERS OF FLAME",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:bringers-of-flame"
+    },
+    {
+      "detachment_id": "champions-of-faith",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "eyes-of-the-oracle",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eyes of the Oracle",
+          "points": 10,
+          "raw_name": "Eyes of the Oracle",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:champions-of-faith:enhancement:eyes-of-the-oracle"
+        },
+        {
+          "enhancement_id": "mark-of-devotion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mark of Devotion",
+          "points": 30,
+          "raw_name": "Mark of Devotion",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:champions-of-faith:enhancement:mark-of-devotion"
+        },
+        {
+          "enhancement_id": "sanctified-amulet",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sanctified Amulet",
+          "points": 25,
+          "raw_name": "Sanctified Amulet",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:champions-of-faith:enhancement:sanctified-amulet"
+        },
+        {
+          "enhancement_id": "triptych-of-judgement",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Triptych of Judgement",
+          "points": 15,
+          "raw_name": "Triptych of Judgement",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:champions-of-faith:enhancement:triptych-of-judgement"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "CHAMPIONS OF FAITH",
+      "raw_name": "CHAMPIONS OF FAITH",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:champions-of-faith"
+    },
+    {
+      "detachment_id": "chorus-of-condemnation",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "clarion-of-urgency",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Clarion of Urgency",
+          "points": 15,
+          "raw_name": "Clarion of Urgency",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:chorus-of-condemnation:enhancement:clarion-of-urgency"
+        },
+        {
+          "enhancement_id": "symphonic-payload",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Symphonic Payload (Upgrade)",
+          "points": 10,
+          "raw_name": "Symphonic Payload (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:chorus-of-condemnation:enhancement:symphonic-payload"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "CHORUS OF CONDEMNATION",
+      "raw_name": "CHORUS OF CONDEMNATION",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:chorus-of-condemnation"
+    },
+    {
+      "detachment_id": "hallowed-martyrs",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "chaplet-of-sacrifice",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Chaplet of Sacrifice",
+          "points": 25,
+          "raw_name": "Chaplet of Sacrifice",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:hallowed-martyrs:enhancement:chaplet-of-sacrifice"
+        },
+        {
+          "enhancement_id": "mantle-of-ophelia",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mantle of Ophelia",
+          "points": 20,
+          "raw_name": "Mantle of Ophelia",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:hallowed-martyrs:enhancement:mantle-of-ophelia"
+        },
+        {
+          "enhancement_id": "saintly-example",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Saintly Example",
+          "points": 10,
+          "raw_name": "Saintly Example",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:hallowed-martyrs:enhancement:saintly-example"
+        },
+        {
+          "enhancement_id": "through-suffering-strength",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Through Suffering, Strength",
+          "points": 25,
+          "raw_name": "Through Suffering, Strength",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:hallowed-martyrs:enhancement:through-suffering-strength"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "HALLOWED MARTYRS",
+      "raw_name": "HALLOWED MARTYRS",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:hallowed-martyrs"
+    },
+    {
+      "detachment_id": "penitent-host",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "catechism-of-divine-penitence",
+          "is_upgrade": false,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "REPENTIA SQUAD"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "repentia-squad"
+            ],
+            "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:penitent-host:enhancement:catechism-of-divine-penitence:leader"
+          },
+          "name": "Catechism of Divine Penitence",
+          "points": 15,
+          "raw_name": "Catechism of Divine Penitence",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:penitent-host:enhancement:catechism-of-divine-penitence"
+        },
+        {
+          "enhancement_id": "psalm-of-righteous-judgement",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Psalm of Righteous Judgement",
+          "points": 20,
+          "raw_name": "Psalm of Righteous Judgement",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:penitent-host:enhancement:psalm-of-righteous-judgement"
+        },
+        {
+          "enhancement_id": "refrain-of-enduring-faith",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Refrain of Enduring Faith",
+          "points": 15,
+          "raw_name": "Refrain of Enduring Faith",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:penitent-host:enhancement:refrain-of-enduring-faith"
+        },
+        {
+          "enhancement_id": "verse-of-holy-piety",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Verse of Holy Piety",
+          "points": 15,
+          "raw_name": "Verse of Holy Piety",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:penitent-host:enhancement:verse-of-holy-piety"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "PENITENT HOST",
+      "raw_name": "PENITENT HOST",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:penitent-host"
+    },
+    {
+      "detachment_id": "sacred-champions",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "perfervid-haste",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Perfervid Haste",
+          "points": 10,
+          "raw_name": "Perfervid Haste",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:sacred-champions:enhancement:perfervid-haste"
+        },
+        {
+          "enhancement_id": "writ-of-compunction",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Writ of Compunction (Upgrade)",
+          "points": 20,
+          "raw_name": "Writ of Compunction (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:sacred-champions:enhancement:writ-of-compunction"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "SACRED CHAMPIONS",
+      "raw_name": "SACRED CHAMPIONS",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:sacred-champions"
+    },
+    {
+      "detachment_id": "sanctified-orators",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "hagiomnifex",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Hagiomnifex (Upgrade)",
+          "points": 25,
+          "raw_name": "Hagiomnifex (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:sanctified-orators:enhancement:hagiomnifex"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "SANCTIFIED ORATORS",
+      "raw_name": "SANCTIFIED ORATORS",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:detachment:sanctified-orators"
+    }
+  ],
+  "faction_id": "adepta-sororitas",
+  "name": "Adepta Sororitas",
+  "raw_name": "Adepta Sororitas",
+  "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-aestred-thurga-and-agathae-dolan:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-aestred-thurga-and-agathae-dolan:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLE SISTERS SQUAD",
+          "CELESTIAN INSIDIANTS",
+          "CELESTIAN SACRESANTS",
+          "DOMINION SQUAD",
+          "RETRIBUTOR SQUAD",
+          "SISTERS NOVITIATE SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battle-sisters-squad",
+          "celestian-insidiants",
+          "celestian-sacresants",
+          "dominion-squad",
+          "retributor-squad",
+          "sisters-novitiate-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-aestred-thurga-and-agathae-dolan:leader"
+      },
+      "name": "AESTRED THURGA AND AGATHAE DOLAN",
+      "raw_name": "AESTRED THURGA AND AGATHAE DOLAN",
+      "record_id": "units-aestred-thurga-and-agathae-dolan",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-aestred-thurga-and-agathae-dolan",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "aestred-thurga-and-agathae-dolan",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-arco-flagellants:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-arco-flagellants:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-arco-flagellants:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARCO-FLAGELLANTS",
+      "raw_name": "ARCO-FLAGELLANTS",
+      "record_id": "units-arco-flagellants",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-arco-flagellants",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "arco-flagellants",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-battle-sisters-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-battle-sisters-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BATTLE SISTERS SQUAD",
+      "raw_name": "BATTLE SISTERS SQUAD",
+      "record_id": "units-battle-sisters-squad",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-battle-sisters-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "battle-sisters-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-canoness:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-canoness:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLE SISTERS SQUAD",
+          "CELESTIAN INSIDIANTS",
+          "CELESTIAN SACRESANTS",
+          "DOMINION SQUAD",
+          "RETRIBUTOR SQUAD",
+          "SISTERS NOVITIATE SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battle-sisters-squad",
+          "celestian-insidiants",
+          "celestian-sacresants",
+          "dominion-squad",
+          "retributor-squad",
+          "sisters-novitiate-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-canoness:leader"
+      },
+      "name": "CANONESS",
+      "raw_name": "CANONESS",
+      "record_id": "units-canoness",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-canoness",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "canoness",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-canoness-with-jump-pack:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-canoness-with-jump-pack:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CANONESS WITH JUMP PACK",
+      "raw_name": "CANONESS WITH JUMP PACK",
+      "record_id": "units-canoness-with-jump-pack",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-canoness-with-jump-pack",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "canoness-with-jump-pack",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-castigator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-castigator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-castigator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-castigator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CASTIGATOR",
+      "raw_name": "CASTIGATOR",
+      "record_id": "units-castigator",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-castigator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "castigator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-insidiants:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-insidiants:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CELESTIAN INSIDIANTS",
+      "raw_name": "CELESTIAN INSIDIANTS",
+      "record_id": "units-celestian-insidiants",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-insidiants",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "celestian-insidiants",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-sacresants:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-sacresants:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-sacresants:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-sacresants:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-sacresants:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-sacresants:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CELESTIAN SACRESANTS",
+      "raw_name": "CELESTIAN SACRESANTS",
+      "record_id": "units-celestian-sacresants",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-celestian-sacresants",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "celestian-sacresants",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-daemonifuge:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-daemonifuge:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMONIFUGE",
+      "raw_name": "DAEMONIFUGE",
+      "record_id": "units-daemonifuge",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-daemonifuge",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "daemonifuge",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 40,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dialogus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dialogus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DIALOGUS",
+      "raw_name": "DIALOGUS",
+      "record_id": "units-dialogus",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dialogus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLE SISTERS SQUAD",
+          "CELESTIAN INSIDIANTS",
+          "CELESTIAN SACRESANTS",
+          "DOMINION SQUAD",
+          "RETRIBUTOR SQUAD",
+          "SISTERS NOVITIATE SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battle-sisters-squad",
+          "celestian-insidiants",
+          "celestian-sacresants",
+          "dominion-squad",
+          "retributor-squad",
+          "sisters-novitiate-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dialogus:support"
+      },
+      "unit_id": "dialogus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dogmata:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dogmata:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DOGMATA",
+      "raw_name": "DOGMATA",
+      "record_id": "units-dogmata",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dogmata",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLE SISTERS SQUAD",
+          "CELESTIAN INSIDIANTS",
+          "CELESTIAN SACRESANTS",
+          "DOMINION SQUAD",
+          "RETRIBUTOR SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battle-sisters-squad",
+          "celestian-insidiants",
+          "celestian-sacresants",
+          "dominion-squad",
+          "retributor-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dogmata:support"
+      },
+      "unit_id": "dogmata",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dominion-squad:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dominion-squad:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dominion-squad:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dominion-squad:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DOMINION SQUAD",
+      "raw_name": "DOMINION SQUAD",
+      "record_id": "units-dominion-squad",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dominion-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "dominion-squad",
+      "wargear_costs": [
+        {
+          "name": "Meltagun",
+          "points_per_item": 5,
+          "raw_name": "per Meltagun",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-dominion-squad:wargear:per-meltagun:1",
+          "wargear_id": "meltagun"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-exorcist:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-exorcist:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-exorcist:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-exorcist:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "EXORCIST",
+      "raw_name": "EXORCIST",
+      "record_id": "units-exorcist",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-exorcist",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "exorcist",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-hospitaller:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-hospitaller:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-hospitaller:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-hospitaller:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HOSPITALLER",
+      "raw_name": "HOSPITALLER",
+      "record_id": "units-hospitaller",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-hospitaller",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLE SISTERS SQUAD",
+          "CELESTIAN INSIDIANTS",
+          "CELESTIAN SACRESANTS",
+          "DOMINION SQUAD",
+          "RETRIBUTOR SQUAD",
+          "SISTERS NOVITIATE SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battle-sisters-squad",
+          "celestian-insidiants",
+          "celestian-sacresants",
+          "dominion-squad",
+          "retributor-squad",
+          "sisters-novitiate-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-hospitaller:support"
+      },
+      "unit_id": "hospitaller",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-imagifier:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-imagifier:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IMAGIFIER",
+      "raw_name": "IMAGIFIER",
+      "record_id": "units-imagifier",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-imagifier",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLE SISTERS SQUAD",
+          "CELESTIAN INSIDIANTS",
+          "CELESTIAN SACRESANTS",
+          "DOMINION SQUAD",
+          "RETRIBUTOR SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battle-sisters-squad",
+          "celestian-insidiants",
+          "celestian-sacresants",
+          "dominion-squad",
+          "retributor-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-imagifier:support"
+      },
+      "unit_id": "imagifier",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-immolator:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-immolator:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-immolator:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-immolator:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IMMOLATOR",
+      "raw_name": "IMMOLATOR",
+      "record_id": "units-immolator",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-immolator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "immolator",
+      "wargear_costs": [
+        {
+          "name": "Twin multi-melta",
+          "points_per_item": 15,
+          "raw_name": "per Twin multi-melta",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-immolator:wargear:per-twin-multi-melta:1",
+          "wargear_id": "twin-multi-melta"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-intranzia-fraye:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-intranzia-fraye:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INTRANZIA FRAYE",
+      "raw_name": "INTRANZIA FRAYE",
+      "record_id": "units-intranzia-fraye",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-intranzia-fraye",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "intranzia-fraye",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-junith-eruita:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-junith-eruita:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLE SISTERS SQUAD",
+          "CELESTIAN INSIDIANTS",
+          "CELESTIAN SACRESANTS",
+          "DOMINION SQUAD",
+          "RETRIBUTOR SQUAD",
+          "SISTERS NOVITIATE SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battle-sisters-squad",
+          "celestian-insidiants",
+          "celestian-sacresants",
+          "dominion-squad",
+          "retributor-squad",
+          "sisters-novitiate-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-junith-eruita:leader"
+      },
+      "name": "JUNITH ERUITA",
+      "raw_name": "JUNITH ERUITA",
+      "record_id": "units-junith-eruita",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-junith-eruita",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "junith-eruita",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-ministorum-priest:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-ministorum-priest:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ARCO-FLAGELLANTS",
+          "BATTLE SISTERS SQUAD",
+          "CELESTIAN INSIDIANTS",
+          "DOMINION SQUAD",
+          "SANCTIFIERS",
+          "SISTERS NOVITIATE SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "arco-flagellants",
+          "battle-sisters-squad",
+          "celestian-insidiants",
+          "dominion-squad",
+          "sanctifiers",
+          "sisters-novitiate-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-ministorum-priest:leader"
+      },
+      "name": "MINISTORUM PRIEST",
+      "raw_name": "MINISTORUM PRIEST",
+      "record_id": "units-ministorum-priest",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-ministorum-priest",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ministorum-priest",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-mortifiers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-mortifiers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-mortifiers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MORTIFIERS",
+      "raw_name": "MORTIFIERS",
+      "record_id": "units-mortifiers",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-mortifiers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "mortifiers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-morvenn-vahl:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-morvenn-vahl:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PARAGON WARSUITS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "paragon-warsuits"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-morvenn-vahl:leader"
+      },
+      "name": "MORVENN VAHL",
+      "raw_name": "MORVENN VAHL",
+      "record_id": "units-morvenn-vahl",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-morvenn-vahl",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "morvenn-vahl",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-palatine:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-palatine:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLE SISTERS SQUAD",
+          "CELESTIAN INSIDIANTS",
+          "CELESTIAN SACRESANTS",
+          "DOMINION SQUAD",
+          "RETRIBUTOR SQUAD",
+          "SISTERS NOVITIATE SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battle-sisters-squad",
+          "celestian-insidiants",
+          "celestian-sacresants",
+          "dominion-squad",
+          "retributor-squad",
+          "sisters-novitiate-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-palatine:leader"
+      },
+      "name": "PALATINE",
+      "raw_name": "PALATINE",
+      "record_id": "units-palatine",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-palatine",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "palatine",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-paragon-warsuits:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-paragon-warsuits:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-paragon-warsuits:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-paragon-warsuits:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PARAGON WARSUITS",
+      "raw_name": "PARAGON WARSUITS",
+      "record_id": "units-paragon-warsuits",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-paragon-warsuits",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "paragon-warsuits",
+      "wargear_costs": [
+        {
+          "name": "Multi-melta",
+          "points_per_item": 10,
+          "raw_name": "per Multi-melta",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-paragon-warsuits:wargear:per-multi-melta:1",
+          "wargear_id": "multi-melta"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-penitent-engines:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-penitent-engines:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-penitent-engines:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PENITENT ENGINES",
+      "raw_name": "PENITENT ENGINES",
+      "record_id": "units-penitent-engines",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-penitent-engines",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "penitent-engines",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-repentia-squad:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-repentia-squad:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-repentia-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "REPENTIA SQUAD",
+      "raw_name": "REPENTIA SQUAD",
+      "record_id": "units-repentia-squad",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-repentia-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "repentia-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-retributor-squad:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-retributor-squad:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-retributor-squad:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-retributor-squad:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RETRIBUTOR SQUAD",
+      "raw_name": "RETRIBUTOR SQUAD",
+      "record_id": "units-retributor-squad",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-retributor-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "retributor-squad",
+      "wargear_costs": [
+        {
+          "name": "Multi-melta",
+          "points_per_item": 5,
+          "raw_name": "per Multi-melta",
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-retributor-squad:wargear:per-multi-melta:1",
+          "wargear_id": "multi-melta"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-saint-celestine:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-saint-celestine:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "SERAPHIM SQUAD",
+          "ZEPHYRIM SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "seraphim-squad",
+          "zephyrim-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-saint-celestine:leader"
+      },
+      "name": "SAINT CELESTINE",
+      "raw_name": "SAINT CELESTINE",
+      "record_id": "units-saint-celestine",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-saint-celestine",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "saint-celestine",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "9 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 9,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "9 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sanctifiers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sanctifiers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SANCTIFIERS",
+      "raw_name": "SANCTIFIERS",
+      "record_id": "units-sanctifiers",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sanctifiers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sanctifiers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-seraphim-squad:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-seraphim-squad:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-seraphim-squad:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-seraphim-squad:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-seraphim-squad:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-seraphim-squad:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SERAPHIM SQUAD",
+      "raw_name": "SERAPHIM SQUAD",
+      "record_id": "units-seraphim-squad",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-seraphim-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "seraphim-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sisters-novitiate-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sisters-novitiate-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SISTERS NOVITIATE SQUAD",
+      "raw_name": "SISTERS NOVITIATE SQUAD",
+      "record_id": "units-sisters-novitiate-squad",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sisters-novitiate-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sisters-novitiate-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sororitas-rhino:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sororitas-rhino:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sororitas-rhino:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sororitas-rhino:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SORORITAS RHINO",
+      "raw_name": "SORORITAS RHINO",
+      "record_id": "units-sororitas-rhino",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-sororitas-rhino",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sororitas-rhino",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 245,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-triumph-of-saint-katherine:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-triumph-of-saint-katherine:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLE SISTERS SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battle-sisters-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-triumph-of-saint-katherine:leader"
+      },
+      "name": "TRIUMPH OF SAINT KATHERINE",
+      "raw_name": "TRIUMPH OF SAINT KATHERINE",
+      "record_id": "units-triumph-of-saint-katherine",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-triumph-of-saint-katherine",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "triumph-of-saint-katherine",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-zephyrim-squad:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-zephyrim-squad:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-zephyrim-squad:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-zephyrim-squad:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-zephyrim-squad:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-zephyrim-squad:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ZEPHYRIM SQUAD",
+      "raw_name": "ZEPHYRIM SQUAD",
+      "record_id": "units-zephyrim-squad",
+      "source_id": "gw-11e-mfm-2026-07:faction:adepta-sororitas:unit:units-zephyrim-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "zephyrim-squad",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/adepta-sororitas"
+}

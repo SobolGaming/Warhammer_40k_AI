@@ -196,14 +196,14 @@ def mfm_roster_unit_point_values(
     ).roster_unit_point_values()
 
 
-def catalog_with_mfm_leader_allowances(
+def catalog_with_mfm_attachment_allowances(
     *,
     catalog: ArmyCatalog,
     faction_id: str,
     source_package: MfmSourcePackage | None = None,
 ) -> ArmyCatalog:
     if type(catalog) is not ArmyCatalog:
-        raise ArmyPointsError("MFM leader overlay requires an ArmyCatalog.")
+        raise ArmyPointsError("MFM attachment overlay requires an ArmyCatalog.")
     requested_faction_id = _validate_identifier(faction_id)
     faction = _mfm_faction_by_catalog_faction_id(
         catalog=catalog,
@@ -213,7 +213,7 @@ def catalog_with_mfm_leader_allowances(
     catalog_faction = _catalog_faction(catalog=catalog, faction_id=requested_faction_id)
     return replace(
         catalog,
-        datasheets=_datasheets_with_mfm_leader_allowances(
+        datasheets=_datasheets_with_mfm_attachment_allowances(
             catalog=catalog,
             catalog_faction=catalog_faction,
             faction=faction,
@@ -238,10 +238,15 @@ def catalog_with_mfm_points(
     catalog_faction = _catalog_faction(catalog=catalog, faction_id=requested_faction_id)
     return replace(
         catalog,
-        datasheets=_datasheets_with_mfm_leader_allowances(
+        datasheets=_datasheets_with_mfm_attachment_allowances(
             catalog=catalog,
             catalog_faction=catalog_faction,
             faction=faction,
+        ),
+        detachments=_detachments_with_mfm_rules(
+            catalog=catalog,
+            faction=faction,
+            faction_id=requested_faction_id,
         ),
         enhancements=_enhancements_with_mfm_points(
             catalog=catalog,
@@ -251,7 +256,7 @@ def catalog_with_mfm_points(
     )
 
 
-def _datasheets_with_mfm_leader_allowances(
+def _datasheets_with_mfm_attachment_allowances(
     *,
     catalog: ArmyCatalog,
     catalog_faction: FactionDefinition,
@@ -266,41 +271,64 @@ def _datasheets_with_mfm_leader_allowances(
             updated_datasheets.append(datasheet)
             continue
         mfm_unit = _mfm_unit_for_datasheet(faction=faction, datasheet=datasheet)
-        leader_allowance = mfm_unit.leader_allowance
-        non_leader_eligibilities = tuple(
-            eligibility
-            for eligibility in datasheet.attachment_eligibilities
-            if eligibility.role is not AttachmentRole.LEADER
-        )
-        leader_eligibilities = tuple(
-            eligibility
-            for eligibility in datasheet.attachment_eligibilities
-            if eligibility.role is AttachmentRole.LEADER
-        )
-        if len(leader_eligibilities) > 1:
-            raise ArmyPointsError(
-                "Catalog datasheet declares multiple Leader attachment eligibilities."
+        source_eligibilities_by_role: dict[AttachmentRole, AttachmentEligibility] = {}
+        for eligibility in datasheet.attachment_eligibilities:
+            if eligibility.role in source_eligibilities_by_role:
+                raise ArmyPointsError(
+                    "Catalog datasheet declares multiple attachment eligibilities for one role."
+                )
+            source_eligibilities_by_role[eligibility.role] = eligibility
+        updated_eligibilities: list[AttachmentEligibility] = []
+        for role, allowance in (
+            (AttachmentRole.LEADER, mfm_unit.leader_allowance),
+            (AttachmentRole.SUPPORT, mfm_unit.support_allowance),
+        ):
+            if allowance is None:
+                continue
+            updated_eligibilities.append(
+                _attachment_eligibility_from_mfm(
+                    allowance=allowance,
+                    role=role,
+                    datasheets_by_unit_id=datasheets_by_unit_id,
+                    source_eligibility=source_eligibilities_by_role.get(role),
+                )
             )
-        source_leader_eligibility = leader_eligibilities[0] if leader_eligibilities else None
-        if leader_allowance is None:
-            updated_datasheets.append(
-                replace(datasheet, attachment_eligibilities=non_leader_eligibilities)
-            )
-            continue
         updated_datasheets.append(
             replace(
                 datasheet,
-                attachment_eligibilities=(
-                    *non_leader_eligibilities,
-                    _attachment_eligibility_from_mfm(
-                        leader_allowance=leader_allowance,
-                        datasheets_by_unit_id=datasheets_by_unit_id,
-                        source_leader_eligibility=source_leader_eligibility,
-                    ),
-                ),
+                attachment_eligibilities=tuple(updated_eligibilities),
             )
         )
     return tuple(updated_datasheets)
+
+
+def _detachments_with_mfm_rules(
+    *,
+    catalog: ArmyCatalog,
+    faction: MfmFactionRecord,
+    faction_id: str,
+) -> tuple[DetachmentDefinition, ...]:
+    updated: list[DetachmentDefinition] = []
+    for detachment in catalog.detachments:
+        if detachment.faction_id != faction_id:
+            updated.append(detachment)
+            continue
+        mfm_detachment = _mfm_detachment_for_catalog_detachment(
+            faction=faction,
+            detachment=detachment,
+        )
+        if mfm_detachment.detachment_point_cost is None:
+            raise ArmyPointsError("MFM detachment is missing its Detachment Points value.")
+        if mfm_detachment.force_disposition_id is None:
+            raise ArmyPointsError("MFM detachment is missing its Force Disposition.")
+        updated.append(
+            replace(
+                detachment,
+                detachment_point_cost=mfm_detachment.detachment_point_cost,
+                force_disposition_ids=(mfm_detachment.force_disposition_id,),
+            )
+        )
+    return tuple(updated)
 
 
 def _enhancements_with_mfm_points(
@@ -684,7 +712,7 @@ def _current_mfm_faction_by_ids(requested_ids: tuple[str, str]) -> MfmFactionRec
 
 
 def _current_mfm_supported_faction_ids() -> tuple[str, ...]:
-    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07 import (
         supported_faction_ids,
     )
 
@@ -692,7 +720,7 @@ def _current_mfm_supported_faction_ids() -> tuple[str, ...]:
 
 
 def _current_mfm_faction_record(faction_id: str) -> MfmFactionRecord:
-    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07 import (
         faction_record,
     )
 
@@ -716,12 +744,13 @@ def _mfm_unit_for_datasheet(
 
 def _attachment_eligibility_from_mfm(
     *,
-    leader_allowance: MfmLeaderAllowance,
+    allowance: MfmLeaderAllowance,
+    role: AttachmentRole,
     datasheets_by_unit_id: dict[str, tuple[DatasheetDefinition, ...]],
-    source_leader_eligibility: AttachmentEligibility | None,
+    source_eligibility: AttachmentEligibility | None,
 ) -> AttachmentEligibility:
     bodyguard_datasheet_ids: list[str] = []
-    for unit_id in leader_allowance.allowed_bodyguard_unit_ids:
+    for unit_id in allowance.allowed_bodyguard_unit_ids:
         datasheets = datasheets_by_unit_id.get(unit_id, ())
         if len(datasheets) != 1:
             raise ArmyPointsError(
@@ -730,18 +759,18 @@ def _attachment_eligibility_from_mfm(
         bodyguard_datasheet_ids.append(datasheets[0].datasheet_id)
     source_targets_by_bodyguard_id = (
         {}
-        if source_leader_eligibility is None
-        else {target.bodyguard_datasheet_id: target for target in source_leader_eligibility.targets}
+        if source_eligibility is None
+        else {target.bodyguard_datasheet_id: target for target in source_eligibility.targets}
     )
     return AttachmentEligibility(
-        role=AttachmentRole.LEADER,
+        role=role,
         targets=tuple(
             AttachmentTargetEligibility(
                 bodyguard_datasheet_id=bodyguard_datasheet_id,
                 source_ids=tuple(
                     sorted(
                         {
-                            leader_allowance.source_id,
+                            allowance.source_id,
                             *(
                                 source_targets_by_bodyguard_id[bodyguard_datasheet_id].source_ids
                                 if bodyguard_datasheet_id in source_targets_by_bodyguard_id

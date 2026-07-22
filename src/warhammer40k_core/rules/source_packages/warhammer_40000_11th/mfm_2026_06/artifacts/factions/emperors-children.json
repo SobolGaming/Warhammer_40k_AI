@@ -454,6 +454,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:legions-of-excess-daemonettes",
       "source_section_id": "legions-of-excess",
       "source_section_name": "LEGIONS OF EXCESS",
+      "support_allowance": null,
       "unit_id": "daemonettes",
       "wargear_costs": []
     },
@@ -506,6 +507,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:legions-of-excess-fiends",
       "source_section_id": "legions-of-excess",
       "source_section_name": "LEGIONS OF EXCESS",
+      "support_allowance": null,
       "unit_id": "fiends",
       "wargear_costs": []
     },
@@ -567,6 +569,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:legions-of-excess-keeper-of-secrets",
       "source_section_id": "legions-of-excess",
       "source_section_name": "LEGIONS OF EXCESS",
+      "support_allowance": null,
       "unit_id": "keeper-of-secrets",
       "wargear_costs": []
     },
@@ -619,6 +622,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:legions-of-excess-seekers",
       "source_section_id": "legions-of-excess",
       "source_section_name": "LEGIONS OF EXCESS",
+      "support_allowance": null,
       "unit_id": "seekers",
       "wargear_costs": []
     },
@@ -680,6 +684,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-chaos-land-raider",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-land-raider",
       "wargear_costs": []
     },
@@ -717,6 +722,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-chaos-rhino",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-rhino",
       "wargear_costs": []
     },
@@ -754,6 +760,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-chaos-spawn",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-spawn",
       "wargear_costs": []
     },
@@ -791,6 +798,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-chaos-terminators",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-terminators",
       "wargear_costs": []
     },
@@ -852,6 +860,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-daemon-prince-of-slaanesh-with-wings",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "daemon-prince-of-slaanesh-with-wings",
       "wargear_costs": []
     },
@@ -913,6 +922,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-defiler",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "defiler",
       "wargear_costs": [
         {
@@ -980,6 +990,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-flawless-blades",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "flawless-blades",
       "wargear_costs": []
     },
@@ -1017,6 +1028,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-fulgrim",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "fulgrim",
       "wargear_costs": []
     },
@@ -1054,6 +1066,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-heldrake",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "heldrake",
       "wargear_costs": []
     },
@@ -1106,6 +1119,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-infractors",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "infractors",
       "wargear_costs": []
     },
@@ -1177,6 +1191,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-lord-exultant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-exultant",
       "wargear_costs": []
     },
@@ -1224,6 +1239,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-lord-kakophonist",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-kakophonist",
       "wargear_costs": []
     },
@@ -1269,6 +1285,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-lucius-the-eternal",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lucius-the-eternal",
       "wargear_costs": []
     },
@@ -1330,6 +1347,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-maulerfiend",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "maulerfiend",
       "wargear_costs": []
     },
@@ -1391,6 +1409,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-noise-marines",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "noise-marines",
       "wargear_costs": []
     },
@@ -1440,6 +1459,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-sorcerer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sorcerer",
       "wargear_costs": []
     },
@@ -1492,6 +1512,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:emperors-children:unit:units-tormentors",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tormentors",
       "wargear_costs": []
     }

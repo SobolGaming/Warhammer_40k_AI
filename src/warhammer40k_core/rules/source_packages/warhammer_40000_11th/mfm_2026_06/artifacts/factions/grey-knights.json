@@ -410,6 +410,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brother-captain",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "brother-captain",
       "wargear_costs": []
     },
@@ -457,6 +458,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-champion",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "brotherhood-champion",
       "wargear_costs": []
     },
@@ -504,6 +506,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-chaplain",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "brotherhood-chaplain",
       "wargear_costs": []
     },
@@ -553,6 +556,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-techmarine",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "brotherhood-techmarine",
       "wargear_costs": []
     },
@@ -704,6 +708,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "brotherhood-terminator-squad",
       "wargear_costs": [
         {
@@ -757,6 +762,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-castellan-crowe",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "castellan-crowe",
       "wargear_costs": []
     },
@@ -804,6 +810,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "grand-master",
       "wargear_costs": []
     },
@@ -865,6 +872,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-in-nemesis-dreadknight",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "grand-master-in-nemesis-dreadknight",
       "wargear_costs": [
         {
@@ -927,6 +935,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-voldus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "grand-master-voldus",
       "wargear_costs": []
     },
@@ -988,6 +997,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grey-knights-thunderhawk-gunship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "grey-knights-thunderhawk-gunship",
       "wargear_costs": []
     },
@@ -1079,6 +1089,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-interceptor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "interceptor-squad",
       "wargear_costs": []
     },
@@ -1140,6 +1151,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "land-raider",
       "wargear_costs": []
     },
@@ -1201,6 +1213,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-crusader",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "land-raider-crusader",
       "wargear_costs": []
     },
@@ -1262,6 +1275,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-redeemer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "land-raider-redeemer",
       "wargear_costs": []
     },
@@ -1323,6 +1337,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-nemesis-dreadknight",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "nemesis-dreadknight",
       "wargear_costs": [
         {
@@ -1482,6 +1497,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "paladin-squad",
       "wargear_costs": [
         {
@@ -1581,6 +1597,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purgation-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "purgation-squad",
       "wargear_costs": [
         {
@@ -1680,6 +1697,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purifier-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "purifier-squad",
       "wargear_costs": [
         {
@@ -1725,6 +1743,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-razorback",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "razorback",
       "wargear_costs": []
     },
@@ -1762,6 +1781,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-rhino",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "rhino",
       "wargear_costs": []
     },
@@ -1799,6 +1819,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormhawk-interceptor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormhawk-interceptor",
       "wargear_costs": []
     },
@@ -1860,6 +1881,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormraven-gunship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormraven-gunship",
       "wargear_costs": []
     },
@@ -1897,6 +1919,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormtalon-gunship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormtalon-gunship",
       "wargear_costs": []
     },
@@ -1949,6 +1972,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-strike-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "strike-squad",
       "wargear_costs": []
     },
@@ -2010,6 +2034,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-venerable-dreadnought",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "venerable-dreadnought",
       "wargear_costs": []
     }

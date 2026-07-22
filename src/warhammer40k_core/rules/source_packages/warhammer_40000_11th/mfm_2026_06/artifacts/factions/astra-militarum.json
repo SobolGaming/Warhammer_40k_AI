@@ -512,6 +512,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-aegis-defence-line",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "aegis-defence-line",
       "wargear_costs": []
     },
@@ -564,6 +565,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-armoured-sentinels",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "armoured-sentinels",
       "wargear_costs": []
     },
@@ -601,6 +603,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-artillery-team",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "artillery-team",
       "wargear_costs": []
     },
@@ -692,6 +695,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-attilan-rough-riders",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "attilan-rough-riders",
       "wargear_costs": []
     },
@@ -753,6 +757,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-baneblade",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "baneblade",
       "wargear_costs": []
     },
@@ -814,6 +819,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banehammer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "banehammer",
       "wargear_costs": []
     },
@@ -875,6 +881,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banesword",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "banesword",
       "wargear_costs": []
     },
@@ -936,6 +943,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-basilisk",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "basilisk",
       "wargear_costs": []
     },
@@ -1027,6 +1035,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-bullgryn-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "bullgryn-squad",
       "wargear_costs": []
     },
@@ -1074,6 +1083,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-castellan",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cadian-castellan",
       "wargear_costs": []
     },
@@ -1119,6 +1129,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-command-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cadian-command-squad",
       "wargear_costs": []
     },
@@ -1156,6 +1167,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-heavy-weapons-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cadian-heavy-weapons-squad",
       "wargear_costs": []
     },
@@ -1193,6 +1205,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-recon-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cadian-recon-squad",
       "wargear_costs": []
     },
@@ -1245,6 +1258,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-shock-troops",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cadian-shock-troops",
       "wargear_costs": []
     },
@@ -1290,6 +1304,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-command-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "catachan-command-squad",
       "wargear_costs": []
     },
@@ -1327,6 +1342,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-heavy-weapons-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "catachan-heavy-weapons-squad",
       "wargear_costs": []
     },
@@ -1379,6 +1395,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-jungle-fighters",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "catachan-jungle-fighters",
       "wargear_costs": []
     },
@@ -1416,6 +1433,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-centaur-rsv",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "centaur-rsv",
       "wargear_costs": []
     },
@@ -1453,6 +1471,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-chimera",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chimera",
       "wargear_costs": []
     },
@@ -1508,6 +1527,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "commissar",
       "wargear_costs": []
     },
@@ -1545,6 +1565,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-graves",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "commissar-graves",
       "wargear_costs": []
     },
@@ -1600,6 +1621,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-graves-on-foot",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "commissar-graves-on-foot",
       "wargear_costs": []
     },
@@ -1655,6 +1677,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-yarrick",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "commissar-yarrick",
       "wargear_costs": []
     },
@@ -1716,6 +1739,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cyclops-demolition-vehicle",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cyclops-demolition-vehicle",
       "wargear_costs": []
     },
@@ -1768,6 +1792,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-korps-of-krieg",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "death-korps-of-krieg",
       "wargear_costs": []
     },
@@ -1820,6 +1845,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-riders",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "death-riders",
       "wargear_costs": []
     },
@@ -1881,6 +1907,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-deathstrike",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "deathstrike",
       "wargear_costs": []
     },
@@ -1942,6 +1969,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-doomhammer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "doomhammer",
       "wargear_costs": []
     },
@@ -1979,6 +2007,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-field-ordnance-battery",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "field-ordnance-battery",
       "wargear_costs": [
         {
@@ -2024,6 +2053,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-gaunts-ghosts",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "gaunts-ghosts",
       "wargear_costs": []
     },
@@ -2085,6 +2115,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhammer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hellhammer",
       "wargear_costs": []
     },
@@ -2146,6 +2177,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhound",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hellhound",
       "wargear_costs": []
     },
@@ -2198,6 +2230,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hippogriff-afv",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hippogriff-afv",
       "wargear_costs": []
     },
@@ -2235,6 +2268,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hydra",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hydra",
       "wargear_costs": []
     },
@@ -2296,6 +2330,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-kasrkin",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kasrkin",
       "wargear_costs": []
     },
@@ -2387,6 +2422,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-combat-engineers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "krieg-combat-engineers",
       "wargear_costs": []
     },
@@ -2434,6 +2470,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-command-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "krieg-command-squad",
       "wargear_costs": []
     },
@@ -2471,6 +2508,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-heavy-weapons-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "krieg-heavy-weapons-squad",
       "wargear_costs": [
         {
@@ -2540,6 +2578,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-battle-tank",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "leman-russ-battle-tank",
       "wargear_costs": []
     },
@@ -2601,6 +2640,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-commander",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "leman-russ-commander",
       "wargear_costs": []
     },
@@ -2662,6 +2702,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-demolisher",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "leman-russ-demolisher",
       "wargear_costs": []
     },
@@ -2723,6 +2764,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-eradicator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "leman-russ-eradicator",
       "wargear_costs": []
     },
@@ -2784,6 +2826,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-executioner",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "leman-russ-executioner",
       "wargear_costs": []
     },
@@ -2845,6 +2888,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-exterminator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "leman-russ-exterminator",
       "wargear_costs": []
     },
@@ -2906,6 +2950,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-punisher",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "leman-russ-punisher",
       "wargear_costs": []
     },
@@ -2967,6 +3012,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-vanquisher",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "leman-russ-vanquisher",
       "wargear_costs": []
     },
@@ -3012,6 +3058,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-marshal-dreir",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-marshal-dreir",
       "wargear_costs": []
     },
@@ -3069,6 +3116,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-solar-leontus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-solar-leontus",
       "wargear_costs": []
     },
@@ -3130,6 +3178,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-manticore",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "manticore",
       "wargear_costs": []
     },
@@ -3199,6 +3248,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-militarum-tempestus-command-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "militarum-tempestus-command-squad",
       "wargear_costs": []
     },
@@ -3254,6 +3304,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ministorum-priest",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ministorum-priest",
       "wargear_costs": []
     },
@@ -3291,6 +3342,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-nork-deddog",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "nork-deddog",
       "wargear_costs": []
     },
@@ -3328,6 +3380,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ogryn-bodyguard",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ogryn-bodyguard",
       "wargear_costs": []
     },
@@ -3380,6 +3433,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ogryn-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ogryn-squad",
       "wargear_costs": []
     },
@@ -3435,6 +3489,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-primaris-psyker",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "primaris-psyker",
       "wargear_costs": []
     },
@@ -3487,6 +3542,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ratlings",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ratlings",
       "wargear_costs": []
     },
@@ -3548,6 +3604,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-battle-tank",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "rogal-dorn-battle-tank",
       "wargear_costs": []
     },
@@ -3609,6 +3666,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-commander",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "rogal-dorn-commander",
       "wargear_costs": []
     },
@@ -3661,6 +3719,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-scout-sentinels",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "scout-sentinels",
       "wargear_costs": []
     },
@@ -3722,6 +3781,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-shadowsword",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "shadowsword",
       "wargear_costs": []
     },
@@ -3759,6 +3819,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-sly-marbo",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sly-marbo",
       "wargear_costs": []
     },
@@ -3820,6 +3881,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormlord",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormlord",
       "wargear_costs": []
     },
@@ -3881,6 +3943,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormsword",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormsword",
       "wargear_costs": []
     },
@@ -3918,6 +3981,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-taurox",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "taurox",
       "wargear_costs": []
     },
@@ -3955,6 +4019,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-taurox-prime",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "taurox-prime",
       "wargear_costs": []
     },
@@ -4008,6 +4073,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tech-priest-enginseer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tech-priest-enginseer",
       "wargear_costs": []
     },
@@ -4045,6 +4111,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-aquilons",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tempestus-aquilons",
       "wargear_costs": []
     },
@@ -4136,6 +4203,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-scions",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tempestus-scions",
       "wargear_costs": []
     },
@@ -4183,6 +4251,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ursula-creed",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ursula-creed",
       "wargear_costs": []
     },
@@ -4244,6 +4313,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-valkyrie",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "valkyrie",
       "wargear_costs": []
     },
@@ -4305,6 +4375,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-wyvern",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wyvern",
       "wargear_costs": []
     }

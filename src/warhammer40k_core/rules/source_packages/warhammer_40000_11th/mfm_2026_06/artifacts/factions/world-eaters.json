@@ -428,6 +428,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:blood-legions-bloodcrushers",
       "source_section_id": "blood-legions",
       "source_section_name": "BLOOD LEGIONS",
+      "support_allowance": null,
       "unit_id": "bloodcrushers",
       "wargear_costs": []
     },
@@ -465,6 +466,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:blood-legions-bloodletters",
       "source_section_id": "blood-legions",
       "source_section_name": "BLOOD LEGIONS",
+      "support_allowance": null,
       "unit_id": "bloodletters",
       "wargear_costs": []
     },
@@ -526,6 +528,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:blood-legions-bloodthirster",
       "source_section_id": "blood-legions",
       "source_section_name": "BLOOD LEGIONS",
+      "support_allowance": null,
       "unit_id": "bloodthirster",
       "wargear_costs": []
     },
@@ -578,6 +581,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:blood-legions-flesh-hounds",
       "source_section_id": "blood-legions",
       "source_section_name": "BLOOD LEGIONS",
+      "support_allowance": null,
       "unit_id": "flesh-hounds",
       "wargear_costs": []
     },
@@ -615,6 +619,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:blood-legions-skarbrand",
       "source_section_id": "blood-legions",
       "source_section_name": "BLOOD LEGIONS",
+      "support_allowance": null,
       "unit_id": "skarbrand",
       "wargear_costs": []
     },
@@ -652,6 +657,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-angron",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "angron",
       "wargear_costs": []
     },
@@ -713,6 +719,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-chaos-land-raider",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-land-raider",
       "wargear_costs": []
     },
@@ -774,6 +781,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-chaos-predator-annihilator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-predator-annihilator",
       "wargear_costs": []
     },
@@ -811,6 +819,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-chaos-predator-destructor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-predator-destructor",
       "wargear_costs": []
     },
@@ -848,6 +857,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-chaos-rhino",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-rhino",
       "wargear_costs": []
     },
@@ -885,6 +895,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-chaos-spawn",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-spawn",
       "wargear_costs": []
     },
@@ -976,6 +987,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-chaos-terminators",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-terminators",
       "wargear_costs": []
     },
@@ -1013,6 +1025,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-daemon-prince-of-khorne",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "daemon-prince-of-khorne",
       "wargear_costs": []
     },
@@ -1050,6 +1063,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-daemon-prince-of-khorne-with-wings",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "daemon-prince-of-khorne-with-wings",
       "wargear_costs": []
     },
@@ -1111,6 +1125,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-defiler",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "defiler",
       "wargear_costs": [
         {
@@ -1217,6 +1232,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-eightbound",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "eightbound",
       "wargear_costs": []
     },
@@ -1308,6 +1324,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-exalted-eightbound",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "exalted-eightbound",
       "wargear_costs": []
     },
@@ -1369,6 +1386,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-forgefiend",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "forgefiend",
       "wargear_costs": []
     },
@@ -1406,6 +1424,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-goremongers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "goremongers",
       "wargear_costs": []
     },
@@ -1443,6 +1462,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-helbrute",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "helbrute",
       "wargear_costs": []
     },
@@ -1480,6 +1500,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-heldrake",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "heldrake",
       "wargear_costs": []
     },
@@ -1532,6 +1553,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-jakhals",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "jakhals",
       "wargear_costs": []
     },
@@ -1571,12 +1593,13 @@
         ],
         "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-kh-rn-the-betrayer:leader"
       },
-      "name": "KH\u00c2RN THE BETRAYER",
-      "raw_name": "KH\u00c2RN THE BETRAYER",
+      "name": "KHÂRN THE BETRAYER",
+      "raw_name": "KHÂRN THE BETRAYER",
       "record_id": "units-kh-rn-the-betrayer",
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-kh-rn-the-betrayer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kh-rn-the-betrayer",
       "wargear_costs": []
     },
@@ -1629,6 +1652,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-khorne-berzerkers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "khorne-berzerkers",
       "wargear_costs": []
     },
@@ -1690,6 +1714,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-khorne-lord-of-skulls",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "khorne-lord-of-skulls",
       "wargear_costs": []
     },
@@ -1739,6 +1764,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-lord-invocatus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-invocatus",
       "wargear_costs": []
     },
@@ -1788,6 +1814,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-lord-on-juggernaut",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-on-juggernaut",
       "wargear_costs": []
     },
@@ -1833,6 +1860,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-master-of-executions",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "master-of-executions",
       "wargear_costs": []
     },
@@ -1894,6 +1922,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-maulerfiend",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "maulerfiend",
       "wargear_costs": []
     },
@@ -1941,6 +1970,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:world-eaters:unit:units-slaughterbound",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "slaughterbound",
       "wargear_costs": []
     }

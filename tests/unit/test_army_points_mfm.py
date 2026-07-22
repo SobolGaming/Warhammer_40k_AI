@@ -38,7 +38,7 @@ from warhammer40k_core.engine.army_points import (
     MfmEnhancementPointLine,
     MfmUnitPointLine,
     calculate_mfm_army_points,
-    catalog_with_mfm_leader_allowances,
+    catalog_with_mfm_attachment_allowances,
     catalog_with_mfm_points,
     mfm_roster_unit_point_values,
 )
@@ -64,7 +64,7 @@ from warhammer40k_core.rules.mfm_source import (
 
 
 def test_army_points_import_does_not_eagerly_load_generated_mfm_package() -> None:
-    module_name = "warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06"
+    module_name = "warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07"
     result = subprocess.run(
         [
             sys.executable,
@@ -277,10 +277,10 @@ def test_calculate_mfm_army_points_maps_section_qualified_records_by_unit_name()
     assert calculation.unit_lines[0].unit_selection_id == "alias-one"
 
 
-def test_catalog_with_mfm_leader_allowances_replaces_stale_catalog_leader_targets() -> None:
+def test_catalog_with_mfm_attachment_allowances_replaces_leader_and_support_targets() -> None:
     catalog = _catalog()
 
-    overlay = catalog_with_mfm_leader_allowances(
+    overlay = catalog_with_mfm_attachment_allowances(
         catalog=catalog,
         faction_id="test-faction",
         source_package=_mfm_package(),
@@ -299,11 +299,34 @@ def test_catalog_with_mfm_leader_allowances_replaces_stale_catalog_leader_target
     assert leader_eligibilities[0].targets[0].source_ids == (
         "test-mfm:faction:test-faction:unit:leader:leader",
     )
+    support = overlay.datasheet_by_id("support")
+    support_eligibilities = tuple(
+        eligibility
+        for eligibility in support.attachment_eligibilities
+        if eligibility.role is AttachmentRole.SUPPORT
+    )
+    assert len(support_eligibilities) == 1
+    assert tuple(target.bodyguard_datasheet_id for target in support_eligibilities[0].targets) == (
+        "bodyguard-b",
+    )
+    assert support_eligibilities[0].targets[0].source_ids == (
+        "test-mfm:faction:test-faction:unit:support:support",
+    )
     assert overlay.datasheet_by_id("foreign-unit") == catalog.datasheet_by_id("foreign-unit")
 
 
 def test_catalog_with_mfm_points_overlays_enhancement_prices_for_roster_total() -> None:
     catalog = _catalog()
+    stale_catalog = replace(
+        catalog,
+        detachments=(
+            replace(
+                catalog.detachments[0],
+                detachment_point_cost=1,
+                force_disposition_ids=("stale-force",),
+            ),
+        ),
+    )
     request = ArmyMusterRequest(
         army_id="army-one",
         player_id="player-one",
@@ -336,7 +359,7 @@ def test_catalog_with_mfm_points_overlays_enhancement_prices_for_roster_total() 
     )
 
     overlay = catalog_with_mfm_points(
-        catalog=catalog,
+        catalog=stale_catalog,
         faction_id="test-faction",
         source_package=_mfm_package(),
     )
@@ -357,6 +380,10 @@ def test_catalog_with_mfm_points_overlays_enhancement_prices_for_roster_total() 
 
     assert catalog.enhancements[0].points == 999
     assert enhancement_points_by_id["test-enhancement"] == 15
+    assert stale_catalog.detachments[0].detachment_point_cost == 1
+    assert stale_catalog.detachments[0].force_disposition_ids == ("stale-force",)
+    assert overlay.detachments[0].detachment_point_cost == 3
+    assert overlay.detachments[0].force_disposition_ids == ("test-force",)
     assert sum(point.points for point in unit_points) == 635
     assert roster_total == 650
 
@@ -518,7 +545,7 @@ def test_calculate_mfm_army_points_rejects_missing_enhancement_target() -> None:
         )
 
 
-def test_catalog_with_mfm_leader_allowances_rejects_missing_bodyguard_mapping() -> None:
+def test_catalog_with_mfm_attachment_allowances_rejects_missing_bodyguard_mapping() -> None:
     catalog = _catalog()
     package = _mfm_package()
     faction = package.faction_by_id("test-faction")
@@ -538,7 +565,7 @@ def test_catalog_with_mfm_leader_allowances_rejects_missing_bodyguard_mapping() 
     bad_package = replace(package, factions=(replace(faction, units=bad_units),))
 
     with pytest.raises(ArmyPointsError):
-        catalog_with_mfm_leader_allowances(
+        catalog_with_mfm_attachment_allowances(
             catalog=catalog,
             faction_id="test-faction",
             source_package=bad_package,
@@ -632,6 +659,23 @@ def _catalog() -> ArmyCatalog:
             datasheet_id="bodyguard-b",
             name="Bodyguard B",
             profiles=(("bodyguard-b", "Bodyguard B", 1, 1),),
+        ),
+        _datasheet(
+            datasheet_id="support",
+            name="Support",
+            profiles=(("support", "Support", 1, 1),),
+            keywords=("INFANTRY", "CHARACTER"),
+            attachment_eligibilities=(
+                AttachmentEligibility(
+                    role=AttachmentRole.SUPPORT,
+                    targets=(
+                        AttachmentTargetEligibility(
+                            bodyguard_datasheet_id="bodyguard-a",
+                            source_ids=("stale:support",),
+                        ),
+                    ),
+                ),
+            ),
         ),
         _datasheet(
             datasheet_id="foreign-unit",
@@ -805,6 +849,15 @@ def _mfm_package() -> MfmSourcePackage:
                     source_id="test-mfm:faction:test-faction:unit:leader:leader",
                 ),
             ),
+            _mfm_unit(
+                raw_name="Support",
+                rows_1=(("1 model", 50),),
+                support_allowance=MfmLeaderAllowance(
+                    allowed_bodyguard_unit_ids=("bodyguard-b",),
+                    allowed_bodyguard_names=("Bodyguard B",),
+                    source_id="test-mfm:faction:test-faction:unit:support:support",
+                ),
+            ),
             _mfm_unit(raw_name="Bodyguard A", rows_1=(("1 model", 50),)),
             _mfm_unit(raw_name="Bodyguard B", rows_1=(("1 model", 50),)),
         ),
@@ -829,6 +882,7 @@ def _mfm_unit(
     rows_2: tuple[tuple[str, int], ...] = (),
     wargear_costs: tuple[MfmWargearCost, ...] = (),
     leader_allowance: MfmLeaderAllowance | None = None,
+    support_allowance: MfmLeaderAllowance | None = None,
 ) -> MfmUnitRecord:
     unit_id = raw_name.lower().replace(" ", "-")
     unit_record_id = unit_id if record_id is None else record_id
@@ -875,6 +929,7 @@ def _mfm_unit(
         cost_brackets=brackets,
         wargear_costs=wargear_costs,
         leader_allowance=leader_allowance,
+        support_allowance=support_allowance,
         source_id=f"test-mfm:faction:test-faction:unit:{unit_record_id}",
     )
 

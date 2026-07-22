@@ -266,9 +266,9 @@
           "enhancement_id": "tl-4-9",
           "is_upgrade": false,
           "leader_allowance": null,
-          "name": "TL-4\u00f89",
+          "name": "TL-4ø9",
           "points": 30,
-          "raw_name": "TL-4\u00f89",
+          "raw_name": "TL-4ø9",
           "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:lords-of-the-forge:enhancement:tl-4-9"
         },
         {
@@ -446,6 +446,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-fusilave",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "archaeopter-fusilave",
       "wargear_costs": []
     },
@@ -483,6 +484,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-stratoraptor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "archaeopter-stratoraptor",
       "wargear_costs": []
     },
@@ -520,6 +522,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-transvector",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "archaeopter-transvector",
       "wargear_costs": []
     },
@@ -557,6 +560,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-belisarius-cawl",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "belisarius-cawl",
       "wargear_costs": []
     },
@@ -609,6 +613,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-corpuscarii-electro-priests",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "corpuscarii-electro-priests",
       "wargear_costs": []
     },
@@ -646,6 +651,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-cybernetica-datasmith",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cybernetica-datasmith",
       "wargear_costs": []
     },
@@ -698,6 +704,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-fulgurite-electro-priests",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "fulgurite-electro-priests",
       "wargear_costs": []
     },
@@ -759,6 +766,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-exterminators",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hastarii-exterminators",
       "wargear_costs": []
     },
@@ -820,6 +828,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-fusiliers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hastarii-fusiliers",
       "wargear_costs": []
     },
@@ -941,6 +950,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ironstrider-ballistarii",
       "wargear_costs": [
         {
@@ -1040,6 +1050,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kastelan-robots",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kastelan-robots",
       "wargear_costs": []
     },
@@ -1092,6 +1103,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-breachers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kataphron-breachers",
       "wargear_costs": []
     },
@@ -1144,6 +1156,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-destroyers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kataphron-destroyers",
       "wargear_costs": []
     },
@@ -1181,6 +1194,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-onager-dunecrawler",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "onager-dunecrawler",
       "wargear_costs": []
     },
@@ -1272,6 +1286,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-skystalkers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "pteraxii-skystalkers",
       "wargear_costs": []
     },
@@ -1363,6 +1378,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-sterylizors",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "pteraxii-sterylizors",
       "wargear_costs": []
     },
@@ -1415,6 +1431,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-raiders",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "serberys-raiders",
       "wargear_costs": []
     },
@@ -1467,6 +1484,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-sulphurhounds",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "serberys-sulphurhounds",
       "wargear_costs": []
     },
@@ -1504,6 +1522,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-servitor-battleclade",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "servitor-battleclade",
       "wargear_costs": []
     },
@@ -1595,6 +1614,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-infiltrators",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sicarian-infiltrators",
       "wargear_costs": []
     },
@@ -1686,6 +1706,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-ruststalkers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sicarian-ruststalkers",
       "wargear_costs": []
     },
@@ -1723,6 +1744,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-marshal",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skitarii-marshal",
       "wargear_costs": []
     },
@@ -1760,6 +1782,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-rangers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skitarii-rangers",
       "wargear_costs": []
     },
@@ -1797,6 +1820,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-vanguard",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skitarii-vanguard",
       "wargear_costs": []
     },
@@ -1834,6 +1858,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skorpius-disintegrator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skorpius-disintegrator",
       "wargear_costs": [
         {
@@ -1879,6 +1904,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skorpius-dunerider",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skorpius-dunerider",
       "wargear_costs": []
     },
@@ -1946,6 +1972,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-radium-jezzails",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sydonian-dragoons-with-radium-jezzails",
       "wargear_costs": []
     },
@@ -2013,6 +2040,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-taser-lances",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sydonian-dragoons-with-taser-lances",
       "wargear_costs": []
     },
@@ -2050,6 +2078,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-skatros",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sydonian-skatros",
       "wargear_costs": []
     },
@@ -2111,6 +2140,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-dominus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tech-priest-dominus",
       "wargear_costs": []
     },
@@ -2166,6 +2196,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-enginseer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tech-priest-enginseer",
       "wargear_costs": []
     },
@@ -2227,6 +2258,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-manipulus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tech-priest-manipulus",
       "wargear_costs": []
     },
@@ -2264,6 +2296,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-technoarcheologist",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "technoarcheologist",
       "wargear_costs": []
     },
@@ -2301,6 +2334,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-thulia-ghuld",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "thulia-ghuld",
       "wargear_costs": []
     }

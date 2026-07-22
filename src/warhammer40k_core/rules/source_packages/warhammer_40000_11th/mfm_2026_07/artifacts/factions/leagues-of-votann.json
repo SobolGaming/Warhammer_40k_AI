@@ -1,0 +1,1689 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "armoured-trailblazers",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "optimised-attack-lines",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Optimised Attack Lines (Upgrade)",
+          "points": 15,
+          "raw_name": "Optimised Attack Lines (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:armoured-trailblazers:enhancement:optimised-attack-lines"
+        },
+        {
+          "enhancement_id": "saturation-rounds",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Saturation Rounds (Upgrade)",
+          "points": 15,
+          "raw_name": "Saturation Rounds (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:armoured-trailblazers:enhancement:saturation-rounds"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "ARMOURED TRAILBLAZERS",
+      "raw_name": "ARMOURED TRAILBLAZERS",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:armoured-trailblazers"
+    },
+    {
+      "detachment_id": "brandfast-oathband",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "precursive-judgement",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Precursive Judgement",
+          "points": 15,
+          "raw_name": "Precursive Judgement",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:brandfast-oathband:enhancement:precursive-judgement"
+        },
+        {
+          "enhancement_id": "signature-restoration",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Signature Restoration",
+          "points": 5,
+          "raw_name": "Signature Restoration",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:brandfast-oathband:enhancement:signature-restoration"
+        },
+        {
+          "enhancement_id": "tactical-alchemy",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tactical Alchemy",
+          "points": 10,
+          "raw_name": "Tactical Alchemy",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:brandfast-oathband:enhancement:tactical-alchemy"
+        },
+        {
+          "enhancement_id": "triv-rg-cyber-implant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Triv\u00e4rg Cyber Implant",
+          "points": 40,
+          "raw_name": "Triv\u00e4rg Cyber Implant",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:brandfast-oathband:enhancement:triv-rg-cyber-implant"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "BRANDFAST OATHBAND",
+      "raw_name": "BRANDFAST OATHBAND",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:brandfast-oathband"
+    },
+    {
+      "detachment_id": "d-lve-assault-shift",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "d-lvewerke-navigator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "D\u00ealvewerke Navigator",
+          "points": 25,
+          "raw_name": "D\u00ealvewerke Navigator",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:d-lve-assault-shift:enhancement:d-lvewerke-navigator"
+        },
+        {
+          "enhancement_id": "multiwave-system-jammer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Multiwave System Jammer",
+          "points": 10,
+          "raw_name": "Multiwave System Jammer",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:d-lve-assault-shift:enhancement:multiwave-system-jammer"
+        },
+        {
+          "enhancement_id": "piledriver",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Piledriver",
+          "points": 15,
+          "raw_name": "Piledriver",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:d-lve-assault-shift:enhancement:piledriver"
+        },
+        {
+          "enhancement_id": "quake-supervisor",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Quake Supervisor",
+          "points": 20,
+          "raw_name": "Quake Supervisor",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:d-lve-assault-shift:enhancement:quake-supervisor"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "D\u00caLVE ASSAULT SHIFT",
+      "raw_name": "D\u00caLVE ASSAULT SHIFT",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:d-lve-assault-shift"
+    },
+    {
+      "detachment_id": "farseekers",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "pan-spectral-lockons",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Pan-spectral Lockons (Upgrade)",
+          "points": 10,
+          "raw_name": "Pan-spectral Lockons (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:farseekers:enhancement:pan-spectral-lockons"
+        },
+        {
+          "enhancement_id": "shroudw-rke-talismans",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Shroudw\u00ebrke Talismans (Upgrade)",
+          "points": 15,
+          "raw_name": "Shroudw\u00ebrke Talismans (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:farseekers:enhancement:shroudw-rke-talismans"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "FARSEEKERS",
+      "raw_name": "FARSEEKERS",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:farseekers"
+    },
+    {
+      "detachment_id": "hearthband",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "bastion-shield",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bastion Shield",
+          "points": 25,
+          "raw_name": "Bastion Shield",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthband:enhancement:bastion-shield"
+        },
+        {
+          "enhancement_id": "high-k-hl",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "High K\u00e2hl",
+          "points": 30,
+          "raw_name": "High K\u00e2hl",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthband:enhancement:high-k-hl"
+        },
+        {
+          "enhancement_id": "ironskein",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ironskein",
+          "points": 10,
+          "raw_name": "Ironskein",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthband:enhancement:ironskein"
+        },
+        {
+          "enhancement_id": "quake-multigenerator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Quake Multigenerator",
+          "points": 15,
+          "raw_name": "Quake Multigenerator",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthband:enhancement:quake-multigenerator"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "HEARTHBAND",
+      "raw_name": "HEARTHBAND",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthband"
+    },
+    {
+      "detachment_id": "hearthfyre-arsenal",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "calculated-tenacity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Calculated Tenacity",
+          "points": 15,
+          "raw_name": "Calculated Tenacity",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthfyre-arsenal:enhancement:calculated-tenacity"
+        },
+        {
+          "enhancement_id": "f-rstrydr-node",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "F\u00e2rstrydr Node",
+          "points": 20,
+          "raw_name": "F\u00e2rstrydr Node",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthfyre-arsenal:enhancement:f-rstrydr-node"
+        },
+        {
+          "enhancement_id": "graviton-vault",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Graviton Vault",
+          "points": 5,
+          "raw_name": "Graviton Vault",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthfyre-arsenal:enhancement:graviton-vault"
+        },
+        {
+          "enhancement_id": "mantle-of-elders",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mantle of Elders",
+          "points": 10,
+          "raw_name": "Mantle of Elders",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthfyre-arsenal:enhancement:mantle-of-elders"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "HEARTHFYRE ARSENAL",
+      "raw_name": "HEARTHFYRE ARSENAL",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthfyre-arsenal"
+    },
+    {
+      "detachment_id": "hearthguard-covenant",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "high-k-hl",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "High K\u00e2hl",
+          "points": 30,
+          "raw_name": "High K\u00e2hl",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthguard-covenant:enhancement:high-k-hl"
+        },
+        {
+          "enhancement_id": "ironskein",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ironskein",
+          "points": 10,
+          "raw_name": "Ironskein",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthguard-covenant:enhancement:ironskein"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "HEARTHGUARD COVENANT",
+      "raw_name": "HEARTHGUARD COVENANT",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:hearthguard-covenant"
+    },
+    {
+      "detachment_id": "mercenary-oathband",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "asset-manipulator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Asset Manipulator",
+          "points": 25,
+          "raw_name": "Asset Manipulator",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:mercenary-oathband:enhancement:asset-manipulator"
+        },
+        {
+          "enhancement_id": "etacarn-sb9-targeting-implant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Etacarn SB9 Targeting Implant",
+          "points": 15,
+          "raw_name": "Etacarn SB9 Targeting Implant",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:mercenary-oathband:enhancement:etacarn-sb9-targeting-implant"
+        },
+        {
+          "enhancement_id": "mercenary-prospector",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mercenary Prospector",
+          "points": 20,
+          "raw_name": "Mercenary Prospector",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:mercenary-oathband:enhancement:mercenary-prospector"
+        },
+        {
+          "enhancement_id": "metaphysical-brokerage",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Metaphysical Brokerage",
+          "points": 20,
+          "raw_name": "Metaphysical Brokerage",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:mercenary-oathband:enhancement:metaphysical-brokerage"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "MERCENARY OATHBAND",
+      "raw_name": "MERCENARY OATHBAND",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:mercenary-oathband"
+    },
+    {
+      "detachment_id": "needga-rd-oathband",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "ancestral-crest",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ancestral Crest",
+          "points": 15,
+          "raw_name": "Ancestral Crest",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:needga-rd-oathband:enhancement:ancestral-crest"
+        },
+        {
+          "enhancement_id": "dead-reckoning",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dead Reckoning",
+          "points": 10,
+          "raw_name": "Dead Reckoning",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:needga-rd-oathband:enhancement:dead-reckoning"
+        },
+        {
+          "enhancement_id": "iron-ambassador",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Iron Ambassador",
+          "points": 5,
+          "raw_name": "Iron Ambassador",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:needga-rd-oathband:enhancement:iron-ambassador"
+        },
+        {
+          "enhancement_id": "oathbound-speculator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Oathbound Speculator",
+          "points": 30,
+          "raw_name": "Oathbound Speculator",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:needga-rd-oathband:enhancement:oathbound-speculator"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "NEEDGA\u00c2RD OATHBAND",
+      "raw_name": "NEEDGA\u00c2RD OATHBAND",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:needga-rd-oathband"
+    },
+    {
+      "detachment_id": "persecution-prospect",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "eye-for-weakness",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eye for Weakness",
+          "points": 25,
+          "raw_name": "Eye for Weakness",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:persecution-prospect:enhancement:eye-for-weakness"
+        },
+        {
+          "enhancement_id": "nomad-strategist",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Nomad Strategist",
+          "points": 20,
+          "raw_name": "Nomad Strategist",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:persecution-prospect:enhancement:nomad-strategist"
+        },
+        {
+          "enhancement_id": "surgical-saboteur",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Surgical Saboteur",
+          "points": 10,
+          "raw_name": "Surgical Saboteur",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:persecution-prospect:enhancement:surgical-saboteur"
+        },
+        {
+          "enhancement_id": "writ-of-acquisition",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Writ of Acquisition",
+          "points": 10,
+          "raw_name": "Writ of Acquisition",
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:persecution-prospect:enhancement:writ-of-acquisition"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "PERSECUTION PROSPECT",
+      "raw_name": "PERSECUTION PROSPECT",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:detachment:persecution-prospect"
+    }
+  ],
+  "faction_id": "leagues-of-votann",
+  "name": "Leagues of Votann",
+  "raw_name": "Leagues of Votann",
+  "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-arkanyst-evaluator:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-arkanyst-evaluator:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARKANYST EVALUATOR",
+      "raw_name": "ARKANYST EVALUATOR",
+      "record_id": "units-arkanyst-evaluator",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-arkanyst-evaluator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "arkanyst-evaluator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-berehk-stornbr-w:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-berehk-stornbr-w:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CTHONIAN BESERKS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cthonian-beserks"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-berehk-stornbr-w:leader"
+      },
+      "name": "BEREHK STORNBR\u00d6W",
+      "raw_name": "BEREHK STORNBR\u00d6W",
+      "record_id": "units-berehk-stornbr-w",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-berehk-stornbr-w",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "berehk-stornbr-w",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-iron-master:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-iron-master:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BR\u00d4KHYR THUNDERKYN",
+          "HEARTHKYN WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "br-khyr-thunderkyn",
+          "hearthkyn-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-iron-master:leader"
+      },
+      "name": "BR\u00d4KHYR IRON-MASTER",
+      "raw_name": "BR\u00d4KHYR IRON-MASTER",
+      "record_id": "units-br-khyr-iron-master",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-iron-master",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "br-khyr-iron-master",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-thunderkyn:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-thunderkyn:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-thunderkyn:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-thunderkyn:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-thunderkyn:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-thunderkyn:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BR\u00d4KHYR THUNDERKYN",
+      "raw_name": "BR\u00d4KHYR THUNDERKYN",
+      "record_id": "units-br-khyr-thunderkyn",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-br-khyr-thunderkyn",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "br-khyr-thunderkyn",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-buri-aegnirssen:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-buri-aegnirssen:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BURI AEGNIRSSEN",
+      "raw_name": "BURI AEGNIRSSEN",
+      "record_id": "units-buri-aegnirssen",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-buri-aegnirssen",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "buri-aegnirssen",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-cthonian-beserks:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-cthonian-beserks:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-cthonian-beserks:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CTHONIAN BESERKS",
+      "raw_name": "CTHONIAN BESERKS",
+      "record_id": "units-cthonian-beserks",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-cthonian-beserks",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "cthonian-beserks",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-cthonian-earthshakers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-cthonian-earthshakers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CTHONIAN EARTHSHAKERS",
+      "raw_name": "CTHONIAN EARTHSHAKERS",
+      "record_id": "units-cthonian-earthshakers",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-cthonian-earthshakers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "cthonian-earthshakers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-champion:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-champion:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "EINHYR HEARTHGUARD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "einhyr-hearthguard"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-champion:leader"
+      },
+      "name": "EINHYR CHAMPION",
+      "raw_name": "EINHYR CHAMPION",
+      "record_id": "units-einhyr-champion",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-champion",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "einhyr-champion",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-hearthguard:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-hearthguard:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-hearthguard:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-hearthguard:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-hearthguard:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-hearthguard:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "EINHYR HEARTHGUARD",
+      "raw_name": "EINHYR HEARTHGUARD",
+      "record_id": "units-einhyr-hearthguard",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-einhyr-hearthguard",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "einhyr-hearthguard",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-grimnyr:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-grimnyr:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "HEARTHKYN WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "hearthkyn-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-grimnyr:leader"
+      },
+      "name": "GRIMNYR",
+      "raw_name": "GRIMNYR",
+      "record_id": "units-grimnyr",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-grimnyr",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "grimnyr",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hearthkyn-warriors:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hearthkyn-warriors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HEARTHKYN WARRIORS",
+      "raw_name": "HEARTHKYN WARRIORS",
+      "record_id": "units-hearthkyn-warriors",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hearthkyn-warriors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "hearthkyn-warriors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hekaton-land-fortress:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hekaton-land-fortress:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 265,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hekaton-land-fortress:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hekaton-land-fortress:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HEKATON LAND FORTRESS",
+      "raw_name": "HEKATON LAND FORTRESS",
+      "record_id": "units-hekaton-land-fortress",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hekaton-land-fortress",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "hekaton-land-fortress",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-pioneers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-pioneers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-pioneers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-pioneers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-pioneers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-pioneers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HERNKYN PIONEERS",
+      "raw_name": "HERNKYN PIONEERS",
+      "record_id": "units-hernkyn-pioneers",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-pioneers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "hernkyn-pioneers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-yaegirs:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-yaegirs:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HERNKYN YAEGIRS",
+      "raw_name": "HERNKYN YAEGIRS",
+      "record_id": "units-hernkyn-yaegirs",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-hernkyn-yaegirs",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "hernkyn-yaegirs",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-heavy-volkanite-disintegrators:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-heavy-volkanite-disintegrators:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-heavy-volkanite-disintegrators:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-heavy-volkanite-disintegrators:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-heavy-volkanite-disintegrators:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-heavy-volkanite-disintegrators:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IRONKIN STEELJACKS WITH HEAVY VOLKANITE DISINTEGRATORS",
+      "raw_name": "IRONKIN STEELJACKS WITH HEAVY VOLKANITE DISINTEGRATORS",
+      "record_id": "units-ironkin-steeljacks-with-heavy-volkanite-disintegrators",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-heavy-volkanite-disintegrators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ironkin-steeljacks-with-heavy-volkanite-disintegrators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-melee-weapons:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-melee-weapons:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-melee-weapons:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-melee-weapons:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-melee-weapons:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-melee-weapons:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IRONKIN STEELJACKS WITH MELEE WEAPONS",
+      "raw_name": "IRONKIN STEELJACKS WITH MELEE WEAPONS",
+      "record_id": "units-ironkin-steeljacks-with-melee-weapons",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-melee-weapons",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ironkin-steeljacks-with-melee-weapons",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-k-hl:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-k-hl:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "EINHYR HEARTHGUARD",
+          "HEARTHKYN WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "einhyr-hearthguard",
+          "hearthkyn-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-k-hl:leader"
+      },
+      "name": "K\u00c2HL",
+      "raw_name": "K\u00c2HL",
+      "record_id": "units-k-hl",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-k-hl",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "k-hl",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-kapricus-carrier:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-kapricus-carrier:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-kapricus-carrier:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-kapricus-carrier:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KAPRICUS CARRIER",
+      "raw_name": "KAPRICUS CARRIER",
+      "record_id": "units-kapricus-carrier",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-kapricus-carrier",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "kapricus-carrier",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-kapricus-defenders:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-kapricus-defenders:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-kapricus-defenders:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KAPRICUS DEFENDERS",
+      "raw_name": "KAPRICUS DEFENDERS",
+      "record_id": "units-kapricus-defenders",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-kapricus-defenders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "kapricus-defenders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-memnyr-strategist:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-memnyr-strategist:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IRONKIN STEELJACKS WITH HEAVY VOLKANITE DISINTEGRATORS",
+          "IRONKIN STEELJACKS WITH MELEE WEAPONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "ironkin-steeljacks-with-heavy-volkanite-disintegrators",
+          "ironkin-steeljacks-with-melee-weapons"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-memnyr-strategist:leader"
+      },
+      "name": "MEMNYR STRATEGIST",
+      "raw_name": "MEMNYR STRATEGIST",
+      "record_id": "units-memnyr-strategist",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-memnyr-strategist",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "memnyr-strategist",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-sagitaur:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-sagitaur:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-sagitaur:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-sagitaur:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SAGITAUR",
+      "raw_name": "SAGITAUR",
+      "record_id": "units-sagitaur",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-sagitaur",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sagitaur",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-thar-the-destined:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-thar-the-destined:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "EINHYR HEARTHGUARD",
+          "HEARTHKYN WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "einhyr-hearthguard",
+          "hearthkyn-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-thar-the-destined:leader"
+      },
+      "name": "\u00dbTHAR THE DESTINED",
+      "raw_name": "\u00dbTHAR THE DESTINED",
+      "record_id": "units-thar-the-destined",
+      "source_id": "gw-11e-mfm-2026-07:faction:leagues-of-votann:unit:units-thar-the-destined",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "thar-the-destined",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/leagues-of-votann"
+}

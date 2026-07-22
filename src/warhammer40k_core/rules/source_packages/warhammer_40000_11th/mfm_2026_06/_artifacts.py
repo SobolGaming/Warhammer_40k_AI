@@ -14,7 +14,7 @@ from warhammer40k_core.rules.mfm_source import (
     MfmWargearCostPayload,
 )
 
-MFM_SOURCE_PACKAGE_ARTIFACT_SCHEMA = "core-v2-mfm-source-package-v1"
+MFM_SOURCE_PACKAGE_ARTIFACT_SCHEMA = "core-v2-mfm-source-package-v2"
 
 
 class _MfmUnitCostRowArtifact(msgspec.Struct, frozen=True):
@@ -109,6 +109,7 @@ class _MfmUnitRecordArtifact(msgspec.Struct, frozen=True):
     cost_brackets: list[_MfmUnitCostBracketArtifact]
     wargear_costs: list[_MfmWargearCostArtifact]
     leader_allowance: _MfmLeaderAllowanceArtifact | None
+    support_allowance: _MfmLeaderAllowanceArtifact | None
     source_id: str
 
     def to_payload(self) -> MfmUnitRecordPayload:
@@ -123,6 +124,9 @@ class _MfmUnitRecordArtifact(msgspec.Struct, frozen=True):
             "wargear_costs": [cost.to_payload() for cost in self.wargear_costs],
             "leader_allowance": (
                 None if self.leader_allowance is None else self.leader_allowance.to_payload()
+            ),
+            "support_allowance": (
+                None if self.support_allowance is None else self.support_allowance.to_payload()
             ),
             "source_id": self.source_id,
         }

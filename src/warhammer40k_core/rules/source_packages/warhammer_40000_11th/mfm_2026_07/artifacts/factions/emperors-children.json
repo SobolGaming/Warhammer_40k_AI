@@ -1,0 +1,1621 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "carnival-of-excess",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "dark-blessings",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dark Blessings",
+          "points": 10,
+          "raw_name": "Dark Blessings",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:carnival-of-excess:enhancement:dark-blessings"
+        },
+        {
+          "enhancement_id": "empyric-suffusion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Empyric Suffusion",
+          "points": 15,
+          "raw_name": "Empyric Suffusion",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:carnival-of-excess:enhancement:empyric-suffusion"
+        },
+        {
+          "enhancement_id": "possessed-blade",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Possessed Blade",
+          "points": 25,
+          "raw_name": "Possessed Blade",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:carnival-of-excess:enhancement:possessed-blade"
+        },
+        {
+          "enhancement_id": "warp-walker",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warp Walker",
+          "points": 30,
+          "raw_name": "Warp Walker",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:carnival-of-excess:enhancement:warp-walker"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "CARNIVAL OF EXCESS",
+      "raw_name": "CARNIVAL OF EXCESS",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:carnival-of-excess"
+    },
+    {
+      "detachment_id": "coterie-of-the-conceited",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "pledge-of-dark-glory",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pledge of Dark Glory",
+          "points": 25,
+          "raw_name": "Pledge of Dark Glory",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:coterie-of-the-conceited:enhancement:pledge-of-dark-glory"
+        },
+        {
+          "enhancement_id": "pledge-of-eternal-servitude",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pledge of Eternal Servitude",
+          "points": 25,
+          "raw_name": "Pledge of Eternal Servitude",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:coterie-of-the-conceited:enhancement:pledge-of-eternal-servitude"
+        },
+        {
+          "enhancement_id": "pledge-of-mortal-pain",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pledge of Mortal Pain",
+          "points": 15,
+          "raw_name": "Pledge of Mortal Pain",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:coterie-of-the-conceited:enhancement:pledge-of-mortal-pain"
+        },
+        {
+          "enhancement_id": "pledge-of-unholy-fortune",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pledge of Unholy Fortune",
+          "points": 30,
+          "raw_name": "Pledge of Unholy Fortune",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:coterie-of-the-conceited:enhancement:pledge-of-unholy-fortune"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "COTERIE OF THE CONCEITED",
+      "raw_name": "COTERIE OF THE CONCEITED",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:coterie-of-the-conceited"
+    },
+    {
+      "detachment_id": "court-of-the-phoenician",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "exalted-patron",
+          "is_upgrade": false,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "FLAWLESS BLADES"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "flawless-blades"
+            ],
+            "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:exalted-patron:leader"
+          },
+          "name": "Exalted Patron",
+          "points": 15,
+          "raw_name": "Exalted Patron",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:exalted-patron"
+        },
+        {
+          "enhancement_id": "soulstain-made-manifest",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Soulstain Made Manifest",
+          "points": 15,
+          "raw_name": "Soulstain Made Manifest",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:soulstain-made-manifest"
+        },
+        {
+          "enhancement_id": "spiritsliver",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Spiritsliver",
+          "points": 20,
+          "raw_name": "Spiritsliver",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:spiritsliver"
+        },
+        {
+          "enhancement_id": "tears-of-the-phoenix",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tears of the Phoenix",
+          "points": 25,
+          "raw_name": "Tears of the Phoenix",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:tears-of-the-phoenix"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "COURT OF THE PHOENICIAN",
+      "raw_name": "COURT OF THE PHOENICIAN",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician"
+    },
+    {
+      "detachment_id": "elegant-brutes",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "cacophonic-accompaniment",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cacophonic Accompaniment",
+          "points": 20,
+          "raw_name": "Cacophonic Accompaniment",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:elegant-brutes:enhancement:cacophonic-accompaniment"
+        },
+        {
+          "enhancement_id": "frenzied-ferocity",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Frenzied Ferocity (Upgrade)",
+          "points": 15,
+          "raw_name": "Frenzied Ferocity (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:elegant-brutes:enhancement:frenzied-ferocity"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "ELEGANT BRUTES",
+      "raw_name": "ELEGANT BRUTES",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:elegant-brutes"
+    },
+    {
+      "detachment_id": "frenzied-host",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "euphoric-crown",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Euphoric Crown",
+          "points": 20,
+          "raw_name": "Euphoric Crown",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:frenzied-host:enhancement:euphoric-crown"
+        },
+        {
+          "enhancement_id": "howling-plate",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Howling Plate",
+          "points": 20,
+          "raw_name": "Howling Plate",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:frenzied-host:enhancement:howling-plate"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "FRENZIED HOST",
+      "raw_name": "FRENZIED HOST",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:frenzied-host"
+    },
+    {
+      "detachment_id": "mercurial-host",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "intoxicating-musk",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Intoxicating Musk",
+          "points": 20,
+          "raw_name": "Intoxicating Musk",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:mercurial-host:enhancement:intoxicating-musk"
+        },
+        {
+          "enhancement_id": "loathsome-dexterity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Loathsome Dexterity",
+          "points": 10,
+          "raw_name": "Loathsome Dexterity",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:mercurial-host:enhancement:loathsome-dexterity"
+        },
+        {
+          "enhancement_id": "steeped-in-suffering",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Steeped in Suffering",
+          "points": 20,
+          "raw_name": "Steeped in Suffering",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:mercurial-host:enhancement:steeped-in-suffering"
+        },
+        {
+          "enhancement_id": "tactical-perfection",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tactical Perfection",
+          "points": 15,
+          "raw_name": "Tactical Perfection",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:mercurial-host:enhancement:tactical-perfection"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "MERCURIAL HOST",
+      "raw_name": "MERCURIAL HOST",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:mercurial-host"
+    },
+    {
+      "detachment_id": "peerless-bladesmen",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "blinding-speed",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blinding Speed",
+          "points": 25,
+          "raw_name": "Blinding Speed",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:peerless-bladesmen:enhancement:blinding-speed"
+        },
+        {
+          "enhancement_id": "distortion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Distortion",
+          "points": 25,
+          "raw_name": "Distortion",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:peerless-bladesmen:enhancement:distortion"
+        },
+        {
+          "enhancement_id": "faultless-opportunist",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Faultless Opportunist",
+          "points": 15,
+          "raw_name": "Faultless Opportunist",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:peerless-bladesmen:enhancement:faultless-opportunist"
+        },
+        {
+          "enhancement_id": "rise-to-the-challenge",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Rise to the Challenge",
+          "points": 30,
+          "raw_name": "Rise to the Challenge",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:peerless-bladesmen:enhancement:rise-to-the-challenge"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "PEERLESS BLADESMEN",
+      "raw_name": "PEERLESS BLADESMEN",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:peerless-bladesmen"
+    },
+    {
+      "detachment_id": "rapid-evisceration",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "accomplished-tactician",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Accomplished Tactician",
+          "points": 35,
+          "raw_name": "Accomplished Tactician",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:rapid-evisceration:enhancement:accomplished-tactician"
+        },
+        {
+          "enhancement_id": "heretek-adept",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Heretek Adept",
+          "points": 35,
+          "raw_name": "Heretek Adept",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:rapid-evisceration:enhancement:heretek-adept"
+        },
+        {
+          "enhancement_id": "spearhead-striker",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Spearhead Striker",
+          "points": 20,
+          "raw_name": "Spearhead Striker",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:rapid-evisceration:enhancement:spearhead-striker"
+        },
+        {
+          "enhancement_id": "sublime-prescience",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sublime Prescience",
+          "points": 25,
+          "raw_name": "Sublime Prescience",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:rapid-evisceration:enhancement:sublime-prescience"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "RAPID EVISCERATION",
+      "raw_name": "RAPID EVISCERATION",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:rapid-evisceration"
+    },
+    {
+      "detachment_id": "slaaneshs-chosen",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "eager-to-prove",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eager to Prove",
+          "points": 15,
+          "raw_name": "Eager to Prove",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:slaaneshs-chosen:enhancement:eager-to-prove"
+        },
+        {
+          "enhancement_id": "proud-and-vainglorious",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Proud and Vainglorious",
+          "points": 20,
+          "raw_name": "Proud and Vainglorious",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:slaaneshs-chosen:enhancement:proud-and-vainglorious"
+        },
+        {
+          "enhancement_id": "repulsed-by-weakness",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Repulsed by Weakness",
+          "points": 25,
+          "raw_name": "Repulsed by Weakness",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:slaaneshs-chosen:enhancement:repulsed-by-weakness"
+        },
+        {
+          "enhancement_id": "slayer-of-champions",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Slayer of Champions",
+          "points": 15,
+          "raw_name": "Slayer of Champions",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:slaaneshs-chosen:enhancement:slayer-of-champions"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "SLAANESH'S CHOSEN",
+      "raw_name": "SLAANESH'S CHOSEN",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:slaaneshs-chosen"
+    },
+    {
+      "detachment_id": "spectacle-of-slaughter",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "beguiling-grotesquerie",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Beguiling Grotesquerie (Upgrade)",
+          "points": 15,
+          "raw_name": "Beguiling Grotesquerie (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:beguiling-grotesquerie"
+        },
+        {
+          "enhancement_id": "eager-patrons",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Eager Patrons (Upgrade)",
+          "points": 20,
+          "raw_name": "Eager Patrons (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:eager-patrons"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "SPECTACLE OF SLAUGHTER",
+      "raw_name": "SPECTACLE OF SLAUGHTER",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter"
+    }
+  ],
+  "faction_id": "emperors-children",
+  "name": "Emperor's Children",
+  "raw_name": "Emperor's Children",
+  "source_id": "gw-11e-mfm-2026-07:faction:emperors-children",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-daemonettes:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-daemonettes:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMONETTES",
+      "raw_name": "DAEMONETTES",
+      "record_id": "legions-of-excess-daemonettes",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-daemonettes",
+      "source_section_id": "legions-of-excess",
+      "source_section_name": "LEGIONS OF EXCESS",
+      "support_allowance": null,
+      "unit_id": "daemonettes",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-fiends:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-fiends:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-fiends:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FIENDS",
+      "raw_name": "FIENDS",
+      "record_id": "legions-of-excess-fiends",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-fiends",
+      "source_section_id": "legions-of-excess",
+      "source_section_name": "LEGIONS OF EXCESS",
+      "support_allowance": null,
+      "unit_id": "fiends",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 255,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-keeper-of-secrets:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-keeper-of-secrets:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-keeper-of-secrets:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-keeper-of-secrets:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KEEPER OF SECRETS",
+      "raw_name": "KEEPER OF SECRETS",
+      "record_id": "legions-of-excess-keeper-of-secrets",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-keeper-of-secrets",
+      "source_section_id": "legions-of-excess",
+      "source_section_name": "LEGIONS OF EXCESS",
+      "support_allowance": null,
+      "unit_id": "keeper-of-secrets",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-seekers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-seekers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-seekers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SEEKERS",
+      "raw_name": "SEEKERS",
+      "record_id": "legions-of-excess-seekers",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-seekers",
+      "source_section_id": "legions-of-excess",
+      "source_section_name": "LEGIONS OF EXCESS",
+      "support_allowance": null,
+      "unit_id": "seekers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 315,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-shalaxi-helbane:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-shalaxi-helbane:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SHALAXI HELBANE",
+      "raw_name": "SHALAXI HELBANE",
+      "record_id": "legions-of-excess-shalaxi-helbane",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:legions-of-excess-shalaxi-helbane",
+      "source_section_id": "legions-of-excess",
+      "source_section_name": "LEGIONS OF EXCESS",
+      "support_allowance": null,
+      "unit_id": "shalaxi-helbane",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-land-raider:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-land-raider:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS LAND RAIDER",
+      "raw_name": "CHAOS LAND RAIDER",
+      "record_id": "units-chaos-land-raider",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-land-raider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-land-raider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-rhino:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-rhino:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-rhino:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-rhino:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS RHINO",
+      "raw_name": "CHAOS RHINO",
+      "record_id": "units-chaos-rhino",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-rhino",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-rhino",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-spawn:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-spawn:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS SPAWN",
+      "raw_name": "CHAOS SPAWN",
+      "record_id": "units-chaos-spawn",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-spawn",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-spawn",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-terminators:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-terminators:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS TERMINATORS",
+      "raw_name": "CHAOS TERMINATORS",
+      "record_id": "units-chaos-terminators",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-chaos-terminators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-terminators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-daemon-prince-of-slaanesh:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-daemon-prince-of-slaanesh:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF SLAANESH",
+      "raw_name": "DAEMON PRINCE OF SLAANESH",
+      "record_id": "units-daemon-prince-of-slaanesh",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-daemon-prince-of-slaanesh",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "daemon-prince-of-slaanesh",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 205,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-daemon-prince-of-slaanesh-with-wings:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-daemon-prince-of-slaanesh-with-wings:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 235,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-daemon-prince-of-slaanesh-with-wings:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-daemon-prince-of-slaanesh-with-wings:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF SLAANESH WITH WINGS",
+      "raw_name": "DAEMON PRINCE OF SLAANESH WITH WINGS",
+      "record_id": "units-daemon-prince-of-slaanesh-with-wings",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-daemon-prince-of-slaanesh-with-wings",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "daemon-prince-of-slaanesh-with-wings",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 300,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-defiler:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-defiler:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 340,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-defiler:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-defiler:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEFILER",
+      "raw_name": "DEFILER",
+      "record_id": "units-defiler",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-defiler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "defiler",
+      "wargear_costs": [
+        {
+          "name": "Hades lascannon",
+          "points_per_item": 15,
+          "raw_name": "per Hades lascannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-defiler:wargear:per-hades-lascannon:2",
+          "wargear_id": "hades-lascannon"
+        },
+        {
+          "name": "Heavy reaper autocannon",
+          "points_per_item": 15,
+          "raw_name": "per Heavy reaper autocannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-defiler:wargear:per-heavy-reaper-autocannon:1",
+          "wargear_id": "heavy-reaper-autocannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-flawless-blades:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-flawless-blades:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-flawless-blades:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FLAWLESS BLADES",
+      "raw_name": "FLAWLESS BLADES",
+      "record_id": "units-flawless-blades",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-flawless-blades",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "flawless-blades",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 340,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-fulgrim:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-fulgrim:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FULGRIM",
+      "raw_name": "FULGRIM",
+      "record_id": "units-fulgrim",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-fulgrim",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "fulgrim",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-heldrake:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-heldrake:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELDRAKE",
+      "raw_name": "HELDRAKE",
+      "record_id": "units-heldrake",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-heldrake",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "heldrake",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-infractors:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-infractors:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-infractors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INFRACTORS",
+      "raw_name": "INFRACTORS",
+      "record_id": "units-infractors",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-infractors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "infractors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-exultant:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-exultant:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-exultant:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-exultant:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "INFRACTORS",
+          "TORMENTORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "infractors",
+          "tormentors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-exultant:leader"
+      },
+      "name": "LORD EXULTANT",
+      "raw_name": "LORD EXULTANT",
+      "record_id": "units-lord-exultant",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-exultant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lord-exultant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-kakophonist:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-kakophonist:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHAOS TERMINATORS",
+          "NOISE MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chaos-terminators",
+          "noise-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-kakophonist:leader"
+      },
+      "name": "LORD KAKOPHONIST",
+      "raw_name": "LORD KAKOPHONIST",
+      "record_id": "units-lord-kakophonist",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lord-kakophonist",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lord-kakophonist",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lucius-the-eternal:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lucius-the-eternal:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "FLAWLESS BLADES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "flawless-blades"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lucius-the-eternal:leader"
+      },
+      "name": "LUCIUS THE ETERNAL",
+      "raw_name": "LUCIUS THE ETERNAL",
+      "record_id": "units-lucius-the-eternal",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-lucius-the-eternal",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lucius-the-eternal",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-maulerfiend:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-maulerfiend:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-maulerfiend:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-maulerfiend:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MAULERFIEND",
+      "raw_name": "MAULERFIEND",
+      "record_id": "units-maulerfiend",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-maulerfiend",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "maulerfiend",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-noise-marines:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-noise-marines:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-noise-marines:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-noise-marines:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NOISE MARINES",
+      "raw_name": "NOISE MARINES",
+      "record_id": "units-noise-marines",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-noise-marines",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "noise-marines",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-sorcerer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-sorcerer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "INFRACTORS",
+          "NOISE MARINES",
+          "TORMENTORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "infractors",
+          "noise-marines",
+          "tormentors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-sorcerer:leader"
+      },
+      "name": "SORCERER",
+      "raw_name": "SORCERER",
+      "record_id": "units-sorcerer",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-sorcerer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sorcerer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-tormentors:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-tormentors:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-tormentors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TORMENTORS",
+      "raw_name": "TORMENTORS",
+      "record_id": "units-tormentors",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:unit:units-tormentors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "tormentors",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/emperors-children"
+}

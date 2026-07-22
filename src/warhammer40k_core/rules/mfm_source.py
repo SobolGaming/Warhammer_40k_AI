@@ -4,15 +4,84 @@ import hashlib
 import json
 import re
 from dataclasses import dataclass, field
-from html.parser import HTMLParser
 from typing import Self, TypedDict
 
-from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.rules.mfm_html_tree import (
+    HtmlNode as _HtmlNode,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    direct_node_children as _direct_node_children,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    first_direct_node_child as _first_direct_node_child,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    node_contains_template as _node_contains_template,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    node_has_class_token as _node_has_class_token,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    node_has_class_tokens as _node_has_class_tokens,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    node_text as _node_text,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    parse_html as _parse_html,
+)
+from warhammer40k_core.rules.mfm_html_tree import (
+    walk as _walk,
+)
+from warhammer40k_core.rules.mfm_sections import (
+    mfm_section_is_supported as _mfm_section_is_supported,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    MfmSourceError as MfmSourceError,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    normalize_wargear_cost_label as _normalize_wargear_cost_label,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    split_attachment_names as _split_attachment_names,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    strip_upgrade_suffix as _strip_upgrade_suffix,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_identifier as _validate_identifier,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_identifier_tuple as _validate_identifier_tuple,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_non_negative_int as _validate_non_negative_int,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_optional_identifier as _validate_optional_identifier,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_optional_non_negative_int as _validate_optional_non_negative_int,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_optional_positive_int as _validate_optional_positive_int,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_positive_int as _validate_positive_int,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_raw_label as _validate_raw_label,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_source_id as _validate_source_id,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_source_url as _validate_source_url,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    validate_url_path as _validate_url_path,
+)
 from warhammer40k_core.rules.text_normalization import normalize_source_label
-
-
-class MfmSourceError(ValueError):
-    """Raised when Munitorum Field Manual source data violates CORE V2 invariants."""
 
 
 class MfmIndexFactionPayload(TypedDict):
@@ -71,6 +140,7 @@ class MfmUnitRecordPayload(TypedDict):
     cost_brackets: list[MfmUnitCostBracketPayload]
     wargear_costs: list[MfmWargearCostPayload]
     leader_allowance: MfmLeaderAllowancePayload | None
+    support_allowance: MfmLeaderAllowancePayload | None
     source_id: str
 
 
@@ -115,12 +185,20 @@ class MfmSourcePackagePayload(TypedDict):
     source_payload_checksum_sha256: str
 
 
-_IDENTIFIER_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 _NON_IDENTIFIER_TEXT_RE = re.compile(r"[^a-z0-9]+")
 _MODEL_COUNT_RE = re.compile(r"^(?P<count>[1-9][0-9]*)\s+models?$", re.IGNORECASE)
 _MODEL_NAME_COUNT_RE = re.compile(r"^(?P<count>[1-9][0-9]*)\s+(?P<name>.+)$")
 _ADDITIONAL_MODEL_RE = re.compile(r"^\+\s*(?P<count>[1-9][0-9]*)\s+(?P<name>.+)$")
-_POINTS_RE = re.compile(r"^(?P<points>[0-9][0-9,]*)\s+pts$", re.IGNORECASE)
+_VALUE_CHANGE_PREFIX = r"(?:[▲▼]\s+\([+-][0-9][0-9,]*\)\s+)?"
+_POINTS_RE = re.compile(
+    rf"^{_VALUE_CHANGE_PREFIX}(?P<points>[0-9][0-9,]*)\s+pts$",
+    re.IGNORECASE,
+)
+_DETACHMENT_POINTS_RE = re.compile(
+    rf"^{_VALUE_CHANGE_PREFIX}(?P<points>[0-9][0-9,]*)\s*DP(?:\s+[▲▼]+)?$",
+    re.IGNORECASE,
+)
+_MFM_VERSION_RE = re.compile(r"^v[0-9]+(?:\.[0-9]+)*$", re.IGNORECASE)
 _ORDINAL_RE = re.compile(r"^(?P<number>[1-9][0-9]*)(?:st|nd|rd|th)$", re.IGNORECASE)
 _COST_BRACKET_SINGLE_RE = re.compile(
     r"^YOUR (?P<ordinal>[1-9][0-9]*(?:ST|ND|RD|TH)) UNIT COSTS?$",
@@ -136,36 +214,9 @@ _COST_BRACKET_OPEN_RE = re.compile(
     re.IGNORECASE,
 )
 _CARD_CLASS_TOKENS = frozenset(("flex", "flex-col", "space-y-1", "m-1"))
-_UNIT_TITLE_CLASS_TOKENS = frozenset(("bg-slate-500", "font-bold", "text-xl", "text-white"))
+_UNIT_TITLE_CLASS_TOKENS = frozenset(("font-bold", "text-white"))
 _DETACHMENT_TITLE_CLASS_TOKENS = frozenset(("flex-row", "justify-between", "text-white"))
-UNSUPPORTED_MFM_SECTION_IDS = frozenset(
-    (
-        "combat-patrol",
-        "crusade",
-        "forge-world",
-        "forge-worlds",
-        "kill-team",
-        "legends",
-    )
-)
-_VOID_TAGS = frozenset(
-    (
-        "area",
-        "base",
-        "br",
-        "col",
-        "embed",
-        "hr",
-        "img",
-        "input",
-        "link",
-        "meta",
-        "param",
-        "source",
-        "track",
-        "wbr",
-    )
-)
+_ATTACHMENT_SECTION_HEADERS = frozenset(("LEADER", "SUPPORT"))
 
 
 @dataclass(frozen=True, slots=True)
@@ -458,6 +509,7 @@ class MfmUnitRecord:
     cost_brackets: tuple[MfmUnitCostBracket, ...]
     wargear_costs: tuple[MfmWargearCost, ...] = ()
     leader_allowance: MfmLeaderAllowance | None = None
+    support_allowance: MfmLeaderAllowance | None = None
     source_id: str = ""
 
     def __post_init__(self) -> None:
@@ -486,6 +538,11 @@ class MfmUnitRecord:
             and type(self.leader_allowance) is not MfmLeaderAllowance
         ):
             raise MfmSourceError("MfmUnitRecord leader_allowance must be MfmLeaderAllowance.")
+        if (
+            self.support_allowance is not None
+            and type(self.support_allowance) is not MfmLeaderAllowance
+        ):
+            raise MfmSourceError("MfmUnitRecord support_allowance must be MfmLeaderAllowance.")
         object.__setattr__(self, "source_id", _validate_source_id(self.source_id))
 
     @property
@@ -512,6 +569,9 @@ class MfmUnitRecord:
             "leader_allowance": (
                 None if self.leader_allowance is None else self.leader_allowance.to_payload()
             ),
+            "support_allowance": (
+                None if self.support_allowance is None else self.support_allowance.to_payload()
+            ),
             "source_id": self.source_id,
         }
 
@@ -533,6 +593,11 @@ class MfmUnitRecord:
                 None
                 if payload["leader_allowance"] is None
                 else MfmLeaderAllowance.from_payload(payload["leader_allowance"])
+            ),
+            support_allowance=(
+                None
+                if payload["support_allowance"] is None
+                else MfmLeaderAllowance.from_payload(payload["support_allowance"])
             ),
             source_id=payload["source_id"],
         )
@@ -853,56 +918,6 @@ class MfmSourcePackage:
         }
 
 
-@dataclass(slots=True)
-class _HtmlNode:
-    tag: str
-    attrs: dict[str, str]
-    children: list[_HtmlNode | str]
-
-
-class _MfmHtmlTreeBuilder(HTMLParser):
-    def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.root = _HtmlNode(tag="document", attrs={}, children=[])
-        self._stack: list[_HtmlNode] = [self.root]
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        normalized_tag = tag.lower()
-        node = _HtmlNode(
-            tag=normalized_tag,
-            attrs={key: "" if value is None else value for key, value in attrs},
-            children=[],
-        )
-        self._stack[-1].children.append(node)
-        if normalized_tag not in _VOID_TAGS:
-            self._stack.append(node)
-
-    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        normalized_tag = tag.lower()
-        self._stack[-1].children.append(
-            _HtmlNode(
-                tag=normalized_tag,
-                attrs={key: "" if value is None else value for key, value in attrs},
-                children=[],
-            )
-        )
-
-    def handle_endtag(self, tag: str) -> None:
-        normalized_tag = tag.lower()
-        if normalized_tag in _VOID_TAGS:
-            return
-        if len(self._stack) == 1 or self._stack[-1].tag != normalized_tag:
-            raise MfmSourceError("MFM HTML contains mismatched tags.")
-        self._stack.pop()
-
-    def handle_data(self, data: str) -> None:
-        if data:
-            self._stack[-1].children.append(data)
-
-    def has_open_tags(self) -> bool:
-        return len(self._stack) != 1
-
-
 def parse_mfm_index_html(html: str) -> tuple[MfmIndexFaction, ...]:
     root = _parse_html(html)
     rows: list[MfmIndexFaction] = []
@@ -926,6 +941,18 @@ def parse_mfm_index_html(html: str) -> tuple[MfmIndexFaction, ...]:
     if not rows:
         raise MfmSourceError("MFM index did not contain faction links.")
     return tuple(sorted(rows, key=lambda row: row.faction_id))
+
+
+def parse_mfm_version_html(html: str) -> str:
+    root = _parse_html(html)
+    versions = {
+        text
+        for heading in _walk(root, tag="h2")
+        if (text := _node_text(heading)) and _MFM_VERSION_RE.fullmatch(text) is not None
+    }
+    if len(versions) != 1:
+        raise MfmSourceError("MFM page did not contain exactly one version label.")
+    return versions.pop()
 
 
 def parse_mfm_faction_html(
@@ -1051,19 +1078,6 @@ def _model_components_from_label(label: str) -> tuple[tuple[int, ...], tuple[str
     return tuple(counts), tuple(names)
 
 
-def _parse_html(html: str) -> _HtmlNode:
-    if type(html) is not str:
-        raise MfmSourceError("MFM HTML must be a string.")
-    if not html.strip():
-        raise MfmSourceError("MFM HTML must not be empty.")
-    parser = _MfmHtmlTreeBuilder()
-    parser.feed(html)
-    parser.close()
-    if parser.has_open_tags():
-        raise MfmSourceError("MFM HTML ended with unclosed tags.")
-    return parser.root
-
-
 def _parse_unit_cards(
     *,
     root: _HtmlNode,
@@ -1074,7 +1088,7 @@ def _parse_unit_cards(
 ) -> tuple[MfmUnitRecord, ...]:
     records: dict[str, MfmUnitRecord] = {}
     for card, section_id, section_name in _card_nodes_with_sections(root):
-        title_node = _unit_title_node(card)
+        title_node = _unit_title_node(card, template_nodes=template_nodes)
         if title_node is None:
             continue
         unit_name = _node_text(title_node)
@@ -1084,6 +1098,7 @@ def _parse_unit_cards(
         cost_brackets: list[MfmUnitCostBracket] = []
         wargear_costs: list[MfmWargearCost] = []
         leader_allowance: MfmLeaderAllowance | None = None
+        support_allowance: MfmLeaderAllowance | None = None
         for section in _direct_node_children(card):
             if section is title_node or not _node_has_class_token(section, "space-y-1"):
                 continue
@@ -1110,14 +1125,18 @@ def _parse_unit_cards(
                         source_prefix=source_prefix,
                     )
                 )
-            elif header_text.upper() == "LEADER":
-                parsed_leader_allowance = _leader_allowance_from_section(
+            elif header_text.upper() in _ATTACHMENT_SECTION_HEADERS:
+                attachment_role = header_text.lower()
+                parsed_allowance = _attachment_allowance_from_section(
                     section=section,
                     template_texts=template_texts,
-                    source_id=f"{source_prefix}:leader",
+                    attachment_role=attachment_role,
+                    source_id=f"{source_prefix}:{attachment_role}",
                 )
-                if parsed_leader_allowance is not None:
-                    leader_allowance = parsed_leader_allowance
+                if parsed_allowance is not None and attachment_role == "leader":
+                    leader_allowance = parsed_allowance
+                elif parsed_allowance is not None:
+                    support_allowance = parsed_allowance
         if not cost_brackets:
             if _node_contains_template(card):
                 continue
@@ -1131,6 +1150,7 @@ def _parse_unit_cards(
             cost_brackets=tuple(cost_brackets),
             wargear_costs=tuple(wargear_costs),
             leader_allowance=leader_allowance,
+            support_allowance=support_allowance,
             source_id=source_prefix,
         )
         previous = records.get(record_id)
@@ -1293,32 +1313,35 @@ def _enhancements_from_section(
     return tuple(enhancements)
 
 
-def _leader_allowance_from_section(
+def _attachment_allowance_from_section(
     *,
     section: _HtmlNode,
     template_texts: dict[str, str],
+    attachment_role: str,
     source_id: str,
 ) -> MfmLeaderAllowance | None:
+    if attachment_role.upper() not in _ATTACHMENT_SECTION_HEADERS:
+        raise MfmSourceError("MFM attachment allowance role is unsupported.")
     header = _first_direct_node_child(section)
     names: list[str] = []
     for child in _direct_node_children(section):
         if child is header:
             continue
         if child.tag == "span":
-            names.extend(_split_leader_names(_node_text(child)))
+            names.extend(_split_attachment_names(_node_text(child)))
         elif child.tag == "template":
             template_id = child.attrs.get("id")
             if template_id is not None and template_id in template_texts:
                 template_text = template_texts[template_id]
                 if (
-                    template_text.upper() != "LEADER"
+                    template_text.upper() not in _ATTACHMENT_SECTION_HEADERS
                     and _POINTS_RE.fullmatch(template_text) is None
                 ):
-                    names.extend(_split_leader_names(template_text))
+                    names.extend(_split_attachment_names(template_text))
     if not names:
         if any(child.tag == "template" for child in _direct_node_children(section)):
             return None
-        raise MfmSourceError("MFM LEADER section has no allowed bodyguard names.")
+        raise MfmSourceError(f"MFM {attachment_role.upper()} section has no bodyguard names.")
     normalized_names = tuple(normalize_source_label(name) for name in names)
     return MfmLeaderAllowance(
         allowed_bodyguard_unit_ids=tuple(source_label_slug(name) for name in normalized_names),
@@ -1344,13 +1367,41 @@ def _merge_duplicate_unit_record(
         and previous.wargear_costs == current.wargear_costs
         and previous.source_id == current.source_id
     ):
-        if previous.leader_allowance is None and current.leader_allowance is not None:
-            return current
-        if previous.leader_allowance is not None and current.leader_allowance is None:
-            return previous
+        leader_allowance = _merged_attachment_allowance(
+            previous=previous.leader_allowance,
+            current=current.leader_allowance,
+        )
+        support_allowance = _merged_attachment_allowance(
+            previous=previous.support_allowance,
+            current=current.support_allowance,
+        )
+        return MfmUnitRecord(
+            record_id=previous.record_id,
+            unit_id=previous.unit_id,
+            raw_name=previous.raw_name,
+            source_section_id=previous.source_section_id,
+            source_section_name=previous.source_section_name,
+            cost_brackets=previous.cost_brackets,
+            wargear_costs=previous.wargear_costs,
+            leader_allowance=leader_allowance,
+            support_allowance=support_allowance,
+            source_id=previous.source_id,
+        )
     raise MfmSourceError(
         f"MFM faction page contains conflicting duplicate unit cards for {previous.record_id}."
     )
+
+
+def _merged_attachment_allowance(
+    *,
+    previous: MfmLeaderAllowance | None,
+    current: MfmLeaderAllowance | None,
+) -> MfmLeaderAllowance | None:
+    if previous is None:
+        return current
+    if current is None or current == previous:
+        return previous
+    raise MfmSourceError("MFM duplicate unit cards contain conflicting attachment allowances.")
 
 
 def _enhancement_leader_allowance_from_wrapper(
@@ -1361,7 +1412,9 @@ def _enhancement_leader_allowance_from_wrapper(
     for div in _walk(wrapper, tag="div"):
         spans = [_node_text(span) for span in _walk(div, tag="span")]
         if len(spans) >= 2 and spans[0].upper() == "LEADER:":
-            names = tuple(normalize_source_label(name) for name in _split_leader_names(spans[1]))
+            names = tuple(
+                normalize_source_label(name) for name in _split_attachment_names(spans[1])
+            )
             return MfmLeaderAllowance(
                 allowed_bodyguard_unit_ids=tuple(source_label_slug(name) for name in names),
                 allowed_bodyguard_names=names,
@@ -1434,7 +1487,7 @@ def _card_nodes_with_sections(
     root: _HtmlNode,
 ) -> tuple[tuple[_HtmlNode, str | None, str | None], ...]:
     cards: list[tuple[_HtmlNode, str | None, str | None]] = []
-    section_state = _SectionState(section_id=None, section_name=None)
+    section_state = _SectionState(section_id=None, section_name=None, include_cards=None)
     _collect_card_nodes_with_sections(
         node=root,
         section_state=section_state,
@@ -1447,6 +1500,7 @@ def _card_nodes_with_sections(
 class _SectionState:
     section_id: str | None
     section_name: str | None
+    include_cards: bool | None
 
 
 def _collect_card_nodes_with_sections(
@@ -1458,13 +1512,18 @@ def _collect_card_nodes_with_sections(
     for child in _direct_node_children(node):
         if child.tag == "h3":
             section_name = _node_text(child)
-            if section_name:
-                section_state.section_name = section_name
-                section_state.section_id = source_label_slug(section_name)
+            if not section_name:
+                raise MfmSourceError("MFM page contains an empty section heading.")
+            section_id = source_label_slug(section_name)
+            section_state.section_name = section_name
+            section_state.section_id = section_id
+            section_state.include_cards = _mfm_section_is_supported(section_id)
             continue
-        if section_state.section_id in UNSUPPORTED_MFM_SECTION_IDS:
+        if section_state.include_cards is False:
             continue
         if _node_has_class_tokens(child, _CARD_CLASS_TOKENS):
+            if section_state.include_cards is None:
+                raise MfmSourceError("MFM card appears outside a classified section.")
             cards.append((child, section_state.section_id, section_state.section_name))
         _collect_card_nodes_with_sections(
             node=child,
@@ -1473,15 +1532,42 @@ def _collect_card_nodes_with_sections(
         )
 
 
-def _unit_title_node(card: _HtmlNode) -> _HtmlNode | None:
+def _unit_title_node(
+    card: _HtmlNode,
+    *,
+    template_nodes: dict[str, _HtmlNode],
+) -> _HtmlNode | None:
     for child in _direct_node_children(card):
-        if not _node_has_class_tokens(child, _UNIT_TITLE_CLASS_TOKENS):
-            continue
-        if _node_has_class_token(child, "flex-row"):
-            continue
-        text = _node_text(child)
-        if text:
-            return child
+        title_content = _unit_title_content_node(child)
+        if title_content is not None:
+            return title_content
+    for template in (child for child in _direct_node_children(card) if child.tag == "template"):
+        template_id = template.attrs.get("id")
+        if template_id is None:
+            raise MfmSourceError("MFM unit title template is missing id.")
+        template_node = template_nodes.get(template_id)
+        if template_node is None:
+            raise MfmSourceError("MFM unit title template did not resolve to a node.")
+        for candidate in _walk(template_node, tag="div"):
+            title_content = _unit_title_content_node(candidate)
+            if title_content is not None:
+                return title_content
+    return None
+
+
+def _unit_title_content_node(candidate: _HtmlNode) -> _HtmlNode | None:
+    if not _node_has_class_tokens(candidate, _UNIT_TITLE_CLASS_TOKENS):
+        return None
+    if any(
+        _DETACHMENT_POINTS_RE.fullmatch(_node_text(span)) is not None
+        for span in _walk(candidate, tag="span")
+    ):
+        return None
+    if _node_has_class_token(candidate, "text-xl") and _node_text(candidate):
+        return candidate
+    for span in _walk(candidate, tag="span"):
+        if _node_has_class_token(span, "text-xl") and _node_text(span):
+            return span
     return None
 
 
@@ -1489,16 +1575,20 @@ def _detachment_title_node(card: _HtmlNode) -> _HtmlNode | None:
     for child in _direct_node_children(card):
         if _node_has_class_tokens(child, _DETACHMENT_TITLE_CLASS_TOKENS):
             spans = [_node_text(span) for span in _walk(child, tag="span")]
-            if len(spans) >= 2 and spans[1].upper().endswith("DP"):
+            if len(spans) >= 2 and _DETACHMENT_POINTS_RE.fullmatch(spans[1]) is not None:
                 return child
     return None
 
 
 def _parse_detachment_points(label: str) -> int:
-    normalized = normalize_source_label(label).upper()
-    if not normalized.endswith("DP"):
+    normalized = normalize_source_label(label)
+    match = _DETACHMENT_POINTS_RE.fullmatch(normalized)
+    if match is None:
         raise MfmSourceError("MFM detachment point label is invalid.")
-    return _validate_non_negative_int("detachment points", int(normalized.removesuffix("DP")))
+    return _validate_non_negative_int(
+        "detachment points",
+        int(match.group("points").replace(",", "")),
+    )
 
 
 def _ordinal_to_int(value: str) -> int:
@@ -1507,77 +1597,6 @@ def _ordinal_to_int(value: str) -> int:
     if match is None:
         raise MfmSourceError("MFM ordinal label is invalid.")
     return int(match.group("number"))
-
-
-def _strip_upgrade_suffix(value: str) -> str:
-    normalized = normalize_source_label(value)
-    if normalized.lower().endswith(" (upgrade)"):
-        return normalized[:-10]
-    return normalized
-
-
-def _normalize_wargear_cost_label(raw_name: str) -> str:
-    name = normalize_source_label(raw_name)
-    if name.lower().startswith("per "):
-        return normalize_source_label(name[4:])
-    return name
-
-
-def _split_leader_names(value: str) -> tuple[str, ...]:
-    normalized = normalize_source_label(value)
-    names = tuple(normalize_source_label(part) for part in normalized.split(",") if part.strip())
-    if not names:
-        raise MfmSourceError("MFM LEADER allowance must contain at least one name.")
-    return names
-
-
-def _walk(node: _HtmlNode, *, tag: str | None = None) -> tuple[_HtmlNode, ...]:
-    found: list[_HtmlNode] = []
-    for child in node.children:
-        if type(child) is not _HtmlNode:
-            continue
-        if tag is None or child.tag == tag:
-            found.append(child)
-        found.extend(_walk(child, tag=tag))
-    return tuple(found)
-
-
-def _direct_node_children(node: _HtmlNode) -> tuple[_HtmlNode, ...]:
-    return tuple(child for child in node.children if type(child) is _HtmlNode)
-
-
-def _first_direct_node_child(node: _HtmlNode) -> _HtmlNode | None:
-    for child in node.children:
-        if type(child) is _HtmlNode:
-            return child
-    return None
-
-
-def _node_text(node: _HtmlNode) -> str:
-    parts: list[str] = []
-    for child in node.children:
-        if type(child) is str:
-            parts.append(child)
-        elif type(child) is _HtmlNode:
-            parts.append(_node_text(child))
-    raw_text = " ".join(part for part in parts if part.strip())
-    if not raw_text.strip():
-        return ""
-    return normalize_source_label(raw_text)
-
-
-def _node_has_class_tokens(node: _HtmlNode, tokens: frozenset[str]) -> bool:
-    class_value = node.attrs.get("class", "")
-    classes = frozenset(class_value.split())
-    return tokens.issubset(classes)
-
-
-def _node_has_class_token(node: _HtmlNode, token: str) -> bool:
-    return token in node.attrs.get("class", "").split()
-
-
-def _node_contains_template(node: _HtmlNode) -> bool:
-    return any(child.tag == "template" for child in _walk(node))
 
 
 def _validate_factions(values: tuple[MfmFactionRecord, ...]) -> tuple[MfmFactionRecord, ...]:
@@ -1721,94 +1740,3 @@ def _validate_name_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str,
     if not normalized:
         raise MfmSourceError(f"{field_name} must not be empty.")
     return tuple(normalized)
-
-
-def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise MfmSourceError(f"{field_name} must be a tuple.")
-    seen: set[str] = set()
-    validated: list[str] = []
-    for value in values:
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise MfmSourceError(f"{field_name} must not contain duplicates.")
-        seen.add(identifier)
-        validated.append(identifier)
-    return tuple(validated)
-
-
-_validate_identifier = IdentifierValidator(
-    MfmSourceError,
-    pattern=_IDENTIFIER_RE,
-    pattern_message="{field_name} must be a slug identifier.",
-)
-
-
-def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
-    if value is None:
-        return None
-    return _validate_identifier(field_name, value)
-
-
-def _validate_source_id(value: object) -> str:
-    if type(value) is not str:
-        raise MfmSourceError("source_id must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise MfmSourceError("source_id must not be empty.")
-    return stripped
-
-
-def _validate_raw_label(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise MfmSourceError(f"{field_name} must be a string.")
-    normalized = normalize_source_label(value)
-    if not normalized:
-        raise MfmSourceError(f"{field_name} must not be empty.")
-    return normalized
-
-
-def _validate_url_path(value: object) -> str:
-    if type(value) is not str:
-        raise MfmSourceError("url_path must be a string.")
-    stripped = value.strip()
-    if not stripped.startswith("/en/"):
-        raise MfmSourceError("url_path must be an English MFM path.")
-    return stripped
-
-
-def _validate_source_url(value: object) -> str:
-    if type(value) is not str:
-        raise MfmSourceError("source_url must be a string.")
-    stripped = value.strip()
-    if not stripped.startswith("https://mfm.warhammer-community.com/en/"):
-        raise MfmSourceError("source_url must be the English MFM source URL.")
-    return stripped
-
-
-def _validate_positive_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise MfmSourceError(f"{field_name} must be an integer.")
-    if value <= 0:
-        raise MfmSourceError(f"{field_name} must be positive.")
-    return value
-
-
-def _validate_non_negative_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise MfmSourceError(f"{field_name} must be an integer.")
-    if value < 0:
-        raise MfmSourceError(f"{field_name} must not be negative.")
-    return value
-
-
-def _validate_optional_positive_int(field_name: str, value: object | None) -> int | None:
-    if value is None:
-        return None
-    return _validate_positive_int(field_name, value)
-
-
-def _validate_optional_non_negative_int(field_name: str, value: object | None) -> int | None:
-    if value is None:
-        return None
-    return _validate_non_negative_int(field_name, value)

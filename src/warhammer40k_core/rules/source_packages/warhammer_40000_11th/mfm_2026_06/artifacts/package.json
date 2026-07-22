@@ -1,5 +1,5 @@
 {
-  "artifact_schema": "core-v2-mfm-source-package-v1",
+  "artifact_schema": "core-v2-mfm-source-package-v2",
   "excluded_faction_ids": [
     "chaos-titan-legions",
     "titan-legions"
@@ -36,7 +36,7 @@
   },
   "source_date": "2026-06-17",
   "source_package_id": "gw-11e-mfm-2026-06",
-  "source_payload_checksum_sha256": "1e668fd51b4766516068b7ea9ea0fa79bc98680aa4e38f649caa17fa7400f2af",
+  "source_payload_checksum_sha256": "4d17fd724718df07840da16ce6d066b42ad2dbf8328d15bd198ebb3b710ee197",
   "source_title": "Warhammer 40,000: Munitorum Field Manual",
   "source_url": "https://mfm.warhammer-community.com/en/",
   "source_version": "v1.0"

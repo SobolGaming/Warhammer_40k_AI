@@ -546,6 +546,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-bannernob",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "bannernob",
       "wargear_costs": []
     },
@@ -583,6 +584,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-battlewagon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "battlewagon",
       "wargear_costs": [
         {
@@ -643,6 +645,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-beast-snagga-boyz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "beast-snagga-boyz",
       "wargear_costs": []
     },
@@ -688,6 +691,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-beastboss",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "beastboss",
       "wargear_costs": []
     },
@@ -743,6 +747,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-big-mek",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "big-mek",
       "wargear_costs": []
     },
@@ -804,6 +809,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-big-mek-dakkarig",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "big-mek-dakkarig",
       "wargear_costs": []
     },
@@ -849,6 +855,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-big-mek-in-mega-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "big-mek-in-mega-armour",
       "wargear_costs": []
     },
@@ -928,6 +935,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-big-mek-with-shokk-attack-gun",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "big-mek-with-shokk-attack-gun",
       "wargear_costs": []
     },
@@ -977,6 +985,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-bigboss",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "bigboss",
       "wargear_costs": []
     },
@@ -1014,6 +1023,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-biged-bossbunka",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "biged-bossbunka",
       "wargear_costs": []
     },
@@ -1051,6 +1061,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-blitza-bommer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "blitza-bommer",
       "wargear_costs": []
     },
@@ -1088,6 +1099,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-boomdakka-snazzwagon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "boomdakka-snazzwagon",
       "wargear_costs": []
     },
@@ -1133,6 +1145,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-boss-snikrot",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "boss-snikrot",
       "wargear_costs": []
     },
@@ -1185,6 +1198,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-boyz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "boyz",
       "wargear_costs": []
     },
@@ -1246,6 +1260,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-breaka-boyz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "breaka-boyz",
       "wargear_costs": []
     },
@@ -1283,6 +1298,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-burna-bommer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "burna-bommer",
       "wargear_costs": []
     },
@@ -1335,6 +1351,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-burna-boyz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "burna-boyz",
       "wargear_costs": []
     },
@@ -1372,6 +1389,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-dakkajet",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "dakkajet",
       "wargear_costs": []
     },
@@ -1433,6 +1451,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-deff-dread",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "deff-dread",
       "wargear_costs": []
     },
@@ -1478,6 +1497,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-deffkilla-wartrike",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "deffkilla-wartrike",
       "wargear_costs": []
     },
@@ -1530,6 +1550,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-deffkoptas",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "deffkoptas",
       "wargear_costs": []
     },
@@ -1621,6 +1642,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-flash-gitz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "flash-gitz",
       "wargear_costs": []
     },
@@ -1682,6 +1704,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-gargantuan-squiggoth",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "gargantuan-squiggoth",
       "wargear_costs": []
     },
@@ -1733,6 +1756,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-ghazghkull-thraka",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ghazghkull-thraka",
       "wargear_costs": []
     },
@@ -1794,6 +1818,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-gorkanaut",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "gorkanaut",
       "wargear_costs": []
     },
@@ -1846,6 +1871,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-gretchin",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "gretchin",
       "wargear_costs": []
     },
@@ -1883,6 +1909,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-hunta-rig",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hunta-rig",
       "wargear_costs": []
     },
@@ -1920,6 +1947,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-kill-rig",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kill-rig",
       "wargear_costs": []
     },
@@ -2011,6 +2039,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-killa-kans",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "killa-kans",
       "wargear_costs": []
     },
@@ -2048,6 +2077,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-kommandos",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kommandos",
       "wargear_costs": []
     },
@@ -2085,6 +2115,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-kustom-boosta-blasta",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kustom-boosta-blasta",
       "wargear_costs": []
     },
@@ -2176,6 +2207,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-lootas",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lootas",
       "wargear_costs": []
     },
@@ -2327,6 +2359,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-meganobz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "meganobz",
       "wargear_costs": []
     },
@@ -2364,6 +2397,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-megatrakk-scrapjet",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "megatrakk-scrapjet",
       "wargear_costs": []
     },
@@ -2417,6 +2451,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-mek",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "mek",
       "wargear_costs": []
     },
@@ -2538,6 +2573,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-mek-gunz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "mek-gunz",
       "wargear_costs": []
     },
@@ -2599,6 +2635,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-morkanaut",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "morkanaut",
       "wargear_costs": []
     },
@@ -2644,6 +2681,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-mozrog-skragbad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "mozrog-skragbad",
       "wargear_costs": []
     },
@@ -2735,6 +2773,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-nobz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "nobz",
       "wargear_costs": []
     },
@@ -2780,6 +2819,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-painboss",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "painboss",
       "wargear_costs": []
     },
@@ -2817,6 +2857,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-painboy",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "painboy",
       "wargear_costs": []
     },
@@ -2854,6 +2895,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-rukkatrukk-squigbuggy",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "rukkatrukk-squigbuggy",
       "wargear_costs": []
     },
@@ -2891,6 +2933,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-shokkjump-dragsta",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "shokkjump-dragsta",
       "wargear_costs": []
     },
@@ -2943,6 +2986,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-squighog-boyz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "squighog-boyz",
       "wargear_costs": []
     },
@@ -3004,6 +3048,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-stompa",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stompa",
       "wargear_costs": []
     },
@@ -3056,6 +3101,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-stormboyz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormboyz",
       "wargear_costs": []
     },
@@ -3117,6 +3163,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-tankbustas",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tankbustas",
       "wargear_costs": []
     },
@@ -3154,6 +3201,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-trukk",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "trukk",
       "wargear_costs": []
     },
@@ -3206,6 +3254,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-warbikers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "warbikers",
       "wargear_costs": []
     },
@@ -3255,6 +3304,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-warboss",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "warboss",
       "wargear_costs": []
     },
@@ -3300,6 +3350,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-warboss-in-mega-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "warboss-in-mega-armour",
       "wargear_costs": []
     },
@@ -3337,6 +3388,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-wartrakk",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wartrakk",
       "wargear_costs": []
     },
@@ -3374,6 +3426,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-wazbom-blastajet",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wazbom-blastajet",
       "wargear_costs": []
     },
@@ -3411,6 +3464,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-wazdakka-gutsmek",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wazdakka-gutsmek",
       "wargear_costs": []
     },
@@ -3458,6 +3512,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-weirdboy",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "weirdboy",
       "wargear_costs": []
     },
@@ -3503,6 +3558,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-wurrboy",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wurrboy",
       "wargear_costs": []
     },
@@ -3548,6 +3604,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:orks:unit:units-zodgrod-wortsnagga",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "zodgrod-wortsnagga",
       "wargear_costs": []
     }

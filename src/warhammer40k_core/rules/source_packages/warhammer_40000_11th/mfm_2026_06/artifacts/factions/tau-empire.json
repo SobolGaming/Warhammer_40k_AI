@@ -341,6 +341,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ax-1-0-tiger-shark",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ax-1-0-tiger-shark",
       "wargear_costs": []
     },
@@ -378,6 +379,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-breacher-team",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "breacher-team",
       "wargear_costs": []
     },
@@ -499,6 +501,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "broadside-battlesuits",
       "wargear_costs": [
         {
@@ -554,6 +557,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-cadre-fireblade",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cadre-fireblade",
       "wargear_costs": []
     },
@@ -603,6 +607,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-farsight",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "commander-farsight",
       "wargear_costs": []
     },
@@ -652,6 +657,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-coldstar-battlesuit",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "commander-in-coldstar-battlesuit",
       "wargear_costs": []
     },
@@ -701,6 +707,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-enforcer-battlesuit",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "commander-in-enforcer-battlesuit",
       "wargear_costs": []
     },
@@ -738,6 +745,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-shadowsun",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "commander-shadowsun",
       "wargear_costs": []
     },
@@ -799,6 +807,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-fireknife-battlesuits",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "crisis-fireknife-battlesuits",
       "wargear_costs": [
         {
@@ -868,6 +877,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-starscythe-battlesuits",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "crisis-starscythe-battlesuits",
       "wargear_costs": [
         {
@@ -937,6 +947,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-sunforge-battlesuits",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "crisis-sunforge-battlesuits",
       "wargear_costs": []
     },
@@ -982,6 +993,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-darkstrider",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "darkstrider",
       "wargear_costs": []
     },
@@ -1019,6 +1031,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-devilfish",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "devilfish",
       "wargear_costs": []
     },
@@ -1066,6 +1079,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ethereal",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ethereal",
       "wargear_costs": []
     },
@@ -1103,6 +1117,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-firesight-team",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "firesight-team",
       "wargear_costs": []
     },
@@ -1164,6 +1179,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ghostkeel-battlesuit",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ghostkeel-battlesuit",
       "wargear_costs": [
         {
@@ -1233,6 +1249,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-hammerhead-gunship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hammerhead-gunship",
       "wargear_costs": []
     },
@@ -1285,6 +1302,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-carnivores",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kroot-carnivores",
       "wargear_costs": []
     },
@@ -1346,6 +1364,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-farstalkers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kroot-farstalkers",
       "wargear_costs": []
     },
@@ -1393,6 +1412,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-flesh-shaper",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kroot-flesh-shaper",
       "wargear_costs": []
     },
@@ -1445,6 +1465,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-hounds",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kroot-hounds",
       "wargear_costs": []
     },
@@ -1482,6 +1503,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-lone-spear",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kroot-lone-spear",
       "wargear_costs": []
     },
@@ -1529,6 +1551,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-trail-shaper",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kroot-trail-shaper",
       "wargear_costs": []
     },
@@ -1576,6 +1599,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-war-shaper",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kroot-war-shaper",
       "wargear_costs": []
     },
@@ -1667,6 +1691,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-rampagers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "krootox-rampagers",
       "wargear_costs": []
     },
@@ -1734,6 +1759,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-riders",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "krootox-riders",
       "wargear_costs": []
     },
@@ -1771,6 +1797,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-manta",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "manta",
       "wargear_costs": []
     },
@@ -1808,6 +1835,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-pathfinder-team",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "pathfinder-team",
       "wargear_costs": [
         {
@@ -1937,6 +1965,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "piranhas",
       "wargear_costs": []
     },
@@ -1974,6 +2003,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-razorshark-strike-fighter",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "razorshark-strike-fighter",
       "wargear_costs": []
     },
@@ -2035,6 +2065,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-riptide-battlesuit",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "riptide-battlesuit",
       "wargear_costs": [
         {
@@ -2080,6 +2111,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-sky-ray-gunship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sky-ray-gunship",
       "wargear_costs": []
     },
@@ -2141,6 +2173,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stealth-battlesuits",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stealth-battlesuits",
       "wargear_costs": []
     },
@@ -2202,6 +2235,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stormsurge",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormsurge",
       "wargear_costs": []
     },
@@ -2239,6 +2273,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-strike-team",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "strike-team",
       "wargear_costs": []
     },
@@ -2276,6 +2311,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-sun-shark-bomber",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sun-shark-bomber",
       "wargear_costs": []
     },
@@ -2337,6 +2373,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-taunar-supremacy-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "taunar-supremacy-armour",
       "wargear_costs": []
     },
@@ -2374,6 +2411,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-the-twin-lance",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "the-twin-lance",
       "wargear_costs": []
     },
@@ -2411,6 +2449,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-droneport",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tidewall-droneport",
       "wargear_costs": []
     },
@@ -2448,6 +2487,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-gunrig",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tidewall-gunrig",
       "wargear_costs": []
     },
@@ -2500,6 +2540,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-shieldline",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tidewall-shieldline",
       "wargear_costs": []
     },
@@ -2561,6 +2602,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tiger-shark",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tiger-shark",
       "wargear_costs": []
     },
@@ -2613,6 +2655,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-vespid-stingwings",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "vespid-stingwings",
       "wargear_costs": []
     }

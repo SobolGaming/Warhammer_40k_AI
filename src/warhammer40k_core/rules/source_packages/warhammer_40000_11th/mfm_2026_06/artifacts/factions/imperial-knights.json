@@ -378,6 +378,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-asterius",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "acastus-knight-asterius",
       "wargear_costs": []
     },
@@ -439,6 +440,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-porphyrion",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "acastus-knight-porphyrion",
       "wargear_costs": []
     },
@@ -476,6 +478,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-helverin",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "armiger-helverin",
       "wargear_costs": []
     },
@@ -513,6 +516,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-moirax",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "armiger-moirax",
       "wargear_costs": []
     },
@@ -550,6 +554,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-warglaive",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "armiger-warglaive",
       "wargear_costs": []
     },
@@ -587,6 +592,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-canis-rex",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "canis-rex",
       "wargear_costs": []
     },
@@ -648,6 +654,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-acheron",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cerastus-knight-acheron",
       "wargear_costs": []
     },
@@ -709,6 +716,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-atrapos",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cerastus-knight-atrapos",
       "wargear_costs": []
     },
@@ -770,6 +778,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-castigator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cerastus-knight-castigator",
       "wargear_costs": []
     },
@@ -831,6 +840,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-lancer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cerastus-knight-lancer",
       "wargear_costs": []
     },
@@ -892,6 +902,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-castellan",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-castellan",
       "wargear_costs": []
     },
@@ -953,6 +964,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-crusader",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-crusader",
       "wargear_costs": [
         {
@@ -1022,6 +1034,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-defender",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-defender",
       "wargear_costs": []
     },
@@ -1083,6 +1096,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-destrier",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-destrier",
       "wargear_costs": []
     },
@@ -1144,6 +1158,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-errant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-errant",
       "wargear_costs": []
     },
@@ -1205,6 +1220,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-gallant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-gallant",
       "wargear_costs": []
     },
@@ -1266,6 +1282,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-paladin",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-paladin",
       "wargear_costs": []
     },
@@ -1327,6 +1344,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-preceptor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-preceptor",
       "wargear_costs": []
     },
@@ -1388,6 +1406,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-valiant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-valiant",
       "wargear_costs": []
     },
@@ -1449,6 +1468,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-warden",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-warden",
       "wargear_costs": []
     },
@@ -1510,6 +1530,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-magaera",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "questoris-knight-magaera",
       "wargear_costs": []
     },
@@ -1571,6 +1592,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-styrix",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "questoris-knight-styrix",
       "wargear_costs": []
     }

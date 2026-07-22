@@ -658,6 +658,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:harlequins-death-jester",
       "source_section_id": "harlequins",
       "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
       "unit_id": "death-jester",
       "wargear_costs": []
     },
@@ -703,6 +704,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:harlequins-shadowseer",
       "source_section_id": "harlequins",
       "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
       "unit_id": "shadowseer",
       "wargear_costs": []
     },
@@ -755,6 +757,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:harlequins-skyweavers",
       "source_section_id": "harlequins",
       "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
       "unit_id": "skyweavers",
       "wargear_costs": []
     },
@@ -792,6 +795,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:harlequins-solitaire",
       "source_section_id": "harlequins",
       "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
       "unit_id": "solitaire",
       "wargear_costs": []
     },
@@ -829,6 +833,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:harlequins-starweaver",
       "source_section_id": "harlequins",
       "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
       "unit_id": "starweaver",
       "wargear_costs": []
     },
@@ -874,6 +879,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-asurmen",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "asurmen",
       "wargear_costs": []
     },
@@ -931,6 +937,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-autarch",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "autarch",
       "wargear_costs": []
     },
@@ -978,6 +985,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-autarch-wayleaper",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "autarch-wayleaper",
       "wargear_costs": []
     },
@@ -1023,6 +1031,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-baharroth",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "baharroth",
       "wargear_costs": []
     },
@@ -1114,6 +1123,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-corsair-skyreavers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "corsair-skyreavers",
       "wargear_costs": []
     },
@@ -1166,6 +1176,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-corsair-voidreavers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "corsair-voidreavers",
       "wargear_costs": []
     },
@@ -1218,6 +1229,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-corsair-voidscarred",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "corsair-voidscarred",
       "wargear_costs": []
     },
@@ -1255,6 +1267,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-crimson-hunter",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "crimson-hunter",
       "wargear_costs": []
     },
@@ -1316,6 +1329,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-d-cannon-platform",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "d-cannon-platform",
       "wargear_costs": []
     },
@@ -1368,6 +1382,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-dark-reapers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "dark-reapers",
       "wargear_costs": []
     },
@@ -1420,6 +1435,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-dire-avengers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "dire-avengers",
       "wargear_costs": []
     },
@@ -1469,6 +1485,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-eldrad-ulthran",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "eldrad-ulthran",
       "wargear_costs": []
     },
@@ -1506,6 +1523,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-falcon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "falcon",
       "wargear_costs": []
     },
@@ -1555,6 +1573,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-farseer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "farseer",
       "wargear_costs": []
     },
@@ -1602,6 +1621,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-farseer-skyrunner",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "farseer-skyrunner",
       "wargear_costs": []
     },
@@ -1693,6 +1713,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-fire-dragons",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "fire-dragons",
       "wargear_costs": []
     },
@@ -1730,6 +1751,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-fire-prism",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "fire-prism",
       "wargear_costs": []
     },
@@ -1775,6 +1797,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-fuegan",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "fuegan",
       "wargear_costs": []
     },
@@ -1812,6 +1835,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-guardian-defenders",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "guardian-defenders",
       "wargear_costs": []
     },
@@ -1849,6 +1873,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-hemlock-wraithfighter",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hemlock-wraithfighter",
       "wargear_costs": []
     },
@@ -1901,6 +1926,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-howling-banshees",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "howling-banshees",
       "wargear_costs": []
     },
@@ -1946,6 +1972,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-jain-zar",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "jain-zar",
       "wargear_costs": []
     },
@@ -1993,6 +2020,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-kharseth",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kharseth",
       "wargear_costs": []
     },
@@ -2038,6 +2066,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-lhykhis",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lhykhis",
       "wargear_costs": []
     },
@@ -2083,6 +2112,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-maugan-ra",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "maugan-ra",
       "wargear_costs": []
     },
@@ -2144,6 +2174,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-night-spinner",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "night-spinner",
       "wargear_costs": []
     },
@@ -2181,6 +2212,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-phantom-titan",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "phantom-titan",
       "wargear_costs": []
     },
@@ -2228,6 +2260,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-prince-yriel",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "prince-yriel",
       "wargear_costs": []
     },
@@ -2280,6 +2313,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-rangers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "rangers",
       "wargear_costs": []
     },
@@ -2317,6 +2351,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-revenant-titan",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "revenant-titan",
       "wargear_costs": []
     },
@@ -2354,6 +2389,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-shadow-weaver-platform",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "shadow-weaver-platform",
       "wargear_costs": []
     },
@@ -2406,6 +2442,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-shining-spears",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "shining-spears",
       "wargear_costs": []
     },
@@ -2458,6 +2495,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-shroud-runners",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "shroud-runners",
       "wargear_costs": []
     },
@@ -2495,6 +2533,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-spiritseer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "spiritseer",
       "wargear_costs": []
     },
@@ -2547,6 +2586,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-starfangs",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "starfangs",
       "wargear_costs": []
     },
@@ -2584,6 +2624,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-storm-guardians",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "storm-guardians",
       "wargear_costs": []
     },
@@ -2636,6 +2677,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-striking-scorpions",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "striking-scorpions",
       "wargear_costs": []
     },
@@ -2727,6 +2769,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-swooping-hawks",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "swooping-hawks",
       "wargear_costs": []
     },
@@ -2764,6 +2807,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-vibro-cannon-platform",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "vibro-cannon-platform",
       "wargear_costs": []
     },
@@ -2816,6 +2860,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-vyper",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "vyper",
       "wargear_costs": []
     },
@@ -2868,6 +2913,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-war-walkers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "war-walkers",
       "wargear_costs": []
     },
@@ -2905,6 +2951,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-warlock",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "warlock",
       "wargear_costs": []
     },
@@ -2967,6 +3014,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-warlock-conclave",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "warlock-conclave",
       "wargear_costs": []
     },
@@ -3027,6 +3075,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-warlock-skyrunners",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "warlock-skyrunners",
       "wargear_costs": []
     },
@@ -3118,6 +3167,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-warp-spiders",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "warp-spiders",
       "wargear_costs": []
     },
@@ -3155,6 +3205,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-wave-serpent",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wave-serpent",
       "wargear_costs": []
     },
@@ -3207,6 +3258,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-windriders",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "windriders",
       "wargear_costs": []
     },
@@ -3244,6 +3296,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-wraithblades",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wraithblades",
       "wargear_costs": []
     },
@@ -3281,6 +3334,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-wraithguard",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wraithguard",
       "wargear_costs": []
     },
@@ -3342,6 +3396,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-wraithknight",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wraithknight",
       "wargear_costs": [
         {
@@ -3411,6 +3466,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-wraithknight-with-ghostglaive",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wraithknight-with-ghostglaive",
       "wargear_costs": []
     },
@@ -3448,6 +3504,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:units-wraithlord",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wraithlord",
       "wargear_costs": []
     },
@@ -3505,6 +3562,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-the-visarch",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "the-visarch",
       "wargear_costs": []
     },
@@ -3542,6 +3600,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-the-yncarne",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "the-yncarne",
       "wargear_costs": []
     },
@@ -3624,6 +3683,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-troupe",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "troupe",
       "wargear_costs": []
     },
@@ -3669,6 +3729,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-troupe-master",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "troupe-master",
       "wargear_costs": []
     },
@@ -3706,6 +3767,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-voidweaver",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "voidweaver",
       "wargear_costs": []
     },
@@ -3753,6 +3815,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-ynnari-archon",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "ynnari-archon",
       "wargear_costs": []
     },
@@ -3805,6 +3868,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-ynnari-incubi",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "ynnari-incubi",
       "wargear_costs": []
     },
@@ -3842,6 +3906,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-ynnari-kabalite-warriors",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "ynnari-kabalite-warriors",
       "wargear_costs": []
     },
@@ -3879,6 +3944,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-ynnari-raider",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "ynnari-raider",
       "wargear_costs": []
     },
@@ -3931,6 +3997,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-ynnari-reavers",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "ynnari-reavers",
       "wargear_costs": []
     },
@@ -3976,6 +4043,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-ynnari-succubus",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "ynnari-succubus",
       "wargear_costs": []
     },
@@ -4013,6 +4081,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-ynnari-venom",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "ynnari-venom",
       "wargear_costs": []
     },
@@ -4050,6 +4119,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-ynnari-wyches",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "ynnari-wyches",
       "wargear_costs": []
     },
@@ -4107,6 +4177,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:aeldari:unit:ynnari-yvraine",
       "source_section_id": "ynnari",
       "source_section_name": "YNNARI",
+      "support_allowance": null,
       "unit_id": "yvraine",
       "wargear_costs": []
     }
