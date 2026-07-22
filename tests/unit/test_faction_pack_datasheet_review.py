@@ -226,6 +226,19 @@ def test_aeldari_markdown_preserves_groups_provenance_and_exclusions() -> None:
     assert "(`000000628`)" not in markdown
 
 
+def test_emperors_children_review_uses_the_faction_pack_page_boundaries() -> None:
+    review = faction_pack_datasheet_review("emperors-children")
+    updated_rows = review.rows_for(DatasheetSourceTreatment.RULES_UPDATE)
+
+    assert len(updated_rows) == 9
+    assert {row.pdf_page_reference for row in updated_rows} == {
+        "Rules Updates, physical PDF page 9"
+    }
+    assert {
+        row.datasheet_name for row in review.rows_for(DatasheetSourceTreatment.COMPLETE_PDF)
+    } == {"Defiler"}
+
+
 def test_manifest_is_a_versioned_data_artifact() -> None:
     manifest_path = (
         Path(__file__).resolve().parents[2]
