@@ -33,8 +33,20 @@ from warhammer40k_core.rules.mfm_html_tree import (
 from warhammer40k_core.rules.mfm_html_tree import (
     walk as _walk,
 )
+from warhammer40k_core.rules.mfm_sections import (
+    mfm_section_is_supported as _mfm_section_is_supported,
+)
 from warhammer40k_core.rules.mfm_validation import (
     MfmSourceError as MfmSourceError,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    normalize_wargear_cost_label as _normalize_wargear_cost_label,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    split_attachment_names as _split_attachment_names,
+)
+from warhammer40k_core.rules.mfm_validation import (
+    strip_upgrade_suffix as _strip_upgrade_suffix,
 )
 from warhammer40k_core.rules.mfm_validation import (
     validate_identifier as _validate_identifier,
@@ -204,16 +216,7 @@ _COST_BRACKET_OPEN_RE = re.compile(
 _CARD_CLASS_TOKENS = frozenset(("flex", "flex-col", "space-y-1", "m-1"))
 _UNIT_TITLE_CLASS_TOKENS = frozenset(("font-bold", "text-white"))
 _DETACHMENT_TITLE_CLASS_TOKENS = frozenset(("flex-row", "justify-between", "text-white"))
-UNSUPPORTED_MFM_SECTION_IDS = frozenset(
-    (
-        "combat-patrol",
-        "crusade",
-        "forge-world",
-        "forge-worlds",
-        "kill-team",
-        "legends",
-    )
-)
+_ATTACHMENT_SECTION_HEADERS = frozenset(("LEADER", "SUPPORT"))
 
 
 @dataclass(frozen=True, slots=True)
@@ -1122,11 +1125,12 @@ def _parse_unit_cards(
                         source_prefix=source_prefix,
                     )
                 )
-            elif header_text.upper() in {"LEADER", "SUPPORT"}:
+            elif header_text.upper() in _ATTACHMENT_SECTION_HEADERS:
                 attachment_role = header_text.lower()
-                parsed_allowance = _leader_allowance_from_section(
+                parsed_allowance = _attachment_allowance_from_section(
                     section=section,
                     template_texts=template_texts,
+                    attachment_role=attachment_role,
                     source_id=f"{source_prefix}:{attachment_role}",
                 )
                 if parsed_allowance is not None and attachment_role == "leader":
@@ -1309,32 +1313,35 @@ def _enhancements_from_section(
     return tuple(enhancements)
 
 
-def _leader_allowance_from_section(
+def _attachment_allowance_from_section(
     *,
     section: _HtmlNode,
     template_texts: dict[str, str],
+    attachment_role: str,
     source_id: str,
 ) -> MfmLeaderAllowance | None:
+    if attachment_role.upper() not in _ATTACHMENT_SECTION_HEADERS:
+        raise MfmSourceError("MFM attachment allowance role is unsupported.")
     header = _first_direct_node_child(section)
     names: list[str] = []
     for child in _direct_node_children(section):
         if child is header:
             continue
         if child.tag == "span":
-            names.extend(_split_leader_names(_node_text(child)))
+            names.extend(_split_attachment_names(_node_text(child)))
         elif child.tag == "template":
             template_id = child.attrs.get("id")
             if template_id is not None and template_id in template_texts:
                 template_text = template_texts[template_id]
                 if (
-                    template_text.upper() != "LEADER"
+                    template_text.upper() not in _ATTACHMENT_SECTION_HEADERS
                     and _POINTS_RE.fullmatch(template_text) is None
                 ):
-                    names.extend(_split_leader_names(template_text))
+                    names.extend(_split_attachment_names(template_text))
     if not names:
         if any(child.tag == "template" for child in _direct_node_children(section)):
             return None
-        raise MfmSourceError("MFM LEADER section has no allowed bodyguard names.")
+        raise MfmSourceError(f"MFM {attachment_role.upper()} section has no bodyguard names.")
     normalized_names = tuple(normalize_source_label(name) for name in names)
     return MfmLeaderAllowance(
         allowed_bodyguard_unit_ids=tuple(source_label_slug(name) for name in normalized_names),
@@ -1405,7 +1412,9 @@ def _enhancement_leader_allowance_from_wrapper(
     for div in _walk(wrapper, tag="div"):
         spans = [_node_text(span) for span in _walk(div, tag="span")]
         if len(spans) >= 2 and spans[0].upper() == "LEADER:":
-            names = tuple(normalize_source_label(name) for name in _split_leader_names(spans[1]))
+            names = tuple(
+                normalize_source_label(name) for name in _split_attachment_names(spans[1])
+            )
             return MfmLeaderAllowance(
                 allowed_bodyguard_unit_ids=tuple(source_label_slug(name) for name in names),
                 allowed_bodyguard_names=names,
@@ -1478,7 +1487,7 @@ def _card_nodes_with_sections(
     root: _HtmlNode,
 ) -> tuple[tuple[_HtmlNode, str | None, str | None], ...]:
     cards: list[tuple[_HtmlNode, str | None, str | None]] = []
-    section_state = _SectionState(section_id=None, section_name=None)
+    section_state = _SectionState(section_id=None, section_name=None, include_cards=None)
     _collect_card_nodes_with_sections(
         node=root,
         section_state=section_state,
@@ -1491,6 +1500,7 @@ def _card_nodes_with_sections(
 class _SectionState:
     section_id: str | None
     section_name: str | None
+    include_cards: bool | None
 
 
 def _collect_card_nodes_with_sections(
@@ -1502,13 +1512,18 @@ def _collect_card_nodes_with_sections(
     for child in _direct_node_children(node):
         if child.tag == "h3":
             section_name = _node_text(child)
-            if section_name:
-                section_state.section_name = section_name
-                section_state.section_id = source_label_slug(section_name)
+            if not section_name:
+                raise MfmSourceError("MFM page contains an empty section heading.")
+            section_id = source_label_slug(section_name)
+            section_state.section_name = section_name
+            section_state.section_id = section_id
+            section_state.include_cards = _mfm_section_is_supported(section_id)
             continue
-        if section_state.section_id in UNSUPPORTED_MFM_SECTION_IDS:
+        if section_state.include_cards is False:
             continue
         if _node_has_class_tokens(child, _CARD_CLASS_TOKENS):
+            if section_state.include_cards is None:
+                raise MfmSourceError("MFM card appears outside a classified section.")
             cards.append((child, section_state.section_id, section_state.section_name))
         _collect_card_nodes_with_sections(
             node=child,
@@ -1582,28 +1597,6 @@ def _ordinal_to_int(value: str) -> int:
     if match is None:
         raise MfmSourceError("MFM ordinal label is invalid.")
     return int(match.group("number"))
-
-
-def _strip_upgrade_suffix(value: str) -> str:
-    normalized = normalize_source_label(value)
-    if normalized.lower().endswith(" (upgrade)"):
-        return normalized[:-10]
-    return normalized
-
-
-def _normalize_wargear_cost_label(raw_name: str) -> str:
-    name = normalize_source_label(raw_name)
-    if name.lower().startswith("per "):
-        return normalize_source_label(name[4:])
-    return name
-
-
-def _split_leader_names(value: str) -> tuple[str, ...]:
-    normalized = normalize_source_label(value)
-    names = tuple(normalize_source_label(part) for part in normalized.split(",") if part.strip())
-    if not names:
-        raise MfmSourceError("MFM LEADER allowance must contain at least one name.")
-    return names
 
 
 def _validate_factions(values: tuple[MfmFactionRecord, ...]) -> tuple[MfmFactionRecord, ...]:

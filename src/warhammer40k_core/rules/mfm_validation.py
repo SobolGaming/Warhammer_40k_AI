@@ -104,3 +104,25 @@ def validate_optional_non_negative_int(
     if value is None:
         return None
     return validate_non_negative_int(field_name, value)
+
+
+def normalize_wargear_cost_label(raw_name: str) -> str:
+    name = normalize_source_label(raw_name)
+    if name.lower().startswith("per "):
+        return normalize_source_label(name[4:])
+    return name
+
+
+def split_attachment_names(value: str) -> tuple[str, ...]:
+    normalized = normalize_source_label(value)
+    names = tuple(normalize_source_label(part) for part in normalized.split(",") if part.strip())
+    if not names:
+        raise MfmSourceError("MFM attachment allowance must contain at least one name.")
+    return names
+
+
+def strip_upgrade_suffix(value: str) -> str:
+    normalized = normalize_source_label(value)
+    if normalized.lower().endswith(" (upgrade)"):
+        return normalized[:-10]
+    return normalized

@@ -6,6 +6,10 @@ from pathlib import Path
 
 import pytest
 
+from warhammer40k_core.rules.mfm_sections import (
+    EXCLUDED_MFM_SECTION_IDS,
+    SUPPORTED_MFM_SECTION_IDS,
+)
 from warhammer40k_core.rules.mfm_source import (
     MfmDetachmentRecord,
     MfmEnhancementRecord,
@@ -38,6 +42,19 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07._a
 
 _ROOT = Path(__file__).resolve().parents[2]
 _MFM_REVIEW = _ROOT / "data" / "source_manifests" / "mfm_2026_07_review.json"
+_POLICY_EXCLUDED_MFM_SECTION_IDS = frozenset(
+    (
+        "boarding-action",
+        "boarding-actions",
+        "combat-patrol",
+        "crusade",
+        "forge-world",
+        "forge-worlds",
+        "kill-team",
+        "legends",
+        "warhammer-legends",
+    )
+)
 
 
 def test_mfm_source_package_excludes_unsupported_factions_and_sections() -> None:
@@ -52,20 +69,15 @@ def test_mfm_source_package_excludes_unsupported_factions_and_sections() -> None
     assert package.source_version == "v1.1"
     assert package.source_date == "2026-07-22"
 
-    unsupported_sections = {
-        "combat-patrol",
-        "crusade",
-        "forge-world",
-        "forge-worlds",
-        "kill-team",
-        "legends",
-    }
-    assert not [
-        (faction.faction_id, unit.record_id, unit.source_section_id)
+    assert EXCLUDED_MFM_SECTION_IDS == _POLICY_EXCLUDED_MFM_SECTION_IDS
+    generated_section_ids = {
+        unit.source_section_id
         for faction in package.factions
         for unit in faction.units
-        if unit.source_section_id in unsupported_sections
-    ]
+        if unit.source_section_id is not None
+    }
+    assert generated_section_ids.isdisjoint(_POLICY_EXCLUDED_MFM_SECTION_IDS)
+    assert generated_section_ids <= SUPPORTED_MFM_SECTION_IDS
 
 
 def test_mfm_source_package_loads_versioned_json_artifacts() -> None:
@@ -404,7 +416,54 @@ def test_mfm_parser_reads_index_units_detachments_wargear_and_leader_allowances(
     support_unit = record.unit_by_id("units-support-unit")
     assert support_unit.support_allowance is not None
     assert support_unit.support_allowance.allowed_bodyguard_unit_ids == ("jakhals",)
+    template_support_unit = record.unit_by_id("units-template-support-unit")
+    assert template_support_unit.support_allowance is None
     assert not [unit for unit in record.units if unit.source_section_id == "legends"]
+
+
+@pytest.mark.parametrize(
+    "heading",
+    ["BOARDING ACTION", "BOARDING ACTIONS", "WARHAMMER LEGENDS"],
+)
+def test_mfm_parser_skips_every_policy_excluded_section_heading(heading: str) -> None:
+    faction = MfmIndexFaction(
+        faction_id="world-eaters",
+        raw_name="World Eaters",
+        url_path="/en/world-eaters",
+    )
+    html = _faction_html_with_unit_section(
+        _unit_card_html("Current Unit")
+        + f"<h3>{heading}</h3>"
+        + _unit_card_html("Out Of Scope Unit")
+    )
+
+    record = parse_mfm_faction_html(
+        html=html,
+        faction=faction,
+        source_package_id="test-mfm",
+    )
+
+    assert tuple(unit.unit_id for unit in record.units) == ("current-unit",)
+
+
+def test_mfm_parser_rejects_unknown_section_heading() -> None:
+    faction = MfmIndexFaction(
+        faction_id="world-eaters",
+        raw_name="World Eaters",
+        url_path="/en/world-eaters",
+    )
+    html = _faction_html_with_unit_section(
+        _unit_card_html("Current Unit")
+        + "<h3>UNREVIEWED EXPANSION</h3>"
+        + _unit_card_html("Unknown Unit")
+    )
+
+    with pytest.raises(MfmSourceError, match="unknown section heading"):
+        parse_mfm_faction_html(
+            html=html,
+            faction=faction,
+            source_package_id="test-mfm",
+        )
 
 
 def test_mfm_parser_rejects_malformed_rows_and_streamed_templates() -> None:
@@ -479,6 +538,7 @@ def _sample_faction_html() -> str:
         <h2>v1.1</h2>
         <div id="S:0">270 pts</div>
         <div id="S:1">LEADER</div>
+        <div id="S:2">SUPPORT</div>
         <div>
           <h3>DETACHMENTS</h3>
           <div class="flex flex-col space-y-1 m-1">
@@ -567,6 +627,21 @@ def _sample_faction_html() -> str:
               <span>Jakhals</span>
             </div>
           </div>
+          <div class="flex flex-col space-y-1 m-1">
+            <div class="px-1 py-0.5 bg-slate-500 font-bold text-xl text-white">
+              Template Support Unit
+            </div>
+            <div class="space-y-1">
+              <div>YOUR UNIT COSTS</div>
+              <ul>
+                <li><span>1 model</span><span>45 pts</span></li>
+              </ul>
+            </div>
+            <div class="space-y-1">
+              <div><span>SUPPORT</span></div>
+              <template id="P:2"></template>
+            </div>
+          </div>
           <h3>LEGENDS</h3>
           <div class="flex flex-col space-y-1 m-1">
             <div class="px-1 py-0.5 bg-slate-500 font-bold text-xl text-white">
@@ -596,4 +671,18 @@ def _faction_html_with_unit_section(body: str) -> str:
         </div>
       </body>
     </html>
+    """
+
+
+def _unit_card_html(name: str) -> str:
+    return f"""
+    <div class="flex flex-col space-y-1 m-1">
+      <div class="px-1 py-0.5 bg-slate-500 font-bold text-xl text-white">
+        {name}
+      </div>
+      <div class="space-y-1">
+        <div>YOUR UNIT COSTS</div>
+        <ul><li><span>1 model</span><span>10 pts</span></li></ul>
+      </div>
+    </div>
     """
