@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
+
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -540,6 +542,7 @@ def apply_heroic_intervention_charge_move(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    ability_index: AbilityCatalogIndex,
 ) -> LifecycleStatus | None:
     proposal_request = _movement_proposal_request_from_payload(request.payload)
     if proposal_request is None or not is_heroic_intervention_charge_move_request(request):
@@ -574,6 +577,8 @@ def apply_heroic_intervention_charge_move(
         maximum_distance_inches=maximum_distance,
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
+        unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
+        ability_index=ability_index,
     )
     violation = charge_move_violation_code(
         resolution=resolution,

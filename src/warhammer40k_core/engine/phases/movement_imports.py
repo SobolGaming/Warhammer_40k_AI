@@ -92,6 +92,10 @@ from warhammer40k_core.engine.catalog_conditional_leader_queries import (
 from warhammer40k_core.engine.catalog_desperate_escape import (
     catalog_forced_desperate_escape_sources_for_unit,
 )
+from warhammer40k_core.engine.catalog_movement_end_selected_target_effects import (
+    SELECT_CATALOG_MOVEMENT_END_TARGET_EFFECT_DECISION_TYPE,
+    CatalogMovementEndSelectedTargetEffectRuntime,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_advance_roll_reroll_permission_for_unit,
 )
@@ -310,6 +314,7 @@ __all__ = (
     "Characteristic",
     "ChargeTargetRestrictionHookRegistry",
     "CombatDisembark",
+    "CatalogMovementEndSelectedTargetEffectRuntime",
     "DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID",
     "DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES",
     "DICE_REROLL_DECISION_TYPE",
@@ -413,6 +418,7 @@ __all__ = (
     "RuntimeModifierRegistry",
     "SELECTED_TO_MOVE_UNIT_CONTEXT_KEY",
     "SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE",
+    "SELECT_CATALOG_MOVEMENT_END_TARGET_EFFECT_DECISION_TYPE",
     "STRATAGEM_DECISION_TYPE",
     "STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE",
     "Self",

@@ -104,6 +104,13 @@
       "submission_kind": "finite"
     },
     {
+      "decision_type": "select_catalog_movement_end_target_effect",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
       "decision_type": "select_catalog_movement_target_pair",
       "interaction_kinds": [
         "finite_option_list"

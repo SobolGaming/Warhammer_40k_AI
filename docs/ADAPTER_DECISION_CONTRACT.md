@@ -541,6 +541,37 @@ malformed, or invented pairs return a typed invalid status without mutation.
 Adapters must not enumerate pairs, infer visibility, grant weapon abilities, or
 advance the movement action while the request is pending.
 
+Aeldari Eldrad Ulthran's Doom uses the public finite decision type
+`select_catalog_movement_end_target_effect` at the end of the active player's
+Movement phase. Its interaction kind is `entity_selection` with entity kind
+`target_unit`. The engine emits one deterministic option for each enemy rules
+unit within 18 inches of and visible to Eldrad's current model; the request and
+option payloads include `submission_kind`, hook ID
+`catalog-ir:movement-end-selected-target-effect`, game/round/phase/player
+context, catalog record and RuleIR identity, source unit/model identity, the
+selection clause, the complete candidate target inventory, and the generic
+effect records for that option. The choice is mandatory when at least one legal
+target exists and is public to both viewers. An accepted option records an
+engine-owned generic RuleIR effect through the start of that player's next
+Command phase. The effect adds 1 to wound rolls made by friendly `AELDARI`
+models only when their attack targets the selected enemy rules unit. The
+lifecycle reproduces source presence, range, visibility, option inventory, and
+payload identity before queue pop; stale, malformed, drifted, or invented
+targets return typed invalid status without mutation. Adapters must not
+enumerate Doom targets, calculate visibility, apply the wound modifier, or
+advance the Movement phase while the request is pending.
+
+Aeldari Shining Spears' Extreme Mobility does not add a separate decision. It
+extends the existing Normal Move, Advance, Fall Back, and Charge Move proposal
+contract. The engine-authored `PathValidationContext` and its serialized payload
+contain the required boolean `ignores_vertical_distance`. When true, the
+movement budget is measured from the horizontal distance of every submitted
+path segment, while the `PathWitness` retains the exact three-dimensional poses
+for transit, terrain, collision, endpoint, and replay validation. Adapters must
+submit the real path and elevations; they must not flatten poses, omit vertical
+transit, or pre-approve a move from its endpoint. The flag is derived from the
+source-linked catalog movement permission and is never adapter-authored.
+
 Phase 17G Movement-end surge and generic RuleIR reactive-movement rules use the
 same finite/proposal split as other physical movement. After an enemy unit
 completes a Normal Move, Advance, or Fall Back in the Movement phase, the engine

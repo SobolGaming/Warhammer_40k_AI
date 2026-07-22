@@ -19,7 +19,6 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
-    AbilityCatalogRecord,
     AbilitySourceKind,
 )
 from warhammer40k_core.engine.advance_hooks import (
@@ -32,9 +31,24 @@ from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierContext,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     CatalogAnyPhaseOncePerBattleRuntime,
+)
+from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
+    CatalogDatasheetClauseSource as _CatalogClauseSource,
+)
+from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
+    current_source_model_ids as _current_source_model_ids,
+)
+from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
+    defensive_strength_toughness_wound_handler,
+    half_range_weapon_ability_handler,
+)
+from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
+    rules_units_within as _rules_units_within,
+)
+from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
+    source_applies_to_rules_unit as _source_applies_to_rules_unit,
 )
 from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     catalog_granted_stealth_hit_roll_modifier,
@@ -69,8 +83,10 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     clause_is_charge_end_leading_unit_weapon_ability_grant,
     clause_is_conditional_lone_operative,
     clause_is_consolidation_move_distance_modifier,
+    clause_is_defensive_strength_toughness_wound_modifier,
     clause_is_fight_selected_weapon_ability_choice,
     clause_is_granted_stealth_effect,
+    clause_is_half_range_weapon_ability_grant,
     clause_is_leading_unit_hit_roll_modifier,
     clause_is_leading_unit_wound_roll_modifier,
     clause_is_passive_characteristic_modifier,
@@ -83,7 +99,6 @@ from warhammer40k_core.engine.catalog_defensive_rule_runtime import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_record_source_matches_unit,
 )
@@ -139,9 +154,6 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WoundRollModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveOption
-from warhammer40k_core.engine.shooting_selection_range import (
-    target_within_shooting_selection_range,
-)
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
 )
@@ -150,7 +162,6 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionHookBinding,
     TargetRestriction,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_proximity import (
     rules_unit_within_friendly_keyworded_models,
     rules_unit_within_friendly_keyworded_units,
@@ -160,25 +171,11 @@ from warhammer40k_core.rules.rule_ir import (
     RuleConditionKind,
     RuleEffectKind,
     RuleEffectSpec,
-    RuleIR,
     parameter_payload,
 )
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
-
-
-@dataclass(frozen=True, slots=True)
-class _CatalogClauseSource:
-    player_id: str
-    record: AbilityCatalogRecord
-    unit: UnitInstance
-    clause: RuleClause
-    rule_ir: RuleIR
-
-    @property
-    def binding_id(self) -> str:
-        return f"catalog-ir:datasheet:{self.unit.unit_instance_id}:{self.clause.clause_id}"
 
 
 _DescriptorT = TypeVar("_DescriptorT")
@@ -409,6 +406,14 @@ class CatalogDatasheetRuleRuntime:
             )
             if descriptor.weapon_characteristic_deltas
         )
+        bindings.extend(
+            WeaponProfileModifierBinding(
+                modifier_id=f"{source.binding_id}:half-range-weapon-ability",
+                source_id=source.rule_ir.source_id,
+                handler=half_range_weapon_ability_handler(source),
+            )
+            for source in self._sources(clause_is_half_range_weapon_ability_grant)
+        )
         return tuple(bindings)
 
     def hit_roll_modifier_bindings(self) -> tuple[HitRollModifierBinding, ...]:
@@ -452,7 +457,7 @@ class CatalogDatasheetRuleRuntime:
         return tuple(bindings)
 
     def wound_roll_modifier_bindings(self) -> tuple[WoundRollModifierBinding, ...]:
-        return tuple(
+        leading = tuple(
             WoundRollModifierBinding(
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
@@ -460,6 +465,15 @@ class CatalogDatasheetRuleRuntime:
             )
             for source in self._sources(clause_is_leading_unit_wound_roll_modifier)
         )
+        defensive = tuple(
+            WoundRollModifierBinding(
+                modifier_id=f"{source.binding_id}:defensive-strength-toughness",
+                source_id=source.rule_ir.source_id,
+                handler=defensive_strength_toughness_wound_handler(source),
+            )
+            for source in self._sources(clause_is_defensive_strength_toughness_wound_modifier)
+        )
+        return (*leading, *defensive)
 
     def shooting_target_restriction_bindings(
         self,
@@ -1205,20 +1219,6 @@ def _source_keyword_gate_applies(source: _CatalogClauseSource) -> bool:
     return required.issubset(keywords)
 
 
-def _source_applies_to_rules_unit(
-    *, source: _CatalogClauseSource, context_unit_id: str, state: object
-) -> bool:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Catalog datasheet runtime requires GameState.")
-    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=context_unit_id)
-    return (
-        source.unit.unit_instance_id in rules_unit.component_unit_instance_ids
-        and _source_is_alive(state, source)
-    )
-
-
 def _source_currently_leading_rules_unit(
     *, source: _CatalogClauseSource, context_unit_id: str, state: object
 ) -> bool:
@@ -1259,24 +1259,6 @@ def _alive_source_model_id(state: object, source: _CatalogClauseSource) -> str:
     if not model_ids:
         raise GameLifecycleError("Catalog datasheet source model is not placed and alive.")
     return model_ids[0]
-
-
-def _current_source_model_ids(*, state: object, source: _CatalogClauseSource) -> tuple[str, ...]:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Catalog datasheet source query requires GameState.")
-    current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
-        state=state,
-        unit=source.unit,
-    )
-    if source.record.source_kind is not AbilitySourceKind.WARGEAR:
-        return current_model_ids
-    return catalog_rule_record_current_wargear_bearer_model_ids(
-        record=source.record,
-        unit=source.unit,
-        current_model_instance_ids=current_model_ids,
-    )
 
 
 def _alive_rules_unit_model_ids(*, state: object, unit_instance_id: str) -> tuple[str, ...]:
@@ -1418,29 +1400,6 @@ def _clause_distance(clause: RuleClause) -> float:
     if not isinstance(value, int | float) or type(value) is bool or value <= 0:
         raise GameLifecycleError("Catalog datasheet distance must be positive numeric.")
     return float(value)
-
-
-def _rules_units_within(
-    state: object,
-    first_unit_id: str,
-    second_unit_id: str,
-    distance: float,
-    *,
-    attacker_model_instance_id: str | None = None,
-) -> bool:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState or state.battlefield_state is None:
-        raise GameLifecycleError("Catalog datasheet range query requires battlefield state.")
-    return target_within_shooting_selection_range(
-        scenario=BattlefieldScenario(
-            armies=tuple(state.army_definitions), battlefield_state=state.battlefield_state
-        ),
-        attacking_unit_instance_id=first_unit_id,
-        attacker_model_instance_id=attacker_model_instance_id,
-        target_unit_instance_id=second_unit_id,
-        max_range_inches=distance,
-    )
 
 
 def _required_string(parameters: Mapping[str, object], key: str) -> str:

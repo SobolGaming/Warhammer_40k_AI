@@ -134,6 +134,7 @@ _MOVEMENT_TRANSIT_PERMISSION_MODES = frozenset(
         MovementMode.NORMAL,
         MovementMode.ADVANCE,
         MovementMode.FALL_BACK,
+        MovementMode.CHARGE,
     }
 )
 
@@ -347,6 +348,7 @@ class MovementCapabilitySet:
         ignores_vertical_distance = bool(
             ignores_vertical_distance_override
             or (has_fly and descriptor.fly_policy.ignores_vertical_distance)
+            or _catalog_ignores_vertical_distance(catalog_permissions)
         )
         return cls(
             ruleset_descriptor_hash=descriptor.descriptor_hash,
@@ -796,6 +798,7 @@ class MovementLegalityContext:
             enemy_engagement_vertical_inches=self.engagement_policy.vertical_inches,
             sample_interval_inches=sample_interval_inches,
             movement_distance_budget_inches=movement_distance_budget_inches,
+            ignores_vertical_distance=self.capabilities.ignores_vertical_distance,
         )
 
     def to_terrain_path_legality_context(
@@ -1083,6 +1086,15 @@ def _catalog_terrain_transit_allowed(
 ) -> bool:
     return any(
         permission.permission == "move_through_terrain_features" and permission.terrain_features
+        for permission in _validated_catalog_permissions(permissions)
+    )
+
+
+def _catalog_ignores_vertical_distance(
+    permissions: tuple[CatalogMovementTransitPermission, ...],
+) -> bool:
+    return any(
+        permission.permission == "ignore_vertical_distance"
         for permission in _validated_catalog_permissions(permissions)
     )
 

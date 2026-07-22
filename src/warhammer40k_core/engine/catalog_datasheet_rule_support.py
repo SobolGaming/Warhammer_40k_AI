@@ -236,7 +236,19 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
             )
             token = ability.value.lower().replace("_", "-").replace(" ", "-")
             consumer_ids.add(f"catalog-ir:weapon-keyword-grant:{token}")
+    if clause_is_half_range_weapon_ability_grant(clause):
+        consumer_ids.add(CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID)
+        ability = weapon_keyword_from_token(
+            _required_string(
+                parameter_payload(clause.effects[0].parameters),
+                "weapon_ability",
+            )
+        )
+        token = ability.value.lower().replace("_", "-").replace(" ", "-")
+        consumer_ids.add(f"catalog-ir:weapon-keyword-grant:{token}")
     if clause_is_leading_unit_wound_roll_modifier(clause):
+        consumer_ids.add(CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID)
+    if clause_is_defensive_strength_toughness_wound_modifier(clause):
         consumer_ids.add(CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID)
     if clause_is_leading_unit_hit_roll_modifier(clause):
         consumer_ids.add(CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID)
@@ -436,6 +448,40 @@ def clause_is_leading_unit_wound_roll_modifier(clause: RuleClause) -> bool:
     return _clause_is_leading_unit_roll_modifier(clause, roll_tokens={"wound", "wound_roll"})
 
 
+def clause_is_defensive_strength_toughness_wound_modifier(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.template_id != "phase17p:defensive-strength-toughness-wound-modifier"
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
+        or parameter_payload(clause.trigger.parameters)
+        != {
+            "attack_kind": "ranged",
+            "attack_role": "target",
+            "timing_window": "attack_sequence.wound",
+        }
+        or clause.conditions
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or clause.target.parameters
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.WHILE_CONDITION_TRUE
+        or clause.duration.parameters
+        or len(clause.effects) != 1
+    ):
+        return False
+    effect = clause.effects[0]
+    return effect.kind is RuleEffectKind.MODIFY_DICE_ROLL and parameter_payload(
+        effect.parameters
+    ) == {
+        "attack_role": "target",
+        "delta": -1,
+        "roll_type": "wound",
+        "target_constraint": "attack_strength_greater_than_target_toughness",
+        "weapon_scope": "ranged",
+    }
+
+
 def clause_is_leading_unit_hit_roll_modifier(clause: RuleClause) -> bool:
     return _clause_is_leading_unit_roll_modifier(clause, roll_tokens={"hit", "hit_roll"})
 
@@ -553,6 +599,49 @@ def clause_is_charge_end_leading_unit_weapon_ability_grant(clause: RuleClause) -
     except WeaponProfileError:
         return False
     return True
+
+
+def clause_is_half_range_weapon_ability_grant(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.template_id != "phase17p:half-range-weapon-ability-grant"
+        or clause.trigger is not None
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.target.parameters
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.WHILE_CONDITION_TRUE
+        or clause.duration.parameters
+        or len(clause.conditions) != 1
+        or len(clause.effects) != 1
+    ):
+        return False
+    condition = clause.conditions[0]
+    if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE or parameter_payload(
+        condition.parameters
+    ) != {
+        "predicate": "within_half_range",
+        "range_reference": "weapon_range",
+        "subject": "target_unit",
+    }:
+        return False
+    effect = clause.effects[0]
+    if effect.kind is not RuleEffectKind.GRANT_WEAPON_ABILITY:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    if (
+        parameters.get("attack_role") != "attacker"
+        or parameters.get("weapon_scope") != "ranged"
+        or parameters.get("weapon_ability_value") != 1
+    ):
+        return False
+    try:
+        return (
+            weapon_keyword_from_token(_required_string(parameters, "weapon_ability")).value
+            == "Sustained Hits"
+        )
+    except WeaponProfileError:
+        return False
 
 
 def _is_while_condition_ability_grant(clause: RuleClause, *, ability: str) -> bool:

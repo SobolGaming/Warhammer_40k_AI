@@ -1,5 +1,86 @@
 [
   {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000568/core/000008346/none",
+    "datasheet_id": "000000568",
+    "datasheet_name": "Eldrad Ulthran",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000568:diviner-of-futures",
+    "ability_name": "Diviner of Futures",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000568/datasheet/000000568:diviner-of-futures/none",
+    "datasheet_id": "000000568",
+    "datasheet_name": "Eldrad Ulthran",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-point-gain"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_command_points.unscoped"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000568:doom-psychic",
+    "ability_name": "Doom (Psychic)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000568/datasheet/000000568:doom-psychic/none",
+    "datasheet_id": "000000568",
+    "datasheet_name": "Eldrad Ulthran",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-end-selected-target-effect"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.wound.friendly_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000568/faction/000009894/none",
+    "datasheet_id": "000000568",
+    "datasheet_name": "Eldrad Ulthran",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008340",
     "ability_name": "Fights First",
     "catalog_id": "chaos-daemons-bridge-catalog",
@@ -489,6 +570,88 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000000593:bladestorm",
+    "ability_name": "Bladestorm",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000593/datasheet/000000593:bladestorm/none",
+    "datasheet_id": "000000593",
+    "datasheet_name": "Dire Avengers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:sustained-hits"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_weapon_ability.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000593/faction/000009894/none",
+    "datasheet_id": "000000593",
+    "datasheet_name": "Dire Avengers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000593:aspect-shrine-token",
+    "ability_name": "Aspect Shrine Token",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000593/wargear/000000593:aspect-shrine-token/000000593:aspect-shrine-token",
+    "datasheet_id": "000000593",
+    "datasheet_name": "Dire Avengers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:dice-result-override"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.override_dice_roll_result.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000000593:aspect-shrine-token",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000593:shimmershield",
+    "ability_name": "Shimmershield",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000593/wargear/000000593:shimmershield/000000593:shimmershield",
+    "datasheet_id": "000000593",
+    "datasheet_name": "Dire Avengers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query"
+    ],
+    "semantic_categories": [
+      "wargear.characteristic_set.invulnerable_save.this_model"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000000593:shimmershield",
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008340",
     "ability_name": "Fights First",
     "catalog_id": "chaos-daemons-bridge-catalog",
@@ -813,6 +976,69 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000599/core/000008339/none",
+    "datasheet_id": "000000599",
+    "datasheet_name": "Wave Serpent",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000599:wave-serpent-shield",
+    "ability_name": "Wave Serpent Shield",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000599/datasheet/000000599:wave-serpent-shield/none",
+    "datasheet_id": "000000599",
+    "datasheet_name": "Wave Serpent",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:wound-roll-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.wound.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000599/faction/000009894/none",
+    "datasheet_id": "000000599",
+    "datasheet_name": "Wave Serpent",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008343",
     "ability_name": "Deep Strike",
     "catalog_id": "chaos-daemons-bridge-catalog",
@@ -977,6 +1203,68 @@
     ],
     "source_kind": "wargear",
     "source_wargear_id": "000000601:aspect-shrine-token",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000602:extreme-mobility",
+    "ability_name": "Extreme Mobility",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000602/datasheet/000000602:extreme-mobility/none",
+    "datasheet_id": "000000602",
+    "datasheet_name": "Shining Spears",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-transit-permission"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.movement_transit_permission.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000602/faction/000009894/none",
+    "datasheet_id": "000000602",
+    "datasheet_name": "Shining Spears",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000602:shimmershield",
+    "ability_name": "Shimmershield",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000602/wargear/000000602:shimmershield/000000602:shimmershield",
+    "datasheet_id": "000000602",
+    "datasheet_name": "Shining Spears",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:invulnerable-save-characteristic-query"
+    ],
+    "semantic_categories": [
+      "wargear.characteristic_set.invulnerable_save.this_model"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000000602:shimmershield",
     "support_stage": "engine_consumed"
   },
   {
