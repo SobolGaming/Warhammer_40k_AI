@@ -399,6 +399,7 @@ def test_catalog_preserves_autarch_stats_geometry_abilities_weapons_and_leader_t
     assert _weapon_names(AUTARCH_ID) == expected_weapon_names
     assert _weapon_names(WAYLEAPER_ID) == expected_weapon_names
     assert _leader_target_ids(autarch) == {
+        "000000593",
         HOWLING_BANSHEES_ID,
         STRIKING_SCORPIONS_ID,
         "000000596",
@@ -409,6 +410,7 @@ def test_catalog_preserves_autarch_stats_geometry_abilities_weapons_and_leader_t
         for eligibility in autarch.attachment_eligibilities
         for target in eligibility.targets
     } == {
+        "000000593": (),
         HOWLING_BANSHEES_ID: (),
         STRIKING_SCORPIONS_ID: (),
         "000000596": (),

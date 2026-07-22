@@ -148,6 +148,10 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.OPPORTUNITY_WINDOW
         ),
         "select_catalog_movement_target_pair": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
+        "select_catalog_movement_end_target_effect": InteractionSpec(
+            InteractionKind.ENTITY_SELECTION,
+            ("target_unit",),
+        ),
         "select_catalog_unit_move_completed_mortal_wounds_target": InteractionSpec(
             InteractionKind.ENTITY_SELECTION,
             ("target_unit",),

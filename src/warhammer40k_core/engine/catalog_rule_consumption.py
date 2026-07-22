@@ -193,6 +193,9 @@ CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:post-shoot-hit
 CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID = (
     _st.CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID
 )
+CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID = (
+    _st.CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID
+)
 CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID = (
     _prebattle_redeploy.CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID
 )
@@ -1288,6 +1291,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+        CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         *_ucbs.registered_hook_ids(),
@@ -3745,12 +3749,7 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
     consumer_ids: set[str] = set()
     for clause in rule_ir.clauses:
         consumer_ids.update(catalog_rule_ir_consumers_for_clause(clause))
-    if _st.rule_has_fight_start_selected_target_effect(rule_ir):
-        consumer_ids.add(CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID)
-    if _st.rule_has_post_shoot_hit_target_effect(rule_ir):
-        consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
-    if _st.rule_has_shooting_start_selected_target_effect(rule_ir):
-        consumer_ids.add(CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID)
+    consumer_ids.update(_st.selected_target_effect_consumer_ids_for_rule(rule_ir))
     return tuple(sorted(consumer_ids))
 
 
@@ -3879,12 +3878,7 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
             if _effect_is_charge_roll_modifier(effect):
                 hook_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
             hook_ids.update(_catalog_ir_hook_ids_for_effect(effect))
-    if _st.rule_has_fight_start_selected_target_effect(rule_ir):
-        hook_ids.add(CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID)
-    if _st.rule_has_post_shoot_hit_target_effect(rule_ir):
-        hook_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
-    if _st.rule_has_shooting_start_selected_target_effect(rule_ir):
-        hook_ids.add(CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID)
+    hook_ids.update(_st.selected_target_effect_consumer_ids_for_rule(rule_ir))
     return tuple(sorted(hook_ids))
 
 

@@ -156,6 +156,34 @@ def clause_is_shooting_start_selected_target_selection(clause: RuleClause) -> bo
     )
 
 
+def clause_is_movement_end_selected_target_selection(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog selected-target classifier requires RuleClause.")
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return False
+    return (
+        clause.is_supported
+        and clause.template_id == "phase17c:selected-target-constraint"
+        and parameter_payload(trigger.parameters)
+        == {
+            "edge": "end",
+            "owner": "active_player",
+            "phase": BattlePhase.MOVEMENT.value,
+            "subject": "this_model",
+            "timing_window": "movement_phase_end",
+        }
+        and _fight_start_selection_target_is_supported(clause.target)
+        and all(
+            condition.kind is not RuleConditionKind.FREQUENCY_LIMIT
+            and selected_target_selection_condition_is_supported(condition)
+            for condition in clause.conditions
+        )
+        and not clause.effects
+        and clause.duration is None
+    )
+
+
 def fight_start_selected_target_selection_is_supported(clause: RuleClause) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog selected-target classifier requires RuleClause.")
@@ -228,6 +256,28 @@ def shooting_start_selected_target_effect_clauses_after(
         raise GameLifecycleError("Shooting-start selected-target selection_index is invalid.")
     selection_clause = clauses[selection_index]
     if not clause_is_shooting_start_selected_target_selection(selection_clause):
+        return ()
+    selected: list[RuleClause] = []
+    for clause in clauses[selection_index + 1 :]:
+        if clause.template_id == "phase17c:selected-target-constraint":
+            break
+        if selected_target_persisting_effect_clause_is_supported(clause):
+            selected.append(clause)
+    return tuple(selected)
+
+
+def movement_end_selected_target_effect_clauses_after(
+    clauses: tuple[RuleClause, ...],
+    selection_index: int,
+) -> tuple[RuleClause, ...]:
+    if type(clauses) is not tuple or any(type(clause) is not RuleClause for clause in clauses):
+        raise GameLifecycleError(
+            "Movement-end selected-target discovery requires RuleClause values."
+        )
+    if type(selection_index) is not int or not 0 <= selection_index < len(clauses):
+        raise GameLifecycleError("Movement-end selected-target selection_index is invalid.")
+    selection_clause = clauses[selection_index]
+    if not clause_is_movement_end_selected_target_selection(selection_clause):
         return ()
     selected: list[RuleClause] = []
     for clause in clauses[selection_index + 1 :]:
@@ -577,6 +627,16 @@ def _effect_duration_is_supported(duration: RuleDuration | None) -> bool:
         return (
             parameters.get("endpoint") in _SUPPORTED_DURATION_ENDPOINTS
             and parameters.get("boundary", "end") == "end"
+        )
+    if frozenset(parameters) == frozenset(
+        {"battle_round_offset", "boundary", "endpoint", "owner", "phase"}
+    ):
+        return (
+            parameters.get("battle_round_offset") == 1
+            and parameters.get("boundary") == "start"
+            and parameters.get("endpoint") == "phase"
+            and parameters.get("owner") == "source_player"
+            and parameters.get("phase") == BattlePhase.COMMAND.value
         )
     return (
         frozenset(parameters) == frozenset({"battle_round_offset", "boundary", "endpoint", "owner"})

@@ -153,6 +153,7 @@ class PathValidationContextPayload(TypedDict):
     enemy_engagement_vertical_inches: float
     sample_interval_inches: float
     movement_distance_budget_inches: float | None
+    ignores_vertical_distance: bool
 
 
 class TerrainPathSegmentPayload(TypedDict):
@@ -397,6 +398,7 @@ class PathValidationContext:
     may_end_in_enemy_engagement: bool = False
     sample_interval_inches: float = 0.5
     movement_distance_budget_inches: float | None = None
+    ignores_vertical_distance: bool = False
 
     def __post_init__(self) -> None:
         if type(self.moving_model) is not Model:
@@ -503,12 +505,19 @@ class PathValidationContext:
                 self.movement_distance_budget_inches,
             ),
         )
+        _validate_bool(
+            "PathValidationContext ignores_vertical_distance",
+            self.ignores_vertical_distance,
+        )
 
     def validate(self) -> PathValidationResult:
         path = self.witness.poses_for_model(self.moving_model.model_id)
+        measurement_path = (
+            _path_without_vertical_distance(path) if self.ignores_vertical_distance else path
+        )
         movement_distance_witness = MovementDistanceWitness.for_model_path(
             model=self.moving_model,
-            poses=path,
+            poses=measurement_path,
             max_distance_inches=self.movement_distance_budget_inches,
         )
         if path[0] != self.moving_model.pose:
@@ -528,7 +537,6 @@ class PathValidationContext:
                 metrics=_PathValidationMetricCounts(sampled_pose_count=len(path)),
                 movement_distance_witness=movement_distance_witness,
             )
-
         metrics = _PathValidationMetricCounts()
         sampled_path = _sampled_pose_path(path, sample_interval_inches=self.sample_interval_inches)
         metrics.sampled_pose_count = len(sampled_path)
@@ -730,6 +738,7 @@ class PathValidationContext:
             "enemy_engagement_vertical_inches": self.enemy_engagement_vertical_inches,
             "sample_interval_inches": self.sample_interval_inches,
             "movement_distance_budget_inches": self.movement_distance_budget_inches,
+            "ignores_vertical_distance": self.ignores_vertical_distance,
         }
 
     @classmethod
@@ -756,6 +765,7 @@ class PathValidationContext:
             enemy_engagement_vertical_inches=payload["enemy_engagement_vertical_inches"],
             sample_interval_inches=payload["sample_interval_inches"],
             movement_distance_budget_inches=payload["movement_distance_budget_inches"],
+            ignores_vertical_distance=payload["ignores_vertical_distance"],
         )
 
 
@@ -2216,6 +2226,19 @@ def _path_horizontal_distance(poses: tuple[Pose, ...]) -> float:
             end.position.y - start.position.y,
         )
         for start, end in pairwise(poses)
+    )
+
+
+def _path_without_vertical_distance(poses: tuple[Pose, ...]) -> tuple[Pose, ...]:
+    measurement_z = poses[0].position.z
+    return tuple(
+        Pose.at(
+            x=pose.position.x,
+            y=pose.position.y,
+            z=measurement_z,
+            facing_degrees=pose.facing.degrees,
+        )
+        for pose in poses
     )
 
 

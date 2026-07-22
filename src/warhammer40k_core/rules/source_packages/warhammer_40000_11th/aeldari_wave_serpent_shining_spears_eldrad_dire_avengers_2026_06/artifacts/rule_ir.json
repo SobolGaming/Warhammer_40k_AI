@@ -1,0 +1,551 @@
+{
+  "artifact_schema": "core-v2-aeldari-wave-serpent-shining-spears-eldrad-dire-avengers-rule-ir-v1",
+  "datasheets": {
+    "000000568": "Eldrad Ulthran",
+    "000000593": "Dire Avengers",
+    "000000599": "Wave Serpent",
+    "000000602": "Shining Spears"
+  },
+  "package_hash": "5f39ee4b924f4cedcc23c45fda700e032963f5f73dbdbd32bbe12f27321db6f6",
+  "records": {
+    "000000568:4": {
+      "ability_name": "Doom (Psychic)",
+      "normalized_text_sha256": "8f0eb2b0639eacdca856a024eed860ff3648c39dc5804225bc7ac822ae9bdafa",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17p:aeldari:four-datasheets:000000568:4:clause:001",
+            "conditions": [
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": 18.0
+                  },
+                  {
+                    "key": "negated",
+                    "value": false
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "model"
+                  },
+                  {
+                    "key": "object_reference",
+                    "value": "this"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within"
+                  },
+                  {
+                    "key": "qualifier",
+                    "value": null
+                  },
+                  {
+                    "key": "range_kind",
+                    "value": "numeric_range"
+                  }
+                ],
+                "source_span": {
+                  "end": 70,
+                  "start": 57,
+                  "text": "within 18\" of"
+                }
+              },
+              {
+                "kind": "visibility_predicate",
+                "parameters": [
+                  {
+                    "key": "observer",
+                    "value": "this_model"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "visible_to"
+                  },
+                  {
+                    "key": "target_reference",
+                    "value": "selected_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 96,
+                  "start": 75,
+                  "text": "visible to this model"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [],
+            "source_span": {
+              "end": 97,
+              "start": 0,
+              "text": "At the end of your Movement phase, select one enemy unit within 18\" of and visible to this model."
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                }
+              ],
+              "source_span": {
+                "end": 56,
+                "start": 42,
+                "text": "one enemy unit"
+              }
+            },
+            "template_id": "phase17c:selected-target-constraint",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "end"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "movement"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "movement_phase_end"
+                }
+              ],
+              "source_span": {
+                "end": 33,
+                "start": 0,
+                "text": "At the end of your Movement phase"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17p:aeldari:four-datasheets:000000568:4:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "attack_target"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "attack_targets_selected_unit"
+                  },
+                  {
+                    "key": "target_reference",
+                    "value": "selected_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 221,
+                  "start": 198,
+                  "text": "targets that enemy unit"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "battle_round_offset",
+                  "value": 1
+                },
+                {
+                  "key": "boundary",
+                  "value": "start"
+                },
+                {
+                  "key": "endpoint",
+                  "value": "phase"
+                },
+                {
+                  "key": "owner",
+                  "value": "source_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "command"
+                }
+              ],
+              "source_span": {
+                "end": 140,
+                "start": 98,
+                "text": "Until the start of your next Command phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_dice_roll",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "wound"
+                  }
+                ],
+                "source_span": {
+                  "end": 246,
+                  "start": 223,
+                  "text": "add 1 to the Wound roll"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 247,
+              "start": 98,
+              "text": "Until the start of your next Command phase, each time a friendly AELDARI model makes an attack that targets that enemy unit, add 1 to the Wound roll."
+            },
+            "target": {
+              "kind": "friendly_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "friendly"
+                },
+                {
+                  "key": "required_keyword",
+                  "value": "AELDARI"
+                }
+              ],
+              "source_span": {
+                "end": 176,
+                "start": 152,
+                "text": "a friendly AELDARI model"
+              }
+            },
+            "template_id": "phase17c:dice-roll-modifier",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "95b4b941a9c9d9e2aacccd388517986fb92801f50ec4e554a1044183bbb3637d",
+        "normalized_text": "At the end of your Movement phase, select one enemy unit within 18\" of and visible to this model. Until the start of your next Command phase, each time a friendly AELDARI model makes an attack that targets that enemy unit, add 1 to the Wound roll.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17p:aeldari:four-datasheets:datasheet:000000568:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-wave-serpent-shining-spears-eldrad-dire-avengers-datasheets-2026-06-14:datasheet:000000568:4"
+      }
+    },
+    "000000593:2": {
+      "ability_name": "Bladestorm",
+      "normalized_text_sha256": "6a043cea4b27107de9969c0670ebc101ad85545a92c2bb7a84395e3453ac9188",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17p:aeldari:four-datasheets:000000593:2:clause:001",
+            "conditions": [
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "predicate",
+                    "value": "within_half_range"
+                  },
+                  {
+                    "key": "range_reference",
+                    "value": "weapon_range"
+                  },
+                  {
+                    "key": "subject",
+                    "value": "target_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 130,
+                  "start": 113,
+                  "text": "within half range"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 130,
+                "start": 83,
+                "text": "while targeting an enemy unit within half range"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_weapon_ability",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "attacker"
+                  },
+                  {
+                    "key": "weapon_ability",
+                    "value": "Sustained Hits"
+                  },
+                  {
+                    "key": "weapon_ability_value",
+                    "value": 1
+                  },
+                  {
+                    "key": "weapon_scope",
+                    "value": "ranged"
+                  }
+                ],
+                "source_span": {
+                  "end": 82,
+                  "start": 56,
+                  "text": "[SUSTAINED HITS 1] ability"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 131,
+              "start": 0,
+              "text": "Ranged weapons equipped by models in this unit have the [SUSTAINED HITS 1] ability while targeting an enemy unit within half range."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 46,
+                "start": 27,
+                "text": "models in this unit"
+              }
+            },
+            "template_id": "phase17p:half-range-weapon-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "09ca7624aa8e30a8601e9ac3e5d21f7456ebf5fa0d7a3f438d19ff9facd426c1",
+        "normalized_text": "Ranged weapons equipped by models in this unit have the [SUSTAINED HITS 1] ability while targeting an enemy unit within half range.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17p:aeldari:four-datasheets:datasheet:000000593:2",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-wave-serpent-shining-spears-eldrad-dire-avengers-datasheets-2026-06-14:datasheet:000000593:2"
+      }
+    },
+    "000000599:3": {
+      "ability_name": "Wave Serpent Shield",
+      "normalized_text_sha256": "5f19cc50422fd3728338d071a161419db4e1fcdf9983112e7758557a7f135d92",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17p:aeldari:four-datasheets:000000599:3:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 150,
+                "start": 46,
+                "text": "if the Strength characteristic of that attack is greater than the Toughness characteristic of this model"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_dice_roll",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "target"
+                  },
+                  {
+                    "key": "delta",
+                    "value": -1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "wound"
+                  },
+                  {
+                    "key": "target_constraint",
+                    "value": "attack_strength_greater_than_target_toughness"
+                  },
+                  {
+                    "key": "weapon_scope",
+                    "value": "ranged"
+                  }
+                ],
+                "source_span": {
+                  "end": 182,
+                  "start": 152,
+                  "text": "subtract 1 from the Wound roll"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 183,
+              "start": 0,
+              "text": "Each time a ranged attack targets this model, if the Strength characteristic of that attack is greater than the Toughness characteristic of this model, subtract 1 from the Wound roll."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 44,
+                "start": 34,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17p:defensive-strength-toughness-wound-modifier",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "attack_kind",
+                  "value": "ranged"
+                },
+                {
+                  "key": "attack_role",
+                  "value": "target"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "attack_sequence.wound"
+                }
+              ],
+              "source_span": {
+                "end": 44,
+                "start": 0,
+                "text": "Each time a ranged attack targets this model"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "376c0ed9fbb35e0ad111c5f76cc0ecf3b2415bb0ddcdc28f85ecdf327fe51017",
+        "normalized_text": "Each time a ranged attack targets this model, if the Strength characteristic of that attack is greater than the Toughness characteristic of this model, subtract 1 from the Wound roll.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17p:aeldari:four-datasheets:datasheet:000000599:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-wave-serpent-shining-spears-eldrad-dire-avengers-datasheets-2026-06-14:datasheet:000000599:3"
+      }
+    },
+    "000000602:2": {
+      "ability_name": "Extreme Mobility",
+      "normalized_text_sha256": "4fd436eef921177ed798a6a14e93060a9f285e21aa595238ed045297a0ddeb33",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17p:aeldari:four-datasheets:000000602:2:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "movement_transit_permission",
+                "parameters": [
+                  {
+                    "key": "movement_modes",
+                    "value": [
+                      "normal",
+                      "advance",
+                      "fall_back",
+                      "charge"
+                    ]
+                  },
+                  {
+                    "key": "permission",
+                    "value": "ignore_vertical_distance"
+                  }
+                ],
+                "source_span": {
+                  "end": 99,
+                  "start": 71,
+                  "text": "ignore any vertical distance"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 186,
+              "start": 0,
+              "text": "Each time this unit makes a Normal, Advance, Fall Back or Charge move, ignore any vertical distance when determining the total distance models in this unit can be moved during that move."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 19,
+                "start": 10,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17p:movement-ignore-vertical-distance",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "during"
+                },
+                {
+                  "key": "movement_modes",
+                  "value": [
+                    "normal",
+                    "advance",
+                    "fall_back",
+                    "charge"
+                  ]
+                },
+                {
+                  "key": "phase",
+                  "value": "movement"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "unit_makes_move"
+                }
+              ],
+              "source_span": {
+                "end": 69,
+                "start": 0,
+                "text": "Each time this unit makes a Normal, Advance, Fall Back or Charge move"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "843d6067d7acac7a284737e2da2795792bddea96b7dedbc6ea251aa1136c99c3",
+        "normalized_text": "Each time this unit makes a Normal, Advance, Fall Back or Charge move, ignore any vertical distance when determining the total distance models in this unit can be moved during that move.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17p:aeldari:four-datasheets:datasheet:000000602:2",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-aeldari-wave-serpent-shining-spears-eldrad-dire-avengers-datasheets-2026-06-14:datasheet:000000602:2"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-aeldari-wave-serpent-shining-spears-eldrad-dire-avengers-datasheets-2026-06-14",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}

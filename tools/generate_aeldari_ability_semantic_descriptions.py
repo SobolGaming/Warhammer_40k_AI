@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -23,6 +22,7 @@ if TYPE_CHECKING or __package__:
     from tools.aeldari_datasheet_semantic_coverage import (
         SCHEMA_VERSION as COVERAGE_SCHEMA_VERSION,
     )
+    from tools.canonical_json_hash import canonical_json_sha256
 else:
     from aeldari_ability_semantic_descriptions import (
         DESCRIPTION_ARTIFACT_PATH,
@@ -40,6 +40,7 @@ else:
     from aeldari_datasheet_semantic_coverage import (
         SCHEMA_VERSION as COVERAGE_SCHEMA_VERSION,
     )
+    from canonical_json_hash import canonical_json_sha256
 
 DESCRIPTION_TEXT_SCHEMA_VERSION = "2"
 _DESCRIPTION_TEXT_ROOT_KEYS = frozenset({"schema_version", "descriptions"})
@@ -123,8 +124,8 @@ def generated_aeldari_ability_semantic_descriptions(
         "schema_version": SCHEMA_VERSION,
         "generated_by": GENERATED_BY,
         "coverage_schema_version": COVERAGE_SCHEMA_VERSION,
-        "coverage_sha256": _sha256(COVERAGE_PATH),
-        "description_text_sha256": _sha256(DESCRIPTION_TEXT_PATH),
+        "coverage_sha256": canonical_json_sha256(COVERAGE_PATH),
+        "description_text_sha256": canonical_json_sha256(DESCRIPTION_TEXT_PATH),
         "exact_ability_count": len(rows),
         "descriptions": rows,
     }
@@ -204,14 +205,6 @@ def _required_sha256(payload: dict[str, Any], key: str) -> str:
     if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
         raise ValueError(f"{key!r} must be a lowercase SHA-256 digest.")
     return value
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 if __name__ == "__main__":

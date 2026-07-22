@@ -8,8 +8,8 @@
     },
     {
       "ability_id": "000000568:doom-psychic",
-      "description": "The visible enemy selection and +1 Wound effect are parsed; a Movement-phase-end selection host, persistence through the next Command phase, and the friendly Aeldari wound-roll query are still needed.",
-      "evidence_sha256": "2e11ab264d3a7ea251bfaafb983a49e8d5a814cb3ccfa6aab9481e67de8472c4"
+      "description": "The end-of-Movement visible enemy selection is engine-enumerated, persisted through the start of the source player's next Command phase, and grants friendly Aeldari models +1 to Wound only against the selected unit.",
+      "evidence_sha256": "eb9ced2990b35387996b0a64c9f299a977ecae60f0d4dd03dd7883664a783bc3"
     },
     {
       "ability_id": "000000571:hand-of-asuryan",
@@ -188,8 +188,8 @@
     },
     {
       "ability_id": "000000593:bladestorm",
-      "description": "A half-range predicate must grant ranged weapons Sustained Hits 1.",
-      "evidence_sha256": "f3bac2dd64a37cb3f0f0c2ea4c121b6d55c9a1bf20d7e80636b16e65410f672e"
+      "description": "Ranged weapons gain Sustained Hits 1 only while the attacking Dire Avenger model targets an enemy unit within half that weapon's range.",
+      "evidence_sha256": "1bcdd6d362b314e7c787d18ea3151479b9804cfe9585b865963af10f44f7df81"
     },
     {
       "ability_id": "000000593:aspect-shrine-token",
@@ -258,8 +258,8 @@
     },
     {
       "ability_id": "000000599:wave-serpent-shield",
-      "description": "The Strength-greater-than-Toughness predicate and defensive Wound-roll modifier are parsed; the ranged-target query host is still needed.",
-      "evidence_sha256": "a06dc0048621b971cd34122a218b4bc020996149cf5132594630054e48a02a8e"
+      "description": "Ranged attacks targeting the living Wave Serpent subtract 1 from the Wound roll only when attack Strength exceeds its Toughness.",
+      "evidence_sha256": "4b393e35858c3a99bcc1abcc5e927c55d1bbee6a914de7ba7975050179a9fb81"
     },
     {
       "ability_id": "000000600:grenade-pack-flyover",
@@ -283,8 +283,8 @@
     },
     {
       "ability_id": "000000602:extreme-mobility",
-      "description": "Normal, Advance, Fall Back, and Charge movement must ignore vertical distance while retaining PathWitness validation.",
-      "evidence_sha256": "594846674caccaaeae030195ae07f901aa297cb9c822b76c2c84ad34936a8a63"
+      "description": "Normal, Advance, Fall Back, and Charge movement ignores vertical distance while retaining complete PathWitness validation for every moved model.",
+      "evidence_sha256": "2995736889b7d92416c3dd64004c11ab8eb2857a98054ccc11daa2aa34dee58f"
     },
     {
       "ability_id": "000000602:shimmershield",
