@@ -17,6 +17,12 @@ if TYPE_CHECKING or __package__:
         aeldari_detachment_semantics_needed,
         aeldari_semantic_snapshot_markdown,
     )
+    from tools.emperors_children_support_report import (
+        EMPERORS_CHILDREN_FACTION_ID,
+        emperors_children_detachment_semantics_needed,
+        emperors_children_faction_pack_review_markdown,
+        emperors_children_semantic_snapshot_markdown,
+    )
     from tools.faction_pack_datasheet_review import (
         faction_pack_datasheet_review_markdown,
         faction_pack_datasheet_snapshot_markdown,
@@ -28,6 +34,12 @@ else:
         aeldari_datasheet_support_markdown,
         aeldari_detachment_semantics_needed,
         aeldari_semantic_snapshot_markdown,
+    )
+    from emperors_children_support_report import (
+        EMPERORS_CHILDREN_FACTION_ID,
+        emperors_children_detachment_semantics_needed,
+        emperors_children_faction_pack_review_markdown,
+        emperors_children_semantic_snapshot_markdown,
     )
     from faction_pack_datasheet_review import (
         faction_pack_datasheet_review_markdown,
@@ -761,6 +773,27 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
             "Friendly LEGIONES DAEMONICA CHARACTER models excluding MONSTER models gain "
             "+1 Leadership and +1 Objective Control through the shared characteristic "
             "modifier path."
+        ),
+    ),
+    (
+        "emperors-children",
+        "court-of-the-phoenician",
+    ): SupportSectionRow(
+        subject="Court of the Phoenician",
+        engine=(
+            "Static RuleIR runtime bundle for two detachment rules, four enhancement bindings, "
+            "and six Stratagem records"
+        ),
+        documentation="Source rows, generated matrix, and WS14 remediation status",
+        tests=(
+            "Lifecycle bundle, runtime-modifier, ability-hook, Stratagem lifecycle, replay, and "
+            "runtime-boundary tests"
+        ),
+        overall="Full",
+        notes=(
+            "Covers Sensational Performance target restrictions and melee Strength/AP bonuses, "
+            "Master of the Pageant CP reduction, all four Enhancements, and all six Stratagems "
+            "through the shared generic RuleIR runtime."
         ),
     ),
     (
@@ -2900,6 +2933,51 @@ def _faction_support_markdown(
             f"{len(enhancement_rows)} | {len(stratagem_rows)} | {engine_consumed_row_count} |"
         ),
     ]
+    if faction_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
+        source_detachment_rows = {
+            row.detachment_id: row
+            for row in faction_detachments_2026_27.detachment_rows()
+            if row.faction_id == EMPERORS_CHILDREN_FACTION_ID
+        }
+        lines.extend(
+            emperors_children_faction_pack_review_markdown(
+                detachment_rows=tuple(
+                    (
+                        row.detachment_id,
+                        row.detachment,
+                        source_detachment_rows[row.detachment_id].force_disposition_id,
+                        source_detachment_rows[row.detachment_id].detachment_point_cost,
+                        source_detachment_rows[row.detachment_id].is_new_for_eleventh,
+                        _detachment_rule_is_supported(row),
+                    )
+                    for row in detachment_support_rows
+                )
+            )
+        )
+        lines.extend(
+            emperors_children_semantic_snapshot_markdown(
+                detachment_rows=tuple(
+                    (row.detachment, _detachment_rule_is_supported(row))
+                    for row in detachment_support_rows
+                ),
+                enhancement_rows=tuple(
+                    (
+                        _required_text(row.detachment_name),
+                        row.rule_name,
+                        _coverage_row_is_engine_consumed(row),
+                    )
+                    for row in enhancement_rows
+                ),
+                stratagem_rows=tuple(
+                    (
+                        _required_text(row.detachment_name),
+                        row.rule_name,
+                        _coverage_row_is_engine_consumed(row),
+                    )
+                    for row in stratagem_rows
+                ),
+            )
+        )
     if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
         lines.extend(_chaos_daemons_semantic_snapshot_markdown())
     if faction_row.faction_id == AELDARI_FACTION_ID:
@@ -2941,7 +3019,11 @@ def _faction_support_markdown(
             leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
     )
-    if faction_row.faction_id in (AELDARI_FACTION_ID, CHAOS_DAEMONS_FACTION_ID):
+    if faction_row.faction_id in (
+        AELDARI_FACTION_ID,
+        CHAOS_DAEMONS_FACTION_ID,
+        EMPERORS_CHILDREN_FACTION_ID,
+    ):
         lines.append("")
         return "\n".join(lines)
     lines.extend(_faction_detachment_rule_coverage_rows_markdown(detachment_rule_rows))
@@ -5855,6 +5937,8 @@ def _detachment_rule_support_rows() -> tuple[DetachmentRuleSupportRow, ...]:
             notes = "No semantic detachment-rule hook is implemented."
             if source_row.faction_id == AELDARI_FACTION_ID:
                 notes = aeldari_detachment_semantics_needed(source_row.detachment_id)
+            if source_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
+                notes = emperors_children_detachment_semantics_needed(source_row.detachment_id)
             rows.append(
                 DetachmentRuleSupportRow(
                     faction_id=source_row.faction_id,

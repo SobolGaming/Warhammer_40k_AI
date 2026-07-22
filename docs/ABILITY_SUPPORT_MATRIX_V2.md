@@ -203,7 +203,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Grey Knights | 9 | 0 | 24 | 36 | 1 | [grey-knights](factions/grey-knights.md) |
 | Chaos Space Marines | 17 | 0 | 60 | 90 | 3 | [chaos-space-marines](factions/chaos-space-marines.md) |
 | World Eaters | 8 | 0 | 24 | 36 | 1 | [world-eaters](factions/world-eaters.md) |
-| Emperor's Children | 10 | 1 | 30 | 45 | 18 | [emperors-children](factions/emperors-children.md) |
+| Emperor's Children | 10 | 2 | 30 | 45 | 18 | [emperors-children](factions/emperors-children.md) |
 | Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |

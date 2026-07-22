@@ -47,11 +47,33 @@ def test_global_support_renderer_preserves_section_order_and_runtime_inventory()
 
 def test_faction_support_renderer_preserves_section_order() -> None:
     aeldari = faction_support_markdown_files()["aeldari.md"]
+    emperors_children = faction_support_markdown_files()["emperors-children.md"]
 
     assert aeldari.startswith("# Aeldari Support Matrix\n")
     assert aeldari.index("## Detachment Rule Support") < aeldari.index(
         "## Datasheet / Unit Support"
     )
+    assert "## 11th Edition Faction Pack Review" in emperors_children
+    assert "Elegant Brutes | Yes | Physical PDF page 2" in emperors_children
+    assert "Frenzied Host | Yes | Physical PDF page 3" in emperors_children
+    assert "Spectacle of Slaughter | Yes | Physical PDF page 4" in emperors_children
+    assert "Court of the Phoenician | No - reprinted/updated" in emperors_children
+    assert "Cacophonic Accompaniment<br>Frenzied Ferocity Upgrade" in emperors_children
+    assert "Possessive Mania<br>Agonised Cacophony<br>Absolute Sensory Overload" in (
+        emperors_children
+    )
+    assert "are not yet present in the structured Phase17E artifacts" in emperors_children
+    assert "## Semantic Support Snapshot" in emperors_children
+    assert (
+        emperors_children.index("## 11th Edition Faction Pack Review")
+        < emperors_children.index("## Semantic Support Snapshot")
+        < emperors_children.index("## Detachment Rule Support")
+        < emperors_children.index("## Datasheet Source Review")
+        < emperors_children.index("## Datasheet / Unit Support")
+    )
+    assert "Court of the Phoenician | `Full`" in emperors_children
+    assert "### Unit Datasheet Source Treatments" in emperors_children
+    assert "## Detachment Rule Coverage Rows" not in emperors_children
 
 
 def test_support_renderer_escapes_tables_and_renders_empty_cells() -> None:

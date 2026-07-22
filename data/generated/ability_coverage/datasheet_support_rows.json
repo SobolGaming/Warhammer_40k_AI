@@ -1343,9 +1343,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "`000009994` Thrill Seekers: `descriptor_only` Faction ability row is not fully consumed; detachment support 1/10.",
+    "notes": "`000009994` Thrill Seekers: `descriptor_only` Faction ability row is not fully consumed; detachment support 2/10.",
     "overall": "Partial",
     "supported_detachment_ids": [
+      "court-of-the-phoenician",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:hit-roll-modifier`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only",
