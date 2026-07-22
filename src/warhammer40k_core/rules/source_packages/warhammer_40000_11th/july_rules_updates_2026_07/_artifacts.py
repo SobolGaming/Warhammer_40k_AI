@@ -1,10 +1,55 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
+from types import MappingProxyType
+
 import msgspec
 
 ARTIFACT_SCHEMA = "core-v2-july-rules-updates-source-package-v1"
 EXPECTED_SOURCE_PACKAGE_ID = "gw-11e-rules-and-event-updates-2026-07-22"
+EXPECTED_SOURCE_TITLE = "Warhammer 40,000 July 2026 Rules and Event Updates"
+EXPECTED_SOURCE_VERSION = "2026-07-22"
 EXPECTED_EVENT_SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-v1-1-2026-07"
+EXPECTED_UNIVERSAL_RULE_BEHAVIORS: Mapping[str, str] = MappingProxyType(
+    {
+        "modifying-a-stratagem-cp-cost": "unnamed_zero_cp_reduces_cost_by_one",
+        "stratagem-repeat-and-limit-exceptions": (
+            "repeat_or_limit_exception_requires_named_stratagem"
+        ),
+        "stratagems-that-prevent-targeting": ("protective_targeting_range_is_eighteen_inches"),
+        "stratagems-that-add-identical-units": ("identical_unit_replacement_once_per_battle"),
+    }
+)
+EXPECTED_EVENT_COMPANION_RULE_BEHAVIORS: Mapping[str, str] = MappingProxyType(
+    {
+        "generating-command-points": "non_core_cp_gain_maximum_one_per_battle_round",
+    }
+)
+EXPECTED_UNIVERSAL_DOCUMENT_METADATA = (
+    "eng_22-07_warhammer40000_universal_rules_updates",
+    "Warhammer 40,000 Universal Rules Updates v1.0",
+    "1.0",
+    (
+        "https://assets.warhammer-community.com/"
+        "eng_22-07_warhammer_40,000_universal_rules_updates-coltxp7ngi-3kvdfxwyon.pdf"
+    ),
+    (
+        "docs/source_rules/"
+        "eng_22-07_warhammer40000_universal_rules_updates-coltxp7ngi-3kvdfxwyon.pdf"
+    ),
+    "a16ede8a54d693c91e24253e8731f12d298b68fd29f4ee457dd7ba4c69c0c053",
+)
+EXPECTED_EVENT_COMPANION_DOCUMENT_METADATA = (
+    "eng_22-07_warhammer40000_event_companion",
+    "Warhammer Event Companion v1.1",
+    "1.1",
+    (
+        "https://assets.warhammer-community.com/"
+        "eng_22-07_warhammer_40,000_event_companion-alyapl19us-b2drgwkji4.pdf"
+    ),
+    ("docs/source_rules/eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf"),
+    "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20",
+)
 EXPECTED_CHANGED_LAYOUT_IDS: frozenset[str] = frozenset(
     (
         "take-and-hold-vs-purge-the-foe-layout-1",
@@ -24,6 +69,13 @@ class JulyRulesUpdateArtifactError(ValueError):
 
 
 class UniversalRuleUpdateRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+    rule_id: str
+    source_id: str
+    source_text: str
+    behavior_descriptor: str
+
+
+class EventCompanionRuleUpdateRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     rule_id: str
     source_id: str
     source_text: str
@@ -59,6 +111,7 @@ class EventCompanionUpdateArtifact(msgspec.Struct, frozen=True, forbid_unknown_f
     local_pdf: str
     source_pdf_sha256: str
     updated_source_package_id: str
+    rules: tuple[EventCompanionRuleUpdateRecord, ...]
     changed_layouts: tuple[EventLayoutRevisionRecord, ...]
 
 
@@ -76,6 +129,11 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
             raise JulyRulesUpdateArtifactError("July rules-update artifact schema is unsupported.")
         if self.source_package_id != EXPECTED_SOURCE_PACKAGE_ID:
             raise JulyRulesUpdateArtifactError("July rules-update package identity drifted.")
+        if (
+            self.source_title != EXPECTED_SOURCE_TITLE
+            or self.source_version != EXPECTED_SOURCE_VERSION
+        ):
+            raise JulyRulesUpdateArtifactError("July rules-update package metadata drifted.")
         if self.source_date != "2026-07-22":
             raise JulyRulesUpdateArtifactError("July rules-update source date drifted.")
         _validate_non_empty_strings(
@@ -88,21 +146,22 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
 
     def _validate_universal_rules_update(self) -> None:
         update = self.universal_rules_update
-        _validate_non_empty_strings(
+        if (
             update.document_id,
             update.source_title,
             update.source_version,
             update.source_url,
             update.local_pdf,
-        )
-        _validate_sha256(update.source_pdf_sha256)
-        if len(update.rules) != 4:
+            update.source_pdf_sha256,
+        ) != EXPECTED_UNIVERSAL_DOCUMENT_METADATA:
+            raise JulyRulesUpdateArtifactError("Universal rules-update document metadata drifted.")
+        rule_behaviors = {rule.rule_id: rule.behavior_descriptor for rule in update.rules}
+        if rule_behaviors != EXPECTED_UNIVERSAL_RULE_BEHAVIORS or len(rule_behaviors) != len(
+            update.rules
+        ):
             raise JulyRulesUpdateArtifactError(
-                "Universal rules-update artifact must contain all four rules."
+                "Universal rules-update rule identity inventory drifted."
             )
-        rule_ids = {rule.rule_id for rule in update.rules}
-        if len(rule_ids) != len(update.rules):
-            raise JulyRulesUpdateArtifactError("Universal rules-update rule IDs must be unique.")
         for rule in update.rules:
             _validate_non_empty_strings(
                 rule.rule_id,
@@ -110,7 +169,7 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
                 rule.source_text,
                 rule.behavior_descriptor,
             )
-            if not rule.source_id.startswith(f"{self.source_package_id}:universal-rules:"):
+            if rule.source_id != (f"{self.source_package_id}:universal-rules:{rule.rule_id}"):
                 raise JulyRulesUpdateArtifactError(
                     "Universal rules-update source identity drifted."
                 )
@@ -125,16 +184,31 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
 
     def _validate_event_companion_update(self) -> None:
         update = self.event_companion
-        _validate_non_empty_strings(
+        if (
             update.document_id,
             update.source_title,
             update.source_version,
             update.source_url,
             update.local_pdf,
-        )
-        _validate_sha256(update.source_pdf_sha256)
+            update.source_pdf_sha256,
+        ) != EXPECTED_EVENT_COMPANION_DOCUMENT_METADATA:
+            raise JulyRulesUpdateArtifactError("Event Companion document metadata drifted.")
         if update.updated_source_package_id != EXPECTED_EVENT_SOURCE_PACKAGE_ID:
             raise JulyRulesUpdateArtifactError("Event Companion updated source identity drifted.")
+        rule_behaviors = {rule.rule_id: rule.behavior_descriptor for rule in update.rules}
+        if rule_behaviors != EXPECTED_EVENT_COMPANION_RULE_BEHAVIORS or len(rule_behaviors) != len(
+            update.rules
+        ):
+            raise JulyRulesUpdateArtifactError("Event Companion rule identity inventory drifted.")
+        for rule in update.rules:
+            _validate_non_empty_strings(
+                rule.rule_id,
+                rule.source_id,
+                rule.source_text,
+                rule.behavior_descriptor,
+            )
+            if rule.source_id != (f"{update.updated_source_package_id}:rules:{rule.rule_id}"):
+                raise JulyRulesUpdateArtifactError("Event Companion rule source identity drifted.")
         rows_by_layout_id = {row.layout_id: row for row in update.changed_layouts}
         if frozenset(rows_by_layout_id) != EXPECTED_CHANGED_LAYOUT_IDS:
             raise JulyRulesUpdateArtifactError("Event Companion changed-layout inventory drifted.")
@@ -189,12 +263,4 @@ def _validate_non_empty_strings(*values: object) -> None:
     ):
         raise JulyRulesUpdateArtifactError(
             "July rules-update text values must be non-empty stripped strings."
-        )
-
-
-def _validate_sha256(value: str) -> None:
-    _validate_non_empty_strings(value)
-    if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
-        raise JulyRulesUpdateArtifactError(
-            "July rules-update PDF checksum must be lowercase SHA-256."
         )

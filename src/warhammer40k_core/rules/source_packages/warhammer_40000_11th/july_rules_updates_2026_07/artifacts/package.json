@@ -69,6 +69,14 @@
     ],
     "document_id": "eng_22-07_warhammer40000_event_companion",
     "local_pdf": "docs/source_rules/eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf",
+    "rules": [
+      {
+        "behavior_descriptor": "non_core_cp_gain_maximum_one_per_battle_round",
+        "rule_id": "generating-command-points",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:rules:generating-command-points",
+        "source_text": "Excluding Core CP, each player can gain a maximum of 1CP per battle round, including the CP gained by discarding an active Secondary Mission card."
+      }
+    ],
     "source_pdf_sha256": "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20",
     "source_title": "Warhammer Event Companion v1.1",
     "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_event_companion-alyapl19us-b2drgwkji4.pdf",

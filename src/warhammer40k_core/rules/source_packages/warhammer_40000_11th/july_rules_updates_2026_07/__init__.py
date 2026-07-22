@@ -18,6 +18,7 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 )
 
 from ._artifacts import (
+    EventCompanionRuleUpdateRecord,
     EventLayoutRevisionRecord,
     JulyRulesUpdateArtifactError,
     JulyRulesUpdatesPackageArtifact,
@@ -56,6 +57,7 @@ IDENTICAL_UNIT_REPLACEMENT_STRATAGEM_SOURCE_IDS: Final = frozenset(
 PROTECTIVE_TARGETING_STRATAGEM_SOURCE_IDS: Final = frozenset(
     _ARTIFACT.universal_rules_update.protective_targeting_stratagem_source_ids
 )
+NON_CORE_CP_GAIN_CAP_SOURCE_ID: Final = _ARTIFACT.event_companion.rules[0].source_id
 
 
 def universal_rule_records() -> tuple[UniversalRuleUpdateRecord, ...]:
@@ -64,6 +66,10 @@ def universal_rule_records() -> tuple[UniversalRuleUpdateRecord, ...]:
 
 def changed_event_layouts() -> tuple[EventLayoutRevisionRecord, ...]:
     return _ARTIFACT.event_companion.changed_layouts
+
+
+def event_companion_rule_records() -> tuple[EventCompanionRuleUpdateRecord, ...]:
+    return _ARTIFACT.event_companion.rules
 
 
 def source_catalog() -> SourceCatalog:
@@ -102,6 +108,13 @@ def source_catalog() -> SourceCatalog:
                             f"{_ARTIFACT.universal_rules_update.local_pdf}; SHA-256: "
                             f"{_ARTIFACT.universal_rules_update.source_pdf_sha256}"
                         ),
+                    ),
+                    *tuple(
+                        RuleSourceText.from_raw(
+                            source_id=rule.source_id,
+                            raw_text=rule.source_text,
+                        )
+                        for rule in event_companion_rule_records()
                     ),
                     *tuple(
                         RuleSourceText.from_raw(
@@ -161,6 +174,7 @@ __all__ = (
     "EVENT_COMPANION_SOURCE_PACKAGE_ID",
     "EVENT_COMPANION_SOURCE_URL",
     "IDENTICAL_UNIT_REPLACEMENT_STRATAGEM_SOURCE_IDS",
+    "NON_CORE_CP_GAIN_CAP_SOURCE_ID",
     "PROTECTIVE_TARGETING_STRATAGEM_SOURCE_IDS",
     "SOURCE_DATE",
     "SOURCE_PACKAGE_ID",
@@ -171,6 +185,7 @@ __all__ = (
     "UNIVERSAL_RULES_SOURCE_URL",
     "JulyRulesUpdateArtifactError",
     "changed_event_layouts",
+    "event_companion_rule_records",
     "july_rules_updates_package_artifact_from_json_bytes",
     "source_catalog",
     "universal_rule_records",
