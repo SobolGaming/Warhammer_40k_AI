@@ -285,6 +285,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-aquila-kill-team",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "aquila-kill-team",
       "wargear_costs": []
     },
@@ -322,6 +323,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-callidus-assassin",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "callidus-assassin",
       "wargear_costs": []
     },
@@ -359,6 +361,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-corvus-blackstar",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "corvus-blackstar",
       "wargear_costs": []
     },
@@ -396,6 +399,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-culexus-assassin",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "culexus-assassin",
       "wargear_costs": []
     },
@@ -448,6 +452,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-deathwatch-kill-team",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "deathwatch-kill-team",
       "wargear_costs": []
     },
@@ -485,6 +490,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-eversor-assassin",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "eversor-assassin",
       "wargear_costs": []
     },
@@ -522,6 +528,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-exaction-squad",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "exaction-squad",
       "wargear_costs": []
     },
@@ -559,6 +566,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-grey-knights-terminator-squad",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "grey-knights-terminator-squad",
       "wargear_costs": [
         {
@@ -604,6 +612,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-imperial-navy-breachers",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "imperial-navy-breachers",
       "wargear_costs": []
     },
@@ -641,6 +650,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-imperial-rhino",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "imperial-rhino",
       "wargear_costs": []
     },
@@ -704,6 +714,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "inquisitor",
       "wargear_costs": []
     },
@@ -761,6 +772,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-coteaz",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "inquisitor-coteaz",
       "wargear_costs": []
     },
@@ -818,6 +830,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-draxus",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "inquisitor-draxus",
       "wargear_costs": []
     },
@@ -877,6 +890,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-greyfax",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "inquisitor-greyfax",
       "wargear_costs": []
     },
@@ -914,6 +928,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-kroyle",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "inquisitor-kroyle",
       "wargear_costs": []
     },
@@ -966,6 +981,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitorial-agents",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "inquisitorial-agents",
       "wargear_costs": []
     },
@@ -1003,6 +1019,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitorial-chimera",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "inquisitorial-chimera",
       "wargear_costs": []
     },
@@ -1040,6 +1057,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-ministorum-priest",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "ministorum-priest",
       "wargear_costs": []
     },
@@ -1087,6 +1105,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-navigator",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "navigator",
       "wargear_costs": []
     },
@@ -1134,6 +1153,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-rogue-trader-entourage",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "rogue-trader-entourage",
       "wargear_costs": []
     },
@@ -1171,6 +1191,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sanctifiers",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "sanctifiers",
       "wargear_costs": []
     },
@@ -1208,6 +1229,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sisters-of-battle-immolator",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "sisters-of-battle-immolator",
       "wargear_costs": [
         {
@@ -1253,6 +1275,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sisters-of-battle-squad",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "sisters-of-battle-squad",
       "wargear_costs": []
     },
@@ -1290,6 +1313,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-subductor-squad",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "subductor-squad",
       "wargear_costs": []
     },
@@ -1327,6 +1351,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-vigilant-squad",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "vigilant-squad",
       "wargear_costs": []
     },
@@ -1364,6 +1389,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-vindicare-assassin",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "vindicare-assassin",
       "wargear_costs": []
     },
@@ -1401,6 +1427,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-voidsmen-at-arms",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "voidsmen-at-arms",
       "wargear_costs": []
     },
@@ -1448,6 +1475,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-captain-artemis",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "watch-captain-artemis",
       "wargear_costs": []
     },
@@ -1495,6 +1523,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-master",
       "source_section_id": "every-model-has-the-imperium-keyword",
       "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "support_allowance": null,
       "unit_id": "watch-master",
       "wargear_costs": []
     },
@@ -1547,6 +1576,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-aquila-kill-team",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "aquila-kill-team",
       "wargear_costs": []
     },
@@ -1584,6 +1614,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-callidus-assassin",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "callidus-assassin",
       "wargear_costs": []
     },
@@ -1621,6 +1652,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-corvus-blackstar",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "corvus-blackstar",
       "wargear_costs": []
     },
@@ -1658,6 +1690,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-culexus-assassin",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "culexus-assassin",
       "wargear_costs": []
     },
@@ -1710,6 +1743,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-deathwatch-kill-team",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "deathwatch-kill-team",
       "wargear_costs": []
     },
@@ -1747,6 +1781,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-eversor-assassin",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "eversor-assassin",
       "wargear_costs": []
     },
@@ -1784,6 +1819,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-exaction-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "exaction-squad",
       "wargear_costs": []
     },
@@ -1821,6 +1857,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-grey-knights-terminator-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "grey-knights-terminator-squad",
       "wargear_costs": [
         {
@@ -1866,6 +1903,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-imperial-navy-breachers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "imperial-navy-breachers",
       "wargear_costs": []
     },
@@ -1903,6 +1941,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-imperial-rhino",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "imperial-rhino",
       "wargear_costs": []
     },
@@ -1966,6 +2005,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "inquisitor",
       "wargear_costs": []
     },
@@ -2023,6 +2063,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-coteaz",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "inquisitor-coteaz",
       "wargear_costs": []
     },
@@ -2080,6 +2121,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-draxus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "inquisitor-draxus",
       "wargear_costs": []
     },
@@ -2139,6 +2181,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-greyfax",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "inquisitor-greyfax",
       "wargear_costs": []
     },
@@ -2176,6 +2219,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-kroyle",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "inquisitor-kroyle",
       "wargear_costs": []
     },
@@ -2228,6 +2272,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitorial-agents",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "inquisitorial-agents",
       "wargear_costs": []
     },
@@ -2265,6 +2310,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitorial-chimera",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "inquisitorial-chimera",
       "wargear_costs": []
     },
@@ -2302,6 +2348,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-ministorum-priest",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ministorum-priest",
       "wargear_costs": []
     },
@@ -2349,6 +2396,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-navigator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "navigator",
       "wargear_costs": []
     },
@@ -2396,6 +2444,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-rogue-trader-entourage",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "rogue-trader-entourage",
       "wargear_costs": []
     },
@@ -2433,6 +2482,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sanctifiers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sanctifiers",
       "wargear_costs": []
     },
@@ -2470,6 +2520,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sisters-of-battle-immolator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sisters-of-battle-immolator",
       "wargear_costs": [
         {
@@ -2515,6 +2566,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sisters-of-battle-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sisters-of-battle-squad",
       "wargear_costs": []
     },
@@ -2552,6 +2604,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-subductor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "subductor-squad",
       "wargear_costs": []
     },
@@ -2589,6 +2642,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-vigilant-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "vigilant-squad",
       "wargear_costs": []
     },
@@ -2626,6 +2680,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-vindicare-assassin",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "vindicare-assassin",
       "wargear_costs": []
     },
@@ -2663,6 +2718,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-voidsmen-at-arms",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "voidsmen-at-arms",
       "wargear_costs": []
     },
@@ -2710,6 +2766,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-captain-artemis",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "watch-captain-artemis",
       "wargear_costs": []
     },
@@ -2757,6 +2814,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-master",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "watch-master",
       "wargear_costs": []
     }

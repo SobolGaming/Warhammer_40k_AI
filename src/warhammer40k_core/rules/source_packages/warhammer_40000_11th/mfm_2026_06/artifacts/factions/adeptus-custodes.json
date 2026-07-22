@@ -415,6 +415,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-agamatus-custodians",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "agamatus-custodians",
       "wargear_costs": []
     },
@@ -464,6 +465,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-aleya",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "aleya",
       "wargear_costs": []
     },
@@ -546,6 +548,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-allarus-custodians",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "allarus-custodians",
       "wargear_costs": []
     },
@@ -583,6 +586,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-anathema-psykana-rhino",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "anathema-psykana-rhino",
       "wargear_costs": []
     },
@@ -644,6 +648,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-ares-gunship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ares-gunship",
       "wargear_costs": []
     },
@@ -719,6 +724,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-blade-champion",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "blade-champion",
       "wargear_costs": []
     },
@@ -780,6 +786,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-caladius-grav-tank",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "caladius-grav-tank",
       "wargear_costs": [
         {
@@ -849,6 +856,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-contemptor-achillus-dreadnought",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "contemptor-achillus-dreadnought",
       "wargear_costs": []
     },
@@ -910,6 +918,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-contemptor-galatus-dreadnought",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "contemptor-galatus-dreadnought",
       "wargear_costs": []
     },
@@ -971,6 +980,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-coronus-grav-carrier",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "coronus-grav-carrier",
       "wargear_costs": []
     },
@@ -1062,6 +1072,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-custodian-guard",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "custodian-guard",
       "wargear_costs": []
     },
@@ -1123,6 +1134,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-custodian-guard-with-adrasite-and-pyrithite-spears",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "custodian-guard-with-adrasite-and-pyrithite-spears",
       "wargear_costs": []
     },
@@ -1214,6 +1226,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-custodian-wardens",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "custodian-wardens",
       "wargear_costs": []
     },
@@ -1263,6 +1276,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-knight-centura",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-centura",
       "wargear_costs": []
     },
@@ -1324,6 +1338,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-orion-assault-dropship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "orion-assault-dropship",
       "wargear_costs": []
     },
@@ -1361,6 +1376,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-pallas-grav-attack",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "pallas-grav-attack",
       "wargear_costs": []
     },
@@ -1443,6 +1459,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-prosecutors",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "prosecutors",
       "wargear_costs": []
     },
@@ -1480,6 +1497,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-sagittarum-custodians",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sagittarum-custodians",
       "wargear_costs": []
     },
@@ -1531,6 +1549,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-shield-captain",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "shield-captain",
       "wargear_costs": []
     },
@@ -1578,6 +1597,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-shield-captain-in-allarus-terminator-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "shield-captain-in-allarus-terminator-armour",
       "wargear_costs": []
     },
@@ -1625,6 +1645,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-shield-captain-on-dawneagle-jetbike",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "shield-captain-on-dawneagle-jetbike",
       "wargear_costs": []
     },
@@ -1686,6 +1707,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-telemon-heavy-dreadnought",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "telemon-heavy-dreadnought",
       "wargear_costs": []
     },
@@ -1737,6 +1759,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-trajann-valoris",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "trajann-valoris",
       "wargear_costs": []
     },
@@ -1788,6 +1811,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-valerian",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "valerian",
       "wargear_costs": []
     },
@@ -1840,6 +1864,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-venatari-custodians",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "venatari-custodians",
       "wargear_costs": []
     },
@@ -1901,6 +1926,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-venerable-contemptor-dreadnought",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "venerable-contemptor-dreadnought",
       "wargear_costs": []
     },
@@ -1962,6 +1988,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-venerable-land-raider",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "venerable-land-raider",
       "wargear_costs": []
     },
@@ -2014,6 +2041,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-vertus-praetors",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "vertus-praetors",
       "wargear_costs": []
     },
@@ -2096,6 +2124,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-vigilators",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "vigilators",
       "wargear_costs": []
     },
@@ -2178,6 +2207,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adeptus-custodes:unit:units-witchseekers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "witchseekers",
       "wargear_costs": []
     }

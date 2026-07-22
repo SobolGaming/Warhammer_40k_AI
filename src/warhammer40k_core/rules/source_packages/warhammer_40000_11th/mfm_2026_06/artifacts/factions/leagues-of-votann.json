@@ -63,9 +63,9 @@
           "enhancement_id": "triv-rg-cyber-implant",
           "is_upgrade": false,
           "leader_allowance": null,
-          "name": "Triv\u00e4rg Cyber Implant",
+          "name": "Trivärg Cyber Implant",
           "points": 40,
-          "raw_name": "Triv\u00e4rg Cyber Implant",
+          "raw_name": "Trivärg Cyber Implant",
           "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:detachment:brandfast-oathband:enhancement:triv-rg-cyber-implant"
         }
       ],
@@ -82,9 +82,9 @@
           "enhancement_id": "d-lvewerke-navigator",
           "is_upgrade": false,
           "leader_allowance": null,
-          "name": "D\u00ealvewerke Navigator",
+          "name": "Dêlvewerke Navigator",
           "points": 25,
-          "raw_name": "D\u00ealvewerke Navigator",
+          "raw_name": "Dêlvewerke Navigator",
           "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:detachment:d-lve-assault-shift:enhancement:d-lvewerke-navigator"
         },
         {
@@ -116,8 +116,8 @@
         }
       ],
       "force_disposition_id": "purge-the-foe",
-      "name": "D\u00caLVE ASSAULT SHIFT",
-      "raw_name": "D\u00caLVE ASSAULT SHIFT",
+      "name": "DÊLVE ASSAULT SHIFT",
+      "raw_name": "DÊLVE ASSAULT SHIFT",
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:detachment:d-lve-assault-shift"
     },
     {
@@ -137,9 +137,9 @@
           "enhancement_id": "shroudw-rke-talismans",
           "is_upgrade": true,
           "leader_allowance": null,
-          "name": "Shroudw\u00ebrke Talismans (Upgrade)",
+          "name": "Shroudwërke Talismans (Upgrade)",
           "points": 15,
-          "raw_name": "Shroudw\u00ebrke Talismans (Upgrade)",
+          "raw_name": "Shroudwërke Talismans (Upgrade)",
           "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:detachment:farseekers:enhancement:shroudw-rke-talismans"
         }
       ],
@@ -165,9 +165,9 @@
           "enhancement_id": "high-k-hl",
           "is_upgrade": false,
           "leader_allowance": null,
-          "name": "High K\u00e2hl",
+          "name": "High Kâhl",
           "points": 30,
-          "raw_name": "High K\u00e2hl",
+          "raw_name": "High Kâhl",
           "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:detachment:hearthband:enhancement:high-k-hl"
         },
         {
@@ -211,9 +211,9 @@
           "enhancement_id": "f-rstrydr-node",
           "is_upgrade": false,
           "leader_allowance": null,
-          "name": "F\u00e2rstrydr Node",
+          "name": "Fârstrydr Node",
           "points": 20,
-          "raw_name": "F\u00e2rstrydr Node",
+          "raw_name": "Fârstrydr Node",
           "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:detachment:hearthfyre-arsenal:enhancement:f-rstrydr-node"
         },
         {
@@ -248,9 +248,9 @@
           "enhancement_id": "high-k-hl",
           "is_upgrade": false,
           "leader_allowance": null,
-          "name": "High K\u00e2hl",
+          "name": "High Kâhl",
           "points": 30,
-          "raw_name": "High K\u00e2hl",
+          "raw_name": "High Kâhl",
           "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:detachment:hearthguard-covenant:enhancement:high-k-hl"
         },
         {
@@ -356,8 +356,8 @@
         }
       ],
       "force_disposition_id": "purge-the-foe",
-      "name": "NEEDGA\u00c2RD OATHBAND",
-      "raw_name": "NEEDGA\u00c2RD OATHBAND",
+      "name": "NEEDGAÂRD OATHBAND",
+      "raw_name": "NEEDGAÂRD OATHBAND",
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:detachment:needga-rd-oathband"
     },
     {
@@ -446,6 +446,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-arkanyst-evaluator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "arkanyst-evaluator",
       "wargear_costs": []
     },
@@ -485,12 +486,13 @@
         ],
         "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-berehk-stornbr-w:leader"
       },
-      "name": "BEREHK STORNBR\u00d6W",
-      "raw_name": "BEREHK STORNBR\u00d6W",
+      "name": "BEREHK STORNBRÖW",
+      "raw_name": "BEREHK STORNBRÖW",
       "record_id": "units-berehk-stornbr-w",
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-berehk-stornbr-w",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "berehk-stornbr-w",
       "wargear_costs": []
     },
@@ -523,7 +525,7 @@
       ],
       "leader_allowance": {
         "allowed_bodyguard_names": [
-          "BR\u00d4KHYR THUNDERKYN",
+          "BRÔKHYR THUNDERKYN",
           "HEARTHKYN WARRIORS"
         ],
         "allowed_bodyguard_unit_ids": [
@@ -532,12 +534,13 @@
         ],
         "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-br-khyr-iron-master:leader"
       },
-      "name": "BR\u00d4KHYR IRON-MASTER",
-      "raw_name": "BR\u00d4KHYR IRON-MASTER",
+      "name": "BRÔKHYR IRON-MASTER",
+      "raw_name": "BRÔKHYR IRON-MASTER",
       "record_id": "units-br-khyr-iron-master",
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-br-khyr-iron-master",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "br-khyr-iron-master",
       "wargear_costs": []
     },
@@ -584,12 +587,13 @@
         }
       ],
       "leader_allowance": null,
-      "name": "BR\u00d4KHYR THUNDERKYN",
-      "raw_name": "BR\u00d4KHYR THUNDERKYN",
+      "name": "BRÔKHYR THUNDERKYN",
+      "raw_name": "BRÔKHYR THUNDERKYN",
       "record_id": "units-br-khyr-thunderkyn",
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-br-khyr-thunderkyn",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "br-khyr-thunderkyn",
       "wargear_costs": []
     },
@@ -627,6 +631,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-buri-aegnirssen",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "buri-aegnirssen",
       "wargear_costs": []
     },
@@ -679,6 +684,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-cthonian-beserks",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cthonian-beserks",
       "wargear_costs": []
     },
@@ -716,6 +722,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-cthonian-earthshakers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cthonian-earthshakers",
       "wargear_costs": []
     },
@@ -761,6 +768,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-einhyr-champion",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "einhyr-champion",
       "wargear_costs": []
     },
@@ -852,6 +860,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-einhyr-hearthguard",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "einhyr-hearthguard",
       "wargear_costs": []
     },
@@ -897,6 +906,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-grimnyr",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "grimnyr",
       "wargear_costs": []
     },
@@ -934,6 +944,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-hearthkyn-warriors",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hearthkyn-warriors",
       "wargear_costs": []
     },
@@ -995,6 +1006,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-hekaton-land-fortress",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hekaton-land-fortress",
       "wargear_costs": []
     },
@@ -1086,6 +1098,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-hernkyn-pioneers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hernkyn-pioneers",
       "wargear_costs": []
     },
@@ -1123,6 +1136,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-hernkyn-yaegirs",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hernkyn-yaegirs",
       "wargear_costs": []
     },
@@ -1214,6 +1228,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-heavy-volkanite-disintegrators",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ironkin-steeljacks-with-heavy-volkanite-disintegrators",
       "wargear_costs": []
     },
@@ -1305,6 +1320,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-ironkin-steeljacks-with-melee-weapons",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ironkin-steeljacks-with-melee-weapons",
       "wargear_costs": []
     },
@@ -1346,12 +1362,13 @@
         ],
         "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-k-hl:leader"
       },
-      "name": "K\u00c2HL",
-      "raw_name": "K\u00c2HL",
+      "name": "KÂHL",
+      "raw_name": "KÂHL",
       "record_id": "units-k-hl",
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-k-hl",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "k-hl",
       "wargear_costs": []
     },
@@ -1389,6 +1406,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-kapricus-carrier",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kapricus-carrier",
       "wargear_costs": []
     },
@@ -1441,6 +1459,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-kapricus-defenders",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kapricus-defenders",
       "wargear_costs": []
     },
@@ -1488,6 +1507,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-memnyr-strategist",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "memnyr-strategist",
       "wargear_costs": []
     },
@@ -1525,6 +1545,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-sagitaur",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sagitaur",
       "wargear_costs": []
     },
@@ -1566,12 +1587,13 @@
         ],
         "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-thar-the-destined:leader"
       },
-      "name": "\u00dbTHAR THE DESTINED",
-      "raw_name": "\u00dbTHAR THE DESTINED",
+      "name": "ÛTHAR THE DESTINED",
+      "raw_name": "ÛTHAR THE DESTINED",
       "record_id": "units-thar-the-destined",
       "source_id": "gw-11e-mfm-2026-06:faction:leagues-of-votann:unit:units-thar-the-destined",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "thar-the-destined",
       "wargear_costs": []
     }

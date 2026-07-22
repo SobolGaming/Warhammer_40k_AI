@@ -1035,6 +1035,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:imperial-fists-darnath-lysander",
       "source_section_id": "imperial-fists",
       "source_section_name": "IMPERIAL FISTS",
+      "support_allowance": null,
       "unit_id": "darnath-lysander",
       "wargear_costs": []
     },
@@ -1086,6 +1087,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:imperial-fists-pedro-kantor",
       "source_section_id": "imperial-fists",
       "source_section_name": "IMPERIAL FISTS",
+      "support_allowance": null,
       "unit_id": "pedro-kantor",
       "wargear_costs": []
     },
@@ -1135,6 +1137,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:imperial-fists-tor-garadon",
       "source_section_id": "imperial-fists",
       "source_section_name": "IMPERIAL FISTS",
+      "support_allowance": null,
       "unit_id": "tor-garadon",
       "wargear_costs": []
     },
@@ -1182,6 +1185,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:iron-hands-caanok-var",
       "source_section_id": "iron-hands",
       "source_section_name": "IRON HANDS",
+      "support_allowance": null,
       "unit_id": "caanok-var",
       "wargear_costs": []
     },
@@ -1231,6 +1235,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:iron-hands-iron-father-feirros",
       "source_section_id": "iron-hands",
       "source_section_name": "IRON HANDS",
+      "support_allowance": null,
       "unit_id": "iron-father-feirros",
       "wargear_costs": []
     },
@@ -1268,6 +1273,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:raven-guard-aethon-shaan",
       "source_section_id": "raven-guard",
       "source_section_name": "RAVEN GUARD",
+      "support_allowance": null,
       "unit_id": "aethon-shaan",
       "wargear_costs": []
     },
@@ -1315,6 +1321,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:raven-guard-kayvaan-shrike",
       "source_section_id": "raven-guard",
       "source_section_name": "RAVEN GUARD",
+      "support_allowance": null,
       "unit_id": "kayvaan-shrike",
       "wargear_costs": []
     },
@@ -1372,6 +1379,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:salamanders-adrax-agatone",
       "source_section_id": "salamanders",
       "source_section_name": "SALAMANDERS",
+      "support_allowance": null,
       "unit_id": "adrax-agatone",
       "wargear_costs": []
     },
@@ -1423,6 +1431,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:salamanders-vulkan-hestan",
       "source_section_id": "salamanders",
       "source_section_name": "SALAMANDERS",
+      "support_allowance": null,
       "unit_id": "vulkan-hestan",
       "wargear_costs": []
     },
@@ -1484,6 +1493,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:ultramarines-captain-titus",
       "source_section_id": "ultramarines",
       "source_section_name": "ULTRAMARINES",
+      "support_allowance": null,
       "unit_id": "captain-titus",
       "wargear_costs": []
     },
@@ -1521,6 +1531,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:ultramarines-cato-sicarius",
       "source_section_id": "ultramarines",
       "source_section_name": "ULTRAMARINES",
+      "support_allowance": null,
       "unit_id": "cato-sicarius",
       "wargear_costs": []
     },
@@ -1578,6 +1589,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:ultramarines-chief-librarian-tigurius",
       "source_section_id": "ultramarines",
       "source_section_name": "ULTRAMARINES",
+      "support_allowance": null,
       "unit_id": "chief-librarian-tigurius",
       "wargear_costs": []
     },
@@ -1669,6 +1681,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-aggressor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "aggressor-squad",
       "wargear_costs": []
     },
@@ -1706,6 +1719,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-ancient",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ancient",
       "wargear_costs": []
     },
@@ -1743,6 +1757,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-ancient-in-terminator-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ancient-in-terminator-armour",
       "wargear_costs": []
     },
@@ -1780,6 +1795,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-apothecary",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "apothecary",
       "wargear_costs": []
     },
@@ -1817,6 +1833,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-apothecary-biologis",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "apothecary-biologis",
       "wargear_costs": []
     },
@@ -1869,6 +1886,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-assault-intercessor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "assault-intercessor-squad",
       "wargear_costs": []
     },
@@ -1960,6 +1978,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-assault-intercessors-with-jump-packs",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "assault-intercessors-with-jump-packs",
       "wargear_costs": []
     },
@@ -2021,6 +2040,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-astraeus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "astraeus",
       "wargear_costs": []
     },
@@ -2082,6 +2102,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-ballistus-dreadnought",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ballistus-dreadnought",
       "wargear_costs": []
     },
@@ -2119,6 +2140,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-bladeguard-ancient",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "bladeguard-ancient",
       "wargear_costs": []
     },
@@ -2210,6 +2232,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-bladeguard-veteran-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "bladeguard-veteran-squad",
       "wargear_costs": []
     },
@@ -2271,6 +2294,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-brutalis-dreadnought",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "brutalis-dreadnought",
       "wargear_costs": []
     },
@@ -2346,6 +2370,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-captain",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "captain",
       "wargear_costs": []
     },
@@ -2397,6 +2422,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-captain-in-gravis-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "captain-in-gravis-armour",
       "wargear_costs": []
     },
@@ -2452,6 +2478,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-captain-in-phobos-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "captain-in-phobos-armour",
       "wargear_costs": []
     },
@@ -2505,6 +2532,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-captain-in-terminator-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "captain-in-terminator-armour",
       "wargear_costs": []
     },
@@ -2556,6 +2584,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-captain-with-jump-pack",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "captain-with-jump-pack",
       "wargear_costs": []
     },
@@ -2608,6 +2637,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-centurion-assault-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "centurion-assault-squad",
       "wargear_costs": []
     },
@@ -2660,6 +2690,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-centurion-devastator-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "centurion-devastator-squad",
       "wargear_costs": []
     },
@@ -2733,6 +2764,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-chaplain",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaplain",
       "wargear_costs": []
     },
@@ -2786,6 +2818,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-chaplain-in-terminator-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaplain-in-terminator-armour",
       "wargear_costs": []
     },
@@ -2833,6 +2866,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-chaplain-on-bike",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaplain-on-bike",
       "wargear_costs": []
     },
@@ -2884,6 +2918,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-chaplain-with-jump-pack",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaplain-with-jump-pack",
       "wargear_costs": []
     },
@@ -2921,6 +2956,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-company-heroes",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "company-heroes",
       "wargear_costs": []
     },
@@ -2982,6 +3018,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-desolation-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "desolation-squad",
       "wargear_costs": []
     },
@@ -3034,6 +3071,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-devastator-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "devastator-squad",
       "wargear_costs": []
     },
@@ -3071,6 +3109,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-dreadnought",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "dreadnought",
       "wargear_costs": []
     },
@@ -3108,6 +3147,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-drop-pod",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "drop-pod",
       "wargear_costs": []
     },
@@ -3145,6 +3185,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-eliminator-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "eliminator-squad",
       "wargear_costs": []
     },
@@ -3236,6 +3277,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-eradicator-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "eradicator-squad",
       "wargear_costs": []
     },
@@ -3297,6 +3339,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-eradicator-squad-with-heavy-bolters",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "eradicator-squad-with-heavy-bolters",
       "wargear_costs": []
     },
@@ -3349,6 +3392,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-firestrike-servo-turrets",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "firestrike-servo-turrets",
       "wargear_costs": []
     },
@@ -3410,6 +3454,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-gladiator-lancer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "gladiator-lancer",
       "wargear_costs": []
     },
@@ -3471,6 +3516,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-gladiator-reaper",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "gladiator-reaper",
       "wargear_costs": []
     },
@@ -3532,6 +3578,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-gladiator-valiant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "gladiator-valiant",
       "wargear_costs": []
     },
@@ -3569,6 +3616,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-hammerfall-bunker",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hammerfall-bunker",
       "wargear_costs": []
     },
@@ -3621,6 +3669,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-heavy-intercessor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "heavy-intercessor-squad",
       "wargear_costs": []
     },
@@ -3673,6 +3722,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-hellblaster-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hellblaster-squad",
       "wargear_costs": []
     },
@@ -3710,6 +3760,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-impulsor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "impulsor",
       "wargear_costs": []
     },
@@ -3801,6 +3852,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-inceptor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "inceptor-squad",
       "wargear_costs": []
     },
@@ -3892,6 +3944,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-incursor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "incursor-squad",
       "wargear_costs": []
     },
@@ -3944,6 +3997,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-infernus-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "infernus-squad",
       "wargear_costs": []
     },
@@ -4035,6 +4089,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-infiltrator-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "infiltrator-squad",
       "wargear_costs": []
     },
@@ -4087,6 +4142,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-intercessor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "intercessor-squad",
       "wargear_costs": []
     },
@@ -4124,6 +4180,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-invader-atv",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "invader-atv",
       "wargear_costs": []
     },
@@ -4161,6 +4218,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-invictor-tactical-warsuit",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "invictor-tactical-warsuit",
       "wargear_costs": []
     },
@@ -4228,6 +4286,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-judiciar",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "judiciar",
       "wargear_costs": []
     },
@@ -4289,6 +4348,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-land-raider",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "land-raider",
       "wargear_costs": []
     },
@@ -4350,6 +4410,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-land-raider-crusader",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "land-raider-crusader",
       "wargear_costs": []
     },
@@ -4411,6 +4472,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-land-raider-redeemer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "land-raider-redeemer",
       "wargear_costs": []
     },
@@ -4472,6 +4534,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-land-speeder",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "land-speeder",
       "wargear_costs": []
     },
@@ -4539,6 +4602,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-librarian",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "librarian",
       "wargear_costs": []
     },
@@ -4594,6 +4658,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-librarian-in-phobos-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "librarian-in-phobos-armour",
       "wargear_costs": []
     },
@@ -4647,6 +4712,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-librarian-in-terminator-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "librarian-in-terminator-armour",
       "wargear_costs": []
     },
@@ -4684,6 +4750,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-lieutenant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lieutenant",
       "wargear_costs": []
     },
@@ -4721,6 +4788,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-lieutenant-in-phobos-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lieutenant-in-phobos-armour",
       "wargear_costs": []
     },
@@ -4758,6 +4826,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-lieutenant-in-reiver-armour",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lieutenant-in-reiver-armour",
       "wargear_costs": []
     },
@@ -4795,6 +4864,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-lieutenant-with-combi-weapon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lieutenant-with-combi-weapon",
       "wargear_costs": []
     },
@@ -4862,6 +4932,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-outrider-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "outrider-squad",
       "wargear_costs": []
     },
@@ -4923,6 +4994,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-predator-annihilator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "predator-annihilator",
       "wargear_costs": []
     },
@@ -4984,6 +5056,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-predator-destructor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "predator-destructor",
       "wargear_costs": []
     },
@@ -5021,6 +5094,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-razorback",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "razorback",
       "wargear_costs": []
     },
@@ -5082,6 +5156,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-redemptor-dreadnought",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "redemptor-dreadnought",
       "wargear_costs": [
         {
@@ -5142,6 +5217,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-reiver-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "reiver-squad",
       "wargear_costs": []
     },
@@ -5203,6 +5279,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-repulsor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "repulsor",
       "wargear_costs": []
     },
@@ -5264,6 +5341,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-repulsor-executioner",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "repulsor-executioner",
       "wargear_costs": []
     },
@@ -5301,6 +5379,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-rhino",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "rhino",
       "wargear_costs": []
     },
@@ -5392,6 +5471,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-scout-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "scout-squad",
       "wargear_costs": []
     },
@@ -5444,6 +5524,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-sternguard-veteran-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sternguard-veteran-squad",
       "wargear_costs": []
     },
@@ -5505,6 +5586,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-storm-speeder-hailstrike",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "storm-speeder-hailstrike",
       "wargear_costs": []
     },
@@ -5566,6 +5648,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-storm-speeder-hammerstrike",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "storm-speeder-hammerstrike",
       "wargear_costs": []
     },
@@ -5627,6 +5710,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-storm-speeder-thunderstrike",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "storm-speeder-thunderstrike",
       "wargear_costs": []
     },
@@ -5664,6 +5748,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-stormhawk-interceptor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormhawk-interceptor",
       "wargear_costs": []
     },
@@ -5725,6 +5810,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-stormraven-gunship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormraven-gunship",
       "wargear_costs": []
     },
@@ -5762,6 +5848,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-stormtalon-gunship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "stormtalon-gunship",
       "wargear_costs": []
     },
@@ -5799,6 +5886,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-suppressor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "suppressor-squad",
       "wargear_costs": []
     },
@@ -5836,6 +5924,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-tactical-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tactical-squad",
       "wargear_costs": []
     },
@@ -5897,6 +5986,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-techmarine",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "techmarine",
       "wargear_costs": []
     },
@@ -5949,6 +6039,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-terminator-assault-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "terminator-assault-squad",
       "wargear_costs": [
         {
@@ -6009,6 +6100,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-terminator-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "terminator-squad",
       "wargear_costs": []
     },
@@ -6046,6 +6138,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-thunderhawk-gunship",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "thunderhawk-gunship",
       "wargear_costs": []
     },
@@ -6137,6 +6230,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-vanguard-veteran-squad-with-jump-packs",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "vanguard-veteran-squad-with-jump-packs",
       "wargear_costs": []
     },
@@ -6198,6 +6292,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-vindicator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "vindicator",
       "wargear_costs": []
     },
@@ -6259,6 +6354,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:units-whirlwind",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "whirlwind",
       "wargear_costs": []
     },
@@ -6314,6 +6410,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:white-scars-korsarro-khan",
       "source_section_id": "white-scars",
       "source_section_name": "WHITE SCARS",
+      "support_allowance": null,
       "unit_id": "korsarro-khan",
       "wargear_costs": []
     },
@@ -6351,6 +6448,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:white-scars-roboute-guilliman",
       "source_section_id": "white-scars",
       "source_section_name": "WHITE SCARS",
+      "support_allowance": null,
       "unit_id": "roboute-guilliman",
       "wargear_costs": []
     },
@@ -6396,6 +6494,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:white-scars-suboden-khan",
       "source_section_id": "white-scars",
       "source_section_name": "WHITE SCARS",
+      "support_allowance": null,
       "unit_id": "suboden-khan",
       "wargear_costs": []
     },
@@ -6451,6 +6550,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:white-scars-uriel-ventris",
       "source_section_id": "white-scars",
       "source_section_name": "WHITE SCARS",
+      "support_allowance": null,
       "unit_id": "uriel-ventris",
       "wargear_costs": []
     },
@@ -6542,6 +6642,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:white-scars-victrix-honour-guard",
       "source_section_id": "white-scars",
       "source_section_name": "WHITE SCARS",
+      "support_allowance": null,
       "unit_id": "victrix-honour-guard",
       "wargear_costs": [
         {
@@ -6594,6 +6695,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:space-marines:unit:white-scars-wardens-of-ultramar",
       "source_section_id": "white-scars",
       "source_section_name": "WHITE SCARS",
+      "support_allowance": null,
       "unit_id": "wardens-of-ultramar",
       "wargear_costs": []
     }

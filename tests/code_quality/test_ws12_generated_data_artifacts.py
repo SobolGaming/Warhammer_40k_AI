@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = ROOT / "src" / "warhammer40k_core"
 ENGINE = PACKAGE / "engine"
-MFM_PACKAGE = PACKAGE / "rules" / "source_packages" / "warhammer_40000_11th" / "mfm_2026_06"
+MFM_PACKAGE = PACKAGE / "rules" / "source_packages" / "warhammer_40000_11th" / "mfm_2026_07"
 EVENT_PACKAGE = PACKAGE / "rules" / "source_packages" / "warhammer_40000_11th"
 
 _ALLOWED_MFM_LOADER_MODULES = {"__init__.py", "_artifacts.py"}

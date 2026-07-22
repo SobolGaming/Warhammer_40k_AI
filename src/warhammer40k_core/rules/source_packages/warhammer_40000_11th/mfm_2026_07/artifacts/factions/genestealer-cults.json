@@ -1,0 +1,1862 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "biosanctic-broodsurge",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "alien-majesty",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Alien Majesty",
+          "points": 15,
+          "raw_name": "Alien Majesty",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:biosanctic-broodsurge:enhancement:alien-majesty"
+        },
+        {
+          "enhancement_id": "biomorph-adaptation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Biomorph Adaptation",
+          "points": 25,
+          "raw_name": "Biomorph Adaptation",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:biosanctic-broodsurge:enhancement:biomorph-adaptation"
+        },
+        {
+          "enhancement_id": "mutagenic-regeneration",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mutagenic Regeneration",
+          "points": 10,
+          "raw_name": "Mutagenic Regeneration",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:biosanctic-broodsurge:enhancement:mutagenic-regeneration"
+        },
+        {
+          "enhancement_id": "predatory-instincts",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Predatory Instincts",
+          "points": 20,
+          "raw_name": "Predatory Instincts",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:biosanctic-broodsurge:enhancement:predatory-instincts"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "BIOSANCTIC BROODSURGE",
+      "raw_name": "BIOSANCTIC BROODSURGE",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:biosanctic-broodsurge"
+    },
+    {
+      "detachment_id": "brood-brothers-auxilia",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "adaptive-reprisal",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Adaptive Reprisal",
+          "points": 15,
+          "raw_name": "Adaptive Reprisal",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:brood-brothers-auxilia:enhancement:adaptive-reprisal"
+        },
+        {
+          "enhancement_id": "fire-point-commander",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fire-point Commander",
+          "points": 10,
+          "raw_name": "Fire-point Commander",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:brood-brothers-auxilia:enhancement:fire-point-commander"
+        },
+        {
+          "enhancement_id": "martial-espionage",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Martial Espionage",
+          "points": 25,
+          "raw_name": "Martial Espionage",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:brood-brothers-auxilia:enhancement:martial-espionage"
+        },
+        {
+          "enhancement_id": "the-hero-returned",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "The Hero Returned",
+          "points": 20,
+          "raw_name": "The Hero Returned",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:brood-brothers-auxilia:enhancement:the-hero-returned"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "BROOD BROTHERS AUXILIA",
+      "raw_name": "BROOD BROTHERS AUXILIA",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:brood-brothers-auxilia"
+    },
+    {
+      "detachment_id": "final-day",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "enraptured-damnation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Enraptured Damnation",
+          "points": 10,
+          "raw_name": "Enraptured Damnation",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:final-day:enhancement:enraptured-damnation"
+        },
+        {
+          "enhancement_id": "inhuman-integration",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Inhuman Integration",
+          "points": 20,
+          "raw_name": "Inhuman Integration",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:final-day:enhancement:inhuman-integration"
+        },
+        {
+          "enhancement_id": "synaptic-auger",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Synaptic Auger",
+          "points": 15,
+          "raw_name": "Synaptic Auger",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:final-day:enhancement:synaptic-auger"
+        },
+        {
+          "enhancement_id": "vanguard-tyrant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Vanguard Tyrant",
+          "points": 25,
+          "raw_name": "Vanguard Tyrant",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:final-day:enhancement:vanguard-tyrant"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "FINAL DAY",
+      "raw_name": "FINAL DAY",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:final-day"
+    },
+    {
+      "detachment_id": "heroes-of-the-uprising",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "contraband-munitions",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Contraband Munitions",
+          "points": 20,
+          "raw_name": "Contraband Munitions",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:heroes-of-the-uprising:enhancement:contraband-munitions"
+        },
+        {
+          "enhancement_id": "gene-tailored-toxins",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gene-tailored Toxins",
+          "points": 35,
+          "raw_name": "Gene-tailored Toxins",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:heroes-of-the-uprising:enhancement:gene-tailored-toxins"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "HEROES OF THE UPRISING",
+      "raw_name": "HEROES OF THE UPRISING",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:heroes-of-the-uprising"
+    },
+    {
+      "detachment_id": "host-of-ascension",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "a-chink-in-their-armour",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "A Chink In Their Armour",
+          "points": 20,
+          "raw_name": "A Chink In Their Armour",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:host-of-ascension:enhancement:a-chink-in-their-armour"
+        },
+        {
+          "enhancement_id": "assassination-edict",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Assassination Edict",
+          "points": 15,
+          "raw_name": "Assassination Edict",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:host-of-ascension:enhancement:assassination-edict"
+        },
+        {
+          "enhancement_id": "our-time-is-nigh",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Our Time is Nigh",
+          "points": 20,
+          "raw_name": "Our Time is Nigh",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:host-of-ascension:enhancement:our-time-is-nigh"
+        },
+        {
+          "enhancement_id": "prowling-agitant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Prowling Agitant",
+          "points": 15,
+          "raw_name": "Prowling Agitant",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:host-of-ascension:enhancement:prowling-agitant"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "HOST OF ASCENSION",
+      "raw_name": "HOST OF ASCENSION",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:host-of-ascension"
+    },
+    {
+      "detachment_id": "outlander-claw",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "assault-commando",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Assault Commando",
+          "points": 15,
+          "raw_name": "Assault Commando",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:outlander-claw:enhancement:assault-commando"
+        },
+        {
+          "enhancement_id": "cartographic-data-leech",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cartographic Data-leech",
+          "points": 10,
+          "raw_name": "Cartographic Data-leech",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:outlander-claw:enhancement:cartographic-data-leech"
+        },
+        {
+          "enhancement_id": "serpentine-tactics",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Serpentine Tactics",
+          "points": 10,
+          "raw_name": "Serpentine Tactics",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:outlander-claw:enhancement:serpentine-tactics"
+        },
+        {
+          "enhancement_id": "starfall-shells",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Starfall Shells",
+          "points": 10,
+          "raw_name": "Starfall Shells",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:outlander-claw:enhancement:starfall-shells"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "OUTLANDER CLAW",
+      "raw_name": "OUTLANDER CLAW",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:outlander-claw"
+    },
+    {
+      "detachment_id": "purestrain-broodswarm",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "mark-of-the-star-children",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Mark of the Star Children (Upgrade)",
+          "points": 30,
+          "raw_name": "Mark of the Star Children (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:purestrain-broodswarm:enhancement:mark-of-the-star-children"
+        },
+        {
+          "enhancement_id": "talons-of-the-sire",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Talons of the Sire",
+          "points": 15,
+          "raw_name": "Talons of the Sire",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:purestrain-broodswarm:enhancement:talons-of-the-sire"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "PURESTRAIN BROODSWARM",
+      "raw_name": "PURESTRAIN BROODSWARM",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:purestrain-broodswarm"
+    },
+    {
+      "detachment_id": "xenocreed-congregation",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "deeds-that-speak-to-the-masses",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Deeds that Speak to the Masses",
+          "points": 25,
+          "raw_name": "Deeds that Speak to the Masses",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:xenocreed-congregation:enhancement:deeds-that-speak-to-the-masses"
+        },
+        {
+          "enhancement_id": "denunciator-of-tyrants",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Denunciator of Tyrants",
+          "points": 25,
+          "raw_name": "Denunciator of Tyrants",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:xenocreed-congregation:enhancement:denunciator-of-tyrants"
+        },
+        {
+          "enhancement_id": "gene-sires-reliquant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gene-sire's Reliquant",
+          "points": 5,
+          "raw_name": "Gene-sire's Reliquant",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:xenocreed-congregation:enhancement:gene-sires-reliquant"
+        },
+        {
+          "enhancement_id": "incendiary-inspiration",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Incendiary Inspiration",
+          "points": 15,
+          "raw_name": "Incendiary Inspiration",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:xenocreed-congregation:enhancement:incendiary-inspiration"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "XENOCREED CONGREGATION",
+      "raw_name": "XENOCREED CONGREGATION",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:xenocreed-congregation"
+    },
+    {
+      "detachment_id": "xenocult-masses",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "devious-disguises",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Devious Disguises (Upgrade)",
+          "points": 15,
+          "raw_name": "Devious Disguises (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:xenocult-masses:enhancement:devious-disguises"
+        },
+        {
+          "enhancement_id": "inspired-to-greatness",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Inspired to Greatness",
+          "points": 15,
+          "raw_name": "Inspired to Greatness",
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:xenocult-masses:enhancement:inspired-to-greatness"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "XENOCULT MASSES",
+      "raw_name": "XENOCULT MASSES",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:detachment:xenocult-masses"
+    }
+  ],
+  "faction_id": "genestealer-cults",
+  "name": "Genestealer Cults",
+  "raw_name": "Genestealer Cults",
+  "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-aberrants:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-aberrants:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-aberrants:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-aberrants:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 290,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-aberrants:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-aberrants:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ABERRANTS",
+      "raw_name": "ABERRANTS",
+      "record_id": "units-aberrants",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-aberrants",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "aberrants",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-abominant:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-abominant:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-abominant:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-abominant:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ABERRANTS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aberrants"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-abominant:leader"
+      },
+      "name": "ABOMINANT",
+      "raw_name": "ABOMINANT",
+      "record_id": "units-abominant",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-abominant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "abominant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-achilles-ridgerunners:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-achilles-ridgerunners:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-achilles-ridgerunners:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-achilles-ridgerunners:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-achilles-ridgerunners:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-achilles-ridgerunners:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ACHILLES RIDGERUNNERS",
+      "raw_name": "ACHILLES RIDGERUNNERS",
+      "record_id": "units-achilles-ridgerunners",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-achilles-ridgerunners",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "achilles-ridgerunners",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-hybrids-with-autopistols:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-hybrids-with-autopistols:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-hybrids-with-autopistols:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+      "raw_name": "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+      "record_id": "units-acolyte-hybrids-with-autopistols",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-hybrids-with-autopistols",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "acolyte-hybrids-with-autopistols",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-hybrids-with-hand-flamers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-hybrids-with-hand-flamers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-hybrids-with-hand-flamers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+      "raw_name": "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+      "record_id": "units-acolyte-hybrids-with-hand-flamers",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-hybrids-with-hand-flamers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "acolyte-hybrids-with-hand-flamers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-iconward:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-iconward:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+          "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+          "HYBRID METAMORPHS",
+          "NEOPHYTE HYBRIDS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "acolyte-hybrids-with-autopistols",
+          "acolyte-hybrids-with-hand-flamers",
+          "hybrid-metamorphs",
+          "neophyte-hybrids"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-iconward:leader"
+      },
+      "name": "ACOLYTE ICONWARD",
+      "raw_name": "ACOLYTE ICONWARD",
+      "record_id": "units-acolyte-iconward",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-acolyte-iconward",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "acolyte-iconward",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-atalan-jackals:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "9 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 9,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "9 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-atalan-jackals:cost:your-1st-to-2nd-units-cost:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-atalan-jackals:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-atalan-jackals:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-atalan-jackals:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "9 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 9,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "9 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-atalan-jackals:cost:your-3rd-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-atalan-jackals:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-atalan-jackals:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ATALAN JACKALS",
+      "raw_name": "ATALAN JACKALS",
+      "record_id": "units-atalan-jackals",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-atalan-jackals",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "atalan-jackals",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-benefictus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-benefictus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+          "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+          "HYBRID METAMORPHS",
+          "NEOPHYTE HYBRIDS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "acolyte-hybrids-with-autopistols",
+          "acolyte-hybrids-with-hand-flamers",
+          "hybrid-metamorphs",
+          "neophyte-hybrids"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-benefictus:leader"
+      },
+      "name": "BENEFICTUS",
+      "raw_name": "BENEFICTUS",
+      "record_id": "units-benefictus",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-benefictus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "benefictus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-biophagus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-biophagus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BIOPHAGUS",
+      "raw_name": "BIOPHAGUS",
+      "record_id": "units-biophagus",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-biophagus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "ABERRANTS",
+          "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+          "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+          "HYBRID METAMORPHS",
+          "NEOPHYTE HYBRIDS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aberrants",
+          "acolyte-hybrids-with-autopistols",
+          "acolyte-hybrids-with-hand-flamers",
+          "hybrid-metamorphs",
+          "neophyte-hybrids"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-biophagus:support"
+      },
+      "unit_id": "biophagus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-clamavus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-clamavus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CLAMAVUS",
+      "raw_name": "CLAMAVUS",
+      "record_id": "units-clamavus",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-clamavus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+          "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+          "HYBRID METAMORPHS",
+          "NEOPHYTE HYBRIDS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "acolyte-hybrids-with-autopistols",
+          "acolyte-hybrids-with-hand-flamers",
+          "hybrid-metamorphs",
+          "neophyte-hybrids"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-clamavus:support"
+      },
+      "unit_id": "clamavus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-rockgrinder:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-rockgrinder:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-rockgrinder:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-rockgrinder:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GOLIATH ROCKGRINDER",
+      "raw_name": "GOLIATH ROCKGRINDER",
+      "record_id": "units-goliath-rockgrinder",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-rockgrinder",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "goliath-rockgrinder",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-truck:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-truck:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-truck:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-truck:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GOLIATH TRUCK",
+      "raw_name": "GOLIATH TRUCK",
+      "record_id": "units-goliath-truck",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-goliath-truck",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "goliath-truck",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-hybrid-metamorphs:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-hybrid-metamorphs:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-hybrid-metamorphs:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-hybrid-metamorphs:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-hybrid-metamorphs:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-hybrid-metamorphs:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HYBRID METAMORPHS",
+      "raw_name": "HYBRID METAMORPHS",
+      "record_id": "units-hybrid-metamorphs",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-hybrid-metamorphs",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "hybrid-metamorphs",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-jackal-alphus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-jackal-alphus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ATALAN JACKALS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "atalan-jackals"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-jackal-alphus:leader"
+      },
+      "name": "JACKAL ALPHUS",
+      "raw_name": "JACKAL ALPHUS",
+      "record_id": "units-jackal-alphus",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-jackal-alphus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "jackal-alphus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-kelermorph:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-kelermorph:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KELERMORPH",
+      "raw_name": "KELERMORPH",
+      "record_id": "units-kelermorph",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-kelermorph",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "kelermorph",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 35,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-locus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-locus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LOCUS",
+      "raw_name": "LOCUS",
+      "record_id": "units-locus",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-locus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+          "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+          "HYBRID METAMORPHS",
+          "NEOPHYTE HYBRIDS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "acolyte-hybrids-with-autopistols",
+          "acolyte-hybrids-with-hand-flamers",
+          "hybrid-metamorphs",
+          "neophyte-hybrids"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-locus:support"
+      },
+      "unit_id": "locus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-magus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-magus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+          "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+          "HYBRID METAMORPHS",
+          "NEOPHYTE HYBRIDS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "acolyte-hybrids-with-autopistols",
+          "acolyte-hybrids-with-hand-flamers",
+          "hybrid-metamorphs",
+          "neophyte-hybrids"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-magus:leader"
+      },
+      "name": "MAGUS",
+      "raw_name": "MAGUS",
+      "record_id": "units-magus",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-magus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "magus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-neophyte-hybrids:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-neophyte-hybrids:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-neophyte-hybrids:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NEOPHYTE HYBRIDS",
+      "raw_name": "NEOPHYTE HYBRIDS",
+      "record_id": "units-neophyte-hybrids",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-neophyte-hybrids",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "neophyte-hybrids",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-nexos:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-nexos:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NEXOS",
+      "raw_name": "NEXOS",
+      "record_id": "units-nexos",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-nexos",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+          "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+          "HYBRID METAMORPHS",
+          "NEOPHYTE HYBRIDS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "acolyte-hybrids-with-autopistols",
+          "acolyte-hybrids-with-hand-flamers",
+          "hybrid-metamorphs",
+          "neophyte-hybrids"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-nexos:support"
+      },
+      "unit_id": "nexos",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-patriarch:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-patriarch:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PURESTRAIN GENESTEALERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "purestrain-genestealers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-patriarch:leader"
+      },
+      "name": "PATRIARCH",
+      "raw_name": "PATRIARCH",
+      "record_id": "units-patriarch",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-patriarch",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "patriarch",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-primus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-primus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ACOLYTE HYBRIDS WITH AUTOPISTOLS",
+          "ACOLYTE HYBRIDS WITH HAND FLAMERS",
+          "HYBRID METAMORPHS",
+          "NEOPHYTE HYBRIDS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "acolyte-hybrids-with-autopistols",
+          "acolyte-hybrids-with-hand-flamers",
+          "hybrid-metamorphs",
+          "neophyte-hybrids"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-primus:leader"
+      },
+      "name": "PRIMUS",
+      "raw_name": "PRIMUS",
+      "record_id": "units-primus",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-primus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "primus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-purestrain-genestealers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-purestrain-genestealers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-purestrain-genestealers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-purestrain-genestealers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-purestrain-genestealers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-purestrain-genestealers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PURESTRAIN GENESTEALERS",
+      "raw_name": "PURESTRAIN GENESTEALERS",
+      "record_id": "units-purestrain-genestealers",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-purestrain-genestealers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "purestrain-genestealers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-reductus-saboteur:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-reductus-saboteur:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-reductus-saboteur:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-reductus-saboteur:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "REDUCTUS SABOTEUR",
+      "raw_name": "REDUCTUS SABOTEUR",
+      "record_id": "units-reductus-saboteur",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-reductus-saboteur",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "reductus-saboteur",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-sanctus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-sanctus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SANCTUS",
+      "raw_name": "SANCTUS",
+      "record_id": "units-sanctus",
+      "source_id": "gw-11e-mfm-2026-07:faction:genestealer-cults:unit:units-sanctus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sanctus",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/genestealer-cults"
+}

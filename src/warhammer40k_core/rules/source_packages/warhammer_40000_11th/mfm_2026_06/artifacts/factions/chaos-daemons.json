@@ -406,6 +406,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-beasts-of-nurgle",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "beasts-of-nurgle",
       "wargear_costs": []
     },
@@ -443,6 +444,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-belakor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "belakor",
       "wargear_costs": []
     },
@@ -534,6 +536,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodcrushers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "bloodcrushers",
       "wargear_costs": []
     },
@@ -571,6 +574,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodletters",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "bloodletters",
       "wargear_costs": []
     },
@@ -632,6 +636,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodthirster",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "bloodthirster",
       "wargear_costs": []
     },
@@ -669,6 +674,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-blue-horrors",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "blue-horrors",
       "wargear_costs": []
     },
@@ -706,6 +712,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-burning-chariot",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "burning-chariot",
       "wargear_costs": []
     },
@@ -753,6 +760,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-changecaster",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "changecaster",
       "wargear_costs": []
     },
@@ -798,6 +806,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-contorted-epitome",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "contorted-epitome",
       "wargear_costs": []
     },
@@ -835,6 +844,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemon-prince-of-chaos",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "daemon-prince-of-chaos",
       "wargear_costs": []
     },
@@ -872,6 +882,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemon-prince-of-chaos-with-wings",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "daemon-prince-of-chaos-with-wings",
       "wargear_costs": []
     },
@@ -909,6 +920,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemonettes",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "daemonettes",
       "wargear_costs": []
     },
@@ -954,6 +966,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-epidemius",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "epidemius",
       "wargear_costs": []
     },
@@ -999,6 +1012,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-exalted-flamer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "exalted-flamer",
       "wargear_costs": []
     },
@@ -1044,6 +1058,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fateskimmer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "fateskimmer",
       "wargear_costs": []
     },
@@ -1081,6 +1096,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-feculent-gnarlmaw",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "feculent-gnarlmaw",
       "wargear_costs": []
     },
@@ -1133,6 +1149,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fiends",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "fiends",
       "wargear_costs": []
     },
@@ -1185,6 +1202,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flamers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "flamers",
       "wargear_costs": []
     },
@@ -1237,6 +1255,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flesh-hounds",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "flesh-hounds",
       "wargear_costs": []
     },
@@ -1284,6 +1303,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fluxmaster",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "fluxmaster",
       "wargear_costs": []
     },
@@ -1345,6 +1365,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-great-unclean-one",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "great-unclean-one",
       "wargear_costs": []
     },
@@ -1397,6 +1418,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-hellflayers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hellflayers",
       "wargear_costs": []
     },
@@ -1442,6 +1464,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-horticulous-slimux",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "horticulous-slimux",
       "wargear_costs": []
     },
@@ -1487,6 +1510,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-infernal-enrapturess",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "infernal-enrapturess",
       "wargear_costs": []
     },
@@ -1524,6 +1548,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-kairos-fateweaver",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kairos-fateweaver",
       "wargear_costs": []
     },
@@ -1569,6 +1594,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-karanak",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "karanak",
       "wargear_costs": []
     },
@@ -1630,6 +1656,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-keeper-of-secrets",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "keeper-of-secrets",
       "wargear_costs": []
     },
@@ -1691,6 +1718,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-lord-of-change",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-of-change",
       "wargear_costs": []
     },
@@ -1743,6 +1771,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-nurglings",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "nurglings",
       "wargear_costs": []
     },
@@ -1780,6 +1809,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-pink-horrors",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "pink-horrors",
       "wargear_costs": []
     },
@@ -1832,6 +1862,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-plague-drones",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "plague-drones",
       "wargear_costs": []
     },
@@ -1869,6 +1900,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-plaguebearers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "plaguebearers",
       "wargear_costs": []
     },
@@ -1914,6 +1946,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-poxbringer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "poxbringer",
       "wargear_costs": []
     },
@@ -1975,6 +2008,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rendmaster-on-blood-throne",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "rendmaster-on-blood-throne",
       "wargear_costs": []
     },
@@ -2012,6 +2046,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rotigus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "rotigus",
       "wargear_costs": []
     },
@@ -2064,6 +2099,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-screamers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "screamers",
       "wargear_costs": []
     },
@@ -2116,6 +2152,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-seekers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "seekers",
       "wargear_costs": []
     },
@@ -2153,6 +2190,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-shalaxi-helbane",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "shalaxi-helbane",
       "wargear_costs": []
     },
@@ -2190,6 +2228,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skarbrand",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skarbrand",
       "wargear_costs": []
     },
@@ -2227,6 +2266,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skull-altar",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skull-altar",
       "wargear_costs": []
     },
@@ -2264,6 +2304,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skull-cannon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skull-cannon",
       "wargear_costs": []
     },
@@ -2309,6 +2350,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skullmaster",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skullmaster",
       "wargear_costs": []
     },
@@ -2354,6 +2396,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skulltaker",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "skulltaker",
       "wargear_costs": []
     },
@@ -2399,6 +2442,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-sloppity-bilepiper",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sloppity-bilepiper",
       "wargear_costs": []
     },
@@ -2460,6 +2504,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-soul-grinder",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "soul-grinder",
       "wargear_costs": []
     },
@@ -2505,6 +2550,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-spoilpox-scrivener",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "spoilpox-scrivener",
       "wargear_costs": []
     },
@@ -2550,6 +2596,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-syllesske",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "syllesske",
       "wargear_costs": []
     },
@@ -2587,6 +2634,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-blue-scribes",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "the-blue-scribes",
       "wargear_costs": []
     },
@@ -2624,6 +2672,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-changeling",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "the-changeling",
       "wargear_costs": []
     },
@@ -2661,6 +2710,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-masque-of-slaanesh",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "the-masque-of-slaanesh",
       "wargear_costs": []
     },
@@ -2706,6 +2756,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tormentbringer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tormentbringer",
       "wargear_costs": []
     },
@@ -2751,6 +2802,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tranceweaver",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tranceweaver",
       "wargear_costs": []
     }

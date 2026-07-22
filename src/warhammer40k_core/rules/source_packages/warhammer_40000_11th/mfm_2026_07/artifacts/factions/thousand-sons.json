@@ -1,0 +1,2287 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "changehost-of-deceit",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "diabolic-savant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Diabolic Savant",
+          "points": 20,
+          "raw_name": "Diabolic Savant",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:changehost-of-deceit:enhancement:diabolic-savant"
+        },
+        {
+          "enhancement_id": "duplicitous-malediction",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Duplicitous Malediction",
+          "points": 15,
+          "raw_name": "Duplicitous Malediction",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:changehost-of-deceit:enhancement:duplicitous-malediction"
+        },
+        {
+          "enhancement_id": "nethershriek-mind-eater",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Nethershriek Mind-Eater",
+          "points": 10,
+          "raw_name": "Nethershriek Mind-Eater",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:changehost-of-deceit:enhancement:nethershriek-mind-eater"
+        },
+        {
+          "enhancement_id": "tome-of-true-names",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tome of True Names",
+          "points": 20,
+          "raw_name": "Tome of True Names",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:changehost-of-deceit:enhancement:tome-of-true-names"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "CHANGEHOST OF DECEIT",
+      "raw_name": "CHANGEHOST OF DECEIT",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:changehost-of-deceit"
+    },
+    {
+      "detachment_id": "grand-coven",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "eldritch-vortex-of-etaph",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eldritch Vortex of E'Taph",
+          "points": 35,
+          "raw_name": "Eldritch Vortex of E'Taph",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:grand-coven:enhancement:eldritch-vortex-of-etaph"
+        },
+        {
+          "enhancement_id": "incandaeum",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Incandaeum",
+          "points": 15,
+          "raw_name": "Incandaeum",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:grand-coven:enhancement:incandaeum"
+        },
+        {
+          "enhancement_id": "lord-of-forbidden-lore",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Lord of Forbidden Lore",
+          "points": 20,
+          "raw_name": "Lord of Forbidden Lore",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:grand-coven:enhancement:lord-of-forbidden-lore"
+        },
+        {
+          "enhancement_id": "umbralefic-crystal",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Umbralefic Crystal",
+          "points": 20,
+          "raw_name": "Umbralefic Crystal",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:grand-coven:enhancement:umbralefic-crystal"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "GRAND COVEN",
+      "raw_name": "GRAND COVEN",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:grand-coven"
+    },
+    {
+      "detachment_id": "hexwarp-thrallband",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "arcane-might",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Arcane Might",
+          "points": 20,
+          "raw_name": "Arcane Might",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:hexwarp-thrallband:enhancement:arcane-might"
+        },
+        {
+          "enhancement_id": "empowered-manifestation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Empowered Manifestation",
+          "points": 20,
+          "raw_name": "Empowered Manifestation",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:hexwarp-thrallband:enhancement:empowered-manifestation"
+        },
+        {
+          "enhancement_id": "empyric-onslaught",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Empyric Onslaught",
+          "points": 25,
+          "raw_name": "Empyric Onslaught",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:hexwarp-thrallband:enhancement:empyric-onslaught"
+        },
+        {
+          "enhancement_id": "noctilith-mantle",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Noctilith Mantle",
+          "points": 15,
+          "raw_name": "Noctilith Mantle",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:hexwarp-thrallband:enhancement:noctilith-mantle"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "HEXWARP THRALLBAND",
+      "raw_name": "HEXWARP THRALLBAND",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:hexwarp-thrallband"
+    },
+    {
+      "detachment_id": "ritual-of-regeneration",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "curse-of-life",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Curse of Life",
+          "points": 20,
+          "raw_name": "Curse of Life",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:ritual-of-regeneration:enhancement:curse-of-life"
+        },
+        {
+          "enhancement_id": "eruption-of-vitality",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eruption of Vitality",
+          "points": 35,
+          "raw_name": "Eruption of Vitality",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:ritual-of-regeneration:enhancement:eruption-of-vitality"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "RITUAL OF REGENERATION",
+      "raw_name": "RITUAL OF REGENERATION",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:ritual-of-regeneration"
+    },
+    {
+      "detachment_id": "rubricae-phalanx",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "arcane-thralls",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Arcane Thralls",
+          "points": 5,
+          "raw_name": "Arcane Thralls",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:rubricae-phalanx:enhancement:arcane-thralls"
+        },
+        {
+          "enhancement_id": "lord-of-the-rubricae",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Lord of the Rubricae",
+          "points": 15,
+          "raw_name": "Lord of the Rubricae",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:rubricae-phalanx:enhancement:lord-of-the-rubricae"
+        },
+        {
+          "enhancement_id": "risen-rubricae",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Risen Rubricae",
+          "points": 30,
+          "raw_name": "Risen Rubricae",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:rubricae-phalanx:enhancement:risen-rubricae"
+        },
+        {
+          "enhancement_id": "stave-abominus",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Stave Abominus",
+          "points": 20,
+          "raw_name": "Stave Abominus",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:rubricae-phalanx:enhancement:stave-abominus"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "RUBRICAE PHALANX",
+      "raw_name": "RUBRICAE PHALANX",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:rubricae-phalanx"
+    },
+    {
+      "detachment_id": "sekhetar-cohort",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "occulus-infernum",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Occulus Infernum",
+          "points": 20,
+          "raw_name": "Occulus Infernum",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:sekhetar-cohort:enhancement:occulus-infernum"
+        },
+        {
+          "enhancement_id": "walking-rampart",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Walking Rampart",
+          "points": 30,
+          "raw_name": "Walking Rampart",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:sekhetar-cohort:enhancement:walking-rampart"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "SEKHETAR COHORT",
+      "raw_name": "SEKHETAR COHORT",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:sekhetar-cohort"
+    },
+    {
+      "detachment_id": "servants-of-change",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "thicket-of-bladed-bone",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Thicket of Bladed Bone (Upgrade)",
+          "points": 10,
+          "raw_name": "Thicket of Bladed Bone (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:servants-of-change:enhancement:thicket-of-bladed-bone"
+        },
+        {
+          "enhancement_id": "unravelled-fates",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Unravelled Fates",
+          "points": 15,
+          "raw_name": "Unravelled Fates",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:servants-of-change:enhancement:unravelled-fates"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "SERVANTS OF CHANGE",
+      "raw_name": "SERVANTS OF CHANGE",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:servants-of-change"
+    },
+    {
+      "detachment_id": "warpforged-cabal",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "biomechanical-mutation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Biomechanical Mutation",
+          "points": 15,
+          "raw_name": "Biomechanical Mutation",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpforged-cabal:enhancement:biomechanical-mutation"
+        },
+        {
+          "enhancement_id": "perplexing-cloak",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Perplexing Cloak",
+          "points": 20,
+          "raw_name": "Perplexing Cloak",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpforged-cabal:enhancement:perplexing-cloak"
+        },
+        {
+          "enhancement_id": "warp-cursed-runemaster",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warp-Cursed Runemaster",
+          "points": 10,
+          "raw_name": "Warp-Cursed Runemaster",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpforged-cabal:enhancement:warp-cursed-runemaster"
+        },
+        {
+          "enhancement_id": "warp-syphon",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warp Syphon",
+          "points": 5,
+          "raw_name": "Warp Syphon",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpforged-cabal:enhancement:warp-syphon"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "WARPFORGED CABAL",
+      "raw_name": "WARPFORGED CABAL",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpforged-cabal"
+    },
+    {
+      "detachment_id": "warpmeld-pact",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "bray-lord",
+          "is_upgrade": false,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "TZAANGORS"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "tzaangors"
+            ],
+            "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpmeld-pact:enhancement:bray-lord:leader"
+          },
+          "name": "Bray Lord",
+          "points": 15,
+          "raw_name": "Bray Lord",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpmeld-pact:enhancement:bray-lord"
+        },
+        {
+          "enhancement_id": "diamond-of-distortion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Diamond of Distortion",
+          "points": 20,
+          "raw_name": "Diamond of Distortion",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpmeld-pact:enhancement:diamond-of-distortion"
+        },
+        {
+          "enhancement_id": "flowing-flesh",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Flowing Flesh",
+          "points": 10,
+          "raw_name": "Flowing Flesh",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpmeld-pact:enhancement:flowing-flesh"
+        },
+        {
+          "enhancement_id": "warpmeld-dagger",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warpmeld Dagger",
+          "points": 10,
+          "raw_name": "Warpmeld Dagger",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpmeld-pact:enhancement:warpmeld-dagger"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "WARPMELD PACT",
+      "raw_name": "WARPMELD PACT",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:detachment:warpmeld-pact"
+    }
+  ],
+  "faction_id": "thousand-sons",
+  "name": "Thousand Sons",
+  "raw_name": "Thousand Sons",
+  "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-blue-horrors:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-blue-horrors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLUE HORRORS",
+      "raw_name": "BLUE HORRORS",
+      "record_id": "scintillating-legions-blue-horrors",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-blue-horrors",
+      "source_section_id": "scintillating-legions",
+      "source_section_name": "SCINTILLATING LEGIONS",
+      "support_allowance": null,
+      "unit_id": "blue-horrors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-flamers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-flamers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-flamers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FLAMERS",
+      "raw_name": "FLAMERS",
+      "record_id": "scintillating-legions-flamers",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-flamers",
+      "source_section_id": "scintillating-legions",
+      "source_section_name": "SCINTILLATING LEGIONS",
+      "support_allowance": null,
+      "unit_id": "flamers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 305,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-kairos-fateweaver:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-kairos-fateweaver:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KAIROS FATEWEAVER",
+      "raw_name": "KAIROS FATEWEAVER",
+      "record_id": "scintillating-legions-kairos-fateweaver",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-kairos-fateweaver",
+      "source_section_id": "scintillating-legions",
+      "source_section_name": "SCINTILLATING LEGIONS",
+      "support_allowance": null,
+      "unit_id": "kairos-fateweaver",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 320,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-lord-of-change:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-lord-of-change:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 340,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-lord-of-change:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-lord-of-change:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LORD OF CHANGE",
+      "raw_name": "LORD OF CHANGE",
+      "record_id": "scintillating-legions-lord-of-change",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-lord-of-change",
+      "source_section_id": "scintillating-legions",
+      "source_section_name": "SCINTILLATING LEGIONS",
+      "support_allowance": null,
+      "unit_id": "lord-of-change",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-pink-horrors:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-pink-horrors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PINK HORRORS",
+      "raw_name": "PINK HORRORS",
+      "record_id": "scintillating-legions-pink-horrors",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-pink-horrors",
+      "source_section_id": "scintillating-legions",
+      "source_section_name": "SCINTILLATING LEGIONS",
+      "support_allowance": null,
+      "unit_id": "pink-horrors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-screamers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-screamers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-screamers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SCREAMERS",
+      "raw_name": "SCREAMERS",
+      "record_id": "scintillating-legions-screamers",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:scintillating-legions-screamers",
+      "source_section_id": "scintillating-legions",
+      "source_section_name": "SCINTILLATING LEGIONS",
+      "support_allowance": null,
+      "unit_id": "screamers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-ahriman:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-ahriman:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "RUBRIC MARINES",
+          "TZAANGOR ENLIGHTENED",
+          "TZAANGOR ENLIGHTENED WITH FATECASTER GREATBOWS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "rubric-marines",
+          "tzaangor-enlightened",
+          "tzaangor-enlightened-with-fatecaster-greatbows"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-ahriman:leader"
+      },
+      "name": "AHRIMAN",
+      "raw_name": "AHRIMAN",
+      "record_id": "units-ahriman",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-ahriman",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ahriman",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-land-raider:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-land-raider:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS LAND RAIDER",
+      "raw_name": "CHAOS LAND RAIDER",
+      "record_id": "units-chaos-land-raider",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-land-raider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-land-raider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-predator-annihilator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-predator-annihilator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-predator-annihilator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-predator-annihilator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS PREDATOR ANNIHILATOR",
+      "raw_name": "CHAOS PREDATOR ANNIHILATOR",
+      "record_id": "units-chaos-predator-annihilator",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-predator-annihilator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-predator-annihilator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-predator-destructor:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-predator-destructor:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS PREDATOR DESTRUCTOR",
+      "raw_name": "CHAOS PREDATOR DESTRUCTOR",
+      "record_id": "units-chaos-predator-destructor",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-predator-destructor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-predator-destructor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-rhino:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-rhino:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-rhino:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-rhino:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS RHINO",
+      "raw_name": "CHAOS RHINO",
+      "record_id": "units-chaos-rhino",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-rhino",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-rhino",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-spawn:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-spawn:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS SPAWN",
+      "raw_name": "CHAOS SPAWN",
+      "record_id": "units-chaos-spawn",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-spawn",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-spawn",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-vindicator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-vindicator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 195,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-vindicator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-vindicator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS VINDICATOR",
+      "raw_name": "CHAOS VINDICATOR",
+      "record_id": "units-chaos-vindicator",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-chaos-vindicator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-vindicator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-daemon-prince-of-tzeentch:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-daemon-prince-of-tzeentch:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF TZEENTCH",
+      "raw_name": "DAEMON PRINCE OF TZEENTCH",
+      "record_id": "units-daemon-prince-of-tzeentch",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-daemon-prince-of-tzeentch",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "daemon-prince-of-tzeentch",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-daemon-prince-of-tzeentch-with-wings:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-daemon-prince-of-tzeentch-with-wings:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-daemon-prince-of-tzeentch-with-wings:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-daemon-prince-of-tzeentch-with-wings:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF TZEENTCH WITH WINGS",
+      "raw_name": "DAEMON PRINCE OF TZEENTCH WITH WINGS",
+      "record_id": "units-daemon-prince-of-tzeentch-with-wings",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-daemon-prince-of-tzeentch-with-wings",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "daemon-prince-of-tzeentch-with-wings",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 300,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-defiler:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-defiler:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 340,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-defiler:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-defiler:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEFILER",
+      "raw_name": "DEFILER",
+      "record_id": "units-defiler",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-defiler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "defiler",
+      "wargear_costs": [
+        {
+          "name": "Hades lascannon",
+          "points_per_item": 15,
+          "raw_name": "per Hades lascannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-defiler:wargear:per-hades-lascannon:1",
+          "wargear_id": "hades-lascannon"
+        },
+        {
+          "name": "Heavy reaper autocannon",
+          "points_per_item": 15,
+          "raw_name": "per Heavy reaper autocannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-defiler:wargear:per-heavy-reaper-autocannon:2",
+          "wargear_id": "heavy-reaper-autocannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-exalted-sorcerer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-exalted-sorcerer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "RUBRIC MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "rubric-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-exalted-sorcerer:leader"
+      },
+      "name": "EXALTED SORCERER",
+      "raw_name": "EXALTED SORCERER",
+      "record_id": "units-exalted-sorcerer",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-exalted-sorcerer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "exalted-sorcerer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-exalted-sorcerer-on-disc-of-tzeentch:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-exalted-sorcerer-on-disc-of-tzeentch:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "RUBRIC MARINES",
+          "TZAANGOR ENLIGHTENED",
+          "TZAANGOR ENLIGHTENED WITH FATECASTER GREATBOWS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "rubric-marines",
+          "tzaangor-enlightened",
+          "tzaangor-enlightened-with-fatecaster-greatbows"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-exalted-sorcerer-on-disc-of-tzeentch:leader"
+      },
+      "name": "EXALTED SORCERER ON DISC OF TZEENTCH",
+      "raw_name": "EXALTED SORCERER ON DISC OF TZEENTCH",
+      "record_id": "units-exalted-sorcerer-on-disc-of-tzeentch",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-exalted-sorcerer-on-disc-of-tzeentch",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "exalted-sorcerer-on-disc-of-tzeentch",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-forgefiend:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-forgefiend:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-forgefiend:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-forgefiend:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FORGEFIEND",
+      "raw_name": "FORGEFIEND",
+      "record_id": "units-forgefiend",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-forgefiend",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "forgefiend",
+      "wargear_costs": [
+        {
+          "name": "Ectoplasma cannon",
+          "points_per_item": 5,
+          "raw_name": "per Ectoplasma cannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-forgefiend:wargear:per-ectoplasma-cannon:1",
+          "wargear_id": "ectoplasma-cannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-helbrute:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-helbrute:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELBRUTE",
+      "raw_name": "HELBRUTE",
+      "record_id": "units-helbrute",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-helbrute",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "helbrute",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-heldrake:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-heldrake:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELDRAKE",
+      "raw_name": "HELDRAKE",
+      "record_id": "units-heldrake",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-heldrake",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "heldrake",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-infernal-master:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-infernal-master:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "RUBRIC MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "rubric-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-infernal-master:leader"
+      },
+      "name": "INFERNAL MASTER",
+      "raw_name": "INFERNAL MASTER",
+      "record_id": "units-infernal-master",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-infernal-master",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "infernal-master",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 455,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-magnus-the-red:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-magnus-the-red:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MAGNUS THE RED",
+      "raw_name": "MAGNUS THE RED",
+      "record_id": "units-magnus-the-red",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-magnus-the-red",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "magnus-the-red",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-maulerfiend:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-maulerfiend:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-maulerfiend:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-maulerfiend:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MAULERFIEND",
+      "raw_name": "MAULERFIEND",
+      "record_id": "units-maulerfiend",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-maulerfiend",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "maulerfiend",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-mutalith-vortex-beast:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-mutalith-vortex-beast:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-mutalith-vortex-beast:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-mutalith-vortex-beast:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MUTALITH VORTEX BEAST",
+      "raw_name": "MUTALITH VORTEX BEAST",
+      "record_id": "units-mutalith-vortex-beast",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-mutalith-vortex-beast",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "mutalith-vortex-beast",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-rubric-marines:cost:your-1st-to-3rd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-rubric-marines:cost:your-1st-to-3rd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-rubric-marines:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-rubric-marines:cost:your-4th-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-rubric-marines:cost:your-4th-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-rubric-marines:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RUBRIC MARINES",
+      "raw_name": "RUBRIC MARINES",
+      "record_id": "units-rubric-marines",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-rubric-marines",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "rubric-marines",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-scarab-occult-terminators:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 385,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-scarab-occult-terminators:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-scarab-occult-terminators:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 195,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-scarab-occult-terminators:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 400,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-scarab-occult-terminators:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-scarab-occult-terminators:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SCARAB OCCULT TERMINATORS",
+      "raw_name": "SCARAB OCCULT TERMINATORS",
+      "record_id": "units-scarab-occult-terminators",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-scarab-occult-terminators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "scarab-occult-terminators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sekhetar-robots:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sekhetar-robots:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sekhetar-robots:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sekhetar-robots:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sekhetar-robots:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sekhetar-robots:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SEKHETAR ROBOTS",
+      "raw_name": "SEKHETAR ROBOTS",
+      "record_id": "units-sekhetar-robots",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sekhetar-robots",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sekhetar-robots",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "RUBRIC MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "rubric-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer:leader"
+      },
+      "name": "SORCERER",
+      "raw_name": "SORCERER",
+      "record_id": "units-sorcerer",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sorcerer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer-in-terminator-armour:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer-in-terminator-armour:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer-in-terminator-armour:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer-in-terminator-armour:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "SCARAB OCCULT TERMINATORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "scarab-occult-terminators"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer-in-terminator-armour:leader"
+      },
+      "name": "SORCERER IN TERMINATOR ARMOUR",
+      "raw_name": "SORCERER IN TERMINATOR ARMOUR",
+      "record_id": "units-sorcerer-in-terminator-armour",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-sorcerer-in-terminator-armour",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sorcerer-in-terminator-armour",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-enlightened:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-enlightened:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-enlightened:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TZAANGOR ENLIGHTENED",
+      "raw_name": "TZAANGOR ENLIGHTENED",
+      "record_id": "units-tzaangor-enlightened",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-enlightened",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "tzaangor-enlightened",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-enlightened-with-fatecaster-greatbows:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-enlightened-with-fatecaster-greatbows:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-enlightened-with-fatecaster-greatbows:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TZAANGOR ENLIGHTENED WITH FATECASTER GREATBOWS",
+      "raw_name": "TZAANGOR ENLIGHTENED WITH FATECASTER GREATBOWS",
+      "record_id": "units-tzaangor-enlightened-with-fatecaster-greatbows",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-enlightened-with-fatecaster-greatbows",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "tzaangor-enlightened-with-fatecaster-greatbows",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-shaman:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-shaman:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "TZAANGOR ENLIGHTENED",
+          "TZAANGOR ENLIGHTENED WITH FATECASTER GREATBOWS",
+          "TZAANGORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "tzaangor-enlightened",
+          "tzaangor-enlightened-with-fatecaster-greatbows",
+          "tzaangors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-shaman:leader"
+      },
+      "name": "TZAANGOR SHAMAN",
+      "raw_name": "TZAANGOR SHAMAN",
+      "record_id": "units-tzaangor-shaman",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangor-shaman",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "tzaangor-shaman",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangors:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangors:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TZAANGORS",
+      "raw_name": "TZAANGORS",
+      "record_id": "units-tzaangors",
+      "source_id": "gw-11e-mfm-2026-07:faction:thousand-sons:unit:units-tzaangors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "tzaangors",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/thousand-sons"
+}

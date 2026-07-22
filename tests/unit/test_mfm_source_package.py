@@ -1,5 +1,8 @@
 import json
+import subprocess
+import sys
 from importlib.resources import files
+from pathlib import Path
 
 import pytest
 
@@ -17,20 +20,24 @@ from warhammer40k_core.rules.mfm_source import (
     MfmWargearCost,
     parse_mfm_faction_html,
     parse_mfm_index_html,
+    parse_mfm_version_html,
     parse_model_count_label,
     parse_points_label,
     unit_cost_bracket_bounds,
     unit_cost_row_label_details,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07 import (
     SOURCE_PAYLOAD_CHECKSUM_SHA256,
     faction_record,
     source_package,
     supported_faction_ids,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06._artifacts import (
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07._artifacts import (
     mfm_package_artifact_from_json_bytes,
 )
+
+_ROOT = Path(__file__).resolve().parents[2]
+_MFM_REVIEW = _ROOT / "data" / "source_manifests" / "mfm_2026_07_review.json"
 
 
 def test_mfm_source_package_excludes_unsupported_factions_and_sections() -> None:
@@ -42,6 +49,8 @@ def test_mfm_source_package_excludes_unsupported_factions_and_sections() -> None
     assert "titan-legions" not in {faction.faction_id for faction in package.factions}
     assert "chaos-titan-legions" not in set(supported_faction_ids())
     assert "titan-legions" not in set(supported_faction_ids())
+    assert package.source_version == "v1.1"
+    assert package.source_date == "2026-07-22"
 
     unsupported_sections = {
         "combat-patrol",
@@ -62,7 +71,7 @@ def test_mfm_source_package_excludes_unsupported_factions_and_sections() -> None
 def test_mfm_source_package_loads_versioned_json_artifacts() -> None:
     package = source_package()
     package_resources = files(
-        "warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06"
+        "warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_07"
     )
     faction_artifacts = tuple(
         sorted(
@@ -80,13 +89,70 @@ def test_mfm_source_package_loads_versioned_json_artifacts() -> None:
     assert package.source_payload_checksum_sha256() == SOURCE_PAYLOAD_CHECKSUM_SHA256
 
 
+def test_mfm_source_package_covers_detachment_rules_and_both_attachment_roles() -> None:
+    package = source_package()
+
+    assert not [
+        (faction.faction_id, detachment.detachment_id)
+        for faction in package.factions
+        for detachment in faction.detachments
+        if detachment.detachment_point_cost is None or detachment.force_disposition_id is None
+    ]
+    assert (
+        sum(
+            unit.leader_allowance is not None
+            for faction in package.factions
+            for unit in faction.units
+        )
+        == 317
+    )
+    assert (
+        sum(
+            unit.support_allowance is not None
+            for faction in package.factions
+            for unit in faction.units
+        )
+        == 69
+    )
+    castellan = package.faction_by_id("black-templars").unit_by_id("units-castellan")
+    assert castellan.leader_allowance is None
+    assert castellan.support_allowance is not None
+    assert castellan.support_allowance.allowed_bodyguard_unit_ids == (
+        "assault-intercessor-squad",
+        "crusader-squad",
+        "infernus-squad",
+        "intercessor-squad",
+        "sternguard-veteran-squad",
+        "sword-brethren-squad",
+    )
+
+
+def test_mfm_update_review_covers_every_supported_faction_and_is_current() -> None:
+    package = source_package()
+    review = json.loads(_MFM_REVIEW.read_text(encoding="utf-8"))
+
+    assert review["current_source_package_id"] == package.source_package_id
+    assert (
+        review["current_source_payload_checksum_sha256"] == package.source_payload_checksum_sha256()
+    )
+    assert review["reviewed_faction_ids"] == list(supported_faction_ids())
+    assert review["excluded_faction_ids"] == ["chaos-titan-legions", "titan-legions"]
+    assert review["summary"]["reviewed_faction_count"] == 28
+    assert review["summary"]["changed_faction_count"] == 28
+    subprocess.run(
+        [sys.executable, "tools/build_mfm_update_review.py", "--check"],
+        cwd=_ROOT,
+        check=True,
+    )
+
+
 def test_mfm_source_package_artifact_manifest_fails_fast_for_schema_drift() -> None:
     payload: dict[str, object] = {
         "artifact_schema": "stale-schema",
-        "source_package_id": "gw-11e-mfm-2026-06",
+        "source_package_id": "gw-11e-mfm-2026-07",
         "source_title": "Warhammer 40,000: Munitorum Field Manual",
-        "source_version": "v1.0",
-        "source_date": "2026-06-17",
+        "source_version": "v1.1",
+        "source_date": "2026-07-22",
         "source_url": "https://mfm.warhammer-community.com/en/",
         "excluded_faction_ids": [],
         "faction_artifacts": {"orks": "factions/orks.json"},
@@ -107,11 +173,11 @@ def test_mfm_source_package_preserves_world_eaters_defiler_special_pricing() -> 
         for bracket in defiler.cost_brackets
     ] == [
         ("YOUR 1ST UNIT COSTS", [("1 model", 270)]),
-        ("YOUR 2ND + UNIT COSTS", [("1 model", 300)]),
+        ("YOUR 2ND + UNIT COSTS", [("1 model", 310)]),
     ]
     assert [(cost.name, cost.points_per_item) for cost in defiler.wargear_costs] == [
-        ("Hades lascannon", 10),
-        ("Heavy reaper autocannon", 10),
+        ("Hades lascannon", 15),
+        ("Heavy reaper autocannon", 15),
     ]
 
 
@@ -131,7 +197,7 @@ def test_mfm_source_package_uses_section_qualified_records_for_duplicate_unit_na
         [(row.label, row.points) for bracket in record.cost_brackets for row in bracket.rows]
         for record in records
     ] == [
-        [("5 models", 100), ("10 models", 200)],
+        [("5 models", 100), ("10 models", 190)],
         [("5 models", 100), ("10 models", 190)],
     ]
 
@@ -169,6 +235,18 @@ def test_mfm_unit_cost_helpers_parse_range_open_and_count_labels() -> None:
     assert unit_cost_bracket_bounds("YOUR 1ST TO 2ND UNITS COSTS") == (1, 2)
     assert unit_cost_bracket_bounds("YOUR 3RD + UNIT COSTS") == (3, None)
     assert parse_model_count_label("12 models") == 12
+    assert parse_points_label("▼ (-5) 15 pts") == 15
+    assert parse_points_label("▲ (+10) 1,005 pts") == 1005
+
+
+def test_mfm_version_parser_requires_one_explicit_version() -> None:
+    assert parse_mfm_version_html("<html><body><h2>v1.1</h2></body></html>") == "v1.1"
+    for html in (
+        "<html><body><h2>current</h2></body></html>",
+        "<html><body><h2>v1.0</h2><h2>v1.1</h2></body></html>",
+    ):
+        with pytest.raises(MfmSourceError, match="version"):
+            parse_mfm_version_html(html)
 
 
 def test_mfm_unit_cost_helpers_reject_invalid_labels() -> None:
@@ -323,6 +401,9 @@ def test_mfm_parser_reads_index_units_detachments_wargear_and_leader_allowances(
     assert defiler.leader_allowance.allowed_bodyguard_unit_ids == ("jakhals",)
     template_leader_unit = record.unit_by_id("units-template-leader-unit")
     assert template_leader_unit.leader_allowance is None
+    support_unit = record.unit_by_id("units-support-unit")
+    assert support_unit.support_allowance is not None
+    assert support_unit.support_allowance.allowed_bodyguard_unit_ids == ("jakhals",)
     assert not [unit for unit in record.units if unit.source_section_id == "legends"]
 
 
@@ -395,13 +476,14 @@ def _sample_faction_html() -> str:
     return """
     <html>
       <body>
+        <h2>v1.1</h2>
         <div id="S:0">270 pts</div>
         <div id="S:1">LEADER</div>
         <div>
           <h3>DETACHMENTS</h3>
           <div class="flex flex-col space-y-1 m-1">
             <div class="flex flex-row justify-between px-1 py-0.5 text-white">
-              <span>Test Detachment</span><span>3DP</span>
+              <span>Test Detachment</span><span>3DP ▼</span>
             </div>
             <div>PURGE THE FOE</div>
             <div class="space-y-1">
@@ -409,7 +491,7 @@ def _sample_faction_html() -> str:
               <ul>
                 <div>
                   <li>
-                    <div><span>Test Enhancement</span><span>15 pts</span></div>
+                    <div><span>Test Enhancement</span><span>▼ (-5) 15 pts</span></div>
                     <div><span>LEADER:</span><span>Eightbound</span></div>
                   </li>
                 </div>
@@ -418,8 +500,8 @@ def _sample_faction_html() -> str:
           </div>
           <h3>UNITS</h3>
           <div class="flex flex-col space-y-1 m-1">
-            <div class="px-1 py-0.5 bg-slate-500 font-bold text-xl text-white">
-              DEFILER
+            <div class="flex flex-row justify-between px-1 py-0.5 bg-red-500 font-bold text-white">
+              <span class="text-xl keep-all">DEFILER</span><span>▲</span>
             </div>
             <div class="space-y-1">
               <div>YOUR 1ST UNIT COSTS</div>
@@ -468,6 +550,21 @@ def _sample_faction_html() -> str:
             <div class="space-y-1">
               <div><span>LEADER</span></div>
               <template id="P:1"></template>
+            </div>
+          </div>
+          <div class="flex flex-col space-y-1 m-1">
+            <div class="px-1 py-0.5 bg-slate-500 font-bold text-xl text-white">
+              Support Unit
+            </div>
+            <div class="space-y-1">
+              <div>YOUR UNIT COSTS</div>
+              <ul>
+                <li><span>1 model</span><span>45 pts</span></li>
+              </ul>
+            </div>
+            <div class="space-y-1">
+              <div><span>SUPPORT</span></div>
+              <span>Jakhals</span>
             </div>
           </div>
           <h3>LEGENDS</h3>

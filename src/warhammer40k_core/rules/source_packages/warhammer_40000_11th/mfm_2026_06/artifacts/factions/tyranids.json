@@ -461,6 +461,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-barbgaunts",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "barbgaunts",
       "wargear_costs": []
     },
@@ -528,6 +529,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-biovores",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "biovores",
       "wargear_costs": []
     },
@@ -573,6 +575,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-broodlord",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "broodlord",
       "wargear_costs": []
     },
@@ -625,6 +628,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-carnifexes",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "carnifexes",
       "wargear_costs": []
     },
@@ -686,6 +690,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-exocrine",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "exocrine",
       "wargear_costs": []
     },
@@ -738,6 +743,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-gargoyles",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "gargoyles",
       "wargear_costs": []
     },
@@ -829,6 +835,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-genestealers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "genestealers",
       "wargear_costs": []
     },
@@ -866,6 +873,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harpy",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "harpy",
       "wargear_costs": []
     },
@@ -927,6 +935,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harridan",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "harridan",
       "wargear_costs": []
     },
@@ -988,6 +997,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-haruspex",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "haruspex",
       "wargear_costs": []
     },
@@ -1049,6 +1059,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hierophant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hierophant",
       "wargear_costs": []
     },
@@ -1086,6 +1097,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-crone",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hive-crone",
       "wargear_costs": []
     },
@@ -1177,6 +1189,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-guard",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hive-guard",
       "wargear_costs": []
     },
@@ -1222,6 +1235,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-tyrant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hive-tyrant",
       "wargear_costs": []
     },
@@ -1274,6 +1288,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hormagaunts",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hormagaunts",
       "wargear_costs": []
     },
@@ -1343,6 +1358,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hyperadapted-raveners",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hyperadapted-raveners",
       "wargear_costs": []
     },
@@ -1380,6 +1396,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-lictor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lictor",
       "wargear_costs": []
     },
@@ -1441,6 +1458,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-maleceptor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "maleceptor",
       "wargear_costs": []
     },
@@ -1478,6 +1496,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-mawloc",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "mawloc",
       "wargear_costs": []
     },
@@ -1530,6 +1549,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-mucolid-spores",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "mucolid-spores",
       "wargear_costs": []
     },
@@ -1582,6 +1602,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurogaunts",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "neurogaunts",
       "wargear_costs": []
     },
@@ -1643,6 +1664,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurolictor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "neurolictor",
       "wargear_costs": []
     },
@@ -1692,6 +1714,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurotyrant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "neurotyrant",
       "wargear_costs": []
     },
@@ -1753,6 +1776,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-assimilator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "norn-assimilator",
       "wargear_costs": []
     },
@@ -1814,6 +1838,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-emissary",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "norn-emissary",
       "wargear_costs": []
     },
@@ -1859,6 +1884,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-old-one-eye",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "old-one-eye",
       "wargear_costs": []
     },
@@ -1896,6 +1922,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-parasite-of-mortrex",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "parasite-of-mortrex",
       "wargear_costs": []
     },
@@ -1933,6 +1960,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-psychophage",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "psychophage",
       "wargear_costs": []
     },
@@ -2054,6 +2082,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "pyrovores",
       "wargear_costs": []
     },
@@ -2115,6 +2144,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-raveners",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "raveners",
       "wargear_costs": []
     },
@@ -2182,6 +2212,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-ripper-swarms",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ripper-swarms",
       "wargear_costs": []
     },
@@ -2243,6 +2274,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-screamer-killer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "screamer-killer",
       "wargear_costs": []
     },
@@ -2295,6 +2327,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-spore-mines",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "spore-mines",
       "wargear_costs": []
     },
@@ -2332,6 +2365,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-sporocyst",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sporocyst",
       "wargear_costs": []
     },
@@ -2384,6 +2418,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-termagants",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "termagants",
       "wargear_costs": []
     },
@@ -2421,6 +2456,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tervigon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tervigon",
       "wargear_costs": []
     },
@@ -2458,6 +2494,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-the-red-terror",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "the-red-terror",
       "wargear_costs": []
     },
@@ -2503,6 +2540,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-the-swarmlord",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "the-swarmlord",
       "wargear_costs": []
     },
@@ -2540,6 +2578,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-toxicrene",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "toxicrene",
       "wargear_costs": []
     },
@@ -2577,6 +2616,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-trygon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "trygon",
       "wargear_costs": []
     },
@@ -2628,6 +2668,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-prime-with-lash-whip",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tyranid-prime-with-lash-whip",
       "wargear_costs": []
     },
@@ -2680,6 +2721,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-melee-bio-weapons",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tyranid-warriors-with-melee-bio-weapons",
       "wargear_costs": []
     },
@@ -2732,6 +2774,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-ranged-bio-weapons",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tyranid-warriors-with-ranged-bio-weapons",
       "wargear_costs": []
     },
@@ -2769,6 +2812,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannocyte",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tyrannocyte",
       "wargear_costs": []
     },
@@ -2830,6 +2874,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannofex",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tyrannofex",
       "wargear_costs": [
         {
@@ -2897,6 +2942,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrant-guard",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tyrant-guard",
       "wargear_costs": []
     },
@@ -2949,6 +2995,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-venomthropes",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "venomthropes",
       "wargear_costs": []
     },
@@ -3001,6 +3048,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-von-ryans-leapers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "von-ryans-leapers",
       "wargear_costs": []
     },
@@ -3038,6 +3086,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-winged-hive-tyrant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "winged-hive-tyrant",
       "wargear_costs": []
     },
@@ -3087,6 +3136,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-winged-tyranid-prime",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "winged-tyranid-prime",
       "wargear_costs": []
     },
@@ -3139,6 +3189,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-zoanthropes",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "zoanthropes",
       "wargear_costs": []
     }

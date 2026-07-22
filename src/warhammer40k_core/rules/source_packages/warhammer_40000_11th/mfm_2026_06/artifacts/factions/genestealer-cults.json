@@ -454,6 +454,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-aberrants",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "aberrants",
       "wargear_costs": []
     },
@@ -523,6 +524,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-abominant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "abominant",
       "wargear_costs": []
     },
@@ -575,6 +577,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-achilles-ridgerunners",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "achilles-ridgerunners",
       "wargear_costs": []
     },
@@ -627,6 +630,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-acolyte-hybrids-with-autopistols",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "acolyte-hybrids-with-autopistols",
       "wargear_costs": []
     },
@@ -679,6 +683,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-acolyte-hybrids-with-hand-flamers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "acolyte-hybrids-with-hand-flamers",
       "wargear_costs": []
     },
@@ -730,6 +735,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-acolyte-iconward",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "acolyte-iconward",
       "wargear_costs": []
     },
@@ -821,6 +827,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-atalan-jackals",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "atalan-jackals",
       "wargear_costs": []
     },
@@ -872,6 +879,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-benefictus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "benefictus",
       "wargear_costs": []
     },
@@ -909,6 +917,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-biophagus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "biophagus",
       "wargear_costs": []
     },
@@ -946,6 +955,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-clamavus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "clamavus",
       "wargear_costs": []
     },
@@ -1007,6 +1017,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-goliath-rockgrinder",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "goliath-rockgrinder",
       "wargear_costs": []
     },
@@ -1044,6 +1055,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-goliath-truck",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "goliath-truck",
       "wargear_costs": []
     },
@@ -1135,6 +1147,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-hybrid-metamorphs",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hybrid-metamorphs",
       "wargear_costs": []
     },
@@ -1180,6 +1193,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-jackal-alphus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "jackal-alphus",
       "wargear_costs": []
     },
@@ -1217,6 +1231,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-kelermorph",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kelermorph",
       "wargear_costs": []
     },
@@ -1254,6 +1269,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-locus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "locus",
       "wargear_costs": []
     },
@@ -1305,6 +1321,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-magus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "magus",
       "wargear_costs": []
     },
@@ -1357,6 +1374,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-neophyte-hybrids",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "neophyte-hybrids",
       "wargear_costs": []
     },
@@ -1394,6 +1412,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-nexos",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "nexos",
       "wargear_costs": []
     },
@@ -1439,6 +1458,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-patriarch",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "patriarch",
       "wargear_costs": []
     },
@@ -1490,6 +1510,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-primus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "primus",
       "wargear_costs": []
     },
@@ -1581,6 +1602,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-purestrain-genestealers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "purestrain-genestealers",
       "wargear_costs": []
     },
@@ -1618,6 +1640,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-reductus-saboteur",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "reductus-saboteur",
       "wargear_costs": []
     },
@@ -1655,6 +1678,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:genestealer-cults:unit:units-sanctus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sanctus",
       "wargear_costs": []
     }

@@ -1,0 +1,1454 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "bastions-of-tyranny",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "hate-filled-dominion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Hate-filled Dominion",
+          "points": 20,
+          "raw_name": "Hate-filled Dominion",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:bastions-of-tyranny:enhancement:hate-filled-dominion"
+        },
+        {
+          "enhancement_id": "pterrorshade-rookery",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pterrorshade Rookery",
+          "points": 20,
+          "raw_name": "Pterrorshade Rookery",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:bastions-of-tyranny:enhancement:pterrorshade-rookery"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "BASTIONS OF TYRANNY",
+      "raw_name": "BASTIONS OF TYRANNY",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:bastions-of-tyranny"
+    },
+    {
+      "detachment_id": "helhunt-lance",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "aspect-of-the-beast",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Aspect of the Beast",
+          "points": 30,
+          "raw_name": "Aspect of the Beast",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:helhunt-lance:enhancement:aspect-of-the-beast"
+        },
+        {
+          "enhancement_id": "hunters-helm",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Hunter's Helm",
+          "points": 15,
+          "raw_name": "Hunter's Helm",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:helhunt-lance:enhancement:hunters-helm"
+        },
+        {
+          "enhancement_id": "octagram-of-conjuration",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Octagram of Conjuration",
+          "points": 40,
+          "raw_name": "Octagram of Conjuration",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:helhunt-lance:enhancement:octagram-of-conjuration"
+        },
+        {
+          "enhancement_id": "throne-tyrannicus",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Throne Tyrannicus",
+          "points": 25,
+          "raw_name": "Throne Tyrannicus",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:helhunt-lance:enhancement:throne-tyrannicus"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "HELHUNT LANCE",
+      "raw_name": "HELHUNT LANCE",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:helhunt-lance"
+    },
+    {
+      "detachment_id": "houndpack-lance",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "final-howl",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Final Howl",
+          "points": 20,
+          "raw_name": "Final Howl",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:houndpack-lance:enhancement:final-howl"
+        },
+        {
+          "enhancement_id": "loping-predator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Loping Predator",
+          "points": 10,
+          "raw_name": "Loping Predator",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:houndpack-lance:enhancement:loping-predator"
+        },
+        {
+          "enhancement_id": "panoply-of-the-cursed-knights",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Panoply of the Cursed Knights",
+          "points": 15,
+          "raw_name": "Panoply of the Cursed Knights",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:houndpack-lance:enhancement:panoply-of-the-cursed-knights"
+        },
+        {
+          "enhancement_id": "preyslayers-mantle",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Preyslayer's Mantle",
+          "points": 15,
+          "raw_name": "Preyslayer's Mantle",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:houndpack-lance:enhancement:preyslayers-mantle"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "HOUNDPACK LANCE",
+      "raw_name": "HOUNDPACK LANCE",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:houndpack-lance"
+    },
+    {
+      "detachment_id": "hunting-warpack",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "snarling-rivalry",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Snarling Rivalry (Upgrade)",
+          "points": 10,
+          "raw_name": "Snarling Rivalry (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:hunting-warpack:enhancement:snarling-rivalry"
+        },
+        {
+          "enhancement_id": "soul-spoor-auspicator",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Soul-spoor Auspicator (Upgrade)",
+          "points": 15,
+          "raw_name": "Soul-spoor Auspicator (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:hunting-warpack:enhancement:soul-spoor-auspicator"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "HUNTING WARPACK",
+      "raw_name": "HUNTING WARPACK",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:hunting-warpack"
+    },
+    {
+      "detachment_id": "iconoclast-fiefdom",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "cruel-lashmaster-aura",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cruel Lashmaster (Aura)",
+          "points": 25,
+          "raw_name": "Cruel Lashmaster (Aura)",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:iconoclast-fiefdom:enhancement:cruel-lashmaster-aura"
+        },
+        {
+          "enhancement_id": "iconoclast-idol-aura",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Iconoclast Idol (Aura)",
+          "points": 20,
+          "raw_name": "Iconoclast Idol (Aura)",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:iconoclast-fiefdom:enhancement:iconoclast-idol-aura"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "ICONOCLAST FIEFDOM",
+      "raw_name": "ICONOCLAST FIEFDOM",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:iconoclast-fiefdom"
+    },
+    {
+      "detachment_id": "infernal-lance",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "bestial-aspect",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bestial Aspect",
+          "points": 30,
+          "raw_name": "Bestial Aspect",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:infernal-lance:enhancement:bestial-aspect"
+        },
+        {
+          "enhancement_id": "blasphemous-engine",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blasphemous Engine",
+          "points": 35,
+          "raw_name": "Blasphemous Engine",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:infernal-lance:enhancement:blasphemous-engine"
+        },
+        {
+          "enhancement_id": "fleshmetal-fusion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fleshmetal Fusion",
+          "points": 35,
+          "raw_name": "Fleshmetal Fusion",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:infernal-lance:enhancement:fleshmetal-fusion"
+        },
+        {
+          "enhancement_id": "knight-diabolus",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Knight Diabolus",
+          "points": 25,
+          "raw_name": "Knight Diabolus",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:infernal-lance:enhancement:knight-diabolus"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "INFERNAL LANCE",
+      "raw_name": "INFERNAL LANCE",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:infernal-lance"
+    },
+    {
+      "detachment_id": "lords-of-dread",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "blade-of-celerity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blade of Celerity",
+          "points": 35,
+          "raw_name": "Blade of Celerity",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:lords-of-dread:enhancement:blade-of-celerity"
+        },
+        {
+          "enhancement_id": "blessing-of-the-dark-master",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blessing of the Dark Master",
+          "points": 20,
+          "raw_name": "Blessing of the Dark Master",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:lords-of-dread:enhancement:blessing-of-the-dark-master"
+        },
+        {
+          "enhancement_id": "mirror-of-fates",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mirror of Fates",
+          "points": 30,
+          "raw_name": "Mirror of Fates",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:lords-of-dread:enhancement:mirror-of-fates"
+        },
+        {
+          "enhancement_id": "putrid-carapace",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Putrid Carapace",
+          "points": 30,
+          "raw_name": "Putrid Carapace",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:lords-of-dread:enhancement:putrid-carapace"
+        },
+        {
+          "enhancement_id": "throne-mechanicum-of-skulls",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Throne Mechanicum of Skulls",
+          "points": 25,
+          "raw_name": "Throne Mechanicum of Skulls",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:lords-of-dread:enhancement:throne-mechanicum-of-skulls"
+        },
+        {
+          "enhancement_id": "warp-borne-stalker",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warp-borne Stalker",
+          "points": 25,
+          "raw_name": "Warp-borne Stalker",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:lords-of-dread:enhancement:warp-borne-stalker"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "LORDS OF DREAD",
+      "raw_name": "LORDS OF DREAD",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:lords-of-dread"
+    },
+    {
+      "detachment_id": "traitoris-lance",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "malevolent-heraldry",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Malevolent Heraldry",
+          "points": 30,
+          "raw_name": "Malevolent Heraldry",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:traitoris-lance:enhancement:malevolent-heraldry"
+        },
+        {
+          "enhancement_id": "nightmares-master",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Nightmare's Master",
+          "points": 20,
+          "raw_name": "Nightmare's Master",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:traitoris-lance:enhancement:nightmares-master"
+        },
+        {
+          "enhancement_id": "tyrants-shadow",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tyrant's Shadow",
+          "points": 25,
+          "raw_name": "Tyrant's Shadow",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:traitoris-lance:enhancement:tyrants-shadow"
+        },
+        {
+          "enhancement_id": "veil-of-medrengard",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Veil of Medrengard",
+          "points": 35,
+          "raw_name": "Veil of Medrengard",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:traitoris-lance:enhancement:veil-of-medrengard"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "TRAITORIS LANCE",
+      "raw_name": "TRAITORIS LANCE",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:detachment:traitoris-lance"
+    }
+  ],
+  "faction_id": "chaos-knights",
+  "name": "Chaos Knights",
+  "raw_name": "Chaos Knights",
+  "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 785,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-asterius:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-asterius:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 860,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-asterius:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-asterius:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS ACASTUS KNIGHT ASTERIUS",
+      "raw_name": "CHAOS ACASTUS KNIGHT ASTERIUS",
+      "record_id": "units-chaos-acastus-knight-asterius",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-asterius",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-acastus-knight-asterius",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 725,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-porphyrion:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-porphyrion:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 800,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-porphyrion:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-porphyrion:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS ACASTUS KNIGHT PORPHYRION",
+      "raw_name": "CHAOS ACASTUS KNIGHT PORPHYRION",
+      "record_id": "units-chaos-acastus-knight-porphyrion",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-acastus-knight-porphyrion",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-acastus-knight-porphyrion",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 370,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-acheron:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-acheron:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 385,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-acheron:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-acheron:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS CERASTUS KNIGHT ACHERON",
+      "raw_name": "CHAOS CERASTUS KNIGHT ACHERON",
+      "record_id": "units-chaos-cerastus-knight-acheron",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-acheron",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-cerastus-knight-acheron",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 395,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-atrapos:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-atrapos:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS CERASTUS KNIGHT ATRAPOS",
+      "raw_name": "CHAOS CERASTUS KNIGHT ATRAPOS",
+      "record_id": "units-chaos-cerastus-knight-atrapos",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-atrapos",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-cerastus-knight-atrapos",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 370,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-castigator:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-castigator:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 385,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-castigator:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-castigator:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS CERASTUS KNIGHT CASTIGATOR",
+      "raw_name": "CHAOS CERASTUS KNIGHT CASTIGATOR",
+      "record_id": "units-chaos-cerastus-knight-castigator",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-castigator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-cerastus-knight-castigator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 395,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-lancer:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-lancer:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 415,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-lancer:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-lancer:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS CERASTUS KNIGHT LANCER",
+      "raw_name": "CHAOS CERASTUS KNIGHT LANCER",
+      "record_id": "units-chaos-cerastus-knight-lancer",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-cerastus-knight-lancer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-cerastus-knight-lancer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 375,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-magaera:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-magaera:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 390,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-magaera:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-magaera:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS QUESTORIS KNIGHT MAGAERA",
+      "raw_name": "CHAOS QUESTORIS KNIGHT MAGAERA",
+      "record_id": "units-chaos-questoris-knight-magaera",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-magaera",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-questoris-knight-magaera",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 365,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-styrix:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-styrix:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 380,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-styrix:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-styrix:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS QUESTORIS KNIGHT STYRIX",
+      "raw_name": "CHAOS QUESTORIS KNIGHT STYRIX",
+      "record_id": "units-chaos-questoris-knight-styrix",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-chaos-questoris-knight-styrix",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "chaos-questoris-knight-styrix",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 355,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-abominant:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-abominant:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 370,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-abominant:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-abominant:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT ABOMINANT",
+      "raw_name": "KNIGHT ABOMINANT",
+      "record_id": "units-knight-abominant",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-abominant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "knight-abominant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 355,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-desecrator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-desecrator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 370,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-desecrator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-desecrator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT DESECRATOR",
+      "raw_name": "KNIGHT DESECRATOR",
+      "record_id": "units-knight-desecrator",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-desecrator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "knight-desecrator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 380,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-despoiler:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-despoiler:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 400,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-despoiler:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-despoiler:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT DESPOILER",
+      "raw_name": "KNIGHT DESPOILER",
+      "record_id": "units-knight-despoiler",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-despoiler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "knight-despoiler",
+      "wargear_costs": [
+        {
+          "name": "Despoiler battle cannon",
+          "points_per_item": 15,
+          "raw_name": "per Despoiler battle cannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-despoiler:wargear:per-despoiler-battle-cannon:2",
+          "wargear_id": "despoiler-battle-cannon"
+        },
+        {
+          "name": "Despoiler gatling cannon",
+          "points_per_item": 25,
+          "raw_name": "per Despoiler gatling cannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-despoiler:wargear:per-despoiler-gatling-cannon:1",
+          "wargear_id": "despoiler-gatling-cannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 365,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-rampager:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-rampager:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 380,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-rampager:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-rampager:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT RAMPAGER",
+      "raw_name": "KNIGHT RAMPAGER",
+      "record_id": "units-knight-rampager",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-rampager",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "knight-rampager",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 340,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-ruinator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-ruinator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 355,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-ruinator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-ruinator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT RUINATOR",
+      "raw_name": "KNIGHT RUINATOR",
+      "record_id": "units-knight-ruinator",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-ruinator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "knight-ruinator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 400,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-tyrant:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-tyrant:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 420,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-tyrant:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-tyrant:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT TYRANT",
+      "raw_name": "KNIGHT TYRANT",
+      "record_id": "units-knight-tyrant",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-knight-tyrant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "knight-tyrant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-brigand:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-brigand:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAR DOG BRIGAND",
+      "raw_name": "WAR DOG BRIGAND",
+      "record_id": "units-war-dog-brigand",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-brigand",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "war-dog-brigand",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-executioner:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-executioner:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAR DOG EXECUTIONER",
+      "raw_name": "WAR DOG EXECUTIONER",
+      "record_id": "units-war-dog-executioner",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-executioner",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "war-dog-executioner",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-huntsman:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-huntsman:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAR DOG HUNTSMAN",
+      "raw_name": "WAR DOG HUNTSMAN",
+      "record_id": "units-war-dog-huntsman",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-huntsman",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "war-dog-huntsman",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-karnivore:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-karnivore:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAR DOG KARNIVORE",
+      "raw_name": "WAR DOG KARNIVORE",
+      "record_id": "units-war-dog-karnivore",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-karnivore",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "war-dog-karnivore",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-moirax:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-moirax:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-moirax:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-moirax:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAR DOG MOIRAX",
+      "raw_name": "WAR DOG MOIRAX",
+      "record_id": "units-war-dog-moirax",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-moirax",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "war-dog-moirax",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-stalker:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-stalker:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAR DOG STALKER",
+      "raw_name": "WAR DOG STALKER",
+      "record_id": "units-war-dog-stalker",
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-knights:unit:units-war-dog-stalker",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "war-dog-stalker",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/chaos-knights"
+}

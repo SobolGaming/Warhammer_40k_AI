@@ -1,0 +1,3840 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "blitz-brigade",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "blitzkaptin",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blitzkaptin",
+          "points": 25,
+          "raw_name": "Blitzkaptin",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:blitz-brigade:enhancement:blitzkaptin"
+        },
+        {
+          "enhancement_id": "runnin-boots",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Runnin' Boots",
+          "points": 10,
+          "raw_name": "Runnin' Boots",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:blitz-brigade:enhancement:runnin-boots"
+        },
+        {
+          "enhancement_id": "supercharged-squig-oil",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Supercharged Squig Oil",
+          "points": 10,
+          "raw_name": "Supercharged Squig Oil",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:blitz-brigade:enhancement:supercharged-squig-oil"
+        },
+        {
+          "enhancement_id": "tuff-git",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tuff Git",
+          "points": 5,
+          "raw_name": "Tuff Git",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:blitz-brigade:enhancement:tuff-git"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "BLITZ BRIGADE",
+      "raw_name": "BLITZ BRIGADE",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:blitz-brigade"
+    },
+    {
+      "detachment_id": "bully-boyz",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "big-gob",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Big Gob",
+          "points": 20,
+          "raw_name": "Big Gob",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:bully-boyz:enhancement:big-gob"
+        },
+        {
+          "enhancement_id": "da-biggest-boss",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Da Biggest Boss",
+          "points": 15,
+          "raw_name": "Da Biggest Boss",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:bully-boyz:enhancement:da-biggest-boss"
+        },
+        {
+          "enhancement_id": "eadstompa",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "'Eadstompa",
+          "points": 10,
+          "raw_name": "'Eadstompa",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:bully-boyz:enhancement:eadstompa"
+        },
+        {
+          "enhancement_id": "tellyporta",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tellyporta",
+          "points": 25,
+          "raw_name": "Tellyporta",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:bully-boyz:enhancement:tellyporta"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "BULLY BOYZ",
+      "raw_name": "BULLY BOYZ",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:bully-boyz"
+    },
+    {
+      "detachment_id": "da-big-hunt",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "glory-hog",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Glory Hog",
+          "points": 30,
+          "raw_name": "Glory Hog",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:da-big-hunt:enhancement:glory-hog"
+        },
+        {
+          "enhancement_id": "proper-killy",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Proper Killy",
+          "points": 15,
+          "raw_name": "Proper Killy",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:da-big-hunt:enhancement:proper-killy"
+        },
+        {
+          "enhancement_id": "skrag-every-stash",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Skrag Every Stash!",
+          "points": 25,
+          "raw_name": "Skrag Every Stash!",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:da-big-hunt:enhancement:skrag-every-stash"
+        },
+        {
+          "enhancement_id": "surly-as-a-squiggoth",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Surly as a Squiggoth",
+          "points": 20,
+          "raw_name": "Surly as a Squiggoth",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:da-big-hunt:enhancement:surly-as-a-squiggoth"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "DA BIG HUNT",
+      "raw_name": "DA BIG HUNT",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:da-big-hunt"
+    },
+    {
+      "detachment_id": "dread-mob",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "gitfinder-gogglez",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gitfinder Gogglez",
+          "points": 10,
+          "raw_name": "Gitfinder Gogglez",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:dread-mob:enhancement:gitfinder-gogglez"
+        },
+        {
+          "enhancement_id": "press-it-fasta",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Press It Fasta!",
+          "points": 35,
+          "raw_name": "Press It Fasta!",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:dread-mob:enhancement:press-it-fasta"
+        },
+        {
+          "enhancement_id": "smoky-gubbinz",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Smoky Gubbinz",
+          "points": 15,
+          "raw_name": "Smoky Gubbinz",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:dread-mob:enhancement:smoky-gubbinz"
+        },
+        {
+          "enhancement_id": "supa-glowy-fing",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Supa-glowy Fing",
+          "points": 20,
+          "raw_name": "Supa-glowy Fing",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:dread-mob:enhancement:supa-glowy-fing"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "DREAD MOB",
+      "raw_name": "DREAD MOB",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:dread-mob"
+    },
+    {
+      "detachment_id": "equatorial-hordes",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "kunnin-hunta",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Kunnin' Hunta",
+          "points": 25,
+          "raw_name": "Kunnin' Hunta",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:equatorial-hordes:enhancement:kunnin-hunta"
+        },
+        {
+          "enhancement_id": "unkillable-scourge",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Unkillable Scourge",
+          "points": 25,
+          "raw_name": "Unkillable Scourge",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:equatorial-hordes:enhancement:unkillable-scourge"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "EQUATORIAL HORDES",
+      "raw_name": "EQUATORIAL HORDES",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:equatorial-hordes"
+    },
+    {
+      "detachment_id": "freebooter-krew",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "bionik-workshop",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bionik Workshop",
+          "points": 15,
+          "raw_name": "Bionik Workshop",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:freebooter-krew:enhancement:bionik-workshop"
+        },
+        {
+          "enhancement_id": "da-kaptin",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Da Kaptin",
+          "points": 10,
+          "raw_name": "Da Kaptin",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:freebooter-krew:enhancement:da-kaptin"
+        },
+        {
+          "enhancement_id": "git-spotter-squig",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Git-Spotter Squig",
+          "points": 20,
+          "raw_name": "Git-Spotter Squig",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:freebooter-krew:enhancement:git-spotter-squig"
+        },
+        {
+          "enhancement_id": "razgits-magik-map",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Razgit's Magik Map",
+          "points": 25,
+          "raw_name": "Razgit's Magik Map",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:freebooter-krew:enhancement:razgits-magik-map"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "FREEBOOTER KREW",
+      "raw_name": "FREEBOOTER KREW",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:freebooter-krew"
+    },
+    {
+      "detachment_id": "green-tide",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "bloodthirsty-belligerence",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bloodthirsty Belligerence",
+          "points": 15,
+          "raw_name": "Bloodthirsty Belligerence",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:green-tide:enhancement:bloodthirsty-belligerence"
+        },
+        {
+          "enhancement_id": "brutal-but-kunnin",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Brutal But Kunnin'",
+          "points": 25,
+          "raw_name": "Brutal But Kunnin'",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:green-tide:enhancement:brutal-but-kunnin"
+        },
+        {
+          "enhancement_id": "ferocious-show-off",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ferocious Show Off",
+          "points": 10,
+          "raw_name": "Ferocious Show Off",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:green-tide:enhancement:ferocious-show-off"
+        },
+        {
+          "enhancement_id": "raucous-warcaller",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Raucous Warcaller",
+          "points": 20,
+          "raw_name": "Raucous Warcaller",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:green-tide:enhancement:raucous-warcaller"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "GREEN TIDE",
+      "raw_name": "GREEN TIDE",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:green-tide"
+    },
+    {
+      "detachment_id": "kult-of-speed",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "fasta-than-yooz",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fasta Than Yooz",
+          "points": 35,
+          "raw_name": "Fasta Than Yooz",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:kult-of-speed:enhancement:fasta-than-yooz"
+        },
+        {
+          "enhancement_id": "speed-makes-right",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Speed Makes Right",
+          "points": 25,
+          "raw_name": "Speed Makes Right",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:kult-of-speed:enhancement:speed-makes-right"
+        },
+        {
+          "enhancement_id": "squig-hide-tyres",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Squig-hide Tyres",
+          "points": 15,
+          "raw_name": "Squig-hide Tyres",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:kult-of-speed:enhancement:squig-hide-tyres"
+        },
+        {
+          "enhancement_id": "wazblasta",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Wazblasta",
+          "points": 10,
+          "raw_name": "Wazblasta",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:kult-of-speed:enhancement:wazblasta"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "KULT OF SPEED",
+      "raw_name": "KULT OF SPEED",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:kult-of-speed"
+    },
+    {
+      "detachment_id": "more-dakka",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "da-gobshot-thunderbuss",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Da Gobshot Thunderbuss",
+          "points": 15,
+          "raw_name": "Da Gobshot Thunderbuss",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:more-dakka:enhancement:da-gobshot-thunderbuss"
+        },
+        {
+          "enhancement_id": "dead-shiny-shootas",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Dead Shiny Shootas (Upgrade)",
+          "points": 15,
+          "raw_name": "Dead Shiny Shootas (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:more-dakka:enhancement:dead-shiny-shootas"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "MORE DAKKA!",
+      "raw_name": "MORE DAKKA!",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:more-dakka"
+    },
+    {
+      "detachment_id": "rollin-deff",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "boarding-ramps",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Boarding Ramps (Upgrade)",
+          "points": 10,
+          "raw_name": "Boarding Ramps (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:rollin-deff:enhancement:boarding-ramps"
+        },
+        {
+          "enhancement_id": "targetin-gizmos",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Targetin' Gizmos (Upgrade)",
+          "points": 15,
+          "raw_name": "Targetin' Gizmos (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:rollin-deff:enhancement:targetin-gizmos"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "ROLLIN' DEFF",
+      "raw_name": "ROLLIN' DEFF",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:rollin-deff"
+    },
+    {
+      "detachment_id": "speedwaaagh",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "dakkamek",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dakkamek",
+          "points": 25,
+          "raw_name": "Dakkamek",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:speedwaaagh:enhancement:dakkamek"
+        },
+        {
+          "enhancement_id": "kustom-shokk-box",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Kustom Shokk Box",
+          "points": 10,
+          "raw_name": "Kustom Shokk Box",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:speedwaaagh:enhancement:kustom-shokk-box"
+        },
+        {
+          "enhancement_id": "master-meknologist",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Master Meknologist",
+          "points": 20,
+          "raw_name": "Master Meknologist",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:speedwaaagh:enhancement:master-meknologist"
+        },
+        {
+          "enhancement_id": "supa-burny-fuel",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Supa-Burny Fuel",
+          "points": 15,
+          "raw_name": "Supa-Burny Fuel",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:speedwaaagh:enhancement:supa-burny-fuel"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "SPEEDWAAAGH!",
+      "raw_name": "SPEEDWAAAGH!",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:speedwaaagh"
+    },
+    {
+      "detachment_id": "taktikal-brigade",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "morks-kunnin",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mork's Kunnin'",
+          "points": 20,
+          "raw_name": "Mork's Kunnin'",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:taktikal-brigade:enhancement:morks-kunnin"
+        },
+        {
+          "enhancement_id": "slippery-git",
+          "is_upgrade": false,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "KOMMANDOS"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "kommandos"
+            ],
+            "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:taktikal-brigade:enhancement:slippery-git:leader"
+          },
+          "name": "Slippery Git",
+          "points": 15,
+          "raw_name": "Slippery Git",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:taktikal-brigade:enhancement:slippery-git"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "TAKTIKAL BRIGADE",
+      "raw_name": "TAKTIKAL BRIGADE",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:taktikal-brigade"
+    },
+    {
+      "detachment_id": "war-horde",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "follow-me-ladz",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Follow Me Ladz",
+          "points": 25,
+          "raw_name": "Follow Me Ladz",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:war-horde:enhancement:follow-me-ladz"
+        },
+        {
+          "enhancement_id": "headwoppas-killchoppa",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Headwoppa's Killchoppa",
+          "points": 20,
+          "raw_name": "Headwoppa's Killchoppa",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:war-horde:enhancement:headwoppas-killchoppa"
+        },
+        {
+          "enhancement_id": "kunnin-but-brutal",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Kunnin' But Brutal",
+          "points": 15,
+          "raw_name": "Kunnin' But Brutal",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:war-horde:enhancement:kunnin-but-brutal"
+        },
+        {
+          "enhancement_id": "supa-cybork-body",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Supa-Cybork Body",
+          "points": 15,
+          "raw_name": "Supa-Cybork Body",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:war-horde:enhancement:supa-cybork-body"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "WAR HORDE",
+      "raw_name": "WAR HORDE",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:detachment:war-horde"
+    }
+  ],
+  "faction_id": "orks",
+  "name": "Orks",
+  "raw_name": "Orks",
+  "source_id": "gw-11e-mfm-2026-07:faction:orks",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-bannernob:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-bannernob:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BANNERNOB",
+      "raw_name": "BANNERNOB",
+      "record_id": "units-bannernob",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-bannernob",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "BOYZ",
+          "BREAKA BOYZ",
+          "BURNA BOYZ",
+          "FLASH GITZ",
+          "LOOTAS",
+          "NOBZ",
+          "TANKBUSTAS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "boyz",
+          "breaka-boyz",
+          "burna-boyz",
+          "flash-gitz",
+          "lootas",
+          "nobz",
+          "tankbustas"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-bannernob:support"
+      },
+      "unit_id": "bannernob",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-battlewagon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-battlewagon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BATTLEWAGON",
+      "raw_name": "BATTLEWAGON",
+      "record_id": "units-battlewagon",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-battlewagon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "battlewagon",
+      "wargear_costs": [
+        {
+          "name": "ard case",
+          "points_per_item": 15,
+          "raw_name": "per ard case",
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-battlewagon:wargear:per-ard-case:1",
+          "wargear_id": "ard-case"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beast-snagga-boyz:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beast-snagga-boyz:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beast-snagga-boyz:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BEAST SNAGGA BOYZ",
+      "raw_name": "BEAST SNAGGA BOYZ",
+      "record_id": "units-beast-snagga-boyz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beast-snagga-boyz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "beast-snagga-boyz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beastboss:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beastboss:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BEAST SNAGGA BOYZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "beast-snagga-boyz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beastboss:leader"
+      },
+      "name": "BEASTBOSS",
+      "raw_name": "BEASTBOSS",
+      "record_id": "units-beastboss",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beastboss",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "beastboss",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beastboss-on-squigosaur:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beastboss-on-squigosaur:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BEASTBOSS ON SQUIGOSAUR",
+      "raw_name": "BEASTBOSS ON SQUIGOSAUR",
+      "record_id": "units-beastboss-on-squigosaur",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-beastboss-on-squigosaur",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "beastboss-on-squigosaur",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BOYZ",
+          "BREAKA BOYZ",
+          "LOOTAS",
+          "MEK GUNZ",
+          "NOBZ",
+          "TANKBUSTAS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "boyz",
+          "breaka-boyz",
+          "lootas",
+          "mek-gunz",
+          "nobz",
+          "tankbustas"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek:leader"
+      },
+      "name": "BIG MEK",
+      "raw_name": "BIG MEK",
+      "record_id": "units-big-mek",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "big-mek",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-dakkarig:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-dakkarig:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BIG MEK DAKKARIG",
+      "raw_name": "BIG MEK DAKKARIG",
+      "record_id": "units-big-mek-dakkarig",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-dakkarig",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "big-mek-dakkarig",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-in-mega-armour:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-in-mega-armour:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "MEGANOBZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "meganobz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-in-mega-armour:leader"
+      },
+      "name": "BIG MEK IN MEGA ARMOUR",
+      "raw_name": "BIG MEK IN MEGA ARMOUR",
+      "record_id": "units-big-mek-in-mega-armour",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-in-mega-armour",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "big-mek-in-mega-armour",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-with-shokk-attack-gun:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-with-shokk-attack-gun:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-with-shokk-attack-gun:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-with-shokk-attack-gun:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BOYZ",
+          "BREAKA BOYZ",
+          "LOOTAS",
+          "MEK GUNZ",
+          "NOBZ",
+          "TANKBUSTAS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "boyz",
+          "breaka-boyz",
+          "lootas",
+          "mek-gunz",
+          "nobz",
+          "tankbustas"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-with-shokk-attack-gun:leader"
+      },
+      "name": "BIG MEK WITH SHOKK ATTACK GUN",
+      "raw_name": "BIG MEK WITH SHOKK ATTACK GUN",
+      "record_id": "units-big-mek-with-shokk-attack-gun",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-big-mek-with-shokk-attack-gun",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "big-mek-with-shokk-attack-gun",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-bigboss:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-bigboss:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BOYZ",
+          "BREAKA BOYZ",
+          "NOBZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "boyz",
+          "breaka-boyz",
+          "nobz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-bigboss:leader"
+      },
+      "name": "BIGBOSS",
+      "raw_name": "BIGBOSS",
+      "record_id": "units-bigboss",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-bigboss",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "bigboss",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-biged-bossbunka:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-biged-bossbunka:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BIG'ED BOSSBUNKA",
+      "raw_name": "BIG'ED BOSSBUNKA",
+      "record_id": "units-biged-bossbunka",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-biged-bossbunka",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "biged-bossbunka",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-blitza-bommer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-blitza-bommer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLITZA-BOMMER",
+      "raw_name": "BLITZA-BOMMER",
+      "record_id": "units-blitza-bommer",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-blitza-bommer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "blitza-bommer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boomdakka-snazzwagon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boomdakka-snazzwagon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BOOMDAKKA SNAZZWAGON",
+      "raw_name": "BOOMDAKKA SNAZZWAGON",
+      "record_id": "units-boomdakka-snazzwagon",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boomdakka-snazzwagon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "boomdakka-snazzwagon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boss-snikrot:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boss-snikrot:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "KOMMANDOS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "kommandos"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boss-snikrot:leader"
+      },
+      "name": "BOSS SNIKROT",
+      "raw_name": "BOSS SNIKROT",
+      "record_id": "units-boss-snikrot",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boss-snikrot",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "boss-snikrot",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boyz:cost:your-1st-to-3rd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boyz:cost:your-1st-to-3rd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boyz:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boyz:cost:your-4th-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boyz:cost:your-4th-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boyz:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BOYZ",
+      "raw_name": "BOYZ",
+      "record_id": "units-boyz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-boyz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "boyz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-breaka-boyz:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-breaka-boyz:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-breaka-boyz:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-breaka-boyz:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BREAKA BOYZ",
+      "raw_name": "BREAKA BOYZ",
+      "record_id": "units-breaka-boyz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-breaka-boyz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "breaka-boyz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-burna-bommer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-burna-bommer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BURNA-BOMMER",
+      "raw_name": "BURNA-BOMMER",
+      "record_id": "units-burna-bommer",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-burna-bommer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "burna-bommer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-burna-boyz:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-burna-boyz:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-burna-boyz:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BURNA BOYZ",
+      "raw_name": "BURNA BOYZ",
+      "record_id": "units-burna-boyz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-burna-boyz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "burna-boyz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-dakkajet:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-dakkajet:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAKKAJET",
+      "raw_name": "DAKKAJET",
+      "record_id": "units-dakkajet",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-dakkajet",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "dakkajet",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deff-dread:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deff-dread:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deff-dread:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deff-dread:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEFF DREAD",
+      "raw_name": "DEFF DREAD",
+      "record_id": "units-deff-dread",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deff-dread",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "deff-dread",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deffkilla-wartrike:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deffkilla-wartrike:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "WARBIKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "warbikers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deffkilla-wartrike:leader"
+      },
+      "name": "DEFFKILLA WARTRIKE",
+      "raw_name": "DEFFKILLA WARTRIKE",
+      "record_id": "units-deffkilla-wartrike",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deffkilla-wartrike",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "deffkilla-wartrike",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deffkoptas:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deffkoptas:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deffkoptas:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEFFKOPTAS",
+      "raw_name": "DEFFKOPTAS",
+      "record_id": "units-deffkoptas",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-deffkoptas",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "deffkoptas",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-flash-gitz:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-flash-gitz:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-flash-gitz:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-flash-gitz:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-flash-gitz:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-flash-gitz:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FLASH GITZ",
+      "raw_name": "FLASH GITZ",
+      "record_id": "units-flash-gitz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-flash-gitz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "flash-gitz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 440,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gargantuan-squiggoth:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gargantuan-squiggoth:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 490,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gargantuan-squiggoth:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gargantuan-squiggoth:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GARGANTUAN SQUIGGOTH",
+      "raw_name": "GARGANTUAN SQUIGGOTH",
+      "record_id": "units-gargantuan-squiggoth",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gargantuan-squiggoth",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "gargantuan-squiggoth",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 235,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-ghazghkull-thraka:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-ghazghkull-thraka:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BOYZ",
+          "BREAKA BOYZ",
+          "MEGANOBZ",
+          "NOBZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "boyz",
+          "breaka-boyz",
+          "meganobz",
+          "nobz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-ghazghkull-thraka:leader"
+      },
+      "name": "GHAZGHKULL THRAKA",
+      "raw_name": "GHAZGHKULL THRAKA",
+      "record_id": "units-ghazghkull-thraka",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-ghazghkull-thraka",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ghazghkull-thraka",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 255,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gorkanaut:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gorkanaut:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 275,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gorkanaut:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gorkanaut:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GORKANAUT",
+      "raw_name": "GORKANAUT",
+      "record_id": "units-gorkanaut",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gorkanaut",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "gorkanaut",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 Gretchin",
+              "model_component_counts": [
+                10
+              ],
+              "model_component_ids": [
+                "gretchin"
+              ],
+              "model_component_names": [
+                "Gretchin"
+              ],
+              "model_count": 10,
+              "model_id": "gretchin",
+              "model_name": "Gretchin",
+              "points": 45,
+              "raw_label": "10 Gretchin",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gretchin:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 Runtherd, 10 Gretchin",
+              "model_component_counts": [
+                1,
+                10
+              ],
+              "model_component_ids": [
+                "runtherd",
+                "gretchin"
+              ],
+              "model_component_names": [
+                "Runtherd",
+                "Gretchin"
+              ],
+              "model_count": 11,
+              "model_id": "runtherd-gretchin",
+              "model_name": "Runtherd, Gretchin",
+              "points": 45,
+              "raw_label": "1 Runtherd, 10 Gretchin",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gretchin:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 Gretchin",
+              "model_component_counts": [
+                20
+              ],
+              "model_component_ids": [
+                "gretchin"
+              ],
+              "model_component_names": [
+                "Gretchin"
+              ],
+              "model_count": 20,
+              "model_id": "gretchin",
+              "model_name": "Gretchin",
+              "points": 80,
+              "raw_label": "20 Gretchin",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gretchin:cost:your-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 Runtherd, 20 Gretchin",
+              "model_component_counts": [
+                1,
+                20
+              ],
+              "model_component_ids": [
+                "runtherd",
+                "gretchin"
+              ],
+              "model_component_names": [
+                "Runtherd",
+                "Gretchin"
+              ],
+              "model_count": 21,
+              "model_id": "runtherd-gretchin",
+              "model_name": "Runtherd, Gretchin",
+              "points": 85,
+              "raw_label": "1 Runtherd, 20 Gretchin",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gretchin:cost:your-unit-costs:4"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 Runtherd, 20 Gretchin",
+              "model_component_counts": [
+                2,
+                20
+              ],
+              "model_component_ids": [
+                "runtherd",
+                "gretchin"
+              ],
+              "model_component_names": [
+                "Runtherd",
+                "Gretchin"
+              ],
+              "model_count": 22,
+              "model_id": "runtherd-gretchin",
+              "model_name": "Runtherd, Gretchin",
+              "points": 90,
+              "raw_label": "2 Runtherd, 20 Gretchin",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gretchin:cost:your-unit-costs:5"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gretchin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GRETCHIN",
+      "raw_name": "GRETCHIN",
+      "record_id": "units-gretchin",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-gretchin",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "gretchin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-hunta-rig:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-hunta-rig:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HUNTA RIG",
+      "raw_name": "HUNTA RIG",
+      "record_id": "units-hunta-rig",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-hunta-rig",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "hunta-rig",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-kill-rig:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-kill-rig:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KILL RIG",
+      "raw_name": "KILL RIG",
+      "record_id": "units-kill-rig",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-kill-rig",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "kill-rig",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-killa-kans:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-killa-kans:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-killa-kans:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-killa-kans:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-killa-kans:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-killa-kans:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KILLA KANS",
+      "raw_name": "KILLA KANS",
+      "record_id": "units-killa-kans",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-killa-kans",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "killa-kans",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-kommandos:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-kommandos:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KOMMANDOS",
+      "raw_name": "KOMMANDOS",
+      "record_id": "units-kommandos",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-kommandos",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "kommandos",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-kustom-boosta-blasta:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-kustom-boosta-blasta:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KUSTOM BOOSTA-BLASTA",
+      "raw_name": "KUSTOM BOOSTA-BLASTA",
+      "record_id": "units-kustom-boosta-blasta",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-kustom-boosta-blasta",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "kustom-boosta-blasta",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-lootas:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-lootas:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-lootas:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-lootas:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-lootas:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-lootas:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LOOTAS",
+      "raw_name": "LOOTAS",
+      "record_id": "units-lootas",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-lootas",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lootas",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-1st-to-2nd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-1st-to-2nd-units-cost:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-1st-to-2nd-units-cost:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-3rd-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-3rd-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-3rd-unit-costs:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MEGANOBZ",
+      "raw_name": "MEGANOBZ",
+      "record_id": "units-meganobz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-meganobz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "meganobz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-megatrakk-scrapjet:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-megatrakk-scrapjet:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MEGATRAKK SCRAPJET",
+      "raw_name": "MEGATRAKK SCRAPJET",
+      "record_id": "units-megatrakk-scrapjet",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-megatrakk-scrapjet",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "megatrakk-scrapjet",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BOYZ",
+          "LOOTAS",
+          "MEK GUNZ",
+          "NOBZ",
+          "TANKBUSTAS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "boyz",
+          "lootas",
+          "mek-gunz",
+          "nobz",
+          "tankbustas"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek:leader"
+      },
+      "name": "MEK",
+      "raw_name": "MEK",
+      "record_id": "units-mek",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "mek",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek-gunz:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek-gunz:cost:your-1st-to-2nd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek-gunz:cost:your-1st-to-2nd-units-cost:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek-gunz:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek-gunz:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek-gunz:cost:your-3rd-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek-gunz:cost:your-3rd-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek-gunz:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MEK GUNZ",
+      "raw_name": "MEK GUNZ",
+      "record_id": "units-mek-gunz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mek-gunz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "mek-gunz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-morkanaut:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-morkanaut:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 290,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-morkanaut:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-morkanaut:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MORKANAUT",
+      "raw_name": "MORKANAUT",
+      "record_id": "units-morkanaut",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-morkanaut",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "morkanaut",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mozrog-skragbad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mozrog-skragbad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "SQUIGHOG BOYZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "squighog-boyz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mozrog-skragbad:leader"
+      },
+      "name": "MOZROG SKRAGBAD",
+      "raw_name": "MOZROG SKRAGBAD",
+      "record_id": "units-mozrog-skragbad",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-mozrog-skragbad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "mozrog-skragbad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-nobz:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-nobz:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-nobz:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-nobz:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-nobz:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-nobz:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NOBZ",
+      "raw_name": "NOBZ",
+      "record_id": "units-nobz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-nobz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "nobz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-painboss:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-painboss:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BEAST SNAGGA BOYZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "beast-snagga-boyz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-painboss:leader"
+      },
+      "name": "PAINBOSS",
+      "raw_name": "PAINBOSS",
+      "record_id": "units-painboss",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-painboss",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "painboss",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-painboy:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-painboy:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PAINBOY",
+      "raw_name": "PAINBOY",
+      "record_id": "units-painboy",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-painboy",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "BOYZ",
+          "BREAKA BOYZ",
+          "BURNA BOYZ",
+          "LOOTAS",
+          "NOBZ",
+          "TANKBUSTAS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "boyz",
+          "breaka-boyz",
+          "burna-boyz",
+          "lootas",
+          "nobz",
+          "tankbustas"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-painboy:support"
+      },
+      "unit_id": "painboy",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-rukkatrukk-squigbuggy:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-rukkatrukk-squigbuggy:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RUKKATRUKK SQUIGBUGGY",
+      "raw_name": "RUKKATRUKK SQUIGBUGGY",
+      "record_id": "units-rukkatrukk-squigbuggy",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-rukkatrukk-squigbuggy",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "rukkatrukk-squigbuggy",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-shokkjump-dragsta:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-shokkjump-dragsta:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SHOKKJUMP DRAGSTA",
+      "raw_name": "SHOKKJUMP DRAGSTA",
+      "record_id": "units-shokkjump-dragsta",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-shokkjump-dragsta",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "shokkjump-dragsta",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-squighog-boyz:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "8 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 8,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "8 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-squighog-boyz:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-squighog-boyz:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SQUIGHOG BOYZ",
+      "raw_name": "SQUIGHOG BOYZ",
+      "record_id": "units-squighog-boyz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-squighog-boyz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "squighog-boyz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 600,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-stompa:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-stompa:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 700,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-stompa:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-stompa:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STOMPA",
+      "raw_name": "STOMPA",
+      "record_id": "units-stompa",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-stompa",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "stompa",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-stormboyz:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-stormboyz:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-stormboyz:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STORMBOYZ",
+      "raw_name": "STORMBOYZ",
+      "record_id": "units-stormboyz",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-stormboyz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "stormboyz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-tankbustas:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-tankbustas:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-tankbustas:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-tankbustas:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TANKBUSTAS",
+      "raw_name": "TANKBUSTAS",
+      "record_id": "units-tankbustas",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-tankbustas",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "tankbustas",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-trukk:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-trukk:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-trukk:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-trukk:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TRUKK",
+      "raw_name": "TRUKK",
+      "record_id": "units-trukk",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-trukk",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "trukk",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warbikers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warbikers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warbikers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WARBIKERS",
+      "raw_name": "WARBIKERS",
+      "record_id": "units-warbikers",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warbikers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "warbikers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warboss:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warboss:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BOYZ",
+          "BREAKA BOYZ",
+          "NOBZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "boyz",
+          "breaka-boyz",
+          "nobz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warboss:leader"
+      },
+      "name": "WARBOSS",
+      "raw_name": "WARBOSS",
+      "record_id": "units-warboss",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warboss",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "warboss",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warboss-in-mega-armour:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warboss-in-mega-armour:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "MEGANOBZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "meganobz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warboss-in-mega-armour:leader"
+      },
+      "name": "WARBOSS IN MEGA ARMOUR",
+      "raw_name": "WARBOSS IN MEGA ARMOUR",
+      "record_id": "units-warboss-in-mega-armour",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-warboss-in-mega-armour",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "warboss-in-mega-armour",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wartrakk:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wartrakk:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WARTRAKK",
+      "raw_name": "WARTRAKK",
+      "record_id": "units-wartrakk",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wartrakk",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wartrakk",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wazbom-blastajet:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wazbom-blastajet:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAZBOM BLASTAJET",
+      "raw_name": "WAZBOM BLASTAJET",
+      "record_id": "units-wazbom-blastajet",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wazbom-blastajet",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wazbom-blastajet",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wazdakka-gutsmek:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wazdakka-gutsmek:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAZDAKKA GUTSMEK",
+      "raw_name": "WAZDAKKA GUTSMEK",
+      "record_id": "units-wazdakka-gutsmek",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wazdakka-gutsmek",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wazdakka-gutsmek",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-weirdboy:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-weirdboy:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BOYZ",
+          "BREAKA BOYZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "boyz",
+          "breaka-boyz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-weirdboy:leader"
+      },
+      "name": "WEIRDBOY",
+      "raw_name": "WEIRDBOY",
+      "record_id": "units-weirdboy",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-weirdboy",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "weirdboy",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wurrboy:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wurrboy:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BEAST SNAGGA BOYZ"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "beast-snagga-boyz"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wurrboy:leader"
+      },
+      "name": "WURRBOY",
+      "raw_name": "WURRBOY",
+      "record_id": "units-wurrboy",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-wurrboy",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wurrboy",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-zodgrod-wortsnagga:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-zodgrod-wortsnagga:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "GRETCHIN"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "gretchin"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-zodgrod-wortsnagga:leader"
+      },
+      "name": "ZODGROD WORTSNAGGA",
+      "raw_name": "ZODGROD WORTSNAGGA",
+      "record_id": "units-zodgrod-wortsnagga",
+      "source_id": "gw-11e-mfm-2026-07:faction:orks:unit:units-zodgrod-wortsnagga",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "zodgrod-wortsnagga",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/orks"
+}

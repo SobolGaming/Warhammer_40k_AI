@@ -1,0 +1,3468 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "annihilation-legion",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "eldritch-nightmare",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eldritch Nightmare",
+          "points": 10,
+          "raw_name": "Eldritch Nightmare",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:annihilation-legion:enhancement:eldritch-nightmare"
+        },
+        {
+          "enhancement_id": "eternal-madness",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eternal Madness",
+          "points": 20,
+          "raw_name": "Eternal Madness",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:annihilation-legion:enhancement:eternal-madness"
+        },
+        {
+          "enhancement_id": "ingrained-superiority",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ingrained Superiority",
+          "points": 5,
+          "raw_name": "Ingrained Superiority",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:annihilation-legion:enhancement:ingrained-superiority"
+        },
+        {
+          "enhancement_id": "soulless-reaper",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Soulless Reaper",
+          "points": 15,
+          "raw_name": "Soulless Reaper",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:annihilation-legion:enhancement:soulless-reaper"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "ANNIHILATION LEGION",
+      "raw_name": "ANNIHILATION LEGION",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:annihilation-legion"
+    },
+    {
+      "detachment_id": "awakened-dynasty",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "enaegic-dermal-bond",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Enaegic Dermal Bond",
+          "points": 30,
+          "raw_name": "Enaegic Dermal Bond",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:awakened-dynasty:enhancement:enaegic-dermal-bond"
+        },
+        {
+          "enhancement_id": "nether-realm-casket",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Nether-realm Casket",
+          "points": 20,
+          "raw_name": "Nether-realm Casket",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:awakened-dynasty:enhancement:nether-realm-casket"
+        },
+        {
+          "enhancement_id": "phasal-subjugator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Phasal Subjugator",
+          "points": 35,
+          "raw_name": "Phasal Subjugator",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:awakened-dynasty:enhancement:phasal-subjugator"
+        },
+        {
+          "enhancement_id": "veil-of-darkness",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Veil of Darkness",
+          "points": 20,
+          "raw_name": "Veil of Darkness",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:awakened-dynasty:enhancement:veil-of-darkness"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "AWAKENED DYNASTY",
+      "raw_name": "AWAKENED DYNASTY",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:awakened-dynasty"
+    },
+    {
+      "detachment_id": "canoptek-court",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "autodivinator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Autodivinator",
+          "points": 15,
+          "raw_name": "Autodivinator",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:canoptek-court:enhancement:autodivinator"
+        },
+        {
+          "enhancement_id": "dimensional-sanctum",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dimensional Sanctum",
+          "points": 20,
+          "raw_name": "Dimensional Sanctum",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:canoptek-court:enhancement:dimensional-sanctum"
+        },
+        {
+          "enhancement_id": "hyperphasic-fulcrum",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Hyperphasic Fulcrum",
+          "points": 15,
+          "raw_name": "Hyperphasic Fulcrum",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:canoptek-court:enhancement:hyperphasic-fulcrum"
+        },
+        {
+          "enhancement_id": "metalodermal-tesla-weave",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Metalodermal Tesla Weave",
+          "points": 10,
+          "raw_name": "Metalodermal Tesla Weave",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:canoptek-court:enhancement:metalodermal-tesla-weave"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "CANOPTEK COURT",
+      "raw_name": "CANOPTEK COURT",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:canoptek-court"
+    },
+    {
+      "detachment_id": "cryptek-conclave",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "atomic-disintegrators",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Atomic Disintegrators",
+          "points": 10,
+          "raw_name": "Atomic Disintegrators",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cryptek-conclave:enhancement:atomic-disintegrators"
+        },
+        {
+          "enhancement_id": "gauntlet-of-compression",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gauntlet of Compression",
+          "points": 20,
+          "raw_name": "Gauntlet of Compression",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cryptek-conclave:enhancement:gauntlet-of-compression"
+        },
+        {
+          "enhancement_id": "gravitic-bolas",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gravitic Bolas",
+          "points": 15,
+          "raw_name": "Gravitic Bolas",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cryptek-conclave:enhancement:gravitic-bolas"
+        },
+        {
+          "enhancement_id": "quantum-abacus",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Quantum Abacus",
+          "points": 15,
+          "raw_name": "Quantum Abacus",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cryptek-conclave:enhancement:quantum-abacus"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "CRYPTEK CONCLAVE",
+      "raw_name": "CRYPTEK CONCLAVE",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cryptek-conclave"
+    },
+    {
+      "detachment_id": "cursed-legion",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "cursed-circlet",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cursed Circlet",
+          "points": 25,
+          "raw_name": "Cursed Circlet",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cursed-legion:enhancement:cursed-circlet"
+        },
+        {
+          "enhancement_id": "destroyer-ankh",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Destroyer Ankh",
+          "points": 20,
+          "raw_name": "Destroyer Ankh",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cursed-legion:enhancement:destroyer-ankh"
+        },
+        {
+          "enhancement_id": "mark-of-the-nekrosor",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mark of the Nekrosor",
+          "points": 20,
+          "raw_name": "Mark of the Nekrosor",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cursed-legion:enhancement:mark-of-the-nekrosor"
+        },
+        {
+          "enhancement_id": "murdermind",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Murdermind",
+          "points": 15,
+          "raw_name": "Murdermind",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cursed-legion:enhancement:murdermind"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "CURSED LEGION",
+      "raw_name": "CURSED LEGION",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:cursed-legion"
+    },
+    {
+      "detachment_id": "hand-of-the-dynasty",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "enlivened-sentinels",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Enlivened Sentinels (Upgrade)",
+          "points": 20,
+          "raw_name": "Enlivened Sentinels (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:hand-of-the-dynasty:enhancement:enlivened-sentinels"
+        },
+        {
+          "enhancement_id": "tools-of-dominion",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Tools of Dominion (Upgrade)",
+          "points": 15,
+          "raw_name": "Tools of Dominion (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:hand-of-the-dynasty:enhancement:tools-of-dominion"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "HAND OF THE DYNASTY",
+      "raw_name": "HAND OF THE DYNASTY",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:hand-of-the-dynasty"
+    },
+    {
+      "detachment_id": "hypercrypt-legion",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "arisen-tyrant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Arisen Tyrant",
+          "points": 25,
+          "raw_name": "Arisen Tyrant",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:hypercrypt-legion:enhancement:arisen-tyrant"
+        },
+        {
+          "enhancement_id": "dimensional-overseer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dimensional Overseer",
+          "points": 25,
+          "raw_name": "Dimensional Overseer",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:hypercrypt-legion:enhancement:dimensional-overseer"
+        },
+        {
+          "enhancement_id": "hyperspatial-transfer-node",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Hyperspatial Transfer Node",
+          "points": 15,
+          "raw_name": "Hyperspatial Transfer Node",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:hypercrypt-legion:enhancement:hyperspatial-transfer-node"
+        },
+        {
+          "enhancement_id": "osteoclave-fulcrum",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Osteoclave Fulcrum",
+          "points": 20,
+          "raw_name": "Osteoclave Fulcrum",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:hypercrypt-legion:enhancement:osteoclave-fulcrum"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "HYPERCRYPT LEGION",
+      "raw_name": "HYPERCRYPT LEGION",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:hypercrypt-legion"
+    },
+    {
+      "detachment_id": "obeisance-phalanx",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "eternal-conqueror",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eternal Conqueror",
+          "points": 25,
+          "raw_name": "Eternal Conqueror",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:obeisance-phalanx:enhancement:eternal-conqueror"
+        },
+        {
+          "enhancement_id": "honourable-combatant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Honourable Combatant",
+          "points": 10,
+          "raw_name": "Honourable Combatant",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:obeisance-phalanx:enhancement:honourable-combatant"
+        },
+        {
+          "enhancement_id": "unflinching-will",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Unflinching Will",
+          "points": 20,
+          "raw_name": "Unflinching Will",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:obeisance-phalanx:enhancement:unflinching-will"
+        },
+        {
+          "enhancement_id": "warrior-noble",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warrior Noble",
+          "points": 15,
+          "raw_name": "Warrior Noble",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:obeisance-phalanx:enhancement:warrior-noble"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "OBEISANCE PHALANX",
+      "raw_name": "OBEISANCE PHALANX",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:obeisance-phalanx"
+    },
+    {
+      "detachment_id": "pantheon-of-woe",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "animus-damper",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Animus Damper",
+          "points": 35,
+          "raw_name": "Animus Damper",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:pantheon-of-woe:enhancement:animus-damper"
+        },
+        {
+          "enhancement_id": "quantum-goad",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Quantum Goad",
+          "points": 45,
+          "raw_name": "Quantum Goad",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:pantheon-of-woe:enhancement:quantum-goad"
+        },
+        {
+          "enhancement_id": "reletavistic-tether",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Reletavistic Tether",
+          "points": 40,
+          "raw_name": "Reletavistic Tether",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:pantheon-of-woe:enhancement:reletavistic-tether"
+        },
+        {
+          "enhancement_id": "singularity-matrix",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Singularity Matrix",
+          "points": 45,
+          "raw_name": "Singularity Matrix",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:pantheon-of-woe:enhancement:singularity-matrix"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "PANTHEON OF WOE",
+      "raw_name": "PANTHEON OF WOE",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:pantheon-of-woe"
+    },
+    {
+      "detachment_id": "skyshroud-spearhead",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "deepening-madness",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Deepening Madness (Upgrade)",
+          "points": 20,
+          "raw_name": "Deepening Madness (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:skyshroud-spearhead:enhancement:deepening-madness"
+        },
+        {
+          "enhancement_id": "recursive-reanimation",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Recursive Reanimation (Upgrade)",
+          "points": 5,
+          "raw_name": "Recursive Reanimation (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:skyshroud-spearhead:enhancement:recursive-reanimation"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "SKYSHROUD SPEARHEAD",
+      "raw_name": "SKYSHROUD SPEARHEAD",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:skyshroud-spearhead"
+    },
+    {
+      "detachment_id": "starshatter-arsenal",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "chrono-impedance-fields",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Chrono-impedance Fields",
+          "points": 25,
+          "raw_name": "Chrono-impedance Fields",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:starshatter-arsenal:enhancement:chrono-impedance-fields"
+        },
+        {
+          "enhancement_id": "demanding-leader",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Demanding Leader",
+          "points": 10,
+          "raw_name": "Demanding Leader",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:starshatter-arsenal:enhancement:demanding-leader"
+        },
+        {
+          "enhancement_id": "dread-majesty",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dread Majesty",
+          "points": 30,
+          "raw_name": "Dread Majesty",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:starshatter-arsenal:enhancement:dread-majesty"
+        },
+        {
+          "enhancement_id": "miniaturised-nebuloscope",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Miniaturised Nebuloscope",
+          "points": 15,
+          "raw_name": "Miniaturised Nebuloscope",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:starshatter-arsenal:enhancement:miniaturised-nebuloscope"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "STARSHATTER ARSENAL",
+      "raw_name": "STARSHATTER ARSENAL",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:starshatter-arsenal"
+    },
+    {
+      "detachment_id": "the-phaerons-armoury",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "mortality-shroud-aura",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Mortality Shroud (Aura) (Upgrade)",
+          "points": 10,
+          "raw_name": "Mortality Shroud (Aura) (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:the-phaerons-armoury:enhancement:mortality-shroud-aura"
+        },
+        {
+          "enhancement_id": "prelocational-optimiser",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Prelocational Optimiser",
+          "points": 25,
+          "raw_name": "Prelocational Optimiser",
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:the-phaerons-armoury:enhancement:prelocational-optimiser"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "THE PHAERON'S ARMOURY",
+      "raw_name": "THE PHAERON'S ARMOURY",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:detachment:the-phaerons-armoury"
+    }
+  ],
+  "faction_id": "necrons",
+  "name": "Necrons",
+  "raw_name": "Necrons",
+  "source_id": "gw-11e-mfm-2026-07:faction:necrons",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-annihilation-barge:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-annihilation-barge:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ANNIHILATION BARGE",
+      "raw_name": "ANNIHILATION BARGE",
+      "record_id": "units-annihilation-barge",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-annihilation-barge",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "annihilation-barge",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-doomstalker:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-doomstalker:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CANOPTEK DOOMSTALKER",
+      "raw_name": "CANOPTEK DOOMSTALKER",
+      "record_id": "units-canoptek-doomstalker",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-doomstalker",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "canoptek-doomstalker",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-macrocytes:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-macrocytes:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CANOPTEK MACROCYTES",
+      "raw_name": "CANOPTEK MACROCYTES",
+      "record_id": "units-canoptek-macrocytes",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-macrocytes",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "canoptek-macrocytes",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-reanimator:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-reanimator:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CANOPTEK REANIMATOR",
+      "raw_name": "CANOPTEK REANIMATOR",
+      "record_id": "units-canoptek-reanimator",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-reanimator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "canoptek-reanimator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 40,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-scarab-swarms:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-scarab-swarms:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-scarab-swarms:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CANOPTEK SCARAB SWARMS",
+      "raw_name": "CANOPTEK SCARAB SWARMS",
+      "record_id": "units-canoptek-scarab-swarms",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-scarab-swarms",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "canoptek-scarab-swarms",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-spyders:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-spyders:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-spyders:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CANOPTEK SPYDERS",
+      "raw_name": "CANOPTEK SPYDERS",
+      "record_id": "units-canoptek-spyders",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-spyders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "canoptek-spyders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-tomb-crawlers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-tomb-crawlers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CANOPTEK TOMB CRAWLERS",
+      "raw_name": "CANOPTEK TOMB CRAWLERS",
+      "record_id": "units-canoptek-tomb-crawlers",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-tomb-crawlers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "canoptek-tomb-crawlers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-wraiths:cost:your-1st-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-wraiths:cost:your-1st-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-wraiths:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-wraiths:cost:your-2nd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-wraiths:cost:your-2nd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-wraiths:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CANOPTEK WRAITHS",
+      "raw_name": "CANOPTEK WRAITHS",
+      "record_id": "units-canoptek-wraiths",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-canoptek-wraiths",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "canoptek-wraiths",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-catacomb-command-barge:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-catacomb-command-barge:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CATACOMB COMMAND BARGE",
+      "raw_name": "CATACOMB COMMAND BARGE",
+      "record_id": "units-catacomb-command-barge",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-catacomb-command-barge",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "catacomb-command-barge",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-chronomancer:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-chronomancer:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-chronomancer:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-chronomancer:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHRONOMANCER",
+      "raw_name": "CHRONOMANCER",
+      "record_id": "units-chronomancer",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-chronomancer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "IMMORTALS",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "immortals",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-chronomancer:support"
+      },
+      "unit_id": "chronomancer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-convergence-of-dominion:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-convergence-of-dominion:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-convergence-of-dominion:cost:your-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-convergence-of-dominion:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CONVERGENCE OF DOMINION",
+      "raw_name": "CONVERGENCE OF DOMINION",
+      "record_id": "units-convergence-of-dominion",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-convergence-of-dominion",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "convergence-of-dominion",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-cryptothralls:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-cryptothralls:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CRYPTOTHRALLS",
+      "raw_name": "CRYPTOTHRALLS",
+      "record_id": "units-cryptothralls",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-cryptothralls",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "cryptothralls",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 330,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ctan-shard-of-the-deceiver:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ctan-shard-of-the-deceiver:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "C'TAN SHARD OF THE DECEIVER",
+      "raw_name": "C'TAN SHARD OF THE DECEIVER",
+      "record_id": "units-ctan-shard-of-the-deceiver",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ctan-shard-of-the-deceiver",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ctan-shard-of-the-deceiver",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 360,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ctan-shard-of-the-nightbringer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ctan-shard-of-the-nightbringer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "C'TAN SHARD OF THE NIGHTBRINGER",
+      "raw_name": "C'TAN SHARD OF THE NIGHTBRINGER",
+      "record_id": "units-ctan-shard-of-the-nightbringer",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ctan-shard-of-the-nightbringer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ctan-shard-of-the-nightbringer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 345,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ctan-shard-of-the-void-dragon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ctan-shard-of-the-void-dragon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "C'TAN SHARD OF THE VOID DRAGON",
+      "raw_name": "C'TAN SHARD OF THE VOID DRAGON",
+      "record_id": "units-ctan-shard-of-the-void-dragon",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ctan-shard-of-the-void-dragon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ctan-shard-of-the-void-dragon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-deathmarks:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-deathmarks:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-deathmarks:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-deathmarks:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-deathmarks:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-deathmarks:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEATHMARKS",
+      "raw_name": "DEATHMARKS",
+      "record_id": "units-deathmarks",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-deathmarks",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "deathmarks",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-doom-scythe:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-doom-scythe:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DOOM SCYTHE",
+      "raw_name": "DOOM SCYTHE",
+      "record_id": "units-doom-scythe",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-doom-scythe",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "doom-scythe",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-doomsday-ark:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-doomsday-ark:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 230,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-doomsday-ark:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-doomsday-ark:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DOOMSDAY ARK",
+      "raw_name": "DOOMSDAY ARK",
+      "record_id": "units-doomsday-ark",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-doomsday-ark",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "doomsday-ark",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-flayed-ones:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-flayed-ones:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-flayed-ones:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FLAYED ONES",
+      "raw_name": "FLAYED ONES",
+      "record_id": "units-flayed-ones",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-flayed-ones",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "flayed-ones",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-geomancer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-geomancer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GEOMANCER",
+      "raw_name": "GEOMANCER",
+      "record_id": "units-geomancer",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-geomancer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "CANOPTEK MACROCYTES",
+          "IMMORTALS",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "canoptek-macrocytes",
+          "immortals",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-geomancer:support"
+      },
+      "unit_id": "geomancer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ghost-ark:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ghost-ark:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GHOST ARK",
+      "raw_name": "GHOST ARK",
+      "record_id": "units-ghost-ark",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ghost-ark",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ghost-ark",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-hexmark-destroyer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-hexmark-destroyer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HEXMARK DESTROYER",
+      "raw_name": "HEXMARK DESTROYER",
+      "record_id": "units-hexmark-destroyer",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-hexmark-destroyer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "hexmark-destroyer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-illuminor-szeras:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-illuminor-szeras:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ILLUMINOR SZERAS",
+      "raw_name": "ILLUMINOR SZERAS",
+      "record_id": "units-illuminor-szeras",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-illuminor-szeras",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "illuminor-szeras",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-immortals:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-immortals:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-immortals:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IMMORTALS",
+      "raw_name": "IMMORTALS",
+      "record_id": "units-immortals",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-immortals",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "immortals",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-imotekh-the-stormlord:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-imotekh-the-stormlord:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IMMORTALS",
+          "LYCHGUARD",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "immortals",
+          "lychguard",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-imotekh-the-stormlord:leader"
+      },
+      "name": "IMOTEKH THE STORMLORD",
+      "raw_name": "IMOTEKH THE STORMLORD",
+      "record_id": "units-imotekh-the-stormlord",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-imotekh-the-stormlord",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "imotekh-the-stormlord",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 40,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-1st-to-2nd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-1st-to-2nd-units-cost:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-1st-to-2nd-units-cost:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-3rd-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-3rd-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-3rd-unit-costs:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LOKHUST DESTROYERS",
+      "raw_name": "LOKHUST DESTROYERS",
+      "record_id": "units-lokhust-destroyers",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-destroyers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lokhust-destroyers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-heavy-destroyers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-heavy-destroyers:cost:your-1st-to-2nd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-heavy-destroyers:cost:your-1st-to-2nd-units-cost:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-heavy-destroyers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-heavy-destroyers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-heavy-destroyers:cost:your-3rd-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-heavy-destroyers:cost:your-3rd-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-heavy-destroyers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LOKHUST HEAVY DESTROYERS",
+      "raw_name": "LOKHUST HEAVY DESTROYERS",
+      "record_id": "units-lokhust-heavy-destroyers",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-heavy-destroyers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lokhust-heavy-destroyers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-lord:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-lord:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "LOKHUST DESTROYERS",
+          "LOKHUST HEAVY DESTROYERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "lokhust-destroyers",
+          "lokhust-heavy-destroyers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-lord:leader"
+      },
+      "name": "LOKHUST LORD",
+      "raw_name": "LOKHUST LORD",
+      "record_id": "units-lokhust-lord",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lokhust-lord",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lokhust-lord",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lychguard:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lychguard:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lychguard:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LYCHGUARD",
+      "raw_name": "LYCHGUARD",
+      "record_id": "units-lychguard",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-lychguard",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lychguard",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 420,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-monolith:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-monolith:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 440,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-monolith:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-monolith:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MONOLITH",
+      "raw_name": "MONOLITH",
+      "record_id": "units-monolith",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-monolith",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "monolith",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-necron-warriors:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-necron-warriors:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-necron-warriors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NECRON WARRIORS",
+      "raw_name": "NECRON WARRIORS",
+      "record_id": "units-necron-warriors",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-necron-warriors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "necron-warriors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-nekrosor-ammentar:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-nekrosor-ammentar:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NEKROSOR AMMENTAR",
+      "raw_name": "NEKROSOR AMMENTAR",
+      "record_id": "units-nekrosor-ammentar",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-nekrosor-ammentar",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "nekrosor-ammentar",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-night-scythe:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-night-scythe:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NIGHT SCYTHE",
+      "raw_name": "NIGHT SCYTHE",
+      "record_id": "units-night-scythe",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-night-scythe",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "night-scythe",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-obelisk:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-obelisk:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 310,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-obelisk:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-obelisk:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "OBELISK",
+      "raw_name": "OBELISK",
+      "record_id": "units-obelisk",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-obelisk",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "obelisk",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ophydian-destroyers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ophydian-destroyers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ophydian-destroyers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ophydian-destroyers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ophydian-destroyers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ophydian-destroyers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "OPHYDIAN DESTROYERS",
+      "raw_name": "OPHYDIAN DESTROYERS",
+      "record_id": "units-ophydian-destroyers",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-ophydian-destroyers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ophydian-destroyers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-orikan-the-diviner:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-orikan-the-diviner:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ORIKAN THE DIVINER",
+      "raw_name": "ORIKAN THE DIVINER",
+      "record_id": "units-orikan-the-diviner",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-orikan-the-diviner",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "IMMORTALS",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "immortals",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-orikan-the-diviner:support"
+      },
+      "unit_id": "orikan-the-diviner",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-overlord:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-overlord:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IMMORTALS",
+          "LYCHGUARD",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "immortals",
+          "lychguard",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-overlord:leader"
+      },
+      "name": "OVERLORD",
+      "raw_name": "OVERLORD",
+      "record_id": "units-overlord",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-overlord",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "overlord",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-overlord-with-translocation-shroud:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-overlord-with-translocation-shroud:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IMMORTALS",
+          "LYCHGUARD",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "immortals",
+          "lychguard",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-overlord-with-translocation-shroud:leader"
+      },
+      "name": "OVERLORD WITH TRANSLOCATION SHROUD",
+      "raw_name": "OVERLORD WITH TRANSLOCATION SHROUD",
+      "record_id": "units-overlord-with-translocation-shroud",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-overlord-with-translocation-shroud",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "overlord-with-translocation-shroud",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-plasmancer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-plasmancer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PLASMANCER",
+      "raw_name": "PLASMANCER",
+      "record_id": "units-plasmancer",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-plasmancer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "IMMORTALS",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "immortals",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-plasmancer:support"
+      },
+      "unit_id": "plasmancer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-psychomancer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-psychomancer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PSYCHOMANCER",
+      "raw_name": "PSYCHOMANCER",
+      "record_id": "units-psychomancer",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-psychomancer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "IMMORTALS",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "immortals",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-psychomancer:support"
+      },
+      "unit_id": "psychomancer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-royal-warden:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-royal-warden:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IMMORTALS",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "immortals",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-royal-warden:leader"
+      },
+      "name": "ROYAL WARDEN",
+      "raw_name": "ROYAL WARDEN",
+      "record_id": "units-royal-warden",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-royal-warden",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "royal-warden",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 540,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-seraptek-heavy-construct:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-seraptek-heavy-construct:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 570,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-seraptek-heavy-construct:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-seraptek-heavy-construct:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SERAPTEK HEAVY CONSTRUCT",
+      "raw_name": "SERAPTEK HEAVY CONSTRUCT",
+      "record_id": "units-seraptek-heavy-construct",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-seraptek-heavy-construct",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "seraptek-heavy-construct",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-destroyers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-destroyers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-destroyers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-destroyers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-destroyers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-destroyers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKORPEKH DESTROYERS",
+      "raw_name": "SKORPEKH DESTROYERS",
+      "record_id": "units-skorpekh-destroyers",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-destroyers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "skorpekh-destroyers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-lord:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-lord:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-lord:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-lord:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "SKORPEKH DESTROYERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "skorpekh-destroyers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-lord:leader"
+      },
+      "name": "SKORPEKH LORD",
+      "raw_name": "SKORPEKH LORD",
+      "record_id": "units-skorpekh-lord",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-skorpekh-lord",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "skorpekh-lord",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-technomancer:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-technomancer:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-technomancer:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-technomancer:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TECHNOMANCER",
+      "raw_name": "TECHNOMANCER",
+      "record_id": "units-technomancer",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-technomancer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "CANOPTEK WRAITHS",
+          "IMMORTALS",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "canoptek-wraiths",
+          "immortals",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-technomancer:support"
+      },
+      "unit_id": "technomancer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 465,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tesseract-vault:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tesseract-vault:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 485,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tesseract-vault:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tesseract-vault:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TESSERACT VAULT",
+      "raw_name": "TESSERACT VAULT",
+      "record_id": "units-tesseract-vault",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tesseract-vault",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "tesseract-vault",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 420,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-the-silent-king:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-the-silent-king:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "THE SILENT KING",
+      "raw_name": "THE SILENT KING",
+      "record_id": "units-the-silent-king",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-the-silent-king",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "the-silent-king",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tomb-blades:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tomb-blades:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tomb-blades:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tomb-blades:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tomb-blades:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tomb-blades:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TOMB BLADES",
+      "raw_name": "TOMB BLADES",
+      "record_id": "units-tomb-blades",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-tomb-blades",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "tomb-blades",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 340,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-transcendent-ctan:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-transcendent-ctan:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 360,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-transcendent-ctan:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-transcendent-ctan:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TRANSCENDENT C'TAN",
+      "raw_name": "TRANSCENDENT C'TAN",
+      "record_id": "units-transcendent-ctan",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-transcendent-ctan",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "transcendent-ctan",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-trazyn-the-infinite:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-trazyn-the-infinite:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IMMORTALS",
+          "LYCHGUARD",
+          "NECRON WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "immortals",
+          "lychguard",
+          "necron-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-trazyn-the-infinite:leader"
+      },
+      "name": "TRAZYN THE INFINITE",
+      "raw_name": "TRAZYN THE INFINITE",
+      "record_id": "units-trazyn-the-infinite",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-trazyn-the-infinite",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "trazyn-the-infinite",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-triarch-praetorians:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-triarch-praetorians:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-triarch-praetorians:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TRIARCH PRAETORIANS",
+      "raw_name": "TRIARCH PRAETORIANS",
+      "record_id": "units-triarch-praetorians",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-triarch-praetorians",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "triarch-praetorians",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-triarch-stalker:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-triarch-stalker:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-triarch-stalker:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-triarch-stalker:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TRIARCH STALKER",
+      "raw_name": "TRIARCH STALKER",
+      "record_id": "units-triarch-stalker",
+      "source_id": "gw-11e-mfm-2026-07:faction:necrons:unit:units-triarch-stalker",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "triarch-stalker",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/necrons"
+}

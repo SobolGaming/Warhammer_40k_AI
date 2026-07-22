@@ -7,10 +7,13 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 from warhammer40k_core.rules.mfm_source import (
+    MfmFactionRecord,
     MfmIndexFaction,
+    MfmSourceError,
     MfmSourcePackage,
     parse_mfm_faction_html,
     parse_mfm_index_html,
+    parse_mfm_version_html,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,13 +24,13 @@ DEFAULT_OUTPUT = (
     / "rules"
     / "source_packages"
     / "warhammer_40000_11th"
-    / "mfm_2026_06"
+    / "mfm_2026_07"
 )
 SOURCE_URL = "https://mfm.warhammer-community.com/en/"
-SOURCE_PACKAGE_ID = "gw-11e-mfm-2026-06"
+SOURCE_PACKAGE_ID = "gw-11e-mfm-2026-07"
 SOURCE_TITLE = "Warhammer 40,000: Munitorum Field Manual"
-SOURCE_VERSION = "v1.0"
-SOURCE_DATE = "2026-06-17"
+SOURCE_VERSION = "v1.1"
+SOURCE_DATE = "2026-07-22"
 EXCLUDED_FACTION_IDS = ("chaos-titan-legions", "titan-legions")
 
 
@@ -38,6 +41,7 @@ class MfmImportToolError(ValueError):
 def main() -> None:
     args = _parse_args()
     index_html = _fetch_url(SOURCE_URL, use_curl=args.use_curl)
+    _validate_source_version(html=index_html, url=SOURCE_URL)
     factions = tuple(
         faction
         for faction in parse_mfm_index_html(index_html)
@@ -46,14 +50,23 @@ def main() -> None:
     if not factions:
         raise MfmImportToolError("MFM import found no supported factions.")
 
-    records = tuple(
-        parse_mfm_faction_html(
-            html=_fetch_url(_absolute_url(faction), use_curl=args.use_curl),
-            faction=faction,
-            source_package_id=SOURCE_PACKAGE_ID,
-        )
-        for faction in factions
-    )
+    records: list[MfmFactionRecord] = []
+    for faction in factions:
+        faction_url = _absolute_url(faction)
+        faction_html = _fetch_url(faction_url, use_curl=args.use_curl)
+        _validate_source_version(html=faction_html, url=faction_url)
+        try:
+            records.append(
+                parse_mfm_faction_html(
+                    html=faction_html,
+                    faction=faction,
+                    source_package_id=SOURCE_PACKAGE_ID,
+                )
+            )
+        except MfmSourceError as exc:
+            raise MfmImportToolError(
+                f"MFM faction import failed for {faction.faction_id}."
+            ) from exc
     package = MfmSourcePackage(
         source_package_id=SOURCE_PACKAGE_ID,
         source_title=SOURCE_TITLE,
@@ -61,7 +74,7 @@ def main() -> None:
         source_date=SOURCE_DATE,
         source_url=SOURCE_URL,
         excluded_faction_ids=EXCLUDED_FACTION_IDS,
-        factions=records,
+        factions=tuple(records),
     )
     output_path = args.output
     output_path.mkdir(parents=True, exist_ok=True)
@@ -107,6 +120,14 @@ def _absolute_url(faction: MfmIndexFaction) -> str:
     return "https://mfm.warhammer-community.com" + faction.url_path
 
 
+def _validate_source_version(*, html: str, url: str) -> None:
+    actual_version = parse_mfm_version_html(html)
+    if actual_version != SOURCE_VERSION:
+        raise MfmImportToolError(
+            f"MFM source version drift at {url}: expected {SOURCE_VERSION}, got {actual_version}."
+        )
+
+
 def _write_package_artifacts(*, output_path: Path, package: MfmSourcePackage) -> None:
     artifacts_path = output_path / "artifacts"
     factions_path = artifacts_path / "factions"
@@ -126,7 +147,7 @@ def _write_package_artifacts(*, output_path: Path, package: MfmSourcePackage) ->
         artifact_path.write_text(_json_artifact_text(faction.to_payload()), encoding="utf-8")
 
     manifest = {
-        "artifact_schema": "core-v2-mfm-source-package-v1",
+        "artifact_schema": "core-v2-mfm-source-package-v2",
         "source_package_id": package.source_package_id,
         "source_title": package.source_title,
         "source_version": package.source_version,

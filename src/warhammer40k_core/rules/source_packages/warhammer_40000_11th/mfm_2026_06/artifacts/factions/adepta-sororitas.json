@@ -371,6 +371,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-aestred-thurga-and-agathae-dolan",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "aestred-thurga-and-agathae-dolan",
       "wargear_costs": []
     },
@@ -423,6 +424,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-arco-flagellants",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "arco-flagellants",
       "wargear_costs": []
     },
@@ -460,6 +462,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-battle-sisters-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "battle-sisters-squad",
       "wargear_costs": []
     },
@@ -515,6 +518,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-canoness",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "canoness",
       "wargear_costs": []
     },
@@ -562,6 +566,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-canoness-with-jump-pack",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "canoness-with-jump-pack",
       "wargear_costs": []
     },
@@ -623,6 +628,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-castigator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "castigator",
       "wargear_costs": []
     },
@@ -660,6 +666,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-celestian-insidiants",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "celestian-insidiants",
       "wargear_costs": []
     },
@@ -751,6 +758,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-celestian-sacresants",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "celestian-sacresants",
       "wargear_costs": []
     },
@@ -788,6 +796,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-daemonifuge",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "daemonifuge",
       "wargear_costs": []
     },
@@ -825,6 +834,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-dialogus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "dialogus",
       "wargear_costs": []
     },
@@ -862,6 +872,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-dogmata",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "dogmata",
       "wargear_costs": []
     },
@@ -923,6 +934,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-dominion-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "dominion-squad",
       "wargear_costs": [
         {
@@ -992,6 +1004,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-exorcist",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "exorcist",
       "wargear_costs": []
     },
@@ -1053,6 +1066,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-hospitaller",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hospitaller",
       "wargear_costs": []
     },
@@ -1090,6 +1104,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-imagifier",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "imagifier",
       "wargear_costs": []
     },
@@ -1151,6 +1166,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-immolator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "immolator",
       "wargear_costs": [
         {
@@ -1196,6 +1212,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-intranzia-fraye",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "intranzia-fraye",
       "wargear_costs": []
     },
@@ -1251,6 +1268,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-junith-eruita",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "junith-eruita",
       "wargear_costs": []
     },
@@ -1306,6 +1324,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-ministorum-priest",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ministorum-priest",
       "wargear_costs": []
     },
@@ -1358,6 +1377,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-mortifiers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "mortifiers",
       "wargear_costs": []
     },
@@ -1403,6 +1423,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-morvenn-vahl",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "morvenn-vahl",
       "wargear_costs": []
     },
@@ -1458,6 +1479,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-palatine",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "palatine",
       "wargear_costs": []
     },
@@ -1519,6 +1541,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-paragon-warsuits",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "paragon-warsuits",
       "wargear_costs": [
         {
@@ -1579,6 +1602,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-penitent-engines",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "penitent-engines",
       "wargear_costs": []
     },
@@ -1631,6 +1655,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-repentia-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "repentia-squad",
       "wargear_costs": []
     },
@@ -1692,6 +1717,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-retributor-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "retributor-squad",
       "wargear_costs": [
         {
@@ -1747,6 +1773,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-saint-celestine",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "saint-celestine",
       "wargear_costs": []
     },
@@ -1784,6 +1811,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-sanctifiers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sanctifiers",
       "wargear_costs": []
     },
@@ -1875,6 +1903,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-seraphim-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "seraphim-squad",
       "wargear_costs": []
     },
@@ -1912,6 +1941,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-sisters-novitiate-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sisters-novitiate-squad",
       "wargear_costs": []
     },
@@ -1949,6 +1979,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-sororitas-rhino",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "sororitas-rhino",
       "wargear_costs": []
     },
@@ -1994,6 +2025,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-triumph-of-saint-katherine",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "triumph-of-saint-katherine",
       "wargear_costs": []
     },
@@ -2046,6 +2078,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:adepta-sororitas:unit:units-zephyrim-squad",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "zephyrim-squad",
       "wargear_costs": []
     }

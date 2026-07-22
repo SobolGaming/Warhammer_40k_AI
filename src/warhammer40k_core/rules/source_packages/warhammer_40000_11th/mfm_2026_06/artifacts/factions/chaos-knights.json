@@ -396,6 +396,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-chaos-acastus-knight-asterius",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-acastus-knight-asterius",
       "wargear_costs": []
     },
@@ -457,6 +458,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-chaos-acastus-knight-porphyrion",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-acastus-knight-porphyrion",
       "wargear_costs": []
     },
@@ -518,6 +520,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-chaos-cerastus-knight-acheron",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-cerastus-knight-acheron",
       "wargear_costs": []
     },
@@ -579,6 +582,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-chaos-cerastus-knight-castigator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-cerastus-knight-castigator",
       "wargear_costs": []
     },
@@ -640,6 +644,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-chaos-cerastus-knight-lancer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-cerastus-knight-lancer",
       "wargear_costs": []
     },
@@ -701,6 +706,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-chaos-questoris-knight-magaera",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-questoris-knight-magaera",
       "wargear_costs": []
     },
@@ -762,6 +768,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-chaos-questoris-knight-styrix",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-questoris-knight-styrix",
       "wargear_costs": []
     },
@@ -823,6 +830,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-knight-abominant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-abominant",
       "wargear_costs": []
     },
@@ -884,6 +892,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-knight-desecrator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-desecrator",
       "wargear_costs": []
     },
@@ -945,6 +954,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-knight-despoiler",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-despoiler",
       "wargear_costs": [
         {
@@ -1021,6 +1031,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-knight-rampager",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-rampager",
       "wargear_costs": []
     },
@@ -1082,6 +1093,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-knight-ruinator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-ruinator",
       "wargear_costs": []
     },
@@ -1143,6 +1155,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-knight-tyrant",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "knight-tyrant",
       "wargear_costs": []
     },
@@ -1180,6 +1193,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-war-dog-brigand",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "war-dog-brigand",
       "wargear_costs": []
     },
@@ -1217,6 +1231,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-war-dog-executioner",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "war-dog-executioner",
       "wargear_costs": []
     },
@@ -1254,6 +1269,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-war-dog-huntsman",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "war-dog-huntsman",
       "wargear_costs": []
     },
@@ -1291,6 +1307,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-war-dog-karnivore",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "war-dog-karnivore",
       "wargear_costs": []
     },
@@ -1352,6 +1369,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-war-dog-moirax",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "war-dog-moirax",
       "wargear_costs": []
     },
@@ -1389,6 +1407,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:chaos-knights:unit:units-war-dog-stalker",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "war-dog-stalker",
       "wargear_costs": []
     }

@@ -1,0 +1,4284 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "armoured-warhost",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "guiding-presence",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Guiding Presence",
+          "points": 25,
+          "raw_name": "Guiding Presence",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:armoured-warhost:enhancement:guiding-presence"
+        },
+        {
+          "enhancement_id": "spirit-stone-of-raelyth",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Spirit Stone of Raelyth",
+          "points": 20,
+          "raw_name": "Spirit Stone of Raelyth",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:armoured-warhost:enhancement:spirit-stone-of-raelyth"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "ARMOURED WARHOST",
+      "raw_name": "ARMOURED WARHOST",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:armoured-warhost"
+    },
+    {
+      "detachment_id": "aspect-host",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "aspect-of-murder",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Aspect of Murder",
+          "points": 15,
+          "raw_name": "Aspect of Murder",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:aspect-host:enhancement:aspect-of-murder"
+        },
+        {
+          "enhancement_id": "mantle-of-wisdom",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mantle of Wisdom",
+          "points": 20,
+          "raw_name": "Mantle of Wisdom",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:aspect-host:enhancement:mantle-of-wisdom"
+        },
+        {
+          "enhancement_id": "shimmerstone",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Shimmerstone",
+          "points": 10,
+          "raw_name": "Shimmerstone",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:aspect-host:enhancement:shimmerstone"
+        },
+        {
+          "enhancement_id": "strategic-savant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Strategic Savant",
+          "points": 10,
+          "raw_name": "Strategic Savant",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:aspect-host:enhancement:strategic-savant"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "ASPECT HOST",
+      "raw_name": "ASPECT HOST",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:aspect-host"
+    },
+    {
+      "detachment_id": "corsair-coterie",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "archraider",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Archraider",
+          "points": 35,
+          "raw_name": "Archraider",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:corsair-coterie:enhancement:archraider"
+        },
+        {
+          "enhancement_id": "infamy",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Infamy",
+          "points": 25,
+          "raw_name": "Infamy",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:corsair-coterie:enhancement:infamy"
+        },
+        {
+          "enhancement_id": "voidstone",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Voidstone",
+          "points": 15,
+          "raw_name": "Voidstone",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:corsair-coterie:enhancement:voidstone"
+        },
+        {
+          "enhancement_id": "webway-pathstone",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Webway Pathstone",
+          "points": 25,
+          "raw_name": "Webway Pathstone",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:corsair-coterie:enhancement:webway-pathstone"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "CORSAIR COTERIE",
+      "raw_name": "CORSAIR COTERIE",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:corsair-coterie"
+    },
+    {
+      "detachment_id": "devoted-of-ynnead",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "borrowed-vigour",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Borrowed Vigour",
+          "points": 10,
+          "raw_name": "Borrowed Vigour",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:devoted-of-ynnead:enhancement:borrowed-vigour"
+        },
+        {
+          "enhancement_id": "gaze-of-ynnead",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gaze of Ynnead",
+          "points": 15,
+          "raw_name": "Gaze of Ynnead",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:devoted-of-ynnead:enhancement:gaze-of-ynnead"
+        },
+        {
+          "enhancement_id": "morbid-might",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Morbid Might",
+          "points": 15,
+          "raw_name": "Morbid Might",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:devoted-of-ynnead:enhancement:morbid-might"
+        },
+        {
+          "enhancement_id": "storm-of-whispers",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Storm of Whispers",
+          "points": 10,
+          "raw_name": "Storm of Whispers",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:devoted-of-ynnead:enhancement:storm-of-whispers"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "DEVOTED OF YNNEAD",
+      "raw_name": "DEVOTED OF YNNEAD",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:devoted-of-ynnead"
+    },
+    {
+      "detachment_id": "eldritch-raiders",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "adrenal-infusions",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Adrenal Infusions",
+          "points": 20,
+          "raw_name": "Adrenal Infusions",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:eldritch-raiders:enhancement:adrenal-infusions"
+        },
+        {
+          "enhancement_id": "alacritous-assault",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Alacritous Assault",
+          "points": 20,
+          "raw_name": "Alacritous Assault",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:eldritch-raiders:enhancement:alacritous-assault"
+        },
+        {
+          "enhancement_id": "exotic-munitions",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Exotic Munitions",
+          "points": 15,
+          "raw_name": "Exotic Munitions",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:eldritch-raiders:enhancement:exotic-munitions"
+        },
+        {
+          "enhancement_id": "pirate-prince",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pirate Prince",
+          "points": 15,
+          "raw_name": "Pirate Prince",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:eldritch-raiders:enhancement:pirate-prince"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "ELDRITCH RAIDERS",
+      "raw_name": "ELDRITCH RAIDERS",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:eldritch-raiders"
+    },
+    {
+      "detachment_id": "fateful-performance",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "a-foot-in-the-future",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "A Foot in the Future",
+          "points": 15,
+          "raw_name": "A Foot in the Future",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:fateful-performance:enhancement:a-foot-in-the-future"
+        },
+        {
+          "enhancement_id": "mistweave",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mistweave",
+          "points": 20,
+          "raw_name": "Mistweave",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:fateful-performance:enhancement:mistweave"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "FATEFUL PERFORMANCE",
+      "raw_name": "FATEFUL PERFORMANCE",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:fateful-performance"
+    },
+    {
+      "detachment_id": "ghosts-of-the-webway",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "cegorachs-coil",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cegorach's Coil",
+          "points": 25,
+          "raw_name": "Cegorach's Coil",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:ghosts-of-the-webway:enhancement:cegorachs-coil"
+        },
+        {
+          "enhancement_id": "mask-of-secrets",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mask of Secrets",
+          "points": 15,
+          "raw_name": "Mask of Secrets",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:ghosts-of-the-webway:enhancement:mask-of-secrets"
+        },
+        {
+          "enhancement_id": "mistweave",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mistweave",
+          "points": 15,
+          "raw_name": "Mistweave",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:ghosts-of-the-webway:enhancement:mistweave"
+        },
+        {
+          "enhancement_id": "murders-jest",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Murder's Jest",
+          "points": 20,
+          "raw_name": "Murder's Jest",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:ghosts-of-the-webway:enhancement:murders-jest"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "GHOSTS OF THE WEBWAY",
+      "raw_name": "GHOSTS OF THE WEBWAY",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:ghosts-of-the-webway"
+    },
+    {
+      "detachment_id": "guardian-battlehost",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "breath-of-vaul",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Breath of Vaul",
+          "points": 10,
+          "raw_name": "Breath of Vaul",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:guardian-battlehost:enhancement:breath-of-vaul"
+        },
+        {
+          "enhancement_id": "craftworlds-champion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Craftworld's Champion",
+          "points": 25,
+          "raw_name": "Craftworld's Champion",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:guardian-battlehost:enhancement:craftworlds-champion"
+        },
+        {
+          "enhancement_id": "ethereal-pathway",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ethereal Pathway",
+          "points": 30,
+          "raw_name": "Ethereal Pathway",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:guardian-battlehost:enhancement:ethereal-pathway"
+        },
+        {
+          "enhancement_id": "protector-of-the-paths",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Protector of the Paths",
+          "points": 20,
+          "raw_name": "Protector of the Paths",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:guardian-battlehost:enhancement:protector-of-the-paths"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "GUARDIAN BATTLEHOST",
+      "raw_name": "GUARDIAN BATTLEHOST",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:guardian-battlehost"
+    },
+    {
+      "detachment_id": "path-of-the-outcast",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "assassins-eye",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Assassins' Eye (Upgrade)",
+          "points": 15,
+          "raw_name": "Assassins' Eye (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:path-of-the-outcast:enhancement:assassins-eye"
+        },
+        {
+          "enhancement_id": "camouflaged-snipers",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Camouflaged Snipers (Upgrade)",
+          "points": 10,
+          "raw_name": "Camouflaged Snipers (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:path-of-the-outcast:enhancement:camouflaged-snipers"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "PATH OF THE OUTCAST",
+      "raw_name": "PATH OF THE OUTCAST",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:path-of-the-outcast"
+    },
+    {
+      "detachment_id": "seer-council",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "lucid-eye",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Lucid Eye",
+          "points": 30,
+          "raw_name": "Lucid Eye",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:seer-council:enhancement:lucid-eye"
+        },
+        {
+          "enhancement_id": "runes-of-warding",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Runes of Warding",
+          "points": 25,
+          "raw_name": "Runes of Warding",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:seer-council:enhancement:runes-of-warding"
+        },
+        {
+          "enhancement_id": "stone-of-eldritch-fury",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Stone of Eldritch Fury",
+          "points": 15,
+          "raw_name": "Stone of Eldritch Fury",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:seer-council:enhancement:stone-of-eldritch-fury"
+        },
+        {
+          "enhancement_id": "torc-of-morai-heg",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Torc of Morai-Heg",
+          "points": 20,
+          "raw_name": "Torc of Morai-Heg",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:seer-council:enhancement:torc-of-morai-heg"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "SEER COUNCIL",
+      "raw_name": "SEER COUNCIL",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:seer-council"
+    },
+    {
+      "detachment_id": "serpents-brood",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "fanged-leer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fanged Leer",
+          "points": 10,
+          "raw_name": "Fanged Leer",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:serpents-brood:enhancement:fanged-leer"
+        },
+        {
+          "enhancement_id": "key-of-ghosts",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Key of Ghosts",
+          "points": 20,
+          "raw_name": "Key of Ghosts",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:serpents-brood:enhancement:key-of-ghosts"
+        },
+        {
+          "enhancement_id": "shedskin-raiment",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Shedskin Raiment",
+          "points": 25,
+          "raw_name": "Shedskin Raiment",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:serpents-brood:enhancement:shedskin-raiment"
+        },
+        {
+          "enhancement_id": "weavers-wail",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Weavers' Wail",
+          "points": 20,
+          "raw_name": "Weavers' Wail",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:serpents-brood:enhancement:weavers-wail"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "SERPENT'S BROOD",
+      "raw_name": "SERPENT'S BROOD",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:serpents-brood"
+    },
+    {
+      "detachment_id": "spirit-conclave",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "higher-duty",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Higher Duty",
+          "points": 25,
+          "raw_name": "Higher Duty",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:spirit-conclave:enhancement:higher-duty"
+        },
+        {
+          "enhancement_id": "light-of-clarity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Light of Clarity",
+          "points": 30,
+          "raw_name": "Light of Clarity",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:spirit-conclave:enhancement:light-of-clarity"
+        },
+        {
+          "enhancement_id": "rune-of-mists",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Rune of Mists",
+          "points": 10,
+          "raw_name": "Rune of Mists",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:spirit-conclave:enhancement:rune-of-mists"
+        },
+        {
+          "enhancement_id": "stave-of-kurnous",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Stave of Kurnous",
+          "points": 15,
+          "raw_name": "Stave of Kurnous",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:spirit-conclave:enhancement:stave-of-kurnous"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "SPIRIT CONCLAVE",
+      "raw_name": "SPIRIT CONCLAVE",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:spirit-conclave"
+    },
+    {
+      "detachment_id": "twilight-flickers",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "prelude-performer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Prelude Performer",
+          "points": 20,
+          "raw_name": "Prelude Performer",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:twilight-flickers:enhancement:prelude-performer"
+        },
+        {
+          "enhancement_id": "shadowfall-masks",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Shadowfall Masks (Upgrade)",
+          "points": 15,
+          "raw_name": "Shadowfall Masks (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:twilight-flickers:enhancement:shadowfall-masks"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "TWILIGHT FLICKERS",
+      "raw_name": "TWILIGHT FLICKERS",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:twilight-flickers"
+    },
+    {
+      "detachment_id": "warhost",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "gift-of-foresight",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gift of Foresight",
+          "points": 15,
+          "raw_name": "Gift of Foresight",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:warhost:enhancement:gift-of-foresight"
+        },
+        {
+          "enhancement_id": "phoenix-gem",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Phoenix Gem",
+          "points": 35,
+          "raw_name": "Phoenix Gem",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:warhost:enhancement:phoenix-gem"
+        },
+        {
+          "enhancement_id": "psychic-destroyer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Psychic Destroyer",
+          "points": 30,
+          "raw_name": "Psychic Destroyer",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:warhost:enhancement:psychic-destroyer"
+        },
+        {
+          "enhancement_id": "timeless-strategist",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Timeless Strategist",
+          "points": 15,
+          "raw_name": "Timeless Strategist",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:warhost:enhancement:timeless-strategist"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "WARHOST",
+      "raw_name": "WARHOST",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:warhost"
+    },
+    {
+      "detachment_id": "windrider-host",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "echoes-of-ulthanesh",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Echoes of Ulthanesh",
+          "points": 20,
+          "raw_name": "Echoes of Ulthanesh",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:windrider-host:enhancement:echoes-of-ulthanesh"
+        },
+        {
+          "enhancement_id": "firstdrawn-blade",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Firstdrawn Blade",
+          "points": 10,
+          "raw_name": "Firstdrawn Blade",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:windrider-host:enhancement:firstdrawn-blade"
+        },
+        {
+          "enhancement_id": "mirage-field",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mirage Field",
+          "points": 25,
+          "raw_name": "Mirage Field",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:windrider-host:enhancement:mirage-field"
+        },
+        {
+          "enhancement_id": "seersight-strike",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Seersight Strike",
+          "points": 15,
+          "raw_name": "Seersight Strike",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:windrider-host:enhancement:seersight-strike"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "WINDRIDER HOST",
+      "raw_name": "WINDRIDER HOST",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:windrider-host"
+    }
+  ],
+  "faction_id": "aeldari",
+  "name": "Aeldari",
+  "raw_name": "Aeldari",
+  "source_id": "gw-11e-mfm-2026-07:faction:aeldari",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-death-jester:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-death-jester:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEATH JESTER",
+      "raw_name": "DEATH JESTER",
+      "record_id": "harlequins-death-jester",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-death-jester",
+      "source_section_id": "harlequins",
+      "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
+      "unit_id": "death-jester",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-shadowseer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-shadowseer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "TROUPE"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "troupe"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-shadowseer:leader"
+      },
+      "name": "SHADOWSEER",
+      "raw_name": "SHADOWSEER",
+      "record_id": "harlequins-shadowseer",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-shadowseer",
+      "source_section_id": "harlequins",
+      "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
+      "unit_id": "shadowseer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-skyweavers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-skyweavers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-skyweavers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKYWEAVERS",
+      "raw_name": "SKYWEAVERS",
+      "record_id": "harlequins-skyweavers",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-skyweavers",
+      "source_section_id": "harlequins",
+      "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
+      "unit_id": "skyweavers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-solitaire:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-solitaire:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SOLITAIRE",
+      "raw_name": "SOLITAIRE",
+      "record_id": "harlequins-solitaire",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-solitaire",
+      "source_section_id": "harlequins",
+      "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
+      "unit_id": "solitaire",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-starweaver:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-starweaver:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-starweaver:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-starweaver:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STARWEAVER",
+      "raw_name": "STARWEAVER",
+      "record_id": "harlequins-starweaver",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:harlequins-starweaver",
+      "source_section_id": "harlequins",
+      "source_section_name": "HARLEQUINS",
+      "support_allowance": null,
+      "unit_id": "starweaver",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-asurmen:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-asurmen:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "DIRE AVENGERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "dire-avengers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-asurmen:leader"
+      },
+      "name": "ASURMEN",
+      "raw_name": "ASURMEN",
+      "record_id": "units-asurmen",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-asurmen",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "asurmen",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-autarch:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-autarch:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "DARK REAPERS",
+          "DIRE AVENGERS",
+          "FIRE DRAGONS",
+          "GUARDIAN DEFENDERS",
+          "HOWLING BANSHEES",
+          "STORM GUARDIANS",
+          "STRIKING SCORPIONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "dark-reapers",
+          "dire-avengers",
+          "fire-dragons",
+          "guardian-defenders",
+          "howling-banshees",
+          "storm-guardians",
+          "striking-scorpions"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-autarch:leader"
+      },
+      "name": "AUTARCH",
+      "raw_name": "AUTARCH",
+      "record_id": "units-autarch",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-autarch",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "autarch",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-autarch-wayleaper:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-autarch-wayleaper:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "SWOOPING HAWKS",
+          "WARP SPIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "swooping-hawks",
+          "warp-spiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-autarch-wayleaper:leader"
+      },
+      "name": "AUTARCH WAYLEAPER",
+      "raw_name": "AUTARCH WAYLEAPER",
+      "record_id": "units-autarch-wayleaper",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-autarch-wayleaper",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "autarch-wayleaper",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-avatar-of-khaine:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-avatar-of-khaine:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "AVATAR OF KHAINE",
+      "raw_name": "AVATAR OF KHAINE",
+      "record_id": "units-avatar-of-khaine",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-avatar-of-khaine",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "avatar-of-khaine",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-skyreavers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-skyreavers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-skyreavers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CORSAIR SKYREAVERS",
+      "raw_name": "CORSAIR SKYREAVERS",
+      "record_id": "units-corsair-skyreavers",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-skyreavers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "corsair-skyreavers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-voidreavers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-voidreavers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-voidreavers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CORSAIR VOIDREAVERS",
+      "raw_name": "CORSAIR VOIDREAVERS",
+      "record_id": "units-corsair-voidreavers",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-voidreavers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "corsair-voidreavers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-voidscarred:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-voidscarred:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-voidscarred:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CORSAIR VOIDSCARRED",
+      "raw_name": "CORSAIR VOIDSCARRED",
+      "record_id": "units-corsair-voidscarred",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-corsair-voidscarred",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "corsair-voidscarred",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-crimson-hunter:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-crimson-hunter:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CRIMSON HUNTER",
+      "raw_name": "CRIMSON HUNTER",
+      "record_id": "units-crimson-hunter",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-crimson-hunter",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "crimson-hunter",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-d-cannon-platform:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-d-cannon-platform:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-d-cannon-platform:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-d-cannon-platform:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "D-CANNON PLATFORM",
+      "raw_name": "D-CANNON PLATFORM",
+      "record_id": "units-d-cannon-platform",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-d-cannon-platform",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "d-cannon-platform",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-dark-reapers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-dark-reapers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-dark-reapers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DARK REAPERS",
+      "raw_name": "DARK REAPERS",
+      "record_id": "units-dark-reapers",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-dark-reapers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "dark-reapers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-dire-avengers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-dire-avengers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-dire-avengers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DIRE AVENGERS",
+      "raw_name": "DIRE AVENGERS",
+      "record_id": "units-dire-avengers",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-dire-avengers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "dire-avengers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-eldrad-ulthran:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-eldrad-ulthran:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "GUARDIAN DEFENDERS",
+          "STORM GUARDIANS",
+          "WARLOCK CONCLAVE"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "guardian-defenders",
+          "storm-guardians",
+          "warlock-conclave"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-eldrad-ulthran:leader"
+      },
+      "name": "ELDRAD ULTHRAN",
+      "raw_name": "ELDRAD ULTHRAN",
+      "record_id": "units-eldrad-ulthran",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-eldrad-ulthran",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "eldrad-ulthran",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-falcon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-falcon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FALCON",
+      "raw_name": "FALCON",
+      "record_id": "units-falcon",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-falcon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "falcon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-farseer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-farseer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "GUARDIAN DEFENDERS",
+          "STORM GUARDIANS",
+          "WARLOCK CONCLAVE"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "guardian-defenders",
+          "storm-guardians",
+          "warlock-conclave"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-farseer:leader"
+      },
+      "name": "FARSEER",
+      "raw_name": "FARSEER",
+      "record_id": "units-farseer",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-farseer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "farseer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-farseer-skyrunner:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-farseer-skyrunner:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "WARLOCK SKYRUNNERS",
+          "WINDRIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "warlock-skyrunners",
+          "windriders"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-farseer-skyrunner:leader"
+      },
+      "name": "FARSEER SKYRUNNER",
+      "raw_name": "FARSEER SKYRUNNER",
+      "record_id": "units-farseer-skyrunner",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-farseer-skyrunner",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "farseer-skyrunner",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-dragons:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-dragons:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-dragons:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-dragons:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-dragons:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-dragons:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FIRE DRAGONS",
+      "raw_name": "FIRE DRAGONS",
+      "record_id": "units-fire-dragons",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-dragons",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "fire-dragons",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-prism:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-prism:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FIRE PRISM",
+      "raw_name": "FIRE PRISM",
+      "record_id": "units-fire-prism",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fire-prism",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "fire-prism",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fuegan:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fuegan:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "FIRE DRAGONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "fire-dragons"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fuegan:leader"
+      },
+      "name": "FUEGAN",
+      "raw_name": "FUEGAN",
+      "record_id": "units-fuegan",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-fuegan",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "fuegan",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-guardian-defenders:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-guardian-defenders:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GUARDIAN DEFENDERS",
+      "raw_name": "GUARDIAN DEFENDERS",
+      "record_id": "units-guardian-defenders",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-guardian-defenders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "guardian-defenders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-hemlock-wraithfighter:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-hemlock-wraithfighter:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HEMLOCK WRAITHFIGHTER",
+      "raw_name": "HEMLOCK WRAITHFIGHTER",
+      "record_id": "units-hemlock-wraithfighter",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-hemlock-wraithfighter",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "hemlock-wraithfighter",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-howling-banshees:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-howling-banshees:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-howling-banshees:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HOWLING BANSHEES",
+      "raw_name": "HOWLING BANSHEES",
+      "record_id": "units-howling-banshees",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-howling-banshees",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "howling-banshees",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-jain-zar:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-jain-zar:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "HOWLING BANSHEES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "howling-banshees"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-jain-zar:leader"
+      },
+      "name": "JAIN ZAR",
+      "raw_name": "JAIN ZAR",
+      "record_id": "units-jain-zar",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-jain-zar",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "jain-zar",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-kharseth:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-kharseth:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CORSAIR VOIDREAVERS",
+          "CORSAIR VOIDSCARRED"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "corsair-voidreavers",
+          "corsair-voidscarred"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-kharseth:leader"
+      },
+      "name": "KHARSETH",
+      "raw_name": "KHARSETH",
+      "record_id": "units-kharseth",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-kharseth",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "kharseth",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-lhykhis:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-lhykhis:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "WARP SPIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "warp-spiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-lhykhis:leader"
+      },
+      "name": "LHYKHIS",
+      "raw_name": "LHYKHIS",
+      "record_id": "units-lhykhis",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-lhykhis",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "lhykhis",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-maugan-ra:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-maugan-ra:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "DARK REAPERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "dark-reapers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-maugan-ra:leader"
+      },
+      "name": "MAUGAN RA",
+      "raw_name": "MAUGAN RA",
+      "record_id": "units-maugan-ra",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-maugan-ra",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "maugan-ra",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-night-spinner:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-night-spinner:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-night-spinner:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-night-spinner:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NIGHT SPINNER",
+      "raw_name": "NIGHT SPINNER",
+      "record_id": "units-night-spinner",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-night-spinner",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "night-spinner",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 2100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-phantom-titan:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-phantom-titan:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PHANTOM TITAN",
+      "raw_name": "PHANTOM TITAN",
+      "record_id": "units-phantom-titan",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-phantom-titan",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "phantom-titan",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-prince-yriel:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-prince-yriel:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CORSAIR VOIDREAVERS",
+          "CORSAIR VOIDSCARRED"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "corsair-voidreavers",
+          "corsair-voidscarred"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-prince-yriel:leader"
+      },
+      "name": "PRINCE YRIEL",
+      "raw_name": "PRINCE YRIEL",
+      "record_id": "units-prince-yriel",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-prince-yriel",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "prince-yriel",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-rangers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-rangers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-rangers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RANGERS",
+      "raw_name": "RANGERS",
+      "record_id": "units-rangers",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-rangers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "rangers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 1100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-revenant-titan:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-revenant-titan:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "REVENANT TITAN",
+      "raw_name": "REVENANT TITAN",
+      "record_id": "units-revenant-titan",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-revenant-titan",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "revenant-titan",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shadow-weaver-platform:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shadow-weaver-platform:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SHADOW WEAVER PLATFORM",
+      "raw_name": "SHADOW WEAVER PLATFORM",
+      "record_id": "units-shadow-weaver-platform",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shadow-weaver-platform",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "shadow-weaver-platform",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shining-spears:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shining-spears:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shining-spears:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SHINING SPEARS",
+      "raw_name": "SHINING SPEARS",
+      "record_id": "units-shining-spears",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shining-spears",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "shining-spears",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shroud-runners:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shroud-runners:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shroud-runners:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SHROUD RUNNERS",
+      "raw_name": "SHROUD RUNNERS",
+      "record_id": "units-shroud-runners",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-shroud-runners",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "shroud-runners",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-spiritseer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-spiritseer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SPIRITSEER",
+      "raw_name": "SPIRITSEER",
+      "record_id": "units-spiritseer",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-spiritseer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "spiritseer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-starfangs:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-starfangs:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-starfangs:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STARFANGS",
+      "raw_name": "STARFANGS",
+      "record_id": "units-starfangs",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-starfangs",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "starfangs",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-storm-guardians:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-storm-guardians:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STORM GUARDIANS",
+      "raw_name": "STORM GUARDIANS",
+      "record_id": "units-storm-guardians",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-storm-guardians",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "storm-guardians",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-striking-scorpions:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-striking-scorpions:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-striking-scorpions:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STRIKING SCORPIONS",
+      "raw_name": "STRIKING SCORPIONS",
+      "record_id": "units-striking-scorpions",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-striking-scorpions",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "striking-scorpions",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-swooping-hawks:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-swooping-hawks:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-swooping-hawks:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-swooping-hawks:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 205,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-swooping-hawks:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-swooping-hawks:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SWOOPING HAWKS",
+      "raw_name": "SWOOPING HAWKS",
+      "record_id": "units-swooping-hawks",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-swooping-hawks",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "swooping-hawks",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-vibro-cannon-platform:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-vibro-cannon-platform:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VIBRO CANNON PLATFORM",
+      "raw_name": "VIBRO CANNON PLATFORM",
+      "record_id": "units-vibro-cannon-platform",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-vibro-cannon-platform",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "vibro-cannon-platform",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-vyper:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-vyper:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-vyper:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VYPER",
+      "raw_name": "VYPER",
+      "record_id": "units-vyper",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-vyper",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "vyper",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-war-walkers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-war-walkers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-war-walkers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAR WALKERS",
+      "raw_name": "WAR WALKERS",
+      "record_id": "units-war-walkers",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-war-walkers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "war-walkers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WARLOCK",
+      "raw_name": "WARLOCK",
+      "record_id": "units-warlock",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": {
+        "allowed_bodyguard_names": [
+          "GUARDIAN DEFENDERS",
+          "STORM GUARDIANS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "guardian-defenders",
+          "storm-guardians"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock:support"
+      },
+      "unit_id": "warlock",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-conclave:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-conclave:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-conclave:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "GUARDIAN DEFENDERS",
+          "STORM GUARDIANS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "guardian-defenders",
+          "storm-guardians"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-conclave:leader"
+      },
+      "name": "WARLOCK CONCLAVE",
+      "raw_name": "WARLOCK CONCLAVE",
+      "record_id": "units-warlock-conclave",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-conclave",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "warlock-conclave",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-skyrunners:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-skyrunners:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-skyrunners:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "WINDRIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "windriders"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-skyrunners:leader"
+      },
+      "name": "WARLOCK SKYRUNNERS",
+      "raw_name": "WARLOCK SKYRUNNERS",
+      "record_id": "units-warlock-skyrunners",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warlock-skyrunners",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "warlock-skyrunners",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warp-spiders:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warp-spiders:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warp-spiders:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warp-spiders:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warp-spiders:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warp-spiders:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WARP SPIDERS",
+      "raw_name": "WARP SPIDERS",
+      "record_id": "units-warp-spiders",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-warp-spiders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "warp-spiders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wave-serpent:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wave-serpent:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wave-serpent:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wave-serpent:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WAVE SERPENT",
+      "raw_name": "WAVE SERPENT",
+      "record_id": "units-wave-serpent",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wave-serpent",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wave-serpent",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-windriders:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-windriders:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-windriders:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WINDRIDERS",
+      "raw_name": "WINDRIDERS",
+      "record_id": "units-windriders",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-windriders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "windriders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithblades:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithblades:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WRAITHBLADES",
+      "raw_name": "WRAITHBLADES",
+      "record_id": "units-wraithblades",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithblades",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wraithblades",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithguard:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithguard:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WRAITHGUARD",
+      "raw_name": "WRAITHGUARD",
+      "record_id": "units-wraithguard",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithguard",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wraithguard",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 385,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 405,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WRAITHKNIGHT",
+      "raw_name": "WRAITHKNIGHT",
+      "record_id": "units-wraithknight",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wraithknight",
+      "wargear_costs": [
+        {
+          "name": "Heavy wraithcannon",
+          "points_per_item": 10,
+          "raw_name": "per Heavy wraithcannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight:wargear:per-heavy-wraithcannon:1",
+          "wargear_id": "heavy-wraithcannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 380,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight-with-ghostglaive:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight-with-ghostglaive:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 400,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight-with-ghostglaive:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight-with-ghostglaive:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WRAITHKNIGHT WITH GHOSTGLAIVE",
+      "raw_name": "WRAITHKNIGHT WITH GHOSTGLAIVE",
+      "record_id": "units-wraithknight-with-ghostglaive",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithknight-with-ghostglaive",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wraithknight-with-ghostglaive",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithlord:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithlord:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WRAITHLORD",
+      "raw_name": "WRAITHLORD",
+      "record_id": "units-wraithlord",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:units-wraithlord",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "wraithlord",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-the-visarch:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-the-visarch:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CORSAIR VOIDREAVERS",
+          "CORSAIR VOIDSCARRED",
+          "GUARDIAN DEFENDERS",
+          "STORM GUARDIANS",
+          "YNNARI INCUBI",
+          "YNNARI KABALITE WARRIORS",
+          "YNNARI WYCHES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "corsair-voidreavers",
+          "corsair-voidscarred",
+          "guardian-defenders",
+          "storm-guardians",
+          "ynnari-incubi",
+          "ynnari-kabalite-warriors",
+          "ynnari-wyches"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-the-visarch:leader"
+      },
+      "name": "THE VISARCH",
+      "raw_name": "THE VISARCH",
+      "record_id": "ynnari-the-visarch",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-the-visarch",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "the-visarch",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 245,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-the-yncarne:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-the-yncarne:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "THE YNCARNE",
+      "raw_name": "THE YNCARNE",
+      "record_id": "ynnari-the-yncarne",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-the-yncarne",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "the-yncarne",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe:cost:your-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "12 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 12,
+              "model_id": null,
+              "model_name": null,
+              "points": 205,
+              "raw_label": "12 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe:cost:your-unit-costs:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TROUPE",
+      "raw_name": "TROUPE",
+      "record_id": "ynnari-troupe",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "troupe",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe-master:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe-master:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "TROUPE"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "troupe"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe-master:leader"
+      },
+      "name": "TROUPE MASTER",
+      "raw_name": "TROUPE MASTER",
+      "record_id": "ynnari-troupe-master",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-troupe-master",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "troupe-master",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-voidweaver:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-voidweaver:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VOIDWEAVER",
+      "raw_name": "VOIDWEAVER",
+      "record_id": "ynnari-voidweaver",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-voidweaver",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "voidweaver",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-archon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-archon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "YNNARI INCUBI",
+          "YNNARI KABALITE WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "ynnari-incubi",
+          "ynnari-kabalite-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-archon:leader"
+      },
+      "name": "YNNARI ARCHON",
+      "raw_name": "YNNARI ARCHON",
+      "record_id": "ynnari-ynnari-archon",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-archon",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "ynnari-archon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-incubi:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-incubi:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-incubi:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-incubi:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-incubi:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-incubi:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "YNNARI INCUBI",
+      "raw_name": "YNNARI INCUBI",
+      "record_id": "ynnari-ynnari-incubi",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-incubi",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "ynnari-incubi",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-kabalite-warriors:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-kabalite-warriors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "YNNARI KABALITE WARRIORS",
+      "raw_name": "YNNARI KABALITE WARRIORS",
+      "record_id": "ynnari-ynnari-kabalite-warriors",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-kabalite-warriors",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "ynnari-kabalite-warriors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-raider:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-raider:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-raider:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-raider:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "YNNARI RAIDER",
+      "raw_name": "YNNARI RAIDER",
+      "record_id": "ynnari-ynnari-raider",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-raider",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "ynnari-raider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-reavers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-reavers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-reavers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "YNNARI REAVERS",
+      "raw_name": "YNNARI REAVERS",
+      "record_id": "ynnari-ynnari-reavers",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-reavers",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "ynnari-reavers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-succubus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-succubus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "YNNARI WYCHES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "ynnari-wyches"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-succubus:leader"
+      },
+      "name": "YNNARI SUCCUBUS",
+      "raw_name": "YNNARI SUCCUBUS",
+      "record_id": "ynnari-ynnari-succubus",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-succubus",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "ynnari-succubus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-venom:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-venom:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-venom:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-venom:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "YNNARI VENOM",
+      "raw_name": "YNNARI VENOM",
+      "record_id": "ynnari-ynnari-venom",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-venom",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "ynnari-venom",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-wyches:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-wyches:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "YNNARI WYCHES",
+      "raw_name": "YNNARI WYCHES",
+      "record_id": "ynnari-ynnari-wyches",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-ynnari-wyches",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "ynnari-wyches",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-yvraine:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-yvraine:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CORSAIR VOIDREAVERS",
+          "CORSAIR VOIDSCARRED",
+          "GUARDIAN DEFENDERS",
+          "STORM GUARDIANS",
+          "YNNARI INCUBI",
+          "YNNARI KABALITE WARRIORS",
+          "YNNARI WYCHES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "corsair-voidreavers",
+          "corsair-voidscarred",
+          "guardian-defenders",
+          "storm-guardians",
+          "ynnari-incubi",
+          "ynnari-kabalite-warriors",
+          "ynnari-wyches"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-yvraine:leader"
+      },
+      "name": "YVRAINE",
+      "raw_name": "YVRAINE",
+      "record_id": "ynnari-yvraine",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:unit:ynnari-yvraine",
+      "source_section_id": "ynnari",
+      "source_section_name": "YNNARI",
+      "support_allowance": null,
+      "unit_id": "yvraine",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/aeldari"
+}

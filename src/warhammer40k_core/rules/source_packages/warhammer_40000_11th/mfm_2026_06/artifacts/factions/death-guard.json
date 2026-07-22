@@ -415,6 +415,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-beasts-of-nurgle",
       "source_section_id": "plague-legions",
       "source_section_name": "PLAGUE LEGIONS",
+      "support_allowance": null,
       "unit_id": "beasts-of-nurgle",
       "wargear_costs": []
     },
@@ -476,6 +477,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-great-unclean-one",
       "source_section_id": "plague-legions",
       "source_section_name": "PLAGUE LEGIONS",
+      "support_allowance": null,
       "unit_id": "great-unclean-one",
       "wargear_costs": []
     },
@@ -528,6 +530,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-nurglings",
       "source_section_id": "plague-legions",
       "source_section_name": "PLAGUE LEGIONS",
+      "support_allowance": null,
       "unit_id": "nurglings",
       "wargear_costs": []
     },
@@ -565,6 +568,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-plaguebearers",
       "source_section_id": "plague-legions",
       "source_section_name": "PLAGUE LEGIONS",
+      "support_allowance": null,
       "unit_id": "plaguebearers",
       "wargear_costs": []
     },
@@ -602,6 +606,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-rotigus",
       "source_section_id": "plague-legions",
       "source_section_name": "PLAGUE LEGIONS",
+      "support_allowance": null,
       "unit_id": "rotigus",
       "wargear_costs": []
     },
@@ -647,6 +652,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-biologus-putrifier",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "biologus-putrifier",
       "wargear_costs": []
     },
@@ -714,6 +720,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-blightlord-terminators",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "blightlord-terminators",
       "wargear_costs": []
     },
@@ -775,6 +782,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-land-raider",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-land-raider",
       "wargear_costs": []
     },
@@ -812,6 +820,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-annihilator",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-predator-annihilator",
       "wargear_costs": []
     },
@@ -873,6 +882,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-destructor",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-predator-destructor",
       "wargear_costs": []
     },
@@ -910,6 +920,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-rhino",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-rhino",
       "wargear_costs": []
     },
@@ -947,6 +958,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-spawn",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "chaos-spawn",
       "wargear_costs": []
     },
@@ -984,6 +996,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-daemon-prince-of-nurgle",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "daemon-prince-of-nurgle",
       "wargear_costs": []
     },
@@ -1021,6 +1034,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-daemon-prince-of-nurgle-with-wings",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "daemon-prince-of-nurgle-with-wings",
       "wargear_costs": []
     },
@@ -1112,6 +1126,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-deathshroud-terminators",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "deathshroud-terminators",
       "wargear_costs": []
     },
@@ -1173,6 +1188,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-defiler",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "defiler",
       "wargear_costs": [
         {
@@ -1249,6 +1265,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "foetid-bloat-drone",
       "wargear_costs": []
     },
@@ -1310,6 +1327,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone-with-heavy-blight-launcher",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "foetid-bloat-drone-with-heavy-blight-launcher",
       "wargear_costs": []
     },
@@ -1355,6 +1373,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foul-blightspawn",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "foul-blightspawn",
       "wargear_costs": []
     },
@@ -1392,6 +1411,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-helbrute",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "helbrute",
       "wargear_costs": []
     },
@@ -1437,6 +1457,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-icon-bearer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "icon-bearer",
       "wargear_costs": []
     },
@@ -1484,6 +1505,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-contagion",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-of-contagion",
       "wargear_costs": []
     },
@@ -1529,6 +1551,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-poxes",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-of-poxes",
       "wargear_costs": []
     },
@@ -1576,6 +1599,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-virulence",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lord-of-virulence",
       "wargear_costs": []
     },
@@ -1623,6 +1647,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-malignant-plaguecaster",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "malignant-plaguecaster",
       "wargear_costs": []
     },
@@ -1660,6 +1685,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-miasmic-malignifier",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "miasmic-malignifier",
       "wargear_costs": []
     },
@@ -1697,6 +1723,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-mortarion",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "mortarion",
       "wargear_costs": []
     },
@@ -1749,6 +1776,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-myphitic-blight-haulers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "myphitic-blight-haulers",
       "wargear_costs": []
     },
@@ -1796,6 +1824,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-noxious-blightbringer",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "noxious-blightbringer",
       "wargear_costs": []
     },
@@ -1863,6 +1892,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-marines",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "plague-marines",
       "wargear_costs": []
     },
@@ -1908,6 +1938,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-surgeon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "plague-surgeon",
       "wargear_costs": []
     },
@@ -1969,6 +2000,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plagueburst-crawler",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "plagueburst-crawler",
       "wargear_costs": []
     },
@@ -2021,6 +2053,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-poxwalkers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "poxwalkers",
       "wargear_costs": []
     },
@@ -2066,6 +2099,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-tallyman",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "tallyman",
       "wargear_costs": []
     },
@@ -2115,6 +2149,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-typhus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "typhus",
       "wargear_costs": []
     }

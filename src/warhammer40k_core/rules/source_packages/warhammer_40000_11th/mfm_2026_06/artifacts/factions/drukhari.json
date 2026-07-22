@@ -412,6 +412,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-archon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "archon",
       "wargear_costs": []
     },
@@ -464,6 +465,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-cronos",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "cronos",
       "wargear_costs": []
     },
@@ -509,6 +511,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-drazhar",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "drazhar",
       "wargear_costs": []
     },
@@ -546,6 +549,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-haemonculus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "haemonculus",
       "wargear_costs": []
     },
@@ -583,6 +587,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hand-of-the-archon",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hand-of-the-archon",
       "wargear_costs": []
     },
@@ -674,6 +679,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hellions",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "hellions",
       "wargear_costs": []
     },
@@ -765,6 +771,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-incubi",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "incubi",
       "wargear_costs": []
     },
@@ -802,6 +809,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-kabalite-warriors",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "kabalite-warriors",
       "wargear_costs": []
     },
@@ -851,6 +859,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lady-malys",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lady-malys",
       "wargear_costs": []
     },
@@ -896,6 +905,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lelith-hesperax",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "lelith-hesperax",
       "wargear_costs": []
     },
@@ -987,6 +997,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-mandrakes",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "mandrakes",
       "wargear_costs": []
     },
@@ -1024,6 +1035,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-raider",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "raider",
       "wargear_costs": []
     },
@@ -1085,6 +1097,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-ravager",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "ravager",
       "wargear_costs": [
         {
@@ -1130,6 +1143,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-razorwing-jetfighter",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "razorwing-jetfighter",
       "wargear_costs": []
     },
@@ -1221,6 +1235,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-reavers",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "reavers",
       "wargear_costs": []
     },
@@ -1282,6 +1297,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-heavy-weapons",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "scourges-with-heavy-weapons",
       "wargear_costs": [
         {
@@ -1358,6 +1374,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-shardcarbines",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "scourges-with-shardcarbines",
       "wargear_costs": []
     },
@@ -1403,6 +1420,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-succubus",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "succubus",
       "wargear_costs": []
     },
@@ -1494,6 +1512,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-talos",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "talos",
       "wargear_costs": [
         {
@@ -1539,6 +1558,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-venom",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "venom",
       "wargear_costs": []
     },
@@ -1576,6 +1596,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-voidraven-bomber",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "voidraven-bomber",
       "wargear_costs": []
     },
@@ -1643,6 +1664,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wracks",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wracks",
       "wargear_costs": []
     },
@@ -1680,6 +1702,7 @@
       "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wyches",
       "source_section_id": "units",
       "source_section_name": "UNITS",
+      "support_allowance": null,
       "unit_id": "wyches",
       "wargear_costs": []
     }

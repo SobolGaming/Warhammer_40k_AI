@@ -1,0 +1,2287 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "auric-champions",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "blade-imperator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blade Imperator",
+          "points": 25,
+          "raw_name": "Blade Imperator",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:auric-champions:enhancement:blade-imperator"
+        },
+        {
+          "enhancement_id": "inspirational-exemplar",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Inspirational Exemplar",
+          "points": 10,
+          "raw_name": "Inspirational Exemplar",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:auric-champions:enhancement:inspirational-exemplar"
+        },
+        {
+          "enhancement_id": "martial-philosopher",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Martial Philosopher",
+          "points": 30,
+          "raw_name": "Martial Philosopher",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:auric-champions:enhancement:martial-philosopher"
+        },
+        {
+          "enhancement_id": "veiled-blade",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Veiled Blade",
+          "points": 25,
+          "raw_name": "Veiled Blade",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:auric-champions:enhancement:veiled-blade"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "AURIC CHAMPIONS",
+      "raw_name": "AURIC CHAMPIONS",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:auric-champions"
+    },
+    {
+      "detachment_id": "lions-of-the-emperor",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "admonimortis",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Admonimortis",
+          "points": 30,
+          "raw_name": "Admonimortis",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:lions-of-the-emperor:enhancement:admonimortis"
+        },
+        {
+          "enhancement_id": "fierce-conqueror",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fierce Conqueror",
+          "points": 15,
+          "raw_name": "Fierce Conqueror",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:lions-of-the-emperor:enhancement:fierce-conqueror"
+        },
+        {
+          "enhancement_id": "praesidius",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Praesidius",
+          "points": 25,
+          "raw_name": "Praesidius",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:lions-of-the-emperor:enhancement:praesidius"
+        },
+        {
+          "enhancement_id": "superior-creation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Superior Creation",
+          "points": 25,
+          "raw_name": "Superior Creation",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:lions-of-the-emperor:enhancement:superior-creation"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "LIONS OF THE EMPEROR",
+      "raw_name": "LIONS OF THE EMPEROR",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:lions-of-the-emperor"
+    },
+    {
+      "detachment_id": "might-of-the-moritoi",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "auramite-sarcophagus",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Auramite Sarcophagus (Upgrade)",
+          "points": 15,
+          "raw_name": "Auramite Sarcophagus (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:might-of-the-moritoi:enhancement:auramite-sarcophagus"
+        },
+        {
+          "enhancement_id": "interred-expertise",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Interred Expertise (Upgrade)",
+          "points": 25,
+          "raw_name": "Interred Expertise (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:might-of-the-moritoi:enhancement:interred-expertise"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "MIGHT OF THE MORITOI",
+      "raw_name": "MIGHT OF THE MORITOI",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:might-of-the-moritoi"
+    },
+    {
+      "detachment_id": "null-maiden-vigil",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "enhanced-voidsheen-cloak",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Enhanced Voidsheen Cloak",
+          "points": 10,
+          "raw_name": "Enhanced Voidsheen Cloak",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:null-maiden-vigil:enhancement:enhanced-voidsheen-cloak"
+        },
+        {
+          "enhancement_id": "huntress-eye",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Huntress' Eye",
+          "points": 15,
+          "raw_name": "Huntress' Eye",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:null-maiden-vigil:enhancement:huntress-eye"
+        },
+        {
+          "enhancement_id": "oblivion-knight",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Oblivion Knight",
+          "points": 25,
+          "raw_name": "Oblivion Knight",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:null-maiden-vigil:enhancement:oblivion-knight"
+        },
+        {
+          "enhancement_id": "raptor-blade",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Raptor Blade",
+          "points": 5,
+          "raw_name": "Raptor Blade",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:null-maiden-vigil:enhancement:raptor-blade"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "NULL MAIDEN VIGIL",
+      "raw_name": "NULL MAIDEN VIGIL",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:null-maiden-vigil"
+    },
+    {
+      "detachment_id": "shield-host",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "auric-mantle",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Auric Mantle",
+          "points": 15,
+          "raw_name": "Auric Mantle",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:shield-host:enhancement:auric-mantle"
+        },
+        {
+          "enhancement_id": "castellans-mark",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Castellan's Mark",
+          "points": 20,
+          "raw_name": "Castellan's Mark",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:shield-host:enhancement:castellans-mark"
+        },
+        {
+          "enhancement_id": "from-the-hall-of-armouries",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "From the Hall of Armouries",
+          "points": 20,
+          "raw_name": "From the Hall of Armouries",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:shield-host:enhancement:from-the-hall-of-armouries"
+        },
+        {
+          "enhancement_id": "panoptispex",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Panoptispex",
+          "points": 5,
+          "raw_name": "Panoptispex",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:shield-host:enhancement:panoptispex"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "SHIELD HOST",
+      "raw_name": "SHIELD HOST",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:shield-host"
+    },
+    {
+      "detachment_id": "silent-hunters",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "encircling-hunter",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Encircling Hunter",
+          "points": 15,
+          "raw_name": "Encircling Hunter",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:silent-hunters:enhancement:encircling-hunter"
+        },
+        {
+          "enhancement_id": "psyk-out-grenades",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Psyk-out Grenades (Upgrade)",
+          "points": 10,
+          "raw_name": "Psyk-out Grenades (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:silent-hunters:enhancement:psyk-out-grenades"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "SILENT HUNTERS",
+      "raw_name": "SILENT HUNTERS",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:silent-hunters"
+    },
+    {
+      "detachment_id": "solar-spearhead",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "adamantine-talisman",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Adamantine Talisman",
+          "points": 25,
+          "raw_name": "Adamantine Talisman",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:solar-spearhead:enhancement:adamantine-talisman"
+        },
+        {
+          "enhancement_id": "augury-uplink",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Augury Uplink",
+          "points": 35,
+          "raw_name": "Augury Uplink",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:solar-spearhead:enhancement:augury-uplink"
+        },
+        {
+          "enhancement_id": "honoured-fallen",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Honoured Fallen",
+          "points": 15,
+          "raw_name": "Honoured Fallen",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:solar-spearhead:enhancement:honoured-fallen"
+        },
+        {
+          "enhancement_id": "veteran-of-the-kataphraktoi",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Veteran of the Kataphraktoi",
+          "points": 10,
+          "raw_name": "Veteran of the Kataphraktoi",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:solar-spearhead:enhancement:veteran-of-the-kataphraktoi"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "SOLAR SPEARHEAD",
+      "raw_name": "SOLAR SPEARHEAD",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:solar-spearhead"
+    },
+    {
+      "detachment_id": "talons-of-the-emperor",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "aegis-projector",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Aegis Projector",
+          "points": 20,
+          "raw_name": "Aegis Projector",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:talons-of-the-emperor:enhancement:aegis-projector"
+        },
+        {
+          "enhancement_id": "champion-of-the-imperium",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Champion of the Imperium",
+          "points": 25,
+          "raw_name": "Champion of the Imperium",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:talons-of-the-emperor:enhancement:champion-of-the-imperium"
+        },
+        {
+          "enhancement_id": "gift-of-terran-artifice",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gift of Terran Artifice",
+          "points": 15,
+          "raw_name": "Gift of Terran Artifice",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:talons-of-the-emperor:enhancement:gift-of-terran-artifice"
+        },
+        {
+          "enhancement_id": "radiant-mantle",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Radiant Mantle",
+          "points": 30,
+          "raw_name": "Radiant Mantle",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:talons-of-the-emperor:enhancement:radiant-mantle"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "TALONS OF THE EMPEROR",
+      "raw_name": "TALONS OF THE EMPEROR",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:talons-of-the-emperor"
+    },
+    {
+      "detachment_id": "tharanatoi-hammerblow",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "efficient-aggression",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Efficient Aggression",
+          "points": 25,
+          "raw_name": "Efficient Aggression",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:tharanatoi-hammerblow:enhancement:efficient-aggression"
+        },
+        {
+          "enhancement_id": "mnemo-locked-shrine-cipher",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mnemo-locked Shrine Cipher",
+          "points": 25,
+          "raw_name": "Mnemo-locked Shrine Cipher",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:tharanatoi-hammerblow:enhancement:mnemo-locked-shrine-cipher"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "THARANATOI HAMMERBLOW",
+      "raw_name": "THARANATOI HAMMERBLOW",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:detachment:tharanatoi-hammerblow"
+    }
+  ],
+  "faction_id": "adeptus-custodes",
+  "name": "Adeptus Custodes",
+  "raw_name": "Adeptus Custodes",
+  "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 225,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-agamatus-custodians:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 450,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-agamatus-custodians:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-agamatus-custodians:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "AGAMATUS CUSTODIANS",
+      "raw_name": "AGAMATUS CUSTODIANS",
+      "record_id": "units-agamatus-custodians",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-agamatus-custodians",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "agamatus-custodians",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-aleya:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-aleya:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PROSECUTORS",
+          "VIGILATORS",
+          "WITCHSEEKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "prosecutors",
+          "vigilators",
+          "witchseekers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-aleya:leader"
+      },
+      "name": "ALEYA",
+      "raw_name": "ALEYA",
+      "record_id": "units-aleya",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-aleya",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "aleya",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-allarus-custodians:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-allarus-custodians:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 275,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-allarus-custodians:cost:your-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 330,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-allarus-custodians:cost:your-unit-costs:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-allarus-custodians:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ALLARUS CUSTODIANS",
+      "raw_name": "ALLARUS CUSTODIANS",
+      "record_id": "units-allarus-custodians",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-allarus-custodians",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "allarus-custodians",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-anathema-psykana-rhino:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-anathema-psykana-rhino:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-anathema-psykana-rhino:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-anathema-psykana-rhino:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ANATHEMA PSYKANA RHINO",
+      "raw_name": "ANATHEMA PSYKANA RHINO",
+      "record_id": "units-anathema-psykana-rhino",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-anathema-psykana-rhino",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "anathema-psykana-rhino",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 580,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-ares-gunship:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-ares-gunship:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 610,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-ares-gunship:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-ares-gunship:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARES GUNSHIP",
+      "raw_name": "ARES GUNSHIP",
+      "record_id": "units-ares-gunship",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-ares-gunship",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "ares-gunship",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-blade-champion:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-blade-champion:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-blade-champion:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-blade-champion:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CUSTODIAN GUARD",
+          "CUSTODIAN GUARD WITH ADRASITE AND PYRITHITE SPEARS",
+          "CUSTODIAN WARDENS",
+          "SAGITTARUM CUSTODIANS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "custodian-guard",
+          "custodian-guard-with-adrasite-and-pyrithite-spears",
+          "custodian-wardens",
+          "sagittarum-custodians"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-blade-champion:leader"
+      },
+      "name": "BLADE CHAMPION",
+      "raw_name": "BLADE CHAMPION",
+      "record_id": "units-blade-champion",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-blade-champion",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "blade-champion",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-caladius-grav-tank:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-caladius-grav-tank:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 225,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-caladius-grav-tank:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-caladius-grav-tank:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CALADIUS GRAV-TANK",
+      "raw_name": "CALADIUS GRAV-TANK",
+      "record_id": "units-caladius-grav-tank",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-caladius-grav-tank",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "caladius-grav-tank",
+      "wargear_costs": [
+        {
+          "name": "Twin arachnus heavy blaze cannon",
+          "points_per_item": 15,
+          "raw_name": "per Twin arachnus heavy blaze cannon",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-caladius-grav-tank:wargear:per-twin-arachnus-heavy-blaze-cannon:1",
+          "wargear_id": "twin-arachnus-heavy-blaze-cannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-achillus-dreadnought:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-achillus-dreadnought:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-achillus-dreadnought:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-achillus-dreadnought:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CONTEMPTOR-ACHILLUS DREADNOUGHT",
+      "raw_name": "CONTEMPTOR-ACHILLUS DREADNOUGHT",
+      "record_id": "units-contemptor-achillus-dreadnought",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-achillus-dreadnought",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "contemptor-achillus-dreadnought",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-galatus-dreadnought:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-galatus-dreadnought:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-galatus-dreadnought:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-galatus-dreadnought:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CONTEMPTOR-GALATUS DREADNOUGHT",
+      "raw_name": "CONTEMPTOR-GALATUS DREADNOUGHT",
+      "record_id": "units-contemptor-galatus-dreadnought",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-contemptor-galatus-dreadnought",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "contemptor-galatus-dreadnought",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-coronus-grav-carrier:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-coronus-grav-carrier:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-coronus-grav-carrier:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-coronus-grav-carrier:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CORONUS GRAV-CARRIER",
+      "raw_name": "CORONUS GRAV-CARRIER",
+      "record_id": "units-coronus-grav-carrier",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-coronus-grav-carrier",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "coronus-grav-carrier",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard:cost:your-1st-to-3rd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 215,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard:cost:your-1st-to-3rd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard:cost:your-4th-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 225,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard:cost:your-4th-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CUSTODIAN GUARD",
+      "raw_name": "CUSTODIAN GUARD",
+      "record_id": "units-custodian-guard",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "custodian-guard",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard-with-adrasite-and-pyrithite-spears:cost:your-1st-to-3rd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard-with-adrasite-and-pyrithite-spears:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 260,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard-with-adrasite-and-pyrithite-spears:cost:your-4th-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard-with-adrasite-and-pyrithite-spears:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CUSTODIAN GUARD WITH ADRASITE AND PYRITHITE SPEARS",
+      "raw_name": "CUSTODIAN GUARD WITH ADRASITE AND PYRITHITE SPEARS",
+      "record_id": "units-custodian-guard-with-adrasite-and-pyrithite-spears",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-guard-with-adrasite-and-pyrithite-spears",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "custodian-guard-with-adrasite-and-pyrithite-spears",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-wardens:cost:your-1st-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-wardens:cost:your-1st-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-wardens:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-wardens:cost:your-2nd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-wardens:cost:your-2nd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-wardens:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CUSTODIAN WARDENS",
+      "raw_name": "CUSTODIAN WARDENS",
+      "record_id": "units-custodian-wardens",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-custodian-wardens",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "custodian-wardens",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-knight-centura:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-knight-centura:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PROSECUTORS",
+          "VIGILATORS",
+          "WITCHSEEKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "prosecutors",
+          "vigilators",
+          "witchseekers"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-knight-centura:leader"
+      },
+      "name": "KNIGHT-CENTURA",
+      "raw_name": "KNIGHT-CENTURA",
+      "record_id": "units-knight-centura",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-knight-centura",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "knight-centura",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 690,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-orion-assault-dropship:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-orion-assault-dropship:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 740,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-orion-assault-dropship:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-orion-assault-dropship:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ORION ASSAULT DROPSHIP",
+      "raw_name": "ORION ASSAULT DROPSHIP",
+      "record_id": "units-orion-assault-dropship",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-orion-assault-dropship",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "orion-assault-dropship",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-pallas-grav-attack:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-pallas-grav-attack:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PALLAS GRAV-ATTACK",
+      "raw_name": "PALLAS GRAV-ATTACK",
+      "record_id": "units-pallas-grav-attack",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-pallas-grav-attack",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "pallas-grav-attack",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-prosecutors:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-prosecutors:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "9 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 9,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "9 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-prosecutors:cost:your-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-prosecutors:cost:your-unit-costs:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-prosecutors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PROSECUTORS",
+      "raw_name": "PROSECUTORS",
+      "record_id": "units-prosecutors",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-prosecutors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "prosecutors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 225,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-sagittarum-custodians:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-sagittarum-custodians:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SAGITTARUM CUSTODIANS",
+      "raw_name": "SAGITTARUM CUSTODIANS",
+      "record_id": "units-sagittarum-custodians",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-sagittarum-custodians",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "sagittarum-custodians",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CUSTODIAN GUARD",
+          "CUSTODIAN GUARD WITH ADRASITE AND PYRITHITE SPEARS",
+          "CUSTODIAN WARDENS",
+          "SAGITTARUM CUSTODIANS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "custodian-guard",
+          "custodian-guard-with-adrasite-and-pyrithite-spears",
+          "custodian-wardens",
+          "sagittarum-custodians"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain:leader"
+      },
+      "name": "SHIELD-CAPTAIN",
+      "raw_name": "SHIELD-CAPTAIN",
+      "record_id": "units-shield-captain",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "shield-captain",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain-in-allarus-terminator-armour:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain-in-allarus-terminator-armour:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ALLARUS CUSTODIANS",
+          "AQUILON CUSTODIANS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "allarus-custodians",
+          "aquilon-custodians"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain-in-allarus-terminator-armour:leader"
+      },
+      "name": "SHIELD-CAPTAIN IN ALLARUS TERMINATOR ARMOUR",
+      "raw_name": "SHIELD-CAPTAIN IN ALLARUS TERMINATOR ARMOUR",
+      "record_id": "units-shield-captain-in-allarus-terminator-armour",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain-in-allarus-terminator-armour",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "shield-captain-in-allarus-terminator-armour",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain-on-dawneagle-jetbike:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain-on-dawneagle-jetbike:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "AGAMATUS CUSTODIANS",
+          "VERTUS PRAETORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "agamatus-custodians",
+          "vertus-praetors"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain-on-dawneagle-jetbike:leader"
+      },
+      "name": "SHIELD-CAPTAIN ON DAWNEAGLE JETBIKE",
+      "raw_name": "SHIELD-CAPTAIN ON DAWNEAGLE JETBIKE",
+      "record_id": "units-shield-captain-on-dawneagle-jetbike",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-shield-captain-on-dawneagle-jetbike",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "shield-captain-on-dawneagle-jetbike",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 225,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-telemon-heavy-dreadnought:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-telemon-heavy-dreadnought:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 245,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-telemon-heavy-dreadnought:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-telemon-heavy-dreadnought:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TELEMON HEAVY DREADNOUGHT",
+      "raw_name": "TELEMON HEAVY DREADNOUGHT",
+      "record_id": "units-telemon-heavy-dreadnought",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-telemon-heavy-dreadnought",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "telemon-heavy-dreadnought",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-trajann-valoris:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-trajann-valoris:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CUSTODIAN GUARD",
+          "CUSTODIAN GUARD WITH ADRASITE AND PYRITHITE SPEARS",
+          "CUSTODIAN WARDENS",
+          "SAGITTARUM CUSTODIANS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "custodian-guard",
+          "custodian-guard-with-adrasite-and-pyrithite-spears",
+          "custodian-wardens",
+          "sagittarum-custodians"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-trajann-valoris:leader"
+      },
+      "name": "TRAJANN VALORIS",
+      "raw_name": "TRAJANN VALORIS",
+      "record_id": "units-trajann-valoris",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-trajann-valoris",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "trajann-valoris",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-valerian:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-valerian:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CUSTODIAN GUARD",
+          "CUSTODIAN GUARD WITH ADRASITE AND PYRITHITE SPEARS",
+          "CUSTODIAN WARDENS",
+          "SAGITTARUM CUSTODIANS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "custodian-guard",
+          "custodian-guard-with-adrasite-and-pyrithite-spears",
+          "custodian-wardens",
+          "sagittarum-custodians"
+        ],
+        "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-valerian:leader"
+      },
+      "name": "VALERIAN",
+      "raw_name": "VALERIAN",
+      "record_id": "units-valerian",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-valerian",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "valerian",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venatari-custodians:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 300,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venatari-custodians:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venatari-custodians:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venatari-custodians:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 310,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venatari-custodians:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venatari-custodians:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VENATARI CUSTODIANS",
+      "raw_name": "VENATARI CUSTODIANS",
+      "record_id": "units-venatari-custodians",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venatari-custodians",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "venatari-custodians",
+      "wargear_costs": [
+        {
+          "name": "Venatari lance",
+          "points_per_item": 5,
+          "raw_name": "per Venatari lance",
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venatari-custodians:wargear:per-venatari-lance:1",
+          "wargear_id": "venatari-lance"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-contemptor-dreadnought:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-contemptor-dreadnought:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-contemptor-dreadnought:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-contemptor-dreadnought:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VENERABLE CONTEMPTOR DREADNOUGHT",
+      "raw_name": "VENERABLE CONTEMPTOR DREADNOUGHT",
+      "record_id": "units-venerable-contemptor-dreadnought",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-contemptor-dreadnought",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "venerable-contemptor-dreadnought",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-land-raider:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-land-raider:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-land-raider:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-land-raider:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VENERABLE LAND RAIDER",
+      "raw_name": "VENERABLE LAND RAIDER",
+      "record_id": "units-venerable-land-raider",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-venerable-land-raider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "venerable-land-raider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vertus-praetors:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 215,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vertus-praetors:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vertus-praetors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VERTUS PRAETORS",
+      "raw_name": "VERTUS PRAETORS",
+      "record_id": "units-vertus-praetors",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vertus-praetors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "vertus-praetors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vigilators:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vigilators:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "9 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 9,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "9 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vigilators:cost:your-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vigilators:cost:your-unit-costs:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vigilators:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VIGILATORS",
+      "raw_name": "VIGILATORS",
+      "record_id": "units-vigilators",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-vigilators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "vigilators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-witchseekers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-witchseekers:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "9 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 9,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "9 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-witchseekers:cost:your-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-witchseekers:cost:your-unit-costs:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-witchseekers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WITCHSEEKERS",
+      "raw_name": "WITCHSEEKERS",
+      "record_id": "units-witchseekers",
+      "source_id": "gw-11e-mfm-2026-07:faction:adeptus-custodes:unit:units-witchseekers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "support_allowance": null,
+      "unit_id": "witchseekers",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/adeptus-custodes"
+}
