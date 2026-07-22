@@ -655,6 +655,73 @@
       "submission_variant_id": "finite_option"
     },
     {
+      "case_id": "finite:select_catalog_movement_end_target_effect",
+      "proposal_payload": null,
+      "request": {
+        "actor_id": "player-a",
+        "decision_type": "select_catalog_movement_end_target_effect",
+        "interaction": {
+          "constraints": {
+            "candidate_option_ids": [
+              "contract-option"
+            ],
+            "entity_kinds": [
+              "target_unit"
+            ],
+            "exact_model_count": null,
+            "maximum_distance_in": null,
+            "maximum_selections": 1,
+            "may_enter_engagement_range": null,
+            "minimum_enemy_distance_in": null,
+            "minimum_selections": 1,
+            "must_preserve_coherency": null,
+            "placement_kinds": [],
+            "proposal_schema_ref": null,
+            "submission_schema_ref": "finite-submission.schema.json"
+          },
+          "display_hints": {
+            "confirm_label": "Confirm Selection",
+            "decline_label": null
+          },
+          "interaction_kind": "entity_selection",
+          "proposal_kind": null,
+          "required_inputs": [
+            "selected_entities"
+          ],
+          "schema_version": "interaction-descriptor-v2-variants",
+          "selected_entity_ids": [],
+          "submission_kind": "finite",
+          "submission_variants": [
+            {
+              "display_label": "Confirm Selection",
+              "interaction_kind": "entity_selection",
+              "proposal_schema_ref": null,
+              "required_inputs": [
+                "selected_entities"
+              ],
+              "variant_id": "finite_option"
+            }
+          ]
+        },
+        "is_parameterized": false,
+        "options": [
+          {
+            "label": "Contract Option",
+            "option_id": "contract-option",
+            "payload": {
+              "contract_fixture": true
+            }
+          }
+        ],
+        "payload": {
+          "contract_fixture": true
+        },
+        "request_id": "interaction-conformance:select_catalog_movement_end_target_effect",
+        "schema_version": "annotated-decision-request-v1"
+      },
+      "submission_variant_id": "finite_option"
+    },
+    {
       "case_id": "finite:select_catalog_movement_target_pair",
       "proposal_payload": null,
       "request": {

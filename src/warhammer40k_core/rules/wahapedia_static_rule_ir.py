@@ -31,6 +31,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_war_walkers_wraithlord_2026_06 as aeldari_war_walkers_wraithlord_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    aeldari_wave_serpent_shining_spears_eldrad_dire_avengers_2026_06 as aeldari_four_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     aeldari_yriel_vypers_starfangs_2026_06 as aeldari_yriel_vypers_starfangs_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -63,6 +66,7 @@ def datasheet_rule_ir_payload_by_source_row_id(source_row_id: str) -> RuleIRPayl
             aeldari_war_walkers_wraithlord_source.datasheet_rule_ir_payload_by_source_row_id(
                 source_row_id
             ),
+            aeldari_four_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
             aeldari_yriel_vypers_starfangs_source.datasheet_rule_ir_payload_by_source_row_id(
                 source_row_id
             ),

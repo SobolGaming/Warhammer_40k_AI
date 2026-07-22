@@ -253,6 +253,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:can-fallback-and-shoot` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
 | `catalog-ir:charge-roll-reroll` | No current generated rows |
+| `catalog-ir:command-point-gain` | Diviner of Futures |
 | `catalog-ir:command-restoration` | Tears of Isha (Psychic) |
 | `catalog-ir:conditional-ability:lone-operative` | Daemonic Lord<br>Spiritseer |
 | `catalog-ir:conditional-leading-ability:fights-first` | ASPECT TRAINING |
@@ -290,7 +291,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Psychic Guidance<br>Revel in Desecration |
 | `catalog-ir:hit-roll-reroll` | Assured Destruction<br>Fated Hero<br>Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
-| `catalog-ir:invulnerable-save-characteristic-query` | Forceshield<br>Mistshield<br>Ranged Invulnerable Save |
+| `catalog-ir:invulnerable-save-characteristic-query` | Forceshield<br>Mistshield<br>Ranged Invulnerable Save<br>Shimmershield |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon<br>Psychic Guidance |
@@ -299,8 +300,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
 | `catalog-ir:movement-end-reactive-normal-move` | Path of the Outcast |
+| `catalog-ir:movement-end-selected-target-effect` | Doom (Psychic) |
 | `catalog-ir:movement-friendly-enemy-target-pair` | Spirit Mark (Psychic) |
-| `catalog-ir:movement-transit-permission` | Scuttling Walker |
+| `catalog-ir:movement-transit-permission` | Extreme Mobility<br>Scuttling Walker |
 | `catalog-ir:named-weapon-ability-choice` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
@@ -332,7 +334,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:tracked-target-selection` | Piratical Raiders |
 | `catalog-ir:unit-move-completed-battle-shock` | No current generated rows |
 | `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede<br>Grenade Pack Flyover |
-| `catalog-ir:weapon-keyword-grant` | Faolchú<br>Harbinger of Death<br>Piratical Hero<br>Piratical Raiders |
+| `catalog-ir:weapon-keyword-grant` | Bladestorm<br>Faolchú<br>Harbinger of Death<br>Piratical Hero<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:c'tan-power` | No current generated rows |
@@ -353,12 +355,12 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-keyword-grant:precision` | Harbinger of Death<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:psychic` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:rapid-fire` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:sustained-hits` | Harbinger of Death<br>Piratical Hero |
+| `catalog-ir:weapon-keyword-grant:sustained-hits` | Bladestorm<br>Harbinger of Death<br>Piratical Hero |
 | `catalog-ir:weapon-keyword-grant:torrent` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:twin-linked` | No current generated rows |
 | `catalog-ir:weapon-skill-characteristic-modifier` | Psychic Guidance |
 | `catalog-ir:weapon-skill-characteristic-query` | No current generated rows |
-| `catalog-ir:wound-roll-modifier` | No current generated rows |
+| `catalog-ir:wound-roll-modifier` | Wave Serpent Shield |
 | `catalog-ir:wound-roll-reroll` | Assured Destruction<br>Fated Hero<br>Storm of Silence |
 | `catalog-ir:wounds-characteristic-modifier` | No current generated rows |
 | `catalog-ir:wounds-characteristic-query` | No current generated rows |

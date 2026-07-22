@@ -1,7 +1,7 @@
 {
   "coverage_schema_version": "aeldari-datasheet-semantic-coverage-v4",
-  "coverage_sha256": "3e33fcfb2e67fff5aace9d0cd5dc8dee2153162085646452bad8adf2cf1d641d",
-  "description_text_sha256": "9470539aa7b2f84888400022925ee92d1f2c039d576e93d923b61edec0f1ff37",
+  "coverage_sha256": "9466bbb2dcc6ae0cb88f5c75770ec5c4c3a4efc0deb2195454984c8c37e652a8",
+  "description_text_sha256": "82155583b778896de3a0c55ff7865ef95580295aeff135611b1c27fd93179986",
   "descriptions": [
     {
       "ability_id": "000000568:diviner-of-futures",
@@ -40,17 +40,21 @@
       "catalog_support": "generic_rule_ir",
       "datasheet_id": "000000568",
       "datasheet_name": "Eldrad Ulthran",
-      "description": "The visible enemy selection and +1 Wound effect are parsed; a Movement-phase-end selection host, persistence through the next Command phase, and the friendly Aeldari wound-roll query are still needed.",
+      "description": "The end-of-Movement visible enemy selection is engine-enumerated, persisted through the start of the source player's next Command phase, and grants friendly Aeldari models +1 to Wound only against the selected unit.",
       "diagnostic_reasons": [],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "2e11ab264d3a7ea251bfaafb983a49e8d5a814cb3ccfa6aab9481e67de8472c4",
+      "documentation_bucket": "supported",
+      "evidence_sha256": "eb9ced2990b35387996b0a64c9f299a977ecae60f0d4dd03dd7883664a783bc3",
       "normalized_text_sha256": "8f0eb2b0639eacdca856a024eed860ff3648c39dc5804225bc7ac822ae9bdafa",
       "raw_text_sha256": "8f0eb2b0639eacdca856a024eed860ff3648c39dc5804225bc7ac822ae9bdafa",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-end-selected-target-effect"
+      ],
       "semantic_consumers": [
         {
-          "runtime_consumer_ids": [],
-          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000568:4:description:clause:002:effect:0",
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-end-selected-target-effect"
+          ],
+          "semantic_id": "phase17p:aeldari:four-datasheets:000000568:4:clause:002:effect:0",
           "semantic_kind": "modify_dice_roll"
         }
       ],
@@ -59,7 +63,7 @@
       ],
       "source_kind": "datasheet",
       "source_row_id": "000000568:4",
-      "support_stage": "generic_ir_executable"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000000571:hand-of-asuryan",
@@ -1117,22 +1121,26 @@
     {
       "ability_id": "000000593:bladestorm",
       "ability_name": "Bladestorm",
-      "catalog_support": "unsupported",
+      "catalog_support": "generic_rule_ir",
       "datasheet_id": "000000593",
       "datasheet_name": "Dire Avengers",
-      "description": "A half-range predicate must grant ranged weapons Sustained Hits 1.",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "f3bac2dd64a37cb3f0f0c2ea4c121b6d55c9a1bf20d7e80636b16e65410f672e",
+      "description": "Ranged weapons gain Sustained Hits 1 only while the attacking Dire Avenger model targets an enemy unit within half that weapon's range.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "evidence_sha256": "1bcdd6d362b314e7c787d18ea3151479b9804cfe9585b865963af10f44f7df81",
       "normalized_text_sha256": "be65500f6c7378cedbb0f089059abd12f29a3bd3fd98a2990d0cdbdb53e17790",
       "raw_text_sha256": "6a043cea4b27107de9969c0670ebc101ad85545a92c2bb7a84395e3453ac9188",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:weapon-keyword-grant",
+        "catalog-ir:weapon-keyword-grant:sustained-hits"
+      ],
       "semantic_consumers": [
         {
-          "runtime_consumer_ids": [],
-          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:2:description:clause:001:effect:0",
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:sustained-hits"
+          ],
+          "semantic_id": "phase17p:aeldari:four-datasheets:000000593:2:clause:001:effect:0",
           "semantic_kind": "grant_weapon_ability"
         }
       ],
@@ -1141,7 +1149,7 @@
       ],
       "source_kind": "datasheet",
       "source_row_id": "000000593:2",
-      "support_stage": "ir_compiled_unsupported"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000000593:aspect-shrine-token",
@@ -1592,17 +1600,21 @@
       "catalog_support": "generic_rule_ir",
       "datasheet_id": "000000599",
       "datasheet_name": "Wave Serpent",
-      "description": "The Strength-greater-than-Toughness predicate and defensive Wound-roll modifier are parsed; the ranged-target query host is still needed.",
+      "description": "Ranged attacks targeting the living Wave Serpent subtract 1 from the Wound roll only when attack Strength exceeds its Toughness.",
       "diagnostic_reasons": [],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "a06dc0048621b971cd34122a218b4bc020996149cf5132594630054e48a02a8e",
+      "documentation_bucket": "supported",
+      "evidence_sha256": "4b393e35858c3a99bcc1abcc5e927c55d1bbee6a914de7ba7975050179a9fb81",
       "normalized_text_sha256": "5f19cc50422fd3728338d071a161419db4e1fcdf9983112e7758557a7f135d92",
       "raw_text_sha256": "5f19cc50422fd3728338d071a161419db4e1fcdf9983112e7758557a7f135d92",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:wound-roll-modifier"
+      ],
       "semantic_consumers": [
         {
-          "runtime_consumer_ids": [],
-          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000599:3:description:clause:001:effect:0",
+          "runtime_consumer_ids": [
+            "catalog-ir:wound-roll-modifier"
+          ],
+          "semantic_id": "phase17p:aeldari:four-datasheets:000000599:3:clause:001:effect:0",
           "semantic_kind": "modify_dice_roll"
         }
       ],
@@ -1611,7 +1623,7 @@
       ],
       "source_kind": "datasheet",
       "source_row_id": "000000599:3",
-      "support_stage": "generic_ir_executable"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000000600:grenade-pack-flyover",
@@ -1761,25 +1773,33 @@
     {
       "ability_id": "000000602:extreme-mobility",
       "ability_name": "Extreme Mobility",
-      "catalog_support": "unsupported",
+      "catalog_support": "generic_rule_ir",
       "datasheet_id": "000000602",
       "datasheet_name": "Shining Spears",
-      "description": "Normal, Advance, Fall Back, and Charge movement must ignore vertical distance while retaining PathWitness validation.",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "594846674caccaaeae030195ae07f901aa297cb9c822b76c2c84ad34936a8a63",
+      "description": "Normal, Advance, Fall Back, and Charge movement ignores vertical distance while retaining complete PathWitness validation for every moved model.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "evidence_sha256": "2995736889b7d92416c3dd64004c11ab8eb2857a98054ccc11daa2aa34dee58f",
       "normalized_text_sha256": "4fd436eef921177ed798a6a14e93060a9f285e21aa595238ed045297a0ddeb33",
       "raw_text_sha256": "4fd436eef921177ed798a6a14e93060a9f285e21aa595238ed045297a0ddeb33",
-      "runtime_consumer_ids": [],
-      "semantic_consumers": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-transit-permission"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-transit-permission"
+          ],
+          "semantic_id": "phase17p:aeldari:four-datasheets:000000602:2:clause:001:effect:0",
+          "semantic_kind": "movement_transit_permission"
+        }
+      ],
       "source_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:2"
       ],
       "source_kind": "datasheet",
       "source_row_id": "000000602:2",
-      "support_stage": "ir_compiled_unsupported"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000000602:shimmershield",

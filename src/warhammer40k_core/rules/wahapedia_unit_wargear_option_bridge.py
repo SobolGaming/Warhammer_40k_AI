@@ -1,20 +1,42 @@
 from __future__ import annotations
 
 import re
-import unicodedata
 
 from warhammer40k_core.core.datasheet import (
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
-from warhammer40k_core.rules.wahapedia_bridge_patterns import COUNT_WORDS
 from warhammer40k_core.rules.wahapedia_loadout_bridge import LoadoutAssignments
 from warhammer40k_core.rules.wahapedia_replacement_option_bridge import replacement_choices
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
+from warhammer40k_core.rules.wahapedia_wargear_option_bridge_support import (
+    name_key as _name_key,
+)
+from warhammer40k_core.rules.wahapedia_wargear_option_bridge_support import (
+    option_common as _option_common,
+)
+from warhammer40k_core.rules.wahapedia_wargear_option_bridge_support import (
+    positive_count as _positive_count,
+)
+from warhammer40k_core.rules.wahapedia_wargear_option_bridge_support import (
+    required_field as _required_field,
+)
+from warhammer40k_core.rules.wahapedia_wargear_option_bridge_support import (
+    required_model_profile_id as _required_model_profile_id,
+)
+from warhammer40k_core.rules.wahapedia_wargear_option_bridge_support import (
+    required_wargear_id as _required_wargear_id,
+)
 
 NAMED_REPLACEMENT_CHOICES_RE = re.compile(
     r"^The (?P<model>.+?)(?: model)?'s (?P<replaced>.+?) can be replaced with "
     r"(?:one|1) of the following:\n"
+    r"(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
+    re.IGNORECASE,
+)
+NAMED_REPLACEMENT_WITH_REQUIRED_CHOICES_RE = re.compile(
+    r"^The (?P<model>.+?)(?: model)?'s (?P<replaced>.+?) can be replaced with "
+    r"1 (?P<required>.+?) and one of the following:\n"
     r"(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
     re.IGNORECASE,
 )
@@ -66,6 +88,11 @@ UNIT_SIZE_REPLACEMENT_RE = re.compile(
 CONDITIONAL_ADDITIVE_RE = re.compile(
     r"^(?P<max_selections>\d+) (?P<model>.+?) model equipped with a (?P<required_first>.+?) "
     r"and (?P<required_second>.+?) can be equipped with 1 (?P<granted>.+?)\.$",
+    re.IGNORECASE,
+)
+CONDITIONAL_SAME_WARGEAR_ADDITIVE_RE = re.compile(
+    r"^If this unit's (?P<model>.+?) is equipped with 1 (?P<required>.+?), "
+    r"it can be equipped with 1 additional (?P<granted>.+?)\.$",
     re.IGNORECASE,
 )
 EACH_MODEL_EQUIPPED_REPLACEMENT_CHOICES_RE = re.compile(
@@ -188,13 +215,34 @@ def append_unit_wargear_option_rows(
             error_type=error_type,
         )
         return True
+    named_required_replacement = NAMED_REPLACEMENT_WITH_REQUIRED_CHOICES_RE.fullmatch(description)
+    if named_required_replacement is not None:
+        _append_named_required_replacement(
+            row=row,
+            datasheet_id=datasheet_id,
+            model_profile_by_name=model_profile_by_name,
+            wargear_ids_by_name=wargear_ids_by_name,
+            match=named_required_replacement,
+            bridged_rows=bridged_rows,
+            error_type=error_type,
+        )
+        return True
     named_multiple_single_replacement = NAMED_MULTIPLE_SINGLE_REPLACEMENT_RE.fullmatch(description)
     if named_multiple_single_replacement is not None:
         replaced_names = _multiple_wargear_names(
             named_multiple_single_replacement.group("replaced")
         )
         if len(replaced_names) < 2:
-            return False
+            _append_named_single_replacement(
+                row=row,
+                datasheet_id=datasheet_id,
+                model_profile_by_name=model_profile_by_name,
+                wargear_ids_by_name=wargear_ids_by_name,
+                match=named_multiple_single_replacement,
+                bridged_rows=bridged_rows,
+                error_type=error_type,
+            )
+            return True
         _append_named_multiple_replacement_choices(
             row=row,
             datasheet_id=datasheet_id,
@@ -309,6 +357,18 @@ def append_unit_wargear_option_rows(
             model_profile_by_name=model_profile_by_name,
             wargear_ids_by_name=wargear_ids_by_name,
             match=conditional_additive,
+            bridged_rows=bridged_rows,
+            error_type=error_type,
+        )
+        return True
+    conditional_same_additive = CONDITIONAL_SAME_WARGEAR_ADDITIVE_RE.fullmatch(description)
+    if conditional_same_additive is not None:
+        _append_conditional_same_wargear_additive(
+            row=row,
+            datasheet_id=datasheet_id,
+            model_profile_by_name=model_profile_by_name,
+            wargear_ids_by_name=wargear_ids_by_name,
+            match=conditional_same_additive,
             bridged_rows=bridged_rows,
             error_type=error_type,
         )
@@ -635,19 +695,6 @@ def _selection_limit_fields(
     }
 
 
-def _positive_count(value: str, *, field_name: str, error_type: type[ValueError]) -> int:
-    count = COUNT_WORDS.get(" ".join(value.casefold().strip().split()))
-    if count is not None:
-        return count
-    try:
-        count = int(value)
-    except ValueError as exc:
-        raise error_type(f"{field_name} must be a positive count.") from exc
-    if count < 1:
-        raise error_type(f"{field_name} must be positive.")
-    return count
-
-
 def _append_named_replacement(
     *,
     row: NormalizedSourceRow,
@@ -719,6 +766,88 @@ def _append_named_replacement(
             "effect_wargear_count": "1",
         }
         for index, choice_id in enumerate(choice_ids, start=1)
+    )
+
+
+def _append_named_required_replacement(
+    *,
+    row: NormalizedSourceRow,
+    datasheet_id: str,
+    model_profile_by_name: dict[str, str],
+    wargear_ids_by_name: dict[str, str],
+    match: re.Match[str],
+    bridged_rows: dict[str, list[dict[str, str]]],
+    error_type: type[ValueError],
+) -> None:
+    choices = replacement_choices(match.group("choices"), error_type=error_type)
+    choice_groups = tuple((match.group("required"), choice.name) for choice in choices)
+    _append_named_paired_replacement_choices(
+        row=row,
+        datasheet_id=datasheet_id,
+        model_profile_id=_required_model_profile_id(
+            model_profile_by_name,
+            match.group("model"),
+            error_type=error_type,
+        ),
+        model_name=match.group("model"),
+        replaced_id=_required_wargear_id(
+            wargear_ids_by_name,
+            match.group("replaced"),
+            error_type=error_type,
+        ),
+        choice_groups=choice_groups,
+        wargear_ids_by_name=wargear_ids_by_name,
+        source_line=_required_field(row, "line", error_type=error_type),
+        bridged_rows=bridged_rows,
+        error_type=error_type,
+    )
+
+
+def _append_named_single_replacement(
+    *,
+    row: NormalizedSourceRow,
+    datasheet_id: str,
+    model_profile_by_name: dict[str, str],
+    wargear_ids_by_name: dict[str, str],
+    match: re.Match[str],
+    bridged_rows: dict[str, list[dict[str, str]]],
+    error_type: type[ValueError],
+) -> None:
+    replaced_id = _required_wargear_id(
+        wargear_ids_by_name,
+        match.group("replaced"),
+        error_type=error_type,
+    )
+    replacement_id = _required_wargear_id(
+        wargear_ids_by_name,
+        match.group("replacement"),
+        error_type=error_type,
+    )
+    source_line = _required_field(row, "line", error_type=error_type)
+    bridged_rows["Datasheets_options"].append(
+        {
+            **_option_common(
+                row=row,
+                datasheet_id=datasheet_id,
+                option_id=(
+                    f"{datasheet_id}:{_name_key(match.group('model'))}-"
+                    f"{_name_key(match.group('replacement'))}:option-{source_line}"
+                ),
+                model_profile_id=_required_model_profile_id(
+                    model_profile_by_name,
+                    match.group("model"),
+                    error_type=error_type,
+                ),
+                allowed_wargear_ids=(replacement_id,),
+                max_selections=1,
+            ),
+            "line": source_line,
+            "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
+            "effect_wargear_id": replacement_id,
+            "effect_replaced_wargear_id": replaced_id,
+            "effect_model_count": "1",
+            "effect_wargear_count": "1",
+        }
     )
 
 
@@ -1316,85 +1445,50 @@ def _append_conditional_additive(
     )
 
 
-def _option_common(
+def _append_conditional_same_wargear_additive(
     *,
     row: NormalizedSourceRow,
     datasheet_id: str,
-    option_id: str,
-    model_profile_id: str,
-    allowed_wargear_ids: tuple[str, ...],
-    max_selections: int,
-) -> dict[str, str]:
-    return {
-        "datasheet_id": datasheet_id,
-        "description": _raw_or_field(row, "description"),
-        "option_id": option_id,
-        "model_profile_id": model_profile_id,
-        "default_wargear_ids": "",
-        "allowed_wargear_ids": ",".join(allowed_wargear_ids),
-        "min_selections": "0",
-        "max_selections": str(max_selections),
-        "condition_kind": "",
-        "condition_wargear_ids": "",
-        "selection_group_id": "",
-        "selection_models_per_increment": "",
-        "selection_group_max_per_increment": "",
-        "selection_option_max_per_increment": "",
-        "source_ids": ",".join(_source_ids(row)),
-    }
-
-
-def _required_model_profile_id(
-    model_profile_by_name: dict[str, str], model_name: str, *, error_type: type[ValueError]
-) -> str:
-    profile_id = model_profile_by_name.get(_name_key(model_name))
-    if profile_id is None and _name_key(model_name).endswith("s"):
-        profile_id = model_profile_by_name.get(_name_key(model_name)[:-1])
-    if profile_id is None:
-        raise error_type("Wargear option references an unknown model profile.")
-    return profile_id
-
-
-def _required_wargear_id(
-    wargear_ids_by_name: dict[str, str], wargear_name: str, *, error_type: type[ValueError]
-) -> str:
-    key = _name_key(wargear_name)
-    wargear_id = wargear_ids_by_name.get(key)
-    if wargear_id is None and key.endswith("s"):
-        wargear_id = wargear_ids_by_name.get(key[:-1])
-    if wargear_id is None:
-        raise error_type(f"Wargear option references an unknown wargear item: {wargear_name!r}.")
-    return wargear_id
-
-
-def _required_field(
-    row: NormalizedSourceRow, column_name: str, *, error_type: type[ValueError]
-) -> str:
-    value = row.runtime_fields_payload().get(column_name)
-    if value is None:
-        raise error_type(f"Required source column is missing: {column_name}.")
-    stripped = value.strip()
-    if not stripped:
-        raise error_type(f"Required source column is empty: {column_name}.")
-    return stripped
-
-
-def _raw_or_field(row: NormalizedSourceRow, column_name: str) -> str:
-    for text_field in row.text_fields:
-        if text_field.column_name == column_name:
-            return text_field.raw_text
-    return row.runtime_fields_payload().get(column_name, "")
-
-
-def _source_ids(row: NormalizedSourceRow) -> tuple[str, ...]:
-    source_ids = [row.stable_source_id()]
-    explicit_source_ids = row.runtime_fields_payload().get("source_ids")
-    if explicit_source_ids is not None:
-        source_ids.extend(item.strip() for item in explicit_source_ids.split(",") if item.strip())
-    return tuple(dict.fromkeys(source_ids))
-
-
-def _name_key(value: str) -> str:
-    normalized = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
-    lowered = normalized.casefold().replace("'", "").replace("&", " and ")
-    return "-".join(part for part in re.split(r"[^a-z0-9]+", lowered) if part)
+    model_profile_by_name: dict[str, str],
+    wargear_ids_by_name: dict[str, str],
+    match: re.Match[str],
+    bridged_rows: dict[str, list[dict[str, str]]],
+    error_type: type[ValueError],
+) -> None:
+    required_id = _required_wargear_id(
+        wargear_ids_by_name,
+        match.group("required"),
+        error_type=error_type,
+    )
+    granted_id = _required_wargear_id(
+        wargear_ids_by_name,
+        match.group("granted"),
+        error_type=error_type,
+    )
+    if required_id != granted_id:
+        raise error_type("Conditional additional wargear must duplicate its required wargear.")
+    source_line = _required_field(row, "line", error_type=error_type)
+    bridged_rows["Datasheets_options"].append(
+        {
+            **_option_common(
+                row=row,
+                datasheet_id=datasheet_id,
+                option_id=f"{datasheet_id}:{_name_key(match.group('granted'))}:option-{source_line}",
+                model_profile_id=_required_model_profile_id(
+                    model_profile_by_name,
+                    match.group("model"),
+                    error_type=error_type,
+                ),
+                allowed_wargear_ids=(granted_id,),
+                max_selections=1,
+            ),
+            "line": source_line,
+            "condition_kind": WargearOptionConditionKind.MODEL_EQUIPPED_WITH.value,
+            "condition_wargear_ids": required_id,
+            "effect_kind": WargearOptionEffectKind.ADD_WARGEAR.value,
+            "effect_wargear_id": granted_id,
+            "effect_replaced_wargear_id": "",
+            "effect_model_count": "1",
+            "effect_wargear_count": "1",
+        }
+    )

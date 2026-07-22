@@ -38,11 +38,15 @@
           "normalized_text_sha256": "8f0eb2b0639eacdca856a024eed860ff3648c39dc5804225bc7ac822ae9bdafa",
           "raw_text": "At the end of your Movement phase, select one enemy unit within 18\" of and visible to this model. Until the start of your next Command phase, each time a friendly AELDARI model makes an attack that targets that enemy unit, add 1 to the Wound roll.",
           "raw_text_sha256": "8f0eb2b0639eacdca856a024eed860ff3648c39dc5804225bc7ac822ae9bdafa",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-end-selected-target-effect"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000568:4:description:clause:002:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-end-selected-target-effect"
+              ],
+              "semantic_id": "phase17p:aeldari:four-datasheets:000000568:4:clause:002:effect:0",
               "semantic_kind": "modify_dice_roll"
             }
           ],
@@ -51,14 +55,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000568:4",
-          "support_stage": "generic_ir_executable"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000568",
       "datasheet_name": "Eldrad Ulthran",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact IR parsed; host needed",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -1149,18 +1153,22 @@
         {
           "ability_id": "000000593:bladestorm",
           "ability_name": "Bladestorm",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "be65500f6c7378cedbb0f089059abd12f29a3bd3fd98a2990d0cdbdb53e17790",
           "raw_text": "Ranged weapons equipped by models in this unit have the [SUSTAINED HITS 1] ability while targeting an enemy unit within half range.",
           "raw_text_sha256": "6a043cea4b27107de9969c0670ebc101ad85545a92c2bb7a84395e3453ac9188",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:sustained-hits"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000593:2:description:clause:001:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:weapon-keyword-grant",
+                "catalog-ir:weapon-keyword-grant:sustained-hits"
+              ],
+              "semantic_id": "phase17p:aeldari:four-datasheets:000000593:2:clause:001:effect:0",
               "semantic_kind": "grant_weapon_ability"
             }
           ],
@@ -1169,7 +1177,7 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000593:2",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000593:aspect-shrine-token",
@@ -1230,7 +1238,7 @@
       "datasheet_name": "Dire Avengers",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "rules_update"
     },
     {
@@ -1630,11 +1638,15 @@
           "normalized_text_sha256": "5f19cc50422fd3728338d071a161419db4e1fcdf9983112e7758557a7f135d92",
           "raw_text": "Each time a ranged attack targets this model, if the Strength characteristic of that attack is greater than the Toughness characteristic of this model, subtract 1 from the Wound roll.",
           "raw_text_sha256": "5f19cc50422fd3728338d071a161419db4e1fcdf9983112e7758557a7f135d92",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:wound-roll-modifier"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000599:3:description:clause:001:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:wound-roll-modifier"
+              ],
+              "semantic_id": "phase17p:aeldari:four-datasheets:000000599:3:clause:001:effect:0",
               "semantic_kind": "modify_dice_roll"
             }
           ],
@@ -1643,14 +1655,14 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000599:3",
-          "support_stage": "generic_ir_executable"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000000599",
       "datasheet_name": "Wave Serpent",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
-      "semantic_bucket": "Exact IR parsed; host needed",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "rules_update"
     },
     {
@@ -1807,21 +1819,29 @@
         {
           "ability_id": "000000602:extreme-mobility",
           "ability_name": "Extreme Mobility",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "4fd436eef921177ed798a6a14e93060a9f285e21aa595238ed045297a0ddeb33",
           "raw_text": "Each time this unit makes a Normal, Advance, Fall Back or Charge move, ignore any vertical distance when determining the total distance models in this unit can be moved during that move.",
           "raw_text_sha256": "4fd436eef921177ed798a6a14e93060a9f285e21aa595238ed045297a0ddeb33",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-transit-permission"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-transit-permission"
+              ],
+              "semantic_id": "phase17p:aeldari:four-datasheets:000000602:2:clause:001:effect:0",
+              "semantic_kind": "movement_transit_permission"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:2"
           ],
           "source_kind": "datasheet",
           "source_row_id": "000000602:2",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000000602:shimmershield",
@@ -1855,7 +1875,7 @@
       "datasheet_name": "Shining Spears",
       "group": "Craftworlds / Asuryani",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -4420,7 +4440,7 @@
   "faction_name": "Aeldari",
   "generated_by": "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py",
   "overlay_pack_hashes": {
-    "data-package:gw:aeldari-faction-pack-datasheet-overlay:11th-2026-06-09": "c0add91026619feefb5aef23f8941c9dada577432232b9ceb27ff3b4e1bfa833",
+    "data-package:gw:aeldari-faction-pack-datasheet-overlay:11th-2026-06-09": "672c6c8b7b51dbd775172d488af3cc7a8038c3c0881a8e97a5e255b5d17de524",
     "data-package:gw:aeldari-tacoma-open-frame-keyword-overlay:11th-2026-07-10": "85ba1b52ddcc4dec798d2b60143c8a0769e35ab9bb0727aaebdbbbf59502eec3"
   },
   "pdf_filename": "eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
@@ -4428,22 +4448,22 @@
   "release_hash": "379616e1abaf64a4e6de5c9614d452b146783a0efccab03c18f3cb82e07e6eed",
   "schema_version": "aeldari-datasheet-semantic-coverage-v4",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 25,
-    "Exact IR parsed; host needed": 6,
-    "Exact ability IR unsupported": 39
+    "All exact abilities consumed": 29,
+    "Exact IR parsed; host needed": 4,
+    "Exact ability IR unsupported": 37
   },
   "source_artifact_hashes": {
-    "Abilities": "c3f7d3ed3f27041a13cc46835ba8c8d4d6b731edc9cfbc70e9e92fe8a7c229c4",
-    "Datasheets": "8cfff4a5cc60e4585d1c2e02681349b35c3bcfe860d7df3adf361de578e53f7f",
-    "Datasheets_abilities": "17fda778d813676c16d81fabe5ffaaac0ea4084501418ce63245f09d2dea1908",
-    "Datasheets_keywords": "9ab71f2e1fc7c650d437a844a269dbe117f492ba46e09882cadb4c064916c464",
-    "Datasheets_leader": "cb627026f8c201b47a0ed1154e9fe055d17115587526e1622ef9c10a8d5f76ce",
-    "Datasheets_models": "e562fbc42d1c7d0dc5944614b82731fbe306343177d76b3feee2ba32cad28cf9",
-    "Datasheets_models_cost": "de8c05c7a170ca8f89b4a8e0a153514cf3b402168658e3646024790fcc1f254f",
-    "Datasheets_options": "331386590eb238d2a305b963bb8943c143e78999ac5473c99084ef581013e0e8",
-    "Datasheets_unit_composition": "fb348611c43db69db9729207cda04f11bbc35b53701cf80e3b1b832557191395",
-    "Datasheets_wargear": "38f85b40a5fd1af0f4f985a8383b04df6ce73549d160490dbe83ce13c3e53e5f",
-    "Factions": "9572f067ac13839d1a3a3a193b1b8391b54d0ccb3902b52ce6f28ae33e1f3a84"
+    "Abilities": "d9df2cbda5ca051740170c848d01a0acbab4555854c6fdfe87161e7ef07785fc",
+    "Datasheets": "2bf5947d110eee88b45f8b3f497b7668ecc57da1c5a61ac178a46fe80f06155b",
+    "Datasheets_abilities": "3fc470bcc767cbdd639be7f59e0acf83b7e097d6dc561bf1ed558795e20a35c6",
+    "Datasheets_keywords": "8f12694d8ee4ed809909c93cc13e69115f69b92814a017cd01b17f1aa5b4d16e",
+    "Datasheets_leader": "9755aef3625f217650aa962a8f0a7dbddf4d408733839bb70f66ddd4a8055164",
+    "Datasheets_models": "79e95a6a7fda882999396fd139e53d027f981776ff4cc455222b9f367710b360",
+    "Datasheets_models_cost": "e94cd1d1de0a654b8252aac45119f568f481c81f43ddf7abeda883c1c4f8f315",
+    "Datasheets_options": "c82552cdeb02b63085d82804c2fcbdaa4eede18d173dba873111368c95e5dfd4",
+    "Datasheets_unit_composition": "95c648a833a4461fbc3e8105a22aa7ed5543f5c2cd1ef4d82e52551a5e3f658e",
+    "Datasheets_wargear": "7f9d5ba4d4a2211d2b06f5d29f304c601fc055cad725bc081d7ff41170da9727",
+    "Factions": "a0c2301683d4e3a1a4a29292325fdc6aa312ed7c5803f40a5a2acbb07bb642b4"
   },
   "source_snapshot_path": "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json",
   "treatment_counts": {

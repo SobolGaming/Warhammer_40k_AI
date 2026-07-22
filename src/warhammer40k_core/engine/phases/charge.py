@@ -1051,6 +1051,10 @@ class ChargePhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 charge_target_restriction_hooks=self.charge_target_restriction_hooks,
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=_active_player_id(state),
+                ),
             )
         raise GameLifecycleError("Charge phase received unsupported decision type.")
 
@@ -2095,6 +2099,7 @@ def _apply_charge_move_proposal_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
+    ability_index: AbilityCatalogIndex,
 ) -> LifecycleStatus | None:
     _validate_charge_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -2160,6 +2165,7 @@ def _apply_charge_move_proposal_decision(
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
         unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
+        ability_index=ability_index,
     )
     violation_code = _charge_move_violation_code(
         resolution=resolution,
@@ -2221,6 +2227,7 @@ def resolve_charge_move(
     hover_mode_states: tuple[HoverModeState, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
     unit_persisting_effects: tuple[PersistingEffect, ...] = (),
+    ability_index: AbilityCatalogIndex | None = None,
 ) -> ChargeMoveResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Charge Move requires a BattlefieldScenario.")
@@ -2283,6 +2290,13 @@ def resolve_charge_move(
             movement_mode=MovementMode.CHARGE,
             movement_phase_action=None,
             displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
+            ability_index=ability_index,
+            unit=unit,
+            model_instance_id=placement.model_instance_id,
+            current_model_instance_ids=tuple(
+                model_placement.model_instance_id
+                for model_placement in unit_placement.model_placements
+            ),
             unit_persisting_effects=unit_persisting_effects,
             owner_player_id=unit_placement.player_id,
         )

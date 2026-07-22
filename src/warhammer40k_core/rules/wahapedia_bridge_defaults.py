@@ -407,6 +407,75 @@ AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000568",
+        model_name="Eldrad Ulthran - EPIC HERO",
+        height=2.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:eldrad-ulthran:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (32mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000593",
+        model_name="Dire Avenger Exarch",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:dire-avengers:exarch:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000593",
+        model_name="Dire Avengers",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:dire-avengers:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (28.5mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000599",
+        model_name="Wave Serpent",
+        height=2.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:wave-serpent:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (60mm flying base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000602",
+        model_name="Shining Spear Exarch",
+        height=3.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:shining-spears:exarch:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (60mm flying base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000000602",
+        model_name="Shining Spears",
+        height=3.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:shining-spears:height",
+        height_document_reference=(
+            "Aeldari Faction Pack assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (60mm flying base)"
+        ),
+    ),
+)
+
 AELDARI_YRIEL_VYPERS_STARFANGS_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004193",
@@ -556,6 +625,7 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES,
     *AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES,
     *AELDARI_KHARSETH_HEIGHT_OVERRIDES,
+    *AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES,
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,

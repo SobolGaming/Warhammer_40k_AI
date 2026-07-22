@@ -378,6 +378,24 @@ class MovementPhaseHandler:
             apply_catalog_movement_target_pair_result,
         )
 
+        if result.decision_type == SELECT_CATALOG_MOVEMENT_END_TARGET_EFFECT_DECISION_TYPE:
+            record = decisions.record_for_result(result)
+            return CatalogMovementEndSelectedTargetEffectRuntime(
+                ability_indexes_by_player_id={
+                    army.player_id: _ability_index_for_player(
+                        self.ability_indexes_by_player_id,
+                        player_id=army.player_id,
+                    )
+                    for army in state.army_definitions
+                },
+                armies=tuple(state.army_definitions),
+            ).apply_result(
+                state=state,
+                decisions=decisions,
+                request=record.request,
+                result=result,
+            )
+
         if result.decision_type == SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE:
             record = decisions.record_for_result(result)
             apply_catalog_movement_target_pair_result(
@@ -629,6 +647,21 @@ def _complete_reinforcements_step(
     )
     if end_movement_active_status is not None:
         return end_movement_active_status
+    selected_target_status = CatalogMovementEndSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: _ability_index_for_player(
+                {} if ability_indexes_by_player_id is None else ability_indexes_by_player_id,
+                player_id=army.player_id,
+            )
+            for army in state.army_definitions
+        },
+        armies=tuple(state.army_definitions),
+    ).request(
+        state=state,
+        decisions=decisions,
+    )
+    if selected_target_status is not None:
+        return selected_target_status
     end_movement_reaction_status = _request_end_opponent_movement_reaction_if_available(
         state=state,
         decisions=decisions,

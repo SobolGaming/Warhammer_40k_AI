@@ -149,7 +149,9 @@ def clause_is_supported_movement_transit_permission(clause: RuleClause) -> bool:
     if target_kind is RuleTargetKind.THIS_MODEL:
         return permissions == {"move_over_as_if_not_there"} and len(supported) == 1
     if target_kind is RuleTargetKind.THIS_UNIT:
-        return permissions == {"move_through_models", "move_through_terrain_features"}
+        return permissions == {"move_through_models", "move_through_terrain_features"} or (
+            permissions == {"ignore_vertical_distance"} and len(supported) == 1
+        )
     return False
 
 
@@ -281,7 +283,24 @@ def _supported_movement_transit_effect_parameters(
         return _supported_move_through_models_parameters(parameters)
     if permission == "move_through_terrain_features":
         return _supported_move_through_terrain_parameters(parameters)
+    if permission == "ignore_vertical_distance":
+        return _supported_ignore_vertical_distance_parameters(parameters)
     return None
+
+
+def _supported_ignore_vertical_distance_parameters(
+    parameters: Mapping[str, object],
+) -> _SupportedMovementTransitEffectParameters | None:
+    if frozenset(parameters) != frozenset({"movement_modes", "permission"}):
+        return None
+    movement_modes = _validate_movement_mode_tokens(parameters["movement_modes"])
+    if frozenset(movement_modes) != frozenset({"advance", "charge", "fall_back", "normal"}):
+        return None
+    return _SupportedMovementTransitEffectParameters(
+        movement_modes=movement_modes,
+        permission="ignore_vertical_distance",
+        model_allegiance="any",
+    )
 
 
 def _supported_move_over_as_if_absent_parameters(
@@ -422,7 +441,7 @@ def _movement_mode_token(value: object) -> str:
     if type(value) is not str or not value.strip():
         raise GameLifecycleError("Catalog movement mode token must be a string.")
     token = value.strip().lower().replace(" ", "_").replace("-", "_")
-    if token not in {"advance", "fall_back", "normal"}:
+    if token not in {"advance", "charge", "fall_back", "normal"}:
         raise GameLifecycleError("Catalog movement mode token is unsupported.")
     return token
 
@@ -431,7 +450,7 @@ def _movement_mode_token_or_none(value: object) -> str | None:
     if type(value) is not str or not value.strip():
         return None
     token = value.strip().lower().replace(" ", "_").replace("-", "_")
-    if token not in {"advance", "fall_back", "normal"}:
+    if token not in {"advance", "charge", "fall_back", "normal"}:
         return None
     return token
 

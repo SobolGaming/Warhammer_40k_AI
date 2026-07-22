@@ -316,6 +316,30 @@ def _overlay_pack(
             SOURCE_REFERENCE,
         ),
         (
+            "000000568",
+            "Eldrad Ulthran",
+            "000000568:blank-keyword:global:true:2098",
+            SOURCE_REFERENCE,
+        ),
+        (
+            "000000593",
+            "Dire Avengers",
+            "000000593:blank-keyword:global:true:2273",
+            SOURCE_REFERENCE,
+        ),
+        (
+            "000000599",
+            "Wave Serpent",
+            "000000599:blank-keyword:global:true:2312",
+            SOURCE_REFERENCE,
+        ),
+        (
+            "000000602",
+            "Shining Spears",
+            "000000602:blank-keyword:global:true:2337",
+            SOURCE_REFERENCE,
+        ),
+        (
             "000004193",
             "Prince Yriel",
             "000004193:blank-keyword:global:true:15614",

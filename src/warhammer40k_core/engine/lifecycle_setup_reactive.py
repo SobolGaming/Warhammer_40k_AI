@@ -138,6 +138,7 @@ def apply_setup_reactive_lifecycle_decision_if_applicable(
         return apply_setup_reactive_charge_move_lifecycle_decision(
             state=state,
             config=config,
+            runtime_content_bundle=runtime_content_bundle,
             decisions=decisions,
             reaction_queue=reaction_queue,
             record=record,
@@ -193,6 +194,7 @@ def apply_setup_reactive_charge_move_lifecycle_decision(
     *,
     state: GameState,
     config: GameConfig,
+    runtime_content_bundle: RuntimeContentBundle,
     decisions: DecisionController,
     reaction_queue: ReactionQueue,
     record: DecisionRecord,
@@ -201,12 +203,19 @@ def apply_setup_reactive_charge_move_lifecycle_decision(
     pending_decision_request: Callable[[], DecisionRequest | None],
     advance_until_decision_or_terminal: Callable[[], LifecycleStatus],
 ) -> LifecycleStatus:
+    actor_id = result.actor_id
+    if actor_id is None:
+        raise GameLifecycleError("Setup-reactive Charge Move actor is missing.")
+    ability_index = runtime_content_bundle.ability_indexes_by_player_id.get(actor_id)
+    if ability_index is None:
+        raise GameLifecycleError("Setup-reactive Charge Move actor has no Ability index.")
     charge_status = apply_catalog_setup_reactive_charge_move(
         state=state,
         request=record.request,
         result=result,
         decisions=decisions,
         ruleset_descriptor=config.ruleset_descriptor,
+        ability_index=ability_index,
     )
     if charge_status is not None:
         if resolves_reaction_frame:

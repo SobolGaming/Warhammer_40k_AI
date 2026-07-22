@@ -40,6 +40,10 @@ from warhammer40k_core.engine.catalog_command_restoration_runtime import (
     invalid_catalog_command_restoration_status,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
+from warhammer40k_core.engine.catalog_movement_end_selected_target_effects import (
+    SELECT_CATALOG_MOVEMENT_END_TARGET_EFFECT_DECISION_TYPE,
+    invalid_catalog_movement_end_target_effect_status,
+)
 from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
     SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE,
     invalid_catalog_movement_target_pair_status,
@@ -146,6 +150,9 @@ from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
 )
 from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
     state_requires_deployed_battlefield_state as _state_requires_deployed_battlefield_state,
+)
+from warhammer40k_core.engine.lifecycle_heroic_intervention import (
+    apply_heroic_intervention_charge_move_lifecycle_decision,
 )
 from warhammer40k_core.engine.lifecycle_reaction_queue import (
     validate_reaction_queue_consistency,
@@ -285,7 +292,6 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTargetBinding,
     apply_command_reroll_decision,
     apply_explosives_mortal_wound_feel_no_pain_decision,
-    apply_heroic_intervention_charge_move,
     apply_stratagem_decision,
     apply_stratagem_placement_proposal,
     apply_stratagem_target_proposal,
@@ -353,6 +359,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
         SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
         SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
         SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE,
+        SELECT_CATALOG_MOVEMENT_END_TARGET_EFFECT_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -1168,6 +1175,12 @@ class GameLifecycle:
                     self._movement_phase_handler.ability_indexes_by_player_id
                 ),
             )
+        if request.decision_type == SELECT_CATALOG_MOVEMENT_END_TARGET_EFFECT_DECISION_TYPE:
+            return invalid_catalog_movement_end_target_effect_status(
+                state=state,
+                request=request,
+                result=result,
+            )
         if is_stratagem_placement_proposal_request(request):
             result.validate_for_request(request)
             if self._result_resolves_active_reaction_frame(result):
@@ -1426,33 +1439,18 @@ class GameLifecycle:
         record: DecisionRecord,
         result: DecisionResult,
     ) -> LifecycleStatus:
-        state = self._require_state()
-        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-        heroic_status = apply_heroic_intervention_charge_move(
-            state=state,
-            request=record.request,
-            result=result,
+        return apply_heroic_intervention_charge_move_lifecycle_decision(
+            state=self._require_state(),
+            config=self._require_config(),
+            runtime_content_bundle=self._require_runtime_content_bundle(),
             decisions=self.decision_controller,
-            ruleset_descriptor=self._require_config().ruleset_descriptor,
+            reaction_queue=self.reaction_queue,
+            record=record,
+            result=result,
+            resolves_reaction_frame=self._result_resolves_active_reaction_frame(result),
+            pending_decision_request=self._pending_decision_request,
+            advance_until_decision_or_terminal=self.advance_until_decision_or_terminal,
         )
-        if heroic_status is not None:
-            if resolves_reaction_frame:
-                retry_request = self._pending_decision_request()
-                if retry_request is not None and is_heroic_intervention_charge_move_request(
-                    retry_request
-                ):
-                    self.reaction_queue.continue_reaction(
-                        result=result,
-                        next_request_id=retry_request.request_id,
-                        decisions=self.decision_controller,
-                    )
-            return heroic_status
-        if resolves_reaction_frame:
-            self.reaction_queue.resolve_reaction(
-                result=result,
-                decisions=self.decision_controller,
-            )
-        return self.advance_until_decision_or_terminal()
 
     def _apply_destroyed_transport_disembark_decision(
         self,

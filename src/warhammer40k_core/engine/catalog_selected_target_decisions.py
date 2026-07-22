@@ -339,6 +339,17 @@ def resolved_shooting_start_group_keys(
     *,
     event_type: str,
 ) -> frozenset[tuple[str, str, str, str, str]]:
+    return resolved_phase_selected_target_group_keys(
+        decisions,
+        event_type=event_type,
+    )
+
+
+def resolved_phase_selected_target_group_keys(
+    decisions: DecisionController,
+    *,
+    event_type: str,
+) -> frozenset[tuple[str, str, str, str, str]]:
     requested_event_type = _validate_identifier("event_type", event_type)
     keys: set[tuple[str, str, str, str, str]] = set()
     for event in decisions.event_log.records:
@@ -346,12 +357,12 @@ def resolved_shooting_start_group_keys(
             continue
         payload = event.payload
         if not isinstance(payload, dict):
-            raise GameLifecycleError("Catalog Shooting-start selected event payload is malformed.")
+            raise GameLifecycleError("Catalog phase selected-target event payload is malformed.")
         payload_value = cast(dict[str, object], payload)
         source_model_id = payload_value.get("source_model_instance_id")
         if source_model_id is not None and type(source_model_id) is not str:
             raise GameLifecycleError(
-                "Catalog Shooting-start selected event source model is malformed."
+                "Catalog phase selected-target event source model is malformed."
             )
         keys.add(
             (

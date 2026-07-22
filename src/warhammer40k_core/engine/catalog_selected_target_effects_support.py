@@ -38,8 +38,10 @@ from warhammer40k_core.engine.catalog_rule_selected_target_classification import
 )
 from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     clause_is_fight_start_selected_target_selection,
+    clause_is_movement_end_selected_target_selection,
     clause_is_shooting_start_selected_target_selection,
     fight_start_selected_target_effect_clauses_after,
+    movement_end_selected_target_effect_clauses_after,
     selected_target_effect_attack_role,
     selected_target_effect_clause_is_supported,
     selected_target_effect_uses_unit_context,
@@ -56,6 +58,7 @@ from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rul
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
+    rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -104,6 +107,10 @@ def clause_is_shooting_start_selection(clause: RuleClause) -> bool:
     return clause_is_shooting_start_selected_target_selection(clause)
 
 
+def clause_is_movement_end_selection(clause: RuleClause) -> bool:
+    return clause_is_movement_end_selected_target_selection(clause)
+
+
 def selected_effect_clauses_after(
     clauses: tuple[RuleClause, ...],
     selection_index: int,
@@ -126,6 +133,13 @@ def shooting_start_effect_clauses_after(
     selection_index: int,
 ) -> tuple[RuleClause, ...]:
     return shooting_start_selected_target_effect_clauses_after(clauses, selection_index)
+
+
+def movement_end_effect_clauses_after(
+    clauses: tuple[RuleClause, ...],
+    selection_index: int,
+) -> tuple[RuleClause, ...]:
+    return movement_end_selected_target_effect_clauses_after(clauses, selection_index)
 
 
 def eligible_selection_target_unit_ids(
@@ -460,30 +474,22 @@ def effect_target_unit_ids(
         )
     if clause.target.kind is not RuleTargetKind.FRIENDLY_UNIT:
         return ()
-    if state.battlefield_state is None:
-        return ()
     from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 
     required_keywords = required_keywords_for_clause(clause)
-    target_ids: set[str] = set()
-    for placed_army in state.battlefield_state.placed_armies:
-        if placed_army.player_id != source_player_id:
-            continue
-        for placement in placed_army.unit_placements:
-            unit = rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=placement.unit_instance_id,
-            )
-            if not rules_unit_has_placed_alive_model(state=state, rules_unit=unit):
-                continue
-            if required_keywords and not unit_has_required_keywords(
+    return tuple(
+        unit.unit_instance_id
+        for unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        if unit.owner_player_id == source_player_id
+        and (
+            not required_keywords
+            or unit_has_required_keywords(
                 unit_keywords=unit.keywords,
                 faction_keywords=unit.faction_keywords,
                 required_keywords=required_keywords,
-            ):
-                continue
-            target_ids.add(unit.unit_instance_id)
-    return tuple(sorted(target_ids))
+            )
+        )
+    )
 
 
 def required_keywords_for_clause(clause: RuleClause) -> tuple[str, ...]:
@@ -810,6 +816,50 @@ def has_shooting_start_selected_target_runtime_records(
     return False
 
 
+def has_movement_end_selected_target_runtime_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> bool:
+    for army in armies:
+        index = ability_indexes_by_player_id.get(army.player_id)
+        if index is None:
+            raise GameLifecycleError("Catalog selected-target runtime missing ability index.")
+        for unit in army.units:
+            current_model_ids = tuple(
+                sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
+            )
+            for record in unit_scoped_generic_records_for_timing(
+                ability_index=index,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+                trigger_kind=TimingTriggerKind.END_PHASE,
+            ):
+                clauses = catalog_selected_target_clauses_from_record(record)
+                runtime_clause_id = runtime_clause_id_from_record(record)
+                for selection_index, selection_clause in enumerate(clauses):
+                    effect_clauses = movement_end_selected_target_effect_clauses_after(
+                        clauses,
+                        selection_index,
+                    )
+                    if (
+                        (
+                            runtime_clause_id is None
+                            or runtime_clause_id == selection_clause.clause_id
+                        )
+                        and clause_is_movement_end_selection(selection_clause)
+                        and effect_clauses
+                        and selection_source_model_ids_for_record(
+                            record,
+                            unit,
+                            selection_clause,
+                            effect_clauses,
+                            current_model_ids,
+                        )
+                    ):
+                        return True
+    return False
+
+
 def record_has_supported_fight_start_selected_target_effect(
     record: AbilityCatalogRecord,
 ) -> bool:
@@ -1017,6 +1067,8 @@ def active_player_id(state: GameState) -> str:
 
 
 def battle_phase_kind(phase: BattlePhase) -> BattlePhaseKind:
+    if phase is BattlePhase.MOVEMENT:
+        return BattlePhaseKind.MOVEMENT
     if phase is BattlePhase.FIGHT:
         return BattlePhaseKind.FIGHT
     if phase is BattlePhase.SHOOTING:
@@ -1053,6 +1105,18 @@ def selected_target_effect_expiration(
             battle_round=state.battle_round + 1,
             player_id=active_player_id(state),
         )
+    if (
+        endpoint == "phase"
+        and duration_parameters.get("boundary") == "start"
+        and duration_parameters.get("owner") == "source_player"
+        and duration_parameters.get("battle_round_offset") == 1
+        and duration_parameters.get("phase") == BattlePhase.COMMAND.value
+    ):
+        return EffectExpiration.start_phase(
+            battle_round=state.battle_round + 1,
+            phase=BattlePhaseKind.COMMAND,
+            player_id=active_player_id(state),
+        )
     if endpoint == "phase":
         return EffectExpiration.end_phase(
             battle_round=state.battle_round,
@@ -1072,6 +1136,8 @@ def selected_target_effect_expiration(
 
 
 def timing_window_id(phase: BattlePhase) -> str:
+    if phase is BattlePhase.MOVEMENT:
+        return "movement_phase_end"
     if phase is BattlePhase.FIGHT:
         return "fight_phase_start"
     if phase is BattlePhase.SHOOTING:

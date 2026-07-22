@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
     CATALOG_SETUP_REACTIVE_CHARGE_MOVE_EVENT,
     CATALOG_SETUP_REACTIVE_SOURCE_KIND,
@@ -133,6 +134,7 @@ def apply_catalog_setup_reactive_charge_move(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    ability_index: AbilityCatalogIndex | None = None,
 ) -> LifecycleStatus | None:
     parsed = _parse_setup_reactive_charge_move_proposal_submission_or_invalid(
         state=state,
@@ -185,6 +187,7 @@ def apply_catalog_setup_reactive_charge_move(
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
         unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
+        ability_index=ability_index,
     )
     violation_code = charge_move_violation_code(
         resolution=resolution,
