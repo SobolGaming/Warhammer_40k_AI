@@ -1,7 +1,7 @@
 {
   "coverage_schema_version": "aeldari-datasheet-semantic-coverage-v4",
-  "coverage_sha256": "b7ef19b0d774049e8ea34d07827debcd57520fa7ca8a613749876a04fd4d21bb",
-  "description_text_sha256": "21bb66cf0839d45e9817e461c95f368d8630fedf80d54812c3e98e54a09a97ba",
+  "coverage_sha256": "9466bbb2dcc6ae0cb88f5c75770ec5c4c3a4efc0deb2195454984c8c37e652a8",
+  "description_text_sha256": "82155583b778896de3a0c55ff7865ef95580295aeff135611b1c27fd93179986",
   "descriptions": [
     {
       "ability_id": "000000568:diviner-of-futures",

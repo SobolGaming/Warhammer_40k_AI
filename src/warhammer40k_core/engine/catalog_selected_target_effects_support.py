@@ -58,6 +58,7 @@ from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rul
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
+    rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -473,30 +474,22 @@ def effect_target_unit_ids(
         )
     if clause.target.kind is not RuleTargetKind.FRIENDLY_UNIT:
         return ()
-    if state.battlefield_state is None:
-        return ()
     from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 
     required_keywords = required_keywords_for_clause(clause)
-    target_ids: set[str] = set()
-    for placed_army in state.battlefield_state.placed_armies:
-        if placed_army.player_id != source_player_id:
-            continue
-        for placement in placed_army.unit_placements:
-            unit = rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=placement.unit_instance_id,
-            )
-            if not rules_unit_has_placed_alive_model(state=state, rules_unit=unit):
-                continue
-            if required_keywords and not unit_has_required_keywords(
+    return tuple(
+        unit.unit_instance_id
+        for unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        if unit.owner_player_id == source_player_id
+        and (
+            not required_keywords
+            or unit_has_required_keywords(
                 unit_keywords=unit.keywords,
                 faction_keywords=unit.faction_keywords,
                 required_keywords=required_keywords,
-            ):
-                continue
-            target_ids.add(unit.unit_instance_id)
-    return tuple(sorted(target_ids))
+            )
+        )
+    )
 
 
 def required_keywords_for_clause(clause: RuleClause) -> tuple[str, ...]:

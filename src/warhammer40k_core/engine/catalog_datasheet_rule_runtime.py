@@ -38,6 +38,9 @@ from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     CatalogDatasheetClauseSource as _CatalogClauseSource,
 )
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
+    current_effect_target_model_ids as _current_effect_target_model_ids,
+)
+from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     current_source_model_ids as _current_source_model_ids,
 )
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
@@ -589,7 +592,7 @@ class CatalogDatasheetRuleRuntime:
                 source=source, context_unit_id=context.unit_instance_id, state=context.state
             ):
                 return context.current_movement_inches
-            if context.model_instance_id not in _current_source_model_ids(
+            if context.model_instance_id not in _current_effect_target_model_ids(
                 state=context.state, source=source
             ) or not _source_keyword_gate_applies(source):
                 return context.current_movement_inches
@@ -686,7 +689,7 @@ class CatalogDatasheetRuleRuntime:
                     state=context.state,
                 )
                 or context.attacker_model_instance_id
-                not in _current_source_model_ids(state=context.state, source=source)
+                not in _current_effect_target_model_ids(state=context.state, source=source)
                 or not _friendly_keyworded_unit_within(source=source, state=context.state)
             ):
                 return context.weapon_profile
@@ -925,7 +928,7 @@ class CatalogDatasheetRuleRuntime:
                 state=context.state,
             ):
                 return context.weapon_profile
-            if context.attacker_model_instance_id not in _current_source_model_ids(
+            if context.attacker_model_instance_id not in _current_effect_target_model_ids(
                 state=context.state, source=source
             ) or not _source_keyword_gate_applies(source):
                 return context.weapon_profile

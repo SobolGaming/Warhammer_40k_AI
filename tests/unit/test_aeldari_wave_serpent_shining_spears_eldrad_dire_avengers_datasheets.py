@@ -41,6 +41,7 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     muster_army,
 )
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     geometry_model_for_placement,
@@ -100,6 +101,7 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
 )
 
 TEST_DETACHMENT_ID = "aeldari-four-datasheets-test"
+ELDRAD_DIRE_AVENGERS_ATTACHED_ID = "attached-unit:army-a:eldrad-dire-avengers"
 
 
 @dataclass(frozen=True, slots=True)
@@ -349,6 +351,37 @@ def test_bladestorm_and_wave_serpent_shield_use_live_attack_context() -> None:
     )
 
 
+def test_bladestorm_this_unit_scope_includes_attached_leader_models() -> None:
+    fixture = _runtime_fixture(attach_eldrad_to_dire_avengers=True)
+    _move_unit_to(
+        fixture.state,
+        unit_instance_id=fixture.eldrad.unit_instance_id,
+        x=4.0,
+        y=4.0,
+    )
+    runtime = CatalogDatasheetRuleRuntime(fixture.indexes, fixture.armies)
+    bladestorm = next(
+        binding
+        for binding in runtime.weapon_profile_modifier_bindings()
+        if binding.source_id == _rule_ir(BLADESTORM_ROW_ID).source_id
+    )
+    catapult = _weapon_profile(DIRE_AVENGERS_DATASHEET_ID, "Avenger shuriken catapult")
+
+    modified = bladestorm.handler(
+        WeaponProfileModifierContext(
+            state=fixture.state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=ELDRAD_DIRE_AVENGERS_ATTACHED_ID,
+            attacker_model_instance_id=fixture.eldrad.own_models[0].model_instance_id,
+            target_unit_instance_id=fixture.enemy_one.unit_instance_id,
+            weapon_profile=catapult,
+        )
+    )
+
+    assert WeaponKeyword.SUSTAINED_HITS in modified.keywords
+    assert "sustained-hits:1" in {ability.ability_id for ability in modified.abilities}
+
+
 @pytest.mark.parametrize(
     "movement_mode",
     [MovementMode.NORMAL, MovementMode.ADVANCE, MovementMode.FALL_BACK, MovementMode.CHARGE],
@@ -567,6 +600,70 @@ def test_doom_submits_through_local_session_rejects_drift_replays_and_expires() 
     assert registry.wound_roll_modifier(wound) == 0
 
 
+def test_doom_benefits_known_aeldari_unit_placed_after_target_selection() -> None:
+    fixture = _runtime_fixture()
+    lifecycle = _lifecycle_for_fixture(fixture)
+    state = cast(GameState, lifecycle.state)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    arriving_placement = battlefield.unit_placement_by_id(fixture.shining_spears.unit_instance_id)
+    reserve_state = state.reposition_unit_to_strategic_reserves(
+        player_id="player-a",
+        unit_instance_id=fixture.shining_spears.unit_instance_id,
+        source_rule_ids=("test:doom:later-placed-beneficiary",),
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    pending = session.advance_until_decision_or_terminal()
+    request = pending.decision_request
+    assert request is not None
+    option = next(
+        option
+        for option in request.options
+        if cast(dict[str, Any], option.payload)["selected_catalog_target_effect"][
+            "target_unit_instance_id"
+        ]
+        == fixture.enemy_one.unit_instance_id
+    )
+
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=option.option_id,
+        result_id="result:doom:later-placed-shining-spears",
+    )
+
+    doom_effect = next(
+        effect
+        for effect in state.persisting_effects
+        if effect.source_rule_id == cast(dict[str, Any], request.payload)["source_rule_id"]
+    )
+    assert fixture.shining_spears.unit_instance_id in doom_effect.target_unit_instance_ids
+    current_battlefield = state.battlefield_state
+    assert current_battlefield is not None
+    state.replace_battlefield_state(
+        current_battlefield.with_added_unit_placement(arriving_placement)
+    )
+    state.replace_reserve_state(
+        reserve_state.mark_arrived(
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            large_model_exception_used=False,
+            post_arrival_restrictions=(),
+        )
+    )
+    wound = WoundRollModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=fixture.shining_spears.unit_instance_id,
+        attacker_model_instance_id=fixture.shining_spears.own_models[0].model_instance_id,
+        target_unit_instance_id=fixture.enemy_one.unit_instance_id,
+        weapon_profile=_weapon_profile(DIRE_AVENGERS_DATASHEET_ID, "Avenger shuriken catapult"),
+        strength=4,
+        toughness=9,
+    )
+
+    assert RuntimeModifierRegistry.empty().wound_roll_modifier(wound) == 1
+
+
 @cache
 def _package() -> Any:
     generated = _ability_support_catalog_package()
@@ -685,7 +782,7 @@ def _muster_request(
     )
 
 
-def _runtime_fixture() -> _RuntimeFixture:
+def _runtime_fixture(*, attach_eldrad_to_dire_avengers: bool = False) -> _RuntimeFixture:
     package = _package()
     catalog = package.army_catalog
     player_a_request = _muster_request(
@@ -710,6 +807,21 @@ def _runtime_fixture() -> _RuntimeFixture:
         muster_army(catalog=catalog, request=player_a_request),
         muster_army(catalog=catalog, request=player_b_request),
     )
+    if attach_eldrad_to_dire_avengers:
+        player_a_units = {unit.unit_instance_id: unit for unit in armies[0].units}
+        eldrad = player_a_units["army-a:eldrad"]
+        dire_avengers = player_a_units["army-a:dire-avengers"]
+        formation = AttachedUnitFormation(
+            attached_unit_instance_id=ELDRAD_DIRE_AVENGERS_ATTACHED_ID,
+            bodyguard_unit_instance_id=dire_avengers.unit_instance_id,
+            leader_unit_instance_ids=(eldrad.unit_instance_id,),
+            component_unit_instance_ids=tuple(
+                sorted((dire_avengers.unit_instance_id, eldrad.unit_instance_id))
+            ),
+            source_id="test:bladestorm:attached-unit",
+            attachment_source_ids=("test:bladestorm:leader-eligibility",),
+        )
+        armies = (replace(armies[0], attached_units=(formation,)), armies[1])
     state = _state_for_armies(armies)
     units = {unit.unit_instance_id: unit for army in armies for unit in army.units}
     eldrad = units["army-a:eldrad"]

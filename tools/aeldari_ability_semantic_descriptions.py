@@ -18,6 +18,7 @@ if TYPE_CHECKING or __package__:
     from tools.aeldari_datasheet_semantic_coverage import (
         SCHEMA_VERSION as COVERAGE_SCHEMA_VERSION,
     )
+    from tools.canonical_json_hash import canonical_json_sha256
 else:
     from aeldari_datasheet_semantic_coverage import (
         COVERAGE_PATH,
@@ -29,6 +30,7 @@ else:
     from aeldari_datasheet_semantic_coverage import (
         SCHEMA_VERSION as COVERAGE_SCHEMA_VERSION,
     )
+    from canonical_json_hash import canonical_json_sha256
 
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
 from warhammer40k_core.engine.ability_coverage import AbilityCoverageSupportStage
@@ -142,9 +144,11 @@ def load_aeldari_ability_semantic_descriptions(
         raise ValueError("Aeldari semantic-description generator identity drifted.")
     if payload["coverage_schema_version"] != COVERAGE_SCHEMA_VERSION:
         raise ValueError("Aeldari semantic-description coverage schema drifted.")
-    if _required_sha256(payload, "coverage_sha256") != _sha256(COVERAGE_PATH):
+    if _required_sha256(payload, "coverage_sha256") != canonical_json_sha256(COVERAGE_PATH):
         raise ValueError("Aeldari semantic-description coverage hash drifted.")
-    if _required_sha256(payload, "description_text_sha256") != _sha256(DESCRIPTION_TEXT_PATH):
+    if _required_sha256(payload, "description_text_sha256") != canonical_json_sha256(
+        DESCRIPTION_TEXT_PATH
+    ):
         raise ValueError("Aeldari semantic-description text hash drifted.")
     rows = tuple(
         _parse_description(raw_description)
@@ -383,11 +387,3 @@ def _required_sha256(payload: dict[str, Any], key: str) -> str:
     if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
         raise ValueError(f"{key!r} must be a lowercase SHA-256 digest.")
     return value
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()

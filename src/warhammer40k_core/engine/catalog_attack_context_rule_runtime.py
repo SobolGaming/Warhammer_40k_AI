@@ -25,7 +25,12 @@ from warhammer40k_core.engine.shooting_selection_range import (
     target_within_shooting_selection_range,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR, parameter_payload
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleIR,
+    RuleTargetKind,
+    parameter_payload,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,7 +56,7 @@ def half_range_weapon_ability_handler(
             state=context.state,
         ):
             return context.weapon_profile
-        if context.attacker_model_instance_id not in current_source_model_ids(
+        if context.attacker_model_instance_id not in current_effect_target_model_ids(
             state=context.state,
             source=source,
         ):
@@ -150,6 +155,37 @@ def current_source_model_ids(
     )
 
 
+def current_effect_target_model_ids(
+    *,
+    state: object,
+    source: CatalogDatasheetClauseSource,
+) -> tuple[str, ...]:
+    if type(state) is not GameState:
+        raise GameLifecycleError("Catalog datasheet effect target query requires GameState.")
+    source_model_ids = current_source_model_ids(state=state, source=source)
+    if source.record.source_kind is AbilitySourceKind.WARGEAR:
+        return source_model_ids
+    target = source.clause.target
+    if target is None or target.kind not in {RuleTargetKind.THIS_MODEL, RuleTargetKind.THIS_UNIT}:
+        raise GameLifecycleError("Catalog datasheet model effect requires a self target.")
+    if target.kind is RuleTargetKind.THIS_MODEL:
+        return source_model_ids
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source.unit.unit_instance_id,
+    )
+    return tuple(
+        sorted(
+            model_instance_id
+            for component in rules_unit.components
+            for model_instance_id in catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+                state=state,
+                unit=component.unit,
+            )
+        )
+    )
+
+
 def rules_units_within(
     state: GameState,
     first_unit_id: str,
@@ -160,12 +196,18 @@ def rules_units_within(
 ) -> bool:
     if type(state) is not GameState or state.battlefield_state is None:
         raise GameLifecycleError("Catalog datasheet range query requires battlefield state.")
+    attacking_unit_id = first_unit_id
+    if attacker_model_instance_id is not None:
+        attacking_unit_id = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=first_unit_id,
+        ).component_unit_id_for_model(attacker_model_instance_id)
     return target_within_shooting_selection_range(
         scenario=BattlefieldScenario(
             armies=tuple(state.army_definitions),
             battlefield_state=state.battlefield_state,
         ),
-        attacking_unit_instance_id=first_unit_id,
+        attacking_unit_instance_id=attacking_unit_id,
         attacker_model_instance_id=attacker_model_instance_id,
         target_unit_instance_id=second_unit_id,
         max_range_inches=distance,
