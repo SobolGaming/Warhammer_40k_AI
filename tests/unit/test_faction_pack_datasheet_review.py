@@ -308,14 +308,18 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         assert markdown.index("## Datasheet Source Review") < markdown.index(
             "## Datasheet / Unit Support"
         )
-        if row.faction_id == "aeldari":
+        if row.faction_id in {"aeldari", "emperors-children"}:
             support_markdown = markdown.split("## Datasheet / Unit Support", 1)[1]
             assert f"| {row.datasheet_name} (`{row.datasheet_id}`) |" in support_markdown
-            assert "| All consumed |" in next(
+            rendered_row = next(
                 line
                 for line in support_markdown.splitlines()
                 if line.startswith(f"| {row.datasheet_name} (`{row.datasheet_id}`) |")
             )
+            if row.faction_id == "aeldari":
+                assert "| All consumed |" in rendered_row
+            else:
+                assert "| IR parsed; host needed |" in rendered_row
         else:
             assert f"| {row.datasheet_name} (`{row.datasheet_id}`) | `{row.overall}` |" in markdown
         if row.faction_id == "aeldari":
@@ -327,7 +331,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
             support_markdown = markdown.split("## Datasheet / Unit Support", 1)[1]
             for ability in semantic_row.abilities:
                 assert support_markdown.count(f"`{ability.ability_id}`") == 1
-        else:
+        elif row.faction_id != "emperors-children":
             for coverage_row_id in row.ability_coverage_row_ids:
                 coverage_row = ability_rows_by_id[coverage_row_id]
                 assert (

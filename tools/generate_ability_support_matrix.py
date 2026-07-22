@@ -19,11 +19,13 @@ if TYPE_CHECKING or __package__:
     )
     from tools.emperors_children_support_report import (
         EMPERORS_CHILDREN_FACTION_ID,
+        emperors_children_datasheet_support_markdown,
         emperors_children_detachment_semantics_needed,
         emperors_children_faction_pack_review_markdown,
         emperors_children_semantic_snapshot_markdown,
     )
     from tools.faction_pack_datasheet_review import (
+        faction_pack_datasheet_review,
         faction_pack_datasheet_review_markdown,
         faction_pack_datasheet_snapshot_markdown,
         reviewed_faction_ids,
@@ -37,11 +39,13 @@ else:
     )
     from emperors_children_support_report import (
         EMPERORS_CHILDREN_FACTION_ID,
+        emperors_children_datasheet_support_markdown,
         emperors_children_detachment_semantics_needed,
         emperors_children_faction_pack_review_markdown,
         emperors_children_semantic_snapshot_markdown,
     )
     from faction_pack_datasheet_review import (
+        faction_pack_datasheet_review,
         faction_pack_datasheet_review_markdown,
         faction_pack_datasheet_snapshot_markdown,
         reviewed_faction_ids,
@@ -3014,7 +3018,10 @@ def _faction_support_markdown(
                 ),
             )
         )
-    elif faction_row.faction_id in reviewed_faction_ids():
+    elif (
+        faction_row.faction_id != EMPERORS_CHILDREN_FACTION_ID
+        and faction_row.faction_id in reviewed_faction_ids()
+    ):
         lines.extend(faction_pack_datasheet_snapshot_markdown(faction_row.faction_id))
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
     if faction_row.faction_id in reviewed_faction_ids():
@@ -3314,6 +3321,24 @@ def _faction_datasheet_support_markdown(
         lines.extend(
             aeldari_datasheet_support_markdown(
                 support_rows_by_datasheet_id={row.datasheet_id: row for row in sorted_rows},
+            )
+        )
+        return lines
+    if faction_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
+        review = faction_pack_datasheet_review(EMPERORS_CHILDREN_FACTION_ID)
+        lines.extend(
+            emperors_children_datasheet_support_markdown(
+                review_rows=tuple(
+                    (
+                        row.datasheet_id,
+                        row.datasheet_name,
+                        row.treatment.value,
+                        row.pdf_page_reference,
+                    )
+                    for row in review.rows
+                    if row.datasheet_id is not None
+                ),
+                generated_support_datasheet_ids=frozenset(row.datasheet_id for row in sorted_rows),
             )
         )
         return lines
