@@ -10,6 +10,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 from ._artifacts import (
     JULY_FACTION_PACK_SOURCE_PACKAGE_ID,
+    JulyDatasheetArtifact,
+    JulyDatasheetPreviewArtifact,
     JulyDeltaLedgerArtifact,
     JulyDetachmentArtifact,
     JulyFactionPackStagingError,
@@ -18,10 +20,13 @@ from ._artifacts import (
     JulyRuntimeScaffoldArtifact,
     JulyStagingPackageArtifact,
     JulySubruleArtifact,
+    audit_datasheet_preview_links,
     audit_load_only_artifact_links,
     audit_manifest_links,
     audit_runtime_predecessor_references,
     canonical_json_sha256_from_bytes,
+    july_datasheet_preview_from_json_bytes,
+    july_datasheets_from_json_bytes,
     july_delta_ledger_from_json_bytes,
     july_detachments_from_json_bytes,
     july_phase17e_from_json_bytes,
@@ -93,6 +98,18 @@ def detachments() -> JulyDetachmentArtifact:
     )
 
 
+def datasheets() -> JulyDatasheetArtifact:
+    return july_datasheets_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-faction-pack-datasheets-2026-07")
+    )
+
+
+def datasheet_support_preview() -> JulyDatasheetPreviewArtifact:
+    return july_datasheet_preview_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-faction-pack-datasheet-preview-2026-07")
+    )
+
+
 def subrules() -> JulySubruleArtifact:
     return july_subrules_from_json_bytes(
         _staged_artifact_bytes("gw-11e-july-faction-pack-subrules-2026-07")
@@ -131,6 +148,7 @@ def source_package_identity_payload() -> dict[str, str]:
 def staged_identity_tokens() -> frozenset[str]:
     ledger = delta_ledger()
     staged_source_row_ids = {
+        *(row.source_row_id for row in datasheets().rows),
         *(row.source_row_id for row in detachments().rows),
         *(row.source_row_id for row in subrules().rows),
     }
@@ -183,6 +201,8 @@ __all__ = (
     "SOURCE_PAYLOAD_CHECKSUM_SHA256",
     "SOURCE_TITLE",
     "SOURCE_VERSION",
+    "JulyDatasheetArtifact",
+    "JulyDatasheetPreviewArtifact",
     "JulyDeltaLedgerArtifact",
     "JulyDetachmentArtifact",
     "JulyFactionPackStagingError",
@@ -191,10 +211,13 @@ __all__ = (
     "JulyRuntimeScaffoldArtifact",
     "JulyStagingPackageArtifact",
     "JulySubruleArtifact",
+    "audit_datasheet_preview_links",
     "audit_load_only_artifact_links",
     "audit_manifest_links",
     "audit_runtime_predecessor_references",
     "audit_staged_package_is_not_active",
+    "datasheet_support_preview",
+    "datasheets",
     "delta_ledger",
     "detachments",
     "phase17e_coverage",

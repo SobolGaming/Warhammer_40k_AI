@@ -21,6 +21,8 @@ JULY_SUBRULE_SCHEMA: Final = "core-v2-july-faction-pack-subrules-v1"
 JULY_PHASE17E_SCHEMA: Final = "core-v2-july-faction-pack-phase17e-coverage-v1"
 JULY_PHASE17F_SCHEMA: Final = "core-v2-july-faction-pack-phase17f-execution-v1"
 JULY_RUNTIME_SCAFFOLD_SCHEMA: Final = "core-v2-july-faction-pack-runtime-scaffolds-v1"
+JULY_DATASHEET_SCHEMA: Final = "core-v2-july-faction-pack-datasheets-v1"
+JULY_DATASHEET_PREVIEW_SCHEMA: Final = "core-v2-july-faction-pack-datasheet-preview-v1"
 JULY_FACTION_PACK_SOURCE_PACKAGE_ID: Final = "gw-11e-staged-faction-packs-2026-07"
 JULY_FACTION_PACK_SOURCE_DATE: Final = "2026-07-22"
 JULY_FACTION_PACK_ACTIVATION_STATUS: Final = "staged"
@@ -66,6 +68,14 @@ _BLOCKED_EXECUTION_STATUS = "blocked_structured_semantics_required"
 _BLOCK_REASON = "structured_rule_semantics_required"
 _LOAD_SUPPORT_STATUS = "loaded"
 _SEMANTIC_EXECUTION_STATUS = "blocked"
+_APPROVED_DATASHEET_OVERLAY_OPERATIONS = frozenset(
+    {
+        "add_keyword",
+        "remove_ability",
+        "replace_ability_text",
+        "remove_from_current_inventory",
+    }
+)
 _EXPECTED_FACTION_IDS = frozenset(
     {
         "adepta-sororitas",
@@ -572,6 +582,230 @@ class JulyRuntimeScaffoldArtifact(msgspec.Struct, frozen=True):
             row.validate()
 
 
+class JulyDatasheetOverlayOperationArtifact(msgspec.Struct, frozen=True):
+    operation_id: str
+    operation_kind: str
+    target_source_row_id: str
+    field_name: str
+    replacement_value: str | None
+
+    def validate(self) -> None:
+        _validate_identifier("datasheet overlay operation_id", self.operation_id)
+        if self.operation_kind not in _APPROVED_DATASHEET_OVERLAY_OPERATIONS:
+            raise JulyFactionPackStagingError(
+                "July datasheet overlay operation kind is unsupported."
+            )
+        _validate_identifier("datasheet overlay target_source_row_id", self.target_source_row_id)
+        _validate_identifier("datasheet overlay field_name", self.field_name)
+        if self.operation_kind in {"add_keyword", "replace_ability_text"}:
+            if self.replacement_value is None:
+                raise JulyFactionPackStagingError(
+                    "July datasheet add/update operation requires a replacement value."
+                )
+            _validate_text("datasheet overlay replacement_value", self.replacement_value)
+        elif self.replacement_value is not None:
+            raise JulyFactionPackStagingError(
+                "July datasheet removal operation cannot carry a replacement value."
+            )
+
+
+class JulyDatasheetRowArtifact(msgspec.Struct, frozen=True):
+    source_row_id: str
+    predecessor_datasheet_source_row_id: str
+    datasheet_id: str
+    datasheet_name: str
+    faction_id: str
+    faction_name: str
+    source_pdf_package_id: str
+    source_pdf_page: int
+    source_treatment: str
+    inventory_status: str
+    historical_provenance_retained: bool
+    load_support_status: str
+    semantic_execution_status: str
+    runtime_support_claim: str
+    overlay_operations: list[JulyDatasheetOverlayOperationArtifact]
+
+    def validate(self) -> None:
+        _validate_staged_row_id(self.source_row_id)
+        _validate_identifier(
+            "datasheet predecessor_datasheet_source_row_id",
+            self.predecessor_datasheet_source_row_id,
+        )
+        _validate_identifier("datasheet datasheet_id", self.datasheet_id)
+        if self.predecessor_datasheet_source_row_id != self.datasheet_id:
+            raise JulyFactionPackStagingError(
+                "July datasheet review must retain its stable predecessor datasheet ID."
+            )
+        _validate_text("datasheet datasheet_name", self.datasheet_name)
+        _validate_identifier("datasheet faction_id", self.faction_id)
+        _validate_text("datasheet faction_name", self.faction_name)
+        _validate_successor_package_id(self.faction_id, self.source_pdf_package_id)
+        _validate_page(self.source_pdf_page)
+        if self.source_treatment != "complete_pdf":
+            raise JulyFactionPackStagingError(
+                "July changed datasheets require complete-PDF staged review."
+            )
+        if self.inventory_status not in {
+            "current_matched_play",
+            "historical_predecessor_only",
+        }:
+            raise JulyFactionPackStagingError("July datasheet inventory status is unsupported.")
+        if not self.historical_provenance_retained:
+            raise JulyFactionPackStagingError(
+                "July datasheet review must retain historical provenance."
+            )
+        _validate_blocked_support(
+            load_support_status=self.load_support_status,
+            semantic_execution_status=self.semantic_execution_status,
+            block_reason=_BLOCK_REASON,
+        )
+        if self.runtime_support_claim != "unknown":
+            raise JulyFactionPackStagingError(
+                "July PR 3 datasheet review cannot upgrade runtime support."
+            )
+        if not self.overlay_operations:
+            raise JulyFactionPackStagingError(
+                "July changed datasheet review requires one or more overlay operations."
+            )
+        seen_operation_ids: set[str] = set()
+        for operation in self.overlay_operations:
+            operation.validate()
+            if operation.operation_id in seen_operation_ids:
+                raise JulyFactionPackStagingError(
+                    "July datasheet overlay operation IDs must be unique within a row."
+                )
+            seen_operation_ids.add(operation.operation_id)
+        removal_operations = [
+            operation
+            for operation in self.overlay_operations
+            if operation.operation_kind == "remove_from_current_inventory"
+        ]
+        if (self.inventory_status == "historical_predecessor_only") != bool(removal_operations):
+            raise JulyFactionPackStagingError(
+                "July removed datasheets require exactly an inventory-removal overlay."
+            )
+
+
+class JulyDatasheetArtifact(msgspec.Struct, frozen=True):
+    artifact_schema: str
+    artifact_id: str
+    source_package_id: str
+    source_date: str
+    predecessor_manifest_path: str
+    predecessor_manifest_sha256: str
+    excluded_content_categories: list[str]
+    rows: list[JulyDatasheetRowArtifact]
+
+    def validate(self) -> None:
+        if self.artifact_schema != JULY_DATASHEET_SCHEMA:
+            raise JulyFactionPackStagingError("July datasheet artifact schema is unsupported.")
+        _validate_identifier("datasheet artifact_id", self.artifact_id)
+        if self.source_package_id != JULY_FACTION_PACK_SOURCE_PACKAGE_ID:
+            raise JulyFactionPackStagingError(
+                "July datasheet artifact belongs to the wrong staged package."
+            )
+        if self.source_date != JULY_FACTION_PACK_SOURCE_DATE:
+            raise JulyFactionPackStagingError("July datasheet artifact source date is stale.")
+        if (
+            self.predecessor_manifest_path
+            != "data/source_manifests/faction_pack_datasheet_review_v1.json"
+        ):
+            raise JulyFactionPackStagingError(
+                "July datasheet predecessor review manifest path is unexpected."
+            )
+        _validate_sha256(
+            "datasheet predecessor_manifest_sha256",
+            self.predecessor_manifest_sha256,
+        )
+        if self.excluded_content_categories != [
+            "imperial-armour",
+            "legends",
+        ]:
+            raise JulyFactionPackStagingError(
+                "July datasheet artifact must exclude Imperial Armour and Legends."
+            )
+        _validate_unique_rows(self.rows)
+        datasheet_ids: set[str] = set()
+        for row in self.rows:
+            row.validate()
+            if row.datasheet_id in datasheet_ids:
+                raise JulyFactionPackStagingError(
+                    "July datasheet review must map each datasheet exactly once."
+                )
+            datasheet_ids.add(row.datasheet_id)
+
+
+class JulyDatasheetPreviewRowArtifact(msgspec.Struct, array_like=True, frozen=True):
+    datasheet_id: str
+    datasheet_name: str
+    faction_id: str
+    inventory_status: str
+    load_support_status: str
+    semantic_execution_status: str
+    runtime_support_claim: str
+
+    def validate(self) -> None:
+        _validate_identifier("datasheet preview datasheet_id", self.datasheet_id)
+        _validate_text("datasheet preview datasheet_name", self.datasheet_name)
+        _validate_identifier("datasheet preview faction_id", self.faction_id)
+        if self.inventory_status not in {
+            "current_matched_play",
+            "historical_predecessor_only",
+        }:
+            raise JulyFactionPackStagingError(
+                "July datasheet preview inventory status is unsupported."
+            )
+        _validate_blocked_support(
+            load_support_status=self.load_support_status,
+            semantic_execution_status=self.semantic_execution_status,
+            block_reason=_BLOCK_REASON,
+        )
+        if self.runtime_support_claim != "unknown":
+            raise JulyFactionPackStagingError(
+                "July datasheet preview cannot upgrade runtime support."
+            )
+
+
+class JulyDatasheetPreviewArtifact(msgspec.Struct, frozen=True):
+    artifact_schema: str
+    artifact_id: str
+    source_package_id: str
+    source_date: str
+    preview_marker: str
+    datasheet_artifact_id: str
+    datasheet_artifact_sha256: str
+    rows: list[JulyDatasheetPreviewRowArtifact]
+
+    def validate(self) -> None:
+        if self.artifact_schema != JULY_DATASHEET_PREVIEW_SCHEMA:
+            raise JulyFactionPackStagingError(
+                "July datasheet preview artifact schema is unsupported."
+            )
+        _validate_identifier("datasheet preview artifact_id", self.artifact_id)
+        if self.source_package_id != JULY_FACTION_PACK_SOURCE_PACKAGE_ID:
+            raise JulyFactionPackStagingError(
+                "July datasheet preview belongs to the wrong staged package."
+            )
+        if self.source_date != JULY_FACTION_PACK_SOURCE_DATE:
+            raise JulyFactionPackStagingError("July datasheet preview source date is stale.")
+        if self.preview_marker != "staged_preview_not_current":
+            raise JulyFactionPackStagingError(
+                "July datasheet support output must be marked as a staged preview."
+            )
+        if self.datasheet_artifact_id != "gw-11e-july-faction-pack-datasheets-2026-07":
+            raise JulyFactionPackStagingError(
+                "July datasheet preview links the wrong datasheet artifact."
+            )
+        _validate_sha256(
+            "datasheet preview datasheet_artifact_sha256",
+            self.datasheet_artifact_sha256,
+        )
+        _validate_unique_rows(self.rows, id_field="datasheet_id")
+        for row in self.rows:
+            row.validate()
+
+
 class JulyStagingPackageArtifact(msgspec.Struct, frozen=True):
     artifact_schema: str
     source_package_id: str
@@ -636,6 +870,8 @@ class JulyStagingPackageArtifact(msgspec.Struct, frozen=True):
             seen_artifact_ids.add(artifact.artifact_id)
             seen_artifact_paths.add(artifact.artifact_path)
         expected_staged_artifact_ids = {
+            "gw-11e-july-faction-pack-datasheet-preview-2026-07",
+            "gw-11e-july-faction-pack-datasheets-2026-07",
             "gw-11e-july-faction-pack-detachments-2026-07",
             "gw-11e-july-faction-pack-subrules-2026-07",
             "gw-11e-july-faction-pack-phase17e-coverage-2026-07",
@@ -712,6 +948,26 @@ def july_runtime_scaffolds_from_json_bytes(raw: bytes) -> JulyRuntimeScaffoldArt
         raw,
         JulyRuntimeScaffoldArtifact,
         artifact_description="runtime scaffold",
+    )
+    artifact.validate()
+    return artifact
+
+
+def july_datasheets_from_json_bytes(raw: bytes) -> JulyDatasheetArtifact:
+    artifact = _decode_json_artifact(
+        raw,
+        JulyDatasheetArtifact,
+        artifact_description="datasheet review and overlay",
+    )
+    artifact.validate()
+    return artifact
+
+
+def july_datasheet_preview_from_json_bytes(raw: bytes) -> JulyDatasheetPreviewArtifact:
+    artifact = _decode_json_artifact(
+        raw,
+        JulyDatasheetPreviewArtifact,
+        artifact_description="datasheet support preview",
     )
     artifact.validate()
     return artifact
@@ -843,6 +1099,47 @@ def audit_load_only_artifact_links(
         ):
             raise JulyFactionPackStagingError(
                 "July runtime scaffold links drifted from staged Phase 17E/17F rows."
+            )
+
+
+def audit_datasheet_preview_links(
+    *,
+    datasheets: JulyDatasheetArtifact,
+    preview: JulyDatasheetPreviewArtifact,
+    datasheet_artifact_sha256: str,
+) -> None:
+    _validate_sha256("datasheet artifact SHA-256", datasheet_artifact_sha256)
+    if preview.datasheet_artifact_id != datasheets.artifact_id:
+        raise JulyFactionPackStagingError("July datasheet preview artifact identity link is stale.")
+    if preview.datasheet_artifact_sha256 != datasheet_artifact_sha256:
+        raise JulyFactionPackStagingError("July datasheet preview artifact hash link is stale.")
+    review_by_id = {row.datasheet_id: row for row in datasheets.rows}
+    preview_by_id = {row.datasheet_id: row for row in preview.rows}
+    if set(review_by_id) != set(preview_by_id):
+        raise JulyFactionPackStagingError(
+            "July datasheet preview must map every staged review row exactly once."
+        )
+    for datasheet_id, preview_row in preview_by_id.items():
+        review_row = review_by_id[datasheet_id]
+        expected = (
+            review_row.datasheet_name,
+            review_row.faction_id,
+            review_row.inventory_status,
+            review_row.load_support_status,
+            review_row.semantic_execution_status,
+            review_row.runtime_support_claim,
+        )
+        actual = (
+            preview_row.datasheet_name,
+            preview_row.faction_id,
+            preview_row.inventory_status,
+            preview_row.load_support_status,
+            preview_row.semantic_execution_status,
+            preview_row.runtime_support_claim,
+        )
+        if actual != expected:
+            raise JulyFactionPackStagingError(
+                "July datasheet preview drifted from its staged review row."
             )
 
 

@@ -541,6 +541,52 @@ def test_july_load_only_rows_are_typed_linked_and_explicitly_blocked() -> None:
     )
 
 
+def test_july_datasheet_preview_preserves_inventory_and_support_boundaries() -> None:
+    datasheets = july_faction_packs_2026_07.datasheets()
+    preview = july_faction_packs_2026_07.datasheet_support_preview()
+    rows_by_id = {row.datasheet_id: row for row in datasheets.rows}
+
+    assert {(row.datasheet_id, row.datasheet_name) for row in datasheets.rows} == {
+        ("000000724", "Ratlings"),
+        ("000000969", "Defiler"),
+        ("000003834", "Tempestus Aquilons"),
+        ("000004210", "Thulia Ghuld"),
+        ("000004216", "Commissar Yarrick"),
+        ("000004221", "Wazdakka Gutsmek"),
+        ("000004225", "The Red Terror"),
+    }
+    assert datasheets.excluded_content_categories == ["imperial-armour", "legends"]
+    assert {
+        datasheet_id
+        for datasheet_id, row in rows_by_id.items()
+        if row.inventory_status == "historical_predecessor_only"
+    } == {"000000724", "000003834"}
+    assert all(row.historical_provenance_retained for row in datasheets.rows)
+    assert all(row.runtime_support_claim == "unknown" for row in datasheets.rows)
+    assert all(row.semantic_execution_status == "blocked" for row in datasheets.rows)
+    assert "Mobile" in {
+        operation.replacement_value for operation in rows_by_id["000004210"].overlay_operations
+    }
+    assert "Mobile" in {
+        operation.replacement_value for operation in rows_by_id["000004225"].overlay_operations
+    }
+    assert {
+        operation.target_source_row_id
+        for operation in rows_by_id["000004225"].overlay_operations
+        if operation.operation_kind == "remove_ability"
+    } == {"000004225:5"}
+    datasheet_reference = next(
+        artifact
+        for artifact in july_faction_packs_2026_07.staging_package().staged_data_artifacts
+        if artifact.artifact_id == datasheets.artifact_id
+    )
+    july_faction_packs_2026_07.audit_datasheet_preview_links(
+        datasheets=datasheets,
+        preview=preview,
+        datasheet_artifact_sha256=datasheet_reference.artifact_sha256,
+    )
+
+
 def test_july_cutover_guard_keeps_staged_ids_out_of_june_defaults() -> None:
     root = Path(__file__).resolve().parents[2]
     current = _official_source_identities(

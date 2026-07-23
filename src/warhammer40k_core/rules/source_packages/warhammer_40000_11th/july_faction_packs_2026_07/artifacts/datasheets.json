@@ -1,0 +1,203 @@
+{
+  "artifact_schema": "core-v2-july-faction-pack-datasheets-v1",
+  "artifact_id": "gw-11e-july-faction-pack-datasheets-2026-07",
+  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
+  "source_date": "2026-07-22",
+  "predecessor_manifest_path": "data/source_manifests/faction_pack_datasheet_review_v1.json",
+  "predecessor_manifest_sha256": "1e0106b1e724f6dae03f62f2aa87e989a20d33164b0d58d95e9eaf065d059f61",
+  "excluded_content_categories": [
+    "imperial-armour",
+    "legends"
+  ],
+  "rows": [
+    {
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-review:adeptus-mechanicus:000004210",
+      "predecessor_datasheet_source_row_id": "000004210",
+      "datasheet_id": "000004210",
+      "datasheet_name": "Thulia Ghuld",
+      "faction_id": "adeptus-mechanicus",
+      "faction_name": "Adeptus Mechanicus",
+      "source_pdf_package_id": "gw-11e-adeptus-mechanicus-faction-pack-2026-07",
+      "source_pdf_page": 9,
+      "source_treatment": "complete_pdf",
+      "inventory_status": "current_matched_play",
+      "historical_provenance_retained": true,
+      "load_support_status": "loaded",
+      "semantic_execution_status": "blocked",
+      "runtime_support_claim": "unknown",
+      "overlay_operations": [
+        {
+          "operation_id": "thulia-ghuld-add-mobile",
+          "operation_kind": "add_keyword",
+          "target_source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-keyword:000004210:mobile",
+          "field_name": "keyword",
+          "replacement_value": "Mobile"
+        },
+        {
+          "operation_id": "thulia-ghuld-remove-cybernetic-augmentation",
+          "operation_kind": "remove_ability",
+          "target_source_row_id": "000004210:4",
+          "field_name": "ability",
+          "replacement_value": null
+        }
+      ]
+    },
+    {
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-review:chaos-space-marines:000000969",
+      "predecessor_datasheet_source_row_id": "000000969",
+      "datasheet_id": "000000969",
+      "datasheet_name": "Defiler",
+      "faction_id": "chaos-space-marines",
+      "faction_name": "Chaos Space Marines",
+      "source_pdf_package_id": "gw-11e-chaos-space-marines-faction-pack-2026-07",
+      "source_pdf_page": 21,
+      "source_treatment": "complete_pdf",
+      "inventory_status": "current_matched_play",
+      "historical_provenance_retained": true,
+      "load_support_status": "loaded",
+      "semantic_execution_status": "blocked",
+      "runtime_support_claim": "unknown",
+      "overlay_operations": [
+        {
+          "operation_id": "chaos-space-marines-defiler-replace-daemonforge",
+          "operation_kind": "replace_ability_text",
+          "target_source_row_id": "000000969:4",
+          "field_name": "description",
+          "replacement_value": "Each time this unit makes a Dark Pact, until the end of the phase, each time this model makes an attack, re-roll a Wound roll of 1."
+        }
+      ]
+    },
+    {
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-review:orks:000004221",
+      "predecessor_datasheet_source_row_id": "000004221",
+      "datasheet_id": "000004221",
+      "datasheet_name": "Wazdakka Gutsmek",
+      "faction_id": "orks",
+      "faction_name": "Orks",
+      "source_pdf_package_id": "gw-11e-orks-faction-pack-2026-07",
+      "source_pdf_page": 17,
+      "source_treatment": "complete_pdf",
+      "inventory_status": "current_matched_play",
+      "historical_provenance_retained": true,
+      "load_support_status": "loaded",
+      "semantic_execution_status": "blocked",
+      "runtime_support_claim": "unknown",
+      "overlay_operations": [
+        {
+          "operation_id": "wazdakka-gutsmek-replace-shokk-attack-engine",
+          "operation_kind": "replace_ability_text",
+          "target_source_row_id": "000004221:8",
+          "field_name": "description",
+          "replacement_value": "In your Command phase, if this unit is unengaged, you can use this ability. If you do, place this unit in Strategic Reserves. This unit can make an ingress move in your next Movement phase (including in your first turn)."
+        }
+      ]
+    },
+    {
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-review:astra-militarum:000004216",
+      "predecessor_datasheet_source_row_id": "000004216",
+      "datasheet_id": "000004216",
+      "datasheet_name": "Commissar Yarrick",
+      "faction_id": "astra-militarum",
+      "faction_name": "Astra Militarum",
+      "source_pdf_package_id": "gw-11e-astra-militarum-faction-pack-2026-07",
+      "source_pdf_page": 14,
+      "source_treatment": "complete_pdf",
+      "inventory_status": "current_matched_play",
+      "historical_provenance_retained": true,
+      "load_support_status": "loaded",
+      "semantic_execution_status": "blocked",
+      "runtime_support_claim": "unknown",
+      "overlay_operations": [
+        {
+          "operation_id": "commissar-yarrick-counterstrategist-range-eight",
+          "operation_kind": "replace_ability_text",
+          "target_source_row_id": "000004216:6",
+          "field_name": "description",
+          "replacement_value": "At the end of your opponent's Movement phase, you can select one enemy unit that was set up or ended a move within 8\" of this model, and one friendly REGIMENT unit within 6\" of and visible to this model that has not made a Normal move or been targeted with the Fire Overwatch Stratagem this phase. That REGIMENT unit can then either: Make a Normal move of up to D6\". Shoot at that enemy unit, but only if it is an eligible target. Until the end of the phase, each time a model in that unit makes a ranged attack, an unmodified Hit roll of 6 is required to score a hit, irrespective of the attacking weapon's Ballistic Skill or any modifiers. Make a Surge move. To do so, roll one D6: models in that unit move a number of inches up to the result, but that unit must end that move as close as possible to the closest enemy unit (excluding AIRCRAFT). When doing so, those models can be moved within Engagement Range of that enemy unit. That unit cannot make a Surge move while it is Battle-shocked or within Engagement Range of one or more enemy units, and can only make one Surge move per phase."
+        }
+      ]
+    },
+    {
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-review:astra-militarum:000003834",
+      "predecessor_datasheet_source_row_id": "000003834",
+      "datasheet_id": "000003834",
+      "datasheet_name": "Tempestus Aquilons",
+      "faction_id": "astra-militarum",
+      "faction_name": "Astra Militarum",
+      "source_pdf_package_id": "gw-11e-astra-militarum-faction-pack-2026-07",
+      "source_pdf_page": 1,
+      "source_treatment": "complete_pdf",
+      "inventory_status": "historical_predecessor_only",
+      "historical_provenance_retained": true,
+      "load_support_status": "loaded",
+      "semantic_execution_status": "blocked",
+      "runtime_support_claim": "unknown",
+      "overlay_operations": [
+        {
+          "operation_id": "tempestus-aquilons-remove-current-faction-pack-inventory",
+          "operation_kind": "remove_from_current_inventory",
+          "target_source_row_id": "000003834",
+          "field_name": "current-inventory",
+          "replacement_value": null
+        }
+      ]
+    },
+    {
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-review:astra-militarum:000000724",
+      "predecessor_datasheet_source_row_id": "000000724",
+      "datasheet_id": "000000724",
+      "datasheet_name": "Ratlings",
+      "faction_id": "astra-militarum",
+      "faction_name": "Astra Militarum",
+      "source_pdf_package_id": "gw-11e-astra-militarum-faction-pack-2026-07",
+      "source_pdf_page": 1,
+      "source_treatment": "complete_pdf",
+      "inventory_status": "historical_predecessor_only",
+      "historical_provenance_retained": true,
+      "load_support_status": "loaded",
+      "semantic_execution_status": "blocked",
+      "runtime_support_claim": "unknown",
+      "overlay_operations": [
+        {
+          "operation_id": "ratlings-remove-current-faction-pack-inventory",
+          "operation_kind": "remove_from_current_inventory",
+          "target_source_row_id": "000000724",
+          "field_name": "current-inventory",
+          "replacement_value": null
+        }
+      ]
+    },
+    {
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-review:tyranids:000004225",
+      "predecessor_datasheet_source_row_id": "000004225",
+      "datasheet_id": "000004225",
+      "datasheet_name": "The Red Terror",
+      "faction_id": "tyranids",
+      "faction_name": "Tyranids",
+      "source_pdf_package_id": "gw-11e-tyranids-faction-pack-2026-07",
+      "source_pdf_page": 7,
+      "source_treatment": "complete_pdf",
+      "inventory_status": "current_matched_play",
+      "historical_provenance_retained": true,
+      "load_support_status": "loaded",
+      "semantic_execution_status": "blocked",
+      "runtime_support_claim": "unknown",
+      "overlay_operations": [
+        {
+          "operation_id": "red-terror-add-mobile",
+          "operation_kind": "add_keyword",
+          "target_source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-keyword:000004225:mobile",
+          "field_name": "keyword",
+          "replacement_value": "Mobile"
+        },
+        {
+          "operation_id": "red-terror-remove-serpentine-fiend",
+          "operation_kind": "remove_ability",
+          "target_source_row_id": "000004225:5",
+          "field_name": "ability",
+          "replacement_value": null
+        }
+      ]
+    }
+  ]
+}

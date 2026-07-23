@@ -31,6 +31,16 @@
   "source_version": "2026-07-22-staged",
   "staged_data_artifacts": [
     {
+      "artifact_id": "gw-11e-july-faction-pack-datasheets-2026-07",
+      "artifact_path": "artifacts/datasheets.json",
+      "artifact_sha256": "e92f766366d41c999a0656b2a1648b387bac362b3a05ef5f5cda491b373ba4b2"
+    },
+    {
+      "artifact_id": "gw-11e-july-faction-pack-datasheet-preview-2026-07",
+      "artifact_path": "artifacts/datasheet-support-preview.json",
+      "artifact_sha256": "c0a2d2ac4552abf6fc1817326ac8e939860532c3d1ad9ed75af5bfc71d6657e9"
+    },
+    {
       "artifact_id": "gw-11e-july-faction-pack-detachments-2026-07",
       "artifact_path": "artifacts/detachments.json",
       "artifact_sha256": "831afe7cbe8b3f54339826bdad26e4f8ccc59ba70dd6a7ce3ca260d6b3cb5c49"

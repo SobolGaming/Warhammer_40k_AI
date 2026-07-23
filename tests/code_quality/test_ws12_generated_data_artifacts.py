@@ -50,6 +50,8 @@ def test_july_faction_pack_staging_uses_typed_json_artifacts() -> None:
 
     assert python_modules == ("__init__.py", "_artifacts.py")
     assert json_artifacts == (
+        "datasheet-support-preview.json",
+        "datasheets.json",
         "delta-ledger.json",
         "detachments.json",
         "package.json",
