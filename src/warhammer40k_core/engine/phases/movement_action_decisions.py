@@ -181,12 +181,6 @@ def _apply_movement_action_decision(  # noqa: RET503
         )
         return None
     if action is MovementPhaseActionKind.NORMAL_MOVE:
-        if _unit_already_made_normal_move_this_phase(
-            state=state,
-            player_id=active_player_id,
-            unit_instance_id=active_selection.unit_instance_id,
-        ):
-            raise GameLifecycleError("Unit has already made a Normal move this phase.")
         movement_mode = _movement_mode_from_payload(payload=payload, action=action)
         pending_action = PendingMovementActionSelection.from_result(
             result=result,

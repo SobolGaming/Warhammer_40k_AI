@@ -1170,15 +1170,17 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         state = self._require_state()
+        if request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
+            return self._movement_phase_handler.invalid_movement_action_selection_status(
+                state=state, request=request, result=result
+            )
         if request.decision_type == SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE:
             return invalid_catalog_movement_target_pair_status(
                 state=state,
                 decisions=self.decision_controller,
                 request=request,
                 result=result,
-                ability_indexes_by_player_id=(
-                    self._movement_phase_handler.ability_indexes_by_player_id
-                ),
+                ability_indexes_by_player_id=self._movement_phase_handler.ability_indexes_by_player_id,
             )
         if request.decision_type == SELECT_CATALOG_MOVEMENT_END_TARGET_EFFECT_DECISION_TYPE:
             return invalid_catalog_movement_end_target_effect_status(
