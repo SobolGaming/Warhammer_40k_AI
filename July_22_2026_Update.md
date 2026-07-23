@@ -46,8 +46,11 @@ generated catalogs, support claims, or runtime behavior.
 - The July PDFs are currently pending source evidence in
   `data/source_manifests/gw_11e_pending_faction_packs_2026_07.yaml`. Generated
   faction support documents and the Phase 17E/17F packages remain pinned to the
-  June source package, so a controlled source cutover is required after the
-  affected rows have been migrated.
+  June source package and must remain pinned through PR 7, so a controlled source
+  cutover is required after the affected rows have been migrated.
+- Deathwatch has no July 22 successor PDF. Its June package remains current
+  source evidence throughout this progression and after the July cutover; the
+  final current-source set is 27 July packages plus the June Deathwatch package.
 
 ## Packs with in-scope changes
 
@@ -142,6 +145,30 @@ The order below prevents the active source manifest and generated support report
 from claiming July semantics before the corresponding runtime consumers are
 correct.
 
+### Staging and activation invariant
+
+PRs 1-7 must not edit July wording into the active
+`faction_detachments_2026_27.py` or `faction_subrules_2026_27.py` packages, change
+their June package identities or `SOURCE_DATE = "2026-06-11"`, advance the
+active Phase 17E/17F mappings, or regenerate `docs/factions/*.md` from July data.
+Those artifacts and their source-row IDs and hashes continue to describe the
+active June source boundary until PR 8.
+
+Instead, PR 1 establishes a separate staged July successor package or overlay.
+It must have its own July 22, 2026 identity, versioned data artifacts, canonical
+hashes, and explicit predecessor links to the active June package and source-row
+IDs. PRs 2-7 populate that staged package and may add runtime descriptors or
+consumers that are reachable only through an explicitly selected staged provider
+or candidate registry. Focused tests must construct that staged bundle
+explicitly; the default current-source mapping and default runtime registry must
+continue to load June behavior until PR 8 atomically activates the completed
+successor.
+
+Deathwatch is not part of the successor overlay because no July Deathwatch pack
+exists. Its `gw-11e-deathwatch-faction-pack-2026-06` identity, hash, and binary
+path remain in the current-source mapping rather than becoming predecessor-only
+provenance.
+
 ### PR 1 — July delta ledger and source-cutover guard
 
 Create a versioned, structured delta ledger for all 27 packs, linked to the
@@ -156,14 +183,18 @@ one of:
 
 Add a fail-closed audit proving that every pending July pack has exactly one
 review row and that every named runtime-affected row maps to an existing stable
-source rule, descriptor, or datasheet ID. Do not promote the July manifest to
-the active semantic source yet. Retain June package identities as predecessors
-while runtime-backed rows still depend on them.
+source rule, descriptor, or datasheet ID. Create the staged July successor
+package/overlay with its own identity, date, hashes, and row-level predecessor
+links, but do not promote it to the active semantic source. Add a guard proving
+that staged July package or row IDs cannot appear in the default current-source,
+Phase 17E/17F, runtime-registry, or generated-current-document mappings before
+PR 8. Retain the active June package unchanged while runtime-backed successor
+rows are prepared.
 
-### PR 2 — Load-only faction, detachment, Enhancement, and Stratagem rows
+### PR 2 — Staged load-only faction, detachment, Enhancement, and Stratagem rows
 
-Regenerate the Phase 17 source boundary for changed rows that are not currently
-executable:
+Populate the staged July successor boundary for changed rows that are not
+currently executable:
 
 - Hagiomnifex;
 - Ordained Sacrifice;
@@ -178,16 +209,21 @@ executable:
 - Eruption of Vitality and Kaleidoscopic Tempest; and
 - On My Signal.
 
-Update `faction_detachments_2026_27.py`, `faction_subrules_2026_27.py`, the
-Phase 17E coverage package, the Phase 17F execution package, generated runtime
-scaffolds, hashes, and generated faction documents as required. Previously
-blocked rows must remain blocked unless that same PR supplies source-backed
-generic semantics and a real runtime consumer. Do not add named handlers for
-these source-only changes.
+Add separate July detachment and subrule data artifacts, staged Phase 17E
+coverage rows, staged Phase 17F execution rows, staged runtime scaffolds, and
+their own hashes and predecessor links. Do not modify
+`faction_detachments_2026_27.py`, `faction_subrules_2026_27.py`, the active Phase
+17E/17F packages, their June identities or hashes, or the generated current
+faction documents. Any generated review output in this PR must be explicitly
+marked as a staged preview and must not be consumed by current-support reporting.
 
-### PR 3 — Load-only datasheet and keyword inventory
+Previously blocked rows must remain blocked unless that same PR supplies
+source-backed generic semantics and a real runtime consumer. Do not add named
+handlers for these source-only changes.
 
-Update non-executable datasheet source reviews and overlays for:
+### PR 3 — Staged load-only datasheet and keyword inventory
+
+Populate staged July datasheet source reviews and overlays for:
 
 - Thulia Ghuld;
 - the Chaos Space Marines Defiler;
@@ -199,15 +235,17 @@ Update non-executable datasheet source reviews and overlays for:
 
 Preserve historical source rows where required for provenance, but do not expose
 removed units as current Faction Pack content. Do not ingest Ciaphas Cain or any
-Imperial Armour/Legends change. Regenerate the datasheet review manifest and
-support documents without upgrading any `Unknown`, `Catalog-only`, or blocked
-runtime status.
+Imperial Armour/Legends change. Generate a staged datasheet review manifest and
+support-document preview without modifying the active June review manifest or
+current support documents, and without upgrading any `Unknown`, `Catalog-only`,
+or blocked runtime status.
 
-### PR 4 — Chaos Daemons Daemonic Manifestation
+### PR 4 — Staged Chaos Daemons Daemonic Manifestation
 
-Update the active Chaos Daemons army-rule source identity and implement the
-Battleline return branch through typed healing/revival state and deterministic
-placement decisions. Cover:
+Add the July Chaos Daemons army-rule successor row and implement its Battleline
+return branch through typed healing/revival state and deterministic placement
+decisions in the staged runtime provider. The active June source mapping and
+default runtime registry remain unchanged. Cover:
 
 - the existing +1 Battle-shock modifier;
 - a successful non-Battleline roll healing one model by D3;
@@ -221,11 +259,14 @@ placement decisions. Cover:
 - viewer-scoped decision/event projections.
 
 Update the adapter decision contract in the same PR because the formerly
-unsupported branch becomes a player-facing placement choice.
+unsupported branch becomes a player-facing placement choice when the staged
+provider is activated. Exercise that choice through an explicitly constructed
+staged adapter session until PR 8 makes the provider current.
 
-### PR 5 — Chaos Daemons Realm of Chaos and changed datasheets
+### PR 5 — Staged Chaos Daemons Realm of Chaos and changed datasheets
 
-Migrate the remaining executable Chaos Daemons deltas:
+Migrate the remaining executable Chaos Daemons deltas into the staged July
+provider:
 
 - change `The Realm of Chaos` from required Deep Strike arrival to the existing
   generic ingress-move flow in the next Movement phase, including turn one;
@@ -238,20 +279,24 @@ Migrate the remaining executable Chaos Daemons deltas:
 Use stable source IDs and generic semantic services. Confirm whether the
 existing ingress and Stratagem-cost decision contracts already cover the
 resulting payloads; update `docs/ADAPTER_DECISION_CONTRACT.md` if any
-adapter-visible option, proposal context, or event shape changes.
+adapter-visible option, proposal context, or event shape changes. Prove that the
+default June provider still exposes the prior June behavior and that the July
+behavior is reachable only when the staged provider is selected explicitly.
 
-### PR 6 — Emperor's Children Exalted Patron
+### PR 6 — Staged Emperor's Children Exalted Patron
 
-Regenerate the Court of the Phoenician static RuleIR for `Exalted Patron`.
-Retain the Lord Exultant eligibility gate and +1" Move modifier, remove the
-Flawless Blades attachment grant, refresh all hashes/execution records, and add
-mustering and lifecycle regression coverage proving the removed permission is
-not available. Keep the Frenzied Host rule itself source-only.
+Generate the staged Court of the Phoenician static RuleIR successor for
+`Exalted Patron`. Retain the Lord Exultant eligibility gate and +1" Move
+modifier, remove the Flawless Blades attachment grant, refresh the staged
+hashes/execution records, and add mustering and lifecycle regression coverage
+proving the removed permission is not available through the staged provider.
+Keep the Frenzied Host rule itself source-only, and prove that the default June
+provider remains unchanged until PR 8.
 
-### PR 7 — Thousand Sons Defiler
+### PR 7 — Staged Thousand Sons Defiler
 
-Atomically update the Defiler source overlay, descriptors, runtime consumers,
-and tests:
+Atomically add the staged July Defiler source overlay, descriptors, runtime
+consumers, and tests:
 
 - remove Feel No Pain 6+;
 - remove the old `Destroyer of Futures` minimum-hit-threshold RuleIR;
@@ -265,18 +310,34 @@ and tests:
 
 Search for the same stale Defiler ability rows across all god-aligned Defiler
 overlays so the fix is source-ID-scoped and does not alter Death Guard, World
-Eaters, Emperor's Children, or Chaos Space Marines behavior accidentally.
+Eaters, Emperor's Children, or Chaos Space Marines behavior accidentally. Prove
+that the active June Thousand Sons provider also remains unchanged until PR 8.
 
 ### PR 8 — July source promotion and closeout
 
-After PRs 2-7 are merged:
+After PRs 1-7 are merged and the source-cutover guard passes:
 
-- promote all 27 July records from pending evidence to the active current-source
-  mapping;
-- retain June PDFs/package identities only where versioned predecessor
-  provenance still references them;
+- atomically switch the 27 replaced factions' current-source and default runtime
+  mappings from their June packages to the completed staged July successor;
+- establish the exact 28-faction current-source set as all 27 July 22 packages
+  plus `gw-11e-deathwatch-faction-pack-2026-06`;
+- add a fail-closed exact-set assertion that rejects a missing or additional
+  current faction, a duplicate faction mapping, any non-July replacement for the
+  27 promoted factions, or any Deathwatch mapping other than its June package;
+- require the current Deathwatch row to retain the June source identity
+  `gw-11e-deathwatch-faction-pack-2026-06`, SHA-256
+  `698b7063a71e3f10301aab1498effcb88ad2be41f3f491e24737c2abc9f988ce`,
+  and binary path
+  `data/raw/faction_packs/eng_08-06_warhammer40000_faction_pack_deathwatch-z0ebavrfze-muhcibnets.pdf`
+  until Games Workshop publishes a successor; it remains current source and must
+  not be classified as historical-only predecessor evidence;
+- retain the replaced June PDFs/package identities as versioned predecessor
+  provenance after their July successors become current;
 - regenerate source-package hashes, catalogs, coverage/execution records,
   ability-support artifacts, and every `docs/factions/*.md` file;
+- prove that the active Phase 17E/17F packages, default runtime registry, and
+  generated current-support documents switch together with no partially promoted
+  state;
 - prove that no executable rule still points at superseded June wording;
 - prove that the 13 no-action packs changed provenance only;
 - prove that Imperial Armour and Legends rows were not introduced; and
