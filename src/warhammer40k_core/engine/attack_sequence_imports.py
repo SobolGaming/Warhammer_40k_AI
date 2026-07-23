@@ -167,6 +167,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
+    PostRollWeaponProfileModifierContext,
+    ResolvedAttackRollValues,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionContext,
@@ -341,6 +345,7 @@ __all__ = (
     "HAZARDOUS_RULE_ID",
     "HitRollMinimumUnmodifiedSuccessContext",
     "HitRollModifierContext",
+    "PostRollWeaponProfileModifierContext",
     "INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID",
     "INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID",
     "INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID",
@@ -385,6 +390,7 @@ __all__ = (
     "RollModifierPayload",
     "RulesetDescriptor",
     "RuntimeModifierRegistry",
+    "ResolvedAttackRollValues",
     "SELECT_ALLOCATION_ORDER_DECISION_TYPE",
     "SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE",
     "SELECT_DESTRUCTION_REACTION_DECISION_TYPE",

@@ -367,7 +367,7 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
     )
 
 
-def test_forced_desperate_escape_rolls_every_model_and_makes_battle_shock_roll() -> None:
+def test_forced_desperate_escape_rolls_every_model() -> None:
     scenario = _engaged_scenario()
     state = _state_for_scenario_with_effects(scenario, effects=())
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
@@ -385,42 +385,22 @@ def test_forced_desperate_escape_rolls_every_model_and_makes_battle_shock_roll()
         ),
         forced_desperate_escape_source_rule_ids=(source_rule_id,),
     )
-    resolution = replace(
-        resolution,
-        movement_payload={
-            **resolution.movement_payload,
-            "forced_desperate_escape_sources": [
-                {
-                    "effect_id": "phase10o-forced-desperate-escape-effect",
-                    "source_rule_id": source_rule_id,
-                    "desperate_escape_roll_modifier": 0,
-                }
-            ],
-        },
-    )
     decisions = DecisionController()
-
     rolls = _roll_desperate_escape_dice(
         state=state,
         decisions=decisions,
         resolution=resolution,
     )
-    requested = tuple(
-        event
-        for event in decisions.event_log.records
-        if event.event_type == "forced_desperate_escape_battle_shock_requested"
-    )
-    resolved = tuple(
-        event
-        for event in decisions.event_log.records
-        if event.event_type == "forced_desperate_escape_battle_shock_resolved"
-    )
 
     assert len(rolls) == len(unit_placement.model_placements)
-    assert len(requested) == 1
-    assert len(resolved) == 1
-    assert cast(dict[str, object], resolved[0].payload)["source_rule_ids"] == [source_rule_id]
-    assert "battle_shock_result" in cast(dict[str, object], resolved[0].payload)
+    assert all(
+        DesperateEscapeRequirementReason.FORCED_BY_RULE in roll.requirement.reasons
+        for roll in rolls
+    )
+    assert not any(
+        event.event_type.startswith("forced_desperate_escape_battle_shock")
+        for event in decisions.event_log.records
+    )
 
 
 def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_state() -> None:

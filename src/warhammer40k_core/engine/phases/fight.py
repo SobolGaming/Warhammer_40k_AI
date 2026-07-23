@@ -18,20 +18,19 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
-    SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
     SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     apply_allocation_order_decision,
-    apply_attack_weapon_group_decision,
     apply_damage_allocation_model_decision,
     apply_destroyed_transport_disembark_proposal_decision,
     apply_destruction_reaction_decision,
     apply_feel_no_pain_decision,
     apply_precision_allocation_decision,
-    apply_resolve_target_unit_decision,
     apply_source_backed_attack_dice_reroll_decision,
     build_select_attack_weapon_group_request,
+    build_select_post_roll_attack_pool_request,
     build_select_resolve_target_unit_request,
     gathered_attack_groups_for_target,
     is_destroyed_transport_disembark_proposal_request,
@@ -170,6 +169,9 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+)
+from warhammer40k_core.engine.phases.fight_attack_sequence_selection import (
+    apply_fight_attack_sequence_selection_decision,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
@@ -425,7 +427,7 @@ class FightPhaseHandler:
                 decisions=decisions,
             )
         if result.decision_type in ATTACK_RESOLUTION_SELECTION_DECISION_TYPES:
-            _apply_fight_attack_sequence_selection_decision(
+            apply_fight_attack_sequence_selection_decision(
                 state=state,
                 result=result,
                 decisions=decisions,
@@ -1344,6 +1346,32 @@ def invalid_fight_attack_sequence_selection_status(
             expected_request=expected_request,
             invalid_reason="fight_resolve_target_payload_drift",
         )
+    if request.decision_type == SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE:
+        pool_set = attack_sequence.post_roll_attack_pools
+        if (
+            pool_set is None
+            or pool_set.selected_pool is not None
+            or result.selected_option_id not in {pool.pool_id for pool in pool_set.unresolved_pools}
+        ):
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Fight post-roll attack pool selection is no longer legal.",
+                payload={
+                    "invalid_reason": "fight_post_roll_attack_pool_option_drift",
+                    "selected_pool_id": result.selected_option_id,
+                },
+            )
+        expected_request = build_select_post_roll_attack_pool_request(
+            request_id=request.request_id,
+            state=state,
+            attack_sequence=attack_sequence,
+        )
+        return _invalid_if_current_option_payload_drifted(
+            state=state,
+            result=result,
+            expected_request=expected_request,
+            invalid_reason="fight_post_roll_attack_pool_payload_drift",
+        )
     selected_group = selected_attack_weapon_group_from_result(result)
     if attack_sequence.selected_target_unit_instance_id != selected_group.target_unit_instance_id:
         return LifecycleStatus.invalid(
@@ -1547,37 +1575,6 @@ def _apply_melee_declaration_decision(
         ),
     )
     return None
-
-
-def _apply_fight_attack_sequence_selection_decision(
-    *,
-    state: GameState,
-    result: DecisionResult,
-    decisions: DecisionController,
-) -> None:
-    fight_state = _require_fight_state(state)
-    if fight_state.attack_sequence is None:
-        raise GameLifecycleError("Fight attack sequence selection requires attack_sequence.")
-    if result.decision_type == SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE:
-        attack_sequence = apply_resolve_target_unit_decision(
-            decisions=decisions,
-            attack_sequence=fight_state.attack_sequence,
-            result=result,
-        )
-    elif result.decision_type == SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE:
-        attack_sequence = apply_attack_weapon_group_decision(
-            decisions=decisions,
-            attack_sequence=fight_state.attack_sequence,
-            result=result,
-        )
-    else:
-        raise GameLifecycleError("Unsupported fight attack sequence selection decision type.")
-    state.replace_fight_phase_state(
-        fight_state.with_attack_sequence_update(
-            attack_sequence=attack_sequence,
-            allocated_model_ids_this_phase=fight_state.allocated_model_ids_this_phase,
-        )
-    )
 
 
 def _apply_fight_attack_sequence_decision(

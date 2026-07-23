@@ -28,6 +28,7 @@ class PostRollAttackPoolPayload(TypedDict):
 class PostRollAttackPoolSetPayload(TypedDict):
     sequence_id: str
     active_player_id: str
+    selected_pool: PostRollAttackPoolPayload | None
     unresolved_pools: list[PostRollAttackPoolPayload]
 
 
@@ -117,6 +118,7 @@ class PostRollAttackPoolSet:
     sequence_id: str
     active_player_id: str
     unresolved_pools: tuple[PostRollAttackPool, ...]
+    selected_pool: PostRollAttackPool | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -129,17 +131,22 @@ class PostRollAttackPoolSet:
             "active_player_id",
             _validate_identifier("PostRollAttackPoolSet active_player_id", self.active_player_id),
         )
-        if not self.unresolved_pools or any(
-            type(pool) is not PostRollAttackPool for pool in self.unresolved_pools
-        ):
-            raise GameLifecycleError(
-                "PostRollAttackPoolSet unresolved_pools must contain attack pools."
-            )
-        pool_ids = tuple(pool.pool_id for pool in self.unresolved_pools)
+        if any(type(pool) is not PostRollAttackPool for pool in self.unresolved_pools):
+            raise GameLifecycleError("PostRollAttackPoolSet unresolved_pools are invalid.")
+        if self.selected_pool is not None and type(self.selected_pool) is not PostRollAttackPool:
+            raise GameLifecycleError("PostRollAttackPoolSet selected_pool is invalid.")
+        if not self.unresolved_pools and self.selected_pool is None:
+            raise GameLifecycleError("PostRollAttackPoolSet requires an attack pool.")
+        pools = (
+            self.unresolved_pools
+            if self.selected_pool is None
+            else (self.selected_pool, *self.unresolved_pools)
+        )
+        pool_ids = tuple(pool.pool_id for pool in pools)
         if len(set(pool_ids)) != len(pool_ids):
             raise GameLifecycleError("PostRollAttackPoolSet pool IDs must be unique.")
         attack_context_ids = tuple(
-            context_id for pool in self.unresolved_pools for context_id in pool.attack_context_ids
+            context_id for pool in pools for context_id in pool.attack_context_ids
         )
         if len(set(attack_context_ids)) != len(attack_context_ids):
             raise GameLifecycleError(
@@ -181,12 +188,23 @@ class PostRollAttackPoolSet:
             unresolved_pools=pools,
         )
 
-    def select_next_pool(
+    @property
+    def all_attack_context_ids(self) -> tuple[str, ...]:
+        pools = (
+            self.unresolved_pools
+            if self.selected_pool is None
+            else (self.selected_pool, *self.unresolved_pools)
+        )
+        return tuple(context_id for pool in pools for context_id in pool.attack_context_ids)
+
+    def with_selected_pool(
         self,
         *,
         actor_id: str,
         selected_pool_id: str,
-    ) -> tuple[PostRollAttackPool, Self | None]:
+    ) -> Self:
+        if self.selected_pool is not None:
+            raise GameLifecycleError("Post-roll attack pool is already selected.")
         if _validate_identifier("actor_id", actor_id) != self.active_player_id:
             raise GameLifecycleError("Only the active player can order post-roll attack pools.")
         requested_pool_id = _validate_identifier("selected_pool_id", selected_pool_id)
@@ -197,20 +215,31 @@ class PostRollAttackPoolSet:
         if selected is None:
             raise GameLifecycleError("Selected post-roll attack pool is not unresolved.")
         remaining = tuple(pool for pool in self.unresolved_pools if pool != selected)
-        return selected, (
-            None
-            if not remaining
-            else type(self)(
-                sequence_id=self.sequence_id,
-                active_player_id=self.active_player_id,
-                unresolved_pools=remaining,
-            )
+        return type(self)(
+            sequence_id=self.sequence_id,
+            active_player_id=self.active_player_id,
+            unresolved_pools=remaining,
+            selected_pool=selected,
+        )
+
+    def after_selected_pool(self) -> Self | None:
+        if self.selected_pool is None:
+            raise GameLifecycleError("Post-roll attack pool completion requires a selection.")
+        if not self.unresolved_pools:
+            return None
+        return type(self)(
+            sequence_id=self.sequence_id,
+            active_player_id=self.active_player_id,
+            unresolved_pools=self.unresolved_pools,
         )
 
     def to_payload(self) -> PostRollAttackPoolSetPayload:
         return {
             "sequence_id": self.sequence_id,
             "active_player_id": self.active_player_id,
+            "selected_pool": (
+                None if self.selected_pool is None else self.selected_pool.to_payload()
+            ),
             "unresolved_pools": [pool.to_payload() for pool in self.unresolved_pools],
         }
 
@@ -219,6 +248,11 @@ class PostRollAttackPoolSet:
         return cls(
             sequence_id=payload["sequence_id"],
             active_player_id=payload["active_player_id"],
+            selected_pool=(
+                None
+                if payload["selected_pool"] is None
+                else PostRollAttackPool.from_payload(payload["selected_pool"])
+            ),
             unresolved_pools=tuple(
                 PostRollAttackPool.from_payload(pool) for pool in payload["unresolved_pools"]
             ),

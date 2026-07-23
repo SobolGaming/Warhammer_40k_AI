@@ -768,6 +768,28 @@ def _alive_allocated_model_ids_for_target_unit(
 def _advance_after_current_pool(*, attack_sequence: AttackSequence) -> AttackSequence:
     if attack_sequence.is_complete:
         raise GameLifecycleError("Completed AttackSequence cannot advance pool.")
+    post_roll_pools = attack_sequence.post_roll_attack_pools
+    if post_roll_pools is not None:
+        remaining = post_roll_pools.after_selected_pool()
+        if remaining is not None:
+            remaining_context_ids = set(remaining.all_attack_context_ids)
+            return replace(
+                attack_sequence,
+                attack_index=0,
+                generated_hit_index=0,
+                current_hit_roll=None,
+                post_roll_attack_pools=remaining,
+                post_roll_attack_contexts=tuple(
+                    context
+                    for context in attack_sequence.post_roll_attack_contexts
+                    if context["attack_context_id"] in remaining_context_ids
+                ),
+            )
+        attack_sequence = replace(
+            attack_sequence,
+            post_roll_attack_pools=None,
+            post_roll_attack_contexts=(),
+        )
     used_pool_indices = attack_sequence.used_pool_indices
     selected_target_unit_instance_id = attack_sequence.selected_target_unit_instance_id
     current_group = attack_sequence.current_gathered_group
@@ -833,6 +855,8 @@ def _attack_sequence_for_context(
             else HitRoll.from_payload(attack_context["hit_roll"])
         ),
         deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
+        post_roll_attack_pools=attack_sequence.post_roll_attack_pools,
+        post_roll_attack_contexts=attack_sequence.post_roll_attack_contexts,
     )
 
 

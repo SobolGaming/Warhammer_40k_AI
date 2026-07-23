@@ -525,6 +525,12 @@ def _apply_attack_sequence_selection_to_sequence(
             attack_sequence=attack_sequence,
             result=result,
         )
+    if result.decision_type == SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE:
+        return apply_post_roll_attack_pool_decision(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            result=result,
+        )
     raise GameLifecycleError("Unsupported attack sequence selection decision type.")
 
 

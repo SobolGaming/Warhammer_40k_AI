@@ -3,7 +3,7 @@
   "created_at": "2026-07-18T20:00:00Z",
   "engine_build_id": "warhammer40k-core-v2:0.1.0",
   "engine_version": "0.1.0",
-  "event_cursor": "wUud2Cb7MShTpAVcJCDg75OM_z-x5CbGZRIEWSHehs8dSsXos5p1aoQuRsPvYnyI",
+  "event_cursor": "JEpSpvMC3D0u1WNdOaKNgBPXDuXUY2-RwHNtQ-VGsIF4m9-C5_LpDEXd6vo3Vhp5",
   "game_id": "phase18e-contract-session",
   "last_activity_at": "2026-07-18T20:00:00Z",
   "lifecycle_status": {
@@ -15,7 +15,7 @@
     "stage": "setup",
     "status_kind": "advanced"
   },
-  "projection_state_hash": "c00b58858777c4cb269b8038413d6dde563d705e16e456ddecfa921cead200c2",
+  "projection_state_hash": "0c2a38c28e84f4d3e3dc9239909d53d01b0f6eec44b09a7a2487e49f8949a4b6",
   "rules_overlay_ids": [],
   "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
   "ruleset_id": {

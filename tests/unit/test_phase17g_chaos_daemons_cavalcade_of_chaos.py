@@ -34,7 +34,9 @@ from warhammer40k_core.core.detachment import (
 from warhammer40k_core.core.detachment import (
     StratagemDefinition as CatalogStratagemDefinition,
 )
+from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import (
     FightEligibilityKind,
     FightOrderingBandKind,
@@ -47,6 +49,13 @@ from warhammer40k_core.engine.army_mustering import (
     EnhancementAssignment,
     validate_roster_legality,
 )
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockHookBinding,
+    BattleShockHookRegistry,
+    BattleShockModifierContext,
+    BattleShockOutcomeContext,
+    BattleShockRerollPermissionContext,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     ModelPlacement,
@@ -56,6 +65,7 @@ from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
 )
+from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -619,6 +629,54 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
     assert "generic_rule_effect" in effect_payload
     assert "generic_rule_execution_result" in effect_payload
 
+    battle_shock_modifier_id = "phase17g-inescapable-battle-shock-modifier"
+
+    def battle_shock_modifier(
+        _context: BattleShockModifierContext,
+    ) -> tuple[RollModifier, ...]:
+        return (
+            RollModifier(
+                modifier_id=battle_shock_modifier_id,
+                source_id=stratagems.INESCAPABLE_MANIFESTATIONS_RULE_IR_SOURCE_ID,
+                operand=1,
+            ),
+        )
+
+    def battle_shock_reroll(
+        context: BattleShockRerollPermissionContext,
+    ) -> RerollPermission:
+        return RerollPermission(
+            source_id="phase17g-inescapable-battle-shock-reroll",
+            timing_window="battle_shock_test",
+            owning_player_id=context.request.player_id,
+            eligible_roll_type=context.request.spec.roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
+
+    def record_battle_shock_outcome(context: BattleShockOutcomeContext) -> None:
+        context.decisions.event_log.append(
+            "phase17g_inescapable_battle_shock_outcome_hook_resolved",
+            {
+                "result_id": context.result.result_id,
+                "unit_instance_id": context.result.request.unit_instance_id,
+            },
+        )
+
+    lifecycle._movement_phase_handler = replace(  # pyright: ignore[reportPrivateUsage]
+        lifecycle._movement_phase_handler,  # pyright: ignore[reportPrivateUsage]
+        battle_shock_hooks=BattleShockHookRegistry.from_bindings(
+            (
+                BattleShockHookBinding(
+                    hook_id="phase17g-inescapable-battle-shock-hook",
+                    source_id=stratagems.INESCAPABLE_MANIFESTATIONS_RULE_IR_SOURCE_ID,
+                    modifier_handler=battle_shock_modifier,
+                    reroll_permission_handler=battle_shock_reroll,
+                    outcome_handler=record_battle_shock_outcome,
+                ),
+            )
+        ),
+    )
+
     unit_placement = _unit_placement(state, _ENEMY_UNIT_ID)
     movement_payload = MovementProposalPayload(
         proposal_request_id=proposal_decision_request.request_id,
@@ -632,7 +690,7 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
             first_model_end_pose=fall_back_forward_pose(unit_placement),
         ),
     )
-    final_status = lifecycle.submit_decision(
+    reroll_status = lifecycle.submit_decision(
         DecisionResult(
             result_id="phase17g-inescapable-fall-back-proposal",
             request_id=proposal_decision_request.request_id,
@@ -640,6 +698,21 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
             actor_id=proposal_decision_request.actor_id,
             selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
             payload=validate_json_value(movement_payload.to_payload()),
+        )
+    )
+
+    reroll_request = decision_request(reroll_status)
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    assert reroll_request.actor_id == "player-b"
+    assert tuple(option.option_id for option in reroll_request.options) == (
+        "decline",
+        "reroll:0,1",
+    )
+    final_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-inescapable-battle-shock-reroll",
+            request=reroll_request,
+            selected_option_id="reroll:0,1",
         )
     )
 
@@ -662,6 +735,25 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
     assert DesperateEscapeRequirementReason.FORCED_BY_RULE.value in cast(
         list[str],
         first_requirement["reasons"],
+    )
+    battle_shock_payload = _event_payload(
+        lifecycle,
+        "forced_desperate_escape_battle_shock_resolved",
+    )
+    battle_shock_result = cast(
+        dict[str, JsonValue],
+        battle_shock_payload["battle_shock_result"],
+    )
+    modified_roll = cast(dict[str, JsonValue], battle_shock_result["modified_roll"])
+    roll_state = cast(dict[str, JsonValue], battle_shock_result["roll_state"])
+    assert modified_roll["applied_modifier_ids"] == [battle_shock_modifier_id]
+    assert len(cast(list[JsonValue], roll_state["rerolls"])) == 1
+    assert (
+        _event_payload(
+            lifecycle,
+            "phase17g_inescapable_battle_shock_outcome_hook_resolved",
+        )["unit_instance_id"]
+        == _ENEMY_UNIT_ID
     )
 
 

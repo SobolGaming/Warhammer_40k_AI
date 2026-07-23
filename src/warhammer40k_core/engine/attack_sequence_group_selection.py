@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.attack_sequence_imports import *
 from warhammer40k_core.engine.attack_sequence_post_roll import (
     defer_grouped_devastating_wounds as _defer_grouped_devastating_wounds,
+    split_or_resume_post_roll_attack_pools,
 )
 
 # fmt: off
@@ -1297,6 +1298,8 @@ def _resolve_grouped_current_pool(
                 "reason": "target_present_without_living_models",
             },
         )
+        if attack_sequence.post_roll_attack_pools is not None:
+            attack_sequence = attack_sequence.without_post_roll_attack_pools()
         return (
             _advance_after_current_pool(attack_sequence=attack_sequence),
             allocated_model_ids,
@@ -1322,17 +1325,42 @@ def _resolve_grouped_current_pool(
     if not allocation_groups:
         raise GameLifecycleError("Pooled attack resolution has no legal allocation groups.")
 
-    wounded_contexts, status = _grouped_wounded_contexts_for_pool(
+    wounded_contexts: tuple[
+        tuple[AttackSequence, AttackResolutionContextPayload],
+        ...,
+    ] = ()
+    if attack_sequence.post_roll_attack_pools is None:
+        wounded_contexts, status = _grouped_wounded_contexts_for_pool(
+            state=state,
+            decisions=decisions,
+            manager=manager,
+            attack_sequence=attack_sequence,
+            hooks=hooks,
+            stratagem_index=stratagem_index,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        if status is not None:
+            return attack_sequence, allocated_model_ids, status
+        if not wounded_contexts:
+            return (
+                _advance_after_current_pool(attack_sequence=attack_sequence),
+                allocated_model_ids,
+                None,
+            )
+    (
+        attack_sequence,
+        wounded_contexts,
+        status,
+    ) = split_or_resume_post_roll_attack_pools(
         state=state,
         decisions=decisions,
-        manager=manager,
         attack_sequence=attack_sequence,
-        hooks=hooks,
-        stratagem_index=stratagem_index,
+        wounded_contexts=wounded_contexts,
         runtime_modifier_registry=runtime_modifier_registry,
     )
     if status is not None:
         return attack_sequence, allocated_model_ids, status
+    pool = attack_sequence.current_pool()
     if not wounded_contexts:
         return (
             _advance_after_current_pool(attack_sequence=attack_sequence),

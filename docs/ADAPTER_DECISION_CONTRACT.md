@@ -1052,10 +1052,24 @@ attacker-visible attack-resolution decisions:
   ID for multi-contribution gathered groups. If exactly one group remains for the
   selected target, the engine records an automatic finite choice instead of
   emitting a pending request.
+- `select_post_roll_attack_pool`: finite active-player choice emitted after
+  actual Hit and Wound rolls, when source-backed post-roll profile modifiers
+  split the successful attacks in the current gathered group into two or more
+  resulting weapon profiles. The request payload includes
+  `submission_kind: "select_post_roll_attack_pool"`, game/round/phase context,
+  `sequence_id`, `attacker_player_id`, the source rule ID, and the unresolved
+  `pool_ids`. Each deterministic pool option repeats the submission kind,
+  sequence and pool IDs, full resulting weapon-profile payload, member
+  `attack_context_ids`, and source rule ID. The selected pool remains persisted
+  on `AttackSequence` while allocation, saves, and damage resolve for only those
+  attacks; the active player is asked again when multiple resulting profiles
+  remain. A single remaining profile is recorded as an automatic finite choice.
+  Shooting and Fight use the same decision type and lifecycle dispatcher.
 
-Adapters must answer both decisions by selecting one pending option ID through
+Adapters must answer these decisions by selecting one pending option ID through
 `GameLifecycle.submit_decision(...)`; they must not invent target IDs, group IDs,
-signature hashes, pool indices, or mutate from option payloads. The lifecycle
+signature hashes, pool indices, post-roll profile payloads, attack-context
+membership, or mutate from option payloads. The lifecycle
 validates malformed, stale, drifted, wrong-target, wrong-group, wrong-option, and
 payload-mismatched submissions before queue pop. Invalid submissions return
 typed invalid diagnostics, preserve the pending request, create no

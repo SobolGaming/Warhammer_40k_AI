@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.movement_transports import _request_pre_move_disembark_if_available, _request_post_normal_move_disembark_if_available, _pre_move_disembark_entries, _post_normal_move_disembark_entries, _disembark_unit_selection_options, _apply_disembark_unit_selection_decision, _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _request_advance_move_grant_decision_if_available, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
-    from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move
+    from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _apply_forced_desperate_escape_battle_shock_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move, is_forced_desperate_escape_battle_shock_reroll_request
     from warhammer40k_core.engine.phases.movement_fall_back_embark import _apply_desperate_escape_model_selection_decision, _apply_fall_back_result, _request_embark_after_move_or_complete_activation, _complete_activation_then_request_post_normal_disembark_if_available, _post_move_embark_options, _apply_embark_transport_selection_decision, _apply_valid_embark, _complete_movement_activation, _complete_movement_activation_with_record_ids, _maximum_model_distance_inches_from_witness, _interrupt_started_mission_actions_for_movement_activation
     from warhammer40k_core.engine.phases.movement_options_dice import _mission_action_state_is_active_for_unit, _movement_action_options, _advance_roll_request_for_action, _roll_advance_dice, _record_advance_roll_resolved_event, _advance_roll_reroll_request, _dice_roll_manager_for_state, _advance_reroll_permission_for_unit, _roll_desperate_escape_dice, _desperate_escape_model_selection_request, _desperate_escape_model_selection_options
     from warhammer40k_core.engine.phases.movement_resolvers import resolve_normal_move, resolve_advance_move, resolve_fall_back_move, _resolve_unit_move, _default_move_witness, _default_fall_back_witness, _movement_transition_batch, _fall_back_transition_batch, _normal_move_transition_batch, _movement_action_availability_result
@@ -72,6 +72,9 @@ class MovementPhaseHandler:
     )
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
+    )
+    battle_shock_hooks: BattleShockHookRegistry = field(
+        default_factory=BattleShockHookRegistry.empty
     )
 
     def __post_init__(self) -> None:
@@ -137,6 +140,8 @@ class MovementPhaseHandler:
             raise GameLifecycleError(
                 "MovementPhaseHandler runtime_modifier_registry must be a registry."
             )
+        if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
+            raise GameLifecycleError("MovementPhaseHandler battle_shock_hooks must be a registry.")
 
     @property
     def phase(self) -> BattlePhase:
@@ -408,6 +413,17 @@ class MovementPhaseHandler:
             return None
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
             reroll_record = decisions.record_for_result(result)
+            if is_forced_desperate_escape_battle_shock_reroll_request(reroll_record.request):
+                return _apply_forced_desperate_escape_battle_shock_reroll_decision(
+                    state=state,
+                    result=result,
+                    decisions=decisions,
+                    ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                    reaction_queue=reaction_queue,
+                    stratagem_index=self.stratagem_index,
+                    fall_back_hooks=self.fall_back_hooks,
+                    battle_shock_hooks=self.battle_shock_hooks,
+                )
             if is_triggered_movement_distance_reroll_request(reroll_record.request):
                 return apply_triggered_movement_distance_reroll_decision(
                     state=state,
@@ -477,6 +493,7 @@ class MovementPhaseHandler:
                     player_id=_active_player_id(state),
                 ),
                 runtime_modifier_registry=self.runtime_modifier_registry,
+                battle_shock_hooks=self.battle_shock_hooks,
             )
         if result.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
             return _apply_reinforcement_unit_selection_decision(

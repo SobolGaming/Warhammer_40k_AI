@@ -9,6 +9,7 @@ from warhammer40k_core.engine.deferred_mortal_wounds import (
     DeferredMortalWounds,
     DeferredMortalWoundsPayload,
 )
+from warhammer40k_core.engine.post_roll_attack_profiles import PostRollAttackPoolSetPayload
 
 # fmt: off
 if TYPE_CHECKING:
@@ -40,6 +41,7 @@ __all__ = (
     "IGNORE_DETRIMENTAL_MODIFIERS_OPTION_ID",
     "KEEP_ALL_MODIFIERS_OPTION_ID",
     "SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE",
+    "SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE",
     "SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE",
     "SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE",
     "SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS",
@@ -95,6 +97,7 @@ ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
 )
 SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE = "select_resolve_target_unit"
 SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE = "select_attack_weapon_group"
+SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE = "select_post_roll_attack_pool"
 SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE = "select_psychic_attack_modifier_ignores"
 KEEP_ALL_MODIFIERS_OPTION_ID = "keep-all-modifiers"
 IGNORE_DETRIMENTAL_MODIFIERS_OPTION_ID = "ignore-detrimental-modifiers"
@@ -104,6 +107,7 @@ ATTACK_RESOLUTION_SELECTION_DECISION_TYPES = frozenset(
     (
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
     )
 )
 
@@ -307,6 +311,8 @@ class AttackSequencePayload(TypedDict):
     deferred_mortal_wounds: list[DeferredMortalWoundsPayload]
     pending_grouped_damage: PendingGroupedDamagePayload | None
     pending_destroyed_transport_disembark: PendingDestroyedTransportDisembarkPayload | None
+    post_roll_attack_pools: PostRollAttackPoolSetPayload | None
+    post_roll_attack_contexts: list[AttackResolutionContextPayload]
 
 
 class AttackResolutionContextPayload(TypedDict):

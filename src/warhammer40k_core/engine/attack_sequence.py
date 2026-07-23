@@ -14,6 +14,7 @@ from warhammer40k_core.engine import (
     attack_sequence_hazardous as attack_sequence_hazardous,
     attack_sequence_hit_wound as attack_sequence_hit_wound,
     attack_sequence_model as attack_sequence_model,
+    attack_sequence_post_roll as attack_sequence_post_roll,
     attack_sequence_psychic_modifiers as attack_sequence_psychic_modifiers,
     attack_sequence_selection as attack_sequence_selection,
     attack_sequence_state as attack_sequence_state,
@@ -31,6 +32,7 @@ from warhammer40k_core.engine.attack_sequence_grouped_allocation import *
 from warhammer40k_core.engine.attack_sequence_hazardous import *
 from warhammer40k_core.engine.attack_sequence_hit_wound import *
 from warhammer40k_core.engine.attack_sequence_model import *
+from warhammer40k_core.engine.attack_sequence_post_roll import *
 from warhammer40k_core.engine.attack_sequence_psychic_modifiers import *
 from warhammer40k_core.engine.attack_sequence_selection import *
 from warhammer40k_core.engine.attack_sequence_state import *
@@ -49,6 +51,7 @@ __all__ = (
     "IGNORE_DETRIMENTAL_MODIFIERS_OPTION_ID",
     "KEEP_ALL_MODIFIERS_OPTION_ID",
     "SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE",
+    "SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE",
     "SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE",
     "SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE",
     "SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS",
@@ -304,6 +307,7 @@ __all__ = (
     "apply_destroyed_transport_disembark_proposal_decision",
     "apply_destruction_reaction_decision",
     "apply_feel_no_pain_decision",
+    "apply_post_roll_attack_pool_decision",
     "apply_precision_allocation_decision",
     "apply_resolve_target_unit_decision",
     "apply_source_backed_attack_dice_reroll_decision",
@@ -312,6 +316,7 @@ __all__ = (
     "attack_sequence_step_from_token",
     "attack_sequence_wound_roll_spec",
     "build_select_attack_weapon_group_request",
+    "build_select_post_roll_attack_pool_request",
     "build_select_resolve_target_unit_request",
     "cover_for_allocated_model",
     "current_legal_damage_allocation_model_ids",

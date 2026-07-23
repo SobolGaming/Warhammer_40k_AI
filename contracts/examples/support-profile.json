@@ -328,6 +328,13 @@
       "submission_kind": "finite"
     },
     {
+      "decision_type": "select_post_roll_attack_pool",
+      "interaction_kinds": [
+        "ordered_sequencing"
+      ],
+      "submission_kind": "finite"
+    },
+    {
       "decision_type": "select_prebattle_action",
       "interaction_kinds": [
         "finite_option_list"

@@ -133,6 +133,10 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.WEAPON_ALLOCATION_MATRIX,
             ("weapon_group",),
         ),
+        "select_post_roll_attack_pool": InteractionSpec(
+            InteractionKind.ORDERED_SEQUENCING,
+            ("weapon_profile",),
+        ),
         "select_catalog_any_phase_once_per_battle_ability": InteractionSpec(
             InteractionKind.OPPORTUNITY_WINDOW
         ),

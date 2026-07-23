@@ -1642,7 +1642,7 @@
               }
             ]
           },
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:attacker-deployment"
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:attacker-deployment"
         },
         {
           "derived_from": [
@@ -1672,7 +1672,7 @@
               }
             ]
           },
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:attacker-territory"
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:attacker-territory"
         },
         {
           "derived_from": [
@@ -1770,7 +1770,7 @@
               }
             ]
           },
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:defender-deployment"
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:defender-deployment"
         },
         {
           "derived_from": [
@@ -1800,7 +1800,7 @@
               }
             ]
           },
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:defender-territory"
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:defender-territory"
         },
         {
           "derived_from": [
@@ -2007,7 +2007,7 @@
               }
             ]
           },
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:no-mans-land"
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:region:no-mans-land"
         }
       ],
       "battlefield_width_inches": 44.0,
@@ -2213,7 +2213,7 @@
           "name": "Attacker Home Objective",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-attacker-home",
           "objective_role": "attacker_home",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-attacker-home",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-attacker-home",
           "x_inches": 9.45,
           "y_inches": 50.3,
           "z_inches": 0.0
@@ -2227,7 +2227,7 @@
           "name": "Central Objective",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-central",
           "objective_role": "central",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-central",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-central",
           "x_inches": 22.0,
           "y_inches": 30.0,
           "z_inches": 0.0
@@ -2241,7 +2241,7 @@
           "name": "Defender Home Objective",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-defender-home",
           "objective_role": "defender_home",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-defender-home",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-defender-home",
           "x_inches": 34.55,
           "y_inches": 9.7,
           "z_inches": 0.0
@@ -2255,7 +2255,7 @@
           "name": "North-east Expansion Objective",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-north-east",
           "objective_role": "expansion",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-expansion-north-east",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-expansion-north-east",
           "x_inches": 34.3,
           "y_inches": 49.45,
           "z_inches": 0.0
@@ -2269,7 +2269,7 @@
           "name": "South-west Expansion Objective",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-south-west",
           "objective_role": "expansion",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-expansion-south-west",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-expansion-south-west",
           "x_inches": 9.7,
           "y_inches": 10.55,
           "z_inches": 0.0
@@ -2279,7 +2279,7 @@
         {
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-attacker-home",
           "objective_role": "attacker_home",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:attacker-home",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:attacker-home",
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west"
           ]
@@ -2287,7 +2287,7 @@
         {
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-central",
           "objective_role": "central",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:central",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:central",
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
             "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east"
@@ -2296,7 +2296,7 @@
         {
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-defender-home",
           "objective_role": "defender_home",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:defender-home",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:defender-home",
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east"
           ]
@@ -2304,7 +2304,7 @@
         {
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-north-east",
           "objective_role": "expansion",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:expansion-north-east",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:expansion-north-east",
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east"
           ]
@@ -2312,7 +2312,7 @@
         {
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-south-west",
           "objective_role": "expansion",
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:expansion-south-west",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:objective-terrain-area:expansion-south-west",
           "terrain_area_ids": [
             "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west"
           ]
@@ -2391,7 +2391,7 @@
           "footprint_template_id": "FOOTPRINT_10X2_5",
           "local_transform": "identity",
           "rotation_degrees": 35.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:10x2-5-north-center",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:10x2-5-north-center",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
           "symmetry_axis": "none",
@@ -2467,7 +2467,7 @@
           "footprint_template_id": "FOOTPRINT_10X2_5",
           "local_transform": "identity",
           "rotation_degrees": 215.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:10x2-5-south-center",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:10x2-5-south-center",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
           "symmetry_axis": "point_center",
@@ -2527,7 +2527,7 @@
           "footprint_template_id": "FOOTPRINT_6X2",
           "local_transform": "identity",
           "rotation_degrees": 180.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-east-midfield",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-east-midfield",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
           "symmetry_axis": "point_center",
@@ -2587,7 +2587,7 @@
           "footprint_template_id": "FOOTPRINT_6X2",
           "local_transform": "identity",
           "rotation_degrees": 180.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-north-east",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-north-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
           "symmetry_axis": "point_center",
@@ -2647,7 +2647,7 @@
           "footprint_template_id": "FOOTPRINT_6X2",
           "local_transform": "identity",
           "rotation_degrees": 0.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-south-west",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-south-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
           "symmetry_axis": "none",
@@ -2707,7 +2707,7 @@
           "footprint_template_id": "FOOTPRINT_6X2",
           "local_transform": "identity",
           "rotation_degrees": 0.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-west-midfield",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-west-midfield",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
           "symmetry_axis": "none",
@@ -2779,7 +2779,7 @@
           "footprint_template_id": "FOOTPRINT_6X4",
           "local_transform": "identity",
           "rotation_degrees": 90.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-central-east",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-central-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
           "symmetry_axis": "none",
@@ -2851,7 +2851,7 @@
           "footprint_template_id": "FOOTPRINT_6X4",
           "local_transform": "identity",
           "rotation_degrees": 270.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-central-west",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-central-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
           "symmetry_axis": "point_center",
@@ -2923,7 +2923,7 @@
           "footprint_template_id": "FOOTPRINT_6X4",
           "local_transform": "identity",
           "rotation_degrees": 90.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-north-west",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-north-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
           "symmetry_axis": "none",
@@ -2995,7 +2995,7 @@
           "footprint_template_id": "FOOTPRINT_6X4",
           "local_transform": "identity",
           "rotation_degrees": 270.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-south-east",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-south-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
           "symmetry_axis": "point_center",
@@ -3067,7 +3067,7 @@
           "footprint_template_id": "FOOTPRINT_7X11_5",
           "local_transform": "identity",
           "rotation_degrees": 180.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-north-east",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-north-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
           "symmetry_axis": "point_center",
@@ -3139,7 +3139,7 @@
           "footprint_template_id": "FOOTPRINT_7X11_5",
           "local_transform": "identity",
           "rotation_degrees": 315.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-north-west",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-north-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
           "symmetry_axis": "none",
@@ -3211,7 +3211,7 @@
           "footprint_template_id": "FOOTPRINT_7X11_5",
           "local_transform": "identity",
           "rotation_degrees": 135.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-south-east",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-south-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
           "symmetry_axis": "point_center",
@@ -3283,7 +3283,7 @@
           "footprint_template_id": "FOOTPRINT_7X11_5",
           "local_transform": "identity",
           "rotation_degrees": 0.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-south-west",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-south-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
           "symmetry_axis": "none",
@@ -3335,7 +3335,7 @@
           "footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
           "local_transform": "identity",
           "rotation_degrees": 0.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:8x11-5-polygon-central-north-west",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:8x11-5-polygon-central-north-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
           "symmetry_axis": "none",
@@ -3387,7 +3387,7 @@
           "footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
           "local_transform": "identity",
           "rotation_degrees": 180.0,
-          "source_id": "gw-11e-warhammer-event-companion-v1-0-2026-06:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:8x11-5-polygon-central-south-east",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:8x11-5-polygon-central-south-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
           "symmetry_axis": "point_center",

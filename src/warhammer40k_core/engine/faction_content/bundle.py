@@ -143,6 +143,9 @@ from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeHookRegistry,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
+    PostRollWeaponProfileModifierBinding,
+)
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalDistanceHookBinding,
     ReserveArrivalDistanceHookRegistry,
@@ -249,6 +252,10 @@ class RuntimeContentContribution:
     advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = ()
     charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = ()
     weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
+    post_roll_weapon_profile_modifier_bindings: tuple[
+        PostRollWeaponProfileModifierBinding,
+        ...,
+    ] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = EMPTY_NAMED_HANDLERS
 
     def __init__(
@@ -326,6 +333,10 @@ class RuntimeContentContribution:
         advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = (),
         charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = (),
         weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = (),
+        post_roll_weapon_profile_modifier_bindings: tuple[
+            PostRollWeaponProfileModifierBinding,
+            ...,
+        ] = (),
         faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = EMPTY_NAMED_HANDLERS,
     ) -> None:
         object.__setattr__(
@@ -599,6 +610,11 @@ class RuntimeContentContribution:
                 "weapon_profile_modifier_bindings",
                 weapon_profile_modifier_bindings,
                 WeaponProfileModifierBinding,
+            ),
+            (
+                "post_roll_weapon_profile_modifier_bindings",
+                post_roll_weapon_profile_modifier_bindings,
+                PostRollWeaponProfileModifierBinding,
             ),
         )
         for field_name, field_value, binding_type in modifier_binding_fields:
@@ -1015,6 +1031,14 @@ def combine_runtime_content_contributions(
             _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.weapon_profile_modifier_bindings,
+            ),
+            lambda binding: binding.modifier_id,
+        ),
+        post_roll_weapon_profile_modifier_bindings=_combine_unique_values(
+            "post-roll weapon profile modifier binding",
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.post_roll_weapon_profile_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
@@ -1824,6 +1848,10 @@ class RuntimeContentBundle:
             )
             + catalog_generic_hooks.weapon_modifiers(
                 ability_indexes_by_player_id, validated_armies
+            ),
+            post_roll_weapon_profile_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.post_roll_weapon_profile_modifier_bindings,
             ),
             attack_reroll_permission_bindings=(catalog_rules.attack_reroll_permission_bindings()),
             failed_save_damage_replacement_bindings=(
