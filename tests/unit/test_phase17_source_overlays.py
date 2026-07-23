@@ -8,7 +8,9 @@ from typing import cast
 
 import pytest
 from tools.apply_source_overlays import apply_source_overlays
+from tools.fetch_official_sources import load_official_source_manifest
 
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th import generated_manifest
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
@@ -22,6 +24,13 @@ from warhammer40k_core.rules.source_overlay import (
     SourceReleaseManifestPayload,
     apply_source_release_overlays,
     build_source_release_overlay_report,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_coverage_2026_27,
+    faction_detachments_2026_27,
+    faction_execution_2026_27,
+    faction_subrules_2026_27,
+    july_faction_packs_2026_07,
 )
 from warhammer40k_core.rules.source_patch import source_row_hash
 from warhammer40k_core.rules.source_reference_generation import (
@@ -404,6 +413,137 @@ def test_phase17_source_overlay_and_reference_payloads_reject_hash_drift() -> No
     reference_payload["catalog_hash"] = hashlib.sha256(b"tampered").hexdigest()
     with pytest.raises(ValueError, match="catalog_hash"):
         SourceReferenceCatalog.from_payload(reference_payload)
+
+
+def test_july_faction_pack_staging_ledger_matches_pending_and_predecessor_manifests() -> None:
+    root = Path(__file__).resolve().parents[2]
+    pending = _official_source_identities(
+        root / "data" / "source_manifests" / "gw_11e_pending_faction_packs_2026_07.yaml"
+    )
+    current = _official_source_identities(
+        root / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
+    )
+    ledger = july_faction_packs_2026_07.delta_ledger()
+
+    july_faction_packs_2026_07.audit_manifest_links(
+        ledger=ledger,
+        pending_packages=pending,
+        current_packages=current,
+    )
+
+    assert len(ledger.pack_reviews) == 27
+    assert all(review.review_items for review in ledger.pack_reviews)
+    assert "gw-11e-deathwatch-faction-pack-2026-06" not in {
+        review.predecessor_package_id for review in ledger.pack_reviews
+    }
+    dispositions = {
+        item.disposition for review in ledger.pack_reviews for item in review.review_items
+    }
+    assert dispositions == {
+        "rules_updates_already_applied",
+        "in_scope_source_only",
+        "in_scope_runtime_affected",
+        "excluded_imperial_armour",
+        "excluded_legends",
+    }
+
+
+def test_july_runtime_affected_rows_link_to_stable_active_source_ids() -> None:
+    root = Path(__file__).resolve().parents[2]
+    source_json = (
+        root
+        / "data"
+        / "source_snapshots"
+        / "wahapedia"
+        / ("".join(("1", "0", "th")) + "-edition")
+        / "2026-06-14"
+        / "json"
+    )
+    source_row_ids = {row.source_row_id for row in faction_subrules_2026_27.enhancement_rows()} | {
+        row.source_row_id for row in faction_subrules_2026_27.stratagem_rows()
+    }
+
+    july_faction_packs_2026_07.audit_runtime_predecessor_references(
+        ledger=july_faction_packs_2026_07.delta_ledger(),
+        stable_reference_ids_by_kind={
+            "phase17e_descriptor_id": {
+                row.descriptor_id for row in faction_coverage_2026_27.coverage_rows()
+            },
+            "source_row_id": source_row_ids,
+            "datasheet_id": _source_row_ids(source_json / "Datasheets.json"),
+            "datasheet_ability_id": _source_row_ids(source_json / "Datasheets_abilities.json"),
+        },
+    )
+
+
+def test_july_cutover_guard_keeps_staged_ids_out_of_june_defaults() -> None:
+    root = Path(__file__).resolve().parents[2]
+    current = _official_source_identities(
+        root / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
+    )
+    current_docs = {
+        path.name: path.read_text(encoding="utf-8")
+        for path in sorted((root / "docs" / "factions").glob("*.md"))
+    }
+    active_phase17_package_ids = (
+        faction_detachments_2026_27.SOURCE_PACKAGE_ID,
+        faction_subrules_2026_27.SOURCE_PACKAGE_ID,
+        faction_coverage_2026_27.SOURCE_PACKAGE_ID,
+        faction_execution_2026_27.SOURCE_PACKAGE_ID,
+    )
+    active_runtime_package_ids = tuple(
+        sorted(
+            {row.source_package_id for row in generated_manifest.generated_runtime_content_rows()}
+        )
+    )
+
+    july_faction_packs_2026_07.audit_staged_package_is_not_active(
+        current_source_package_ids=tuple(sorted(current)),
+        phase17_source_package_ids=active_phase17_package_ids,
+        runtime_source_package_ids=active_runtime_package_ids,
+        generated_current_documents=current_docs,
+    )
+
+    with pytest.raises(
+        july_faction_packs_2026_07.JulyFactionPackStagingError,
+        match="leaked into an active",
+    ):
+        july_faction_packs_2026_07.audit_staged_package_is_not_active(
+            current_source_package_ids=(
+                *tuple(sorted(current)),
+                july_faction_packs_2026_07.SOURCE_PACKAGE_ID,
+            ),
+            phase17_source_package_ids=active_phase17_package_ids,
+            runtime_source_package_ids=active_runtime_package_ids,
+            generated_current_documents=current_docs,
+        )
+
+
+def _official_source_identities(path: Path) -> dict[str, tuple[str, str]]:
+    identities: dict[str, tuple[str, str]] = {}
+    for entry in load_official_source_manifest(path):
+        if entry.local_cache_path is None:
+            raise AssertionError("Faction-pack manifest entry must declare a local cache path.")
+        identities[entry.package_id] = (entry.sha256, entry.local_cache_path)
+    return identities
+
+
+def _source_row_ids(path: Path) -> set[str]:
+    raw_payload = json.loads(path.read_text(encoding="utf-8"))
+    if type(raw_payload) is not dict:
+        raise AssertionError("Source artifact must contain a JSON object.")
+    rows = cast(dict[str, object], raw_payload)["rows"]
+    if type(rows) is not list:
+        raise AssertionError("Source artifact rows must be a list.")
+    source_row_ids: set[str] = set()
+    for raw_row in cast(list[object], rows):
+        if type(raw_row) is not dict:
+            raise AssertionError("Source artifact row must be a JSON object.")
+        source_row_id = cast(dict[str, object], raw_row)["source_row_id"]
+        if type(source_row_id) is not str:
+            raise AssertionError("Source artifact row ID must be a string.")
+        source_row_ids.add(source_row_id)
+    return source_row_ids
 
 
 def _updated_row_after_first_operation(

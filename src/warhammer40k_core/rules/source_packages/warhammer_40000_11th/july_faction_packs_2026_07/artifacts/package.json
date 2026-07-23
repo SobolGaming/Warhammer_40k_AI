@@ -1,0 +1,33 @@
+{
+  "activation_status": "staged",
+  "artifact_schema": "core-v2-july-faction-pack-staging-package-v1",
+  "delta_ledger_artifact": "artifacts/delta-ledger.json",
+  "delta_ledger_sha256": "5672533339c900a9bb63a73d2d2ac30fd9531d48e27ccf3b547bbb113e61f96b",
+  "predecessor_artifacts": [
+    {
+      "source_date": "2026-06-11",
+      "source_package_id": "gw-11e-faction-detachments-2026-27",
+      "source_payload_checksum_sha256": "5e48d00f5d670b60a9ef78902772e6cd6fed95f5f6ab8ad3e27bea4e5bd5ff89"
+    },
+    {
+      "source_date": "2026-06-21",
+      "source_package_id": "gw-11e-phase17e-exact-faction-subrules-2026-27",
+      "source_payload_checksum_sha256": "757bb34a64e61214db915a6ac63212c3667085e567983f3514bbc88f454e200c"
+    },
+    {
+      "source_date": "2026-06-11",
+      "source_package_id": "gw-11e-phase17e-faction-coverage-2026-27",
+      "source_payload_checksum_sha256": "1c9f9976f973d5d11ab6ef2088ffa88c3f3b2670fafbf41c5c08981b19a0b02c"
+    },
+    {
+      "source_date": "2026-06-11",
+      "source_package_id": "gw-11e-phase17f-faction-execution-2026-27",
+      "source_payload_checksum_sha256": "10459e9f1f0f7bf7247786c02784ed15198a650f3917ef81bcf6a16fd25b1c55"
+    }
+  ],
+  "source_date": "2026-07-22",
+  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
+  "source_title": "Warhammer 40,000 11th Edition July 22 Faction Pack Staging",
+  "source_version": "2026-07-22-staged",
+  "staged_data_artifacts": []
+}
