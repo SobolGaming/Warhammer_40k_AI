@@ -587,6 +587,24 @@ def test_july_datasheet_preview_preserves_inventory_and_support_boundaries() -> 
     )
 
 
+def test_july_daemonic_manifestation_artifact_is_candidate_only_and_executable() -> None:
+    artifact = july_faction_packs_2026_07.daemonic_manifestation()
+
+    assert artifact.rule_name == "Daemonic Manifestation"
+    assert artifact.predecessor_source_rule_id == "phase17f:phase17e:chaos-daemons:army-rule"
+    assert artifact.semantic_execution_status == "executable_named_handler"
+    assert artifact.provider_activation_status == "candidate_only"
+    assert (
+        artifact.named_handler_classification
+        == "approved_successor_of_existing_army_rule_orchestrator"
+    )
+    assert artifact.named_handler_budget_execution_id == artifact.predecessor_source_rule_id
+    assert artifact.decision_types == [
+        "select_healing_model",
+        "submit_healing_revival_placement",
+    ]
+
+
 def test_july_cutover_guard_keeps_staged_ids_out_of_june_defaults() -> None:
     root = Path(__file__).resolve().parents[2]
     current = _official_source_identities(

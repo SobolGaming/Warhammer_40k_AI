@@ -742,7 +742,25 @@ def _healing_candidates_for_next_step(
             if not model.is_alive and model.model_instance_id in removed_ids
         )
     )
+    eligible_revival_model_ids = hctx.healing_source_context_identifier_tuple(
+        effect.source_context,
+        "eligible_revival_model_ids",
+    )
+    if eligible_revival_model_ids is not None:
+        eligible_ids = set(eligible_revival_model_ids)
+        missing_model_ids = tuple(
+            model_id for model_id in missing_model_ids if model_id in eligible_ids
+        )
+        unknown_eligible_ids = eligible_ids - {
+            model.model_instance_id for model in rules_unit.own_models
+        }
+        if unknown_eligible_ids:
+            raise GameLifecycleError(
+                "Healing eligible revival model IDs must belong to the target rules unit."
+            )
     if not missing_model_ids:
+        if eligible_revival_model_ids is not None:
+            return _HealingStepCandidates(step_kind=HealingStepKind.NO_EFFECT)
         raise GameLifecycleError(
             "Healing cannot revive a below-starting-strength unit without removed models."
         )

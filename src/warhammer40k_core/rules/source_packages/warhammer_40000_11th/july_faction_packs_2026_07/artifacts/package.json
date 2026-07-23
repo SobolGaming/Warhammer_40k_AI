@@ -31,6 +31,11 @@
   "source_version": "2026-07-22-staged",
   "staged_data_artifacts": [
     {
+      "artifact_id": "gw-11e-july-chaos-daemons-daemonic-manifestation-2026-07",
+      "artifact_path": "artifacts/chaos-daemons-daemonic-manifestation.json",
+      "artifact_sha256": "4fcbc6bf1bf135da06d82c8c4458fd49140bdd3a2ffd992f7d7c6c1b8e0fbcb0"
+    },
+    {
       "artifact_id": "gw-11e-july-faction-pack-datasheets-2026-07",
       "artifact_path": "artifacts/datasheets.json",
       "artifact_sha256": "e92f766366d41c999a0656b2a1648b387bac362b3a05ef5f5cda491b373ba4b2"

@@ -870,6 +870,7 @@ class JulyStagingPackageArtifact(msgspec.Struct, frozen=True):
             seen_artifact_ids.add(artifact.artifact_id)
             seen_artifact_paths.add(artifact.artifact_path)
         expected_staged_artifact_ids = {
+            "gw-11e-july-chaos-daemons-daemonic-manifestation-2026-07",
             "gw-11e-july-faction-pack-datasheet-preview-2026-07",
             "gw-11e-july-faction-pack-datasheets-2026-07",
             "gw-11e-july-faction-pack-detachments-2026-07",

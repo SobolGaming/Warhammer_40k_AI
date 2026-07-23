@@ -954,10 +954,22 @@ Healing and revival placement decisions expose public battlefield state in the c
 Source-backed healing effects may carry engine-authored `source_context` flags
 that restrict resolution to wounded models or destroyed removed models, lock a
 multi-wound heal to the first selected wounded model, or return a revived model
-at full Starting Wounds. Those flags are validated as part of the serialized
+at full Starting Wounds. A source may also bind the exact
+`eligible_revival_model_ids` snapshot when its eligibility excludes some
+destroyed models. Those flags and IDs are validated as part of the serialized
 `HealingEffect`; adapters answer emitted `select_healing_model` and
 `submit_healing_revival_placement` requests and must not apply the wound or
 revival result locally.
+
+The July 22, 2026 Chaos Daemons `Daemonic Manifestation` candidate provider
+uses this existing healing contract for its successful Battleline branch. The
+engine rolls D3, excludes destroyed CHARACTER component models, binds the
+remaining destroyed-model IDs and the owning player in `source_context`, and
+then emits the ordinary model-selection and placement requests until up to D3
+models have been returned. The candidate remains opt-in until the July source
+promotion; the default June provider continues to emit its typed unsupported
+diagnostic. No July-specific adapter option, proposal kind, or mutation path is
+introduced.
 
 Phase 14I defines the finite `select_weapon_ability_instance` request shape and helper for duplicate source-backed weapon ability instances when the PDF timing gives the controlling player a choice. Phase 13B Shooting declaration target candidates embed this request under `required_weapon_ability_selections` for duplicate matching `[ANTI]` descriptors, and adapters must copy the selected option ID into the matching `WeaponDeclarationPayload.selected_weapon_ability_ids` entry before submitting the declaration. Structured Anti descriptors use canonical slash-separated keyword groups in the `keyword` parameter, such as `vehicle/monster`, and may use `match_mode: "missing_keyword"` for `[ANTI-NON-X]` semantics. Other attack/targeting hosts that can encounter duplicate instances must call the helper and route the selected descriptor ID before resolving that duplicate ability. The request payload includes `submission_kind: "select_weapon_ability_instance"`, `weapon_profile_id`, `ability_kind`, canonical `target_keywords`, and replay-safe `source_context`. Option IDs are the selected structured ability descriptor IDs; option payloads repeat the submission kind, weapon profile ID, ability kind, selected ability ID, and the full ability descriptor payload. Adapters must select one emitted option ID and must not synthesize ability IDs from text. If no duplicate choice exists for the current target and timing, no request is emitted. Runtime helpers reject duplicate ability use without an explicit selected ability ID.
 

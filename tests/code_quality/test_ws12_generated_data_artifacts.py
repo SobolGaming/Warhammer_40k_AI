@@ -48,8 +48,9 @@ def test_july_faction_pack_staging_uses_typed_json_artifacts() -> None:
         sorted(path.name for path in (JULY_FACTION_PACK_PACKAGE / "artifacts").glob("*.json"))
     )
 
-    assert python_modules == ("__init__.py", "_artifacts.py")
+    assert python_modules == ("__init__.py", "_artifacts.py", "_runtime_artifacts.py")
     assert json_artifacts == (
+        "chaos-daemons-daemonic-manifestation.json",
         "datasheet-support-preview.json",
         "datasheets.json",
         "delta-ledger.json",
@@ -61,6 +62,7 @@ def test_july_faction_pack_staging_uses_typed_json_artifacts() -> None:
         "subrules.json",
     )
     assert _line_count(JULY_FACTION_PACK_PACKAGE / "_artifacts.py") < 1500
+    assert _line_count(JULY_FACTION_PACK_PACKAGE / "_runtime_artifacts.py") < 1500
 
 
 def test_ws12_engine_runtime_does_not_read_source_package_json_artifacts_directly() -> None:

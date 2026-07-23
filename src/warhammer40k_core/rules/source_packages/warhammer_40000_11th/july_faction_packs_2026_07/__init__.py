@@ -35,6 +35,10 @@ from ._artifacts import (
     july_staging_package_from_json_bytes,
     july_subrules_from_json_bytes,
 )
+from ._runtime_artifacts import (
+    JulyDaemonicManifestationArtifact,
+    july_daemonic_manifestation_from_json_bytes,
+)
 
 _PACKAGE_ARTIFACT_PATH: Final = "artifacts/package.json"
 
@@ -107,6 +111,12 @@ def datasheets() -> JulyDatasheetArtifact:
 def datasheet_support_preview() -> JulyDatasheetPreviewArtifact:
     return july_datasheet_preview_from_json_bytes(
         _staged_artifact_bytes("gw-11e-july-faction-pack-datasheet-preview-2026-07")
+    )
+
+
+def daemonic_manifestation() -> JulyDaemonicManifestationArtifact:
+    return july_daemonic_manifestation_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-chaos-daemons-daemonic-manifestation-2026-07")
     )
 
 
@@ -201,6 +211,7 @@ __all__ = (
     "SOURCE_PAYLOAD_CHECKSUM_SHA256",
     "SOURCE_TITLE",
     "SOURCE_VERSION",
+    "JulyDaemonicManifestationArtifact",
     "JulyDatasheetArtifact",
     "JulyDatasheetPreviewArtifact",
     "JulyDeltaLedgerArtifact",
@@ -216,6 +227,7 @@ __all__ = (
     "audit_manifest_links",
     "audit_runtime_predecessor_references",
     "audit_staged_package_is_not_active",
+    "daemonic_manifestation",
     "datasheet_support_preview",
     "datasheets",
     "delta_ledger",
