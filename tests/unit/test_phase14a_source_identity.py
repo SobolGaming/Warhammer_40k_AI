@@ -41,11 +41,22 @@ def test_july_rules_updates_source_catalog_cites_both_committed_pdfs() -> None:
     catalog = july_rules_updates_2026_07.source_catalog()
     payload = catalog.to_payload()
     encoded = json.dumps(payload, sort_keys=True)
-    source_texts = tuple(
-        source for document in catalog.documents for source in document.source_texts
-    )
 
     assert len(catalog.documents) == 2
+    universal_documents = tuple(
+        document
+        for document in catalog.documents
+        if july_rules_updates_2026_07.UNIVERSAL_RULES_LOCAL_PDF in document.title
+    )
+    event_companion_documents = tuple(
+        document
+        for document in catalog.documents
+        if july_rules_updates_2026_07.EVENT_COMPANION_LOCAL_PDF in document.title
+    )
+    assert len(universal_documents) == 1
+    assert len(event_companion_documents) == 1
+    universal_document = universal_documents[0]
+    event_companion_document = event_companion_documents[0]
     universal_rules = july_rules_updates_2026_07.universal_rule_records()
     event_rules = july_rules_updates_2026_07.event_companion_rule_records()
     assert {rule.rule_id: rule.behavior_descriptor for rule in universal_rules} == {
@@ -68,14 +79,18 @@ def test_july_rules_updates_source_catalog_cites_both_committed_pdfs() -> None:
     assert july_rules_updates_2026_07.EVENT_COMPANION_LOCAL_PDF in encoded
     assert july_rules_updates_2026_07.UNIVERSAL_RULES_PDF_SHA256 in encoded
     assert july_rules_updates_2026_07.EVENT_COMPANION_PDF_SHA256 in encoded
-    source_texts_by_id = {source.source_id: source for source in source_texts}
-    assert {rule.source_id for rule in universal_rules} <= {
-        source.source_id for source in source_texts
+    universal_source_ids = {source.source_id for source in universal_document.source_texts}
+    event_source_texts_by_id = {
+        source.source_id: source for source in event_companion_document.source_texts
     }
-    assert july_rules_updates_2026_07.NON_CORE_CP_GAIN_CAP_SOURCE_ID in source_texts_by_id
+    assert {rule.source_id for rule in universal_rules} <= universal_source_ids
+    assert july_rules_updates_2026_07.NON_CORE_CP_GAIN_CAP_SOURCE_ID not in universal_source_ids
+    assert july_rules_updates_2026_07.NON_CORE_CP_GAIN_CAP_SOURCE_ID in event_source_texts_by_id
     assert (
         "maximum of 1CP per battle round"
-        in source_texts_by_id[july_rules_updates_2026_07.NON_CORE_CP_GAIN_CAP_SOURCE_ID].raw_text
+        in event_source_texts_by_id[
+            july_rules_updates_2026_07.NON_CORE_CP_GAIN_CAP_SOURCE_ID
+        ].raw_text
     )
     assert SourceCatalog.from_payload(payload).to_payload() == payload
 

@@ -114,13 +114,6 @@ def source_catalog() -> SourceCatalog:
                             source_id=rule.source_id,
                             raw_text=rule.source_text,
                         )
-                        for rule in event_companion_rule_records()
-                    ),
-                    *tuple(
-                        RuleSourceText.from_raw(
-                            source_id=rule.source_id,
-                            raw_text=rule.source_text,
-                        )
                         for rule in universal_rule_records()
                     ),
                 ),
@@ -139,6 +132,13 @@ def source_catalog() -> SourceCatalog:
                             f"{_ARTIFACT.event_companion.local_pdf}; SHA-256: "
                             f"{_ARTIFACT.event_companion.source_pdf_sha256}"
                         ),
+                    ),
+                    *tuple(
+                        RuleSourceText.from_raw(
+                            source_id=rule.source_id,
+                            raw_text=rule.source_text,
+                        )
+                        for rule in event_companion_rule_records()
                     ),
                     *tuple(
                         RuleSourceText.from_raw(
