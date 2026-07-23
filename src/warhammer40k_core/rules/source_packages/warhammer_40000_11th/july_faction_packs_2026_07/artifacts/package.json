@@ -29,5 +29,31 @@
   "source_package_id": "gw-11e-staged-faction-packs-2026-07",
   "source_title": "Warhammer 40,000 11th Edition July 22 Faction Pack Staging",
   "source_version": "2026-07-22-staged",
-  "staged_data_artifacts": []
+  "staged_data_artifacts": [
+    {
+      "artifact_id": "gw-11e-july-faction-pack-detachments-2026-07",
+      "artifact_path": "artifacts/detachments.json",
+      "artifact_sha256": "831afe7cbe8b3f54339826bdad26e4f8ccc59ba70dd6a7ce3ca260d6b3cb5c49"
+    },
+    {
+      "artifact_id": "gw-11e-july-faction-pack-subrules-2026-07",
+      "artifact_path": "artifacts/subrules.json",
+      "artifact_sha256": "83f00732d6d02484db9bd484399ce975330caaf325b8d83e1f27e2fd370076de"
+    },
+    {
+      "artifact_id": "gw-11e-july-faction-pack-phase17e-coverage-2026-07",
+      "artifact_path": "artifacts/phase17e-coverage.json",
+      "artifact_sha256": "a03688e6c04e7738537817fb87a06f6faeb2800f912218fc60fd71aa2c4539c0"
+    },
+    {
+      "artifact_id": "gw-11e-july-faction-pack-phase17f-execution-2026-07",
+      "artifact_path": "artifacts/phase17f-execution.json",
+      "artifact_sha256": "08d6c7f80a52303a1b015cb959ffde2def7c66635e4edc32cd39c22d2a6284fa"
+    },
+    {
+      "artifact_id": "gw-11e-july-faction-pack-runtime-scaffolds-2026-07",
+      "artifact_path": "artifacts/runtime-scaffolds.json",
+      "artifact_sha256": "0d57534e4fb5c1616a0c7f7cb03871e596afaa5b58e249e332196b2a760707c0"
+    }
+  ]
 }

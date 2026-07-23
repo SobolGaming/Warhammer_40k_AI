@@ -476,6 +476,71 @@ def test_july_runtime_affected_rows_link_to_stable_active_source_ids() -> None:
     )
 
 
+def test_july_load_only_rows_are_typed_linked_and_explicitly_blocked() -> None:
+    detachments = july_faction_packs_2026_07.detachments()
+    subrules = july_faction_packs_2026_07.subrules()
+    phase17e = july_faction_packs_2026_07.phase17e_coverage()
+    phase17f = july_faction_packs_2026_07.phase17f_execution()
+    scaffolds = july_faction_packs_2026_07.runtime_scaffolds()
+
+    assert {row.detachment_name for row in detachments.rows} == {
+        "Equatorial Hordes",
+        "Frenzied Host",
+        "Vengeful Hosts",
+    }
+    frenzied_host = next(row for row in detachments.rows if row.detachment_name == "Frenzied Host")
+    assert frenzied_host.tags == []
+    assert frenzied_host.removed_tags == ["host"]
+    assert {row.rule_name for row in subrules.rows} == {
+        "Avenging Angel",
+        "Concealed Krumpin'",
+        "Dey're Over 'Ere",
+        "Echojump",
+        "Empyric Wellspring",
+        "Eruption of Vitality",
+        "Evasive Manoeuvres",
+        "Foetid Resurgence",
+        "Frantic Focus",
+        "Fusillade",
+        "Hagiomnifex",
+        "Imperator Unleashed",
+        "Infernal Puppeteer",
+        "Jungle Know-wotz",
+        "Kaleidoscopic Tempest",
+        "Know No Fear",
+        "Kunnin' Hunta",
+        "Meteoric Onslaught",
+        "Murdermind",
+        "Mysterious Guardian",
+        "On My Signal",
+        "Ordained Sacrifice",
+        "Orksbane",
+        "Purge by Sectors",
+        "Reletavistic Tether",
+        "Sorrowscent Vulture",
+        "Stragglerz",
+        "Temporal Corridor",
+        "Thieves of Pain",
+        "Unkillable Scourge",
+    }
+    assert all(row.load_support_status == "loaded" for row in detachments.rows)
+    assert all(row.load_support_status == "loaded" for row in subrules.rows)
+    assert all(row.semantic_execution_status == "blocked" for row in detachments.rows)
+    assert all(row.semantic_execution_status == "blocked" for row in subrules.rows)
+    assert all(row.coverage_status == "unsupported" for row in phase17e.rows)
+    assert all(
+        row.execution_status == "blocked_structured_semantics_required" for row in phase17f.rows
+    )
+    assert all(row.named_handler_id is None for row in scaffolds.rows)
+    july_faction_packs_2026_07.audit_load_only_artifact_links(
+        detachments=detachments,
+        subrules=subrules,
+        phase17e=phase17e,
+        phase17f=phase17f,
+        runtime_scaffolds=scaffolds,
+    )
+
+
 def test_july_cutover_guard_keeps_staged_ids_out_of_june_defaults() -> None:
     root = Path(__file__).resolve().parents[2]
     current = _official_source_identities(

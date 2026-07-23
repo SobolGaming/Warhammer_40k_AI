@@ -11,13 +11,24 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 from ._artifacts import (
     JULY_FACTION_PACK_SOURCE_PACKAGE_ID,
     JulyDeltaLedgerArtifact,
+    JulyDetachmentArtifact,
     JulyFactionPackStagingError,
+    JulyPhase17ECoverageArtifact,
+    JulyPhase17FExecutionArtifact,
+    JulyRuntimeScaffoldArtifact,
     JulyStagingPackageArtifact,
+    JulySubruleArtifact,
+    audit_load_only_artifact_links,
     audit_manifest_links,
     audit_runtime_predecessor_references,
     canonical_json_sha256_from_bytes,
     july_delta_ledger_from_json_bytes,
+    july_detachments_from_json_bytes,
+    july_phase17e_from_json_bytes,
+    july_phase17f_from_json_bytes,
+    july_runtime_scaffolds_from_json_bytes,
     july_staging_package_from_json_bytes,
+    july_subrules_from_json_bytes,
 )
 
 _PACKAGE_ARTIFACT_PATH: Final = "artifacts/package.json"
@@ -62,6 +73,50 @@ def delta_ledger() -> JulyDeltaLedgerArtifact:
     return ledger
 
 
+def _staged_artifact_bytes(artifact_id: str) -> bytes:
+    references = {artifact.artifact_id: artifact for artifact in _PACKAGE.staged_data_artifacts}
+    try:
+        reference = references[artifact_id]
+    except KeyError as exc:
+        raise JulyFactionPackStagingError(
+            "July staged data artifact is not declared by the package."
+        ) from exc
+    raw = _artifact_bytes(reference.artifact_path)
+    if canonical_json_sha256_from_bytes(raw) != reference.artifact_sha256:
+        raise JulyFactionPackStagingError("July staged data artifact hash is stale.")
+    return raw
+
+
+def detachments() -> JulyDetachmentArtifact:
+    return july_detachments_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-faction-pack-detachments-2026-07")
+    )
+
+
+def subrules() -> JulySubruleArtifact:
+    return july_subrules_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-faction-pack-subrules-2026-07")
+    )
+
+
+def phase17e_coverage() -> JulyPhase17ECoverageArtifact:
+    return july_phase17e_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-faction-pack-phase17e-coverage-2026-07")
+    )
+
+
+def phase17f_execution() -> JulyPhase17FExecutionArtifact:
+    return july_phase17f_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-faction-pack-phase17f-execution-2026-07")
+    )
+
+
+def runtime_scaffolds() -> JulyRuntimeScaffoldArtifact:
+    return july_runtime_scaffolds_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-faction-pack-runtime-scaffolds-2026-07")
+    )
+
+
 def source_package_identity_payload() -> dict[str, str]:
     return {
         "source_package_id": SOURCE_PACKAGE_ID,
@@ -75,11 +130,16 @@ def source_package_identity_payload() -> dict[str, str]:
 
 def staged_identity_tokens() -> frozenset[str]:
     ledger = delta_ledger()
+    staged_source_row_ids = {
+        *(row.source_row_id for row in detachments().rows),
+        *(row.source_row_id for row in subrules().rows),
+    }
     return frozenset(
         {
             JULY_FACTION_PACK_SOURCE_PACKAGE_ID,
             *(review.successor_package_id for review in ledger.pack_reviews),
             *(artifact.artifact_id for artifact in _PACKAGE.staged_data_artifacts),
+            *staged_source_row_ids,
         }
     )
 
@@ -124,13 +184,24 @@ __all__ = (
     "SOURCE_TITLE",
     "SOURCE_VERSION",
     "JulyDeltaLedgerArtifact",
+    "JulyDetachmentArtifact",
     "JulyFactionPackStagingError",
+    "JulyPhase17ECoverageArtifact",
+    "JulyPhase17FExecutionArtifact",
+    "JulyRuntimeScaffoldArtifact",
     "JulyStagingPackageArtifact",
+    "JulySubruleArtifact",
+    "audit_load_only_artifact_links",
     "audit_manifest_links",
     "audit_runtime_predecessor_references",
     "audit_staged_package_is_not_active",
     "delta_ledger",
+    "detachments",
+    "phase17e_coverage",
+    "phase17f_execution",
+    "runtime_scaffolds",
     "source_package_identity_payload",
     "staged_identity_tokens",
     "staging_package",
+    "subrules",
 )

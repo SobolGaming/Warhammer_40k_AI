@@ -49,7 +49,15 @@ def test_july_faction_pack_staging_uses_typed_json_artifacts() -> None:
     )
 
     assert python_modules == ("__init__.py", "_artifacts.py")
-    assert json_artifacts == ("delta-ledger.json", "package.json")
+    assert json_artifacts == (
+        "delta-ledger.json",
+        "detachments.json",
+        "package.json",
+        "phase17e-coverage.json",
+        "phase17f-execution.json",
+        "runtime-scaffolds.json",
+        "subrules.json",
+    )
     assert _line_count(JULY_FACTION_PACK_PACKAGE / "_artifacts.py") < 1500
 
 
