@@ -343,12 +343,21 @@ class MovementPhaseState:
         unit_instance_id: str,
         *,
         maximum_model_distance_inches: float,
+        maximum_model_horizontal_distance_inches: float,
     ) -> Self:
         completed_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
         maximum_distance = _validate_non_negative_finite_number(
             "maximum_model_distance_inches",
             maximum_model_distance_inches,
         )
+        maximum_horizontal_distance = _validate_non_negative_finite_number(
+            "maximum_model_horizontal_distance_inches",
+            maximum_model_horizontal_distance_inches,
+        )
+        if maximum_horizontal_distance > maximum_distance:
+            raise GameLifecycleError(
+                "Movement activation horizontal distance cannot exceed total distance."
+            )
         if self.step is not MovementPhaseStepKind.MOVE_UNITS:
             raise GameLifecycleError("Movement activation completion requires Move Units step.")
         if self.active_selection is None:
@@ -373,6 +382,7 @@ class MovementPhaseState:
                 MovementDistanceRecord(
                     unit_instance_id=completed_unit_id,
                     maximum_model_distance_inches=maximum_distance,
+                    maximum_model_horizontal_distance_inches=maximum_horizontal_distance,
                 ),
             ),
             active_selection=None,

@@ -203,8 +203,13 @@ def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> N
     resolved_payload = _event_payload(lifecycle.decision_controller, "triggered_movement_resolved")
     assert resolved_payload["source_rule_id"] == rule.SOURCE_RULE_ID
     assert resolved_payload["unit_instance_id"] == _BLOOD_UNIT_ID
-    assert len(state.surge_move_states) == 1
-    assert state.surge_move_states[0].source_rule_id == rule.SOURCE_RULE_ID
+    assert len(state.normal_move_states) == 2
+    surge_states = tuple(
+        move_state
+        for move_state in state.normal_move_states
+        if move_state.source_rule_id == rule.SOURCE_RULE_ID
+    )
+    assert len(surge_states) == 1
 
 
 def test_blood_tainted_records_sticky_control_at_phase_end_boundary() -> None:

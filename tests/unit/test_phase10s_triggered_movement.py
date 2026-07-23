@@ -28,6 +28,11 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.normal_move_history import (
+    NormalMoveSourceKind,
+    NormalMoveState,
+    NormalMoveStatePayload,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -46,8 +51,6 @@ from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.triggered_movement import (
     DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
-    SurgeMoveState,
-    SurgeMoveStatePayload,
     TriggeredMovementDescriptor,
     TriggeredMovementHandler,
     TriggeredMovementKind,
@@ -127,8 +130,8 @@ def test_blood_surge_like_movement_is_triggered_decision_with_model_choices() ->
         strict=True,
     ):
         assert after.pose.position.x == before.pose.position.x + 3.0
-    assert len(state.surge_move_states) == 1
-    assert state.surge_move_states[0].source_rule_id == "blood_surge"
+    assert len(state.normal_move_states) == 1
+    assert state.normal_move_states[0].source_rule_id == "blood_surge"
     resolved_payload = _last_event_payload(decisions, "triggered_movement_resolved")
     transition_batch = cast(dict[str, JsonValue], resolved_payload["transition_batch"])
     displacements = cast(list[dict[str, JsonValue]], transition_batch["displacements"])
@@ -166,7 +169,7 @@ def test_optional_triggered_movement_can_be_declined_without_mutation() -> None:
 
     assert status is None
     assert _unit_placement(state).to_payload() == unit_placement.to_payload()
-    assert state.surge_move_states == []
+    assert state.normal_move_states == []
     declined_payload = _last_event_payload(decisions, "triggered_movement_declined")
     assert declined_payload["phase_body_status"] == "triggered_movement_declined"
     assert declined_payload["declined"] is True
@@ -305,7 +308,7 @@ def test_shooting_reaction_window_resolves_with_matching_event_and_transition_ph
 
 def test_triggered_payloads_round_trip_without_object_reprs() -> None:
     descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
-    state = SurgeMoveState.from_resolution(
+    state = _normal_move_state_from_descriptor(
         player_id="player-a",
         battle_round=1,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -324,7 +327,7 @@ def test_triggered_payloads_round_trip_without_object_reprs() -> None:
     assert "<" not in state_blob
     assert "object at 0x" not in state_blob
     assert TriggeredMovementDescriptor.from_payload(descriptor_payload) == descriptor
-    assert SurgeMoveState.from_payload(state_payload) == state
+    assert NormalMoveState.from_payload(state_payload) == state
     assert ReactionWindow.from_payload(descriptor.trigger_timing.to_payload()) == (
         descriptor.trigger_timing
     )
@@ -396,10 +399,10 @@ def test_triggered_violation_payload_round_trips_without_object_reprs() -> None:
         triggered_movement_violation_code_from_token("unsupported")
 
 
-def test_non_surge_triggered_movement_records_triggered_displacement_without_surge_state() -> None:
+def test_reactive_normal_move_history_blocks_second_triggered_source_after_round_trip() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _reactive_step_descriptor(max_distance_inches=2.0)
+    descriptor = _reactive_step_descriptor(max_distance_inches=2.0, one_per_phase=False)
     handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
     request = handler.request_from_state(
@@ -419,13 +422,33 @@ def test_non_surge_triggered_movement_records_triggered_displacement_without_sur
     status = handler.apply_decision(state=state, result=result, decisions=decisions)
 
     assert status is None
-    assert state.surge_move_states == []
+    assert len(state.normal_move_states) == 1
+    assert state.normal_move_states[0].source_kind is NormalMoveSourceKind.TRIGGERED
     resolved_payload = _last_event_payload(decisions, "triggered_movement_resolved")
     transition_batch = cast(dict[str, JsonValue], resolved_payload["transition_batch"])
     displacements = cast(list[dict[str, JsonValue]], transition_batch["displacements"])
     assert {cast(str, record["displacement_kind"]) for record in displacements} == {
         "triggered_move"
     }
+    restored = GameState.from_payload(state.to_payload())
+    assert restored.to_payload() == state.to_payload()
+    restored_placement = _unit_placement(restored)
+    second_descriptor = replace(
+        descriptor,
+        source_rule_id="second_reactive_step",
+        max_distance_inches=1.0,
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match=TriggeredMovementViolationCode.NORMAL_MOVE_ALREADY_USED_THIS_PHASE.value,
+    ):
+        handler.request_from_state(
+            state=restored,
+            unit_instance_id=restored_placement.unit_instance_id,
+            descriptor=second_descriptor,
+            candidate_witnesses=(_shift_witness(restored_placement, dx=1.0),),
+        )
 
 
 def test_apply_triggered_movement_to_battlefield_uses_valid_resolution() -> None:
@@ -620,7 +643,7 @@ def test_lifecycle_submit_decision_routes_triggered_movement_choice() -> None:
     )
 
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert len(state.surge_move_states) == 1
+    assert len(state.normal_move_states) == 1
     assert _unit_placement(state).model_placements[0].pose.position.x == (
         unit_placement.model_placements[0].pose.position.x + 3.0
     )
@@ -847,8 +870,8 @@ def test_one_surge_move_per_phase_is_enforced() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
     descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
-    state.record_surge_move_state(
-        SurgeMoveState.from_resolution(
+    state.record_normal_move_state(
+        _normal_move_state_from_descriptor(
             player_id=unit_placement.player_id,
             battle_round=state.battle_round,
             unit_instance_id=unit_placement.unit_instance_id,
@@ -865,7 +888,7 @@ def test_one_surge_move_per_phase_is_enforced() -> None:
         descriptor=descriptor,
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
-        surge_move_states=tuple(state.surge_move_states),
+        normal_move_states=tuple(state.normal_move_states),
     )
 
     assert not resolution.is_valid
@@ -874,12 +897,12 @@ def test_one_surge_move_per_phase_is_enforced() -> None:
     )
 
 
-def test_record_surge_move_state_rejects_duplicate_same_phase_unit_state() -> None:
+def test_record_normal_move_state_rejects_duplicate_same_phase_unit_state() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
     descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
-    state.record_surge_move_state(
-        SurgeMoveState.from_resolution(
+    state.record_normal_move_state(
+        _normal_move_state_from_descriptor(
             player_id=unit_placement.player_id,
             battle_round=state.battle_round,
             unit_instance_id=unit_placement.unit_instance_id,
@@ -890,8 +913,8 @@ def test_record_surge_move_state_rejects_duplicate_same_phase_unit_state() -> No
     )
 
     with pytest.raises(GameLifecycleError, match="already exists for unit in this phase"):
-        state.record_surge_move_state(
-            SurgeMoveState.from_resolution(
+        state.record_normal_move_state(
+            _normal_move_state_from_descriptor(
                 player_id=unit_placement.player_id,
                 battle_round=state.battle_round,
                 unit_instance_id=unit_placement.unit_instance_id,
@@ -902,14 +925,14 @@ def test_record_surge_move_state_rejects_duplicate_same_phase_unit_state() -> No
         )
 
 
-def test_lifecycle_payload_rejects_duplicate_same_phase_surge_states() -> None:
+def test_lifecycle_payload_rejects_duplicate_same_phase_normal_move_states() -> None:
     lifecycle, _movement_status = _advance_to_movement_unit_selection(_config())
     state = lifecycle.state
     assert state is not None
     unit_placement = _unit_placement(state)
     descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
-    state.record_surge_move_state(
-        SurgeMoveState.from_resolution(
+    state.record_normal_move_state(
+        _normal_move_state_from_descriptor(
             player_id=unit_placement.player_id,
             battle_round=state.battle_round,
             unit_instance_id=unit_placement.unit_instance_id,
@@ -919,23 +942,23 @@ def test_lifecycle_payload_rejects_duplicate_same_phase_surge_states() -> None:
         )
     )
     payload = lifecycle.to_payload()
-    duplicate_payload = dict(payload["state"]["surge_move_states"][0])
+    duplicate_payload = dict(payload["state"]["normal_move_states"][0])
     duplicate_payload["request_id"] = "decision-request-duplicate-phase"
     duplicate_payload["result_id"] = "phase10s-result-duplicate-phase"
-    payload["state"]["surge_move_states"].append(cast(SurgeMoveStatePayload, duplicate_payload))
+    payload["state"]["normal_move_states"].append(cast(NormalMoveStatePayload, duplicate_payload))
 
     with pytest.raises(GameLifecycleError, match="unique by unit phase"):
         GameLifecycle.from_payload(payload)
 
 
-def test_surge_move_state_allows_same_unit_in_different_phases_or_rounds() -> None:
+def test_normal_move_state_allows_same_unit_in_different_phases_or_rounds() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
     movement_descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     shooting_descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
 
-    state.record_surge_move_state(
-        SurgeMoveState.from_resolution(
+    state.record_normal_move_state(
+        _normal_move_state_from_descriptor(
             player_id=unit_placement.player_id,
             battle_round=1,
             unit_instance_id=unit_placement.unit_instance_id,
@@ -944,8 +967,8 @@ def test_surge_move_state_allows_same_unit_in_different_phases_or_rounds() -> No
             result_id="phase10s-result-movement-round-one",
         )
     )
-    state.record_surge_move_state(
-        SurgeMoveState.from_resolution(
+    state.record_normal_move_state(
+        _normal_move_state_from_descriptor(
             player_id=unit_placement.player_id,
             battle_round=1,
             unit_instance_id=unit_placement.unit_instance_id,
@@ -954,8 +977,8 @@ def test_surge_move_state_allows_same_unit_in_different_phases_or_rounds() -> No
             result_id="phase10s-result-shooting-round-one",
         )
     )
-    state.record_surge_move_state(
-        SurgeMoveState.from_resolution(
+    state.record_normal_move_state(
+        _normal_move_state_from_descriptor(
             player_id=unit_placement.player_id,
             battle_round=2,
             unit_instance_id=unit_placement.unit_instance_id,
@@ -965,7 +988,42 @@ def test_surge_move_state_allows_same_unit_in_different_phases_or_rounds() -> No
         )
     )
 
-    assert len(state.surge_move_states) == 3
+    assert len(state.normal_move_states) == 3
+
+
+def test_prior_reactive_normal_move_removes_normal_move_phase_action_option() -> None:
+    lifecycle, movement_status = _advance_to_movement_unit_selection(_config())
+    state = lifecycle.state
+    assert state is not None
+    unit_placement = _unit_placement(state)
+    state.record_normal_move_state(
+        _normal_move_state_from_descriptor(
+            player_id=unit_placement.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_placement.unit_instance_id,
+            descriptor=_reactive_step_descriptor(
+                max_distance_inches=2.0,
+                one_per_phase=False,
+            ),
+            request_id="decision-request-prior-reactive-normal-move",
+            result_id="decision-result-prior-reactive-normal-move",
+        )
+    )
+
+    action_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id=unit_placement.unit_instance_id,
+        result_id="phase10s-select-unit-after-reactive-normal-move",
+    )
+    action_request = _decision_request(action_status)
+
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert all(
+        not isinstance(option.payload, dict)
+        or option.payload.get("movement_phase_action") != MovementPhaseActionKind.NORMAL_MOVE.value
+        for option in action_request.options
+    )
 
 
 def test_triggered_movement_does_not_appear_in_select_movement_action() -> None:
@@ -1136,45 +1194,38 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
             max_distance_inches=3.0,
             optional=cast(bool, "yes"),
         )
-    with pytest.raises(GameLifecycleError, match="trigger_timing must be a ReactionWindow"):
-        SurgeMoveState(
+    with pytest.raises(GameLifecycleError, match="Unsupported NormalMoveSourceKind token"):
+        NormalMoveState(
             player_id="player-a",
             battle_round=1,
-            phase=BattlePhase.SHOOTING.value,
+            phase=BattlePhase.SHOOTING,
             unit_instance_id="army-alpha:intercessor-unit-1",
             source_rule_id="blood_surge",
-            trigger_timing=cast(ReactionWindow, "not-a-reaction-window"),
+            source_kind=cast(NormalMoveSourceKind, "not-a-source-kind"),
             request_id="decision-request-invalid-trigger-window",
             result_id="phase10s-result-invalid-trigger-window",
         )
-    with pytest.raises(GameLifecycleError, match="SurgeMoveState phase must match"):
-        SurgeMoveState(
+    with pytest.raises(GameLifecycleError, match="Unsupported NormalMoveState phase token"):
+        NormalMoveState(
             player_id="player-a",
             battle_round=1,
-            phase=BattlePhase.SHOOTING.value,
+            phase=cast(BattlePhase, "not-a-phase"),
             unit_instance_id="army-alpha:intercessor-unit-1",
             source_rule_id="blood_surge",
-            trigger_timing=descriptor.trigger_timing,
+            source_kind=NormalMoveSourceKind.SURGE,
             request_id="decision-request-invalid-phase",
             result_id="phase10s-result-invalid-phase",
         )
-    with pytest.raises(GameLifecycleError, match="requires a TriggeredMovementDescriptor"):
-        SurgeMoveState.from_resolution(
+    with pytest.raises(GameLifecycleError, match="positive integer"):
+        NormalMoveState(
             player_id="player-a",
-            battle_round=1,
+            battle_round=0,
+            phase=BattlePhase.SHOOTING,
             unit_instance_id="army-alpha:intercessor-unit-1",
-            descriptor=cast(TriggeredMovementDescriptor, "not-a-descriptor"),
+            source_rule_id="blood_surge",
+            source_kind=NormalMoveSourceKind.SURGE,
             request_id="decision-request-bad-descriptor",
             result_id="phase10s-result-bad-descriptor",
-        )
-    with pytest.raises(GameLifecycleError, match="SurgeMoveState can record only surge movement"):
-        SurgeMoveState.from_resolution(
-            player_id="player-a",
-            battle_round=1,
-            unit_instance_id="army-alpha:intercessor-unit-1",
-            descriptor=_reactive_step_descriptor(max_distance_inches=2.0),
-            request_id="decision-request-non-surge",
-            result_id="phase10s-result-non-surge",
         )
 
     state = _battle_ready_state()
@@ -1674,6 +1725,7 @@ def _reactive_step_descriptor(
     *,
     max_distance_inches: float,
     optional: bool = True,
+    one_per_phase: bool = True,
 ) -> TriggeredMovementDescriptor:
     return TriggeredMovementDescriptor(
         movement_kind=TriggeredMovementKind.TRIGGERED,
@@ -1686,6 +1738,32 @@ def _reactive_step_descriptor(
         ),
         max_distance_inches=max_distance_inches,
         optional=optional,
+        one_per_phase=one_per_phase,
+    )
+
+
+def _normal_move_state_from_descriptor(
+    *,
+    player_id: str,
+    battle_round: int,
+    unit_instance_id: str,
+    descriptor: TriggeredMovementDescriptor,
+    request_id: str,
+    result_id: str,
+) -> NormalMoveState:
+    return NormalMoveState(
+        player_id=player_id,
+        battle_round=battle_round,
+        phase=descriptor.trigger_timing.phase,
+        unit_instance_id=unit_instance_id,
+        source_rule_id=descriptor.source_rule_id,
+        source_kind=(
+            NormalMoveSourceKind.SURGE
+            if descriptor.movement_kind is TriggeredMovementKind.SURGE
+            else NormalMoveSourceKind.TRIGGERED
+        ),
+        request_id=request_id,
+        result_id=result_id,
     )
 
 

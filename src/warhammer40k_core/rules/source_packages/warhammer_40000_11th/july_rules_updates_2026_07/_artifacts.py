@@ -33,11 +33,18 @@ EXPECTED_APP_CORE_RULE_BEHAVIORS: Mapping[str, str] = MappingProxyType(
         "09.07.01-forced-desperate-escape": (
             "forced_desperate_escape_tests_all_models_and_battle_shock"
         ),
+        "09-normal-move-one-per-phase": "normal_move_limited_to_once_per_unit_per_phase",
         "12.08-objective-consolidation": "objective_consolidation_requires_unengaged_endpoint",
         "14.02.01-control-first": "objective_control_determined_first_at_phase_and_turn_end",
         "18.01-dedicated-transport": "empty_dedicated_transport_models_destroyed_without_triggers",
         "20.01.02-strategic-reserves": (
             "strategic_reserves_destroyed_at_final_turn_without_triggers"
+        ),
+        "faq-heavy-fly-horizontal-distance": (
+            "fly_heavy_uses_horizontal_distance_for_three_inch_limit"
+        ),
+        "faq-hazardous-mixed-unit-keywords": (
+            "infantry_monster_vehicle_hazard_failure_inflicts_one_mortal_wound"
         ),
         "24.28.01-precision-devastating-wounds": (
             "precision_mortals_prioritize_selected_character_group"

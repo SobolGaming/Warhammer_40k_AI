@@ -77,7 +77,7 @@ def test_july_rules_updates_source_catalog_cites_pdfs_and_app_core_rules() -> No
     assert {rule.rule_id: rule.behavior_descriptor for rule in event_rules} == {
         "generating-command-points": "non_core_cp_gain_maximum_one_per_battle_round",
     }
-    assert len(app_core_rules) == 12
+    assert len(app_core_rules) == 15
     assert {rule.rule_id for rule in app_core_rules} == set(
         july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS
     )
@@ -90,6 +90,9 @@ def test_july_rules_updates_source_catalog_cites_pdfs_and_app_core_rules() -> No
         "precision_mortals_prioritize_selected_character_group",
         "torrent_excludes_indirect_fire_and_precision",
         "incursion_allows_one_three_dp_detachment",
+        "normal_move_limited_to_once_per_unit_per_phase",
+        "fly_heavy_uses_horizontal_distance_for_three_inch_limit",
+        "infantry_monster_vehicle_hazard_failure_inflicts_one_mortal_wound",
     }
     assert len(july_rules_updates_2026_07.changed_event_layouts()) == 8
     assert all(

@@ -48,6 +48,10 @@ from warhammer40k_core.engine.movement_proposals import (
     ProposalKind,
     ProposalValidationResult,
 )
+from warhammer40k_core.engine.normal_move_history import (
+    NormalMoveSourceKind,
+    NormalMoveState,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowPayload
 from warhammer40k_core.engine.unit_coherency import (
@@ -88,6 +92,7 @@ class TriggeredMovementViolationCode(StrEnum):
     BATTLE_SHOCKED_SURGE_FORBIDDEN = "battle_shocked_surge_forbidden"
     ENGAGEMENT_RANGE_SURGE_FORBIDDEN = "engagement_range_surge_forbidden"
     SURGE_MOVE_ALREADY_USED_THIS_PHASE = "surge_move_already_used_this_phase"
+    NORMAL_MOVE_ALREADY_USED_THIS_PHASE = "normal_move_already_used_this_phase"
 
 
 class TriggeredMovementDescriptorPayload(TypedDict):
@@ -105,17 +110,6 @@ class TriggeredMovementDescriptorPayload(TypedDict):
 class TriggeredMovementViolationPayload(TypedDict):
     violation_code: str
     message: str
-
-
-class SurgeMoveStatePayload(TypedDict):
-    player_id: str
-    battle_round: int
-    phase: str
-    unit_instance_id: str
-    source_rule_id: str
-    trigger_timing: ReactionWindowPayload
-    request_id: str
-    result_id: str
 
 
 class TriggeredMovementResolutionPayload(TypedDict):
@@ -273,113 +267,6 @@ class TriggeredMovementViolation:
         return cls(
             violation_code=triggered_movement_violation_code_from_token(payload["violation_code"]),
             message=payload["message"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class SurgeMoveState:
-    player_id: str
-    battle_round: int
-    phase: str
-    unit_instance_id: str
-    source_rule_id: str
-    trigger_timing: ReactionWindow
-    request_id: str
-    result_id: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "player_id",
-            _validate_identifier("SurgeMoveState player_id", self.player_id),
-        )
-        object.__setattr__(
-            self,
-            "battle_round",
-            _validate_positive_int("SurgeMoveState battle_round", self.battle_round),
-        )
-        object.__setattr__(
-            self,
-            "phase",
-            _validate_identifier("SurgeMoveState phase", self.phase),
-        )
-        object.__setattr__(
-            self,
-            "unit_instance_id",
-            _validate_identifier("SurgeMoveState unit_instance_id", self.unit_instance_id),
-        )
-        object.__setattr__(
-            self,
-            "source_rule_id",
-            _validate_identifier("SurgeMoveState source_rule_id", self.source_rule_id),
-        )
-        if type(self.trigger_timing) is not ReactionWindow:
-            raise GameLifecycleError("SurgeMoveState trigger_timing must be a ReactionWindow.")
-        if self.trigger_timing.phase.value != self.phase:
-            raise GameLifecycleError("SurgeMoveState phase must match trigger_timing phase.")
-        object.__setattr__(
-            self,
-            "request_id",
-            _validate_identifier("SurgeMoveState request_id", self.request_id),
-        )
-        object.__setattr__(
-            self,
-            "result_id",
-            _validate_identifier("SurgeMoveState result_id", self.result_id),
-        )
-
-    @classmethod
-    def from_resolution(
-        cls,
-        *,
-        player_id: str,
-        battle_round: int,
-        unit_instance_id: str,
-        descriptor: TriggeredMovementDescriptor,
-        request_id: str,
-        result_id: str,
-    ) -> Self:
-        if type(descriptor) is not TriggeredMovementDescriptor:
-            raise GameLifecycleError("SurgeMoveState requires a TriggeredMovementDescriptor.")
-        if descriptor.movement_kind is not TriggeredMovementKind.SURGE:
-            raise GameLifecycleError("SurgeMoveState can record only surge movement.")
-        return cls(
-            player_id=player_id,
-            battle_round=battle_round,
-            phase=descriptor.trigger_timing.phase.value,
-            unit_instance_id=unit_instance_id,
-            source_rule_id=descriptor.source_rule_id,
-            trigger_timing=descriptor.trigger_timing,
-            request_id=request_id,
-            result_id=result_id,
-        )
-
-    def same_phase_key(self) -> tuple[int, str, str, str]:
-        return (self.battle_round, self.phase, self.player_id, self.unit_instance_id)
-
-    def to_payload(self) -> SurgeMoveStatePayload:
-        return {
-            "player_id": self.player_id,
-            "battle_round": self.battle_round,
-            "phase": self.phase,
-            "unit_instance_id": self.unit_instance_id,
-            "source_rule_id": self.source_rule_id,
-            "trigger_timing": self.trigger_timing.to_payload(),
-            "request_id": self.request_id,
-            "result_id": self.result_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: SurgeMoveStatePayload) -> Self:
-        return cls(
-            player_id=payload["player_id"],
-            battle_round=payload["battle_round"],
-            phase=payload["phase"],
-            unit_instance_id=payload["unit_instance_id"],
-            source_rule_id=payload["source_rule_id"],
-            trigger_timing=ReactionWindow.from_payload(payload["trigger_timing"]),
-            request_id=payload["request_id"],
-            result_id=payload["result_id"],
         )
 
 
@@ -775,15 +662,22 @@ def triggered_movement_unit_selection_request(
     if type(descriptor) is not TriggeredMovementDescriptor:
         raise GameLifecycleError("Triggered movement unit selection requires a descriptor.")
     _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
-    unit_options = _validate_eligible_units(eligible_units)
-    if not unit_options:
-        raise GameLifecycleError("Triggered movement unit selection requires eligible units.")
     active_player_id = state.active_player_id
     if active_player_id is None:
         raise GameLifecycleError("Triggered movement requires active_player_id.")
     current_phase = state.current_battle_phase
     if current_phase is None:
         raise GameLifecycleError("Triggered movement requires current battle phase.")
+    unit_options = _eligible_units_after_normal_move_restriction(
+        state=state,
+        player_id=actor_id,
+        descriptor=descriptor,
+        eligible_units=_validate_eligible_units(eligible_units),
+    )
+    if not unit_options and not descriptor.optional:
+        raise GameLifecycleError(
+            "Mandatory triggered movement unit selection requires an eligible unit."
+        )
     return DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
@@ -806,6 +700,30 @@ def triggered_movement_unit_selection_request(
             descriptor=descriptor,
             eligible_units=unit_options,
         ),
+    )
+
+
+def _eligible_units_after_normal_move_restriction(
+    *,
+    state: GameState,
+    player_id: str,
+    descriptor: TriggeredMovementDescriptor,
+    eligible_units: tuple[TriggeredMovementEligibleUnit, ...],
+) -> tuple[TriggeredMovementEligibleUnit, ...]:
+    if descriptor.movement_mode is not MovementMode.NORMAL:
+        return eligible_units
+    current_phase = state.current_battle_phase
+    if current_phase is None:
+        raise GameLifecycleError("Triggered movement requires current battle phase.")
+    return tuple(
+        unit
+        for unit in eligible_units
+        if not state.normal_move_states_for_unit_phase(
+            player_id=player_id,
+            battle_round=state.battle_round,
+            phase=current_phase,
+            unit_instance_id=unit.unit_instance_id,
+        )
     )
 
 
@@ -877,7 +795,7 @@ def resolve_triggered_movement(
     path_witness: PathWitness,
     battle_round: int,
     battle_shocked_unit_ids: tuple[str, ...] = (),
-    surge_move_states: tuple[SurgeMoveState, ...] = (),
+    normal_move_states: tuple[NormalMoveState, ...] = (),
     hover_mode_states: tuple[HoverModeState, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
 ) -> TriggeredMovementResolution:
@@ -903,7 +821,7 @@ def resolve_triggered_movement(
         descriptor=descriptor,
         battle_round=triggered_round,
         battle_shocked_unit_ids=battle_shocked_unit_ids,
-        surge_move_states=surge_move_states,
+        normal_move_states=normal_move_states,
     )
     moved_placements = tuple(
         placement.with_pose(path_witness.final_pose_for_model(placement.model_instance_id))
@@ -1150,56 +1068,65 @@ def _triggered_movement_restriction_violations(
     descriptor: TriggeredMovementDescriptor,
     battle_round: int,
     battle_shocked_unit_ids: tuple[str, ...],
-    surge_move_states: tuple[SurgeMoveState, ...],
+    normal_move_states: tuple[NormalMoveState, ...],
 ) -> tuple[TriggeredMovementViolation, ...]:
-    if descriptor.movement_kind is not TriggeredMovementKind.SURGE:
-        return ()
     violations: list[TriggeredMovementViolation] = []
-    battle_shocked_ids = set(
-        _validate_identifier_tuple("battle_shocked_unit_ids", battle_shocked_unit_ids)
+    prior_normal_moves = _validate_normal_move_state_tuple(normal_move_states)
+    if descriptor.movement_kind is TriggeredMovementKind.SURGE:
+        battle_shocked_ids = set(
+            _validate_identifier_tuple("battle_shocked_unit_ids", battle_shocked_unit_ids)
+        )
+        if (
+            unit_placement.unit_instance_id in battle_shocked_ids
+            and not descriptor.allow_battle_shocked
+        ):
+            violations.append(
+                TriggeredMovementViolation(
+                    violation_code=TriggeredMovementViolationCode.BATTLE_SHOCKED_SURGE_FORBIDDEN,
+                    message="Battle-shocked units cannot make surge moves.",
+                )
+            )
+        if (
+            _enemy_engagement_model_ids_for_unit(
+                scenario=scenario,
+                unit_placement=unit_placement,
+                ruleset_descriptor=ruleset_descriptor,
+            )
+            and not descriptor.allow_within_engagement_range
+        ):
+            violations.append(
+                TriggeredMovementViolation(
+                    violation_code=TriggeredMovementViolationCode.ENGAGEMENT_RANGE_SURGE_FORBIDDEN,
+                    message="Units within Engagement Range cannot make surge moves.",
+                )
+            )
+    requested_key = (
+        battle_round,
+        descriptor.trigger_timing.phase,
+        unit_placement.player_id,
+        unit_placement.unit_instance_id,
+    )
+    matching_prior_moves = tuple(
+        state for state in prior_normal_moves if state.same_phase_key() == requested_key
     )
     if (
-        unit_placement.unit_instance_id in battle_shocked_ids
-        and not descriptor.allow_battle_shocked
+        descriptor.movement_kind is TriggeredMovementKind.SURGE
+        and descriptor.one_per_phase
+        and any(state.source_kind is NormalMoveSourceKind.SURGE for state in matching_prior_moves)
     ):
         violations.append(
             TriggeredMovementViolation(
-                violation_code=TriggeredMovementViolationCode.BATTLE_SHOCKED_SURGE_FORBIDDEN,
-                message="Battle-shocked units cannot make surge moves.",
+                violation_code=TriggeredMovementViolationCode.SURGE_MOVE_ALREADY_USED_THIS_PHASE,
+                message="Unit already made a surge move this phase.",
             )
         )
-    if (
-        _enemy_engagement_model_ids_for_unit(
-            scenario=scenario,
-            unit_placement=unit_placement,
-            ruleset_descriptor=ruleset_descriptor,
-        )
-        and not descriptor.allow_within_engagement_range
-    ):
+    if descriptor.movement_mode is MovementMode.NORMAL and matching_prior_moves:
         violations.append(
             TriggeredMovementViolation(
-                violation_code=TriggeredMovementViolationCode.ENGAGEMENT_RANGE_SURGE_FORBIDDEN,
-                message="Units within Engagement Range cannot make surge moves.",
+                violation_code=(TriggeredMovementViolationCode.NORMAL_MOVE_ALREADY_USED_THIS_PHASE),
+                message="Unit already made a Normal move this phase.",
             )
         )
-    if descriptor.one_per_phase:
-        requested_key = (
-            battle_round,
-            descriptor.trigger_timing.phase.value,
-            unit_placement.player_id,
-            unit_placement.unit_instance_id,
-        )
-        for state in _validate_surge_move_state_tuple(surge_move_states):
-            if state.same_phase_key() == requested_key:
-                violations.append(
-                    TriggeredMovementViolation(
-                        violation_code=(
-                            TriggeredMovementViolationCode.SURGE_MOVE_ALREADY_USED_THIS_PHASE
-                        ),
-                        message="Unit already made a surge move this phase.",
-                    )
-                )
-                break
     return tuple(violations)
 
 
@@ -2222,15 +2149,15 @@ def _validate_path_witness(value: object) -> PathWitness:
     return value
 
 
-def _validate_surge_move_state_tuple(values: object) -> tuple[SurgeMoveState, ...]:
+def _validate_normal_move_state_tuple(values: object) -> tuple[NormalMoveState, ...]:
     if type(values) is not tuple:
-        raise GameLifecycleError("surge_move_states must be a tuple.")
-    return tuple(_validate_surge_move_state(value) for value in cast(tuple[object, ...], values))
+        raise GameLifecycleError("normal_move_states must be a tuple.")
+    return tuple(_validate_normal_move_state(value) for value in cast(tuple[object, ...], values))
 
 
-def _validate_surge_move_state(value: object) -> SurgeMoveState:
-    if type(value) is not SurgeMoveState:
-        raise GameLifecycleError("surge_move_states must contain SurgeMoveState values.")
+def _validate_normal_move_state(value: object) -> NormalMoveState:
+    if type(value) is not NormalMoveState:
+        raise GameLifecycleError("normal_move_states must contain NormalMoveState values.")
     return value
 
 

@@ -1011,8 +1011,17 @@ def test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_i
         abilities=(AbilityDescriptor.heavy(),),
     )
 
-    for moved_inches, expected_modifier in ((3.0, 1), (3.1, 0)):
-        moved_id = str(moved_inches).replace(".", "-")
+    cases = (
+        (3.0, 3.0, False, 1),
+        (3.1, 3.1, False, 0),
+        (6.0, 2.0, True, 1),
+        (6.0, 2.0, False, 0),
+        (6.0, 3.1, True, 0),
+    )
+    for moved_inches, horizontal_inches, has_fly, expected_modifier in cases:
+        moved_id = f"{moved_inches}-{horizontal_inches}-{'fly' if has_fly else 'ground'}".replace(
+            ".", "-"
+        )
         catalog = _catalog_with_extra_bolt_profile(heavy_profile)
         lifecycle, units = _shooting_lifecycle(
             alpha_unit_ids=("intercessor-1",),
@@ -1021,6 +1030,9 @@ def test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_i
         )
         state = _state(lifecycle)
         attacker = units["intercessor-1"]
+        if has_fly:
+            attacker = replace(attacker, keywords=(*attacker.keywords, "Fly"))
+            _replace_unit_instance_in_state(state=state, replacement=attacker)
         state.movement_phase_state = MovementPhaseState(
             battle_round=1,
             active_player_id="player-a",
@@ -1030,6 +1042,7 @@ def test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_i
                 MovementDistanceRecord(
                     unit_instance_id=attacker.unit_instance_id,
                     maximum_model_distance_inches=moved_inches,
+                    maximum_model_horizontal_distance_inches=horizontal_inches,
                 ),
             ),
         )
@@ -6694,32 +6707,34 @@ def test_phase13d_fire_overwatch_torrent_weapons_auto_hit() -> None:
 @pytest.mark.parametrize(
     (
         "hazardous_roll_value",
-        "extra_attacker_keywords",
+        "replacement_attacker_keywords",
         "expected_successful",
         "expected_mortal_wounds",
     ),
     [
-        (1, (), False, 1),
-        (2, (), False, 1),
-        (3, (), True, 0),
+        (1, None, False, 1),
+        (2, None, False, 1),
+        (3, None, True, 0),
         (1, ("Vehicle",), False, 3),
         (2, ("Vehicle",), False, 3),
         (1, ("Monster",), False, 3),
         (2, ("Monster",), False, 3),
         (3, ("Monster",), True, 0),
+        (1, ("Infantry", "Vehicle"), False, 1),
+        (2, ("Infantry", "Monster"), False, 1),
     ],
 )
 def test_phase13d_hazardous_tests_resolve_after_all_attacks(
     hazardous_roll_value: int,
-    extra_attacker_keywords: tuple[str, ...],
+    replacement_attacker_keywords: tuple[str, ...] | None,
     expected_successful: bool,
     expected_mortal_wounds: int,
 ) -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
-    if extra_attacker_keywords:
-        attacker = replace(attacker, keywords=(*attacker.keywords, *extra_attacker_keywords))
+    if replacement_attacker_keywords is not None:
+        attacker = replace(attacker, keywords=replacement_attacker_keywords)
         _replace_unit_instance_in_state(state=state, replacement=attacker)
     defender = units["enemy"]
     battlefield = state.battlefield_state

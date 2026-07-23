@@ -3,6 +3,7 @@ from __future__ import annotations
 # pyright: reportPrivateUsage=false
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -10,6 +11,10 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayload,
     MovementProposalPayloadPayload,
+)
+from warhammer40k_core.engine.normal_move_history import (
+    NormalMoveSourceKind,
+    NormalMoveState,
 )
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
@@ -19,7 +24,6 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.triggered_movement import (
     DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
-    SurgeMoveState,
     TriggeredMovementDescriptor,
     TriggeredMovementDescriptorPayload,
     TriggeredMovementKind,
@@ -81,7 +85,7 @@ def request_from_state(
             path_witness=witness,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
-            surge_move_states=tuple(state.surge_move_states),
+            normal_move_states=tuple(state.normal_move_states),
             hover_mode_states=tuple(state.hover_mode_states),
         )
         for witness in candidate_witness_tuple
@@ -172,7 +176,7 @@ def apply_decision(
         path_witness=witness,
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
-        surge_move_states=tuple(state.surge_move_states),
+        normal_move_states=tuple(state.normal_move_states),
         hover_mode_states=tuple(state.hover_mode_states),
     )
     drift_code = resolution.selected_payload_drift_code(payload)
@@ -214,13 +218,19 @@ def apply_decision(
     state.replace_battlefield_state(
         battlefield_state.with_unit_placement(resolution.attempted_placement)
     )
-    if descriptor.movement_kind is TriggeredMovementKind.SURGE:
-        state.record_surge_move_state(
-            SurgeMoveState.from_resolution(
+    if descriptor.movement_mode is MovementMode.NORMAL:
+        state.record_normal_move_state(
+            NormalMoveState(
                 player_id=unit_placement.player_id,
                 battle_round=state.battle_round,
+                phase=descriptor.trigger_timing.phase,
                 unit_instance_id=unit_instance_id,
-                descriptor=descriptor,
+                source_rule_id=descriptor.source_rule_id,
+                source_kind=(
+                    NormalMoveSourceKind.SURGE
+                    if descriptor.movement_kind is TriggeredMovementKind.SURGE
+                    else NormalMoveSourceKind.TRIGGERED
+                ),
                 request_id=result.request_id,
                 result_id=result.result_id,
             )
@@ -278,7 +288,7 @@ def apply_proposal_decision(
         path_witness=submission.witness,
         battle_round=state.battle_round,
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
-        surge_move_states=tuple(state.surge_move_states),
+        normal_move_states=tuple(state.normal_move_states),
         hover_mode_states=tuple(state.hover_mode_states),
     )
     if not resolution.is_valid:
@@ -313,13 +323,19 @@ def apply_proposal_decision(
             resolution=resolution,
         )
     )
-    if descriptor.movement_kind is TriggeredMovementKind.SURGE:
-        state.record_surge_move_state(
-            SurgeMoveState.from_resolution(
+    if descriptor.movement_mode is MovementMode.NORMAL:
+        state.record_normal_move_state(
+            NormalMoveState(
                 player_id=unit_placement.player_id,
                 battle_round=state.battle_round,
+                phase=descriptor.trigger_timing.phase,
                 unit_instance_id=proposal_request.unit_instance_id,
-                descriptor=descriptor,
+                source_rule_id=descriptor.source_rule_id,
+                source_kind=(
+                    NormalMoveSourceKind.SURGE
+                    if descriptor.movement_kind is TriggeredMovementKind.SURGE
+                    else NormalMoveSourceKind.TRIGGERED
+                ),
                 request_id=result.request_id,
                 result_id=result.result_id,
             )

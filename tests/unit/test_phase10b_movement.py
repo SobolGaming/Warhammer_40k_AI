@@ -1,3 +1,4 @@
+# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 import json
@@ -40,6 +41,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.normal_move_history import NormalMoveSourceKind
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -56,6 +58,8 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseStepKind,
     MovementUnitSelection,
     MovementUnitSelectionPayload,
+    _maximum_model_distance_inches_from_witness,
+    _maximum_model_horizontal_distance_inches_from_witness,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
@@ -66,6 +70,8 @@ from warhammer40k_core.engine.stratagems import (
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.geometry.pathing import PathWitness
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
@@ -262,6 +268,7 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
             MovementDistanceRecord(
                 unit_instance_id="army-alpha:intercessor-unit-1",
                 maximum_model_distance_inches=2.5,
+                maximum_model_horizontal_distance_inches=2.5,
             ),
         ),
     )
@@ -286,6 +293,7 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
                 MovementDistanceRecord(
                     unit_instance_id="other-unit",
                     maximum_model_distance_inches=1.0,
+                    maximum_model_horizontal_distance_inches=1.0,
                 ),
             ),
         )
@@ -299,10 +307,12 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
                 MovementDistanceRecord(
                     unit_instance_id="army-alpha:intercessor-unit-1",
                     maximum_model_distance_inches=1.0,
+                    maximum_model_horizontal_distance_inches=1.0,
                 ),
                 MovementDistanceRecord(
                     unit_instance_id="army-alpha:intercessor-unit-1",
                     maximum_model_distance_inches=2.0,
+                    maximum_model_horizontal_distance_inches=2.0,
                 ),
             ),
         )
@@ -341,6 +351,24 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
             moved_unit_ids=("army-alpha:intercessor-unit-1",),
             active_selection=selection,
         )
+
+
+def test_movement_distance_record_tracks_horizontal_and_total_path_independently() -> None:
+    witness = PathWitness.for_paths(
+        (
+            (
+                "model-1",
+                (
+                    Pose.at(0.0, 0.0, 0.0),
+                    Pose.at(0.0, 0.0, 4.0),
+                    Pose.at(3.0, 0.0, 4.0),
+                ),
+            ),
+        )
+    )
+
+    assert _maximum_model_distance_inches_from_witness(witness) == 7.0
+    assert _maximum_model_horizontal_distance_inches_from_witness(witness) == 3.0
 
 
 def test_lifecycle_from_payload_rejects_battlefield_state_missing_unit_reference() -> None:
@@ -565,6 +593,10 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
     assert terminal_event["movement_phase_action"] == MovementPhaseActionKind.NORMAL_MOVE.value
     assert terminal_event["displacement_kind"] == ModelDisplacementKind.NORMAL_MOVE.value
     assert terminal_event["movement_inches"] == 6
+    assert len(lifecycle.state.normal_move_states) == 1
+    normal_move_state = lifecycle.state.normal_move_states[0]
+    assert normal_move_state.source_kind is NormalMoveSourceKind.MOVEMENT_PHASE_ACTION
+    assert normal_move_state.phase is BattlePhase.MOVEMENT
     witness = terminal_event["witness"]
     assert isinstance(witness, dict)
     witness_payload = cast(dict[str, object], witness)

@@ -3373,7 +3373,7 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     _validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
-    _validate_surge_move_state_consistency(state=state)
+    _validate_normal_move_state_consistency(state=state)
     if config is None:
         return
     if state.game_id != config.game_id:
@@ -3884,22 +3884,22 @@ def _validate_fell_back_unit_state_consistency(*, state: GameState) -> None:
             raise GameLifecycleError("fell_back_unit_states unit is not active player's unit.")
 
 
-def _validate_surge_move_state_consistency(*, state: GameState) -> None:
-    if not state.surge_move_states:
+def _validate_normal_move_state_consistency(*, state: GameState) -> None:
+    if not state.normal_move_states:
         return
     if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("surge_move_states require battle stage.")
+        raise GameLifecycleError("normal_move_states require battle stage.")
     unit_owner_by_id = {
         unit.unit_instance_id: army.player_id
         for army in state.army_definitions
         for unit in army.units
     }
-    for surge_state in state.surge_move_states:
-        owner = unit_owner_by_id.get(surge_state.unit_instance_id)
+    for normal_move_state in state.normal_move_states:
+        owner = unit_owner_by_id.get(normal_move_state.unit_instance_id)
         if owner is None:
-            raise GameLifecycleError("surge_move_states unit is unknown.")
-        if owner != surge_state.player_id:
-            raise GameLifecycleError("surge_move_states player_id does not match unit owner.")
+            raise GameLifecycleError("normal_move_states unit is unknown.")
+        if owner != normal_move_state.player_id:
+            raise GameLifecycleError("normal_move_states player_id does not match unit owner.")
 
 
 def _fully_removed_unit_ids_for_player(*, state: GameState, player_id: str) -> set[str]:

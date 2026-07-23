@@ -168,7 +168,7 @@ def test_generated_rangers_path_of_the_outcast_moves_through_local_session_facad
 
 
 @pytest.mark.integration
-def test_generated_rangers_receive_sequential_and_repeatable_reaction_windows(
+def test_generated_rangers_cannot_repeat_normal_move_reactions_in_one_phase(
     rangers_facade_catalog: ArmyCatalog,
 ) -> None:
     session, units = _rangers_movement_session(
@@ -241,34 +241,30 @@ def test_generated_rangers_receive_sequential_and_repeatable_reaction_windows(
         result_id_prefix="rangers-repeat-enemy-two",
         dx=0.25,
     )
-    alpha_second_request = _assert_triggered_request(
+    second_request = _request(
         status,
-        unit_instance_id=alpha.unit_instance_id,
+        SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
     )
-    second_enemy_event_id = _trigger_source_event_id(alpha_second_request)
+    assert second_request.actor_id == "player-a"
+    assert {option.option_id for option in second_request.options} == {
+        DECLINE_TRIGGERED_MOVEMENT_OPTION_ID
+    }
+    second_enemy_event_id = _trigger_source_event_id(second_request)
     assert second_enemy_event_id != first_enemy_event_id
-    status = _submit_triggered_move(
-        session,
-        status=status,
-        unit_instance_id=alpha.unit_instance_id,
-        result_id_prefix="rangers-repeat-alpha-second",
-        dx=-0.25,
+    session.submit_option(
+        request_id=second_request.request_id,
+        option_id=DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+        result_id="rangers-repeat-decline-second-window",
     )
     _assert_shifted(
         alpha_start,
         _unit_placement(session, alpha.unit_instance_id),
-        dx=-0.5,
+        dx=-0.25,
     )
-
-    beta_second_request = _assert_triggered_request(
-        status,
-        unit_instance_id=beta.unit_instance_id,
-    )
-    assert _trigger_source_event_id(beta_second_request) == second_enemy_event_id
-    session.submit_option(
-        request_id=beta_second_request.request_id,
-        option_id=DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
-        result_id="rangers-repeat-decline-beta-second",
+    _assert_shifted(
+        beta_start,
+        _unit_placement(session, beta.unit_instance_id),
+        dx=-0.25,
     )
 
     alpha_applied_events = tuple(
@@ -277,7 +273,7 @@ def test_generated_rangers_receive_sequential_and_repeatable_reaction_windows(
         if record.event_type == "triggered_movement_resolved"
         and _json_object(record.payload).get("unit_instance_id") == alpha.unit_instance_id
     )
-    assert len(alpha_applied_events) == 2
+    assert len(alpha_applied_events) == 1
 
 
 def _rangers_facade_catalog() -> ArmyCatalog:

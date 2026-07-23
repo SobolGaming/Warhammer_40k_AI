@@ -28,6 +28,12 @@
         "source_text": "If a Stratagem or ability forces a unit to make a Desperate Escape test, that unit must make one hazard roll for each model in that unit and must make a battle-shock roll."
       },
       {
+        "behavior_descriptor": "normal_move_limited_to_once_per_unit_per_phase",
+        "rule_id": "09-normal-move-one-per-phase",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase",
+        "source_text": "A unit cannot make more than one Normal move per phase."
+      },
+      {
         "behavior_descriptor": "objective_consolidation_requires_unengaged_endpoint",
         "rule_id": "12.08-objective-consolidation",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:12.08-objective-consolidation",
@@ -50,6 +56,18 @@
         "rule_id": "20.01.02-strategic-reserves",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:20.01.02-strategic-reserves",
         "source_text": "At the end of the final turn, units in Strategic Reserves are destroyed, but they do not trigger rules that apply when a model is destroyed."
+      },
+      {
+        "behavior_descriptor": "fly_heavy_uses_horizontal_distance_for_three_inch_limit",
+        "rule_id": "faq-heavy-fly-horizontal-distance",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-heavy-fly-horizontal-distance",
+        "source_text": "A unit that has FLY still benefits from HEAVY if none of its models moved more than 3 inches horizontally, regardless of the vertical distance those models moved."
+      },
+      {
+        "behavior_descriptor": "infantry_monster_vehicle_hazard_failure_inflicts_one_mortal_wound",
+        "rule_id": "faq-hazardous-mixed-unit-keywords",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-hazardous-mixed-unit-keywords",
+        "source_text": "If a unit has both INFANTRY and MONSTER or VEHICLE keywords, it suffers 1 mortal wound for each failed Hazard roll."
       },
       {
         "behavior_descriptor": "precision_mortals_prioritize_selected_character_group",
