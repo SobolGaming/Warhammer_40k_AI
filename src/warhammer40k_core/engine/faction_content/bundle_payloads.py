@@ -62,6 +62,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     advance_roll_modifier_ids: list[str]
     charge_roll_modifier_ids: list[str]
     weapon_profile_modifier_ids: list[str]
+    post_roll_weapon_profile_modifier_ids: list[str]
     faction_execution_record_ids: list[str]
     selected_execution_record_ids: list[str]
     bundle_summary_hash: str
@@ -243,6 +244,12 @@ def runtime_content_bundle_summary_payload(
         "weapon_profile_modifier_ids": [
             binding.modifier_id
             for binding in bundle.runtime_modifier_registry.all_weapon_profile_bindings()
+        ],
+        "post_roll_weapon_profile_modifier_ids": [
+            binding.modifier_id
+            for binding in (
+                bundle.runtime_modifier_registry.post_roll_weapon_profile_modifier_bindings
+            )
         ],
         "faction_execution_record_ids": [
             record.execution_id for record in bundle.faction_rule_execution_registry.all_records()

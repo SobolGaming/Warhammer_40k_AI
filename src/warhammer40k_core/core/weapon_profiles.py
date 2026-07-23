@@ -675,6 +675,14 @@ class WeaponProfile:
         keywords = _canonical_keyword_tuple(self.keywords)
         if keywords != self.keywords:
             object.__setattr__(self, "keywords", keywords)
+        if WeaponKeyword.TORRENT in keywords:
+            incompatible = frozenset(
+                {WeaponKeyword.INDIRECT_FIRE, WeaponKeyword.PRECISION}
+            ).intersection(keywords)
+            if incompatible:
+                raise WeaponProfileError(
+                    "Torrent WeaponProfile cannot also have Indirect Fire or Precision."
+                )
         abilities = _canonical_ability_tuple(self.abilities)
         if abilities != self.abilities:
             object.__setattr__(self, "abilities", abilities)

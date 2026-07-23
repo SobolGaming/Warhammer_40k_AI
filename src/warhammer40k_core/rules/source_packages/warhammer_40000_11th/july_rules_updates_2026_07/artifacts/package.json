@@ -1,5 +1,85 @@
 {
-  "artifact_schema": "core-v2-july-rules-updates-source-package-v1",
+  "artifact_schema": "core-v2-july-rules-updates-source-package-v2",
+  "app_core_rules_update": {
+    "document_id": "warhammer-40000-app-core-rules-2026-07-22",
+    "rules": [
+      {
+        "behavior_descriptor": "embarked_return_requires_remaining_transport_capacity",
+        "rule_id": "01.02.03-embarked-model-return",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:01.02.03-embarked-model-return",
+        "source_text": "When a model revives, resurrects, returns or is added to an embarked unit, if that TRANSPORT has sufficient remaining transport capacity for that model, that model is returned to that unit and is embarked. Otherwise, that model is destroyed, but it does not trigger rules that apply when a model is destroyed."
+      },
+      {
+        "behavior_descriptor": "post_roll_profile_changes_split_attack_pools",
+        "rule_id": "05.03.02-post-roll-attack-profiles",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.03.02-post-roll-attack-profiles",
+        "source_text": "Some attacks may be modified as a result of the values of hit/wound rolls made for those attacks. When this happens, split those attacks into attack pools based on their new identical attack profiles. The active player can decide which attack pool to resolve first for steps 5.3 and 5.4. Once those steps have been completed for that attack pool, the active player can decide the next pool to resolve and repeat until all new attack pools are resolved."
+      },
+      {
+        "behavior_descriptor": "desperate_escape_test_means_hazard_rolls",
+        "rule_id": "09.07.01-desperate-escape-definition",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-desperate-escape-definition",
+        "source_text": "Some rules may reference the term 'Desperate Escape test'. In all instances this means the hazard rolls made for the desperate escape mode of a fall-back move. Abilities that subtract from a unit's Desperate Escape test instead subtract from those hazard rolls. Example: A battle-shocked unit makes a fall-back move away from a unit of Bloodletters that have the Bane of Cowards ability. As a result of Bane of Cowards, because the unit making the fall-back move is battle-shocked, the hazard rolls they make as part of their desperate escape will be at -1."
+      },
+      {
+        "behavior_descriptor": "forced_desperate_escape_tests_all_models_and_battle_shock",
+        "rule_id": "09.07.01-forced-desperate-escape",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-forced-desperate-escape",
+        "source_text": "If a Stratagem or ability forces a unit to make a Desperate Escape test, that unit must make one hazard roll for each model in that unit and must make a battle-shock roll."
+      },
+      {
+        "behavior_descriptor": "objective_consolidation_requires_unengaged_endpoint",
+        "rule_id": "12.08-objective-consolidation",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:12.08-objective-consolidation",
+        "source_text": "After Moving - Objective Consolidation: Your unit must be unengaged and within range of the selected objective."
+      },
+      {
+        "behavior_descriptor": "objective_control_determined_first_at_phase_and_turn_end",
+        "rule_id": "14.02.01-control-first",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first",
+        "source_text": "At the end of each phase and turn, the first thing players do (before any other 'at the end of the phase/end of the turn' rules or abilities) is determine which objectives are controlled by which player."
+      },
+      {
+        "behavior_descriptor": "empty_dedicated_transport_models_destroyed_without_triggers",
+        "rule_id": "18.01-dedicated-transport",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:18.01-dedicated-transport",
+        "source_text": "A friendly unit must be embarked within each friendly DEDICATED TRANSPORT model. At the end of this step, each friendly DEDICATED TRANSPORT model without an embarked unit is destroyed, but they do not trigger rules that are triggered when a model is destroyed."
+      },
+      {
+        "behavior_descriptor": "strategic_reserves_destroyed_at_final_turn_without_triggers",
+        "rule_id": "20.01.02-strategic-reserves",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:20.01.02-strategic-reserves",
+        "source_text": "At the end of the final turn, units in Strategic Reserves are destroyed, but they do not trigger rules that apply when a model is destroyed."
+      },
+      {
+        "behavior_descriptor": "precision_mortals_prioritize_selected_character_group",
+        "rule_id": "24.28.01-precision-devastating-wounds",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.28.01-precision-devastating-wounds",
+        "source_text": "Mortal Wounds inflicted by a [PRECISION] attack with the [DEVASTATING WOUNDS] ability are first applied to the CHARACTER group that was selected for those [PRECISION] attacks (if that group is not already destroyed)."
+      },
+      {
+        "behavior_descriptor": "torrent_excludes_indirect_fire_and_precision",
+        "rule_id": "24.37.01-torrent",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.37.01-torrent",
+        "source_text": "[TORRENT] weapons cannot have [INDIRECT FIRE] or [PRECISION]."
+      },
+      {
+        "behavior_descriptor": "epic_hero_models_cannot_be_given_enhancements",
+        "rule_id": "25.04-epic-hero-enhancements",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-epic-hero-enhancements",
+        "source_text": "EPIC HEROES models cannot be given enhancements."
+      },
+      {
+        "behavior_descriptor": "incursion_allows_one_three_dp_detachment",
+        "rule_id": "25.04-incursion-detachment",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-incursion-detachment",
+        "source_text": "If you are playing an Incursion battle, you can select a 3DP detachment as your only detachment."
+      }
+    ],
+    "source_platform": "Warhammer 40,000 App",
+    "source_title": "Warhammer 40,000 App Core Rules",
+    "source_version": "2026-07-22"
+  },
   "event_companion": {
     "changed_layouts": [
       {

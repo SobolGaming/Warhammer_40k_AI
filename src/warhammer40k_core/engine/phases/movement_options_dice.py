@@ -15,6 +15,20 @@ from warhammer40k_core.engine.phases.movement_placement_proposals import *
 from warhammer40k_core.engine.phases.movement_action_decisions import *
 from warhammer40k_core.engine.phases.movement_resolution_flow import *
 from warhammer40k_core.engine.phases.movement_fall_back_embark import *
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockTestReason,
+    BattleShockTestRequest,
+    battle_shock_leadership_target_for_unit,
+)
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockDiceExpressionContext,
+    BattleShockHookRegistry,
+)
+from warhammer40k_core.engine.battle_shock_resolution import (
+    resolve_battle_shock_test_with_optional_reroll,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 # fmt: off
 if TYPE_CHECKING:
@@ -36,6 +50,8 @@ if TYPE_CHECKING:
 # fmt: on
 
 __all__ = (
+    "FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND",
+    "FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID",
     "_advance_reroll_permission_for_unit",
     "_advance_roll_request_for_action",
     "_advance_roll_reroll_request",
@@ -45,8 +61,14 @@ __all__ = (
     "_mission_action_state_is_active_for_unit",
     "_movement_action_options",
     "_record_advance_roll_resolved_event",
+    "_resolve_forced_desperate_escape_battle_shock",
     "_roll_advance_dice",
     "_roll_desperate_escape_dice",
+)
+
+FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND = "forced_desperate_escape_battle_shock"
+FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID = (
+    "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-forced-desperate-escape"
 )
 
 
@@ -436,6 +458,134 @@ def _roll_desperate_escape_dice(
         )
         rolls.append(roll)
     return tuple(rolls)
+
+
+def _resolve_forced_desperate_escape_battle_shock(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    resolution: FallBackActionResult,
+    action_result: DecisionResult,
+    battle_shock_hooks: BattleShockHookRegistry,
+    ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    movement_proposal_request_id: str,
+) -> LifecycleStatus | None:
+    raw_sources = resolution.movement_payload.get("forced_desperate_escape_sources")
+    if raw_sources is None:
+        return None
+    if not isinstance(raw_sources, list) or not raw_sources:
+        raise GameLifecycleError(
+            "forced_desperate_escape_sources must be a non-empty list when present."
+        )
+    source_rule_ids = _forced_desperate_escape_source_rule_ids_from_context(
+        resolution.movement_payload
+    )
+    if not source_rule_ids:
+        raise GameLifecycleError("Forced Desperate Escape requires source rule IDs.")
+    for event in decisions.event_log.records:
+        if event.event_type != "forced_desperate_escape_battle_shock_resolved":
+            continue
+        payload = cast(dict[str, JsonValue], event.payload)
+        if (
+            payload.get("unit_instance_id") == resolution.unit_instance_id
+            and payload.get("battle_round") == state.battle_round
+            and payload.get("source_rule_ids") == list(source_rule_ids)
+        ):
+            return None
+
+    unit = _unit_instance_by_id(
+        state=state,
+        unit_instance_id=resolution.unit_instance_id,
+    )
+    player_id = resolution.attempted_placement.player_id
+    current_model_ids = tuple(
+        model.model_instance_id for model in unit.own_models if model.is_alive
+    )
+    if not current_model_ids:
+        raise GameLifecycleError("Forced Desperate Escape battle-shock found no living models.")
+    phase_start_battle_shocked_unit_ids = tuple(state.battle_shocked_unit_ids)
+    reason = (
+        BattleShockTestReason.FORCED_BY_STRATAGEM
+        if any(
+            isinstance(source, dict) and source.get("stratagem_use_id") is not None
+            for source in raw_sources
+        )
+        else BattleShockTestReason.FORCED_BY_ARMY_RULE
+    )
+    dice_expression = battle_shock_hooks.dice_expression_for(
+        BattleShockDiceExpressionContext(
+            state=state,
+            player_id=player_id,
+            unit_instance_id=unit.unit_instance_id,
+            reason=reason,
+            active_player_id=_active_player_id(state),
+            phase=BattlePhase.MOVEMENT,
+            default_expression=DiceExpression(quantity=2, sides=6),
+            phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+        )
+    )
+    request = BattleShockTestRequest.for_unit(
+        request_id=(f"forced-desperate-escape:{state.battle_round:02d}:{unit.unit_instance_id}"),
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id=player_id,
+        unit_instance_id=unit.unit_instance_id,
+        reason=reason,
+        leadership_target=battle_shock_leadership_target_for_unit(
+            unit,
+            current_model_ids=current_model_ids,
+            ability_index=ability_index,
+            state=state,
+            runtime_modifier_registry=runtime_modifier_registry,
+        ),
+        below_half_strength_context=BelowHalfStrengthContext.from_unit(
+            player_id=player_id,
+            unit=unit,
+            starting_strength=state.starting_strength_record_for_unit(unit.unit_instance_id),
+            current_model_ids=current_model_ids,
+        ),
+        dice_expression=dice_expression,
+    )
+    base_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "unit_instance_id": unit.unit_instance_id,
+        "source_kind": FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND,
+        "source_rule_ids": list(source_rule_ids),
+        "source_rule_id": FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID,
+        "fall_back_result": validate_json_value(resolution.to_payload()),
+        "action_result": validate_json_value(action_result.to_payload()),
+        "movement_proposal_request_id": movement_proposal_request_id,
+    }
+    decisions.event_log.append(
+        "forced_desperate_escape_battle_shock_requested",
+        {
+            **base_payload,
+            "battle_shock_test_request": request.to_payload(),
+        },
+    )
+    manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
+    battle_shock_resolution = resolve_battle_shock_test_with_optional_reroll(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        battle_shock_hooks=battle_shock_hooks,
+        request=request,
+        roll_state=manager.roll(request.spec),
+        active_player_id=_active_player_id(state),
+        phase=BattlePhase.MOVEMENT,
+        phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+        source_kind=FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND,
+        base_payload=base_payload,
+        resolved_event_types=("forced_desperate_escape_battle_shock_resolved",),
+        pending_phase_body_status=("forced_desperate_escape_battle_shock_reroll_pending"),
+    )
+    if battle_shock_resolution.pending_status is not None:
+        return battle_shock_resolution.pending_status
+    if battle_shock_resolution.resolved_payload is None:
+        raise GameLifecycleError("Forced Desperate Escape Battle-shock did not resolve.")
+    return None
 
 
 def _desperate_escape_roll_modifiers(

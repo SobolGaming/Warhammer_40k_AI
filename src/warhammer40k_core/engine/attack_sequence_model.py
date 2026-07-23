@@ -5,6 +5,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.deferred_mortal_wounds import (
+    DeferredMortalWounds,
+    DeferredMortalWoundsPayload,
+)
+from warhammer40k_core.engine.post_roll_attack_profiles import PostRollAttackPoolSetPayload
 
 # fmt: off
 if TYPE_CHECKING:
@@ -36,6 +41,7 @@ __all__ = (
     "IGNORE_DETRIMENTAL_MODIFIERS_OPTION_ID",
     "KEEP_ALL_MODIFIERS_OPTION_ID",
     "SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE",
+    "SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE",
     "SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE",
     "SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE",
     "SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS",
@@ -91,6 +97,7 @@ ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
 )
 SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE = "select_resolve_target_unit"
 SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE = "select_attack_weapon_group"
+SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE = "select_post_roll_attack_pool"
 SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE = "select_psychic_attack_modifier_ignores"
 KEEP_ALL_MODIFIERS_OPTION_ID = "keep-all-modifiers"
 IGNORE_DETRIMENTAL_MODIFIERS_OPTION_ID = "ignore-detrimental-modifiers"
@@ -100,6 +107,7 @@ ATTACK_RESOLUTION_SELECTION_DECISION_TYPES = frozenset(
     (
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
     )
 )
 
@@ -303,6 +311,8 @@ class AttackSequencePayload(TypedDict):
     deferred_mortal_wounds: list[DeferredMortalWoundsPayload]
     pending_grouped_damage: PendingGroupedDamagePayload | None
     pending_destroyed_transport_disembark: PendingDestroyedTransportDisembarkPayload | None
+    post_roll_attack_pools: PostRollAttackPoolSetPayload | None
+    post_roll_attack_contexts: list[AttackResolutionContextPayload]
 
 
 class AttackResolutionContextPayload(TypedDict):
@@ -377,13 +387,6 @@ class DestructionReactionContextPayload(TypedDict):
     transition_batch: JsonValue
     destroyed_model_rules_triggered: bool
     continuation: JsonValue
-
-
-class DeferredMortalWoundsPayload(TypedDict):
-    source_rule_id: str
-    target_unit_instance_id: str
-    attack_context_id: str
-    mortal_wounds: int
 
 
 class HazardousMortalWoundSourceContextPayload(TypedDict):
@@ -1098,59 +1101,6 @@ class AttackModifierStackSet:
                 modifier.to_payload() for modifier in self.wound_roll_modifiers
             ],
         }
-
-
-@dataclass(frozen=True, slots=True)
-class DeferredMortalWounds:
-    source_rule_id: str
-    target_unit_instance_id: str
-    attack_context_id: str
-    mortal_wounds: int
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "source_rule_id",
-            _validate_identifier("DeferredMortalWounds source_rule_id", self.source_rule_id),
-        )
-        object.__setattr__(
-            self,
-            "target_unit_instance_id",
-            _validate_identifier(
-                "DeferredMortalWounds target_unit_instance_id",
-                self.target_unit_instance_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "attack_context_id",
-            _validate_identifier(
-                "DeferredMortalWounds attack_context_id",
-                self.attack_context_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "mortal_wounds",
-            _validate_positive_int("DeferredMortalWounds mortal_wounds", self.mortal_wounds),
-        )
-
-    def to_payload(self) -> DeferredMortalWoundsPayload:
-        return {
-            "source_rule_id": self.source_rule_id,
-            "target_unit_instance_id": self.target_unit_instance_id,
-            "attack_context_id": self.attack_context_id,
-            "mortal_wounds": self.mortal_wounds,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: DeferredMortalWoundsPayload) -> Self:
-        return cls(
-            source_rule_id=payload["source_rule_id"],
-            target_unit_instance_id=payload["target_unit_instance_id"],
-            attack_context_id=payload["attack_context_id"],
-            mortal_wounds=payload["mortal_wounds"],
-        )
 
 
 @dataclass(frozen=True, slots=True)

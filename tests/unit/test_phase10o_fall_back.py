@@ -12,10 +12,20 @@ from tests.deployment_submission_helpers import (
 from tests.movement_submission_helpers import (
     submit_action_and_movement_proposal,
     submit_default_movement_proposal_if_pending,
+    submit_movement_proposal,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    AbilityCatalogIndex,
+    AbilityCatalogRecord,
+    AbilityDefinition,
+    AbilitySourceKind,
+    AbilityTimingDescriptor,
+)
+from warhammer40k_core.engine.advance_hooks import AdvanceMoveHookRegistry
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battle_shock import BattleShockedUnitState
 from warhammer40k_core.engine.battlefield_state import (
@@ -27,6 +37,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
@@ -37,6 +48,7 @@ from warhammer40k_core.engine.effects import (
     EffectExpiration,
     PersistingEffect,
 )
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -44,6 +56,10 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -63,25 +79,34 @@ from warhammer40k_core.engine.phases.movement import (
     FellBackUnitState,
     MovementPhaseActionKind,
     MovementPhaseStepKind,
+    _roll_desperate_escape_dice,
     resolve_fall_back_move,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    StratagemCatalogIndex,
     stratagem_decline_payload,
 )
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     UnitCoherencyResult,
     unit_placement_coherency_result,
 )
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-01-0002"
 _TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-v3-0004"
@@ -363,6 +388,135 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
         DesperateEscapeRequirementReason.BATTLE_SHOCKED in requirement.reasons
         for requirement in resolution.desperate_escape_requirements
     )
+
+
+def test_forced_desperate_escape_rolls_every_model() -> None:
+    scenario = _engaged_scenario()
+    state = _state_for_scenario_with_effects(scenario, effects=())
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    source_rule_id = "phase10o-forced-desperate-escape-source"
+    resolution = resolve_fall_back_move(
+        scenario=scenario,
+        state=state,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        path_witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=Pose.at(6.0, 12.0),
+        ),
+        forced_desperate_escape_source_rule_ids=(source_rule_id,),
+    )
+    decisions = DecisionController()
+    rolls = _roll_desperate_escape_dice(
+        state=state,
+        decisions=decisions,
+        resolution=resolution,
+    )
+
+    assert len(rolls) == len(unit_placement.model_placements)
+    assert all(
+        DesperateEscapeRequirementReason.FORCED_BY_RULE in roll.requirement.reasons
+        for roll in rolls
+    )
+    assert not any(
+        event.event_type.startswith("forced_desperate_escape_battle_shock")
+        for event in decisions.event_log.records
+    )
+
+
+def test_catalog_ability_forces_desperate_escape_on_immediate_fall_back_path() -> None:
+    lifecycle, movement_status = _advance_to_movement_unit_selection(
+        _config(game_id="phase10o-catalog-forced-desperate-escape")
+    )
+    _move_first_enemy_model_into_side_engagement(lifecycle)
+    state = _state(lifecycle)
+    target_army = state.army_definition_for_player("player-a")
+    source_army = state.army_definition_for_player("player-b")
+    assert target_army is not None
+    assert source_army is not None
+    target_unit = target_army.unit_by_id("army-alpha:intercessor-unit-1")
+    source_unit = source_army.unit_by_id("army-beta:intercessor-unit-2")
+    record = _forced_desperate_escape_ability_record(source_unit=source_unit)
+    lifecycle._movement_phase_handler = replace(  # pyright: ignore[reportPrivateUsage]
+        lifecycle._movement_phase_handler,  # pyright: ignore[reportPrivateUsage]
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        advance_move_hooks=AdvanceMoveHookRegistry.empty(),
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records(()),
+            "player-b": AbilityCatalogIndex.from_records((record,)),
+        },
+    )
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase10o-catalog-select-unit",
+            request=_decision_request(movement_status),
+            selected_option_id=target_unit.unit_instance_id,
+        )
+    )
+    action_request = _decision_request(action_status)
+    proposal_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase10o-catalog-select-ordered-fall-back",
+            request=action_request,
+            selected_option_id=_ORDERED_FALL_BACK_OPTION_ID,
+        )
+    )
+    proposal_decision_request = _decision_request(proposal_status)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        proposal_decision_request.payload
+    )
+    context = proposal_request.context
+
+    assert proposal_decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert context is not None
+    assert context["declared_fall_back_mode"] == FallBackModeKind.ORDERED_RETREAT.value
+    assert context["fall_back_mode"] == FallBackModeKind.DESPERATE_ESCAPE.value
+    assert context["forced_desperate_escape_source_rule_ids"] == [record.definition.source_id]
+    sources = cast(list[JsonValue], context["forced_desperate_escape_sources"])
+    assert cast(dict[str, JsonValue], sources[0])["catalog_record_id"] == record.record_id
+
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    unit_placement = battlefield.unit_placement_by_id(target_unit.unit_instance_id)
+    resolution_status = submit_movement_proposal(
+        lifecycle,
+        request=proposal_decision_request,
+        result_id="phase10o-catalog-forced-fall-back-proposal",
+        unit_instance_id=target_unit.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
+    )
+
+    assert resolution_status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    }
+    roll_events = _event_payloads(lifecycle, "desperate_escape_roll_resolved")
+    assert len(roll_events) == len(unit_placement.model_placements)
+    assert all(
+        DesperateEscapeRequirementReason.FORCED_BY_RULE.value
+        in cast(
+            list[str],
+            cast(
+                dict[str, JsonValue],
+                cast(dict[str, JsonValue], event["desperate_escape_roll"])["requirement"],
+            )["reasons"],
+        )
+        for event in roll_events
+    )
+    battle_shock_event = _last_event_payload(
+        lifecycle,
+        "forced_desperate_escape_battle_shock_resolved",
+    )
+    assert battle_shock_event["unit_instance_id"] == target_unit.unit_instance_id
+    assert battle_shock_event["source_rule_ids"] == [record.definition.source_id]
 
 
 def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_state() -> None:
@@ -972,6 +1126,44 @@ def _generic_movement_transit_effect(*, target_unit_instance_id: str) -> Persist
                 ],
             },
         },
+    )
+
+
+def _forced_desperate_escape_ability_record(
+    *,
+    source_unit: UnitInstance,
+) -> AbilityCatalogRecord:
+    source_text = RuleSourceText.from_raw(
+        source_id="phase10o:catalog-ability:forced-desperate-escape",
+        raw_text=(
+            "Each time an enemy unit (excluding Monsters and Vehicles) that is within "
+            "Engagement Range of one or more units from your army with this ability is selected "
+            "to Fall Back, models in that enemy unit must take Desperate Escape tests."
+        ),
+    )
+    rule_ir = compile_rule_source_text(
+        source_text,
+        source_keyword_sequence_parts=(
+            datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+        ),
+    ).rule_ir
+    return AbilityCatalogRecord(
+        record_id="phase10o:catalog-record:forced-desperate-escape",
+        definition=AbilityDefinition(
+            ability_id="phase10o:catalog-ability:forced-desperate-escape",
+            name="Forced Desperate Escape",
+            source_id=source_text.source_id,
+            when_descriptor="Enemy selected to Fall Back.",
+            effect_descriptor="Force Desperate Escape tests.",
+            restrictions_descriptor="Non-Monster non-Vehicle enemy unit.",
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK
+            ),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": rule_ir.to_payload()}),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=source_unit.datasheet_id,
     )
 
 

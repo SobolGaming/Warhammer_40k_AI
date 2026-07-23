@@ -245,7 +245,11 @@ def test_blood_tainted_records_sticky_control_at_phase_end_boundary() -> None:
     phase_end_record = state.objective_control_records[-1]
     retained_result = phase_end_record.result_by_objective_id(objective_id)
     assert retained_result.controlled_by_player_id == "player-a"
-    assert retained_result.retained_control_source_id == rule.SOURCE_RULE_ID
+    assert retained_result.retained_control_source_id is None
+    event_types = tuple(event.event_type for event in decisions.event_log.records)
+    assert event_types.index("end_boundary_objective_control_determined") < event_types.index(
+        "sticky_objective_control_state_recorded"
+    )
 
 
 def test_blood_tainted_credits_only_unit_destruction_completion_attacker() -> None:

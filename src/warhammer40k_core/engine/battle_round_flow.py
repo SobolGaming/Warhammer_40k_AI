@@ -227,6 +227,29 @@ class BattleRoundFlow:
         ):
             return status
 
+        objective_control_records = state.determine_current_end_objective_control(
+            runtime_modifier_registry=self._runtime_modifier_registry,
+        )
+        if not any(
+            event.event_type == "end_boundary_objective_control_determined"
+            and isinstance(event.payload, dict)
+            and event.payload.get("record_ids")
+            == [record.record_id for record in objective_control_records]
+            for event in decisions.event_log.records
+        ):
+            decisions.event_log.append(
+                "end_boundary_objective_control_determined",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "phase": current_phase.value,
+                    "record_ids": [record.record_id for record in objective_control_records],
+                    "source_rule_id": (
+                        "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
+                        "14.02.01-control-first"
+                    ),
+                },
+            )
         _emit_end_timing_windows(
             state=state,
             decisions=decisions,

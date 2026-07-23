@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.post_roll_attack_profiles import PostRollAttackPoolSet
 
 # fmt: off
 if TYPE_CHECKING:
@@ -51,6 +52,8 @@ class AttackSequence:
     deferred_mortal_wounds: tuple[DeferredMortalWounds, ...] = ()
     pending_grouped_damage: PendingGroupedDamage | None = None
     pending_destroyed_transport_disembark: PendingDestroyedTransportDisembark | None = None
+    post_roll_attack_pools: PostRollAttackPoolSet | None = None
+    post_roll_attack_contexts: tuple[AttackResolutionContextPayload, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -161,6 +164,35 @@ class AttackSequence:
                 "AttackSequence pending_destroyed_transport_disembark must be "
                 "PendingDestroyedTransportDisembark."
             )
+        if self.post_roll_attack_pools is None:
+            if self.post_roll_attack_contexts:
+                raise GameLifecycleError(
+                    "AttackSequence post-roll contexts require post-roll pools."
+                )
+        else:
+            if type(self.post_roll_attack_pools) is not PostRollAttackPoolSet:
+                raise GameLifecycleError(
+                    "AttackSequence post_roll_attack_pools must be a PostRollAttackPoolSet."
+                )
+            if self.post_roll_attack_pools.sequence_id != self.sequence_id:
+                raise GameLifecycleError("AttackSequence post-roll pool sequence drift.")
+            if self.current_gathered_group is None:
+                raise GameLifecycleError(
+                    "AttackSequence post-roll pools require a gathered attack group."
+                )
+            context_ids = tuple(
+                _validate_identifier(
+                    "AttackSequence post-roll attack_context_id",
+                    context["attack_context_id"],
+                )
+                for context in self.post_roll_attack_contexts
+            )
+            if len(set(context_ids)) != len(context_ids):
+                raise GameLifecycleError("AttackSequence post-roll attack contexts must be unique.")
+            if set(context_ids) != set(self.post_roll_attack_pools.all_attack_context_ids):
+                raise GameLifecycleError(
+                    "AttackSequence post-roll attack context membership drift."
+                )
         if self.pool_index > len(self.attack_pools):
             raise GameLifecycleError("AttackSequence pool_index is outside attack_pools.")
         if self.pool_index == len(self.attack_pools):
@@ -181,6 +213,10 @@ class AttackSequence:
             if self.pending_destroyed_transport_disembark is not None:
                 raise GameLifecycleError(
                     "Completed AttackSequence cannot have pending destroyed Transport state."
+                )
+            if self.post_roll_attack_pools is not None:
+                raise GameLifecycleError(
+                    "Completed AttackSequence cannot have post-roll attack pools."
                 )
             if self.attack_index != 0:
                 raise GameLifecycleError("Completed AttackSequence must have attack_index 0.")
@@ -237,11 +273,59 @@ class AttackSequence:
         if self.is_complete:
             raise GameLifecycleError("Completed AttackSequence has no current pool.")
         if self.current_gathered_group is not None:
-            return _synthetic_pool_for_gathered_group(
+            pool = _synthetic_pool_for_gathered_group(
                 attack_pools=self.attack_pools,
                 gathered_group=self.current_gathered_group,
             )
-        return self.attack_pools[self.pool_index]
+        else:
+            pool = self.attack_pools[self.pool_index]
+        if self.post_roll_attack_pools is None or self.post_roll_attack_pools.selected_pool is None:
+            return pool
+        profile = self.post_roll_attack_pools.selected_pool.weapon_profile
+        return replace(
+            pool,
+            weapon_profile_id=profile.profile_id,
+            weapon_profile=profile,
+        )
+
+    def with_post_roll_attack_pools(
+        self,
+        *,
+        pools: PostRollAttackPoolSet,
+        attack_contexts: tuple[AttackResolutionContextPayload, ...],
+    ) -> Self:
+        if type(pools) is not PostRollAttackPoolSet:
+            raise GameLifecycleError("Post-roll attack pool state is invalid.")
+        return replace(
+            self,
+            post_roll_attack_pools=pools,
+            post_roll_attack_contexts=attack_contexts,
+        )
+
+    def with_selected_post_roll_attack_pool(
+        self,
+        *,
+        actor_id: str,
+        selected_pool_id: str,
+    ) -> Self:
+        if self.post_roll_attack_pools is None:
+            raise GameLifecycleError("Post-roll attack pool selection requires pending pools.")
+        return replace(
+            self,
+            post_roll_attack_pools=self.post_roll_attack_pools.with_selected_pool(
+                actor_id=actor_id,
+                selected_pool_id=selected_pool_id,
+            ),
+        )
+
+    def without_post_roll_attack_pools(self) -> Self:
+        if self.post_roll_attack_pools is None:
+            raise GameLifecycleError("AttackSequence has no post-roll attack pools to discard.")
+        return replace(
+            self,
+            post_roll_attack_pools=None,
+            post_roll_attack_contexts=(),
+        )
 
     def attack_context_id(self) -> str:
         if self.is_complete:
@@ -277,6 +361,8 @@ class AttackSequence:
                 deferred_mortal_wounds=self.deferred_mortal_wounds,
                 pending_grouped_damage=self.pending_grouped_damage,
                 pending_destroyed_transport_disembark=(self.pending_destroyed_transport_disembark),
+                post_roll_attack_pools=self.post_roll_attack_pools,
+                post_roll_attack_contexts=self.post_roll_attack_contexts,
             )
         next_pool_index = self.pool_index + 1
         return type(self)(
@@ -293,6 +379,8 @@ class AttackSequence:
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def advanced_after_generated_hit(self, hit_roll: HitRoll) -> Self:
@@ -322,6 +410,8 @@ class AttackSequence:
                 deferred_mortal_wounds=self.deferred_mortal_wounds,
                 pending_grouped_damage=self.pending_grouped_damage,
                 pending_destroyed_transport_disembark=(self.pending_destroyed_transport_disembark),
+                post_roll_attack_pools=self.post_roll_attack_pools,
+                post_roll_attack_contexts=self.post_roll_attack_contexts,
             ).advanced_after_attack()
         return type(self)(
             sequence_id=self.sequence_id,
@@ -339,6 +429,8 @@ class AttackSequence:
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=(self.pending_destroyed_transport_disembark),
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def with_deferred_mortal_wounds(self, deferred: DeferredMortalWounds) -> Self:
@@ -360,6 +452,8 @@ class AttackSequence:
             deferred_mortal_wounds=(*self.deferred_mortal_wounds, deferred),
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def without_deferred_mortal_wounds(self) -> Self:
@@ -385,6 +479,8 @@ class AttackSequence:
             deferred_mortal_wounds=deferred_mortal_wounds,
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def with_pending_grouped_damage(self, pending: PendingGroupedDamage) -> Self:
@@ -404,6 +500,8 @@ class AttackSequence:
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_grouped_damage=pending,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def without_pending_grouped_damage(self) -> Self:
@@ -419,6 +517,8 @@ class AttackSequence:
             pool_index=self.pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def with_pending_destroyed_transport_disembark(
@@ -443,6 +543,8 @@ class AttackSequence:
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=pending,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def without_pending_destroyed_transport_disembark(self) -> Self:
@@ -461,6 +563,8 @@ class AttackSequence:
             current_hit_roll=self.current_hit_roll,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_grouped_damage=self.pending_grouped_damage,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def with_selected_target_unit(self, target_unit_instance_id: str) -> Self:
@@ -482,6 +586,8 @@ class AttackSequence:
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def without_selected_target_unit(self) -> Self:
@@ -498,6 +604,8 @@ class AttackSequence:
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def with_current_gathered_group(self, gathered_group: GatheredAttackGroup) -> Self:
@@ -518,6 +626,8 @@ class AttackSequence:
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
+            post_roll_attack_pools=self.post_roll_attack_pools,
+            post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
 
     def to_payload(self) -> AttackSequencePayload:
@@ -553,6 +663,12 @@ class AttackSequence:
                 if self.pending_destroyed_transport_disembark is None
                 else self.pending_destroyed_transport_disembark.to_payload()
             ),
+            "post_roll_attack_pools": (
+                None
+                if self.post_roll_attack_pools is None
+                else self.post_roll_attack_pools.to_payload()
+            ),
+            "post_roll_attack_contexts": list(self.post_roll_attack_contexts),
         }
 
     @classmethod
@@ -599,6 +715,12 @@ class AttackSequence:
                     pending_destroyed_transport_payload
                 )
             ),
+            post_roll_attack_pools=(
+                None
+                if payload["post_roll_attack_pools"] is None
+                else PostRollAttackPoolSet.from_payload(payload["post_roll_attack_pools"])
+            ),
+            post_roll_attack_contexts=tuple(payload["post_roll_attack_contexts"]),
         )
 
 

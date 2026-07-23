@@ -37,12 +37,12 @@ def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() ->
     assert SourceCatalog.from_payload(payload).to_payload() == payload
 
 
-def test_july_rules_updates_source_catalog_cites_both_committed_pdfs() -> None:
+def test_july_rules_updates_source_catalog_cites_pdfs_and_app_core_rules() -> None:
     catalog = july_rules_updates_2026_07.source_catalog()
     payload = catalog.to_payload()
     encoded = json.dumps(payload, sort_keys=True)
 
-    assert len(catalog.documents) == 2
+    assert len(catalog.documents) == 3
     universal_documents = tuple(
         document
         for document in catalog.documents
@@ -53,12 +53,19 @@ def test_july_rules_updates_source_catalog_cites_both_committed_pdfs() -> None:
         for document in catalog.documents
         if july_rules_updates_2026_07.EVENT_COMPANION_LOCAL_PDF in document.title
     )
+    app_core_documents = tuple(
+        document
+        for document in catalog.documents
+        if "Warhammer 40,000 App Core Rules" in document.title
+    )
     assert len(universal_documents) == 1
     assert len(event_companion_documents) == 1
+    assert len(app_core_documents) == 1
     universal_document = universal_documents[0]
     event_companion_document = event_companion_documents[0]
     universal_rules = july_rules_updates_2026_07.universal_rule_records()
     event_rules = july_rules_updates_2026_07.event_companion_rule_records()
+    app_core_rules = july_rules_updates_2026_07.app_core_rule_records()
     assert {rule.rule_id: rule.behavior_descriptor for rule in universal_rules} == {
         "modifying-a-stratagem-cp-cost": "unnamed_zero_cp_reduces_cost_by_one",
         "stratagem-repeat-and-limit-exceptions": (
@@ -69,6 +76,20 @@ def test_july_rules_updates_source_catalog_cites_both_committed_pdfs() -> None:
     }
     assert {rule.rule_id: rule.behavior_descriptor for rule in event_rules} == {
         "generating-command-points": "non_core_cp_gain_maximum_one_per_battle_round",
+    }
+    assert len(app_core_rules) == 12
+    assert {rule.rule_id for rule in app_core_rules} == set(
+        july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS
+    )
+    assert {rule.behavior_descriptor for rule in app_core_rules} >= {
+        "embarked_return_requires_remaining_transport_capacity",
+        "post_roll_profile_changes_split_attack_pools",
+        "forced_desperate_escape_tests_all_models_and_battle_shock",
+        "objective_consolidation_requires_unengaged_endpoint",
+        "objective_control_determined_first_at_phase_and_turn_end",
+        "precision_mortals_prioritize_selected_character_group",
+        "torrent_excludes_indirect_fire_and_precision",
+        "incursion_allows_one_three_dp_detachment",
     }
     assert len(july_rules_updates_2026_07.changed_event_layouts()) == 8
     assert all(
@@ -92,6 +113,10 @@ def test_july_rules_updates_source_catalog_cites_both_committed_pdfs() -> None:
             july_rules_updates_2026_07.NON_CORE_CP_GAIN_CAP_SOURCE_ID
         ].raw_text
     )
+    assert {rule.source_id for rule in app_core_rules} == {
+        source.source_id for source in app_core_documents[0].source_texts
+    }
+    assert any("Bane of Cowards" in rule.source_text for rule in app_core_rules)
     assert SourceCatalog.from_payload(payload).to_payload() == payload
 
     for relative_path, expected_sha256 in (

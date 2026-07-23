@@ -33,6 +33,8 @@ CORE_HEALING_RULE_ID = "core_rules_healing"
 class HealingStepKind(StrEnum):
     HEAL_WOUND = "heal_wound"
     REVIVE_MODEL = "revive_model"
+    REVIVE_MODEL_EMBARKED = "revive_model_embarked"
+    REVIVE_MODEL_DESTROYED_NO_CAPACITY = "revive_model_destroyed_no_capacity"
     NO_EFFECT = "no_effect"
 
 
@@ -149,6 +151,25 @@ class HealingStep:
             raise GameLifecycleError("Heal-wound HealingStep must not include placement.")
         if self.step_kind is HealingStepKind.REVIVE_MODEL and self.transition_batch is None:
             raise GameLifecycleError("Revive-model HealingStep requires placement.")
+        if (
+            self.step_kind
+            in {
+                HealingStepKind.REVIVE_MODEL_EMBARKED,
+                HealingStepKind.REVIVE_MODEL_DESTROYED_NO_CAPACITY,
+            }
+            and self.transition_batch is not None
+        ):
+            raise GameLifecycleError("Embarked revival HealingStep must not include placement.")
+        if self.step_kind is HealingStepKind.REVIVE_MODEL_EMBARKED and (
+            self.starting_wounds_remaining != 0 or self.final_wounds_remaining != 1
+        ):
+            raise GameLifecycleError("Embarked revival must return a model with one wound.")
+        if self.step_kind is HealingStepKind.REVIVE_MODEL_DESTROYED_NO_CAPACITY and (
+            self.starting_wounds_remaining != 0 or self.final_wounds_remaining != 0
+        ):
+            raise GameLifecycleError(
+                "Capacity-failed embarked revival must leave the model destroyed."
+            )
 
     def to_payload(self) -> HealingStepPayload:
         return {
@@ -453,6 +474,17 @@ def resolve_healing_until_blocked(
     while not current.is_complete():
         candidates = _healing_candidates_for_next_step(state=state, effect=current)
         if candidates.step_kind is HealingStepKind.REVIVE_MODEL and len(candidates.model_ids) == 1:
+            embarked_step = _apply_embarked_revival_step_if_applicable(
+                state=state,
+                effect=current,
+                model_instance_id=candidates.model_ids[0],
+                request_id=None,
+                result_id=None,
+            )
+            if embarked_step is not None:
+                current = current.with_step(embarked_step)
+                _emit_healing_step(decisions=decisions, effect=current, step=embarked_step)
+                continue
             from warhammer40k_core.engine.healing_revival import (
                 request_healing_revival_placement,
             )
@@ -556,6 +588,22 @@ def apply_recorded_healing_model_decision(
         effect=active_effect,
     )
     if selection.selection_kind is HealingStepKind.REVIVE_MODEL:
+        embarked_step = _apply_embarked_revival_step_if_applicable(
+            state=state,
+            effect=active_effect,
+            model_instance_id=selection.selected_model_id,
+            request_id=request.request_id,
+            result_id=result.result_id,
+        )
+        if embarked_step is not None:
+            updated = active_effect.with_step(embarked_step)
+            _emit_healing_step(decisions=decisions, effect=updated, step=embarked_step)
+            return resolve_healing_until_blocked(
+                state=state,
+                decisions=decisions,
+                ruleset_descriptor=ruleset_descriptor,
+                effect=updated,
+            )
         from warhammer40k_core.engine.healing_revival import (
             request_healing_revival_placement,
         )
@@ -838,6 +886,72 @@ def _apply_healing_step_to_model(
             result_id=result_id,
         )
     raise GameLifecycleError("Unsupported selected healing step kind.")
+
+
+def _apply_embarked_revival_step_if_applicable(
+    *,
+    state: GameState,
+    effect: HealingEffect,
+    model_instance_id: str,
+    request_id: str | None,
+    result_id: str | None,
+) -> HealingStep | None:
+    owner_unit_id = _model_owner_unit_instance_id(
+        state=state,
+        model_instance_id=model_instance_id,
+    )
+    cargo_state = state.transport_cargo_state_for_embarked_unit(owner_unit_id)
+    if cargo_state is None:
+        return None
+    alive_cargo_model_count = 0
+    unit_by_id = {
+        unit.unit_instance_id: unit for army in state.army_definitions for unit in army.units
+    }
+    for embarked_unit_id in cargo_state.embarked_unit_instance_ids:
+        embarked_unit = unit_by_id.get(embarked_unit_id)
+        if embarked_unit is None:
+            raise GameLifecycleError("TransportCargoState references an unknown embarked unit.")
+        alive_cargo_model_count += sum(model.is_alive for model in embarked_unit.own_models)
+    if alive_cargo_model_count >= cargo_state.capacity_profile.max_model_count:
+        return HealingStep(
+            step_index=effect.next_step_index(),
+            step_kind=HealingStepKind.REVIVE_MODEL_DESTROYED_NO_CAPACITY,
+            model_instance_id=model_instance_id,
+            starting_wounds_remaining=0,
+            final_wounds_remaining=0,
+            request_id=request_id,
+            result_id=result_id,
+        )
+    _replace_model_wounds(
+        state=state,
+        model_instance_id=model_instance_id,
+        wounds_remaining=1,
+    )
+    battlefield = _battlefield_state(state)
+    state.replace_battlefield_state(battlefield.with_returned_unplaced_model(model_instance_id))
+    return HealingStep(
+        step_index=effect.next_step_index(),
+        step_kind=HealingStepKind.REVIVE_MODEL_EMBARKED,
+        model_instance_id=model_instance_id,
+        starting_wounds_remaining=0,
+        final_wounds_remaining=1,
+        request_id=request_id,
+        result_id=result_id,
+    )
+
+
+def _model_owner_unit_instance_id(*, state: GameState, model_instance_id: str) -> str:
+    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    owner_unit_id: str | None = None
+    for army in state.army_definitions:
+        for unit in army.units:
+            if any(model.model_instance_id == requested_model_id for model in unit.own_models):
+                if owner_unit_id is not None:
+                    raise GameLifecycleError("Model cannot be owned by multiple units.")
+                owner_unit_id = unit.unit_instance_id
+    if owner_unit_id is None:
+        raise GameLifecycleError("Healing cannot find the model's owning unit.")
+    return owner_unit_id
 
 
 def _validate_effect_for_state(*, state: GameState, effect: HealingEffect) -> None:

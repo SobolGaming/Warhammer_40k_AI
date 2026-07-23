@@ -40,6 +40,11 @@ from warhammer40k_core.engine.hazard import (
     HAZARD_ROLL_FAILURE_THRESHOLD,
     hazard_roll_spec,
 )
+from warhammer40k_core.engine.healing import (
+    HealingEffect,
+    HealingStepKind,
+    resolve_healing_until_blocked,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -295,6 +300,83 @@ def test_lifecycle_replay_accepts_embarked_models_accounted_by_transport_cargo_s
     assert lifecycle.state.embarked_model_ids() == tuple(
         model.model_instance_id for model in passenger.own_models
     )
+
+
+@pytest.mark.parametrize(
+    ("capacity", "expected_kind", "expected_wounds", "remains_destroyed"),
+    [
+        (5, HealingStepKind.REVIVE_MODEL_EMBARKED, 1, False),
+        (4, HealingStepKind.REVIVE_MODEL_DESTROYED_NO_CAPACITY, 0, True),
+    ],
+)
+def test_embarked_model_revival_requires_remaining_transport_capacity_without_destroyed_trigger(
+    capacity: int,
+    expected_kind: HealingStepKind,
+    expected_wounds: int,
+    remains_destroyed: bool,
+) -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario, game_id=f"phase10q-embarked-revival-{capacity}")
+    destroyed_model = passenger.own_models[-1]
+    revived_passenger = replace(
+        passenger,
+        own_models=tuple(
+            replace(model, wounds_remaining=0)
+            if model.model_instance_id == destroyed_model.model_instance_id
+            else model
+            for model in passenger.own_models
+        ),
+    )
+    alpha_army = state.army_definitions[0]
+    state.army_definitions[0] = replace(
+        alpha_army,
+        units=tuple(
+            revived_passenger if unit.unit_instance_id == passenger.unit_instance_id else unit
+            for unit in alpha_army.units
+        ),
+    )
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        (destroyed_model.model_instance_id,)
+    ).without_unit_placement(passenger.unit_instance_id)
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            max_model_count=capacity,
+        )
+    )
+
+    decisions = DecisionController()
+    resolved, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=HealingEffect(
+            effect_id=f"phase10q-embarked-revival-effect-{capacity}",
+            target_unit_instance_id=passenger.unit_instance_id,
+            amount=1,
+            opposing_player_id="player-b",
+            source_rule_id=(
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
+                "01.02.03-embarked-model-return"
+            ),
+        ),
+    )
+
+    assert request is None
+    assert resolved.resolved_steps[0].step_kind is expected_kind
+    assert (
+        model_by_id(
+            state=state, model_instance_id=destroyed_model.model_instance_id
+        ).wounds_remaining
+        == expected_wounds
+    )
+    assert state.battlefield_state is not None
+    assert (
+        destroyed_model.model_instance_id in state.battlefield_state.removed_model_ids
+    ) is remains_destroyed
+    assert not any(event.event_type == "model_destroyed" for event in decisions.event_log.records)
 
 
 def test_normal_move_ending_near_transport_emits_embark_decision() -> None:
@@ -3519,13 +3601,14 @@ def _cargo_state(
     started_unit_ids: tuple[str, ...] = (),
     disembarked_unit_ids: tuple[str, ...] = (),
     battle_round: int | None = None,
+    max_model_count: int = 10,
 ) -> TransportCargoState:
     return TransportCargoState(
         player_id="player-a",
         transport_unit_instance_id=transport.unit_instance_id,
         capacity_profile=TransportCapacityProfile(
             transport_datasheet_id=transport.datasheet_id,
-            max_model_count=10,
+            max_model_count=max_model_count,
             allowed_keywords=("INFANTRY",),
         ),
         embarked_unit_instance_ids=embarked_unit_ids,

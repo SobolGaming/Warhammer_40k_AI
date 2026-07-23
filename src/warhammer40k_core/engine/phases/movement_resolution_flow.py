@@ -2,8 +2,13 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.engine.battle_shock_resolution import (
+    apply_battle_shock_reroll_resolution_decision,
+    is_battle_shock_reroll_request,
+)
+from warhammer40k_core.engine.decision_result import DecisionResultPayload
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
@@ -27,7 +32,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _request_advance_move_grant_decision_if_available, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
     from warhammer40k_core.engine.phases.movement_fall_back_embark import _apply_desperate_escape_model_selection_decision, _apply_fall_back_result, _request_embark_after_move_or_complete_activation, _complete_activation_then_request_post_normal_disembark_if_available, _post_move_embark_options, _apply_embark_transport_selection_decision, _apply_valid_embark, _complete_movement_activation, _complete_movement_activation_with_record_ids, _maximum_model_distance_inches_from_witness, _interrupt_started_mission_actions_for_movement_activation
-    from warhammer40k_core.engine.phases.movement_options_dice import _mission_action_state_is_active_for_unit, _movement_action_options, _advance_roll_request_for_action, _roll_advance_dice, _record_advance_roll_resolved_event, _advance_roll_reroll_request, _dice_roll_manager_for_state, _advance_reroll_permission_for_unit, _roll_desperate_escape_dice, _desperate_escape_model_selection_request, _desperate_escape_model_selection_options
+    from warhammer40k_core.engine.phases.movement_options_dice import FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND, _mission_action_state_is_active_for_unit, _movement_action_options, _advance_roll_request_for_action, _roll_advance_dice, _record_advance_roll_resolved_event, _advance_roll_reroll_request, _dice_roll_manager_for_state, _advance_reroll_permission_for_unit, _roll_desperate_escape_dice, _resolve_forced_desperate_escape_battle_shock, _desperate_escape_model_selection_request, _desperate_escape_model_selection_options
     from warhammer40k_core.engine.phases.movement_resolvers import resolve_normal_move, resolve_advance_move, resolve_fall_back_move, _resolve_unit_move, _default_move_witness, _default_fall_back_witness, _movement_transition_batch, _fall_back_transition_batch, _normal_move_transition_batch, _movement_action_availability_result
     from warhammer40k_core.engine.phases.movement_geometry import _movement_action_availability_context, _enemy_engagement_model_ids_for_unit, _enemy_engaged_unit_ids_for_unit_placement, _hover_mode_state_for_unit, _desperate_escape_requirements_for_fall_back, _enemy_model_ids_crossed_by_witness, _sampled_witness_transit_poses, _interpolate_pose, _model_at_pose, _geometry_models_for_unit_placement, _friendly_geometry_models_for_path, _enemy_geometry_models_for_player, _friendly_vehicle_monster_model_ids, _enemy_vehicle_monster_model_ids_for_player, _unit_has_vehicle_or_monster_keyword, _unit_has_deep_strike_keyword, _canonical_keyword, _validate_ability_index_mapping, _ability_index_for_player, _validate_move_witness_matches_unit, _path_result_with_aircraft_violations, _normal_move_violation_code
     from warhammer40k_core.engine.phases.movement_validation import _movement_action_invalid_payload, assert_move_units_step_complete_for_reinforcements, _remaining_move_units_unit_ids, _normal_move_invalid_message, _ensure_movement_phase_state, _validate_movement_phase_state, _battlefield_scenario, _movement_unit_options, _active_player_id, movement_phase_action_kind_from_token, fall_back_mode_kind_from_token, movement_phase_step_kind_from_token, desperate_escape_requirement_reason_from_token, movement_mode_for_phase_action, _movement_mode_from_payload, _movement_mode_from_proposal_submission, _fall_back_mode_from_payload, _fall_back_mode_from_proposal_submission, _movement_action_option_id, _movement_action_label, _movement_modes_for_action_options, _unit_can_take_to_the_skies, _fall_back_modes_for_parameterized_option, _fall_back_result_with_mode, _fall_back_mode_violation_code, _model_movement_inches, _model_base_movement_inches, _model_movement_budget_inches, _movement_distance_modifier_inches, _movement_mode_for_action, _temporary_movement_keywords_for_unit, _movement_bonus_inches_for_unit, _effective_movement_keywords, _model_default_movement_distance_inches, _modified_movement_inches, _runtime_modifier_registry, _default_move_end_pose, _ruleset_descriptor_for_handler, _mission_setup_for_live_reinforcements, _objective_markers_for_state, _active_movement_selection, _ensure_transport_cargo_phase_states, _unit_instance_by_id, _unit_has_keyword, _transport_status_for_movement_action, _movement_completion_context_payload, _transport_operation_invalid_payload, _request_payload_for_result, _decision_payload_object, _payload_string, _payload_object, _payload_json_object, _identifier_list_from_json_object, _payload_positive_int, _optional_payload_path_witness, _payload_model_displacement_kind, _payload_transition_batch, _payload_json_array, _validate_json_object, _validate_movement_action_tuple, _validate_transport_restriction_override_tuple, _validate_path_validation_result_tuple, _validate_terrain_path_legality_result_tuple, _validate_desperate_escape_reason_tuple, _validate_desperate_escape_requirement_tuple, _validate_desperate_escape_roll_tuple, _validate_identifier_tuple, _validate_movement_distance_records, _validate_objective_marker_tuple, _validate_advance_roll_spec, _validate_identifier, _validate_positive_int, _validate_non_negative_finite_number, _validate_bool
@@ -40,12 +45,14 @@ __all__ = (
     "_apply_advance_move_grants",
     "_apply_advance_roll_reroll_decision",
     "_apply_aircraft_reserve_transition_for_normal_move",
+    "_apply_forced_desperate_escape_battle_shock_reroll_decision",
     "_apply_movement_proposal_decision",
     "_grant_ranged_weapon_keywords",
     "_reject_invalid_movement_resolution",
     "_reject_invalid_proposal",
     "_resolve_and_apply_advance_move",
     "_selected_advance_move_grant_hook_ids_from_context",
+    "is_forced_desperate_escape_battle_shock_reroll_request",
 )
 
 
@@ -62,6 +69,7 @@ def _apply_movement_proposal_decision(
     fall_back_hooks: FallBackEligibilityHookRegistry,
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    battle_shock_hooks: BattleShockHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -355,9 +363,27 @@ def _apply_movement_proposal_decision(
             action=action,
         )
         fall_back_mode = _fall_back_mode_from_proposal_submission(submission=submission)
+        proposal_context = proposal_request.context or {}
         forced_desperate_escape_source_rule_ids = (
-            _forced_desperate_escape_source_rule_ids_from_context(proposal_request.context or {})
+            _forced_desperate_escape_source_rule_ids_from_context(proposal_context)
         )
+        forced_desperate_escape_sources = _forced_desperate_escape_sources_from_context(
+            proposal_context
+        )
+        if bool(forced_desperate_escape_source_rule_ids) != bool(forced_desperate_escape_sources):
+            raise GameLifecycleError(
+                "Forced Desperate Escape source IDs and source payloads must both be present."
+            )
+        if (
+            tuple(
+                sorted(
+                    cast(str, source["source_rule_id"])
+                    for source in forced_desperate_escape_sources
+                )
+            )
+            != forced_desperate_escape_source_rule_ids
+        ):
+            raise GameLifecycleError("Forced Desperate Escape source payload IDs drift.")
         fall_back_resolution = resolve_fall_back_move(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
@@ -387,6 +413,16 @@ def _apply_movement_proposal_decision(
             resolution=fall_back_resolution,
             fall_back_mode=fall_back_mode,
         )
+        if forced_desperate_escape_sources:
+            fall_back_resolution = replace(
+                fall_back_resolution,
+                movement_payload={
+                    **fall_back_resolution.movement_payload,
+                    "forced_desperate_escape_sources": validate_json_value(
+                        list(forced_desperate_escape_sources)
+                    ),
+                },
+            )
         mode_violation_code = _fall_back_mode_violation_code(
             resolution=fall_back_resolution,
             fall_back_mode=fall_back_mode,
@@ -444,32 +480,26 @@ def _apply_movement_proposal_decision(
                 **fall_back_result.movement_payload,
             },
         )
-        if fall_back_result.failed_desperate_escape_rolls:
-            request = _desperate_escape_model_selection_request(
+        if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
+            battle_shock_status = _resolve_forced_desperate_escape_battle_shock(
                 state=state,
-                fall_back_result=fall_back_result,
+                decisions=decisions,
+                resolution=fall_back_result,
                 action_result=action_result,
+                battle_shock_hooks=battle_shock_hooks,
+                ability_index=ability_index,
+                runtime_modifier_registry=runtime_modifier_registry,
+                movement_proposal_request_id=proposal_request.request_id,
             )
-            decisions.request_decision(request)
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.BATTLE,
-                decision_request=request,
-                payload={
-                    "phase": BattlePhase.MOVEMENT.value,
-                    "phase_body_status": "desperate_escape_model_selection_pending",
-                    "battle_round": state.battle_round,
-                    "active_player_id": active_player_id,
-                    "unit_instance_id": proposal_request.unit_instance_id,
-                    "proposal_request_id": proposal_request.request_id,
-                },
-            )
-        return _apply_fall_back_result(
+            if battle_shock_status is not None:
+                return battle_shock_status
+        return _continue_forced_desperate_escape_fall_back(
             state=state,
             decisions=decisions,
-            result=action_result,
-            unit_placement=unit_placement,
             fall_back_result=fall_back_result,
-            destroyed_model_ids=(),
+            action_result=action_result,
+            unit_placement=unit_placement,
+            movement_proposal_request_id=proposal_request.request_id,
             ruleset_descriptor=ruleset_descriptor,
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
@@ -477,6 +507,130 @@ def _apply_movement_proposal_decision(
         )
 
     raise GameLifecycleError("Unsupported movement proposal action.")
+
+
+def _forced_desperate_escape_sources_from_context(
+    context: dict[str, JsonValue],
+) -> tuple[dict[str, JsonValue], ...]:
+    value = context.get("forced_desperate_escape_sources")
+    if value is None:
+        return ()
+    if not isinstance(value, list) or not value:
+        raise GameLifecycleError(
+            "forced_desperate_escape_sources must be a non-empty list when present."
+        )
+    sources: list[dict[str, JsonValue]] = []
+    for raw_source in value:
+        if not isinstance(raw_source, dict):
+            raise GameLifecycleError("forced_desperate_escape_sources must contain objects.")
+        source = raw_source
+        source_rule_id = source.get("source_rule_id")
+        if type(source_rule_id) is not str:
+            raise GameLifecycleError("forced_desperate_escape_sources require source_rule_id.")
+        _validate_identifier("forced_desperate_escape_source_rule_id", source_rule_id)
+        sources.append(source)
+    return tuple(sources)
+
+
+def is_forced_desperate_escape_battle_shock_reroll_request(
+    request: DecisionRequest,
+) -> bool:
+    return is_battle_shock_reroll_request(
+        request,
+        source_kind=FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND,
+    )
+
+
+def _apply_forced_desperate_escape_battle_shock_reroll_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+    fall_back_hooks: FallBackEligibilityHookRegistry,
+    battle_shock_hooks: BattleShockHookRegistry,
+) -> LifecycleStatus | None:
+    resolved_payload = apply_battle_shock_reroll_resolution_decision(
+        state=state,
+        decisions=decisions,
+        result=result,
+        battle_shock_hooks=battle_shock_hooks,
+        expected_source_kind=FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND,
+    )
+    fall_back_payload = _payload_object(resolved_payload, key="fall_back_result")
+    action_result_payload = _payload_object(resolved_payload, key="action_result")
+    movement_proposal_request_id = _payload_string(
+        resolved_payload,
+        key="movement_proposal_request_id",
+    )
+    fall_back_result = FallBackActionResult.from_payload(
+        cast(FallBackActionResultPayload, fall_back_payload)
+    )
+    action_result = DecisionResult.from_payload(cast(DecisionResultPayload, action_result_payload))
+    scenario = _battlefield_scenario(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        fall_back_result.unit_instance_id
+    )
+    return _continue_forced_desperate_escape_fall_back(
+        state=state,
+        decisions=decisions,
+        fall_back_result=fall_back_result,
+        action_result=action_result,
+        unit_placement=unit_placement,
+        movement_proposal_request_id=movement_proposal_request_id,
+        ruleset_descriptor=ruleset_descriptor,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
+        fall_back_hooks=fall_back_hooks,
+    )
+
+
+def _continue_forced_desperate_escape_fall_back(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    fall_back_result: FallBackActionResult,
+    action_result: DecisionResult,
+    unit_placement: UnitPlacement,
+    movement_proposal_request_id: str,
+    ruleset_descriptor: RulesetDescriptor,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+    fall_back_hooks: FallBackEligibilityHookRegistry,
+) -> LifecycleStatus | None:
+    if fall_back_result.failed_desperate_escape_rolls:
+        request = _desperate_escape_model_selection_request(
+            state=state,
+            fall_back_result=fall_back_result,
+            action_result=action_result,
+        )
+        decisions.request_decision(request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "phase_body_status": "desperate_escape_model_selection_pending",
+                "battle_round": state.battle_round,
+                "active_player_id": _active_player_id(state),
+                "unit_instance_id": fall_back_result.unit_instance_id,
+                "proposal_request_id": movement_proposal_request_id,
+            },
+        )
+    return _apply_fall_back_result(
+        state=state,
+        decisions=decisions,
+        result=action_result,
+        unit_placement=unit_placement,
+        fall_back_result=fall_back_result,
+        destroyed_model_ids=(),
+        ruleset_descriptor=ruleset_descriptor,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
+        fall_back_hooks=fall_back_hooks,
+    )
 
 
 def _action_result_from_proposal_request(

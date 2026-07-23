@@ -919,6 +919,8 @@ Phase 17G Cavalcade of Chaos Movement-phase Stratagems use source-backed `generi
 
 Phase 17G also uses `generic:rule-ir` for Inescapable Manifestations during opponent Movement phase Fall Back selection. After the active player selects `select_movement_action` with Fall Back, the Movement engine may open a reaction-window `use_stratagem` request for the non-active player when an eligible friendly unit is engaged with that falling-back enemy unit. Accepted use spends CP and records an engine-owned persisting effect on the enemy unit from a generic RuleIR `force_desperate_escape_tests` effect, then the parent Movement action resumes with a `submit_movement_proposal` Fall Back request whose context preserves the declared mode under `declared_fall_back_mode` and forces `fall_back_mode: "desperate_escape"` with replay-safe `forced_desperate_escape_source_rule_ids` and `forced_desperate_escape_stratagem_use_ids`. Adapters must submit a Fall Back movement proposal using the emitted forced mode; they must not locally downgrade or bypass Desperate Escape.
 
+Catalog ability sources at the selected-to-Fall-Back timing use the same source-enriched Fall Back proposal path even when no Stratagem or optional movement-grant decision intervenes. The request preserves the declared mode, forces `fall_back_mode: "desperate_escape"`, and carries replay-safe entries in `forced_desperate_escape_sources`.
+
 Phase 15C eligible-to-fight passes are finite options on `select_fight_activation` using option ID `eligible_to_fight_pass`. The pass option is emitted only when every currently eligible unit for the actor is more than the source-backed pass distance (`RulesetDescriptor.fight_policy.eligible_pass_distance_inches`, currently 5") from all enemy units. The option payload includes `submission_kind: "eligible_to_fight_pass"`, the actor, ordering band, pass distance, and the eligible unit snapshot. Adapters must not synthesize a pass option. Stale unit snapshots, player drift, ordering-band drift, or pass-distance drift reject before queue pop.
 
 Phase 15C fight interrupts use the Phase 12A reaction queue and decision type `resolve_fight_interrupt`. The request payload includes the ordinary reaction wrapper (`reaction_window`, `interrupts_parent`, and parent resume metadata) plus a handler payload with `phase_body_status: "fight_interrupt_required"` and a `FightInterruptRequest`. The engine emits a deterministic decline option `decline_fight_interrupt` and deterministic activation options using the same `fight:<fight_type>:<unit_instance_id>` option IDs and eligibility payload shape as normal fight activations, with `submission_kind: "select_fight_interrupt"` and the interrupt payload embedded. Accepted interrupt selections record the activation through the same fight-order state, append a `ResolvedFightInterrupt` for the trigger-specific interrupt ID and underlying `source_effect_id`, and resume the parent reaction frame. Declines append the same source-scoped consumption record and resume the parent frame. Hand-crafted, repeated-source, stale, wrong-context, or ineligible interrupt submissions reject before queue pop. Repeated-source validation is keyed by the source effect ID, not only by a trigger-event-specific interrupt ID.
@@ -1052,10 +1054,24 @@ attacker-visible attack-resolution decisions:
   ID for multi-contribution gathered groups. If exactly one group remains for the
   selected target, the engine records an automatic finite choice instead of
   emitting a pending request.
+- `select_post_roll_attack_pool`: finite active-player choice emitted after
+  actual Hit and Wound rolls, when source-backed post-roll profile modifiers
+  split the successful attacks in the current gathered group into two or more
+  resulting weapon profiles. The request payload includes
+  `submission_kind: "select_post_roll_attack_pool"`, game/round/phase context,
+  `sequence_id`, `active_player_id`, `attacker_player_id`, the source rule ID,
+  and the unresolved `pool_ids`. Each deterministic pool option repeats the submission kind,
+  sequence and pool IDs, full resulting weapon-profile payload, member
+  `attack_context_ids`, and source rule ID. The selected pool remains persisted
+  on `AttackSequence` while allocation, saves, and damage resolve for only those
+  attacks; the active player is asked again when multiple resulting profiles
+  remain. A single remaining profile is recorded as an automatic finite choice.
+  Shooting and Fight use the same decision type and lifecycle dispatcher.
 
-Adapters must answer both decisions by selecting one pending option ID through
+Adapters must answer these decisions by selecting one pending option ID through
 `GameLifecycle.submit_decision(...)`; they must not invent target IDs, group IDs,
-signature hashes, pool indices, or mutate from option payloads. The lifecycle
+signature hashes, pool indices, post-roll profile payloads, attack-context
+membership, or mutate from option payloads. The lifecycle
 validates malformed, stale, drifted, wrong-target, wrong-group, wrong-option, and
 payload-mismatched submissions before queue pop. Invalid submissions return
 typed invalid diagnostics, preserve the pending request, create no

@@ -13,6 +13,9 @@ from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierContext,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
+    PostRollWeaponProfileModifierBinding,
+)
 from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
@@ -786,6 +789,10 @@ class RuntimeModifierRegistry:
     advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = ()
     charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = ()
     weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
+    post_roll_weapon_profile_modifier_bindings: tuple[
+        PostRollWeaponProfileModifierBinding,
+        ...,
+    ] = ()
     attack_reroll_permission_bindings: tuple[AttackRerollPermissionBinding, ...] = ()
     failed_save_damage_replacement_bindings: tuple[
         FailedSaveDamageReplacementBinding,
@@ -894,6 +901,15 @@ class RuntimeModifierRegistry:
         )
         object.__setattr__(
             self,
+            "post_roll_weapon_profile_modifier_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry post_roll_weapon_profile_modifier_bindings",
+                self.post_roll_weapon_profile_modifier_bindings,
+                PostRollWeaponProfileModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "attack_reroll_permission_bindings",
             _validate_bindings(
                 "RuntimeModifierRegistry attack_reroll_permission_bindings",
@@ -936,6 +952,10 @@ class RuntimeModifierRegistry:
         advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = (),
         charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = (),
         weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = (),
+        post_roll_weapon_profile_modifier_bindings: tuple[
+            PostRollWeaponProfileModifierBinding,
+            ...,
+        ] = (),
         attack_reroll_permission_bindings: tuple[AttackRerollPermissionBinding, ...] = (),
         failed_save_damage_replacement_bindings: tuple[
             FailedSaveDamageReplacementBinding,
@@ -954,6 +974,7 @@ class RuntimeModifierRegistry:
             advance_roll_modifier_bindings=advance_roll_modifier_bindings,
             charge_roll_modifier_bindings=charge_roll_modifier_bindings,
             weapon_profile_modifier_bindings=weapon_profile_modifier_bindings,
+            post_roll_weapon_profile_modifier_bindings=(post_roll_weapon_profile_modifier_bindings),
             attack_reroll_permission_bindings=attack_reroll_permission_bindings,
             failed_save_damage_replacement_bindings=(failed_save_damage_replacement_bindings),
         )
@@ -1291,6 +1312,7 @@ def _validate_bindings[T](
             | AdvanceRollModifierBinding
             | ChargeRollModifierBinding
             | WeaponProfileModifierBinding
+            | PostRollWeaponProfileModifierBinding
             | AttackRerollPermissionBinding
             | FailedSaveDamageReplacementBinding,
             binding,
@@ -1315,6 +1337,7 @@ def _modifier_id_for_binding(binding: object) -> str:
         AdvanceRollModifierBinding,
         ChargeRollModifierBinding,
         WeaponProfileModifierBinding,
+        PostRollWeaponProfileModifierBinding,
         AttackRerollPermissionBinding,
         FailedSaveDamageReplacementBinding,
     }:
@@ -1330,6 +1353,7 @@ def _modifier_id_for_binding(binding: object) -> str:
             | AdvanceRollModifierBinding
             | ChargeRollModifierBinding
             | WeaponProfileModifierBinding
+            | PostRollWeaponProfileModifierBinding
             | AttackRerollPermissionBinding
             | FailedSaveDamageReplacementBinding,
             binding,

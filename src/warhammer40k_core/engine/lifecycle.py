@@ -21,6 +21,7 @@ from warhammer40k_core.engine.army_muster_consistency import validate_mustered_a
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
     SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
@@ -377,6 +378,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
         SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
@@ -391,6 +393,7 @@ _ATTACK_SEQUENCE_DECISION_TYPES = frozenset(
     (
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
         SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
@@ -434,6 +437,7 @@ _FIGHT_DECISION_TYPES = frozenset(
         MOVEMENT_PROPOSAL_DECISION_TYPE,
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
         SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
@@ -466,6 +470,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
         SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
@@ -1613,6 +1618,7 @@ class GameLifecycle:
         if request.decision_type in (
             SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
             SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+            SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
         ):
             if _fight_attack_sequence_is_active_for_request(
                 state=state,
@@ -2608,6 +2614,7 @@ class GameLifecycle:
             stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
             ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
             runtime_modifier_registry=bundle.runtime_modifier_registry,
+            battle_shock_hooks=bundle.battle_shock_hook_registry,
         )
         self._charge_phase_handler = ChargePhaseHandler(
             ruleset_descriptor=self._charge_phase_handler.ruleset_descriptor,
@@ -3152,6 +3159,7 @@ def _fight_attack_sequence_is_active_for_request(
     if request.decision_type not in (
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,

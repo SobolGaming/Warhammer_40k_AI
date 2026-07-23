@@ -374,6 +374,33 @@ def test_weapon_profile_keywords_are_deduplicated_and_sorted_deterministically()
         )
 
 
+@pytest.mark.parametrize(
+    "incompatible_keyword",
+    [WeaponKeyword.INDIRECT_FIRE, WeaponKeyword.PRECISION],
+)
+def test_torrent_rejects_indirect_fire_and_precision(
+    incompatible_keyword: WeaponKeyword,
+) -> None:
+    with pytest.raises(
+        WeaponProfileError,
+        match="Torrent WeaponProfile cannot also have Indirect Fire or Precision",
+    ):
+        WeaponProfile(
+            profile_id=f"invalid-torrent-{incompatible_keyword.name.lower()}",
+            name="Invalid Torrent profile",
+            range_profile=RangeProfile.distance(12),
+            attack_profile=AttackProfile.fixed(1),
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+            strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+            armor_penetration=CharacteristicValue.from_raw(
+                Characteristic.ARMOR_PENETRATION,
+                0,
+            ),
+            damage_profile=DamageProfile.fixed(1),
+            keywords=(WeaponKeyword.TORRENT, incompatible_keyword),
+        )
+
+
 def test_weapon_profile_abilities_are_deduplicated_and_sorted_deterministically() -> None:
     rapid_fire = AbilityDescriptor.rapid_fire(1)
     sustained_hits = AbilityDescriptor.sustained_hits(1)

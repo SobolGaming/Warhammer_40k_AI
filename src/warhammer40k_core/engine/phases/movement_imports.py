@@ -69,6 +69,10 @@ from warhammer40k_core.engine.aircraft import (
     resolve_aircraft_reserve_transition,
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusteringError
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockDiceExpressionContext,
+    BattleShockHookRegistry,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRemovalKind,
@@ -305,6 +309,8 @@ __all__ = (
     "BattlefieldPlacementKind",
     "BattlefieldRemovalKind",
     "BattlefieldScenario",
+    "BattleShockDiceExpressionContext",
+    "BattleShockHookRegistry",
     "BattlefieldTransitionBatch",
     "BattlefieldTransitionBatchPayload",
     "battlefield_placement_kind_from_token",

@@ -114,6 +114,7 @@ def _apply_movement_action_decision(  # noqa: RET503
     stratagem_index: StratagemCatalogIndex | None,
     advance_move_hooks: AdvanceMoveHookRegistry,
     ability_index: AbilityCatalogIndex,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
@@ -295,17 +296,11 @@ def _apply_movement_action_decision(  # noqa: RET503
                     movement_state.with_pending_action(pending_action)
                 )
             return movement_grant_status
-        return _request_movement_proposal(
+        return _request_pending_movement_action_proposal(
             state=state,
             decisions=decisions,
-            result=result,
-            unit_instance_id=active_selection.unit_instance_id,
-            action=MovementPhaseActionKind.FALL_BACK,
-            proposal_kind=ProposalKind.FALL_BACK,
-            context={
-                "movement_mode": movement_mode.value,
-                "fall_back_mode": fall_back_mode.value,
-            },
+            pending_action=pending_action,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
         )
 
 
@@ -1093,7 +1088,7 @@ def _forced_desperate_escape_sources_for_unit(
                 "required_fall_back_mode": FallBackModeKind.DESPERATE_ESCAPE.value,
             }
         )
-    if ability_indexes_by_player_id is not None:
+    if ability_indexes_by_player_id:
         sources.extend(
             catalog_forced_desperate_escape_sources_for_unit(
                 state=state,

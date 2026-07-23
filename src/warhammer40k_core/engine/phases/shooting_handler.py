@@ -577,6 +577,33 @@ class ShootingPhaseHandler:
                 expected_request=expected_request,
                 invalid_reason="resolve_target_payload_drift",
             )
+        if request.decision_type == SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE:
+            pool_set = attack_sequence.post_roll_attack_pools
+            if (
+                pool_set is None
+                or pool_set.selected_pool is not None
+                or result.selected_option_id
+                not in {pool.pool_id for pool in pool_set.unresolved_pools}
+            ):
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Post-roll attack pool selection is no longer legal.",
+                    payload={
+                        "invalid_reason": "post_roll_attack_pool_option_drift",
+                        "selected_pool_id": result.selected_option_id,
+                    },
+                )
+            expected_request = build_select_post_roll_attack_pool_request(
+                request_id=request.request_id,
+                state=state,
+                attack_sequence=attack_sequence,
+            )
+            return _invalid_if_current_option_payload_drifted(
+                state=state,
+                result=result,
+                expected_request=expected_request,
+                invalid_reason="post_roll_attack_pool_payload_drift",
+            )
         selected_group = selected_attack_weapon_group_from_result(result)
         if (
             attack_sequence.selected_target_unit_instance_id

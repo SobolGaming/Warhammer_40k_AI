@@ -101,6 +101,8 @@ from warhammer40k_core.core.weapon_profiles import (
     DamageProfile,
     DevastatingWoundsEffect,
     WeaponKeyword,
+    WeaponProfile,
+    WeaponProfileError,
     WeaponProfilePayload,
 )
 from warhammer40k_core.engine.abilities import (
@@ -117,6 +119,7 @@ from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
 )
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
     SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackModifierStackSet,
@@ -257,12 +260,17 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
     request_out_of_phase_shooting_declaration,
 )
+from warhammer40k_core.engine.post_roll_attack_profiles import (
+    POST_ROLL_ATTACK_PROFILE_POOLS_SOURCE_ID,
+)
+from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
+    PostRollWeaponProfileModifierBinding,
+    PostRollWeaponProfileModifierContext,
+)
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
-from warhammer40k_core.engine.runtime_modifiers import (
-    RuntimeModifierRegistry,
-)
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.saves import (
     PlungingFireModifier,
     PlungingFireModifierResult,
@@ -2107,6 +2115,202 @@ def test_phase13d_deferred_devastating_mortal_wound_queue_survives_fnp_pause() -
     assert _state(restored).shooting_phase_state is None
 
 
+def test_out_of_phase_post_roll_pools_are_ordered_by_active_player() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["enemy"]
+    defender = units["intercessor-1"]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    base_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-post-roll-base",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(WeaponKeyword.TORRENT,),
+    )
+    modified_profile_id = "phase13d-post-roll-critical-wound"
+
+    def modify_profile_after_rolls(
+        context: PostRollWeaponProfileModifierContext,
+    ) -> WeaponProfile:
+        if not context.wound_roll.critical:
+            return context.weapon_profile
+        return replace(
+            context.weapon_profile,
+            profile_id=modified_profile_id,
+            damage_profile=DamageProfile.fixed(2),
+        )
+
+    runtime_modifiers = RuntimeModifierRegistry.from_bindings(
+        post_roll_weapon_profile_modifier_bindings=(
+            PostRollWeaponProfileModifierBinding(
+                modifier_id="phase13d-post-roll-critical-wound-modifier",
+                source_id=POST_ROLL_ATTACK_PROFILE_POOLS_SOURCE_ID,
+                handler=modify_profile_after_rolls,
+            ),
+        ),
+    )
+    sequence_id = "phase13d-post-roll-split"
+    wound_specs = tuple(
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id=base_profile.profile_id,
+            attack_context_id=f"{sequence_id}:pool-001:attack-{index:03d}",
+            attacker_player_id="player-b",
+        )
+        for index in (1, 2)
+    )
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-b",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=base_profile,
+                attacks=2,
+            ),
+        ),
+    )
+    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound-001",
+                    spec=wound_specs[0],
+                    value=4,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound-002",
+                    spec=wound_specs[1],
+                    value=6,
+                ),
+            ),
+        ),
+        runtime_modifier_registry=runtime_modifiers,
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+
+    assert remaining is not None
+    assert request.decision_type == SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    request_payload = cast(dict[str, object], request.payload)
+    assert request_payload["active_player_id"] == "player-a"
+    assert request_payload["attacker_player_id"] == "player-b"
+    assert len(request.options) == 2
+    assert remaining.post_roll_attack_pools is not None
+    assert remaining.post_roll_attack_pools.active_player_id == "player-a"
+    assert remaining.post_roll_attack_pools.selected_pool is None
+    assert len(remaining.post_roll_attack_pools.unresolved_pools) == 2
+    assert tuple(
+        cast(dict[str, object], event["payload"])["unmodified_roll"]
+        for event in _attack_step_payloads(lifecycle, AttackSequenceStep.WOUND)
+    ) == (4, 6)
+    base_option = next(
+        option
+        for option in request.options
+        if cast(
+            dict[str, object],
+            cast(dict[str, object], option.payload)["weapon_profile"],
+        )["profile_id"]
+        == base_profile.profile_id
+    )
+    state.out_of_phase_shooting_state = OutOfPhaseShootingState(
+        battle_round=state.battle_round,
+        player_id="player-b",
+        parent_phase=BattlePhase.SHOOTING,
+        source_rule_id="phase13d:out-of-phase-post-roll-pools",
+        source_decision_request_id="phase13d:out-of-phase-source-request",
+        source_decision_result_id="phase13d:out-of-phase-source-result",
+        source_context={"active_player_id": "player-a"},
+        selected_unit_instance_id=attacker.unit_instance_id,
+        target_unit_ids=(defender.unit_instance_id,),
+        attack_pools=remaining.attack_pools,
+        attack_sequence=remaining,
+        allocated_model_ids=allocated_ids,
+    )
+    paused_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    invalid_replay = GameLifecycle.from_payload(paused_payload)
+    invalid_request = invalid_replay.decision_controller.queue.pending_requests[0]
+    invalid_state = _state(invalid_replay)
+    assert invalid_state.out_of_phase_shooting_state is not None
+    assert invalid_state.out_of_phase_shooting_state.attack_sequence is not None
+    paused_sequence_payload = invalid_state.out_of_phase_shooting_state.attack_sequence.to_payload()
+    paused_records = invalid_replay.decision_controller.records
+    invalid_status = invalid_replay.submit_decision(
+        DecisionResult(
+            result_id="phase13d-post-roll-malformed-result",
+            request_id=invalid_request.request_id,
+            decision_type=invalid_request.decision_type,
+            actor_id=invalid_request.actor_id,
+            selected_option_id=base_option.option_id,
+            payload={},
+        )
+    )
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_replay.decision_controller.queue.pending_requests == (invalid_request,)
+    assert invalid_replay.decision_controller.records == paused_records
+    assert (
+        invalid_state.out_of_phase_shooting_state.attack_sequence.to_payload()
+        == paused_sequence_payload
+    )
+
+    first_replay = GameLifecycle.from_payload(paused_payload)
+    second_replay = GameLifecycle.from_payload(paused_payload)
+
+    for replay in (first_replay, second_replay):
+        replay_request = replay.decision_controller.queue.pending_requests[0]
+        resumed = replay.submit_decision(
+            DecisionResult.for_request(
+                result_id="phase13d-post-roll-select-base-first",
+                request=replay_request,
+                selected_option_id=base_option.option_id,
+            )
+        )
+        assert resumed.status_kind is not LifecycleStatusKind.INVALID
+
+    assert first_replay.to_payload() == second_replay.to_payload()
+    allocation_steps = _attack_step_payloads(first_replay, AttackSequenceStep.ALLOCATE)
+    save_steps = _attack_step_payloads(first_replay, AttackSequenceStep.SAVE)
+    damage_steps = _attack_step_payloads(first_replay, AttackSequenceStep.DAMAGE)
+    allocation_payloads = tuple(
+        cast(dict[str, object], event["payload"]) for event in allocation_steps
+    )
+    save_payloads = tuple(cast(dict[str, object], event["payload"]) for event in save_steps)
+    damage_payloads = tuple(cast(dict[str, object], event["payload"]) for event in damage_steps)
+    assert tuple(payload["attack_context_ids"] for payload in allocation_payloads) == (
+        [f"{sequence_id}:pool-001:attack-001"],
+        [f"{sequence_id}:pool-001:attack-002"],
+    )
+    assert tuple(payload["weapon_profile_id"] for payload in save_payloads) == (
+        base_profile.profile_id,
+        modified_profile_id,
+    )
+    assert tuple(payload["weapon_profile_id"] for payload in damage_payloads) == (
+        base_profile.profile_id,
+        modified_profile_id,
+    )
+    assert tuple(
+        cast(dict[str, object], payload["damage_application"])["requested_damage"]
+        for payload in damage_payloads
+    ) == (1, 2)
+
+
 def test_phase13d_precision_allocation_can_select_visible_attached_character() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -2222,6 +2426,80 @@ def test_phase13d_precision_allocation_can_select_visible_attached_character() -
     assert attacker_constraint["can_allocate_protected_characters"] is True
     assert PRECISION_RULE_ID in cast(list[str], attacker_constraint["source_rule_ids"])
     assert bodyguard_model.model_instance_id != save_step["allocated_model_id"]
+
+
+def test_phase13d_precision_devastating_mortal_wounds_prioritize_selected_character() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = defender.own_models[0]
+    character_model = defender.own_models[1]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-precision-devastating-rifle",
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(WeaponKeyword.DEVASTATING_WOUNDS, WeaponKeyword.PRECISION),
+        abilities=(AbilityDescriptor.devastating_wounds(),),
+    )
+    request, remaining_sequence, allocated_ids = _precision_request_for_fixture(
+        lifecycle=lifecycle,
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        sequence_id="phase13d-precision-devastating",
+    )
+    character_option = next(
+        option
+        for option in request.options
+        if character_model.model_instance_id
+        in cast(list[str], cast(dict[str, object], option.payload)["selected_model_ids"])
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining_sequence.attack_pools,
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13d-precision-devastating-character",
+            request=request,
+            selected_option_id=character_option.option_id,
+        )
+    )
+    applied = _event_payloads(lifecycle, "devastating_wounds_mortal_wounds_applied")
+
+    assert status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.TERMINAL,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    }
+    assert (
+        model_by_id(
+            state=state,
+            model_instance_id=character_model.model_instance_id,
+        ).wounds_remaining
+        == character_model.starting_wounds - 1
+    )
+    assert (
+        model_by_id(
+            state=state,
+            model_instance_id=bodyguard_model.model_instance_id,
+        ).wounds_remaining
+        == bodyguard_model.starting_wounds
+    )
+    mortal_wound_application = cast(dict[str, object], applied[0]["mortal_wound_application"])
+    assert (
+        cast(list[dict[str, object]], mortal_wound_application["applications"])[0][
+            "model_instance_id"
+        ]
+        == character_model.model_instance_id
+    )
 
 
 def test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_allocation() -> None:
@@ -5746,21 +6024,12 @@ def test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_
     assert candidates[0].hit_roll_modifier == -1
     assert INDIRECT_FIRE_NO_VISIBLE_RULE_ID in candidates[0].targeting_rule_ids
     assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in candidates[0].targeting_rule_ids
-    torrent_profile = replace(
-        weapon_profile,
-        profile_id="phase13d-indirect-torrent",
-        keywords=(WeaponKeyword.INDIRECT_FIRE, WeaponKeyword.TORRENT),
-    )
-    torrent_candidates = shooting_target_candidates_for_unit(
-        scenario=scenario,
-        ruleset_descriptor=_ruleset(),
-        attacker_unit=attacker,
-        weapon_profile=torrent_profile,
-        target_unit_ids=(defender.unit_instance_id,),
-        terrain_features=(blocking_ruin,),
-    )
-    assert not torrent_candidates[0].is_legal
-    assert torrent_candidates[0].violation_code is ShootingTargetViolationCode.NOT_VISIBLE
+    with pytest.raises(WeaponProfileError, match="cannot also have Indirect Fire"):
+        replace(
+            weapon_profile,
+            profile_id="phase13d-indirect-torrent",
+            keywords=(WeaponKeyword.INDIRECT_FIRE, WeaponKeyword.TORRENT),
+        )
 
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),

@@ -2332,6 +2332,45 @@ def test_phase15d_consolidate_reports_engaging_and_objective_endpoint_violations
         "objective_consolidation_not_in_range"
     )
 
+    _catalog, ruleset, scenario, attacker, _target_a, _target_b = _melee_fixture(
+        target_a_pose=Pose.at(15.5, 10.0),
+        target_b_pose=Pose.at(34.0, 30.0),
+    )
+    request = _fight_movement_request(
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        attacker=attacker,
+        context={"objective_markers": [objective_marker.to_payload()]},
+    )
+    engaged_after_objective = replace(
+        objective,
+        proposal_request_id=request.request_id,
+        witness=_movement_witness_for_unit(
+            scenario=scenario,
+            unit_instance_id=attacker.unit_instance_id,
+            dx=3.0,
+            endpoint_only=False,
+        ),
+    )
+    engaged_after_resolution = resolve_fight_movement(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=engaged_after_objective,
+    )
+    engaged_after_violation = fight_movement_resolution_violation(
+        proposal_request=request,
+        proposal=engaged_after_objective,
+        resolution=engaged_after_resolution,
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+    )
+
+    assert engaged_after_resolution.is_valid
+    assert engaged_after_violation is not None
+    assert (
+        engaged_after_violation.violations[0].violation_code
+        == "objective_consolidation_unit_engaged_after"
+    )
+
 
 def test_phase15d_resolve_fight_movement_fails_fast_on_wrong_context() -> None:
     _catalog, ruleset, scenario, attacker, target_a, _target_b = _melee_fixture(

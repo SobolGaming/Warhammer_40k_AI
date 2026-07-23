@@ -849,6 +849,9 @@ def test_core_policy_destroys_unarrived_reserves_only_at_end_of_battle() -> None
 
     assert round_three.destroyed_unit_instance_ids == ()
     assert end_battle.destroyed_unit_instance_ids == (reserve_state.unit_instance_id,)
+    assert policy.source_id == (
+        "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:20.01.02-strategic-reserves"
+    )
 
 
 def test_chapter_approved_policy_destroys_declare_battle_formation_reserves_at_br3() -> None:

@@ -27,6 +27,13 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.mortal_wound_context import (
+    MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND,
+    MortalWoundFeelNoPainContextPayload,
+)
+from warhammer40k_core.engine.mortal_wound_context import (
+    parse_mortal_wound_feel_no_pain_context as _mortal_wound_context_from_payload,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
@@ -45,7 +52,6 @@ SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE = "select_damage_allocation_model"
 SELECT_PRECISION_ALLOCATION_DECISION_TYPE = "select_precision_allocation"
 SELECT_FEEL_NO_PAIN_DECISION_TYPE = "select_feel_no_pain"
 SELECT_DESTRUCTION_REACTION_DECISION_TYPE = "select_destruction_reaction"
-MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND = "mortal_wound"
 
 
 class FeelNoPainAttackCondition(StrEnum):
@@ -210,23 +216,6 @@ class FeelNoPainResolutionPayload(TypedDict):
     ignored_wounds: int
     remaining_wounds: int
     rolls: list[FeelNoPainRollPayload]
-
-
-class MortalWoundFeelNoPainContextPayload(TypedDict):
-    context_kind: str
-    application_id: str
-    source_rule_id: str
-    source_context: JsonValue
-    target_unit_instance_id: str
-    defender_player_id: str
-    model_instance_id: str
-    mortal_wounds: int
-    remaining_mortal_wounds: int
-    spill_over: bool
-    applications: list[DamageApplicationPayload]
-    feel_no_pain_resolutions: list[FeelNoPainResolutionPayload]
-    ignored_mortal_wounds: int
-    remaining_mortal_wounds_lost: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -1119,6 +1108,7 @@ class MortalWoundApplicationProgress:
     feel_no_pain_resolutions: tuple[FeelNoPainResolution, ...] = ()
     ignored_mortal_wounds: int = 0
     remaining_mortal_wounds_lost: int = 0
+    priority_model_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1196,6 +1186,14 @@ class MortalWoundApplicationProgress:
                 self.remaining_mortal_wounds_lost,
             ),
         )
+        object.__setattr__(
+            self,
+            "priority_model_ids",
+            _validate_identifier_tuple(
+                "MortalWoundApplicationProgress priority_model_ids",
+                self.priority_model_ids,
+            ),
+        )
         accounted = (
             sum(application.wounds_lost for application in self.applications)
             + self.ignored_mortal_wounds
@@ -1216,6 +1214,7 @@ class MortalWoundApplicationProgress:
         defender_player_id: str,
         mortal_wounds: int,
         spill_over: bool,
+        priority_model_ids: tuple[str, ...] = (),
     ) -> Self:
         wounds = _validate_positive_int("mortal_wounds", mortal_wounds)
         return cls(
@@ -1227,6 +1226,7 @@ class MortalWoundApplicationProgress:
             mortal_wounds=wounds,
             remaining_mortal_wounds=wounds,
             spill_over=spill_over,
+            priority_model_ids=priority_model_ids,
         )
 
     @classmethod
@@ -1251,6 +1251,7 @@ class MortalWoundApplicationProgress:
             ),
             ignored_mortal_wounds=context["ignored_mortal_wounds"],
             remaining_mortal_wounds_lost=context["remaining_mortal_wounds_lost"],
+            priority_model_ids=tuple(context["priority_model_ids"]),
         )
 
     def to_feel_no_pain_context(
@@ -1278,6 +1279,7 @@ class MortalWoundApplicationProgress:
             ],
             "ignored_mortal_wounds": self.ignored_mortal_wounds,
             "remaining_mortal_wounds_lost": self.remaining_mortal_wounds_lost,
+            "priority_model_ids": list(self.priority_model_ids),
         }
 
     def with_remaining_lost(self) -> Self:
@@ -1298,6 +1300,7 @@ class MortalWoundApplicationProgress:
             remaining_mortal_wounds_lost=(
                 self.remaining_mortal_wounds_lost + self.remaining_mortal_wounds
             ),
+            priority_model_ids=self.priority_model_ids,
         )
 
     def after_wound_resolution(
@@ -1350,6 +1353,7 @@ class MortalWoundApplicationProgress:
             feel_no_pain_resolutions=(*self.feel_no_pain_resolutions, resolution),
             ignored_mortal_wounds=ignored,
             remaining_mortal_wounds_lost=remaining_lost,
+            priority_model_ids=self.priority_model_ids,
         )
 
     def to_application(self) -> MortalWoundApplication:
@@ -2204,10 +2208,24 @@ def continue_mortal_wound_application(
                 progress=completed,
                 application=completed.to_application(),
             )
+        alive_priority_model_ids = tuple(
+            model_id
+            for model_id in current.priority_model_ids
+            if model_by_id(state=state, model_instance_id=model_id).is_alive
+        )
         allocation_context = allocation_context_for_unit(
             state=state,
             target_unit_instance_id=current.target_unit_instance_id,
             already_allocated_model_ids=(),
+            attacker_constraint=(
+                AttackAllocationConstraint(
+                    source_rule_ids=(current.source_rule_id,),
+                    allowed_model_ids=alive_priority_model_ids,
+                    can_allocate_protected_characters=True,
+                )
+                if alive_priority_model_ids
+                else None
+            ),
         )
         legal_model_ids = allocation_context.legal_model_ids()
         if not legal_model_ids:
@@ -2808,45 +2826,6 @@ def _mortal_wound_context_from_request(
     return _mortal_wound_context_from_payload(payload["lost_wound_context"])
 
 
-def _mortal_wound_context_from_payload(payload: JsonValue) -> MortalWoundFeelNoPainContextPayload:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Mortal wound Feel No Pain context must be an object.")
-    if payload.get("context_kind") != MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND:
-        raise GameLifecycleError("Mortal wound Feel No Pain context kind is invalid.")
-    source_context = validate_json_value(payload.get("source_context"))
-    applications = payload.get("applications")
-    resolutions = payload.get("feel_no_pain_resolutions")
-    if not isinstance(applications, list):
-        raise GameLifecycleError("Mortal wound applications must be a list.")
-    if not isinstance(resolutions, list):
-        raise GameLifecycleError("Mortal wound Feel No Pain resolutions must be a list.")
-    return {
-        "context_kind": MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND,
-        "application_id": _payload_string(payload, key="application_id"),
-        "source_rule_id": _payload_string(payload, key="source_rule_id"),
-        "source_context": source_context,
-        "target_unit_instance_id": _payload_string(payload, key="target_unit_instance_id"),
-        "defender_player_id": _payload_string(payload, key="defender_player_id"),
-        "model_instance_id": _payload_string(payload, key="model_instance_id"),
-        "mortal_wounds": _payload_positive_int(payload, key="mortal_wounds"),
-        "remaining_mortal_wounds": _payload_non_negative_int(
-            payload,
-            key="remaining_mortal_wounds",
-        ),
-        "spill_over": _payload_bool(payload, key="spill_over"),
-        "applications": cast(list[DamageApplicationPayload], applications),
-        "feel_no_pain_resolutions": cast(list[FeelNoPainResolutionPayload], resolutions),
-        "ignored_mortal_wounds": _payload_non_negative_int(
-            payload,
-            key="ignored_mortal_wounds",
-        ),
-        "remaining_mortal_wounds_lost": _payload_non_negative_int(
-            payload,
-            key="remaining_mortal_wounds_lost",
-        ),
-    }
-
-
 def _selected_feel_no_pain_source_from_request(
     *,
     request: DecisionRequest,
@@ -2866,33 +2845,6 @@ def _selected_feel_no_pain_source_from_request(
         if source.source_id == selected_source_id:
             return source
     raise GameLifecycleError("Selected Feel No Pain source is not in the request.")
-
-
-def _payload_positive_int(payload: dict[str, JsonValue], *, key: str) -> int:
-    if key not in payload:
-        raise GameLifecycleError(f"Decision payload missing {key}.")
-    value = payload[key]
-    if type(value) is not int:
-        raise GameLifecycleError(f"Decision payload {key} must be an integer.")
-    return _validate_positive_int(f"Decision payload {key}", value)
-
-
-def _payload_non_negative_int(payload: dict[str, JsonValue], *, key: str) -> int:
-    if key not in payload:
-        raise GameLifecycleError(f"Decision payload missing {key}.")
-    value = payload[key]
-    if type(value) is not int:
-        raise GameLifecycleError(f"Decision payload {key} must be an integer.")
-    return _validate_non_negative_int(f"Decision payload {key}", value)
-
-
-def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
-    if key not in payload:
-        raise GameLifecycleError(f"Decision payload missing {key}.")
-    value = payload[key]
-    if type(value) is not bool:
-        raise GameLifecycleError(f"Decision payload {key} must be a bool.")
-    return value
 
 
 def _validate_damage_applications(values: object) -> tuple[DamageApplication, ...]:
