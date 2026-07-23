@@ -2180,6 +2180,50 @@ def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> 
         muster_army(catalog=multi_detachment_catalog, request=unsupported_unit_request)
 
 
+def test_incursion_allows_one_three_detachment_point_detachment_only() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    three_point_detachment = replace(
+        catalog.detachments[0],
+        detachment_point_cost=3,
+    )
+    one_point_detachment = replace(
+        catalog.detachments[0],
+        detachment_id="core-incursion-support",
+        name="CORE Incursion Support",
+        detachment_point_cost=1,
+        source_ids=("detachment:core-incursion-support",),
+    )
+    incursion_catalog = replace(
+        catalog,
+        detachments=(three_point_detachment, one_point_detachment),
+    )
+    single_three_point = DetachmentSelection(
+        faction_id="core-marine-force",
+        detachment_ids=(three_point_detachment.detachment_id,),
+    )
+    combined_selection = DetachmentSelection(
+        faction_id="core-marine-force",
+        detachment_ids=(
+            three_point_detachment.detachment_id,
+            one_point_detachment.detachment_id,
+        ),
+    )
+
+    _faction, detachments = validate_detachment_selection(
+        catalog=incursion_catalog,
+        selection=single_three_point,
+        battle_size=BattleSize.INCURSION,
+    )
+
+    assert tuple(detachment.detachment_point_cost for detachment in detachments) == (3,)
+    with pytest.raises(ListValidationError, match="Detachment Points"):
+        validate_detachment_selection(
+            catalog=incursion_catalog,
+            selection=combined_selection,
+            battle_size=BattleSize.INCURSION,
+        )
+
+
 def test_phase16d_strict_roster_records_warlord_enhancement_and_transport_manifest() -> None:
     catalog = _phase16d_catalog()
     request = _phase16d_transport_roster_request(catalog)

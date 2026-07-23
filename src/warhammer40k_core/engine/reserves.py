@@ -302,7 +302,10 @@ class ReserveDestructionTimingPolicy:
             battle_round=None,
             exclude_during_battle_strategic_reserves=False,
             only_declare_battle_formations=False,
-            source_id="core_rules_end_of_battle_reserves",
+            source_id=(
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
+                "20.01.02-strategic-reserves"
+            ),
         )
 
     @classmethod
@@ -327,7 +330,10 @@ class ReserveDestructionTimingPolicy:
                 mission_policy.reserve_destruction_timing
                 is ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N
             )
-            else "core_rules_end_of_battle_reserves"
+            else (
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
+                "20.01.02-strategic-reserves"
+            )
         )
         return cls(
             timing_kind=mission_policy.reserve_destruction_timing,

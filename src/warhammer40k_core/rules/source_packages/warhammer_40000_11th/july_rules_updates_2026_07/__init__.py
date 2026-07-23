@@ -18,6 +18,7 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 )
 
 from ._artifacts import (
+    AppCoreRuleUpdateRecord,
     EventCompanionRuleUpdateRecord,
     EventLayoutRevisionRecord,
     JulyRulesUpdateArtifactError,
@@ -58,6 +59,9 @@ PROTECTIVE_TARGETING_STRATAGEM_SOURCE_IDS: Final = frozenset(
     _ARTIFACT.universal_rules_update.protective_targeting_stratagem_source_ids
 )
 NON_CORE_CP_GAIN_CAP_SOURCE_ID: Final = _ARTIFACT.event_companion.rules[0].source_id
+APP_CORE_RULE_SOURCE_IDS: Final = {
+    rule.rule_id: rule.source_id for rule in _ARTIFACT.app_core_rules_update.rules
+}
 
 
 def universal_rule_records() -> tuple[UniversalRuleUpdateRecord, ...]:
@@ -70,6 +74,10 @@ def changed_event_layouts() -> tuple[EventLayoutRevisionRecord, ...]:
 
 def event_companion_rule_records() -> tuple[EventCompanionRuleUpdateRecord, ...]:
     return _ARTIFACT.event_companion.rules
+
+
+def app_core_rule_records() -> tuple[AppCoreRuleUpdateRecord, ...]:
+    return _ARTIFACT.app_core_rules_update.rules
 
 
 def source_catalog() -> SourceCatalog:
@@ -89,6 +97,10 @@ def source_catalog() -> SourceCatalog:
     event_document_id = SourceDocumentId(
         package_id=package_id,
         document_id=_ARTIFACT.event_companion.document_id,
+    )
+    app_core_document_id = SourceDocumentId(
+        package_id=package_id,
+        document_id=_ARTIFACT.app_core_rules_update.document_id,
     )
     return SourceCatalog(
         package_id=package_id,
@@ -153,6 +165,21 @@ def source_catalog() -> SourceCatalog:
                     ),
                 ),
             ),
+            SourceDocument(
+                document_id=app_core_document_id,
+                title=(
+                    f"{_ARTIFACT.app_core_rules_update.source_title} "
+                    f"({_ARTIFACT.app_core_rules_update.source_platform}, "
+                    f"{_ARTIFACT.app_core_rules_update.source_version})"
+                ),
+                source_texts=tuple(
+                    RuleSourceText.from_raw(
+                        source_id=rule.source_id,
+                        raw_text=rule.source_text,
+                    )
+                    for rule in app_core_rule_records()
+                ),
+            ),
         ),
         ruleset_bundles=(
             RulesetBundle(
@@ -162,13 +189,18 @@ def source_catalog() -> SourceCatalog:
                 ),
                 package_id=package_id,
                 catalog_version=catalog_version,
-                source_document_ids=(universal_document_id, event_document_id),
+                source_document_ids=(
+                    universal_document_id,
+                    event_document_id,
+                    app_core_document_id,
+                ),
             ),
         ),
     )
 
 
 __all__ = (
+    "APP_CORE_RULE_SOURCE_IDS",
     "EVENT_COMPANION_LOCAL_PDF",
     "EVENT_COMPANION_PDF_SHA256",
     "EVENT_COMPANION_SOURCE_PACKAGE_ID",
@@ -184,6 +216,7 @@ __all__ = (
     "UNIVERSAL_RULES_PDF_SHA256",
     "UNIVERSAL_RULES_SOURCE_URL",
     "JulyRulesUpdateArtifactError",
+    "app_core_rule_records",
     "changed_event_layouts",
     "event_companion_rule_records",
     "july_rules_updates_package_artifact_from_json_bytes",

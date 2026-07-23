@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.attack_sequence_post_roll import (
+    defer_grouped_devastating_wounds as _defer_grouped_devastating_wounds,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -299,6 +302,39 @@ def apply_precision_allocation_decision(
         attack_context=attack_context,
         context_name="Precision allocation",
     )
+    wounded_contexts = tuple(
+        (
+            _attack_sequence_for_context(
+                attack_sequence=attack_sequence,
+                attack_context=cast(AttackResolutionContextPayload, raw_context),
+            ),
+            cast(AttackResolutionContextPayload, raw_context),
+        )
+        for raw_context in raw_attack_contexts
+    )
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    attack_sequence, normal_wounded_contexts, status = _defer_grouped_devastating_wounds(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=attack_sequence,
+        wounded_contexts=wounded_contexts,
+        hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
+        stratagem_index=stratagem_index,
+        runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
+        precision_priority_model_ids=_precision_pool_selection(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+        ).selected_model_ids,
+    )
+    if status is not None:
+        return attack_sequence, already_allocated_model_ids, status
+    if not normal_wounded_contexts:
+        return (
+            _advance_after_current_pool(attack_sequence=attack_sequence),
+            already_allocated_model_ids,
+            None,
+        )
     precision_selection = _precision_pool_selection(
         decisions=decisions,
         attack_sequence=attack_sequence,
@@ -329,20 +365,11 @@ def apply_precision_allocation_decision(
         state=state,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
-        manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        manager=manager,
         attack_sequence=attack_sequence,
         allocation_context=allocation_context,
         allocation_groups=allocation_groups,
-        wounded_contexts=tuple(
-            (
-                _attack_sequence_for_context(
-                    attack_sequence=attack_sequence,
-                    attack_context=cast(AttackResolutionContextPayload, raw_context),
-                ),
-                cast(AttackResolutionContextPayload, raw_context),
-            )
-            for raw_context in raw_attack_contexts
-        ),
+        wounded_contexts=normal_wounded_contexts,
         allocated_model_ids=already_allocated_model_ids,
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         priority_group_ids=priority_group_ids,
@@ -672,6 +699,7 @@ def _apply_deferred_mortal_wounds(
             ),
             mortal_wounds=deferred.mortal_wounds,
             spill_over=False,
+            priority_model_ids=deferred.priority_model_ids,
         )
         routed = continue_mortal_wound_application(
             state=state,
@@ -1311,6 +1339,43 @@ def _resolve_grouped_current_pool(
             allocated_model_ids,
             None,
         )
+    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.PRECISION):
+        precision_selection = _precision_pool_selection(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+        )
+        if not precision_selection.selection_recorded:
+            grouped_attack_context = _grouped_attack_context_payload(
+                attack_sequence=attack_sequence,
+                attack_contexts=tuple(context for _, context in wounded_contexts),
+                pool=pool,
+                defender_player_id=unit_owner_player_id(
+                    state=state,
+                    unit_instance_id=pool.target_unit_instance_id,
+                ),
+            )
+            precision_request = _grouped_precision_request_if_available(
+                state=state,
+                attack_sequence=attack_sequence,
+                attack_context=grouped_attack_context,
+                attack_contexts=tuple(context for _, context in wounded_contexts),
+                allocated_model_ids=allocated_model_ids,
+            )
+            if precision_request is not None:
+                decisions.request_decision(precision_request)
+                return (
+                    attack_sequence,
+                    allocated_model_ids,
+                    LifecycleStatus.waiting_for_decision(
+                        stage=GameLifecycleStage.BATTLE,
+                        decision_request=precision_request,
+                        payload={
+                            "phase": attack_sequence.source_phase.value,
+                            "decision_type": SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+                            "attack_context_id": grouped_attack_context["attack_context_id"],
+                        },
+                    ),
+                )
     attack_sequence, normal_wounded_contexts, status = _defer_grouped_devastating_wounds(
         state=state,
         decisions=decisions,
@@ -1320,6 +1385,10 @@ def _resolve_grouped_current_pool(
         hooks=hooks,
         stratagem_index=stratagem_index,
         runtime_modifier_registry=runtime_modifier_registry,
+        precision_priority_model_ids=_precision_pool_selection(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+        ).selected_model_ids,
     )
     if status is not None:
         return attack_sequence, allocated_model_ids, status
@@ -1401,99 +1470,3 @@ def _grouped_wounded_contexts_for_pool(
                 break
             current = next_sequence
     return tuple(wounded_contexts), None
-
-
-def _defer_grouped_devastating_wounds(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    manager: DiceRollManager,
-    attack_sequence: AttackSequence,
-    wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
-    hooks: AttackSequenceHooks,
-    stratagem_index: StratagemCatalogIndex | None,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-) -> tuple[
-    AttackSequence,
-    tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
-    LifecycleStatus | None,
-]:
-    current = attack_sequence
-    normal_contexts: list[tuple[AttackSequence, AttackResolutionContextPayload]] = []
-    pool = attack_sequence.current_pool()
-    for wounded_sequence, attack_context in wounded_contexts:
-        resolution = _devastating_wounds_resolution_for_attack(
-            pool=pool,
-            attack_context=attack_context,
-            target_keywords=rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=attack_context["target_unit_instance_id"],
-            ).keywords,
-        )
-        if resolution is not DevastatingWoundsResolution.MORTAL_WOUNDS:
-            normal_contexts.append((wounded_sequence, attack_context))
-            continue
-        damage_value, status = _damage_value(
-            state=state,
-            decisions=decisions,
-            manager=manager,
-            profile=pool.weapon_profile.damage_profile,
-            attack_context_id=attack_context["attack_context_id"],
-            attacker_player_id=attack_sequence.attacker_player_id,
-            affected_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-            attacker_model_instance_id=pool.attacker_model_instance_id,
-            target_unit_instance_id=attack_context["target_unit_instance_id"],
-            weapon_profile=pool.weapon_profile,
-            source_phase=attack_sequence.source_phase,
-            stratagem_index=stratagem_index,
-            runtime_modifier_registry=runtime_modifier_registry,
-        )
-        if status is not None:
-            return current, (), status
-        if damage_value is None:
-            raise GameLifecycleError("Damage roll did not resolve a value.")
-        mortal_wounds = damage_value + _melta_damage_modifier(
-            pool,
-            target_keywords=rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=attack_context["target_unit_instance_id"],
-            ).keywords,
-        )
-        deferred = DeferredMortalWounds(
-            source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
-            target_unit_instance_id=attack_context["target_unit_instance_id"],
-            attack_context_id=attack_context["attack_context_id"],
-            mortal_wounds=mortal_wounds,
-        )
-        _emit_event(
-            decisions=decisions,
-            hooks=hooks,
-            event=AttackSequenceEvent(
-                step=AttackSequenceStep.DAMAGE,
-                sequence_id=wounded_sequence.sequence_id,
-                attack_context_id=attack_context["attack_context_id"],
-                pool_index=wounded_sequence.pool_index,
-                attack_index=wounded_sequence.attack_index,
-                payload=validate_json_value(
-                    {
-                        "saving_throw": None,
-                        "damage_application": None,
-                        "feel_no_pain": None,
-                        "deferred_mortal_wounds": deferred.to_payload(),
-                    }
-                ),
-            ),
-        )
-        decisions.event_log.append(
-            "devastating_wounds_deferred",
-            {
-                "sequence_id": attack_sequence.sequence_id,
-                "attack_context_id": attack_context["attack_context_id"],
-                "target_unit_instance_id": attack_context["target_unit_instance_id"],
-                "mortal_wounds": mortal_wounds,
-                "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
-            },
-        )
-        current = current.with_deferred_mortal_wounds(deferred)
-    return current, tuple(normal_contexts), None

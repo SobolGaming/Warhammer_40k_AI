@@ -101,6 +101,7 @@ from warhammer40k_core.core.weapon_profiles import (
     DamageProfile,
     DevastatingWoundsEffect,
     WeaponKeyword,
+    WeaponProfileError,
     WeaponProfilePayload,
 )
 from warhammer40k_core.engine.abilities import (
@@ -256,6 +257,11 @@ from warhammer40k_core.engine.phases.shooting import (
     OutOfPhaseShootingState,
     ShootingPhaseState,
     request_out_of_phase_shooting_declaration,
+)
+from warhammer40k_core.engine.post_roll_attack_profiles import (
+    POST_ROLL_ATTACK_PROFILE_POOLS_SOURCE_ID,
+    PostRollAttackPoolSet,
+    PostRollModifiedAttack,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
@@ -2107,6 +2113,59 @@ def test_phase13d_deferred_devastating_mortal_wound_queue_survives_fnp_pause() -
     assert _state(restored).shooting_phase_state is None
 
 
+def test_post_roll_profile_changes_split_pools_and_active_player_orders_each_pool() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    base_profile = _first_weapon_profile(lifecycle, units["intercessor-1"])
+    modified_profile = replace(
+        base_profile,
+        profile_id="phase13d-post-roll-modified",
+        damage_profile=DamageProfile.fixed(2),
+    )
+    pool_set = PostRollAttackPoolSet.from_modified_attacks(
+        sequence_id="phase13d-post-roll-split",
+        active_player_id="player-a",
+        attacks=(
+            PostRollModifiedAttack(
+                attack_context_id="phase13d-post-roll-split:attack-001",
+                weapon_profile=base_profile,
+            ),
+            PostRollModifiedAttack(
+                attack_context_id="phase13d-post-roll-split:attack-002",
+                weapon_profile=modified_profile,
+            ),
+            PostRollModifiedAttack(
+                attack_context_id="phase13d-post-roll-split:attack-003",
+                weapon_profile=base_profile,
+            ),
+        ),
+    )
+    modified_pool = next(
+        pool
+        for pool in pool_set.unresolved_pools
+        if pool.weapon_profile.profile_id == modified_profile.profile_id
+    )
+    selected, remaining = pool_set.select_next_pool(
+        actor_id="player-a",
+        selected_pool_id=modified_pool.pool_id,
+    )
+
+    assert len(pool_set.unresolved_pools) == 2
+    assert selected.attack_context_ids == ("phase13d-post-roll-split:attack-002",)
+    assert selected.source_rule_id == POST_ROLL_ATTACK_PROFILE_POOLS_SOURCE_ID
+    assert remaining is not None
+    assert len(remaining.unresolved_pools) == 1
+    assert remaining.unresolved_pools[0].attack_context_ids == (
+        "phase13d-post-roll-split:attack-001",
+        "phase13d-post-roll-split:attack-003",
+    )
+    assert PostRollAttackPoolSet.from_payload(pool_set.to_payload()) == pool_set
+    with pytest.raises(GameLifecycleError, match="Only the active player"):
+        pool_set.select_next_pool(
+            actor_id="player-b",
+            selected_pool_id=modified_pool.pool_id,
+        )
+
+
 def test_phase13d_precision_allocation_can_select_visible_attached_character() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -2222,6 +2281,80 @@ def test_phase13d_precision_allocation_can_select_visible_attached_character() -
     assert attacker_constraint["can_allocate_protected_characters"] is True
     assert PRECISION_RULE_ID in cast(list[str], attacker_constraint["source_rule_ids"])
     assert bodyguard_model.model_instance_id != save_step["allocated_model_id"]
+
+
+def test_phase13d_precision_devastating_mortal_wounds_prioritize_selected_character() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = defender.own_models[0]
+    character_model = defender.own_models[1]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-precision-devastating-rifle",
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(WeaponKeyword.DEVASTATING_WOUNDS, WeaponKeyword.PRECISION),
+        abilities=(AbilityDescriptor.devastating_wounds(),),
+    )
+    request, remaining_sequence, allocated_ids = _precision_request_for_fixture(
+        lifecycle=lifecycle,
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        sequence_id="phase13d-precision-devastating",
+    )
+    character_option = next(
+        option
+        for option in request.options
+        if character_model.model_instance_id
+        in cast(list[str], cast(dict[str, object], option.payload)["selected_model_ids"])
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining_sequence.attack_pools,
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13d-precision-devastating-character",
+            request=request,
+            selected_option_id=character_option.option_id,
+        )
+    )
+    applied = _event_payloads(lifecycle, "devastating_wounds_mortal_wounds_applied")
+
+    assert status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.TERMINAL,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    }
+    assert (
+        model_by_id(
+            state=state,
+            model_instance_id=character_model.model_instance_id,
+        ).wounds_remaining
+        == character_model.starting_wounds - 1
+    )
+    assert (
+        model_by_id(
+            state=state,
+            model_instance_id=bodyguard_model.model_instance_id,
+        ).wounds_remaining
+        == bodyguard_model.starting_wounds
+    )
+    mortal_wound_application = cast(dict[str, object], applied[0]["mortal_wound_application"])
+    assert (
+        cast(list[dict[str, object]], mortal_wound_application["applications"])[0][
+            "model_instance_id"
+        ]
+        == character_model.model_instance_id
+    )
 
 
 def test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_allocation() -> None:
@@ -5746,21 +5879,12 @@ def test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_
     assert candidates[0].hit_roll_modifier == -1
     assert INDIRECT_FIRE_NO_VISIBLE_RULE_ID in candidates[0].targeting_rule_ids
     assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in candidates[0].targeting_rule_ids
-    torrent_profile = replace(
-        weapon_profile,
-        profile_id="phase13d-indirect-torrent",
-        keywords=(WeaponKeyword.INDIRECT_FIRE, WeaponKeyword.TORRENT),
-    )
-    torrent_candidates = shooting_target_candidates_for_unit(
-        scenario=scenario,
-        ruleset_descriptor=_ruleset(),
-        attacker_unit=attacker,
-        weapon_profile=torrent_profile,
-        target_unit_ids=(defender.unit_instance_id,),
-        terrain_features=(blocking_ruin,),
-    )
-    assert not torrent_candidates[0].is_legal
-    assert torrent_candidates[0].violation_code is ShootingTargetViolationCode.NOT_VISIBLE
+    with pytest.raises(WeaponProfileError, match="cannot also have Indirect Fire"):
+        replace(
+            weapon_profile,
+            profile_id="phase13d-indirect-torrent",
+            keywords=(WeaponKeyword.INDIRECT_FIRE, WeaponKeyword.TORRENT),
+        )
 
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),

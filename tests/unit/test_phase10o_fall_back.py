@@ -27,6 +27,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
@@ -63,6 +64,7 @@ from warhammer40k_core.engine.phases.movement import (
     FellBackUnitState,
     MovementPhaseActionKind,
     MovementPhaseStepKind,
+    _roll_desperate_escape_dice,
     resolve_fall_back_move,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -363,6 +365,62 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
         DesperateEscapeRequirementReason.BATTLE_SHOCKED in requirement.reasons
         for requirement in resolution.desperate_escape_requirements
     )
+
+
+def test_forced_desperate_escape_rolls_every_model_and_makes_battle_shock_roll() -> None:
+    scenario = _engaged_scenario()
+    state = _state_for_scenario_with_effects(scenario, effects=())
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    source_rule_id = "phase10o-forced-desperate-escape-source"
+    resolution = resolve_fall_back_move(
+        scenario=scenario,
+        state=state,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        path_witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=Pose.at(6.0, 12.0),
+        ),
+        forced_desperate_escape_source_rule_ids=(source_rule_id,),
+    )
+    resolution = replace(
+        resolution,
+        movement_payload={
+            **resolution.movement_payload,
+            "forced_desperate_escape_sources": [
+                {
+                    "effect_id": "phase10o-forced-desperate-escape-effect",
+                    "source_rule_id": source_rule_id,
+                    "desperate_escape_roll_modifier": 0,
+                }
+            ],
+        },
+    )
+    decisions = DecisionController()
+
+    rolls = _roll_desperate_escape_dice(
+        state=state,
+        decisions=decisions,
+        resolution=resolution,
+    )
+    requested = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "forced_desperate_escape_battle_shock_requested"
+    )
+    resolved = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "forced_desperate_escape_battle_shock_resolved"
+    )
+
+    assert len(rolls) == len(unit_placement.model_placements)
+    assert len(requested) == 1
+    assert len(resolved) == 1
+    assert cast(dict[str, object], resolved[0].payload)["source_rule_ids"] == [source_rule_id]
+    assert "battle_shock_result" in cast(dict[str, object], resolved[0].payload)
 
 
 def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_state() -> None:

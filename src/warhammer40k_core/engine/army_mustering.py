@@ -1722,9 +1722,12 @@ def _append_enhancement_violations(
             violations.append(
                 RosterLegalityViolation(
                     violation_code="epic_hero_enhancement_forbidden",
-                    message="EPIC HERO units cannot receive Enhancements.",
+                    message="EPIC HERO models cannot be given Enhancements.",
                     unit_selection_id=assignment.target_unit_selection_id,
-                    source_id=assignment.source_id,
+                    source_id=(
+                        "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
+                        "25.04-epic-hero-enhancements"
+                    ),
                 )
             )
         if enhancement is not None:

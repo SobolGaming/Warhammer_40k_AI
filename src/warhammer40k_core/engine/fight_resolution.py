@@ -1952,6 +1952,21 @@ def _consolidate_endpoint_validation(
                         "witness",
                     )
     if proposal.consolidation_mode is ConsolidationModeKind.OBJECTIVE:
+        attempted_scenario = _scenario_with_unit_placement(
+            scenario=scenario,
+            placement=after,
+        )
+        if _engaged_enemy_unit_ids(
+            scenario=attempted_scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=after,
+            state=state,
+        ):
+            return _endpoint_invalid(
+                proposal_request,
+                "objective_consolidation_unit_engaged_after",
+                "witness",
+            )
         marker = _objective_marker_by_id(
             proposal_request=proposal_request,
             objective_id=proposal.objective_id,

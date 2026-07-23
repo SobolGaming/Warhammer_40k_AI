@@ -496,7 +496,14 @@ def validate_detachment_selection(
                 "DetachmentSelection detachment force disposition is awaiting source."
             )
     total_detachment_points = sum(detachment_point_costs)
-    if total_detachment_points > policy.detachment_point_limit:
+    incursion_three_point_exception = (
+        policy.battle_size is BattleSize.INCURSION
+        and len(detachments) == 1
+        and detachment_point_costs == [3]
+    )
+    if total_detachment_points > policy.detachment_point_limit and not (
+        incursion_three_point_exception
+    ):
         raise ListValidationError("DetachmentSelection exceeds battle size Detachment Points.")
     allowed_enhancement_ids = tuple(
         enhancement_id

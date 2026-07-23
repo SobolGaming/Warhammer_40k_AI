@@ -5,7 +5,7 @@ from types import MappingProxyType
 
 import msgspec
 
-ARTIFACT_SCHEMA = "core-v2-july-rules-updates-source-package-v1"
+ARTIFACT_SCHEMA = "core-v2-july-rules-updates-source-package-v2"
 EXPECTED_SOURCE_PACKAGE_ID = "gw-11e-rules-and-event-updates-2026-07-22"
 EXPECTED_SOURCE_TITLE = "Warhammer 40,000 July 2026 Rules and Event Updates"
 EXPECTED_SOURCE_VERSION = "2026-07-22"
@@ -24,6 +24,34 @@ EXPECTED_EVENT_COMPANION_RULE_BEHAVIORS: Mapping[str, str] = MappingProxyType(
     {
         "generating-command-points": "non_core_cp_gain_maximum_one_per_battle_round",
     }
+)
+EXPECTED_APP_CORE_RULE_BEHAVIORS: Mapping[str, str] = MappingProxyType(
+    {
+        "01.02.03-embarked-model-return": "embarked_return_requires_remaining_transport_capacity",
+        "05.03.02-post-roll-attack-profiles": "post_roll_profile_changes_split_attack_pools",
+        "09.07.01-desperate-escape-definition": "desperate_escape_test_means_hazard_rolls",
+        "09.07.01-forced-desperate-escape": (
+            "forced_desperate_escape_tests_all_models_and_battle_shock"
+        ),
+        "12.08-objective-consolidation": "objective_consolidation_requires_unengaged_endpoint",
+        "14.02.01-control-first": "objective_control_determined_first_at_phase_and_turn_end",
+        "18.01-dedicated-transport": "empty_dedicated_transport_models_destroyed_without_triggers",
+        "20.01.02-strategic-reserves": (
+            "strategic_reserves_destroyed_at_final_turn_without_triggers"
+        ),
+        "24.28.01-precision-devastating-wounds": (
+            "precision_mortals_prioritize_selected_character_group"
+        ),
+        "24.37.01-torrent": "torrent_excludes_indirect_fire_and_precision",
+        "25.04-epic-hero-enhancements": "epic_hero_models_cannot_be_given_enhancements",
+        "25.04-incursion-detachment": "incursion_allows_one_three_dp_detachment",
+    }
+)
+EXPECTED_APP_CORE_DOCUMENT_METADATA = (
+    "warhammer-40000-app-core-rules-2026-07-22",
+    "Warhammer 40,000 App Core Rules",
+    "2026-07-22",
+    "Warhammer 40,000 App",
 )
 EXPECTED_UNIVERSAL_DOCUMENT_METADATA = (
     "eng_22-07_warhammer40000_universal_rules_updates",
@@ -82,6 +110,13 @@ class EventCompanionRuleUpdateRecord(msgspec.Struct, frozen=True, forbid_unknown
     behavior_descriptor: str
 
 
+class AppCoreRuleUpdateRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+    rule_id: str
+    source_id: str
+    source_text: str
+    behavior_descriptor: str
+
+
 class EventLayoutRevisionRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     layout_id: str
     source_page: int
@@ -115,6 +150,14 @@ class EventCompanionUpdateArtifact(msgspec.Struct, frozen=True, forbid_unknown_f
     changed_layouts: tuple[EventLayoutRevisionRecord, ...]
 
 
+class AppCoreRulesUpdateArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+    document_id: str
+    source_title: str
+    source_version: str
+    source_platform: str
+    rules: tuple[AppCoreRuleUpdateRecord, ...]
+
+
 class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     artifact_schema: str
     source_package_id: str
@@ -123,6 +166,7 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
     source_date: str
     universal_rules_update: UniversalRulesUpdateArtifact
     event_companion: EventCompanionUpdateArtifact
+    app_core_rules_update: AppCoreRulesUpdateArtifact
 
     def validate(self) -> None:
         if self.artifact_schema != ARTIFACT_SCHEMA:
@@ -143,6 +187,7 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
         )
         self._validate_universal_rules_update()
         self._validate_event_companion_update()
+        self._validate_app_core_rules_update()
 
     def _validate_universal_rules_update(self) -> None:
         update = self.universal_rules_update
@@ -236,6 +281,30 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
                 raise JulyRulesUpdateArtifactError(
                     "Event Companion layout-revision source identity drifted."
                 )
+
+    def _validate_app_core_rules_update(self) -> None:
+        update = self.app_core_rules_update
+        if (
+            update.document_id,
+            update.source_title,
+            update.source_version,
+            update.source_platform,
+        ) != EXPECTED_APP_CORE_DOCUMENT_METADATA:
+            raise JulyRulesUpdateArtifactError("App core-rules document metadata drifted.")
+        rule_behaviors = {rule.rule_id: rule.behavior_descriptor for rule in update.rules}
+        if rule_behaviors != EXPECTED_APP_CORE_RULE_BEHAVIORS or len(rule_behaviors) != len(
+            update.rules
+        ):
+            raise JulyRulesUpdateArtifactError("App core-rules identity inventory drifted.")
+        for rule in update.rules:
+            _validate_non_empty_strings(
+                rule.rule_id,
+                rule.source_id,
+                rule.source_text,
+                rule.behavior_descriptor,
+            )
+            if rule.source_id != f"{self.source_package_id}:app-core-rules:{rule.rule_id}":
+                raise JulyRulesUpdateArtifactError("App core-rules source identity drifted.")
 
 
 def july_rules_updates_package_artifact_from_json_bytes(

@@ -3224,7 +3224,7 @@ def _cargo_model_count(
         unit = units.get(unit_id)
         if unit is None:
             raise GameLifecycleError("TransportCargoState references an unknown embarked unit.")
-        count += len(unit.own_models)
+        count += sum(model.is_alive for model in unit.own_models)
     return count
 
 

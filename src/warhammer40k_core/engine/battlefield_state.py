@@ -993,6 +993,25 @@ class BattlefieldRuntimeState:
             ),
         )
 
+    def with_returned_unplaced_model(self, model_instance_id: str) -> Self:
+        """Mark a removed model as returned while it remains off the battlefield."""
+
+        model_id = _validate_identifier("model_instance_id", model_instance_id)
+        if model_id in set(self.placed_model_ids()):
+            raise PlacementError("BattlefieldRuntimeState returned model is already placed.")
+        if model_id not in set(self.removed_model_ids):
+            raise PlacementError("BattlefieldRuntimeState returned model was not removed.")
+        return type(self)(
+            battlefield_id=self.battlefield_id,
+            battlefield_width_inches=self.battlefield_width_inches,
+            battlefield_depth_inches=self.battlefield_depth_inches,
+            placed_armies=self.placed_armies,
+            terrain_features=self.terrain_features,
+            removed_model_ids=tuple(
+                removed_id for removed_id in self.removed_model_ids if removed_id != model_id
+            ),
+        )
+
     def with_unplaced_models_marked_removed(self, model_instance_ids: tuple[str, ...]) -> Self:
         removed_model_ids = _validate_identifier_tuple(
             "model_instance_ids",

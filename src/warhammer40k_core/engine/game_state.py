@@ -13,6 +13,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     setup_step_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import game_state_queries as _queries
 from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.aircraft import HoverModeState
@@ -179,7 +180,6 @@ from warhammer40k_core.engine.scoring import (
 )
 from warhammer40k_core.engine.sticky_objective_control import (
     StickyObjectiveControlState,
-    apply_sticky_objective_control,
     sticky_objective_control_state_is_expired,
 )
 from warhammer40k_core.engine.stratagems import StratagemUseRecord
@@ -1852,17 +1852,16 @@ class GameState:
         completed_player_id = self.active_player_id
         if completed_player_id is None:
             raise GameLifecycleError("GameState active player is required during battle.")
+        end_boundary_records = self.determine_current_end_objective_control(
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        phase_end_record = end_boundary_records[0]
         self.expire_persisting_effects_at_boundary(
             EffectExpirationBoundary.phase_end(
                 battle_round=self.battle_round,
                 phase=completed_phase,
                 player_id=completed_player_id,
             )
-        )
-        phase_end_record = self._record_objective_control_boundary(
-            completed_phase=completed_phase,
-            timing=ObjectiveControlTiming.PHASE_END,
-            runtime_modifier_registry=runtime_modifier_registry,
         )
         self._score_objective_control_boundary(phase_end_record)
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
@@ -1891,11 +1890,9 @@ class GameState:
                 player_id=completed_player_id,
             )
         )
-        turn_end_record = self._record_objective_control_boundary(
-            completed_phase=completed_phase,
-            timing=ObjectiveControlTiming.TURN_END,
-            runtime_modifier_registry=runtime_modifier_registry,
-        )
+        if len(end_boundary_records) != 2:
+            raise GameLifecycleError("Final phase requires phase-end and turn-end control records.")
+        turn_end_record = end_boundary_records[1]
         self._score_objective_control_boundary(turn_end_record)
         if completed_phase is BattlePhase.COMMAND:
             self.command_step_state = None
@@ -1941,6 +1938,16 @@ class GameState:
         )
         self._expire_persisting_effects_at_current_phase_start()
         return completed_phase
+
+    def determine_current_end_objective_control(
+        self,
+        *,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ) -> tuple[ObjectiveControlRecord, ...]:
+        return _queries.determine_current_end_objective_control(
+            state=self,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
 
     def record_secondary_mission_choice(self, choice: SecondaryMissionChoice) -> None:
         if choice.player_id not in self.player_ids:
@@ -2669,7 +2676,7 @@ class GameState:
                 self,
                 timing=ObjectiveControlTiming.TURN_END,
                 phase=completion_phase,
-                ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
+                ruleset_descriptor=self.ruleset_descriptor_for_runtime_policy(),
             )
         )
         for result in record.results:
@@ -3010,7 +3017,7 @@ class GameState:
         return state
 
     def runtime_ruleset_descriptor(self) -> RulesetDescriptor:
-        return self._ruleset_descriptor_for_runtime_policy()
+        return self.ruleset_descriptor_for_runtime_policy()
 
     def record_persisting_effect(self, effect: PersistingEffect) -> None:
         if type(effect) is not PersistingEffect:
@@ -3740,7 +3747,7 @@ class GameState:
                 self,
                 timing=ObjectiveControlTiming.TURN_END,
                 phase=phase,
-                ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
+                ruleset_descriptor=self.ruleset_descriptor_for_runtime_policy(),
             )
         )
         self._record_objective_control_record_if_absent(record)
@@ -4315,6 +4322,15 @@ class GameState:
             if cargo_state.transport_unit_instance_id == requested_transport_id:
                 return cargo_state
         return None
+
+    def transport_cargo_state_for_embarked_unit(
+        self,
+        embarked_unit_instance_id: str,
+    ) -> TransportCargoState | None:
+        return _queries.transport_cargo_state_for_embarked_unit(
+            state=self,
+            embarked_unit_instance_id=embarked_unit_instance_id,
+        )
 
     def replace_transport_cargo_state(self, cargo_state: TransportCargoState) -> None:
         if type(cargo_state) is not TransportCargoState:
@@ -5101,37 +5117,21 @@ class GameState:
                     return unit
         raise GameLifecycleError("GameState unit_instance_id was not found.")
 
-    def _record_objective_control_boundary(
+    def record_objective_control_boundary(
         self,
         *,
         completed_phase: BattlePhase,
         timing: ObjectiveControlTiming,
         runtime_modifier_registry: RuntimeModifierRegistry | None,
     ) -> ObjectiveControlRecord:
-        if self.mission_setup is None:
-            raise GameLifecycleError("Objective control updates require MissionSetup.")
-        if self.battlefield_state is None:
-            raise GameLifecycleError("Objective control updates require battlefield_state.")
-        if self.active_player_id is None:
-            raise GameLifecycleError("Objective control updates require an active player.")
-        record = resolve_objective_control(
-            ObjectiveControlContext.from_game_state(
-                self,
-                timing=timing,
-                phase=completed_phase,
-                ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
-                runtime_modifier_registry=runtime_modifier_registry,
-            )
+        return _queries.record_objective_control_boundary(
+            state=self,
+            completed_phase=completed_phase,
+            timing=timing,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
-        retained_record = apply_sticky_objective_control(
-            record=record,
-            states=tuple(self.sticky_objective_control_states),
-        )
-        self._expire_sticky_objective_control_states(record)
-        self.record_objective_control_record(retained_record)
-        return retained_record
 
-    def _expire_sticky_objective_control_states(
+    def expire_sticky_objective_control_states(
         self,
         record: ObjectiveControlRecord,
     ) -> None:
@@ -5166,7 +5166,7 @@ class GameState:
                 self,
                 timing=ObjectiveControlTiming.PHASE_END,
                 phase=current_phase,
-                ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
+                ruleset_descriptor=self.ruleset_descriptor_for_runtime_policy(),
                 runtime_modifier_registry=runtime_modifier_registry,
             )
         )
@@ -5289,7 +5289,7 @@ class GameState:
         cleanup, updated_battlefield = resolve_end_turn_cleanup(
             game_id=self.game_id,
             scenario=scenario,
-            ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
+            ruleset_descriptor=self.ruleset_descriptor_for_runtime_policy(),
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase=completed_phase,
@@ -5322,7 +5322,7 @@ class GameState:
         )
         self.reserve_states = list(destruction.updated_reserve_states)
 
-    def _ruleset_descriptor_for_runtime_policy(self) -> RulesetDescriptor:
+    def ruleset_descriptor_for_runtime_policy(self) -> RulesetDescriptor:
         if self.mission_setup is not None and (
             self.mission_setup.mission_pack_id == eleventh_ca_2026_27_source.MISSION_PACK_ID
         ):
