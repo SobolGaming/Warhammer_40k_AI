@@ -1,0 +1,144 @@
+{
+  "artifact_schema": "core-v2-july-rules-updates-source-package-v1",
+  "event_companion": {
+    "changed_layouts": [
+      {
+        "deployment_zone_template_number": 4,
+        "deployment_zones_changed": false,
+        "layout_id": "take-and-hold-vs-purge-the-foe-layout-1",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:layout-revision:take-and-hold-vs-purge-the-foe-layout-1",
+        "source_page": 12,
+        "terrain_changed": true
+      },
+      {
+        "deployment_zone_template_number": 3,
+        "deployment_zones_changed": false,
+        "layout_id": "take-and-hold-vs-purge-the-foe-layout-2",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:layout-revision:take-and-hold-vs-purge-the-foe-layout-2",
+        "source_page": 13,
+        "terrain_changed": true
+      },
+      {
+        "deployment_zone_template_number": 5,
+        "deployment_zones_changed": false,
+        "layout_id": "take-and-hold-vs-purge-the-foe-layout-3",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:layout-revision:take-and-hold-vs-purge-the-foe-layout-3",
+        "source_page": 14,
+        "terrain_changed": true
+      },
+      {
+        "deployment_zone_template_number": 3,
+        "deployment_zones_changed": false,
+        "layout_id": "purge-the-foe-vs-disruption-layout-1",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:layout-revision:purge-the-foe-vs-disruption-layout-1",
+        "source_page": 27,
+        "terrain_changed": true
+      },
+      {
+        "deployment_zone_template_number": 1,
+        "deployment_zones_changed": false,
+        "layout_id": "purge-the-foe-vs-disruption-layout-2",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:layout-revision:purge-the-foe-vs-disruption-layout-2",
+        "source_page": 28,
+        "terrain_changed": true
+      },
+      {
+        "deployment_zone_template_number": 4,
+        "deployment_zones_changed": false,
+        "layout_id": "purge-the-foe-vs-disruption-layout-3",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:layout-revision:purge-the-foe-vs-disruption-layout-3",
+        "source_page": 29,
+        "terrain_changed": true
+      },
+      {
+        "deployment_zone_template_number": 1,
+        "deployment_zones_changed": false,
+        "layout_id": "disruption-vs-reconnaissance-layout-1",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:layout-revision:disruption-vs-reconnaissance-layout-1",
+        "source_page": 39,
+        "terrain_changed": true
+      },
+      {
+        "deployment_zone_template_number": 3,
+        "deployment_zones_changed": false,
+        "layout_id": "disruption-vs-reconnaissance-layout-3",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:layout-revision:disruption-vs-reconnaissance-layout-3",
+        "source_page": 41,
+        "terrain_changed": true
+      }
+    ],
+    "document_id": "eng_22-07_warhammer40000_event_companion",
+    "local_pdf": "docs/source_rules/eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf",
+    "rules": [
+      {
+        "behavior_descriptor": "non_core_cp_gain_maximum_one_per_battle_round",
+        "rule_id": "generating-command-points",
+        "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:rules:generating-command-points",
+        "source_text": "Excluding Core CP, each player can gain a maximum of 1CP per battle round, including the CP gained by discarding an active Secondary Mission card."
+      }
+    ],
+    "source_pdf_sha256": "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20",
+    "source_title": "Warhammer Event Companion v1.1",
+    "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_event_companion-alyapl19us-b2drgwkji4.pdf",
+    "source_version": "1.1",
+    "updated_source_package_id": "gw-11e-warhammer-event-companion-v1-1-2026-07"
+  },
+  "source_date": "2026-07-22",
+  "source_package_id": "gw-11e-rules-and-event-updates-2026-07-22",
+  "source_title": "Warhammer 40,000 July 2026 Rules and Event Updates",
+  "source_version": "2026-07-22",
+  "universal_rules_update": {
+    "document_id": "eng_22-07_warhammer40000_universal_rules_updates",
+    "identical_unit_replacement_stratagem_source_ids": [
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:astra-militarum:combined-arms:000008381003",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-knights:iconoclast-fiefdom:000009766003",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:death-guard:tallyband-summoners:000010136002",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:tau-empire:kroot-hunting-pack:000008822002",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:tyranids:unending-swarm:000008409003",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:world-eaters:cult-of-blood:000010075003"
+    ],
+    "local_pdf": "docs/source_rules/eng_22-07_warhammer40000_universal_rules_updates-coltxp7ngi-3kvdfxwyon.pdf",
+    "protective_targeting_stratagem_source_ids": [
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:adeptus-mechanicus:skitarii-hunter-cohort:000008561006",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:aeldari:seer-council:000009924007",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-space-marines:pactbound-zealots:000008358007",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:drukhari:kabalite-cartel:000010589007",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:imperial-agents:veiled-blade-elimination-force:000009758005",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:necrons:canoptek-court:000008547006",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:tau-empire:experimental-prototype-cadre:000009984007",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:tau-empire:kroot-hunting-pack:000008822007",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:thousand-sons:changehost-of-deceit:000010198005",
+      "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:tyranids:vanguard-onslaught:000008418006"
+    ],
+    "rules": [
+      {
+        "behavior_descriptor": "unnamed_zero_cp_reduces_cost_by_one",
+        "rule_id": "modifying-a-stratagem-cp-cost",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:universal-rules:modifying-a-stratagem-cp-cost",
+        "source_text": "An unnamed rule that would make a friendly unit's Stratagem cost 0CP instead reduces that use's CP cost by 1CP."
+      },
+      {
+        "behavior_descriptor": "repeat_or_limit_exception_requires_named_stratagem",
+        "rule_id": "stratagem-repeat-and-limit-exceptions",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:universal-rules:stratagem-repeat-and-limit-exceptions",
+        "source_text": "A rule can override repeated-use or once-per-turn, round, or battle restrictions only when it names the affected Stratagem."
+      },
+      {
+        "behavior_descriptor": "protective_targeting_range_is_eighteen_inches",
+        "rule_id": "stratagems-that-prevent-targeting",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:universal-rules:stratagems-that-prevent-targeting",
+        "source_text": "A Stratagem effect that prevents ranged targeting beyond 12 inches instead uses an 18-inch threshold."
+      },
+      {
+        "behavior_descriptor": "identical_unit_replacement_once_per_battle",
+        "rule_id": "stratagems-that-add-identical-units",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:universal-rules:stratagems-that-add-identical-units",
+        "source_text": "A Stratagem that adds a new unit identical to a destroyed unit can be used only once per battle."
+      }
+    ],
+    "source_pdf_sha256": "a16ede8a54d693c91e24253e8731f12d298b68fd29f4ee457dd7ba4c69c0c053",
+    "source_title": "Warhammer 40,000 Universal Rules Updates v1.0",
+    "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_universal_rules_updates-coltxp7ngi-3kvdfxwyon.pdf",
+    "source_version": "1.0"
+  }
+}

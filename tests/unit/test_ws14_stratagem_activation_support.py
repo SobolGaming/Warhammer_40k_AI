@@ -60,6 +60,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_generic_ir_support_2026_27,
     faction_stratagem_activation_2026_27,
     faction_subrules_2026_27,
+    july_rules_updates_2026_07,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_lords_of_the_warp_ir_support_2026_27 as lords_ir,
@@ -148,6 +149,28 @@ def test_ws14_source_backed_stratagem_activation_records_are_runtime_loadable() 
     assert {record.definition.handler_id for record in records} == {
         GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
     }
+    assert {
+        record.definition.source_id
+        for record in records
+        if record.definition.restriction_policy.once_per_battle
+    } == july_rules_updates_2026_07.IDENTICAL_UNIT_REPLACEMENT_STRATAGEM_SOURCE_IDS
+
+    profiles_by_source_id = {profile.source_id: profile for profile in profiles}
+    assert {
+        profile.source_id
+        for profile in profiles
+        if "identical to your destroyed unit" in profile.effect_descriptor.lower()
+    } == july_rules_updates_2026_07.IDENTICAL_UNIT_REPLACEMENT_STRATAGEM_SOURCE_IDS
+    assert {
+        profile.source_id
+        for profile in profiles
+        if 'target of a ranged attack if the attacking model is within 18"'
+        in profile.effect_descriptor
+    } == july_rules_updates_2026_07.PROTECTIVE_TARGETING_STRATAGEM_SOURCE_IDS
+    for source_id in july_rules_updates_2026_07.PROTECTIVE_TARGETING_STRATAGEM_SOURCE_IDS:
+        effect_descriptor = profiles_by_source_id[source_id].effect_descriptor
+        assert 'within 18"' in effect_descriptor
+        assert 'within 12"' not in effect_descriptor
 
     more_dakka = {
         record.definition.stratagem_id: record

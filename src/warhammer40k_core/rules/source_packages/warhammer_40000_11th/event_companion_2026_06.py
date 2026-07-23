@@ -53,11 +53,11 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 EDITION_ID = "warhammer_40000_11th"
-MISSION_PACK_ID = "11e-warhammer-event-companion-2026-06"
-SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-v1-0-2026-06"
-SOURCE_TITLE = "Warhammer Event Companion v1.0"
-SOURCE_VERSION = "1.0"
-DOCUMENT_VERSION = "1.0"
+MISSION_PACK_ID = "11e-warhammer-event-companion-2026-07"
+SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-v1-1-2026-07"
+SOURCE_TITLE = "Warhammer Event Companion v1.1"
+SOURCE_VERSION = "1.1"
+DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"

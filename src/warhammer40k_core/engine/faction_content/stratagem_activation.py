@@ -19,6 +19,7 @@ from warhammer40k_core.engine.stratagems import (
 from warhammer40k_core.engine.timing_windows import timing_trigger_kind_from_token
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_stratagem_activation_2026_27,
+    july_rules_updates_2026_07,
 )
 
 __all__ = (
@@ -84,6 +85,10 @@ def _record_for_phase(
             ),
             restriction_policy=StratagemRestrictionPolicy(
                 same_unit_target_per_phase=True,
+                once_per_battle=(
+                    profile.source_id
+                    in july_rules_updates_2026_07.IDENTICAL_UNIT_REPLACEMENT_STRATAGEM_SOURCE_IDS
+                ),
             ),
             target_spec=StratagemTargetSpec(
                 target_kind=StratagemTargetKind(profile.target_kind),

@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from warhammer40k_core.core.deployment_zones import DeploymentZoneShape
 from warhammer40k_core.core.missions import BattlefieldLayoutDefinition
 from warhammer40k_core.rules.mission_pack_import import (
-    warhammer_event_companion_2026_06_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as chapter_approved,
@@ -56,7 +56,7 @@ def html_document(*, data: dict[str, object] | None = None) -> str:
 
 
 def _build_data_payload() -> dict[str, object]:
-    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     matrix = {
         f"{cell.player_force_disposition_id}|{cell.opponent_force_disposition_id}": {
             "primary_mission_id": cell.primary_mission_id,

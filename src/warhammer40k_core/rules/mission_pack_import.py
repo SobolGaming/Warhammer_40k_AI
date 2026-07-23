@@ -39,8 +39,8 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 
 CHAPTER_APPROVED_2026_27_SOURCE_ID = source_data.SOURCE_PACKAGE_ID
 CHAPTER_APPROVED_2026_27_SOURCE_VERSION = source_data.SOURCE_VERSION
-EVENT_COMPANION_2026_06_SOURCE_ID = event_source_data.SOURCE_PACKAGE_ID
-EVENT_COMPANION_2026_06_SOURCE_VERSION = event_source_data.SOURCE_VERSION
+EVENT_COMPANION_2026_07_SOURCE_ID = event_source_data.SOURCE_PACKAGE_ID
+EVENT_COMPANION_2026_07_SOURCE_VERSION = event_source_data.SOURCE_VERSION
 
 
 def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
@@ -171,47 +171,47 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
     )
 
 
-def warhammer_event_companion_2026_06_mission_pack() -> MissionPackDefinition:
-    """Build the source-linked Warhammer Event Companion v1.0 mission pack descriptors."""
+def warhammer_event_companion_2026_07_mission_pack() -> MissionPackDefinition:
+    """Build the current source-linked Warhammer Event Companion mission pack descriptors."""
 
     deployment_maps = _deployment_maps(
         rows=event_source_data.battlefield_layout_rows(),
-        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
     )
     terrain_layouts = _terrain_layouts(
         rows=event_source_data.battlefield_layout_rows(),
-        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
     )
     primary_missions = _primary_missions(
         rows=event_source_data.primary_mission_rows(),
-        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
     )
     secondary_missions = _secondary_missions(
         rows=event_source_data.secondary_mission_rows(),
-        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
     )
     mission_actions = _mission_actions(
         rows=event_source_data.mission_action_rows(),
-        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
     )
-    challenger_cards = _challenger_cards(source_id=EVENT_COMPANION_2026_06_SOURCE_ID)
+    challenger_cards = _challenger_cards(source_id=EVENT_COMPANION_2026_07_SOURCE_ID)
     force_dispositions = _force_dispositions(
         rows=event_source_data.force_disposition_rows(),
-        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
     )
     scoring = event_source_data.mission_pack_scoring_row()
     return MissionPackDefinition(
         mission_pack_id=event_source_data.MISSION_PACK_ID,
-        name="Warhammer Event Companion v1.0",
-        source_version=EVENT_COMPANION_2026_06_SOURCE_VERSION,
-        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        name="Warhammer Event Companion v1.1",
+        source_version=EVENT_COMPANION_2026_07_SOURCE_VERSION,
+        source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
         source_package=event_source_data.source_package_definition(),
         sequence=ChapterApprovedMissionSequence(
             sequence_id="warhammer-event-mission-sequence",
             steps=tuple(
                 step.step_id for step in event_source_data.mission_sequence_descriptor().steps
             ),
-            source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+            source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
         ),
         deployment_maps=deployment_maps,
         terrain_layout_templates=terrain_layouts,
@@ -228,7 +228,7 @@ def warhammer_event_companion_2026_06_mission_pack() -> MissionPackDefinition:
             deployment_map_ids=tuple(
                 deployment_map.deployment_map_id for deployment_map in deployment_maps
             ),
-            source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+            source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
         ),
         primary_missions=primary_missions,
         secondary_missions=secondary_missions,
@@ -237,18 +237,18 @@ def warhammer_event_companion_2026_06_mission_pack() -> MissionPackDefinition:
         force_dispositions=force_dispositions,
         primary_mission_matrix_cells=_primary_mission_matrix_cells(
             rows=event_source_data.primary_mission_matrix_rows(),
-            source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+            source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
         ),
         mission_pool_entries=_mission_pool_entries(
             rows=event_source_data.battlefield_layout_rows(),
-            source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+            source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
         ),
         scoring_caps=TournamentScoringCaps(
             primary_vp_cap=scoring.primary_vp_cap,
             secondary_vp_cap=scoring.secondary_vp_cap,
             battle_ready_vp=10,
             total_vp_cap=scoring.total_vp_cap,
-            source_id=f"{EVENT_COMPANION_2026_06_SOURCE_ID}:tournament-scoring",
+            source_id=f"{EVENT_COMPANION_2026_07_SOURCE_ID}:tournament-scoring",
         ),
         scoring=MissionPackScoringDefinition(
             game_length_battle_rounds=scoring.game_length_battle_rounds,
@@ -269,7 +269,7 @@ def warhammer_event_companion_2026_06_mission_pack() -> MissionPackDefinition:
             reserve_destruction_only_declare_battle_formations=(
                 scoring.reserve_destruction_only_declare_battle_formations
             ),
-            source_id=f"{EVENT_COMPANION_2026_06_SOURCE_ID}:scoring",
+            source_id=f"{EVENT_COMPANION_2026_07_SOURCE_ID}:scoring",
         ),
     )
 
