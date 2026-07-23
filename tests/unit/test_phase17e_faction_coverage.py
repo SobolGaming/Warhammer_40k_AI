@@ -51,8 +51,8 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_covera
 
 ROOT = Path(__file__).resolve().parents[2]
 FACTION_PACK_MANIFEST = ROOT / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
-SUPPLEMENTAL_FACTION_PACK_MANIFEST = (
-    ROOT / "data" / "source_manifests" / "gw_11e_supplemental_faction_packs.yaml"
+PENDING_FACTION_PACK_MANIFEST = (
+    ROOT / "data" / "source_manifests" / "gw_11e_pending_faction_packs_2026_07.yaml"
 )
 RAW_FACTION_PDF_DIR = ROOT / "data" / "raw" / "faction_packs"
 BRIDGE_JSON_DIR = (
@@ -1636,12 +1636,12 @@ def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:
     records_by_filename = {
         record.pdf_filename: record for record in faction_coverage_source.faction_pdf_records()
     }
-    supplemental_entries_by_filename = {
+    pending_entries_by_filename = {
         PurePosixPath(entry.local_cache_path).name: entry
-        for entry in load_official_source_manifest(SUPPLEMENTAL_FACTION_PACK_MANIFEST)
+        for entry in load_official_source_manifest(PENDING_FACTION_PACK_MANIFEST)
         if entry.local_cache_path is not None
     }
-    declared_pdf_filenames = records_by_filename.keys() | supplemental_entries_by_filename.keys()
+    declared_pdf_filenames = records_by_filename.keys() | pending_entries_by_filename.keys()
     unknown_pdf_filenames = present_pdf_filenames.difference(declared_pdf_filenames)
     assert not unknown_pdf_filenames
 
@@ -1651,11 +1651,11 @@ def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:
             expected_bytes = record.bytes
             expected_sha256 = record.sha256
         else:
-            supplemental_entry = supplemental_entries_by_filename[pdf_filename]
-            if supplemental_entry.expected_bytes is None:
-                raise AssertionError("Supplemental faction-pack source must declare bytes.")
-            expected_bytes = supplemental_entry.expected_bytes
-            expected_sha256 = supplemental_entry.sha256
+            pending_entry = pending_entries_by_filename[pdf_filename]
+            if pending_entry.expected_bytes is None:
+                raise AssertionError("Pending faction-pack source must declare bytes.")
+            expected_bytes = pending_entry.expected_bytes
+            expected_sha256 = pending_entry.sha256
         pdf_path = RAW_FACTION_PDF_DIR / pdf_filename
         assert pdf_path.is_file()
         pdf_data = pdf_path.read_bytes()
