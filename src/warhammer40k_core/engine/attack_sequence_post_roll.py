@@ -64,6 +64,9 @@ def split_or_resume_post_roll_attack_pools(
 ]:
     current = attack_sequence
     if current.post_roll_attack_pools is None:
+        active_player_id = state.active_player_id
+        if active_player_id is None:
+            raise GameLifecycleError("Post-roll attack pools require an active player.")
         modified_contexts = tuple(
             _post_roll_modified_wound_context(
                 state=state,
@@ -84,7 +87,7 @@ def split_or_resume_post_roll_attack_pools(
             return current, wounded_contexts, None
         pool_set = PostRollAttackPoolSet.from_modified_attacks(
             sequence_id=current.sequence_id,
-            active_player_id=current.attacker_player_id,
+            active_player_id=active_player_id,
             attacks=tuple(
                 PostRollModifiedAttack(
                     attack_context_id=modified_context["attack_context_id"],
@@ -101,7 +104,7 @@ def split_or_resume_post_roll_attack_pools(
             "post_roll_attack_pools_created",
             {
                 "sequence_id": current.sequence_id,
-                "active_player_id": current.attacker_player_id,
+                "active_player_id": pool_set.active_player_id,
                 "source_rule_id": POST_ROLL_ATTACK_PROFILE_POOLS_SOURCE_ID,
                 "post_roll_attack_pools": pool_set.to_payload(),
             },
@@ -181,16 +184,19 @@ def build_select_post_roll_attack_pool_request(
         raise GameLifecycleError(
             "Post-roll attack pool selection requires unresolved unselected pools."
         )
+    if pool_set.active_player_id != state.active_player_id:
+        raise GameLifecycleError("Post-roll attack pool active player drift.")
     return DecisionRequest(
         request_id=request_id,
         decision_type=SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
-        actor_id=attack_sequence.attacker_player_id,
+        actor_id=pool_set.active_player_id,
         payload={
             "submission_kind": SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "phase": attack_sequence.source_phase.value,
             "sequence_id": attack_sequence.sequence_id,
+            "active_player_id": pool_set.active_player_id,
             "attacker_player_id": attack_sequence.attacker_player_id,
             "source_rule_id": POST_ROLL_ATTACK_PROFILE_POOLS_SOURCE_ID,
             "pool_ids": [pool.pool_id for pool in pool_set.unresolved_pools],

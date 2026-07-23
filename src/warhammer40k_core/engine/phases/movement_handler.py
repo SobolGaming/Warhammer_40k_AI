@@ -460,6 +460,7 @@ class MovementPhaseHandler:
                     self.ability_indexes_by_player_id,
                     player_id=_active_player_id(state),
                 ),
+                ability_indexes_by_player_id=self.ability_indexes_by_player_id,
                 runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE:

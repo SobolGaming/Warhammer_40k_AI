@@ -2115,11 +2115,11 @@ def test_phase13d_deferred_devastating_mortal_wound_queue_survives_fnp_pause() -
     assert _state(restored).shooting_phase_state is None
 
 
-def test_post_roll_profile_changes_split_pools_and_active_player_orders_each_pool() -> None:
+def test_out_of_phase_post_roll_pools_are_ordered_by_active_player() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
-    attacker = units["intercessor-1"]
-    defender = units["enemy"]
+    attacker = units["enemy"]
+    defender = units["intercessor-1"]
     battlefield = state.battlefield_state
     assert battlefield is not None
     state.battlefield_state = battlefield.with_removed_models(
@@ -2159,13 +2159,13 @@ def test_post_roll_profile_changes_split_pools_and_active_player_orders_each_poo
         attack_sequence_wound_roll_spec(
             weapon_profile_id=base_profile.profile_id,
             attack_context_id=f"{sequence_id}:pool-001:attack-{index:03d}",
-            attacker_player_id="player-a",
+            attacker_player_id="player-b",
         )
         for index in (1, 2)
     )
     sequence = AttackSequence.start(
         sequence_id=sequence_id,
-        attacker_player_id="player-a",
+        attacker_player_id="player-b",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(
             _attack_pool_for_test(
@@ -2205,8 +2205,12 @@ def test_post_roll_profile_changes_split_pools_and_active_player_orders_each_poo
     assert remaining is not None
     assert request.decision_type == SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE
     assert request.actor_id == "player-a"
+    request_payload = cast(dict[str, object], request.payload)
+    assert request_payload["active_player_id"] == "player-a"
+    assert request_payload["attacker_player_id"] == "player-b"
     assert len(request.options) == 2
     assert remaining.post_roll_attack_pools is not None
+    assert remaining.post_roll_attack_pools.active_player_id == "player-a"
     assert remaining.post_roll_attack_pools.selected_pool is None
     assert len(remaining.post_roll_attack_pools.unresolved_pools) == 2
     assert tuple(
@@ -2222,14 +2226,19 @@ def test_post_roll_profile_changes_split_pools_and_active_player_orders_each_poo
         )["profile_id"]
         == base_profile.profile_id
     )
-    state.shooting_phase_state = ShootingPhaseState(
+    state.out_of_phase_shooting_state = OutOfPhaseShootingState(
         battle_round=state.battle_round,
-        active_player_id="player-a",
-        selected_unit_ids=(attacker.unit_instance_id,),
-        shot_unit_ids=(attacker.unit_instance_id,),
+        player_id="player-b",
+        parent_phase=BattlePhase.SHOOTING,
+        source_rule_id="phase13d:out-of-phase-post-roll-pools",
+        source_decision_request_id="phase13d:out-of-phase-source-request",
+        source_decision_result_id="phase13d:out-of-phase-source-result",
+        source_context={"active_player_id": "player-a"},
+        selected_unit_instance_id=attacker.unit_instance_id,
+        target_unit_ids=(defender.unit_instance_id,),
         attack_pools=remaining.attack_pools,
         attack_sequence=remaining,
-        allocated_model_ids_this_phase=allocated_ids,
+        allocated_model_ids=allocated_ids,
     )
     paused_payload = cast(
         GameLifecyclePayload,
@@ -2238,9 +2247,9 @@ def test_post_roll_profile_changes_split_pools_and_active_player_orders_each_poo
     invalid_replay = GameLifecycle.from_payload(paused_payload)
     invalid_request = invalid_replay.decision_controller.queue.pending_requests[0]
     invalid_state = _state(invalid_replay)
-    assert invalid_state.shooting_phase_state is not None
-    assert invalid_state.shooting_phase_state.attack_sequence is not None
-    paused_sequence_payload = invalid_state.shooting_phase_state.attack_sequence.to_payload()
+    assert invalid_state.out_of_phase_shooting_state is not None
+    assert invalid_state.out_of_phase_shooting_state.attack_sequence is not None
+    paused_sequence_payload = invalid_state.out_of_phase_shooting_state.attack_sequence.to_payload()
     paused_records = invalid_replay.decision_controller.records
     invalid_status = invalid_replay.submit_decision(
         DecisionResult(
@@ -2257,7 +2266,8 @@ def test_post_roll_profile_changes_split_pools_and_active_player_orders_each_poo
     assert invalid_replay.decision_controller.queue.pending_requests == (invalid_request,)
     assert invalid_replay.decision_controller.records == paused_records
     assert (
-        invalid_state.shooting_phase_state.attack_sequence.to_payload() == paused_sequence_payload
+        invalid_state.out_of_phase_shooting_state.attack_sequence.to_payload()
+        == paused_sequence_payload
     )
 
     first_replay = GameLifecycle.from_payload(paused_payload)

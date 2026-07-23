@@ -176,8 +176,6 @@ class AttackSequence:
                 )
             if self.post_roll_attack_pools.sequence_id != self.sequence_id:
                 raise GameLifecycleError("AttackSequence post-roll pool sequence drift.")
-            if self.post_roll_attack_pools.active_player_id != self.attacker_player_id:
-                raise GameLifecycleError("AttackSequence post-roll pool active player drift.")
             if self.current_gathered_group is None:
                 raise GameLifecycleError(
                     "AttackSequence post-roll pools require a gathered attack group."
