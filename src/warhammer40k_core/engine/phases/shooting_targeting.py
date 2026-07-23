@@ -199,10 +199,23 @@ def _rules_unit_remained_stationary(
     movement_unit_ids = set(movement_state.moved_unit_ids)
     if not movement_unit_ids.intersection(unit_ids):
         return True
-    for record in movement_state.movement_distance_records:
-        if record.unit_instance_id in unit_ids:
-            return record.maximum_model_distance_inches <= 3.0
-    return False
+    matching_records = tuple(
+        record
+        for record in movement_state.movement_distance_records
+        if record.unit_instance_id in unit_ids
+    )
+    if not matching_records:
+        return False
+    unit_can_fly = any(_canonical_keyword(keyword) == "FLY" for keyword in rules_unit.keywords)
+    return all(
+        (
+            record.maximum_model_horizontal_distance_inches
+            if unit_can_fly
+            else record.maximum_model_distance_inches
+        )
+        <= 3.0
+        for record in matching_records
+    )
 
 
 def _heavy_hit_roll_modifier_applies(

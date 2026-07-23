@@ -149,6 +149,11 @@ from warhammer40k_core.engine.movement_proposals import (
     ProposalKind,
     ProposalValidationResult,
 )
+from warhammer40k_core.engine.normal_move_history import (
+    ONE_NORMAL_MOVE_PER_PHASE_SOURCE_RULE_ID,
+    NormalMoveSourceKind,
+    NormalMoveState,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -381,6 +386,9 @@ __all__ = (
     "MovementEndSurgeHookRegistry",
     "MovementLegalityContext",
     "MovementMode",
+    "NormalMoveSourceKind",
+    "NormalMoveState",
+    "ONE_NORMAL_MOVE_PER_PHASE_SOURCE_RULE_ID",
     "MovementProposalPayload",
     "MovementProposalPayloadPayload",
     "MovementProposalRequest",

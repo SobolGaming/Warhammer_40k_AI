@@ -44,6 +44,7 @@ __all__ = (
     "_complete_movement_activation_with_record_ids",
     "_interrupt_started_mission_actions_for_movement_activation",
     "_maximum_model_distance_inches_from_witness",
+    "_maximum_model_horizontal_distance_inches_from_witness",
     "_post_move_embark_options",
     "_request_embark_after_move_or_complete_activation",
 )
@@ -665,10 +666,26 @@ def _complete_movement_activation_with_record_ids(
         result_id=result_id,
         displacement_kind=displacement_kind,
     )
+    if action is MovementPhaseActionKind.NORMAL_MOVE:
+        state.record_normal_move_state(
+            NormalMoveState(
+                player_id=active_selection.player_id,
+                battle_round=state.battle_round,
+                phase=BattlePhase.MOVEMENT,
+                unit_instance_id=active_selection.unit_instance_id,
+                source_rule_id=ONE_NORMAL_MOVE_PER_PHASE_SOURCE_RULE_ID,
+                source_kind=NormalMoveSourceKind.MOVEMENT_PHASE_ACTION,
+                request_id=request_id,
+                result_id=result_id,
+            )
+        )
     state.replace_movement_phase_state(
         movement_state.with_activation_complete(
             active_selection.unit_instance_id,
             maximum_model_distance_inches=_maximum_model_distance_inches_from_witness(witness),
+            maximum_model_horizontal_distance_inches=(
+                _maximum_model_horizontal_distance_inches_from_witness(witness)
+            ),
         )
     )
     event_payload: dict[str, JsonValue] = {
@@ -699,6 +716,20 @@ def _maximum_model_distance_inches_from_witness(witness: PathWitness | None) -> 
         model_distance = 0.0
         for index in range(1, len(poses)):
             model_distance += poses[index - 1].distance_3d_to(poses[index])
+        maximum_distance = max(maximum_distance, model_distance)
+    return maximum_distance
+
+
+def _maximum_model_horizontal_distance_inches_from_witness(
+    witness: PathWitness | None,
+) -> float:
+    if witness is None:
+        return 0.0
+    maximum_distance = 0.0
+    for _model_id, poses in witness.model_paths:
+        model_distance = 0.0
+        for index in range(1, len(poses)):
+            model_distance += poses[index - 1].distance_2d_to(poses[index])
         maximum_distance = max(maximum_distance, model_distance)
     return maximum_distance
 

@@ -208,6 +208,7 @@ class MovementActionAvailabilityResultPayload(TypedDict):
 class MovementDistanceRecordPayload(TypedDict):
     unit_instance_id: str
     maximum_model_distance_inches: float
+    maximum_model_horizontal_distance_inches: float
 
 
 class AdvanceRollRequestPayload(TypedDict):
@@ -1316,6 +1317,7 @@ class DisembarkCandidate:
 class MovementDistanceRecord:
     unit_instance_id: str
     maximum_model_distance_inches: float
+    maximum_model_horizontal_distance_inches: float
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1331,11 +1333,26 @@ class MovementDistanceRecord:
                 self.maximum_model_distance_inches,
             ),
         )
+        object.__setattr__(
+            self,
+            "maximum_model_horizontal_distance_inches",
+            _validate_non_negative_finite_number(
+                "MovementDistanceRecord maximum_model_horizontal_distance_inches",
+                self.maximum_model_horizontal_distance_inches,
+            ),
+        )
+        if self.maximum_model_horizontal_distance_inches > self.maximum_model_distance_inches:
+            raise GameLifecycleError(
+                "MovementDistanceRecord horizontal distance cannot exceed total distance."
+            )
 
     def to_payload(self) -> MovementDistanceRecordPayload:
         return {
             "unit_instance_id": self.unit_instance_id,
             "maximum_model_distance_inches": self.maximum_model_distance_inches,
+            "maximum_model_horizontal_distance_inches": (
+                self.maximum_model_horizontal_distance_inches
+            ),
         }
 
     @classmethod
@@ -1343,4 +1360,7 @@ class MovementDistanceRecord:
         return cls(
             unit_instance_id=payload["unit_instance_id"],
             maximum_model_distance_inches=payload["maximum_model_distance_inches"],
+            maximum_model_horizontal_distance_inches=payload[
+                "maximum_model_horizontal_distance_inches"
+            ],
         )

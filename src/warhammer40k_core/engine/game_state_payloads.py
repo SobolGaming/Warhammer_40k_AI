@@ -26,6 +26,7 @@ from warhammer40k_core.engine.faction_resources import FactionResourceLedgerPayl
 from warhammer40k_core.engine.faction_rule_states import FactionRuleStatePayload
 from warhammer40k_core.engine.fight_order import FightPhaseStatePayload
 from warhammer40k_core.engine.mission_setup import MissionSetupPayload
+from warhammer40k_core.engine.normal_move_history import NormalMoveStatePayload
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecordPayload
 from warhammer40k_core.engine.phases.charge import ChargePhaseStatePayload
 from warhammer40k_core.engine.phases.movement import (
@@ -64,7 +65,6 @@ from warhammer40k_core.engine.transports import (
     DisembarkedUnitStatePayload,
     TransportCargoStatePayload,
 )
-from warhammer40k_core.engine.triggered_movement import SurgeMoveStatePayload
 from warhammer40k_core.engine.turn_cleanup import EndTurnCleanupStatePayload
 from warhammer40k_core.engine.unit_resources import UnitResourceLedgerPayload
 from warhammer40k_core.engine.unit_state import StartingStrengthRecordPayload
@@ -171,7 +171,7 @@ class GameStatePayload(TypedDict):
     disembarked_unit_states: list[DisembarkedUnitStatePayload]
     advanced_unit_states: list[AdvancedUnitStatePayload]
     fell_back_unit_states: list[FellBackUnitStatePayload]
-    surge_move_states: list[SurgeMoveStatePayload]
+    normal_move_states: list[NormalMoveStatePayload]
     battle_shocked_unit_ids: list[str]
     battle_shocked_unit_states: list[BattleShockedUnitStatePayload]
     objective_control_records: list[ObjectiveControlRecordPayload]

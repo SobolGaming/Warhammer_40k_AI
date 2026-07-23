@@ -32,6 +32,8 @@ def hazard_mortal_wounds_per_failed_roll(unit: UnitInstance) -> int:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Hazard mortal wounds require a UnitInstance.")
     keyword_set = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    if "INFANTRY" in keyword_set:
+        return 1
     if "MONSTER" in keyword_set or "VEHICLE" in keyword_set:
         return 3
     return 1

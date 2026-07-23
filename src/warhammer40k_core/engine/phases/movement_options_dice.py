@@ -90,12 +90,15 @@ def _movement_action_options(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
+    normal_move_already_made: bool,
     battle_round: int = 1,
     hover_mode_states: tuple[HoverModeState, ...] = (),
     battle_shocked_unit_ids: tuple[str, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     disembarked_unit_state: DisembarkedUnitState | None = None,
 ) -> tuple[DecisionOption, ...]:
+    if type(normal_move_already_made) is not bool:
+        raise GameLifecycleError("Normal move history flag must be a bool.")
     if disembarked_unit_state is not None and type(disembarked_unit_state) is not (
         DisembarkedUnitState
     ):
@@ -137,6 +140,8 @@ def _movement_action_options(
             )
             continue
         if action is MovementPhaseActionKind.NORMAL_MOVE:
+            if normal_move_already_made:
+                continue
             movement_modes = _movement_modes_for_action_options(
                 scenario=scenario,
                 unit_placement=unit_placement,

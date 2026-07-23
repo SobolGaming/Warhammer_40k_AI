@@ -105,6 +105,7 @@ from warhammer40k_core.engine.missions import (
     mission_scoring_policy_from_setup,
     reserve_destruction_policy_from_scoring_policy,
 )
+from warhammer40k_core.engine.normal_move_history import NormalMoveState
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -205,7 +206,6 @@ from warhammer40k_core.engine.transports import (
     TransportCapacityProfile,
     TransportCargoState,
 )
-from warhammer40k_core.engine.triggered_movement import SurgeMoveState
 from warhammer40k_core.engine.turn_cleanup import (
     EndTurnCleanupState,
     resolve_end_turn_cleanup,
@@ -385,7 +385,7 @@ def _new_fell_back_unit_states() -> list[FellBackUnitState]:
     return []
 
 
-def _new_surge_move_states() -> list[SurgeMoveState]:
+def _new_normal_move_states() -> list[NormalMoveState]:
     return []
 
 
@@ -1131,7 +1131,7 @@ class GameState:
     fell_back_unit_states: list[FellBackUnitState] = field(
         default_factory=_new_fell_back_unit_states
     )
-    surge_move_states: list[SurgeMoveState] = field(default_factory=_new_surge_move_states)
+    normal_move_states: list[NormalMoveState] = field(default_factory=_new_normal_move_states)
     battle_shocked_unit_ids: list[str] = field(default_factory=_new_battle_shocked_unit_ids)
     battle_shocked_unit_states: list[BattleShockedUnitState] = field(
         default_factory=_new_battle_shocked_unit_states
@@ -1364,8 +1364,8 @@ class GameState:
             self.fell_back_unit_states,
             player_ids=self.player_ids,
         )
-        self.surge_move_states = _validate_surge_move_states(
-            self.surge_move_states,
+        self.normal_move_states = _validate_normal_move_states(
+            self.normal_move_states,
             player_ids=self.player_ids,
         )
         self.battle_shocked_unit_ids = list(
@@ -4478,19 +4478,19 @@ class GameState:
                 return state
         return None
 
-    def record_surge_move_state(self, state: SurgeMoveState) -> None:
-        if type(state) is not SurgeMoveState:
-            raise GameLifecycleError("Surge move state must be a SurgeMoveState.")
+    def record_normal_move_state(self, state: NormalMoveState) -> None:
+        if type(state) is not NormalMoveState:
+            raise GameLifecycleError("Normal move state must be a NormalMoveState.")
         if state.player_id not in self.player_ids:
-            raise GameLifecycleError("SurgeMoveState player_id is not in this game.")
-        if any(stored.result_id == state.result_id for stored in self.surge_move_states):
-            raise GameLifecycleError("SurgeMoveState already exists for result_id.")
+            raise GameLifecycleError("NormalMoveState player_id is not in this game.")
+        if any(stored.result_id == state.result_id for stored in self.normal_move_states):
+            raise GameLifecycleError("NormalMoveState already exists for result_id.")
         if any(
-            stored.same_phase_key() == state.same_phase_key() for stored in self.surge_move_states
+            stored.same_phase_key() == state.same_phase_key() for stored in self.normal_move_states
         ):
-            raise GameLifecycleError("SurgeMoveState already exists for unit in this phase.")
-        self.surge_move_states.append(state)
-        self.surge_move_states.sort(
+            raise GameLifecycleError("NormalMoveState already exists for unit in this phase.")
+        self.normal_move_states.append(state)
+        self.normal_move_states.sort(
             key=lambda stored: (
                 stored.battle_round,
                 stored.phase,
@@ -4500,24 +4500,25 @@ class GameState:
             )
         )
 
-    def surge_move_states_for_unit_phase(
+    def normal_move_states_for_unit_phase(
         self,
         *,
         player_id: str,
         battle_round: int,
-        phase: str,
+        phase: BattlePhase,
         unit_instance_id: str,
-    ) -> tuple[SurgeMoveState, ...]:
+    ) -> tuple[NormalMoveState, ...]:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         requested_round = _validate_positive_int("battle_round", battle_round)
-        requested_phase = _validate_identifier("phase", phase)
+        if type(phase) is not BattlePhase:
+            raise GameLifecycleError("Normal move state query phase must be a BattlePhase.")
         requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
         return tuple(
             state
-            for state in self.surge_move_states
+            for state in self.normal_move_states
             if state.player_id == requested_player_id
             and state.battle_round == requested_round
-            and state.phase == requested_phase
+            and state.phase is phase
             and state.unit_instance_id == requested_unit_id
         )
 
@@ -4612,7 +4613,7 @@ class GameState:
             ],
             "advanced_unit_states": [state.to_payload() for state in self.advanced_unit_states],
             "fell_back_unit_states": [state.to_payload() for state in self.fell_back_unit_states],
-            "surge_move_states": [state.to_payload() for state in self.surge_move_states],
+            "normal_move_states": [state.to_payload() for state in self.normal_move_states],
             "battle_shocked_unit_ids": list(self.battle_shocked_unit_ids),
             "battle_shocked_unit_states": [
                 state.to_payload() for state in self.battle_shocked_unit_states
@@ -4945,8 +4946,8 @@ class GameState:
             fell_back_unit_states=[
                 FellBackUnitState.from_payload(state) for state in payload["fell_back_unit_states"]
             ],
-            surge_move_states=[
-                SurgeMoveState.from_payload(state) for state in payload["surge_move_states"]
+            normal_move_states=[
+                NormalMoveState.from_payload(state) for state in payload["normal_move_states"]
             ],
             battle_shocked_unit_ids=list(payload["battle_shocked_unit_ids"]),
             battle_shocked_unit_states=[
@@ -6413,29 +6414,29 @@ def _validate_fell_back_unit_states(
     )
 
 
-def _validate_surge_move_states(
+def _validate_normal_move_states(
     values: object,
     *,
     player_ids: tuple[str, ...],
-) -> list[SurgeMoveState]:
+) -> list[NormalMoveState]:
     if not isinstance(values, list):
-        raise GameLifecycleError("GameState surge_move_states must be a list.")
-    validated: list[SurgeMoveState] = []
+        raise GameLifecycleError("GameState normal_move_states must be a list.")
+    validated: list[NormalMoveState] = []
     seen_result_ids: set[str] = set()
     seen_same_phase_keys: set[tuple[int, str, str, str]] = set()
     for value in cast(list[object], values):
-        if type(value) is not SurgeMoveState:
+        if type(value) is not NormalMoveState:
             raise GameLifecycleError(
-                "GameState surge_move_states must contain SurgeMoveState values."
+                "GameState normal_move_states must contain NormalMoveState values."
             )
         if value.player_id not in player_ids:
-            raise GameLifecycleError("SurgeMoveState player_id is not in this game.")
+            raise GameLifecycleError("NormalMoveState player_id is not in this game.")
         if value.result_id in seen_result_ids:
-            raise GameLifecycleError("GameState surge_move_states must be unique by result.")
+            raise GameLifecycleError("GameState normal_move_states must be unique by result.")
         seen_result_ids.add(value.result_id)
         same_phase_key = value.same_phase_key()
         if same_phase_key in seen_same_phase_keys:
-            raise GameLifecycleError("GameState surge_move_states must be unique by unit phase.")
+            raise GameLifecycleError("GameState normal_move_states must be unique by unit phase.")
         seen_same_phase_keys.add(same_phase_key)
         validated.append(value)
     return sorted(

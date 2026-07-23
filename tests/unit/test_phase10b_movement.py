@@ -1,3 +1,4 @@
+# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 import json
@@ -28,6 +29,7 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -40,6 +42,17 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalPayload,
+    MovementProposalRequest,
+    ProposalKind,
+)
+from warhammer40k_core.engine.normal_move_history import (
+    ONE_NORMAL_MOVE_PER_PHASE_SOURCE_RULE_ID,
+    NormalMoveSourceKind,
+    NormalMoveState,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -56,6 +69,8 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseStepKind,
     MovementUnitSelection,
     MovementUnitSelectionPayload,
+    _maximum_model_distance_inches_from_witness,
+    _maximum_model_horizontal_distance_inches_from_witness,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
@@ -66,6 +81,8 @@ from warhammer40k_core.engine.stratagems import (
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.geometry.pathing import PathWitness
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
@@ -197,6 +214,111 @@ def test_select_movement_action_options_are_standard_phase_actions_only() -> Non
         assert option.payload["movement_phase_action"] == option.option_id
 
 
+def test_stale_normal_move_action_rejects_before_commit_or_state_mutation() -> None:
+    lifecycle, action_request = _advance_to_movement_action_request()
+    state = lifecycle.state
+    assert state is not None
+    _record_prior_normal_move(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        result_id="phase10b-stale-action-prior-normal-move",
+    )
+    before_pending = lifecycle.decision_controller.queue.pending_requests
+    before_records = lifecycle.decision_controller.records
+    before_movement_state = state.movement_phase_state
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    before_battlefield = battlefield_state.to_payload()
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase10b-stale-normal-action",
+            request=action_request,
+            selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.payload == {
+        "invalid_reason": "normal_move_already_used_this_phase",
+        "unit_instance_id": "army-alpha:intercessor-unit-1",
+    }
+    assert lifecycle.decision_controller.queue.pending_requests == before_pending
+    assert lifecycle.decision_controller.records == before_records
+    assert state.movement_phase_state == before_movement_state
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.to_payload() == before_battlefield
+
+
+def test_stale_normal_move_proposal_rejects_before_commit_or_state_mutation() -> None:
+    lifecycle, action_request = _advance_to_movement_action_request()
+    proposal_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase10b-stale-proposal-action",
+            request=action_request,
+            selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        )
+    )
+    proposal_request = _decision_request(proposal_status)
+    assert proposal_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    state = lifecycle.state
+    assert state is not None
+    _record_prior_normal_move(
+        state,
+        unit_instance_id=proposal.unit_instance_id,
+        result_id="phase10b-stale-proposal-prior-normal-move",
+    )
+    before_pending = lifecycle.decision_controller.queue.pending_requests
+    before_records = lifecycle.decision_controller.records
+    before_movement_state = state.movement_phase_state
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    before_battlefield = battlefield_state.to_payload()
+
+    status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase10b-stale-normal-proposal",
+            request_id=proposal_request.request_id,
+            decision_type=proposal_request.decision_type,
+            actor_id=proposal_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(
+                MovementProposalPayload(
+                    proposal_request_id=proposal.request_id,
+                    proposal_kind=ProposalKind.NORMAL_MOVE,
+                    unit_instance_id=proposal.unit_instance_id,
+                    movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+                    movement_mode=MovementMode.NORMAL.value,
+                    witness=straight_line_witness_for_unit(
+                        lifecycle,
+                        unit_instance_id=proposal.unit_instance_id,
+                        dx=3.0,
+                    ),
+                ).to_payload()
+            ),
+        )
+    )
+    status_payload = cast(dict[str, object], status.payload)
+    proposal_validation = cast(dict[str, object], status_payload["proposal_validation"])
+    violations = cast(list[dict[str, object]], proposal_validation["violations"])
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert proposal_validation["status"] == "stale"
+    assert violations == [
+        {
+            "violation_code": "normal_move_already_used_this_phase",
+            "message": "Unit has already made a Normal move this phase.",
+            "field": "unit_instance_id",
+        }
+    ]
+    assert lifecycle.decision_controller.queue.pending_requests == before_pending
+    assert lifecycle.decision_controller.records == before_records
+    assert state.movement_phase_state == before_movement_state
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.to_payload() == before_battlefield
+
+
 def test_movement_taxonomy_keeps_steps_placements_and_displacements_separate() -> None:
     placement_values = {kind.value for kind in BattlefieldPlacementKind}
     displacement_values = {kind.value for kind in ModelDisplacementKind}
@@ -262,6 +384,7 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
             MovementDistanceRecord(
                 unit_instance_id="army-alpha:intercessor-unit-1",
                 maximum_model_distance_inches=2.5,
+                maximum_model_horizontal_distance_inches=2.5,
             ),
         ),
     )
@@ -286,6 +409,7 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
                 MovementDistanceRecord(
                     unit_instance_id="other-unit",
                     maximum_model_distance_inches=1.0,
+                    maximum_model_horizontal_distance_inches=1.0,
                 ),
             ),
         )
@@ -299,10 +423,12 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
                 MovementDistanceRecord(
                     unit_instance_id="army-alpha:intercessor-unit-1",
                     maximum_model_distance_inches=1.0,
+                    maximum_model_horizontal_distance_inches=1.0,
                 ),
                 MovementDistanceRecord(
                     unit_instance_id="army-alpha:intercessor-unit-1",
                     maximum_model_distance_inches=2.0,
+                    maximum_model_horizontal_distance_inches=2.0,
                 ),
             ),
         )
@@ -341,6 +467,24 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
             moved_unit_ids=("army-alpha:intercessor-unit-1",),
             active_selection=selection,
         )
+
+
+def test_movement_distance_record_tracks_horizontal_and_total_path_independently() -> None:
+    witness = PathWitness.for_paths(
+        (
+            (
+                "model-1",
+                (
+                    Pose.at(0.0, 0.0, 0.0),
+                    Pose.at(0.0, 0.0, 4.0),
+                    Pose.at(3.0, 0.0, 4.0),
+                ),
+            ),
+        )
+    )
+
+    assert _maximum_model_distance_inches_from_witness(witness) == 7.0
+    assert _maximum_model_horizontal_distance_inches_from_witness(witness) == 3.0
 
 
 def test_lifecycle_from_payload_rejects_battlefield_state_missing_unit_reference() -> None:
@@ -565,6 +709,10 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
     assert terminal_event["movement_phase_action"] == MovementPhaseActionKind.NORMAL_MOVE.value
     assert terminal_event["displacement_kind"] == ModelDisplacementKind.NORMAL_MOVE.value
     assert terminal_event["movement_inches"] == 6
+    assert len(lifecycle.state.normal_move_states) == 1
+    normal_move_state = lifecycle.state.normal_move_states[0]
+    assert normal_move_state.source_kind is NormalMoveSourceKind.MOVEMENT_PHASE_ACTION
+    assert normal_move_state.phase is BattlePhase.MOVEMENT
     witness = terminal_event["witness"]
     assert isinstance(witness, dict)
     witness_payload = cast(dict[str, object], witness)
@@ -727,6 +875,26 @@ def _payload_copy(lifecycle: GameLifecycle) -> GameLifecyclePayload:
     return cast(
         GameLifecyclePayload,
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+
+
+def _record_prior_normal_move(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    result_id: str,
+) -> None:
+    state.record_normal_move_state(
+        NormalMoveState(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            unit_instance_id=unit_instance_id,
+            source_rule_id=ONE_NORMAL_MOVE_PER_PHASE_SOURCE_RULE_ID,
+            source_kind=NormalMoveSourceKind.TRIGGERED,
+            request_id=f"{result_id}-request",
+            result_id=result_id,
+        )
     )
 
 

@@ -87,6 +87,7 @@ __all__ = (
     "_temporary_movement_keywords_for_unit",
     "_transport_operation_invalid_payload",
     "_transport_status_for_movement_action",
+    "_unit_already_made_normal_move_this_phase",
     "_unit_can_take_to_the_skies",
     "_unit_has_keyword",
     "_unit_instance_by_id",
@@ -219,6 +220,25 @@ def _normal_move_invalid_message(violation_code: str) -> str:
     }:
         return "Normal Move terrain path is invalid."
     return "Normal Move path is invalid."
+
+
+def _unit_already_made_normal_move_this_phase(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+) -> bool:
+    current_phase = state.current_battle_phase
+    if current_phase is None:
+        raise GameLifecycleError("Normal move history query requires a battle phase.")
+    return bool(
+        state.normal_move_states_for_unit_phase(
+            player_id=player_id,
+            battle_round=state.battle_round,
+            phase=current_phase,
+            unit_instance_id=unit_instance_id,
+        )
+    )
 
 
 def _ensure_movement_phase_state(
