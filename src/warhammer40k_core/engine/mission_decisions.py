@@ -40,6 +40,8 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
@@ -77,8 +79,10 @@ def request_mission_action_opportunity(
     state: GameState,
     decisions: DecisionController,
     player_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _assert_battle_state(state)
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     requested_player = _validate_active_player_id(state=state, player_id=player_id)
     phase = _current_phase(state)
     shooting_state = state.shooting_phase_state
@@ -110,6 +114,7 @@ def request_mission_action_opportunity(
     options = _mission_action_opportunity_options(
         state=state,
         player_id=requested_player,
+        runtime_modifier_registry=runtime_modifier_registry,
         relevant_actions=relevant_actions,
     )
     if not options:
@@ -358,8 +363,10 @@ def request_mission_action_start(
     decisions: DecisionController,
     player_id: str,
     mission_action_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus:
     _assert_battle_state(state)
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     requested_player = _validate_active_player_id(state=state, player_id=player_id)
     phase = _current_phase(state)
     mission_action = _mission_action_for_state(state=state, mission_action_id=mission_action_id)
@@ -412,6 +419,7 @@ def request_mission_action_start(
         state=state,
         player_id=requested_player,
         action=mission_action,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if not options:
         return LifecycleStatus.unsupported(
@@ -465,7 +473,9 @@ def invalid_mission_decision_status(
     state: GameState,
     request: DecisionRequest,
     result: DecisionResult,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     if request.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
         payload = _payload_object(result.payload)
         player_id = _payload_string(payload, key="player_id")
@@ -587,6 +597,7 @@ def invalid_mission_decision_status(
                 state=state,
                 payload=payload,
                 player_id=player_id,
+                runtime_modifier_registry=runtime_modifier_registry,
             )
             if opportunity_drift_reason is not None:
                 return LifecycleStatus.invalid(
@@ -631,6 +642,7 @@ def invalid_mission_decision_status(
                     state=state,
                     player_id=player_id,
                     action=action,
+                    runtime_modifier_registry=runtime_modifier_registry,
                 )
             }
         except PlacementError as exc:
@@ -669,7 +681,9 @@ def apply_mission_decision(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     if result.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
         _apply_tactical_secondary_score(state=state, result=result, decisions=decisions)
         return
@@ -682,9 +696,15 @@ def apply_mission_decision(
                 state=state,
                 result=result,
                 decisions=decisions,
+                runtime_modifier_registry=runtime_modifier_registry,
             )
             return
-        _apply_start_mission_action(state=state, result=result, decisions=decisions)
+        _apply_start_mission_action(
+            state=state,
+            result=result,
+            decisions=decisions,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
         return
     raise GameLifecycleError("Mission decision handler received unsupported decision_type.")
 
@@ -822,8 +842,10 @@ def _apply_start_mission_action(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
     _assert_battle_state(state)
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     payload = _payload_object(result.payload)
     player_id = _payload_string(payload, key="player_id")
     _validate_decision_context(state=state, payload=payload, player_id=player_id, result=result)
@@ -831,10 +853,16 @@ def _apply_start_mission_action(
         state=state,
         mission_action_id=_payload_string(payload, key="mission_action_id"),
     )
+    unit_instance_id = _payload_string(payload, key="unit_instance_id")
+    if rules_unit_is_battle_shocked(
+        state=state,
+        unit_instance_id=unit_instance_id,
+    ):
+        raise GameLifecycleError("Battle-shocked units cannot start actions.")
     action_state = MissionActionState.start(
         action_id=f"mission-action:{result.result_id}",
         player_id=player_id,
-        unit_instance_id=_payload_string(payload, key="unit_instance_id"),
+        unit_instance_id=unit_instance_id,
         target_id=_payload_string(payload, key="target_id"),
         mission_id=mission_action.mission_id,
         battle_round=state.battle_round,
@@ -941,6 +969,7 @@ def _apply_mission_action_opportunity_decline(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
     _assert_battle_state(state)
     payload = _payload_object(result.payload)
@@ -952,6 +981,7 @@ def _apply_mission_action_opportunity_decline(
         state=state,
         payload=payload,
         player_id=player_id,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if drift_reason is not None:
         raise GameLifecycleError(f"Mission Action opportunity drifted: {drift_reason}.")
@@ -1306,6 +1336,11 @@ def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"Mission decision payload key must be a bool: {key}.")
     return value
+
+
+def _require_runtime_modifier_registry(registry: object) -> None:
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Mission decisions require a RuntimeModifierRegistry.")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

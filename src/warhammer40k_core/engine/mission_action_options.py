@@ -32,6 +32,7 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import SecondaryMissionCardStatus
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -94,8 +95,10 @@ def mission_action_opportunity_options(
     *,
     state: GameState,
     player_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry,
     relevant_actions: tuple[MissionActionDefinition, ...] | None = None,
 ) -> tuple[MissionActionStartOption, ...]:
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     phase = _current_phase(state)
     actions = (
         available_mission_actions_for_state(state=state, player_id=player_id)
@@ -111,6 +114,7 @@ def mission_action_opportunity_options(
             state=state,
             player_id=player_id,
             action=action,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     )
     return tuple(sorted(options, key=lambda option: option.option_id()))
@@ -121,7 +125,9 @@ def mission_action_start_options(
     state: GameState,
     player_id: str,
     action: MissionActionDefinition,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[MissionActionStartOption, ...]:
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Mission Action start requires battlefield_state.")
@@ -140,6 +146,7 @@ def mission_action_start_options(
         state=state,
         player_id=player_id,
         action=action,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     target_ids_by_unit = _target_ids_by_unit_for_action(
         state=state,
@@ -147,6 +154,7 @@ def mission_action_start_options(
         action=action,
         scenario=scenario,
         placed_unit_ids=eligible_unit_ids,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     eligible_target_pairs = tuple(
         (unit_id, target_id)
@@ -210,6 +218,7 @@ def mission_action_opportunity_drift_reason(
     state: GameState,
     payload: dict[str, JsonValue],
     player_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> str | None:
     shooting_state = state.shooting_phase_state
     if shooting_state is None:
@@ -223,6 +232,7 @@ def mission_action_opportunity_drift_reason(
             for option in mission_action_opportunity_options(
                 state=state,
                 player_id=player_id,
+                runtime_modifier_registry=runtime_modifier_registry,
             )
         )
     except PlacementError as exc:
@@ -237,6 +247,7 @@ def _eligible_rules_unit_instance_ids_for_action(
     state: GameState,
     player_id: str,
     action: MissionActionDefinition,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[str, ...]:
     eligible_ids: list[str] = []
     for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
@@ -247,6 +258,7 @@ def _eligible_rules_unit_instance_ids_for_action(
                 state=state,
                 player_id=player_id,
                 unit_instance_id=rules_unit.unit_instance_id,
+                runtime_modifier_registry=runtime_modifier_registry,
             )
             is not None
         ):
@@ -264,12 +276,14 @@ def _target_ids_by_unit_for_action(
     action: MissionActionDefinition,
     scenario: BattlefieldScenario,
     placed_unit_ids: tuple[str, ...],
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> dict[str, tuple[str, ...]]:
     if action.target_policy == "objective_marker":
         return _objective_marker_target_ids_by_unit(
             state=state,
             player_id=player_id,
             action=action,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     if action.target_policy == "trappable_terrain_area":
         return _trappable_terrain_target_ids_by_unit(
@@ -306,6 +320,7 @@ def _objective_marker_target_ids_by_unit(
     state: GameState,
     player_id: str,
     action: MissionActionDefinition,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> dict[str, tuple[str, ...]]:
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
@@ -313,6 +328,7 @@ def _objective_marker_target_ids_by_unit(
             timing=ObjectiveControlTiming.PHASE_END,
             phase=_current_phase(state),
             ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     )
     home_objective_ids: frozenset[str]
@@ -595,6 +611,11 @@ def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> list[str
     if not isinstance(value, list):
         raise GameLifecycleError(f"Mission Action payload key must be a list: {key}.")
     return [_validate_identifier(f"{key} value", item) for item in cast(list[object], value)]
+
+
+def _require_runtime_modifier_registry(registry: object) -> None:
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Mission Action options require a RuntimeModifierRegistry.")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

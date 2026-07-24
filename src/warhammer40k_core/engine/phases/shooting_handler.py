@@ -274,6 +274,7 @@ class ShootingPhaseHandler:
             state=state,
             decisions=decisions,
             player_id=_active_player_id(state),
+            runtime_modifier_registry=self.runtime_modifier_registry,
         )
         if mission_action_status is not None:
             return mission_action_status

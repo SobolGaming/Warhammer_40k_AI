@@ -5,7 +5,13 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_identity_ids,
+    rules_unit_is_battle_shocked,
+    rules_unit_view_by_id,
+)
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
 
@@ -30,8 +36,10 @@ def mission_action_unit_ineligibility_reason(
     state: GameState,
     player_id: str,
     unit_instance_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> str | None:
     _require_game_state(state, operation="eligibility")
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     requested_player_id = _validated_player_id(state=state, player_id=player_id)
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
     if rules_unit.owner_player_id != requested_player_id:
@@ -45,17 +53,24 @@ def mission_action_unit_ineligibility_reason(
     if "FORTIFICATION" in keyword_set:
         return MISSION_ACTION_UNIT_FORTIFICATION
     state_unit_ids = _rules_unit_state_unit_ids(rules_unit)
-    if any(unit_id in state.battle_shocked_unit_ids for unit_id in state_unit_ids):
+    if rules_unit_is_battle_shocked(
+        state=state,
+        unit_instance_id=rules_unit.unit_instance_id,
+    ):
         return MISSION_ACTION_UNIT_BATTLE_SHOCKED
     if not any(
         (
             characteristic := model_objective_control_characteristic(
                 model,
                 battle_shocked=False,
+                state=state,
+                unit_instance_id=component_unit_id,
+                runtime_modifier_registry=runtime_modifier_registry,
+                model_instance_id=model.model_instance_id,
             )
         ).is_numeric
         and characteristic.final > 0
-        for model in placed_alive_models
+        for component_unit_id, model in placed_alive_models
     ):
         return MISSION_ACTION_UNIT_ZERO_OBJECTIVE_CONTROL
     if "TITANIC" not in keyword_set and unit_within_enemy_engagement_range(
@@ -108,14 +123,21 @@ def rules_unit_started_mission_action_this_turn(
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
     if rules_unit.owner_player_id != requested_player_id:
         return False
+    requested_identity_ids = frozenset(
+        rules_unit_identity_ids(
+            state=state,
+            unit_instance_id=rules_unit.unit_instance_id,
+        )
+    )
     return any(
         action_state.player_id == requested_player_id
         and action_state.battle_round_started == state.battle_round
-        and rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=action_state.unit_instance_id,
-        ).unit_instance_id
-        == rules_unit.unit_instance_id
+        and not requested_identity_ids.isdisjoint(
+            rules_unit_identity_ids(
+                state=state,
+                unit_instance_id=action_state.unit_instance_id,
+            )
+        )
         for action_state in state.mission_action_states
     )
 
@@ -135,15 +157,22 @@ def mission_action_prevents_rules_unit_from_shooting_this_phase(
         return False
     if "TITANIC" in _rules_unit_keyword_set(rules_unit):
         return False
+    requested_identity_ids = frozenset(
+        rules_unit_identity_ids(
+            state=state,
+            unit_instance_id=rules_unit.unit_instance_id,
+        )
+    )
     return any(
         action_state.player_id == requested_player_id
         and action_state.battle_round_started == state.battle_round
         and action_state.phase_started == BattlePhase.SHOOTING.value
-        and rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=action_state.unit_instance_id,
-        ).unit_instance_id
-        == rules_unit.unit_instance_id
+        and not requested_identity_ids.isdisjoint(
+            rules_unit_identity_ids(
+                state=state,
+                unit_instance_id=action_state.unit_instance_id,
+            )
+        )
         for action_state in state.mission_action_states
     )
 
@@ -152,13 +181,16 @@ def _placed_alive_models(
     *,
     state: GameState,
     rules_unit: RulesUnitView,
-) -> tuple[ModelInstance, ...]:
+) -> tuple[tuple[str, ModelInstance], ...]:
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         return ()
     placed_model_ids = frozenset(battlefield_state.placed_model_ids())
     return tuple(
-        model for model in rules_unit.alive_models() if model.model_instance_id in placed_model_ids
+        (component.unit.unit_instance_id, model)
+        for component in rules_unit.components
+        for model in component.unit.own_models
+        if model.is_alive and model.model_instance_id in placed_model_ids
     )
 
 
@@ -201,6 +233,11 @@ def _require_game_state(state: object, *, operation: str) -> None:
 
     if type(state) is not GameState:
         raise GameLifecycleError(f"Mission Action {operation} requires GameState.")
+
+
+def _require_runtime_modifier_registry(registry: object) -> None:
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Mission Action eligibility requires a RuntimeModifierRegistry.")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

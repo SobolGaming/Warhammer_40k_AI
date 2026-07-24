@@ -38,6 +38,11 @@ from warhammer40k_core.engine.actions import (
     mission_action_status_from_token,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockResult,
+    BattleShockTestReason,
+    BattleShockTestRequest,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldScenario,
@@ -50,6 +55,7 @@ from warhammer40k_core.engine.command_points import (
     CommandPointSourceKind,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
@@ -61,7 +67,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionMode,
     TacticalSecondaryDraw,
 )
-from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     DetachmentSelection,
@@ -70,6 +76,7 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_action_eligibility import (
     MISSION_ACTION_UNIT_ALREADY_STARTED_ACTION,
     mission_action_unit_ineligibility_reason,
+    rules_unit_started_mission_action_this_turn,
 )
 from warhammer40k_core.engine.mission_decisions import (
     DECLINE_MISSION_ACTION_START_OPTION_ID,
@@ -122,13 +129,21 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
+    ShootingPhaseHandler,
     ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveState,
     ReserveStatus,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
+from warhammer40k_core.engine.runtime_modifiers import (
+    ObjectiveControlModifierBinding,
+    ObjectiveControlModifierContext,
+    RuntimeModifierRegistry,
 )
 from warhammer40k_core.engine.scoring import (
     MissionScoringPolicy,
@@ -170,6 +185,7 @@ from warhammer40k_core.engine.turn_cleanup import (
     resolve_end_turn_cleanup,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -403,6 +419,7 @@ def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrai
         decisions=lifecycle.decision_controller,
         player_id="player-a",
         mission_action_id="booby-trap-terrain",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     request = waiting.decision_request
     assert request is not None
@@ -526,6 +543,7 @@ def test_booby_trap_action_is_primary_scoped_and_immediate_zero_vp() -> None:
         decisions=lifecycle.decision_controller,
         player_id="player-a",
         mission_action_id="booby-trap-terrain",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     unsupported_payload = cast(dict[str, JsonValue], unsupported.payload)
 
@@ -2949,6 +2967,7 @@ def test_mission_action_opportunity_enforces_each_core_action_restriction(
             state=state,
             player_id="player-a",
             unit_instance_id=unit_id,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         )
         == expected_reason
     )
@@ -3084,6 +3103,7 @@ def test_attached_rules_unit_has_one_canonical_action_option_and_state_identity(
             state=state,
             player_id="player-a",
             unit_instance_id=leader_id,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         )
         == MISSION_ACTION_UNIT_ALREADY_STARTED_ACTION
     )
@@ -3120,6 +3140,228 @@ def test_attached_rules_unit_canonical_shot_state_blocks_all_component_action_op
         waiting.decision_request is None
         or waiting.decision_request.decision_type != START_MISSION_ACTION_DECISION_TYPE
     )
+
+
+def test_attached_action_history_survives_split_payload_round_trip_and_replay() -> None:
+    config = _config_with_player_a_attached_unit(include_independent_unit=True)
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    attached_id = "attached-unit:army-alpha:bodyguard-unit"
+    bodyguard_id = "army-alpha:bodyguard-unit"
+    leader_id = "army-alpha:leader-unit"
+    independent_id = "army-alpha:intercessor-unit-2"
+    enemy_id = "army-beta:intercessor-unit-3"
+    for unit_id, x_inches, y_inches in (
+        (leader_id, 20.0, 20.0),
+        (independent_id, 20.0, 30.0),
+        (enemy_id, 27.0, 25.0),
+    ):
+        _place_unit_near_point(
+            state,
+            unit_instance_id=unit_id,
+            x_inches=x_inches,
+            y_inches=y_inches,
+        )
+    action = _attached_cleanse_action(state=state, action_id="phase11e-attached-before-split")
+    state.record_mission_action_state(action)
+    bodyguard_model_ids = state.army_definitions[0].unit_by_id(bodyguard_id).own_model_ids()
+    state.battlefield_state = state.battlefield_state.with_removed_models(bodyguard_model_ids)
+
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(leader_id,),
+    )
+
+    interrupted = state.mission_action_state_by_id(action.action_id)
+    assert interrupted.status is MissionActionStatus.INTERRUPTED
+    assert interrupted.interrupted_reason == "unit_destroyed"
+    assert rules_unit_started_mission_action_this_turn(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=leader_id,
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
+    lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    round_tripped = GameLifecycle.from_payload(lifecycle_payload)
+    round_tripped_state = round_tripped.state
+    assert round_tripped_state is not None
+    assert rules_unit_started_mission_action_this_turn(
+        state=round_tripped_state,
+        player_id="player-a",
+        unit_instance_id=leader_id,
+    )
+    session = LocalGameSession(lifecycle=round_tripped)
+
+    charge_request = session.advance_until_decision_or_terminal().decision_request
+
+    assert charge_request is not None
+    assert charge_request.decision_type == "select_charging_unit"
+    charge_option_ids = {option.option_id for option in charge_request.options}
+    assert leader_id not in charge_option_ids
+    assert independent_id in charge_option_ids
+    session.submit_option(
+        request_id=charge_request.request_id,
+        option_id="complete_charge_phase",
+        result_id="phase11e-complete-charge-after-attached-split",
+    )
+    replay_result = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="phase11e-attached-split-action-history")
+    ).run()
+    assert replay_result.status is ReplayRunStatus.REPRODUCED
+
+
+def test_attached_action_cannot_complete_after_component_fails_battle_shock() -> None:
+    config = _config_with_player_a_attached_unit()
+    state = _battle_state_from_config(
+        config,
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    attached_id = "attached-unit:army-alpha:bodyguard-unit"
+    bodyguard_id = "army-alpha:bodyguard-unit"
+    for component_id in (bodyguard_id, "army-alpha:leader-unit"):
+        _place_unit_near_objective(
+            state,
+            unit_instance_id=component_id,
+            target_suffix="center",
+        )
+    action = _attached_cleanse_action(
+        state=state,
+        action_id="phase11e-attached-battle-shocked",
+    )
+    state.record_mission_action_state(action)
+    bodyguard = state.army_definitions[0].unit_by_id(bodyguard_id)
+    starting_strength = StartingStrengthRecord.from_unit(
+        player_id="player-a",
+        unit=bodyguard,
+    )
+    request = BattleShockTestRequest.for_unit(
+        request_id="phase11e-attached-component-battle-shock",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-a",
+        unit_instance_id=bodyguard_id,
+        reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
+        leadership_target=6,
+        below_half_strength_context=BelowHalfStrengthContext.from_unit(
+            player_id="player-a",
+            unit=bodyguard,
+            starting_strength=starting_strength,
+            current_model_ids=bodyguard.own_model_ids(),
+        ),
+    )
+    state.record_battle_shock_result(
+        BattleShockResult.from_roll_state(
+            result_id="phase11e-attached-component-battle-shock-result",
+            request=request,
+            roll_state=DiceRollManager("phase11e-attached-battle-shock").roll_fixed(
+                request.spec,
+                [1, 1],
+            ),
+        )
+    )
+
+    assert state.battle_shocked_unit_ids == [bodyguard_id]
+    assert rules_unit_is_battle_shocked(state=state, unit_instance_id=attached_id)
+    with pytest.raises(GameLifecycleError, match="cannot complete actions"):
+        state.complete_mission_action(
+            action_id=action.action_id,
+            completion_phase=BattlePhase.FIGHT,
+        )
+    assert state.mission_action_state_by_id(action.action_id).status is MissionActionStatus.STARTED
+
+
+@pytest.mark.parametrize(
+    ("base_objective_control", "modified_objective_control", "expected_reason", "expects_action"),
+    [
+        pytest.param(
+            2,
+            0,
+            "mission_action_unit_zero_objective_control",
+            False,
+            id="runtime-reduction-to-zero",
+        ),
+        pytest.param(0, 1, None, True, id="runtime-increase-from-zero"),
+    ],
+)
+def test_mission_action_eligibility_uses_runtime_modified_objective_control(
+    base_objective_control: int,
+    modified_objective_control: int,
+    expected_reason: str | None,
+    expects_action: bool,
+) -> None:
+    lifecycle = _battle_lifecycle(
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    unit_id = "army-alpha:intercessor-unit-1"
+    _replace_unit_objective_control(
+        state,
+        unit_instance_id=unit_id,
+        objective_control=base_objective_control,
+    )
+    _place_unit_near_objective(
+        state,
+        unit_instance_id=unit_id,
+        target_suffix="center",
+    )
+    modified_contexts: list[ObjectiveControlModifierContext] = []
+
+    def modify_objective_control(context: ObjectiveControlModifierContext) -> int:
+        if context.unit_instance_id != unit_id:
+            return context.current_objective_control
+        modified_contexts.append(context)
+        return modified_objective_control
+
+    registry = RuntimeModifierRegistry.from_bindings(
+        objective_control_modifier_bindings=(
+            ObjectiveControlModifierBinding(
+                modifier_id="phase11e:mission-action-objective-control",
+                source_id="phase11e:mission-action-objective-control-source",
+                handler=modify_objective_control,
+            ),
+        )
+    )
+
+    assert (
+        mission_action_unit_ineligibility_reason(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            runtime_modifier_registry=registry,
+        )
+        == expected_reason
+    )
+    runtime_config = lifecycle.config
+    status = ShootingPhaseHandler(
+        ruleset_descriptor=runtime_config.ruleset_descriptor,
+        army_catalog=runtime_config.army_catalog,
+        runtime_modifier_registry=registry,
+    ).begin_phase(
+        state=state,
+        decisions=DecisionController(),
+    )
+
+    request = status.decision_request
+    action_requested = (
+        request is not None and request.decision_type == START_MISSION_ACTION_DECISION_TYPE
+    )
+    assert action_requested is expects_action
+    assert modified_contexts
+    assert {context.unit_instance_id for context in modified_contexts} == {unit_id}
 
 
 def test_cli_and_projection_expose_unique_human_action_option_labels() -> None:
@@ -3219,6 +3461,7 @@ def test_shooting_lifecycle_filters_mission_actions_by_primary_and_secondary_own
         decisions=GameLifecycle().decision_controller,
         player_id="player-a",
         mission_action_id="cleanse-objective",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
 
     assert unheld_status.decision_request is not None
@@ -3402,6 +3645,7 @@ def test_plunder_mission_action_completes_immediately_and_records_secondary_evid
         decisions=lifecycle.decision_controller,
         player_id="player-a",
         mission_action_id="plunder-terrain",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     request = waiting.decision_request
     assert request is not None
@@ -3431,6 +3675,7 @@ def test_plunder_mission_action_completes_immediately_and_records_secondary_evid
             decisions=lifecycle.decision_controller,
             player_id="player-a",
             mission_action_id="plunder-terrain",
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         ).status_kind
         is LifecycleStatusKind.UNSUPPORTED
     )
@@ -3487,6 +3732,7 @@ def test_plunder_excludes_terrain_area_in_player_territory_outside_deployment_zo
         decisions=lifecycle.decision_controller,
         player_id="player-a",
         mission_action_id="plunder-terrain",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
 
     assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
@@ -3922,6 +4168,7 @@ def test_mission_action_start_excludes_units_that_shot_this_shooting_phase() -> 
         decisions=lifecycle.decision_controller,
         player_id="player-a",
         mission_action_id="cleanse-objective",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
 
     assert waiting.status_kind.value == "unsupported"
@@ -5024,6 +5271,28 @@ def _mission_action_state(
     )
 
 
+def _attached_cleanse_action(
+    *,
+    state: GameState,
+    action_id: str,
+) -> MissionActionState:
+    return MissionActionState.start(
+        action_id=action_id,
+        player_id="player-a",
+        unit_instance_id="attached-unit:army-alpha:bodyguard-unit",
+        target_id=_center_marker_definition(state).objective_marker_id,
+        mission_id="cleanse",
+        battle_round=state.battle_round,
+        phase=BattlePhase.SHOOTING.value,
+        start_timing="shooting_phase",
+        completion_timing="turn_end",
+        eligible_unit_instance_ids=("attached-unit:army-alpha:bodyguard-unit",),
+        interruption_conditions=("unit_moved", "unit_destroyed", "unit_left_battlefield"),
+        scoring_source_id="cleanse",
+        victory_points=0,
+    )
+
+
 def _center_marker_definition(state: GameState) -> ObjectiveMarkerDefinition:
     return _objective_marker_definition(state, "center")
 
@@ -5109,6 +5378,7 @@ def _start_mission_action_via_lifecycle(
         decisions=lifecycle.decision_controller,
         player_id="player-a",
         mission_action_id="cleanse-objective",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     request = waiting.decision_request
     assert request is not None
@@ -5552,7 +5822,10 @@ def _config_with_two_player_a_infantry_units() -> GameConfig:
     )
 
 
-def _config_with_player_a_attached_unit() -> GameConfig:
+def _config_with_player_a_attached_unit(
+    *,
+    include_independent_unit: bool = False,
+) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11e-game",
@@ -5583,6 +5856,18 @@ def _config_with_player_a_attached_unit() -> GameConfig:
                         datasheet_id="core-character-leader",
                         model_profile_id="core-character-leader",
                         model_count=1,
+                    ),
+                    *(
+                        (
+                            _unit_muster_selection(
+                                unit_selection_id="intercessor-unit-2",
+                                datasheet_id="core-intercessor-like-infantry",
+                                model_profile_id="core-intercessor-like",
+                                model_count=5,
+                            ),
+                        )
+                        if include_independent_unit
+                        else ()
                     ),
                 ),
                 attachment_declarations=(

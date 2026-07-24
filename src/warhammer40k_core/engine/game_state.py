@@ -14,6 +14,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import game_state_queries as _queries
+from warhammer40k_core.engine import mission_action_history as _action_history
 from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.aircraft import HoverModeState
@@ -2612,7 +2613,7 @@ class GameState:
         if type(completion_phase) is not BattlePhase:
             raise GameLifecycleError("completion_phase must be a BattlePhase.")
         action_state = self.mission_action_state_by_id(action_id)
-        if action_state.unit_instance_id in self.battle_shocked_unit_ids:
+        if _action_history.is_battle_shocked(self, action_state.unit_instance_id):
             raise GameLifecycleError("Battle-shocked units cannot complete actions.")
         if action_state.victory_points == 0:
             if action_state.scoring_source_id == "cleanse":
@@ -3405,6 +3406,7 @@ class GameState:
             attached_unit_instance_id=requested_attached_unit_id,
             surviving_unit_instance_ids=surviving_ids,
         )
+        _action_history.interrupt_for_attached_unit_split(self, requested_attached_unit_id)
         self._remove_attached_unit_formation(attached_unit_instance_id=requested_attached_unit_id)
         replaced_ids = {*recovery_unit_ids, requested_attached_unit_id}
         self.starting_strength_records = [

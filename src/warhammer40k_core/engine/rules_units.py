@@ -259,6 +259,49 @@ def rules_unit_owner_player_id(*, state: GameState, unit_instance_id: str) -> st
     return rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id).owner_player_id
 
 
+def rules_unit_identity_ids(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[str, ...]:
+    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        if requested_id == rules_unit.unit_instance_id or (
+            requested_id in rules_unit.component_unit_instance_ids
+        ):
+            return tuple(
+                dict.fromkeys(
+                    (
+                        rules_unit.unit_instance_id,
+                        *rules_unit.component_unit_instance_ids,
+                    )
+                )
+            )
+    for starting_attached_unit in state.starting_attached_unit_records:
+        if starting_attached_unit.attached_unit_instance_id == requested_id:
+            return tuple(
+                dict.fromkeys(
+                    (
+                        starting_attached_unit.attached_unit_instance_id,
+                        *starting_attached_unit.component_unit_instance_ids,
+                    )
+                )
+            )
+    raise GameLifecycleError("Rules unit_instance_id is unknown.")
+
+
+def rules_unit_is_battle_shocked(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> bool:
+    identity_ids = rules_unit_identity_ids(
+        state=state,
+        unit_instance_id=unit_instance_id,
+    )
+    return any(unit_id in state.battle_shocked_unit_ids for unit_id in identity_ids)
+
+
 def placed_alive_models_for_component_unit(
     *, state: GameState, unit_instance_id: str
 ) -> tuple[ModelInstance, ...]:

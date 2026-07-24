@@ -2064,6 +2064,7 @@ class GameLifecycle:
             state=self._require_state(),
             request=request,
             result=result,
+            runtime_modifier_registry=self._shooting_phase_handler.runtime_modifier_registry,
         )
 
     def _apply_mission_decision(
@@ -2076,6 +2077,7 @@ class GameLifecycle:
             state=state,
             result=result,
             decisions=self.decision_controller,
+            runtime_modifier_registry=self._shooting_phase_handler.runtime_modifier_registry,
         )
         if mission_decision_pauses_after_apply(record.request):
             return LifecycleStatus.advanced(

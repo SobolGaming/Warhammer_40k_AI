@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -32,17 +34,51 @@ def validate_mustered_army_consistency(
         )
     except ArmyMusteringError as exc:
         raise GameLifecycleError("Lifecycle config army muster requests are invalid.") from exc
-    expected_payloads = [army.to_payload() for army in expected_armies]
-    state_payloads = [army.to_payload() for army in state.army_definitions]
-    if _state_requires_mustered_armies(state) and not state_payloads:
+    state_armies = tuple(state.army_definitions)
+    if _state_requires_mustered_armies(state) and not state_armies:
         raise GameLifecycleError("Lifecycle state is missing mustered army definitions.")
-    if state_payloads and state_payloads != expected_payloads:
+    if state_armies and not _armies_match_muster_with_runtime_attached_unit_splits(
+        state=state,
+        state_armies=state_armies,
+        expected_armies=expected_armies,
+    ):
         raise GameLifecycleError("Lifecycle state army definitions do not match config.")
-    if state_payloads:
+    if state_armies:
         _validate_unit_resource_initialization_consistency(
             state=state,
             expected_armies=expected_armies,
         )
+
+
+def _armies_match_muster_with_runtime_attached_unit_splits(
+    *,
+    state: GameState,
+    state_armies: tuple[ArmyDefinition, ...],
+    expected_armies: tuple[ArmyDefinition, ...],
+) -> bool:
+    if len(state_armies) != len(expected_armies):
+        return False
+    for state_army, expected_army in zip(state_armies, expected_armies, strict=True):
+        if state.stage is not GameLifecycleStage.BATTLE:
+            if state_army != expected_army:
+                return False
+            continue
+        expected_attached_units_by_id = {
+            formation.attached_unit_instance_id: formation
+            for formation in expected_army.attached_units
+        }
+        if any(
+            expected_attached_units_by_id.get(formation.attached_unit_instance_id) != formation
+            for formation in state_army.attached_units
+        ):
+            return False
+        normalized_state_army = replace(
+            state_army,
+            attached_units=expected_army.attached_units,
+        )
+        if normalized_state_army != expected_army:
+            return False
+    return True
 
 
 def _validate_unit_resource_initialization_consistency(
