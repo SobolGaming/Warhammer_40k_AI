@@ -19,9 +19,10 @@ from warhammer40k_core.engine.rule_execution import (
     RuleExecutionStatus,
     execute_rule_ir,
 )
+from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
-    faction_generic_ir_support_2026_27,
+    faction_rule_ir_promotion_2026_07,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionRecord,
@@ -326,6 +327,7 @@ FactionRuleGenericIrExecutor = Callable[
     [Phase17FExecutionRecord, FactionRuleExecutionContext],
     FactionRuleExecutionResult,
 ]
+FactionRuleIrResolver = Callable[[str], RuleIR]
 
 
 @dataclass(frozen=True, slots=True)
@@ -433,16 +435,57 @@ def default_faction_rule_generic_ir_executor(
     record: Phase17FExecutionRecord,
     context: FactionRuleExecutionContext,
 ) -> FactionRuleExecutionResult:
-    return _generic_rule_ir_executor(record, context)
+    return _generic_rule_ir_executor(
+        record,
+        context,
+        rule_ir_resolver=default_faction_rule_ir_resolver,
+    )
+
+
+def default_faction_rule_ir_resolver(coverage_descriptor_id: str) -> RuleIR:
+    return faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
+        coverage_descriptor_id
+    )
+
+
+def faction_rule_generic_ir_executor_for_resolver(
+    rule_ir_resolver: FactionRuleIrResolver,
+) -> FactionRuleGenericIrExecutor:
+    resolver = _validate_rule_ir_resolver(rule_ir_resolver)
+
+    def executor(
+        record: Phase17FExecutionRecord,
+        context: FactionRuleExecutionContext,
+    ) -> FactionRuleExecutionResult:
+        return _generic_rule_ir_executor(
+            record,
+            context,
+            rule_ir_resolver=resolver,
+        )
+
+    return executor
+
+
+def faction_rule_ir_runtime(
+    rule_ir_resolver: FactionRuleIrResolver | None,
+) -> tuple[FactionRuleIrResolver, FactionRuleGenericIrExecutor]:
+    resolver = (
+        default_faction_rule_ir_resolver
+        if rule_ir_resolver is None
+        else _validate_rule_ir_resolver(rule_ir_resolver)
+    )
+    return resolver, faction_rule_generic_ir_executor_for_resolver(resolver)
 
 
 def _generic_rule_ir_executor(
     record: Phase17FExecutionRecord,
     context: FactionRuleExecutionContext,
+    *,
+    rule_ir_resolver: FactionRuleIrResolver,
 ) -> FactionRuleExecutionResult:
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-        record.coverage_descriptor_id
-    )
+    rule_ir = rule_ir_resolver(record.coverage_descriptor_id)
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Faction RuleIR resolver returned an invalid value.")
     if record.rule_ir_hash != rule_ir.ir_hash():
         raise GameLifecycleError("Generic faction-rule execution record has stale rule_ir_hash.")
     rule_result = execute_rule_ir(
@@ -574,6 +617,14 @@ def _validate_generic_ir_executor(
             "FactionRuleExecutionRegistry generic_ir_executor must be callable."
         )
     return generic_ir_executor
+
+
+def _validate_rule_ir_resolver(
+    rule_ir_resolver: FactionRuleIrResolver,
+) -> FactionRuleIrResolver:
+    if not callable(rule_ir_resolver):
+        raise GameLifecycleError("Faction RuleIR resolver must be callable.")
+    return rule_ir_resolver
 
 
 def _validate_executor_result(

@@ -8,8 +8,45 @@ from typing import cast
 
 import pytest
 from tools.apply_source_overlays import apply_source_overlays
+from tools.fetch_official_sources import load_official_source_manifest
 
+from warhammer40k_core.engine.catalog_command_point_support import (
+    CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    command_point_consumer_ids_for_clause,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_rule_clauses_from_record,
+)
+from warhammer40k_core.engine.faction_content.manifest import (
+    RuntimeContentModuleFamily,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th import generated_manifest
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    july_2026 as chaos_daemons_july,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    july_2026_updates as chaos_daemons_july_updates,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    manifest as chaos_daemons_june_manifest,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
+    july_2026 as emperors_children_july,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
+    manifest as emperors_children_june_manifest,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
+    july_2026 as thousand_sons_july,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
+    manifest as thousand_sons_june_manifest,
+)
+from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
+    stratagem_phase_use_exception,
+)
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, parameter_payload
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
     OverlaySourceArtifactPayload,
@@ -22,6 +59,13 @@ from warhammer40k_core.rules.source_overlay import (
     SourceReleaseManifestPayload,
     apply_source_release_overlays,
     build_source_release_overlay_report,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_coverage_2026_27,
+    faction_execution_2026_27,
+    faction_source_promotion_2026_07,
+    faction_subrules_2026_27,
+    july_faction_packs_2026_07,
 )
 from warhammer40k_core.rules.source_patch import source_row_hash
 from warhammer40k_core.rules.source_reference_generation import (
@@ -404,6 +448,440 @@ def test_phase17_source_overlay_and_reference_payloads_reject_hash_drift() -> No
     reference_payload["catalog_hash"] = hashlib.sha256(b"tampered").hexdigest()
     with pytest.raises(ValueError, match="catalog_hash"):
         SourceReferenceCatalog.from_payload(reference_payload)
+
+
+def test_july_faction_pack_ledger_matches_current_and_predecessor_manifests() -> None:
+    root = Path(__file__).resolve().parents[2]
+    current = _official_source_identities(
+        root / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
+    )
+    predecessors = _official_source_identities(
+        root / "data" / "source_manifests" / "gw_11e_faction_pack_predecessors_2026_06.yaml"
+    )
+    deathwatch_id = faction_source_promotion_2026_07.DEATHWATCH_PACKAGE_ID
+    successors = {
+        package_id: identity
+        for package_id, identity in current.items()
+        if package_id != deathwatch_id
+    }
+    retained_predecessors = {**predecessors, deathwatch_id: current[deathwatch_id]}
+    ledger = july_faction_packs_2026_07.delta_ledger()
+
+    july_faction_packs_2026_07.audit_manifest_links(
+        ledger=ledger,
+        successor_packages=successors,
+        predecessor_packages=retained_predecessors,
+    )
+
+    assert len(ledger.pack_reviews) == 27
+    assert all(review.review_items for review in ledger.pack_reviews)
+    assert "gw-11e-deathwatch-faction-pack-2026-06" not in {
+        review.predecessor_package_id for review in ledger.pack_reviews
+    }
+    dispositions = {
+        item.disposition for review in ledger.pack_reviews for item in review.review_items
+    }
+    assert dispositions == {
+        "rules_updates_already_applied",
+        "in_scope_source_only",
+        "in_scope_runtime_affected",
+        "excluded_imperial_armour",
+        "excluded_legends",
+    }
+
+
+def test_july_runtime_affected_rows_link_to_stable_active_source_ids() -> None:
+    root = Path(__file__).resolve().parents[2]
+    source_json = (
+        root
+        / "data"
+        / "source_snapshots"
+        / "wahapedia"
+        / ("".join(("1", "0", "th")) + "-edition")
+        / "2026-06-14"
+        / "json"
+    )
+    source_row_ids = {row.source_row_id for row in faction_subrules_2026_27.enhancement_rows()} | {
+        row.source_row_id for row in faction_subrules_2026_27.stratagem_rows()
+    }
+
+    july_faction_packs_2026_07.audit_runtime_predecessor_references(
+        ledger=july_faction_packs_2026_07.delta_ledger(),
+        stable_reference_ids_by_kind={
+            "phase17e_descriptor_id": {
+                row.descriptor_id for row in faction_coverage_2026_27.coverage_rows()
+            },
+            "source_row_id": source_row_ids,
+            "datasheet_id": _source_row_ids(source_json / "Datasheets.json"),
+            "datasheet_ability_id": _source_row_ids(source_json / "Datasheets_abilities.json"),
+        },
+    )
+
+
+def test_july_load_only_rows_are_typed_linked_and_explicitly_blocked() -> None:
+    detachments = july_faction_packs_2026_07.detachments()
+    subrules = july_faction_packs_2026_07.subrules()
+    phase17e = july_faction_packs_2026_07.phase17e_coverage()
+    phase17f = july_faction_packs_2026_07.phase17f_execution()
+    scaffolds = july_faction_packs_2026_07.runtime_scaffolds()
+
+    assert {row.detachment_name for row in detachments.rows} == {
+        "Equatorial Hordes",
+        "Frenzied Host",
+        "Vengeful Hosts",
+    }
+    frenzied_host = next(row for row in detachments.rows if row.detachment_name == "Frenzied Host")
+    assert frenzied_host.tags == []
+    assert frenzied_host.removed_tags == ["host"]
+    assert {row.rule_name for row in subrules.rows} == {
+        "Avenging Angel",
+        "Concealed Krumpin'",
+        "Dey're Over 'Ere",
+        "Echojump",
+        "Empyric Wellspring",
+        "Eruption of Vitality",
+        "Evasive Manoeuvres",
+        "Foetid Resurgence",
+        "Frantic Focus",
+        "Fusillade",
+        "Hagiomnifex",
+        "Imperator Unleashed",
+        "Infernal Puppeteer",
+        "Jungle Know-wotz",
+        "Kaleidoscopic Tempest",
+        "Know No Fear",
+        "Kunnin' Hunta",
+        "Meteoric Onslaught",
+        "Murdermind",
+        "Mysterious Guardian",
+        "On My Signal",
+        "Ordained Sacrifice",
+        "Orksbane",
+        "Purge by Sectors",
+        "Reletavistic Tether",
+        "Sorrowscent Vulture",
+        "Stragglerz",
+        "Temporal Corridor",
+        "Thieves of Pain",
+        "Unkillable Scourge",
+    }
+    assert all(row.load_support_status == "loaded" for row in detachments.rows)
+    assert all(row.load_support_status == "loaded" for row in subrules.rows)
+    assert all(row.semantic_execution_status == "blocked" for row in detachments.rows)
+    assert all(row.semantic_execution_status == "blocked" for row in subrules.rows)
+    assert all(row.coverage_status == "unsupported" for row in phase17e.rows)
+    assert all(
+        row.execution_status == "blocked_structured_semantics_required" for row in phase17f.rows
+    )
+    assert all(row.named_handler_id is None for row in scaffolds.rows)
+    july_faction_packs_2026_07.audit_load_only_artifact_links(
+        detachments=detachments,
+        subrules=subrules,
+        phase17e=phase17e,
+        phase17f=phase17f,
+        runtime_scaffolds=scaffolds,
+    )
+
+
+def test_july_datasheet_preview_preserves_inventory_and_support_boundaries() -> None:
+    datasheets = july_faction_packs_2026_07.datasheets()
+    preview = july_faction_packs_2026_07.datasheet_support_preview()
+    rows_by_id = {row.datasheet_id: row for row in datasheets.rows}
+
+    assert {(row.datasheet_id, row.datasheet_name) for row in datasheets.rows} == {
+        ("000000724", "Ratlings"),
+        ("000000969", "Defiler"),
+        ("000003834", "Tempestus Aquilons"),
+        ("000004210", "Thulia Ghuld"),
+        ("000004216", "Commissar Yarrick"),
+        ("000004221", "Wazdakka Gutsmek"),
+        ("000004225", "The Red Terror"),
+    }
+    assert datasheets.excluded_content_categories == ["imperial-armour", "legends"]
+    assert {
+        datasheet_id
+        for datasheet_id, row in rows_by_id.items()
+        if row.inventory_status == "historical_predecessor_only"
+    } == {"000000724", "000003834"}
+    assert all(row.historical_provenance_retained for row in datasheets.rows)
+    assert all(row.runtime_support_claim == "unknown" for row in datasheets.rows)
+    assert all(row.semantic_execution_status == "blocked" for row in datasheets.rows)
+    assert "Mobile" in {
+        operation.replacement_value for operation in rows_by_id["000004210"].overlay_operations
+    }
+    assert "Mobile" in {
+        operation.replacement_value for operation in rows_by_id["000004225"].overlay_operations
+    }
+    assert {
+        operation.target_source_row_id
+        for operation in rows_by_id["000004225"].overlay_operations
+        if operation.operation_kind == "remove_ability"
+    } == {"000004225:5"}
+    datasheet_reference = next(
+        artifact
+        for artifact in july_faction_packs_2026_07.source_package().staged_data_artifacts
+        if artifact.artifact_id == datasheets.artifact_id
+    )
+    july_faction_packs_2026_07.audit_datasheet_preview_links(
+        datasheets=datasheets,
+        preview=preview,
+        datasheet_artifact_sha256=datasheet_reference.artifact_sha256,
+    )
+
+
+def test_july_daemonic_manifestation_artifact_is_current_and_executable() -> None:
+    artifact = july_faction_packs_2026_07.daemonic_manifestation()
+
+    assert artifact.rule_name == "Daemonic Manifestation"
+    assert artifact.predecessor_source_rule_id == "phase17f:phase17e:chaos-daemons:army-rule"
+    assert artifact.semantic_execution_status == "executable_named_handler"
+    assert artifact.provider_activation_status == "current_default"
+    assert (
+        artifact.named_handler_classification
+        == "approved_successor_of_existing_army_rule_orchestrator"
+    )
+    assert artifact.named_handler_budget_execution_id == artifact.predecessor_source_rule_id
+    assert artifact.decision_types == [
+        "select_healing_model",
+        "submit_healing_revival_placement",
+    ]
+
+
+def test_july_chaos_daemons_runtime_artifact_is_current_and_contract_stable() -> None:
+    artifact = july_faction_packs_2026_07.chaos_daemons_runtime_updates()
+
+    assert artifact.provider_activation_status == "current_default"
+    assert artifact.ingress_decision_type == "submit_placement_proposal"
+    assert artifact.stratagem_cost_decision_type == "select_stratagem_cost_modifier_option"
+    assert artifact.adapter_contract_status == "existing_contract_unchanged"
+    assert chaos_daemons_july_updates.replacement_keywords_for_datasheet(
+        chaos_daemons_july_updates.SCREAMERS_DATASHEET_ID
+    ) == (
+        "BEAST",
+        "FLY",
+        "CHAOS",
+        "DAEMON",
+        "TZEENTCH",
+        "SCREAMERS",
+    )
+    unsupported = chaos_daemons_july_updates.unsupported_ability_rows()
+    assert [(row.rule_name, row.semantic_execution_status) for row in unsupported] == [
+        ("Altered Reality", "unsupported")
+    ]
+    june_contribution = chaos_daemons_june_manifest.runtime_contribution()
+    current_contribution = chaos_daemons_july.runtime_contribution()
+    assert all(
+        record.definition.source_id != artifact.rows[0].source_row_id
+        for record in june_contribution.stratagem_records
+    )
+    assert any(
+        record.definition.source_id == artifact.rows[0].source_row_id
+        for record in current_contribution.stratagem_records
+    )
+
+
+def test_july_exalted_patron_artifact_is_current_generic_rule_ir() -> None:
+    artifact = july_faction_packs_2026_07.exalted_patron()
+    rule_ir = artifact.rule_ir()
+    execution_record = artifact.execution_record()
+
+    assert artifact.provider_activation_status == "current_default"
+    assert artifact.target_required_keywords == ["LORD EXULTANT"]
+    assert artifact.removed_ability_ids == ["may_attach_to_flawless_blades"]
+    assert tuple(effect.kind for clause in rule_ir.clauses for effect in clause.effects) == (
+        RuleEffectKind.MODIFY_MOVE_DISTANCE,
+    )
+    assert parameter_payload(rule_ir.clauses[1].effects[0].parameters) == {"delta": 1}
+    assert execution_record.rule_ir_hash == rule_ir.ir_hash()
+    assert (
+        emperors_children_july.runtime_contribution().contribution_id
+        == artifact.runtime_provider_id
+    )
+    assert (
+        emperors_children_june_manifest.runtime_contribution().contribution_id
+        != artifact.runtime_provider_id
+    )
+
+    current_record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.execution_id == artifact.phase17f_execution_id
+    )
+    assert current_record == execution_record
+
+    frenzied_host = next(
+        row
+        for row in july_faction_packs_2026_07.phase17f_execution().rows
+        if row.source_row_id.endswith(":subrule:emperors-children:frenzied-host:frantic-focus")
+    )
+    assert frenzied_host.execution_status == "blocked_structured_semantics_required"
+    assert frenzied_host.runtime_consumer_ids == []
+
+
+def test_july_thousand_sons_defiler_artifact_and_provider_are_current() -> None:
+    artifact = july_faction_packs_2026_07.thousand_sons_defiler()
+    june = thousand_sons_june_manifest.runtime_contribution()
+    current = thousand_sons_july.runtime_contribution()
+    record = current.stratagem_records[0]
+    exception = stratagem_phase_use_exception(record.definition)
+
+    assert artifact.aligned_defiler_datasheet_ids == [
+        "000001030",
+        "000004207",
+        "000004208",
+        "000004209",
+    ]
+    assert artifact.audited_chaos_space_marines_datasheet_id == "000000969"
+    assert artifact.old_rule_ir_semantics == "removed_minimum_hit_threshold"
+    assert artifact.semantic_execution_status == "executable_generic_runtime"
+    assert artifact.provider_activation_status == "current_default"
+    assert june.contribution_id != artifact.runtime_provider_id
+    assert june.stratagem_records == ()
+    assert june.stratagem_cost_modifier_bindings == ()
+    assert current.contribution_id == artifact.runtime_provider_id
+    assert record.definition.handler_id == artifact.counteroffensive_handler_id
+    assert exception is not None
+    assert exception.source_ability_id == artifact.source_ability_id
+    assert exception.eligible_datasheet_ids == (artifact.datasheet_id,)
+    assert tuple(binding.modifier_id for binding in current.stratagem_cost_modifier_bindings) == (
+        artifact.runtime_consumer_ids[1],
+    )
+
+    active_thousand_sons_row = next(
+        row
+        for row in generated_manifest.generated_runtime_content_rows()
+        if row.owner_faction_id == "thousand-sons" and row.owner_detachment_id is None
+    )
+    assert active_thousand_sons_row.module_path is not None
+    assert active_thousand_sons_row.module_path.endswith(".thousand_sons.july_2026")
+    assert "july_2026_candidate" not in active_thousand_sons_row.module_path
+
+
+def test_july_kairos_uses_existing_generic_stratagem_cost_semantics() -> None:
+    record = next(
+        record
+        for record in chaos_daemons_july_updates.runtime_contribution().ability_records
+        if record.datasheet_id == chaos_daemons_july_updates.KAIROS_DATASHEET_ID
+    )
+    clauses = catalog_rule_clauses_from_record(record)
+
+    assert len(clauses) == 1
+    assert command_point_consumer_ids_for_clause(clauses[0]) == (
+        CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    )
+    assert record.definition.source_id.startswith(july_faction_packs_2026_07.SOURCE_PACKAGE_ID)
+
+
+def test_july_source_runtime_and_document_promotion_is_atomic() -> None:
+    root = Path(__file__).resolve().parents[2]
+    current = _official_source_identities(
+        root / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
+    )
+    current_docs = {
+        path.name: path.read_text(encoding="utf-8")
+        for path in sorted((root / "docs" / "factions").glob("*.md"))
+    }
+    phase17_package_ids = (
+        faction_coverage_2026_27.SOURCE_PACKAGE_ID,
+        faction_execution_2026_27.SOURCE_PACKAGE_ID,
+    )
+    runtime_rows = generated_manifest.generated_runtime_content_rows()
+    runtime_package_ids = tuple(sorted({row.source_package_id for row in runtime_rows}))
+    runtime_module_paths: dict[str, str] = {}
+    for row in runtime_rows:
+        if row.family is not RuntimeContentModuleFamily.FACTION:
+            continue
+        if row.owner_faction_id is None or row.module_path is None:
+            raise AssertionError("Current faction runtime row is incomplete.")
+        runtime_module_paths[row.owner_faction_id] = row.module_path
+    source_records = faction_source_promotion_2026_07.current_source_records()
+    current_package_ids = tuple(record.package_id for record in source_records)
+    assert set(current) == set(current_package_ids)
+
+    july_faction_packs_2026_07.audit_current_package_is_atomically_active(
+        current_source_package_ids=current_package_ids,
+        phase17_source_package_ids=phase17_package_ids,
+        runtime_source_package_ids=runtime_package_ids,
+        runtime_module_paths_by_faction=runtime_module_paths,
+        generated_current_documents=current_docs,
+    )
+
+    current_source_by_faction = {record.faction_id: record.package_id for record in source_records}
+    executable_statuses = {
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+    }
+    assert all(
+        record.source_pdf_package_id == current_source_by_faction[record.faction_id]
+        for record in faction_execution_2026_27.execution_records()
+        if record.execution_status in executable_statuses
+    )
+    source_set = faction_source_promotion_2026_07.current_source_set()
+    deathwatch = next(
+        record
+        for record in source_set.records
+        if record.faction_id == faction_source_promotion_2026_07.DEATHWATCH_FACTION_ID
+    )
+    assert (
+        deathwatch.package_id,
+        deathwatch.sha256,
+        deathwatch.pdf_path,
+    ) == (
+        faction_source_promotion_2026_07.DEATHWATCH_PACKAGE_ID,
+        faction_source_promotion_2026_07.DEATHWATCH_SHA256,
+        faction_source_promotion_2026_07.DEATHWATCH_PDF_PATH,
+    )
+    assert deathwatch.predecessor_package_id is None
+    provenance_only_ids = {
+        record.faction_id
+        for record in source_set.records
+        if record.semantic_change_status == "provenance_only"
+    }
+    assert provenance_only_ids == faction_source_promotion_2026_07.NO_ACTION_FACTION_IDS
+    assert source_set.excluded_content_categories == ["imperial-armour", "legends"]
+    assert not (
+        {"imperial-armour", "legends"}
+        & {row.inventory_status for row in july_faction_packs_2026_07.datasheets().rows}
+    )
+
+    with pytest.raises(
+        faction_source_promotion_2026_07.FactionSourcePromotionError,
+        match="exact promoted set",
+    ):
+        july_faction_packs_2026_07.audit_current_package_is_atomically_active(
+            current_source_package_ids=current_package_ids[:-1],
+            phase17_source_package_ids=phase17_package_ids,
+            runtime_source_package_ids=runtime_package_ids,
+            runtime_module_paths_by_faction=runtime_module_paths,
+            generated_current_documents=current_docs,
+        )
+
+
+def _official_source_identities(path: Path) -> dict[str, tuple[str, str]]:
+    identities: dict[str, tuple[str, str]] = {}
+    for entry in load_official_source_manifest(path):
+        if entry.local_cache_path is None:
+            raise AssertionError("Faction-pack manifest entry must declare a local cache path.")
+        identities[entry.package_id] = (entry.sha256, entry.local_cache_path)
+    return identities
+
+
+def _source_row_ids(path: Path) -> set[str]:
+    raw_payload = json.loads(path.read_text(encoding="utf-8"))
+    if type(raw_payload) is not dict:
+        raise AssertionError("Source artifact must contain a JSON object.")
+    rows = cast(dict[str, object], raw_payload)["rows"]
+    if type(rows) is not list:
+        raise AssertionError("Source artifact rows must be a list.")
+    source_row_ids: set[str] = set()
+    for raw_row in cast(list[object], rows):
+        if type(raw_row) is not dict:
+            raise AssertionError("Source artifact row must be a JSON object.")
+        source_row_id = cast(dict[str, object], raw_row)["source_row_id"]
+        if type(source_row_id) is not str:
+            raise AssertionError("Source artifact row ID must be a string.")
+        source_row_ids.add(source_row_id)
+    return source_row_ids
 
 
 def _updated_row_after_first_operation(

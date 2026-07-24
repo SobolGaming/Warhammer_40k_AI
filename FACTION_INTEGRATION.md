@@ -105,18 +105,18 @@ with the patched source mirror.
 Phase 17E is complete as source-backed coverage, not broad execution. The
 coverage package is:
 
-- package ID: `gw-11e-phase17e-faction-coverage-2026-27`
+- package ID: `gw-11e-phase17e-faction-coverage-2026-07`
 - path:
   `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_coverage_2026_27.py`
-- source title: `Warhammer 40,000 11th Edition Phase 17E Faction Coverage`
-- source version: `2026-27`
-- source date: `2026-06-11`
+- source title: `Warhammer 40,000 11th Edition Phase 17E July Faction Coverage`
+- source version: `2026-07-22`
+- source date: `2026-07-22`
 - upstream identity:
-  `official-11th-edition-faction-packs-and-detachment-source-package`
+  `gw-11e-faction-packs-2026-07`
 - source edition: `11th`
-- schema version: `core-v2-phase17e-faction-coverage-v2`
+- schema version: `core-v2-phase17e-faction-coverage-v3`
 - source-payload SHA-256 checksum:
-  `1c9f9976f973d5d11ab6ef2088ffa88c3f3b2670fafbf41c5c08981b19a0b02c`
+  `f99fe6fef434d98aaaa848273f2232dbb3b737ac655e298149295b52a7895d08`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -164,21 +164,21 @@ new runtime-only rows fail generation until their provenance is approved.
 Phase 17F is complete as deterministic execution dispatch and status for every
 Phase 17E coverage row. The execution package is:
 
-- package ID: `gw-11e-phase17f-faction-execution-2026-27`
+- package ID: `gw-11e-phase17f-faction-execution-2026-07`
 - path:
   `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_execution_2026_27.py`
 - engine path:
   `src/warhammer40k_core/engine/faction_rule_execution.py`
-- source title: `Warhammer 40,000 11th Edition Phase 17F Faction Execution`
-- source version: `2026-27`
-- source date: `2026-06-11`
-- upstream identity: `gw-11e-phase17e-faction-coverage-2026-27`
+- source title: `Warhammer 40,000 11th Edition Phase 17F July Faction Execution`
+- source version: `2026-07-22`
+- source date: `2026-07-22`
+- upstream identity: `gw-11e-phase17e-faction-coverage-2026-07`
 - source edition: `11th`
-- schema version: `core-v2-phase17f-faction-execution-v2`
+- schema version: `core-v2-phase17f-faction-execution-v3`
 - source-payload SHA-256 checksum:
-  `10459e9f1f0f7bf7247786c02784ed15198a650f3917ef81bcf6a16fd25b1c55`
+  `e0891821a29789028855176d5f03077aa1572b31067c66e6b2619affb2771ef0`
 - upstream Phase 17E checksum:
-  `1c9f9976f973d5d11ab6ef2088ffa88c3f3b2670fafbf41c5c08981b19a0b02c`
+  `f99fe6fef434d98aaaa848273f2232dbb3b737ac655e298149295b52a7895d08`
 
 The package emits 2149 execution records, one for every Phase 17E coverage row:
 1999 rows are blocked as `structured_rule_semantics_required`, 28 rows are
@@ -439,13 +439,13 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
   `Warhammer 40,000 11th Edition Phase 17I Blocked Row Classification`
 - source version: `2026-27`
 - source date: `2026-07-02`
-- upstream identity: `gw-11e-phase17f-faction-execution-2026-27`
+- upstream identity: `gw-11e-phase17f-faction-execution-2026-07`
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `271a26ebaee50b63e0bb7baa6546a0b2137c7f59cda3ed76b89204a0705e9c0a`
+  `5621e78f14ac84759379a345a7a634b2e4c48e8b1ca6916fe12a813af47591bb`
 - upstream Phase 17F checksum:
-  `10459e9f1f0f7bf7247786c02784ed15198a650f3917ef81bcf6a16fd25b1c55`
+  `e0891821a29789028855176d5f03077aa1572b31067c66e6b2619affb2771ef0`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
@@ -481,13 +481,13 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
   `Warhammer 40,000 11th Edition Phase 17I Named Handler Budget`
 - source version: `2026-27`
 - source date: `2026-07-03`
-- upstream identity: `gw-11e-phase17f-faction-execution-2026-27`
+- upstream identity: `gw-11e-phase17f-faction-execution-2026-07`
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `6ac3584b1893837bf2773f7bde26da4bbb355bce6e51d4b0a32a3d28fe376e88`
+  `25f14fc5bef1efdea5df8a36e8379fc123428eac60463f0a78e12b8be2bf56af`
 - upstream Phase 17F checksum:
-  `10459e9f1f0f7bf7247786c02784ed15198a650f3917ef81bcf6a16fd25b1c55`
+  `e0891821a29789028855176d5f03077aa1572b31067c66e6b2619affb2771ef0`
 
 The budget report tracks 23 executable named-handler Phase 17F rows and 23
 approved entries. The current approved reason is

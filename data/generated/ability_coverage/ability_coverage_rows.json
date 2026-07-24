@@ -1540,39 +1540,21 @@
     "support_stage": "engine_consumed"
   },
   {
-    "ability_id": "000008338",
-    "ability_name": "Feel No Pain",
-    "catalog_id": "chaos-daemons-bridge-catalog",
-    "catalog_support": "descriptor_only",
-    "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/core/000008338/none",
-    "datasheet_id": "000001030",
-    "datasheet_name": "Defiler",
-    "diagnostic_reasons": [],
-    "runtime_consumer_ids": [
-      "descriptor:lost-wound:feel-no-pain-source",
-      "descriptor:lost-wound:feel-no-pain-resolution"
-    ],
-    "semantic_categories": [
-      "core.feel_no_pain"
-    ],
-    "source_kind": "core",
-    "source_wargear_id": null,
-    "support_stage": "engine_consumed"
-  },
-  {
     "ability_id": "000001030:destroyer-of-futures",
     "ability_name": "Destroyer of Futures",
     "catalog_id": "chaos-daemons-bridge-catalog",
-    "catalog_support": "generic_rule_ir",
+    "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none",
     "datasheet_id": "000001030",
     "datasheet_name": "Defiler",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "catalog-ir:minimum-unmodified-hit-success"
+      "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception",
+      "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount"
     ],
     "semantic_categories": [
-      "datasheet.rule_ir.set_contextual_status.this_unit"
+      "datasheet.counteroffensive.phase_use_exception",
+      "datasheet.counteroffensive.cost_modifier"
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,

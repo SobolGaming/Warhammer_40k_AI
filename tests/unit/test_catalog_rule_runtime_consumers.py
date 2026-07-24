@@ -21,7 +21,13 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainFeatureKind,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
-from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
+from warhammer40k_core.core.weapon_profiles import (
+    AttackProfile,
+    DamageProfile,
+    RangeProfile,
+    WeaponKeyword,
+    WeaponProfile,
+)
 from warhammer40k_core.engine import catalog_battle_shock_runtime as battle_shock_runtime
 from warhammer40k_core.engine import (
     catalog_command_point_runtime as command_point_runtime,
@@ -182,6 +188,9 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerRegistry,
     RuntimeContentEventIndex,
     RuntimeContentEventResult,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    july_2026_updates as chaos_daemons_july_updates,
 )
 from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
@@ -2450,6 +2459,91 @@ def test_catalog_post_shoot_roleless_negative_modifier_is_normalized_to_attacker
                 attacking_unit_instance_id=target_unit.unit_instance_id,
                 attacker_model_instance_id=target_unit.own_models[0].model_instance_id,
                 target_unit_instance_id=source_unit.unit_instance_id,
+            )
+        )
+        == 0
+    )
+
+
+def test_july_fluxmaster_passive_defences_use_generic_catalog_runtime() -> None:
+    source_army, enemy_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    enemy_unit = enemy_army.units[0]
+    battlefield = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=10.0,
+        target_army=enemy_army,
+        target_unit=enemy_unit,
+        target_x=20.0,
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=enemy_army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    records = tuple(
+        replace(record, datasheet_id=source_unit.datasheet_id)
+        for record in chaos_daemons_july_updates.runtime_contribution().ability_records
+        if record.datasheet_id == chaos_daemons_july_updates.FLUXMASTER_DATASHEET_ID
+    )
+    runtime = CatalogDatasheetRuleRuntime(
+        {
+            source_army.player_id: AbilityCatalogIndex.from_records(records),
+            enemy_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        (source_army, enemy_army),
+    )
+    registry = RuntimeModifierRegistry.from_bindings(
+        hit_roll_modifier_bindings=runtime.hit_roll_modifier_bindings(),
+    )
+    ranged_profile = WeaponProfile(
+        profile_id="july-fluxmaster-ranged",
+        name="July Fluxmaster ranged test",
+        range_profile=RangeProfile.distance(24),
+        attack_profile=AttackProfile.fixed(1),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+        armor_penetration=CharacteristicValue.from_raw(
+            Characteristic.ARMOR_PENETRATION,
+            0,
+        ),
+        damage_profile=DamageProfile.fixed(1),
+    )
+    context = HitRollModifierContext(
+        state=state,
+        attacking_unit_instance_id=enemy_unit.unit_instance_id,
+        attacker_model_instance_id=enemy_unit.own_models[0].model_instance_id,
+        target_unit_instance_id=source_unit.unit_instance_id,
+        weapon_profile=ranged_profile,
+        source_phase=BattlePhase.SHOOTING,
+    )
+
+    assert registry.hit_roll_modifier(context) == -1
+    assert (
+        registry.hit_roll_modifier(
+            replace(
+                context,
+                weapon_profile=replace(
+                    ranged_profile,
+                    profile_id="july-fluxmaster-melee",
+                    range_profile=RangeProfile.melee(),
+                    skill=CharacteristicValue.from_raw(
+                        Characteristic.WEAPON_SKILL,
+                        3,
+                    ),
+                ),
+                source_phase=BattlePhase.FIGHT,
+            )
+        )
+        == -1
+    )
+    assert (
+        registry.hit_roll_modifier(
+            replace(
+                context,
+                target_unit_instance_id=enemy_unit.unit_instance_id,
             )
         )
         == 0

@@ -655,40 +655,6 @@
   {
     "ability_datasheet_pairs": [
       {
-        "ability_id": "000008338",
-        "ability_name": "Feel No Pain",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/core/000008338/none",
-        "datasheet_id": "000001030",
-        "datasheet_name": "Defiler",
-        "source_kind": "core"
-      }
-    ],
-    "ability_names": [
-      "Feel No Pain"
-    ],
-    "category_id": "core.feel_no_pain",
-    "category_name": "Core Feel No Pain",
-    "coverage_row_count": 1,
-    "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000001030/core/000008338/none"
-    ],
-    "datasheet_names": [
-      "Defiler"
-    ],
-    "runtime_consumer_ids": [
-      "descriptor:lost-wound:feel-no-pain-resolution",
-      "descriptor:lost-wound:feel-no-pain-source"
-    ],
-    "source_kind_counts": {
-      "core": 1
-    },
-    "support_stages": [
-      "engine_consumed"
-    ]
-  },
-  {
-    "ability_datasheet_pairs": [
-      {
         "ability_id": "000008340",
         "ability_name": "Fights First",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
@@ -921,6 +887,74 @@
     ],
     "runtime_consumer_ids": [
       "catalog-ir:movement-action-grant"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001030:destroyer-of-futures",
+        "ability_name": "Destroyer of Futures",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none",
+        "datasheet_id": "000001030",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Destroyer of Futures"
+    ],
+    "category_id": "datasheet.counteroffensive.cost_modifier",
+    "category_name": "Datasheet Counteroffensive Cost Modifier",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount",
+      "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001030:destroyer-of-futures",
+        "ability_name": "Destroyer of Futures",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none",
+        "datasheet_id": "000001030",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Destroyer of Futures"
+    ],
+    "category_id": "datasheet.counteroffensive.phase_use_exception",
+    "category_name": "Datasheet Counteroffensive Phase Use Exception",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount",
+      "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -2903,14 +2937,6 @@
         "source_kind": "datasheet"
       },
       {
-        "ability_id": "000001030:destroyer-of-futures",
-        "ability_name": "Destroyer of Futures",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none",
-        "datasheet_id": "000001030",
-        "datasheet_name": "Defiler",
-        "source_kind": "datasheet"
-      },
-      {
         "ability_id": "000000595:mandiblasters",
         "ability_name": "Mandiblasters",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none",
@@ -2920,21 +2946,18 @@
       }
     ],
     "ability_names": [
-      "Destroyer of Futures",
       "Mandiblasters",
       "Shadow Form"
     ],
     "category_id": "datasheet.rule_ir.set_contextual_status.this_unit",
     "category_name": "Datasheet Rule Ir Set Contextual Status This Unit",
-    "coverage_row_count": 3,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-form/none",
-      "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none",
       "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none"
     ],
     "datasheet_names": [
       "Be'lakor",
-      "Defiler",
       "Striking Scorpions"
     ],
     "runtime_consumer_ids": [
@@ -2942,7 +2965,7 @@
       "catalog-ir:shadow-form-choice"
     ],
     "source_kind_counts": {
-      "datasheet": 3
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"

@@ -9,7 +9,7 @@ from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRError
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_execution_2026_27,
-    faction_generic_ir_support_2026_27,
+    faction_rule_ir_promotion_2026_07,
 )
 
 _Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
@@ -56,7 +56,7 @@ def generic_rule_ability_sources(
 
 
 def _rule_ir_for_record(record: _Phase17FExecutionRecord) -> RuleIR:
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+    rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
         record.coverage_descriptor_id
     )
     _validate_record_rule_ir_hash(record=record, rule_ir=rule_ir)

@@ -18,6 +18,7 @@ from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
+    HitRollModifierContext,
     WeaponProfileModifierContext,
     WoundRollModifierContext,
 )
@@ -116,6 +117,43 @@ def defensive_strength_toughness_wound_handler(
         delta = parameter_payload(source.clause.effects[0].parameters).get("delta")
         if type(delta) is not int:
             raise GameLifecycleError("Catalog defensive wound delta must be integer.")
+        return delta
+
+    return handler
+
+
+def passive_self_stealth_hit_handler(
+    source: CatalogDatasheetClauseSource,
+) -> Callable[[HitRollModifierContext], int]:
+    def handler(context: HitRollModifierContext) -> int:
+        if context.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
+            return 0
+        if not source_applies_to_rules_unit(
+            source=source,
+            context_unit_id=context.target_unit_instance_id,
+            state=context.state,
+        ):
+            return 0
+        return -1
+
+    return handler
+
+
+def passive_self_defensive_hit_handler(
+    source: CatalogDatasheetClauseSource,
+) -> Callable[[HitRollModifierContext], int]:
+    def handler(context: HitRollModifierContext) -> int:
+        if context.weapon_profile.range_profile.kind is not RangeProfileKind.MELEE:
+            return 0
+        if not source_applies_to_rules_unit(
+            source=source,
+            context_unit_id=context.target_unit_instance_id,
+            state=context.state,
+        ):
+            return 0
+        delta = parameter_payload(source.clause.effects[0].parameters).get("delta")
+        if type(delta) is not int:
+            raise GameLifecycleError("Catalog defensive hit delta must be integer.")
         return delta
 
     return handler

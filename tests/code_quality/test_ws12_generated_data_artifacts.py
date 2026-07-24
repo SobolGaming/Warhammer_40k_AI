@@ -8,6 +8,9 @@ PACKAGE = ROOT / "src" / "warhammer40k_core"
 ENGINE = PACKAGE / "engine"
 MFM_PACKAGE = PACKAGE / "rules" / "source_packages" / "warhammer_40000_11th" / "mfm_2026_07"
 EVENT_PACKAGE = PACKAGE / "rules" / "source_packages" / "warhammer_40000_11th"
+JULY_FACTION_PACK_PACKAGE = (
+    PACKAGE / "rules" / "source_packages" / "warhammer_40000_11th" / "july_faction_packs_2026_07"
+)
 
 _ALLOWED_MFM_LOADER_MODULES = {"__init__.py", "_artifacts.py"}
 _FORBIDDEN_ENGINE_IMPORTS = {
@@ -37,6 +40,33 @@ def test_ws12_event_companion_base_sizes_are_json_artifact_backed() -> None:
 
     assert artifact.is_file()
     assert _line_count(loader) < 1500
+
+
+def test_july_faction_pack_current_source_uses_typed_json_artifacts() -> None:
+    python_modules = tuple(sorted(path.name for path in JULY_FACTION_PACK_PACKAGE.glob("*.py")))
+    json_artifacts = tuple(
+        sorted(path.name for path in (JULY_FACTION_PACK_PACKAGE / "artifacts").glob("*.json"))
+    )
+
+    assert python_modules == ("__init__.py", "_artifacts.py", "_runtime_artifacts.py")
+    assert json_artifacts == (
+        "chaos-daemons-daemonic-manifestation.json",
+        "chaos-daemons-runtime-updates.json",
+        "current-sources.json",
+        "datasheet-support-preview.json",
+        "datasheets.json",
+        "delta-ledger.json",
+        "detachments.json",
+        "emperors-children-exalted-patron.json",
+        "package.json",
+        "phase17e-coverage.json",
+        "phase17f-execution.json",
+        "runtime-scaffolds.json",
+        "subrules.json",
+        "thousand-sons-defiler.json",
+    )
+    assert _line_count(JULY_FACTION_PACK_PACKAGE / "_artifacts.py") < 1500
+    assert _line_count(JULY_FACTION_PACK_PACKAGE / "_runtime_artifacts.py") < 1500
 
 
 def test_ws12_engine_runtime_does_not_read_source_package_json_artifacts_directly() -> None:

@@ -42,8 +42,6 @@ LEGACY_OVERSIZED_MODULE_LIMITS = {
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
     "event_companion_2026_06.py": 3621,
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
-    "faction_coverage_2026_27.py": 1535,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
     "faction_subrules_2026_27.py": 2957,
     "src/warhammer40k_core/rules/wahapedia_bridge.py": 2425,
 }

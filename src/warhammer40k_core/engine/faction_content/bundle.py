@@ -70,6 +70,9 @@ from warhammer40k_core.engine.faction_content import bundle_payloads as _bundle_
 from warhammer40k_core.engine.faction_content import bundle_validation as _bundle_validation
 from warhammer40k_core.engine.faction_content import catalog_generic_hooks, catalog_runtime_hooks
 from warhammer40k_core.engine.faction_content import unit_move_completed as _unit_move_completed
+from warhammer40k_core.engine.faction_content.ability_record_merge import (
+    merge_ability_records_with_contribution_overrides,
+)
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
@@ -107,8 +110,9 @@ from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
 )
 from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionRegistry,
+    FactionRuleIrResolver,
     FactionRuleNamedHandler,
-    default_faction_rule_generic_ir_executor,
+    faction_rule_ir_runtime,
 )
 from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityHookBinding,
@@ -1283,6 +1287,7 @@ class RuntimeContentBundle:
         base_rule_execution_registry: RuleExecutionRegistry | None = None,
         faction_execution_records: tuple[_Phase17FExecutionRecord, ...] | None = None,
         include_unselected_faction_execution_records: bool = False,
+        faction_rule_ir_resolver: FactionRuleIrResolver | None = None,
     ) -> RuntimeContentBundle:
         if type(activation) is not RuntimeContentActivation:
             raise GameLifecycleError("Runtime content bundle requires activation.")
@@ -1293,14 +1298,13 @@ class RuntimeContentBundle:
             raise GameLifecycleError("Runtime content bundle requires ArmyCatalog.")
         validated_contributions = _validate_contributions(contributions)
         vc = validated_contributions
-        ability_records = _merge_records(
-            "ability_records",
+        contribution_ability_records = _contribution_values(
+            validated_contributions,
+            lambda contribution: contribution.ability_records,
+        )
+        ability_records = merge_ability_records_with_contribution_overrides(
             base_ability_records,
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.ability_records,
-            ),
-            AbilityCatalogRecord,
+            contribution_ability_records,
         )
         contribution_stratagem_records = _contribution_values(
             validated_contributions,
@@ -1342,10 +1346,11 @@ class RuntimeContentBundle:
                 available_records, activation.selected_execution_record_ids
             )
         )
+        rule_ir_resolver, generic_ir_executor = faction_rule_ir_runtime(faction_rule_ir_resolver)
         faction_registry = FactionRuleExecutionRegistry.from_records(
             records,
             named_handlers=named_handlers,
-            generic_ir_executor=default_faction_rule_generic_ir_executor,
+            generic_ir_executor=generic_ir_executor,
         )
         contribution_ids = _validate_identifier_tuple(
             "contribution_ids",
@@ -1697,6 +1702,7 @@ class RuntimeContentBundle:
                 *generic_enhancement_effect_bindings(
                     activation=activation,
                     execution_records=records,
+                    rule_ir_resolver=rule_ir_resolver,
                 ),
             )
         )
@@ -1705,6 +1711,7 @@ class RuntimeContentBundle:
                 *generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
                     activation=activation,
                     execution_records=records,
+                    rule_ir_resolver=rule_ir_resolver,
                 ),
                 *catalog_rules.fight_activation_ability_hook_bindings(),
                 *_contribution_values(

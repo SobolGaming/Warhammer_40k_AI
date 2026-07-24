@@ -18,7 +18,7 @@ _TRACKED_FACTION_PACK_PDF_PATTERN = "data/raw/faction_packs/*.pdf"
 _ROOT = Path(__file__).resolve().parents[2]
 _FACTION_PACK_MANIFEST_PATHS = (
     _ROOT / "data" / "source_manifests" / "gw_11e_faction_packs.yaml",
-    _ROOT / "data" / "source_manifests" / "gw_11e_pending_faction_packs_2026_07.yaml",
+    _ROOT / "data" / "source_manifests" / "gw_11e_faction_pack_predecessors_2026_06.yaml",
 )
 _OFFICIAL_WARHAMMER_40000_DOWNLOADS_PAGE = (
     "https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/"
@@ -60,24 +60,25 @@ def test_official_gw_faction_pack_manifest_uses_tracked_pdf_policy() -> None:
     )
     assert all(entry.sha256 and len(entry.sha256) == 64 for entry in entries)
     assert all(entry.expected_bytes is not None and entry.expected_bytes > 0 for entry in entries)
-    assert all("tracked as source evidence" in entry.license_note for entry in entries)
+    assert all("tracked as current source evidence" in entry.license_note for entry in entries)
 
 
-def test_official_gw_pending_faction_pack_manifest_uses_evidence_only_policy() -> None:
+def test_official_gw_predecessor_faction_pack_manifest_retains_historical_evidence() -> None:
     entries = load_official_source_manifest(_FACTION_PACK_MANIFEST_PATHS[1])
 
     assert len(entries) == 27
     assert all(
         entry.source_page_url == _OFFICIAL_WARHAMMER_40000_DOWNLOADS_PAGE for entry in entries
     )
-    assert all(entry.source_date == "2026-07-22" for entry in entries)
-    assert all(entry.package_id.endswith("-2026-07") for entry in entries)
+    assert all(entry.source_date != "2026-07-22" for entry in entries)
+    assert all(entry.package_id.endswith("-2026-06") for entry in entries)
+    assert all(entry.package_id != "gw-11e-deathwatch-faction-pack-2026-06" for entry in entries)
     assert all(entry.local_cache_path is not None for entry in entries)
     assert all(
         PurePosixPath(entry.local_cache_path or "").match("data/raw/faction_packs/*.pdf")
         for entry in entries
     )
-    assert all("not a semantic-support claim" in entry.license_note for entry in entries)
+    assert all("retained as versioned predecessor" in entry.license_note for entry in entries)
 
 
 def _assert_tracked_faction_pack_pdfs_match_manifest(tracked_files: tuple[str, ...]) -> None:

@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27,
+    faction_source_promotion_2026_07,
     faction_subrules_2026_27,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -17,12 +18,12 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 
 EDITION_ID = "warhammer_40000_11th"
 SOURCE_EDITION = "11th"
-SOURCE_PACKAGE_ID = "gw-11e-phase17e-faction-coverage-2026-27"
-SOURCE_TITLE = "Warhammer 40,000 11th Edition Phase 17E Faction Coverage"
-SOURCE_VERSION = "2026-27"
-SOURCE_DATE = "2026-06-11"
-UPSTREAM_IDENTITY = "official-11th-edition-faction-packs-and-detachment-source-package"
-IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17e-faction-coverage-v2"
+SOURCE_PACKAGE_ID = "gw-11e-phase17e-faction-coverage-2026-07"
+SOURCE_TITLE = "Warhammer 40,000 11th Edition Phase 17E July Faction Coverage"
+SOURCE_VERSION = "2026-07-22"
+SOURCE_DATE = "2026-07-22"
+UPSTREAM_IDENTITY = faction_source_promotion_2026_07.SOURCE_PACKAGE_ID
+IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17e-faction-coverage-v3"
 
 
 class Phase17EFactionCoverageError(ValueError):
@@ -808,7 +809,10 @@ def phase17e_coverage_package() -> Phase17ECoveragePackage:
             )
         )
 
-    return Phase17ECoveragePackage(pdf_records=pdf_records, coverage_rows=tuple(rows))
+    return Phase17ECoveragePackage(
+        pdf_records=pdf_records,
+        coverage_rows=_promote_current_successor_rows(tuple(rows)),
+    )
 
 
 def faction_pdf_records() -> tuple[Phase17EFactionPdfRecord, ...]:
@@ -817,6 +821,43 @@ def faction_pdf_records() -> tuple[Phase17EFactionPdfRecord, ...]:
 
 def coverage_rows() -> tuple[Phase17ECoverageRow, ...]:
     return phase17e_coverage_package().coverage_rows
+
+
+def _promote_current_successor_rows(
+    rows: tuple[Phase17ECoverageRow, ...],
+) -> tuple[Phase17ECoverageRow, ...]:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        july_faction_packs_2026_07,
+    )
+
+    successor = july_faction_packs_2026_07.exalted_patron().execution_record()
+    current_runtime_status = faction_subrules_2026_27.SourceSubruleRuntimeStatus.ENGINE_CONSUMED
+    if successor.runtime_support_status != current_runtime_status.value:
+        raise Phase17EFactionCoverageError("July Exalted Patron successor must be engine-consumed.")
+    promoted: list[Phase17ECoverageRow] = []
+    replacements = 0
+    for row in rows:
+        if row.descriptor_id != successor.coverage_descriptor_id:
+            promoted.append(row)
+            continue
+        promoted.append(
+            replace(
+                row,
+                status=Phase17ECoverageStatus.GENERIC_SUPPORTED,
+                source_ids=successor.source_ids,
+                source_pdf_package_id=successor.source_pdf_package_id,
+                runtime_support_status=current_runtime_status,
+                runtime_consumer_ids=successor.runtime_consumer_ids,
+                handler_id=None,
+                rule_ir_hash=successor.rule_ir_hash,
+            )
+        )
+        replacements += 1
+    if replacements != 1:
+        raise Phase17EFactionCoverageError(
+            "July coverage package requires exactly one Exalted Patron predecessor."
+        )
+    return tuple(promoted)
 
 
 def source_package_identity_payload() -> dict[str, str]:
@@ -1250,286 +1291,17 @@ def _sha256_payload(payload: object) -> str:
 
 
 _PDF_RECORDS = _validate_pdf_records(
-    (
+    tuple(
         Phase17EFactionPdfRecord(
-            faction_id="adepta-sororitas",
-            faction_name="Adepta Sororitas",
-            package_id="gw-11e-adepta-sororitas-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Adepta Sororitas Faction Pack",
-            source_date="2026-06-11",
-            pdf_filename="eng_11-06_warhammer40000_faction_pack_adepta_sororitas-ktlklgb0t5-knvswx9kyw.pdf",
-            sha256="7cbcc25461d0ac00b0ae1ad33923845abf6ed3d86637b4833c150ad11df77c67",
-            bytes=5819917,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="adeptus-custodes",
-            faction_name="Adeptus Custodes",
-            package_id="gw-11e-adeptus-custodes-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Adeptus Custodes Faction Pack",
-            source_date="2026-06-11",
-            pdf_filename="eng_11-06_warhammer40000_faction_pack_adeptus_custodes-dntocqoxie-fpdm060c9y.pdf",
-            sha256="e0865cb1f28d3b0623effda2fd2b38b9ba3811d9d79aa5841bb9f0843f2db3ce",
-            bytes=12498619,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="adeptus-mechanicus",
-            faction_name="Adeptus Mechanicus",
-            package_id="gw-11e-adeptus-mechanicus-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Adeptus Mechanicus Faction Pack",
-            source_date="2026-06-11",
-            pdf_filename="eng_11-06_warhammer40000_faction_pack_adeptus_mechanicus-4dczibqdew-ebqqmotlpe.pdf",
-            sha256="7f01dd2ce7e35c762b0ab625ade779022275574cf2d01ee46ee16b2f5582341c",
-            bytes=11545405,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="aeldari",
-            faction_name="Aeldari",
-            package_id="gw-11e-aeldari-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Aeldari Faction Pack",
-            source_date="2026-06-09",
-            pdf_filename="eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr.pdf",
-            sha256="48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9",
-            bytes=6216106,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="astra-militarum",
-            faction_name="Astra Militarum",
-            package_id="gw-11e-astra-militarum-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Astra Militarum Faction Pack",
-            source_date="2026-06-11",
-            pdf_filename="eng_11-06_warhammer40000_faction_pack_astra_militarum-etf9ihpodv-mbqdsa1bfv.pdf",
-            sha256="ca0686dedc7c921970a5efbf779d9d85a7d427cdce252e64c3576899809acecd",
-            bytes=19027709,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="black-templars",
-            faction_name="Black Templars",
-            package_id="gw-11e-black-templars-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Black Templars Faction Pack",
-            source_date="2026-06-08",
-            pdf_filename="eng_08-06_warhammer40000_faction_pack_black_templars-3rhveur6zi-dsptpcxpkh.pdf",
-            sha256="8e83cebc9ab53113b20cd35075bab9ebe2563b8125f3692aeb82eaf6bd97e12a",
-            bytes=2662864,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="blood-angels",
-            faction_name="Blood Angels",
-            package_id="gw-11e-blood-angels-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Blood Angels Faction Pack",
-            source_date="2026-06-08",
-            pdf_filename="eng_08-06_warhammer40000_faction_pack_blood_angels-iinnedwcaa-bsyp1349et.pdf",
-            sha256="e0c06b2cdeff8be5a94721f96854d35f9f6fa4d6c410453e61ece14c1aa0bce7",
-            bytes=14698420,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="chaos-daemons",
-            faction_name="Chaos Daemons",
-            package_id="gw-11e-chaos-daemons-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Chaos Daemons Faction Pack",
-            source_date="2026-06-10",
-            pdf_filename="eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9pla0dk.pdf",
-            sha256="6f06517dbc35213103e93c41c34c413010f87868b68bf1570bb175c2645cdc4c",
-            bytes=40821822,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="chaos-knights",
-            faction_name="Chaos Knights",
-            package_id="gw-11e-chaos-knights-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Chaos Knights Faction Pack",
-            source_date="2026-06-10",
-            pdf_filename="eng_10-06_warhammer40000_faction_pack_chaos_knights-nd97dcwfqa-6prdhhde6p.pdf",
-            sha256="08f011a00fc6af66134c100e075376c9b01453b1f14226111a0eed8af4f92b1e",
-            bytes=12755840,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="chaos-space-marines",
-            faction_name="Chaos Space Marines",
-            package_id="gw-11e-chaos-space-marines-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Chaos Space Marines Faction Pack",
-            source_date="2026-06-10",
-            pdf_filename="eng_10-06_warhammer40000_faction_pack_chaos_space_marines-h16lkqvvnq-bcejav0qap.pdf",
-            sha256="4065d5349c1417e9083474f3e35a006ae0fb8d4d3515f261a1c3f10a00902bcd",
-            bytes=17715894,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="dark-angels",
-            faction_name="Dark Angels",
-            package_id="gw-11e-dark-angels-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Dark Angels Faction Pack",
-            source_date="2026-06-08",
-            pdf_filename="eng_08-06_warhammer40000_faction_pack_dark_angels-fw4ot2jwtw-hplla1qiky.pdf",
-            sha256="7f1efe2d62f57597d0949d62b8d9bf0675e0199a6e99a1eef61bfa65de76aa52",
-            bytes=9152446,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="death-guard",
-            faction_name="Death Guard",
-            package_id="gw-11e-death-guard-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Death Guard Faction Pack",
-            source_date="2026-06-10",
-            pdf_filename="eng_10-06_warhammer40000_faction_pack_death_guard-dgm6djcpoa-iiqvmsh0op.pdf",
-            sha256="5430fe8d89047644aab0102d0265783db725655c4535ad6600c3925f2cf32885",
-            bytes=6383020,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="deathwatch",
-            faction_name="Deathwatch",
-            package_id="gw-11e-deathwatch-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Deathwatch Faction Pack",
-            source_date="2026-06-08",
-            pdf_filename="eng_08-06_warhammer40000_faction_pack_deathwatch-z0ebavrfze-muhcibnets.pdf",
-            sha256="698b7063a71e3f10301aab1498effcb88ad2be41f3f491e24737c2abc9f988ce",
-            bytes=12938672,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="drukhari",
-            faction_name="Drukhari",
-            package_id="gw-11e-drukhari-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Drukhari Faction Pack",
-            source_date="2026-06-09",
-            pdf_filename="eng_09-06_warhammer40000_faction_pack_drukhari-wp9pdv8x9l-dhoh0i94sx.pdf",
-            sha256="e438923611efffea389ec46f37e2f58795440fc8e00e3734480690f9e238391a",
-            bytes=9020910,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="emperors-children",
-            faction_name="Emperor's Children",
-            package_id="gw-11e-emperors-children-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Emperor's Children Faction Pack",
-            source_date="2026-06-10",
-            pdf_filename="eng_10-06_warhammer40000_faction_pack_emperor_s_children-fffbpc3gn0-mesp5k6khu.pdf",
-            sha256="2b59fff06a1e5f3164155d3ceea0f773d565eaf85e6c5807b36b7d497d0307a3",
-            bytes=8749167,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="genestealer-cults",
-            faction_name="Genestealer Cults",
-            package_id="gw-11e-genestealer-cults-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Genestealer Cults Faction Pack",
-            source_date="2026-06-09",
-            pdf_filename="eng_09-06_warhammer40000_faction_pack_genestealer_cults-ee2tg004ty-lfbh6g1gr7.pdf",
-            sha256="3a6060942f8862409d4f2d0d422b8f25c29ccd900a4b79ce3964c20a8fc40637",
-            bytes=6079913,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="grey-knights",
-            faction_name="Grey Knights",
-            package_id="gw-11e-grey-knights-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Grey Knights Faction Pack",
-            source_date="2026-06-08",
-            pdf_filename="eng_08-06_warhammer40000_faction_pack_grey_knights-geqfqwt3wh-g2fikyrqup.pdf",
-            sha256="3f5436dd0507ab03bf568b505da509dd4096250ebc60466f95618561a344e923",
-            bytes=12897380,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="imperial-agents",
-            faction_name="Imperial Agents",
-            package_id="gw-11e-imperial-agents-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Imperial Agents Faction Pack",
-            source_date="2026-06-11",
-            pdf_filename="eng_11-06_warhammer40000_faction_pack_imperial_agents-qhp2xzepry-gapdknla3x.pdf",
-            sha256="219fb2a4973b0a6ff393f13544adb4ccb7bae81bc4cbd6138ebd3179661b5fee",
-            bytes=16552296,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="imperial-knights",
-            faction_name="Imperial Knights",
-            package_id="gw-11e-imperial-knights-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Imperial Knights Faction Pack",
-            source_date="2026-06-11",
-            pdf_filename="eng_11-06_warhammer40000_faction_pack_imperial_knights-uoieohputz-totyd7mvs6.pdf",
-            sha256="45e9a921b807ab677e688adf43f0aaa207165991b6bf9d9039b96a4950fd1ab1",
-            bytes=10927685,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="leagues-of-votann",
-            faction_name="Leagues of Votann",
-            package_id="gw-11e-leagues-of-votann-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Leagues of Votann Faction Pack",
-            source_date="2026-06-09",
-            pdf_filename="eng_09-06_warhammer40000_faction_pack_leagues_of_votann-awex3qmdiz-clwoaoyyos.pdf",
-            sha256="82f19ac07e96a28374cc042b1afdcbe99b7c96fb32d33bce03c872d00a80c2de",
-            bytes=11933140,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="necrons",
-            faction_name="Necrons",
-            package_id="gw-11e-necrons-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Necrons Faction Pack",
-            source_date="2026-06-09",
-            pdf_filename="eng_09-06_warhammer40000_faction_pack_necrons-qodfthk7tt-bzeqy07okc.pdf",
-            sha256="34c6c6ddaecdfd027986c3856bd924f04eaeecd937b0d91ec0f2893ab9c9f240",
-            bytes=6340985,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="orks",
-            faction_name="Orks",
-            package_id="gw-11e-orks-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Orks Faction Pack",
-            source_date="2026-06-09",
-            pdf_filename="eng_09-06_warhammer40000_faction_pack_orks-agh9kwrtno-0xarrl5fjj.pdf",
-            sha256="2c15bcd7dde77ad2e3656175410516135f52d6874577e27769d76394f763f7d1",
-            bytes=15871001,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="space-marines",
-            faction_name="Space Marines",
-            package_id="gw-11e-space-marines-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Space Marines Faction Pack",
-            source_date="2026-06-08",
-            pdf_filename="eng_08-06_warhammer40000_faction_pack_space-marines-nd2ezs5yzn-wxe2nf2ckk.pdf",
-            sha256="82b2e28b0950c53b12bc83681a3bee3fd6a58cd6d2acd7a9d67d37f2dcbe6f2f",
-            bytes=25855867,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="space-wolves",
-            faction_name="Space Wolves",
-            package_id="gw-11e-space-wolves-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Space Wolves Faction Pack",
-            source_date="2026-06-08",
-            pdf_filename="eng_08-06_warhammer40000_faction_pack_space_wolves-secweiq0m1-z9ayyyugii.pdf",
-            sha256="98adc2602ffba4714a8c453f54a0ff2afc08ed034cb0e305b0364da24cfc8942",
-            bytes=7225635,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="tau-empire",
-            faction_name="T'au Empire",
-            package_id="gw-11e-tau-empire-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition T'au Empire Faction Pack",
-            source_date="2026-06-09",
-            pdf_filename="eng_09-06_warhammer40000_faction_pack_tau_empire-avmkx2gg8i-jezqgeb55k.pdf",
-            sha256="da70143aea942aa016f760287bb389f66d10f9e3de3449a2263a0c04f009a6f0",
-            bytes=11432753,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="thousand-sons",
-            faction_name="Thousand Sons",
-            package_id="gw-11e-thousand-sons-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Thousand Sons Faction Pack",
-            source_date="2026-06-10",
-            pdf_filename="eng_10-06_warhammer40000_faction_pack_thousand_sons-qxnr1lbasx-i6ee7zitrl.pdf",
-            sha256="b6d2f04a1fda50200f779ee56ff9b977284f9945beceefa2910084b321da7984",
-            bytes=18356824,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="tyranids",
-            faction_name="Tyranids",
-            package_id="gw-11e-tyranids-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition Tyranids Faction Pack",
-            source_date="2026-06-09",
-            pdf_filename="eng_09-06_warhammer40000_faction_pack_tyranids-avhhzmcte8-j0kseag7td.pdf",
-            sha256="de2105f97171812369288cb5d5da3da9730f47dc7daa67aa06b1ebc771ad6c36",
-            bytes=17011355,
-        ),
-        Phase17EFactionPdfRecord(
-            faction_id="world-eaters",
-            faction_name="World Eaters",
-            package_id="gw-11e-world-eaters-faction-pack-2026-06",
-            title="Warhammer 40,000 11th Edition World Eaters Faction Pack",
-            source_date="2026-06-10",
-            pdf_filename="eng_10-06_warhammer40000_faction_pack_world_eaters-az7rivdn6x-d9rvbncqvt.pdf",
-            sha256="c773ef3a9c73ab354a18bd9b0c1e9a190ee89c9155a1e2bba52286fa6e39be30",
-            bytes=4012084,
-        ),
+            faction_id=record.faction_id,
+            faction_name=record.faction_name,
+            package_id=record.package_id,
+            title=record.title,
+            source_date=record.source_date,
+            pdf_filename=record.pdf_path.rsplit("/", maxsplit=1)[-1],
+            sha256=record.sha256,
+            bytes=record.bytes,
+        )
+        for record in faction_source_promotion_2026_07.current_source_records()
     )
 )

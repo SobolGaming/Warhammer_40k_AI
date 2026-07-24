@@ -181,11 +181,29 @@ def apply_generic_rule_ir_reserve_removal(
         effect_payload,
         "required_arrival_battle_round_offset",
     )
-    required_arrival_battle_round = (
-        None
-        if required_arrival_round_offset is None
-        else context.battle_round + required_arrival_round_offset
+    required_arrival_timing = _optional_rule_effect_string_parameter(
+        effect_payload,
+        "required_arrival_timing",
     )
+    if required_arrival_round_offset is not None and required_arrival_timing is not None:
+        raise GameLifecycleError(
+            "Generic reserve removal arrival timing must use one timing descriptor."
+        )
+    if required_arrival_timing is not None and (
+        required_arrival_timing != "next_owner_movement_phase"
+    ):
+        raise GameLifecycleError("Generic reserve removal arrival timing is unsupported.")
+    required_arrival_battle_round = None
+    if required_arrival_round_offset is not None:
+        required_arrival_battle_round = context.battle_round + required_arrival_round_offset
+    elif required_arrival_timing is not None:
+        active_player_index = state.turn_order.index(context.active_player_id)
+        owner_player_index = state.turn_order.index(use_record.player_id)
+        required_arrival_battle_round = (
+            context.battle_round
+            if owner_player_index > active_player_index
+            else context.battle_round + 1
+        )
     required_arrival_phase = _optional_rule_effect_string_parameter(
         effect_payload,
         "required_arrival_phase",
@@ -199,7 +217,7 @@ def apply_generic_rule_ir_reserve_removal(
         "required_arrival_placement_kind",
     )
     required_arrival_fields = (
-        required_arrival_round_offset,
+        required_arrival_battle_round,
         required_arrival_phase,
         required_arrival_source_rule_id,
     )

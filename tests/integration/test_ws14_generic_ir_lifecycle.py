@@ -33,6 +33,9 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
+    july_2026 as emperors_children_july,
+)
 from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionContext,
     FactionRuleExecutionResult,
@@ -104,6 +107,9 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    july_faction_packs_2026_07,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionStatus,
@@ -915,6 +921,73 @@ def test_ws14_court_of_the_phoenician_rule_and_enhancements_bind_to_runtime_hook
 
 
 @pytest.mark.integration
+def test_ws14_july_exalted_patron_mustering_and_lifecycle_remove_attachment_grant() -> None:
+    current_catalog = emperors_children_july.current_army_catalog(_court_catalog())
+    valid_request = replace(
+        _court_muster_request(
+            catalog=current_catalog,
+            army_id="army-alpha",
+            player_id="player-a",
+            unit_selection_ids=("lord-exultant-1",),
+            enhancement_assignments=(("000010654003", "lord-exultant-1"),),
+        ),
+        roster_legality_required=False,
+    )
+    mustered = muster_army(catalog=current_catalog, request=valid_request)
+    assert not any(
+        violation.violation_code == "enhancement_target_keyword_required"
+        for violation in mustered.roster_legality_report.violations
+    )
+
+    invalid_request = replace(
+        _court_muster_request(
+            catalog=current_catalog,
+            army_id="army-alpha",
+            player_id="player-a",
+            unit_selection_ids=("tears-1",),
+            enhancement_assignments=(("000010654003", "tears-1"),),
+        ),
+        roster_legality_required=False,
+    )
+    invalid_mustered = muster_army(catalog=current_catalog, request=invalid_request)
+    assert any(
+        violation.violation_code == "enhancement_target_keyword_required"
+        for violation in invalid_mustered.roster_legality_report.violations
+    )
+
+    lifecycle = _court_battle_lifecycle()
+    state = _state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+    artifact = july_faction_packs_2026_07.exalted_patron()
+    record = bundle.faction_rule_execution_registry.record_by_execution_id(
+        artifact.phase17f_execution_id
+    )
+    assert record.rule_ir_hash == artifact.rule_ir().ir_hash()
+    lord_model_id = _first_model_id(state, unit_instance_id="army-alpha:lord-exultant-1")
+    assert (
+        bundle.runtime_modifier_registry.modified_movement_inches(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id="army-alpha:lord-exultant-1",
+                model_instance_id=lord_model_id,
+                base_movement_inches=6.0,
+                current_movement_inches=6.0,
+            )
+        )
+        == 7.0
+    )
+    current_effect_payload = json.dumps(
+        [
+            effect.to_payload()
+            for effect in state.persisting_effects_for_unit("army-alpha:lord-exultant-1")
+        ],
+        sort_keys=True,
+    )
+    assert "may_attach_to_flawless_blades" not in current_effect_payload
+    assert "FLAWLESS BLADES" not in current_effect_payload
+
+
+@pytest.mark.integration
 def test_ws14_court_of_the_phoenician_stratagems_execute_through_lifecycle() -> None:
     prideful_lifecycle = _court_battle_lifecycle()
     use_record, submit_status = _use_court_stratagem_through_lifecycle(
@@ -1470,7 +1543,7 @@ def _spectacle_muster_request(
 
 
 def _court_lifecycle_config() -> GameConfig:
-    catalog = _court_catalog()
+    catalog = emperors_children_july.current_army_catalog(_court_catalog())
     return GameConfig(
         game_id="ws14-court-of-the-phoenician-generic-ir-game",
         allow_legacy_non_strict_rosters=True,

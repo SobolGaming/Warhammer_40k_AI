@@ -94,6 +94,9 @@ from warhammer40k_core.engine.faction_content.runtime import (
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     datasheets,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    july_2026_updates as july_updates,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501  # noqa: E501
     enhancements,
     rule,
@@ -1109,6 +1112,62 @@ def test_the_realm_of_chaos_removes_unit_to_deep_strike_required_reserves() -> N
     reserve_payload = cast(dict[str, JsonValue], reserve_payloads[0])
     assert reserve_payload["unit_instance_id"] == _ANCHOR_UNIT_ID
     assert reserve_payload["required_arrival_placement_kind"] == "deep_strike"
+
+
+def test_staged_realm_of_chaos_requires_first_turn_generic_ingress() -> None:
+    state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
+    state.active_player_id = "player-b"
+    state.turn_order = ("player-b", "player-a")
+    definition = next(
+        record.definition
+        for record in july_updates.runtime_contribution().stratagem_records
+        if isinstance(record.definition.effect_payload, dict)
+        and record.definition.effect_payload.get("effect_selection_kind") is None
+    )
+    decisions = DecisionController()
+    use_record = replace(
+        _daemonic_stratagem_use_record(
+            definition=definition,
+            target_unit_id=_ANCHOR_UNIT_ID,
+            phase=BattlePhase.MOVEMENT,
+        ),
+        active_player_id="player-b",
+    )
+    context = replace(
+        _daemonic_stratagem_context(
+            state=state,
+            phase=BattlePhase.MOVEMENT,
+            trigger_kind=TimingTriggerKind.END_TURN,
+        ),
+        active_player_id="player-b",
+    )
+
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=decisions,
+        definition=definition,
+        use_record=use_record,
+        context=context,
+    )
+
+    reserve_state = state.reserve_state_for_unit(_ANCHOR_UNIT_ID)
+    assert reserve_state is not None
+    assert reserve_state.arrival_is_required_at(
+        battle_round=1,
+        phase=BattlePhase.MOVEMENT,
+    )
+    assert (
+        reserve_state.required_arrival_placement_kind
+        == BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+    )
+    assert reserve_state.required_arrival_source_rule_id == definition.source_id
+    event = last_event_payload(decisions, "generic_stratagem_reserve_removal_resolved")
+    generic_effect = cast(dict[str, JsonValue], event["generic_rule_effect"])
+    effect = cast(dict[str, JsonValue], generic_effect["effect"])
+    parameters = cast(list[dict[str, JsonValue]], effect["parameters"])
+    assert {cast(str, parameter["key"]): parameter["value"] for parameter in parameters}[
+        "required_arrival_timing"
+    ] == "next_owner_movement_phase"
 
 
 def test_the_realm_of_chaos_companion_selection_requires_shadow_units() -> None:

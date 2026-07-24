@@ -22,6 +22,36 @@ _SOURCE_IDENTITY = faction_execution_2026_27.source_package_identity_payload()
 _SOURCE_PACKAGE_ID = _SOURCE_IDENTITY["source_package_id"]
 _SOURCE_PACKAGE_HASH = _SOURCE_IDENTITY["source_payload_checksum_sha256"]
 _EXECUTION_RECORDS = faction_execution_2026_27.execution_records()
+_CURRENT_FACTION_MODULE_PATHS = {
+    "orks": f"{_BASE}.orks.manifest",
+    "aeldari": f"{_BASE}.aeldari.manifest",
+    "drukhari": f"{_BASE}.drukhari.manifest",
+    "tyranids": f"{_BASE}.tyranids.manifest",
+    "genestealer-cults": f"{_BASE}.genestealer_cults.manifest",
+    "necrons": f"{_BASE}.necrons.manifest",
+    "leagues-of-votann": f"{_BASE}.leagues_of_votann.manifest",
+    "tau-empire": f"{_BASE}.tau_empire.manifest",
+    "space-marines": f"{_BASE}.space_marines.manifest",
+    "dark-angels": f"{_BASE}.dark_angels.manifest",
+    "blood-angels": f"{_BASE}.blood_angels.manifest",
+    "space-wolves": f"{_BASE}.space_wolves.manifest",
+    "black-templars": f"{_BASE}.black_templars.manifest",
+    "deathwatch": f"{_BASE}.deathwatch.manifest",
+    "grey-knights": f"{_BASE}.grey_knights.manifest",
+    "chaos-space-marines": f"{_BASE}.chaos_space_marines.manifest",
+    "world-eaters": f"{_BASE}.world_eaters.manifest",
+    "emperors-children": f"{_BASE}.emperors_children.july_2026",
+    "death-guard": f"{_BASE}.death_guard.manifest",
+    "thousand-sons": f"{_BASE}.thousand_sons.july_2026",
+    "chaos-knights": f"{_BASE}.chaos_knights.manifest",
+    "chaos-daemons": f"{_BASE}.chaos_daemons.july_2026",
+    "astra-militarum": f"{_BASE}.astra_militarum.manifest",
+    "adepta-sororitas": f"{_BASE}.adepta_sororitas.manifest",
+    "adeptus-mechanicus": f"{_BASE}.adeptus_mechanicus.manifest",
+    "imperial-knights": f"{_BASE}.imperial_knights.manifest",
+    "adeptus-custodes": f"{_BASE}.adeptus_custodes.manifest",
+    "imperial-agents": f"{_BASE}.imperial_agents.manifest",
+}
 
 
 def generated_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
@@ -45,7 +75,6 @@ def generated_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
 def _faction_row(
     row: faction_detachments_2026_27.SourceFactionRow,
 ) -> RuntimeContentManifestRow:
-    faction_module = _module_name_for_id(row.faction_id)
     execution_record_ids = _execution_ids_for(
         faction_id=row.faction_id,
         detachment_id=None,
@@ -57,9 +86,18 @@ def _faction_row(
         owner_faction_id=row.faction_id,
         owner_detachment_id=None,
         execution_record_ids=execution_record_ids,
-        module_path=f"{_BASE}.{faction_module}.manifest",
+        module_path=_current_faction_module_path(row.faction_id),
         semantic_status=_semantic_status_for_execution_ids(execution_record_ids),
     )
+
+
+def _current_faction_module_path(faction_id: str) -> str:
+    try:
+        return _CURRENT_FACTION_MODULE_PATHS[faction_id]
+    except KeyError as exc:
+        raise GameLifecycleError(
+            "Generated runtime manifest has no current faction module mapping."
+        ) from exc
 
 
 def _detachment_row(

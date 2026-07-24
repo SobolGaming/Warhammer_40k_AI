@@ -53,6 +53,10 @@ CATALOG_IR_MUSTERING_SELECTION_CONSUMER_ID = "army-mustering:required-datasheet-
 CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID = "catalog-ir:conditional-ability:lone-operative"
 CATALOG_IR_STEALTH_AURA_CONSUMER_ID = "catalog-ir:aura-ability:stealth"
 CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID = "catalog-ir:granted-ability:stealth"
+CATALOG_IR_PASSIVE_SELF_STEALTH_CONSUMER_ID = "catalog-ir:passive-self-ability:stealth"
+CATALOG_IR_PASSIVE_SELF_DEFENSIVE_HIT_MODIFIER_CONSUMER_ID = (
+    "catalog-ir:passive-self-defensive-hit-roll-modifier"
+)
 CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = (
     "catalog-ir:fight-selected-weapon-ability-choice"
 )
@@ -158,6 +162,10 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID)
     if clause_is_stealth_aura(clause):
         consumer_ids.add(CATALOG_IR_STEALTH_AURA_CONSUMER_ID)
+    if clause_is_passive_self_stealth(clause):
+        consumer_ids.add(CATALOG_IR_PASSIVE_SELF_STEALTH_CONSUMER_ID)
+    if clause_is_passive_self_defensive_hit_roll_modifier(clause):
+        consumer_ids.add(CATALOG_IR_PASSIVE_SELF_DEFENSIVE_HIT_MODIFIER_CONSUMER_ID)
     if clause_is_passive_characteristic_modifier(clause):
         characteristic = Characteristic(
             _required_string(parameter_payload(clause.effects[0].parameters), "characteristic")
@@ -403,6 +411,61 @@ def clause_is_granted_stealth_effect(clause: RuleClause) -> bool:
         and clause.effects[0].kind is RuleEffectKind.GRANT_ABILITY
         and parameter_payload(clause.effects[0].parameters).get("ability") == "stealth"
     )
+
+
+def clause_is_passive_self_stealth(clause: RuleClause) -> bool:
+    return (
+        clause.is_supported
+        and clause.template_id == "phase17p:passive-self-ability-grant"
+        and clause.trigger is None
+        and not clause.conditions
+        and clause.target is not None
+        and clause.target.kind is RuleTargetKind.THIS_UNIT
+        and not clause.target.parameters
+        and clause.duration is not None
+        and clause.duration.kind is RuleDurationKind.WHILE_CONDITION_TRUE
+        and not clause.duration.parameters
+        and len(clause.effects) == 1
+        and clause.effects[0].kind is RuleEffectKind.GRANT_ABILITY
+        and parameter_payload(clause.effects[0].parameters)
+        == {
+            "ability": "stealth",
+            "target_scope": "this_unit",
+        }
+    )
+
+
+def clause_is_passive_self_defensive_hit_roll_modifier(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.template_id != "phase17p:passive-self-defensive-hit-roll-modifier"
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
+        or parameter_payload(clause.trigger.parameters)
+        != {
+            "attack_kind": "melee",
+            "attack_role": "target",
+            "roll_type": "hit",
+            "timing_window": "attack_sequence.hit",
+        }
+        or clause.conditions
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.target.parameters
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.WHILE_CONDITION_TRUE
+        or clause.duration.parameters
+        or len(clause.effects) != 1
+    ):
+        return False
+    return clause.effects[0].kind is RuleEffectKind.MODIFY_DICE_ROLL and parameter_payload(
+        clause.effects[0].parameters
+    ) == {
+        "attack_role": "target",
+        "delta": -1,
+        "roll_type": "hit",
+        "weapon_scope": "melee",
+    }
 
 
 def clause_is_fight_selected_weapon_ability_choice(clause: RuleClause) -> bool:

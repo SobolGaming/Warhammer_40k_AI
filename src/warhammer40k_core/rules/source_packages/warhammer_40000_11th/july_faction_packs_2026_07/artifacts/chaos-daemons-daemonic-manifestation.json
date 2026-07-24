@@ -1,0 +1,30 @@
+{
+  "adapter_contract_path": "docs/ADAPTER_DECISION_CONTRACT.md",
+  "artifact_id": "gw-11e-july-chaos-daemons-daemonic-manifestation-2026-07",
+  "artifact_schema": "core-v2-july-chaos-daemons-daemonic-manifestation-v1",
+  "bespoke_subsystem_justification": "Shadow of Chaos owns army-wide objective-region state and cross-player Battle-shock orchestration; its model-return sub-effect delegates to the generic typed healing and revival decision services.",
+  "decision_types": [
+    "select_healing_model",
+    "submit_healing_revival_placement"
+  ],
+  "load_support_status": "loaded",
+  "named_handler_budget_execution_id": "phase17f:phase17e:chaos-daemons:army-rule",
+  "named_handler_classification": "approved_successor_of_existing_army_rule_orchestrator",
+  "normalized_rule_text": "While a friendly LEGIONES DAEMONICA unit is within your army's Shadow of Chaos, each time that unit makes a Battle-shock roll, that unit has +1 to that Battle-shock roll and, if that roll is successful, one model in that unit heals D3 wounds (if that unit is a BATTLELINE unit and that roll is successful, up to D3 destroyed models (excluding CHARACTER models) can be returned to that unit instead).",
+  "phase17e_descriptor_id": "gw-11e-faction-packs-2026-07:phase17e:army-rule:chaos-daemons:daemonic-manifestation",
+  "phase17f_execution_id": "gw-11e-faction-packs-2026-07:phase17f:army-rule:chaos-daemons:daemonic-manifestation",
+  "predecessor_source_rule_id": "phase17f:phase17e:chaos-daemons:army-rule",
+  "provider_activation_status": "current_default",
+  "raw_rule_text": "While a friendly LEGIONES DAEMONICA unit is within your army's Shadow of Chaos, each time that unit makes a Battle-shock roll, that unit has +1 to that Battle-shock roll and, if that roll is successful, one model in that unit heals D3 wounds (if that unit is a BATTLELINE unit and that roll is successful, up to D3 destroyed models (excluding CHARACTER models) can be returned to that unit instead).",
+  "rule_name": "Daemonic Manifestation",
+  "runtime_consumer_ids": [
+    "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
+  ],
+  "runtime_provider_id": "warhammer_40000_11th:chaos_daemons:faction_manifest:july_2026",
+  "semantic_execution_status": "executable_named_handler",
+  "source_date": "2026-07-22",
+  "source_package_id": "gw-11e-faction-packs-2026-07",
+  "source_pdf_package_id": "gw-11e-chaos-daemons-faction-pack-2026-07",
+  "source_pdf_page": 1,
+  "source_row_id": "gw-11e-faction-packs-2026-07:army-rule:chaos-daemons:daemonic-manifestation"
+}

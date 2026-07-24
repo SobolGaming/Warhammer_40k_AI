@@ -70,6 +70,33 @@ def healing_source_context_bool(source_context: JsonValue, key: str) -> bool:
     return value
 
 
+def healing_source_context_identifier_tuple(
+    source_context: JsonValue,
+    key: str,
+) -> tuple[str, ...] | None:
+    if not isinstance(source_context, dict):
+        return None
+    value = source_context.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, list):
+        raise GameLifecycleError("Healing source-context identifier collection must be a list.")
+    identifiers: list[str] = []
+    seen: set[str] = set()
+    for item in value:
+        if type(item) is not str or not item.strip() or item != item.strip():
+            raise GameLifecycleError(
+                "Healing source-context identifier collection contains an invalid identifier."
+            )
+        if item in seen:
+            raise GameLifecycleError(
+                "Healing source-context identifier collection contains duplicates."
+            )
+        identifiers.append(item)
+        seen.add(item)
+    return tuple(identifiers)
+
+
 def revival_wounds_remaining(source_context: JsonValue, starting_wounds: int) -> int:
     if healing_source_context_bool(source_context, "revive_model_full_health"):
         return starting_wounds

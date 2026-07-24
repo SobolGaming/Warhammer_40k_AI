@@ -25,6 +25,9 @@ from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
 from warhammer40k_core.engine.stratagems_apply import *
 from warhammer40k_core.engine.stratagems_selection import *
+from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
+    phase_use_exception_restriction_violation,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -238,12 +241,17 @@ def _restriction_violation(
 ) -> str | None:
     policy = definition.restriction_policy
     previous_uses = state.stratagem_use_records_for_player(player_id)
-    if policy.same_stratagem_per_phase and any(
-        use.stratagem_id == definition.stratagem_id
-        and _same_stratagem_phase(use=use, context=context)
-        for use in previous_uses
-    ):
-        return "same_stratagem_per_phase"
+    if policy.same_stratagem_per_phase:
+        phase_use_violation = phase_use_exception_restriction_violation(
+            state=state,
+            player_id=player_id,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+            previous_uses=previous_uses,
+        )
+        if phase_use_violation is not None:
+            return phase_use_violation
     if policy.once_per_turn and any(
         use.stratagem_id == definition.stratagem_id
         and use.battle_round == context.battle_round

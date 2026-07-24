@@ -339,6 +339,7 @@ class CatalogCommandPointRuntime:
                 "stratagem_id": context.definition.stratagem_id,
                 "stratagem_player_id": context.eligibility_context.player_id,
                 "target_unit_instance_id": context.target_binding.target_unit_instance_id,
+                "target_unit_instance_ids": list(_cost_choice_target_unit_ids(context=context)),
                 "source_decision_request_id": context.source_request.request_id,
                 "source_decision_result_id": context.source_result.result_id,
                 "request_id": context.request.request_id,
@@ -492,6 +493,17 @@ class CatalogCommandPointRuntime:
             != stratagem_player_id
         ):
             return False
+        target_unit_ids = tuple(
+            unit_id
+            for unit_id in _cost_choice_target_unit_ids(context=context)
+            if rules_unit_owner_player_id(
+                state=context.state,
+                unit_instance_id=unit_id,
+            )
+            == stratagem_player_id
+        )
+        if not target_unit_ids:
+            return False
         parameters = command_point_effect_parameters(source.clause)
         stratagem_id = parameters.get("stratagem_id")
         if stratagem_id is not None:
@@ -513,20 +525,21 @@ class CatalogCommandPointRuntime:
         trigger_parameters = parameter_payload(_required_trigger(source.clause).parameters)
         relationship = trigger_parameters.get("source_relationship")
         if relationship == "stratagem_targets_source_unit":
-            if rules_unit_id_for_unit_id(
+            source_rules_unit_id = rules_unit_id_for_unit_id(
                 armies=self.armies,
                 unit_instance_id=source.source_unit_instance_id,
-            ) != rules_unit_id_for_unit_id(
-                armies=self.armies,
-                unit_instance_id=target_unit_id,
-            ):
+            )
+            if source_rules_unit_id not in target_unit_ids:
                 return False
         elif relationship == "stratagem_targets_unit_within_source_model_range":
-            if not _source_model_is_within_target_range(
-                state=context.state,
-                source_model_instance_id=source.source_model_instance_id,
-                target_unit_instance_id=target_unit_id,
-                range_inches=_cost_source_range_inches(source.clause),
+            if not any(
+                _source_model_is_within_target_range(
+                    state=context.state,
+                    source_model_instance_id=source.source_model_instance_id,
+                    target_unit_instance_id=target_id,
+                    range_inches=_cost_source_range_inches(source.clause),
+                )
+                for target_id in target_unit_ids
             ):
                 return False
         elif relationship != "stratagem_targets_friendly_unit":
@@ -655,6 +668,7 @@ def _cost_choice_request(
             "stratagem_id": context.definition.stratagem_id,
             "stratagem_player_id": context.eligibility_context.player_id,
             "target_unit_instance_id": context.target_binding.target_unit_instance_id,
+            "target_unit_instance_ids": list(_cost_choice_target_unit_ids(context=context)),
             "source_decision_request_id": context.source_request.request_id,
             "source_decision_result_id": context.source_result.result_id,
             "source_decision_result": source_result_payload_for_cost_choice(context.source_result),
@@ -691,6 +705,7 @@ def _cost_choice_option(
             "source_unit_instance_id": source.source_unit_instance_id,
             "source_model_instance_id": source.source_model_instance_id,
             "target_unit_instance_id": context.target_binding.target_unit_instance_id,
+            "target_unit_instance_ids": list(_cost_choice_target_unit_ids(context=context)),
             "source_decision_request_id": context.source_request.request_id,
             "source_decision_result_id": context.source_result.result_id,
             "use_ability": use_ability,
@@ -715,12 +730,32 @@ def _validate_cost_choice_result_context(
         "source_unit_instance_id": source.source_unit_instance_id,
         "source_model_instance_id": source.source_model_instance_id,
         "target_unit_instance_id": context.target_binding.target_unit_instance_id,
+        "target_unit_instance_ids": list(_cost_choice_target_unit_ids(context=context)),
         "source_decision_request_id": context.source_request.request_id,
         "source_decision_result_id": context.source_result.result_id,
     }
     for key, expected_value in expected.items():
         if result_payload.get(key) != expected_value:
             raise GameLifecycleError(f"Catalog Stratagem cost choice {key} drift.")
+
+
+def _cost_choice_target_unit_ids(
+    *,
+    context: StratagemCostChoiceRequestContext
+    | StratagemCostChoiceResultContext
+    | StratagemCostModifierContext,
+) -> tuple[str, ...]:
+    from warhammer40k_core.engine.stratagems_eligibility import (
+        _stratagem_affected_unit_ids,
+    )
+
+    return _stratagem_affected_unit_ids(
+        state=context.state,
+        definition=context.definition,
+        context=context.eligibility_context,
+        target_binding=context.target_binding,
+        effect_selection=context.effect_selection,
+    )
 
 
 def _cost_choice_answered(

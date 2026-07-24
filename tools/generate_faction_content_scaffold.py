@@ -192,6 +192,11 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
         "court_of_the_phoenician:stratagems:rule_ir"
     ),
 }
+CURRENT_FACTION_MODULE_FILENAMES_BY_FACTION_ID = {
+    "chaos-daemons": "july_2026",
+    "emperors-children": "july_2026",
+    "thousand-sons": "july_2026",
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -337,6 +342,12 @@ def module_name_for_id(identifier: str) -> str:
     if module_name.isidentifier() and not keyword.iskeyword(module_name):
         return module_name
     return f"content_{module_name}"
+
+
+def current_faction_module_path_for_id(faction_id: str) -> str:
+    faction_module = module_name_for_id(faction_id)
+    module_filename = CURRENT_FACTION_MODULE_FILENAMES_BY_FACTION_ID.get(faction_id, "manifest")
+    return f"{BASE_IMPORT_PATH}.{faction_module}.{module_filename}"
 
 
 def write_expected_files(*, force: bool = False) -> None:
@@ -526,6 +537,14 @@ def _detachment_manifest_content(*, faction_module: str, detachment_module: str)
 
 
 def _generated_manifest_content() -> str:
+    current_faction_module_paths = "\n".join(
+        (
+            f'    "{row.faction_id}": f"{{_BASE}}.'
+            f"{module_name_for_id(row.faction_id)}."
+            f'{CURRENT_FACTION_MODULE_FILENAMES_BY_FACTION_ID.get(row.faction_id, "manifest")}",'
+        )
+        for row in faction_detachments_2026_27.faction_rows()
+    )
     return (
         f"{_generated_header()}\n"
         "import keyword\n"
@@ -548,6 +567,9 @@ def _generated_manifest_content() -> str:
         '_SOURCE_PACKAGE_ID = _SOURCE_IDENTITY["source_package_id"]\n'
         '_SOURCE_PACKAGE_HASH = _SOURCE_IDENTITY["source_payload_checksum_sha256"]\n'
         "_EXECUTION_RECORDS = faction_execution_2026_27.execution_records()\n"
+        "_CURRENT_FACTION_MODULE_PATHS = {\n"
+        f"{current_faction_module_paths}\n"
+        "}\n"
         "\n"
         "\n"
         "def generated_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:\n"
@@ -573,7 +595,6 @@ def _generated_manifest_content() -> str:
         "def _faction_row(\n"
         "    row: faction_detachments_2026_27.SourceFactionRow,\n"
         ") -> RuntimeContentManifestRow:\n"
-        "    faction_module = _module_name_for_id(row.faction_id)\n"
         "    execution_record_ids = _execution_ids_for(\n"
         "        faction_id=row.faction_id,\n"
         "        detachment_id=None,\n"
@@ -585,9 +606,18 @@ def _generated_manifest_content() -> str:
         "        owner_faction_id=row.faction_id,\n"
         "        owner_detachment_id=None,\n"
         "        execution_record_ids=execution_record_ids,\n"
-        '        module_path=f"{_BASE}.{faction_module}.manifest",\n'
+        "        module_path=_current_faction_module_path(row.faction_id),\n"
         "        semantic_status=_semantic_status_for_execution_ids(execution_record_ids),\n"
         "    )\n"
+        "\n"
+        "\n"
+        "def _current_faction_module_path(faction_id: str) -> str:\n"
+        "    try:\n"
+        "        return _CURRENT_FACTION_MODULE_PATHS[faction_id]\n"
+        "    except KeyError as exc:\n"
+        "        raise GameLifecycleError(\n"
+        '            "Generated runtime manifest has no current faction module mapping."\n'
+        "        ) from exc\n"
         "\n"
         "\n"
         "def _detachment_row(\n"

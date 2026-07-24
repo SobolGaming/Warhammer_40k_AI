@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import cast
@@ -163,7 +163,7 @@ from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_execution_2026_27,
-    faction_generic_ir_support_2026_27,
+    faction_rule_ir_promotion_2026_07,
 )
 
 _Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
@@ -269,11 +269,16 @@ def fight_activation_ability_hook_bindings(
     *,
     activation: RuntimeContentActivation,
     execution_records: tuple[_Phase17FExecutionRecord, ...],
+    rule_ir_resolver: Callable[[str], RuleIR] = (
+        faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id
+    ),
 ) -> tuple[FightActivationAbilityHookBinding, ...]:
     if type(activation) is not RuntimeContentActivation:
         raise GameLifecycleError("Generic fight activation bindings require activation.")
     if type(execution_records) is not tuple:
         raise GameLifecycleError("Generic fight activation bindings require execution records.")
+    if not callable(rule_ir_resolver):
+        raise GameLifecycleError("Generic fight activation RuleIR resolver must be callable.")
     assignments_by_enhancement_id = _assignments_by_enhancement_id(activation)
     bindings: list[FightActivationAbilityHookBinding] = []
     for record in execution_records:
@@ -285,7 +290,7 @@ def fight_activation_ability_hook_bindings(
         assignments = assignments_by_enhancement_id.get(enhancement_id)
         if assignments is None:
             continue
-        rule_ir = _rule_ir_for_record(record)
+        rule_ir = _rule_ir_for_record(record, rule_ir_resolver=rule_ir_resolver)
         if not rule_ir_grants_any_ability(
             rule_ir,
             abilities=(_FIGHT_ACTIVATION_TARGETING_ABILITY,),
@@ -1305,10 +1310,18 @@ def _record_rule_id(record: _Phase17FExecutionRecord) -> str:
     return record.rule_id
 
 
-def _rule_ir_for_record(record: _Phase17FExecutionRecord) -> RuleIR:
-    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-        record.coverage_descriptor_id
-    )
+def _rule_ir_for_record(
+    record: _Phase17FExecutionRecord,
+    *,
+    rule_ir_resolver: Callable[[str], RuleIR] = (
+        faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id
+    ),
+) -> RuleIR:
+    if not callable(rule_ir_resolver):
+        raise GameLifecycleError("Generic lifecycle RuleIR resolver must be callable.")
+    rule_ir = rule_ir_resolver(record.coverage_descriptor_id)
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Generic lifecycle RuleIR resolver returned invalid value.")
     _validate_record_rule_ir_hash(record=record, rule_ir=rule_ir)
     return rule_ir
 
