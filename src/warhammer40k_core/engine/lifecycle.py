@@ -107,12 +107,13 @@ from warhammer40k_core.engine.event_log import (
     canonical_json,
     validate_json_value,
 )
-from warhammer40k_core.engine.faction_content.bundle import (
-    RuntimeContentBundle,
-)
+from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import (
     build_runtime_content_bundle_for_armies,
     runtime_content_activation_for_armies,
+)
+from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
+    combine_stratagem_indexes_with_runtime_overrides,
 )
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
@@ -572,25 +573,9 @@ def _combined_runtime_stratagem_index(
 ) -> StratagemCatalogIndex:
     if type(bundle) is not RuntimeContentBundle:
         raise GameLifecycleError("Runtime Stratagem index requires RuntimeContentBundle.")
-    if type(base_indexes) is not tuple:
-        raise GameLifecycleError("Runtime Stratagem index base indexes must be a tuple.")
-    records_by_id: dict[str, StratagemCatalogRecord] = {}
-    for base_index in base_indexes:
-        if type(base_index) is not StratagemCatalogIndex:
-            raise GameLifecycleError("Runtime Stratagem index base value must be an index.")
-        for record in base_index.all_records():
-            existing = records_by_id.get(record.record_id)
-            if existing is not None and existing != record:
-                raise GameLifecycleError("Base Stratagem record ID drift across phase indexes.")
-            records_by_id[record.record_id] = record
-    for player_index in bundle.stratagem_indexes_by_player_id.values():
-        for record in player_index.all_records():
-            existing = records_by_id.get(record.record_id)
-            if existing is not None and existing != record:
-                raise GameLifecycleError("Runtime Stratagem record ID drift across player indexes.")
-            records_by_id[record.record_id] = record
-    return StratagemCatalogIndex.from_records(
-        tuple(records_by_id[record_id] for record_id in sorted(records_by_id))
+    return combine_stratagem_indexes_with_runtime_overrides(
+        base_indexes=base_indexes,
+        runtime_indexes=tuple(bundle.stratagem_indexes_by_player_id.values()),
     )
 
 
@@ -829,9 +814,16 @@ class GameLifecycle:
         return payload
 
     @classmethod
-    def from_payload(cls, payload: GameLifecyclePayload) -> Self:
+    def from_payload(
+        cls,
+        payload: GameLifecyclePayload,
+        *,
+        runtime_content_bundle: RuntimeContentBundle | None = None,
+    ) -> Self:
         config_payload = payload["config"]
         config = None if config_payload is None else GameConfig.from_payload(config_payload)
+        if runtime_content_bundle is not None and config is None:
+            raise GameLifecycleError("Explicit runtime content restoration requires config.")
         parameterized_movement_proposals = _payload_bool(
             "GameLifecycle parameterized_movement_proposals",
             payload["parameterized_movement_proposals"],
@@ -842,6 +834,7 @@ class GameLifecycle:
             state=GameState.from_payload(payload["state"]),
             parameterized_movement_proposals=parameterized_movement_proposals,
             _config=config,
+            _runtime_content_bundle=runtime_content_bundle,
             _runtime_content_audit=_runtime_content_audit_from_payload(
                 payload.get("runtime_content_audit")
             ),
@@ -872,6 +865,13 @@ class GameLifecycle:
             pending_request=lifecycle._pending_decision_request(),
             reaction_frame_decision_types=_REACTION_FRAME_DECISION_TYPES,
         )
+        if runtime_content_bundle is not None:
+            lifecycle._runtime_content_activation_input_hash = (
+                _runtime_content_activation_input_hash(
+                    config=cast(GameConfig, config),
+                    armies=tuple(lifecycle._require_state().army_definitions),
+                )
+            )
         lifecycle._refresh_runtime_content_bundle_if_armies_mustered()
         lifecycle._battle_round_flow = BattleRoundFlow(
             phase_handlers=lifecycle._phase_handlers(),

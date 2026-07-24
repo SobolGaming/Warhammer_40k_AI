@@ -31,6 +31,7 @@ from ._artifacts import (
 JULY_DAEMONIC_MANIFESTATION_SCHEMA = "core-v2-july-chaos-daemons-daemonic-manifestation-v1"
 JULY_CHAOS_DAEMONS_RUNTIME_SCHEMA = "core-v2-july-chaos-daemons-runtime-updates-v1"
 JULY_EXALTED_PATRON_SCHEMA = "core-v2-july-emperors-children-exalted-patron-v1"
+JULY_THOUSAND_SONS_DEFILER_SCHEMA = "core-v2-july-thousand-sons-defiler-v1"
 
 
 class JulyDaemonicManifestationArtifact(msgspec.Struct, frozen=True):
@@ -323,6 +324,209 @@ def july_chaos_daemons_runtime_from_json_bytes(
     except msgspec.DecodeError as exc:
         raise JulyFactionPackStagingError(
             "July Chaos Daemons runtime artifact is invalid."
+        ) from exc
+    artifact.validate()
+    return artifact
+
+
+class JulyThousandSonsDefilerOverlayOperation(msgspec.Struct, frozen=True):
+    op_id: str
+    order_index: int
+    operation_kind: str
+    source_table: str
+    source_row_id: str
+    expected_preimage_hash: str
+    reason: str
+    fields: dict[str, str]
+
+
+class JulyThousandSonsDefilerArtifact(msgspec.Struct, frozen=True):
+    artifact_schema: str
+    artifact_id: str
+    audited_chaos_space_marines_datasheet_id: str
+    source_package_id: str
+    source_date: str
+    source_pdf_package_id: str
+    source_pdf_page: int
+    datasheet_id: str
+    source_rule_row_id: str
+    source_ability_id: str
+    source_rule_name: str
+    removed_ability_id: str
+    aligned_defiler_datasheet_ids: list[str]
+    load_support_status: str
+    semantic_execution_status: str
+    old_rule_ir_semantics: str
+    counteroffensive_stratagem_id: str
+    counteroffensive_handler_id: str
+    runtime_consumer_ids: list[str]
+    runtime_provider_id: str
+    provider_activation_status: str
+    operations: list[JulyThousandSonsDefilerOverlayOperation]
+
+    def validate(self) -> None:
+        if (
+            self.artifact_schema != JULY_THOUSAND_SONS_DEFILER_SCHEMA
+            or self.artifact_id != "gw-11e-july-thousand-sons-defiler-2026-07"
+        ):
+            raise JulyFactionPackStagingError(
+                "July Thousand Sons Defiler artifact identity drifted."
+            )
+        if (
+            self.source_package_id != JULY_FACTION_PACK_SOURCE_PACKAGE_ID
+            or self.source_date != JULY_FACTION_PACK_SOURCE_DATE
+            or self.source_pdf_package_id != "gw-11e-thousand-sons-faction-pack-2026-07"
+            or self.source_pdf_page != 7
+        ):
+            raise JulyFactionPackStagingError(
+                "July Thousand Sons Defiler source identity is invalid."
+            )
+        if (
+            self.datasheet_id != "000001030"
+            or self.audited_chaos_space_marines_datasheet_id != "000000969"
+            or self.source_rule_row_id != "000001030:4"
+            or self.source_ability_id != "000001030:destroyer-of-futures"
+            or self.source_rule_name != "Destroyer of Futures"
+            or self.removed_ability_id != "000008338"
+        ):
+            raise JulyFactionPackStagingError("July Thousand Sons Defiler source rows drifted.")
+        _validate_exact_identifier_list(
+            "Thousand Sons aligned Defiler datasheet IDs",
+            self.aligned_defiler_datasheet_ids,
+            expected=("000001030", "000004207", "000004208", "000004209"),
+        )
+        if (
+            self.load_support_status != "loaded"
+            or self.semantic_execution_status != "executable_generic_runtime"
+            or self.old_rule_ir_semantics != "removed_minimum_hit_threshold"
+        ):
+            raise JulyFactionPackStagingError(
+                "July Thousand Sons Defiler support status is invalid."
+            )
+        if (
+            self.counteroffensive_stratagem_id != "counteroffensive"
+            or self.counteroffensive_handler_id != "core:counteroffensive"
+        ):
+            raise JulyFactionPackStagingError(
+                "July Thousand Sons Defiler must retain core Counteroffensive."
+            )
+        _validate_exact_identifier_list(
+            "Thousand Sons Defiler runtime consumer IDs",
+            self.runtime_consumer_ids,
+            expected=(
+                "warhammer_40000_11th:thousand_sons:defiler:"
+                "destroyer-of-futures:phase-use-exception",
+                "warhammer_40000_11th:thousand_sons:defiler:"
+                "destroyer-of-futures:counteroffensive-discount",
+            ),
+        )
+        if (
+            self.runtime_provider_id
+            != "warhammer_40000_11th:thousand_sons:faction_manifest:july_2026_candidate"
+            or self.provider_activation_status != "candidate_only"
+        ):
+            raise JulyFactionPackStagingError(
+                "July Thousand Sons Defiler provider must remain candidate-only."
+            )
+        self._validate_operations()
+
+    def _validate_operations(self) -> None:
+        expected = {
+            "july-thousand-sons-defiler-remove-empty-keyword": (
+                10,
+                "supersede_row",
+                "Datasheets_keywords",
+                "000001030:blank-keyword:global:true:4079",
+                "a131c8969fe780eefdb815c36fb247c299d9231321e0a90f2ad5ce06b524c978",
+            ),
+            "july-world-eaters-defiler-remove-empty-keyword": (
+                20,
+                "supersede_row",
+                "Datasheets_keywords",
+                "000004207:blank-keyword:global:true:15727",
+                "e8c91f47e38689afa7b59c36721643fee719c36c9440f7cb96ba72f9951a67bc",
+            ),
+            "july-emperors-children-defiler-remove-empty-keyword": (
+                30,
+                "supersede_row",
+                "Datasheets_keywords",
+                "000004208:blank-keyword:global:true:15734",
+                "bb0bd82976f6829978c930144924225dff06654ffae55fde2df78865d2dcde52",
+            ),
+            "july-death-guard-defiler-remove-empty-keyword": (
+                40,
+                "supersede_row",
+                "Datasheets_keywords",
+                "000004209:blank-keyword:global:true:15742",
+                "fca69bb8584c336c3e97a9ca4cbb64dd1eb515ee48c871e7c3b5ee28aaefa342",
+            ),
+            "july-thousand-sons-defiler-remove-feel-no-pain": (
+                50,
+                "supersede_row",
+                "Datasheets_abilities",
+                "000001030:2",
+                "ec4cc4309f022b6727d380d7cd123b6e0984d3c7e57d3e529084356abd5749ca",
+            ),
+            "july-thousand-sons-defiler-replace-destroyer-of-futures": (
+                60,
+                "update_row",
+                "Datasheets_abilities",
+                "000001030:4",
+                "6a984fb7a66ef5b2deebc2aa7974ab7089435c3e573d309859cf0d764b8a47ce",
+            ),
+        }
+        if len(self.operations) != len(expected):
+            raise JulyFactionPackStagingError(
+                "July Thousand Sons Defiler overlay operation set drifted."
+            )
+        seen_operation_ids: set[str] = set()
+        for operation in self.operations:
+            _validate_identifier("Thousand Sons Defiler overlay op_id", operation.op_id)
+            if operation.op_id in seen_operation_ids:
+                raise JulyFactionPackStagingError(
+                    "July Thousand Sons Defiler overlay operation IDs must be unique."
+                )
+            seen_operation_ids.add(operation.op_id)
+            actual = (
+                operation.order_index,
+                operation.operation_kind,
+                operation.source_table,
+                operation.source_row_id,
+                operation.expected_preimage_hash,
+            )
+            if expected.get(operation.op_id) != actual:
+                raise JulyFactionPackStagingError(
+                    "July Thousand Sons Defiler overlay operation drifted."
+                )
+            if operation.operation_kind == "update_row":
+                expected_description = (
+                    "Once per phase, per unit: You can target this unit with the "
+                    "Counteroffensive stratagem, regardless of any other uses of that "
+                    "stratagem this phase. If you do: That use is -1 CP. That use does "
+                    "not prevent any uses of that stratagem on other units this phase."
+                )
+                if operation.fields != {"description": expected_description}:
+                    raise JulyFactionPackStagingError(
+                        "July Destroyer of Futures replacement text drifted."
+                    )
+            elif operation.fields:
+                raise JulyFactionPackStagingError(
+                    "July Defiler supersede operations must not edit fields."
+                )
+        if seen_operation_ids != set(expected):
+            raise JulyFactionPackStagingError(
+                "July Thousand Sons Defiler overlay operation set drifted."
+            )
+
+
+def july_thousand_sons_defiler_from_json_bytes(
+    raw: bytes,
+) -> JulyThousandSonsDefilerArtifact:
+    try:
+        artifact = msgspec.json.decode(raw, type=JulyThousandSonsDefilerArtifact)
+    except msgspec.DecodeError as exc:
+        raise JulyFactionPackStagingError(
+            "July Thousand Sons Defiler artifact is invalid."
         ) from exc
     artifact.validate()
     return artifact

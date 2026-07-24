@@ -62,6 +62,7 @@ def test_july_faction_pack_staging_uses_typed_json_artifacts() -> None:
         "phase17f-execution.json",
         "runtime-scaffolds.json",
         "subrules.json",
+        "thousand-sons-defiler.json",
     )
     assert _line_count(JULY_FACTION_PACK_PACKAGE / "_artifacts.py") < 1500
     assert _line_count(JULY_FACTION_PACK_PACKAGE / "_runtime_artifacts.py") < 1500

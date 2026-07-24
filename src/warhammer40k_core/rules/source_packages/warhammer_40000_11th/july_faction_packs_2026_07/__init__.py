@@ -40,9 +40,11 @@ from ._runtime_artifacts import (
     JulyChaosDaemonsRuntimeRow,
     JulyDaemonicManifestationArtifact,
     JulyExaltedPatronArtifact,
+    JulyThousandSonsDefilerArtifact,
     july_chaos_daemons_runtime_from_json_bytes,
     july_daemonic_manifestation_from_json_bytes,
     july_exalted_patron_from_json_bytes,
+    july_thousand_sons_defiler_from_json_bytes,
 )
 
 _PACKAGE_ARTIFACT_PATH: Final = "artifacts/package.json"
@@ -134,6 +136,12 @@ def chaos_daemons_runtime_updates() -> JulyChaosDaemonsRuntimeArtifact:
 def exalted_patron() -> JulyExaltedPatronArtifact:
     return july_exalted_patron_from_json_bytes(
         _staged_artifact_bytes("gw-11e-july-emperors-children-exalted-patron-2026-07")
+    )
+
+
+def thousand_sons_defiler() -> JulyThousandSonsDefilerArtifact:
+    return july_thousand_sons_defiler_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-thousand-sons-defiler-2026-07")
     )
 
 
@@ -242,6 +250,7 @@ __all__ = (
     "JulyRuntimeScaffoldArtifact",
     "JulyStagingPackageArtifact",
     "JulySubruleArtifact",
+    "JulyThousandSonsDefilerArtifact",
     "audit_datasheet_preview_links",
     "audit_load_only_artifact_links",
     "audit_manifest_links",
@@ -261,4 +270,5 @@ __all__ = (
     "staged_identity_tokens",
     "staging_package",
     "subrules",
+    "thousand_sons_defiler",
 )

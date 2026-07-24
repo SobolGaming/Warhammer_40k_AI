@@ -33,6 +33,15 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_chil
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
     manifest as emperors_children_june_manifest,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
+    july_2026_candidate as thousand_sons_july_candidate,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
+    manifest as thousand_sons_june_manifest,
+)
+from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
+    stratagem_phase_use_exception,
+)
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, parameter_payload
 from warhammer40k_core.rules.source_overlay import (
@@ -703,6 +712,45 @@ def test_july_exalted_patron_artifact_is_candidate_only_generic_rule_ir() -> Non
     )
     assert frenzied_host.execution_status == "blocked_structured_semantics_required"
     assert frenzied_host.runtime_consumer_ids == []
+
+
+def test_july_thousand_sons_defiler_artifact_and_provider_remain_candidate_only() -> None:
+    artifact = july_faction_packs_2026_07.thousand_sons_defiler()
+    june = thousand_sons_june_manifest.runtime_contribution()
+    candidate = thousand_sons_july_candidate.runtime_contribution()
+    record = candidate.stratagem_records[0]
+    exception = stratagem_phase_use_exception(record.definition)
+
+    assert artifact.aligned_defiler_datasheet_ids == [
+        "000001030",
+        "000004207",
+        "000004208",
+        "000004209",
+    ]
+    assert artifact.audited_chaos_space_marines_datasheet_id == "000000969"
+    assert artifact.old_rule_ir_semantics == "removed_minimum_hit_threshold"
+    assert artifact.semantic_execution_status == "executable_generic_runtime"
+    assert artifact.provider_activation_status == "candidate_only"
+    assert june.contribution_id != artifact.runtime_provider_id
+    assert june.stratagem_records == ()
+    assert june.stratagem_cost_modifier_bindings == ()
+    assert candidate.contribution_id == artifact.runtime_provider_id
+    assert record.definition.handler_id == artifact.counteroffensive_handler_id
+    assert exception is not None
+    assert exception.source_ability_id == artifact.source_ability_id
+    assert exception.eligible_datasheet_ids == (artifact.datasheet_id,)
+    assert tuple(binding.modifier_id for binding in candidate.stratagem_cost_modifier_bindings) == (
+        artifact.runtime_consumer_ids[1],
+    )
+
+    active_thousand_sons_row = next(
+        row
+        for row in generated_manifest.generated_runtime_content_rows()
+        if row.owner_faction_id == "thousand-sons" and row.owner_detachment_id is None
+    )
+    assert active_thousand_sons_row.module_path is not None
+    assert active_thousand_sons_row.module_path.endswith(".thousand_sons.manifest")
+    assert "july_2026_candidate" not in active_thousand_sons_row.module_path
 
 
 def test_july_kairos_uses_existing_generic_stratagem_cost_semantics() -> None:

@@ -941,6 +941,25 @@ Phase 15E adds these Stratagem-coupled Charge/Fight decisions:
 - Counteroffensive and Epic Challenge are `submit_stratagem_target_proposal` requests emitted from Fight-step timing hooks. Counteroffensive target proposals are reaction-window requests for the opponent after an enemy unit has resolved attacks. Epic Challenge target proposals are declinable requests for the player whose CHARACTER unit has just been selected to fight.
 - Crushing Impact is a Charge-phase `submit_stratagem_target_proposal` after a friendly MONSTER/VEHICLE ends a Charge Move. Its nested enemy/model selections are carried in `effect_selection`, not in adapter-owned state.
 
+Source-backed per-unit exceptions to Counteroffensive's same-Stratagem-per-phase
+restriction retain this proposal shape and the `core:counteroffensive` handler.
+When such a source is active, the embedded catalog record's
+`definition.effect_payload.stratagem_phase_use_exception` contains the stable
+source ability ID, runtime descriptor ID, exact eligible datasheet IDs,
+`frequency_scope: "phase_per_unit"`, and the two non-blocking phase-use flags.
+The engine may therefore keep the parameterized opportunity available after an
+earlier Counteroffensive use when the actor owns a qualifying unit. Adapters
+must treat this payload as engine-owned availability context: they must not
+infer qualifying units from display names or rule text, suppress the opportunity
+because another unit used Counteroffensive, or synthesize an additional use.
+Target-specific validation rejects a second use by the same qualifying unit
+with `source_ability_once_per_phase_per_unit`. Accepted qualifying uses still
+follow the ordinary proposal, CP transaction, `StratagemUseRecord`,
+`stratagem_used`, `counteroffensive_activation_selected`, and replay paths.
+Any source-backed CP discount is recorded in
+`command_point_modifier_ids` and `command_point_modifier_source_ids`; no new
+decision type or proposal field is introduced.
+
 Adapters must not synthesize these timing windows, `effect_selection` keys, charge-move reachable-target snapshots, model Toughness rolls, Fights First effects, Precision effects, or mortal-wound applications. They select pending options or submit the pending proposal shape, and the engine owns validation and mutation.
 
 Phase 14H updates Transport Disembark decisions to expose the source-backed `disembark_mode` on every pending `select_disembark_unit`, `submit_placement_proposal`, Disembark selection payload, Disembarked unit state, destroyed-Transport disembark payload, and `unit_disembarked` event. Valid mode tokens are `rapid_disembark`, `tactical_disembark`, `combat_disembark`, `destroyed_transport`, and `emergency_disembark`. Adapters must submit the pending mode token unchanged unless the pending placement proposal context exposes an explicit `allowed_disembark_modes` list containing the submitted token; stale, malformed, omitted, or wrong-mode finite and parameterized submissions reject before authoritative mutation. Tactical and Rapid Disembark placement is always submitted through `submit_placement_proposal`; adapters must not infer or synthesize model placement from finite option payloads. `rapid_disembark` is used for post-Normal/Ingress Transport movement and records no further movement or charge permission. `tactical_disembark` is used for pre-move stationary/not-yet-selected Transports, forbids choosing Remain Stationary afterward, and routes the unit back through the shared Movement action decision path. When a pre-move Tactical placement proposal advertises both `tactical_disembark` and `combat_disembark` in `allowed_disembark_modes`, a submitted Combat placement is accepted only after the engine first evaluates the same submitted placement as Tactical and records deterministic Tactical-invalid fallback evidence; if that Tactical placement is legal, the Combat submission is rejected and the placement request is re-emitted. `destroyed_transport` and `emergency_disembark` are replay/domain modes for the corresponding source-backed destroyed-Transport rule paths and must not be inferred locally from placement distance; the engine emits the required placement proposal from the actual destruction event before Transport removal and Deadly Demise resolution, and lifecycle submission routes the accepted placement back through the owning attack sequence. `combat_disembark` has a dedicated domain resolver for 6" placement, official 1-2 Hazard Rolls, shared mortal-wound/Feel No Pain routing, Battle-shock, no-charge state, and the narrow permission to set up engaged only with enemy units engaged with the Transport.

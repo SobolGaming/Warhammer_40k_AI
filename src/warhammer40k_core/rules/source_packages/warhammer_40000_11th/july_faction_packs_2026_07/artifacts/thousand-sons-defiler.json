@@ -1,0 +1,95 @@
+{
+  "aligned_defiler_datasheet_ids": [
+    "000001030",
+    "000004207",
+    "000004208",
+    "000004209"
+  ],
+  "artifact_id": "gw-11e-july-thousand-sons-defiler-2026-07",
+  "artifact_schema": "core-v2-july-thousand-sons-defiler-v1",
+  "audited_chaos_space_marines_datasheet_id": "000000969",
+  "counteroffensive_handler_id": "core:counteroffensive",
+  "counteroffensive_stratagem_id": "counteroffensive",
+  "datasheet_id": "000001030",
+  "load_support_status": "loaded",
+  "old_rule_ir_semantics": "removed_minimum_hit_threshold",
+  "operations": [
+    {
+      "expected_preimage_hash": "a131c8969fe780eefdb815c36fb247c299d9231321e0a90f2ad5ce06b524c978",
+      "fields": {},
+      "op_id": "july-thousand-sons-defiler-remove-empty-keyword",
+      "operation_kind": "supersede_row",
+      "order_index": 10,
+      "reason": "Supersede empty keyword source row before 11e Defiler bridge.",
+      "source_row_id": "000001030:blank-keyword:global:true:4079",
+      "source_table": "Datasheets_keywords"
+    },
+    {
+      "expected_preimage_hash": "e8c91f47e38689afa7b59c36721643fee719c36c9440f7cb96ba72f9951a67bc",
+      "fields": {},
+      "op_id": "july-world-eaters-defiler-remove-empty-keyword",
+      "operation_kind": "supersede_row",
+      "order_index": 20,
+      "reason": "Supersede empty keyword source row before 11e Defiler bridge.",
+      "source_row_id": "000004207:blank-keyword:global:true:15727",
+      "source_table": "Datasheets_keywords"
+    },
+    {
+      "expected_preimage_hash": "bb0bd82976f6829978c930144924225dff06654ffae55fde2df78865d2dcde52",
+      "fields": {},
+      "op_id": "july-emperors-children-defiler-remove-empty-keyword",
+      "operation_kind": "supersede_row",
+      "order_index": 30,
+      "reason": "Supersede empty keyword source row before 11e Defiler bridge.",
+      "source_row_id": "000004208:blank-keyword:global:true:15734",
+      "source_table": "Datasheets_keywords"
+    },
+    {
+      "expected_preimage_hash": "fca69bb8584c336c3e97a9ca4cbb64dd1eb515ee48c871e7c3b5ee28aaefa342",
+      "fields": {},
+      "op_id": "july-death-guard-defiler-remove-empty-keyword",
+      "operation_kind": "supersede_row",
+      "order_index": 40,
+      "reason": "Supersede empty keyword source row before 11e Defiler bridge.",
+      "source_row_id": "000004209:blank-keyword:global:true:15742",
+      "source_table": "Datasheets_keywords"
+    },
+    {
+      "expected_preimage_hash": "ec4cc4309f022b6727d380d7cd123b6e0984d3c7e57d3e529084356abd5749ca",
+      "fields": {},
+      "op_id": "july-thousand-sons-defiler-remove-feel-no-pain",
+      "operation_kind": "supersede_row",
+      "order_index": 50,
+      "reason": "Remove the superseded Feel No Pain 6+ core ability.",
+      "source_row_id": "000001030:2",
+      "source_table": "Datasheets_abilities"
+    },
+    {
+      "expected_preimage_hash": "6a984fb7a66ef5b2deebc2aa7974ab7089435c3e573d309859cf0d764b8a47ce",
+      "fields": {
+        "description": "Once per phase, per unit: You can target this unit with the Counteroffensive stratagem, regardless of any other uses of that stratagem this phase. If you do: That use is -1 CP. That use does not prevent any uses of that stratagem on other units this phase."
+      },
+      "op_id": "july-thousand-sons-defiler-replace-destroyer-of-futures",
+      "operation_kind": "update_row",
+      "order_index": 60,
+      "reason": "Apply the July Destroyer of Futures source-backed replacement.",
+      "source_row_id": "000001030:4",
+      "source_table": "Datasheets_abilities"
+    }
+  ],
+  "provider_activation_status": "candidate_only",
+  "removed_ability_id": "000008338",
+  "runtime_consumer_ids": [
+    "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception",
+    "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount"
+  ],
+  "runtime_provider_id": "warhammer_40000_11th:thousand_sons:faction_manifest:july_2026_candidate",
+  "semantic_execution_status": "executable_generic_runtime",
+  "source_ability_id": "000001030:destroyer-of-futures",
+  "source_date": "2026-07-22",
+  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
+  "source_pdf_package_id": "gw-11e-thousand-sons-faction-pack-2026-07",
+  "source_pdf_page": 7,
+  "source_rule_name": "Destroyer of Futures",
+  "source_rule_row_id": "000001030:4"
+}

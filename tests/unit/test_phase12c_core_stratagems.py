@@ -12,6 +12,7 @@ from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollSt
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
+from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.attack_sequence import (
     attack_sequence_hit_roll_spec,
@@ -42,6 +43,17 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+from warhammer40k_core.engine.faction_content.stratagem_activation import (
+    source_backed_detachment_stratagem_activation_records,
+)
+from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
+    combine_stratagem_indexes_with_runtime_overrides,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
+    july_2026_candidate as thousand_sons_july_candidate,
+)
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -50,7 +62,10 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionMode,
     TacticalSecondaryDraw,
 )
-from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.lifecycle import (
+    GameLifecycle,
+    GameLifecyclePayload,
+)
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
@@ -158,6 +173,9 @@ from warhammer40k_core.engine.weapon_declaration import (
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    july_faction_packs_2026_07,
+)
 
 
 def test_command_reroll_source_handler_resolves_via_restored_lifecycle() -> None:
@@ -2541,6 +2559,79 @@ def test_phase15e_counteroffensive_selects_next_fight_activation() -> None:
     )
 
 
+def test_july_destroyer_of_futures_uses_core_counteroffensive_paths_per_unit() -> None:
+    special_a = "army-beta:enemy-unit"
+    special_b = "army-beta:enemy-unit-2"
+    normal = "army-beta:enemy-unit-3"
+    special_lifecycle, special_status = _submit_july_counteroffensive_once(
+        previous_target_ids=(),
+        target_unit_id=special_a,
+        result_id="july-counteroffensive-special-a",
+    )
+    normal_lifecycle, normal_status = _submit_july_counteroffensive_once(
+        previous_target_ids=(special_a,),
+        target_unit_id=normal,
+        result_id="july-counteroffensive-normal-after-special",
+    )
+    second_special_lifecycle, second_special_status = _submit_july_counteroffensive_once(
+        previous_target_ids=(special_a, normal),
+        target_unit_id=special_b,
+        result_id="july-counteroffensive-special-b-after-normal",
+    )
+    repeated_lifecycle, repeated = _submit_july_counteroffensive_once(
+        previous_target_ids=(special_a, normal),
+        target_unit_id=special_a,
+        result_id="july-counteroffensive-special-a-repeat",
+    )
+
+    assert special_status.status_kind is not LifecycleStatusKind.INVALID
+    assert normal_status.status_kind is not LifecycleStatusKind.INVALID
+    assert second_special_status.status_kind is not LifecycleStatusKind.INVALID
+    artifact = july_faction_packs_2026_07.thousand_sons_defiler()
+    accepted_records = (
+        _stratagem_use_by_result_id(
+            _state(special_lifecycle),
+            "july-counteroffensive-special-a",
+        ),
+        _stratagem_use_by_result_id(
+            _state(normal_lifecycle),
+            "july-counteroffensive-normal-after-special",
+        ),
+        _stratagem_use_by_result_id(
+            _state(second_special_lifecycle),
+            "july-counteroffensive-special-b-after-normal",
+        ),
+    )
+    assert tuple(record.command_point_cost for record in accepted_records) == (1, 2, 1)
+    assert all(record.handler_id == "core:counteroffensive" for record in accepted_records)
+    assert accepted_records[0].command_point_modifier_ids == (artifact.runtime_consumer_ids[1],)
+    assert accepted_records[1].command_point_modifier_ids == ()
+    assert accepted_records[2].command_point_modifier_source_ids == (artifact.source_ability_id,)
+    assert all(record.command_point_transaction_id is not None for record in accepted_records)
+    for lifecycle in (
+        special_lifecycle,
+        normal_lifecycle,
+        second_special_lifecycle,
+    ):
+        assert _has_event(lifecycle.decision_controller, "stratagem_used")
+        assert _has_event(
+            lifecycle.decision_controller,
+            "counteroffensive_activation_selected",
+        )
+        restored_state = GameState.from_payload(_state(lifecycle).to_payload())
+        restored_decisions = DecisionController.from_payload(
+            lifecycle.decision_controller.to_payload()
+        )
+        assert restored_state.stratagem_use_records == _state(lifecycle).stratagem_use_records
+        assert restored_decisions.to_payload() == lifecycle.decision_controller.to_payload()
+        assert "<" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
+
+    assert repeated.status_kind is LifecycleStatusKind.INVALID
+    assert repeated.payload == {"invalid_reason": "source_ability_once_per_phase_per_unit"}
+    assert len(_state(repeated_lifecycle).stratagem_use_records) == 2
+    assert _state(repeated_lifecycle).command_point_total("player-b") == 2
+
+
 def test_phase15e_crushing_impact_uses_selected_enemy_and_model() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
@@ -4422,9 +4513,10 @@ def _submit_source_stratagem_target(
     result_id: str,
     trigger_payload: JsonValue = None,
     effect_selection: JsonValue = None,
+    catalog_record: StratagemCatalogRecord | None = None,
 ) -> LifecycleStatus:
     state = _state(lifecycle)
-    record = _source_stratagem_record(stratagem_id)
+    record = _source_stratagem_record(stratagem_id) if catalog_record is None else catalog_record
     context = _context(
         state=state,
         player_id=player_id,
@@ -4869,6 +4961,190 @@ def _battle_lifecycle(config: GameConfig | None = None) -> GameLifecycle:
     )
 
 
+def _july_thousand_sons_defiler_lifecycle() -> tuple[GameLifecycle, StratagemCatalogRecord]:
+    catalog = _july_thousand_sons_defiler_catalog()
+    config = _config(
+        beta_unit_selection_ids=("enemy-unit", "enemy-unit-2", "enemy-unit-3"),
+        beta_datasheet_ids=("000001030", "000001030", "core-intercessor-like-infantry"),
+        catalog=catalog,
+    )
+    state = _battle_state(config=config)
+    armies = tuple(state.army_definitions)
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=RuntimeContentActivation.from_armies(
+            armies=armies,
+            catalog=config.army_catalog,
+        ),
+        armies=armies,
+        catalog=config.army_catalog,
+        contributions=(thousand_sons_july_candidate.runtime_contribution(),),
+        base_ability_records=catalog_ability_records_from_catalog(config.army_catalog),
+        base_stratagem_records=source_backed_detachment_stratagem_activation_records(),
+    )
+    lifecycle = GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": DecisionController().to_payload(),
+            "reaction_queue": ReactionQueue().to_payload(),
+        },
+        runtime_content_bundle=bundle,
+    )
+    runtime_index = combine_stratagem_indexes_with_runtime_overrides(
+        base_indexes=(eleventh_edition_stratagem_index(),),
+        runtime_indexes=(bundle.stratagem_indexes_by_player_id["player-b"],),
+    )
+    record = next(
+        record
+        for record in runtime_index.all_records()
+        if record.definition.stratagem_id == "counteroffensive"
+    )
+    return lifecycle, record
+
+
+def _july_thousand_sons_defiler_catalog() -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    return replace(
+        catalog,
+        catalog_id="phase12c-july-thousand-sons-defiler-catalog",
+        source_package_id="data-package:core-v2:phase12c-july-thousand-sons-defiler:2026-07-22",
+        datasheets=(
+            *catalog.datasheets,
+            replace(
+                source,
+                datasheet_id="000001030",
+                name="July Thousand Sons Defiler Fixture",
+                source_ids=("datasheet:000001030:july-thousand-sons-defiler-fixture",),
+            ),
+        ),
+        detachments=tuple(
+            replace(
+                detachment,
+                unit_datasheet_ids=(*detachment.unit_datasheet_ids, "000001030"),
+            )
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in catalog.detachments
+        ),
+    )
+
+
+def _submit_july_counteroffensive_once(
+    *,
+    previous_target_ids: tuple[str, ...],
+    target_unit_id: str,
+    result_id: str,
+) -> tuple[GameLifecycle, LifecycleStatus]:
+    lifecycle, counteroffensive = _july_thousand_sons_defiler_lifecycle()
+    state = _state(lifecycle)
+    targets = (
+        "army-beta:enemy-unit",
+        "army-beta:enemy-unit-2",
+        "army-beta:enemy-unit-3",
+    )
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    state.active_player_id = "player-a"
+    for target_index, candidate_id in enumerate(targets):
+        _replace_unit_poses(
+            state,
+            unit_instance_id=candidate_id,
+            poses=tuple(Pose.at(x=2.0 + index * 2.0, y=float(target_index)) for index in range(5)),
+        )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(x=index * 2.0, y=0.0) for index in range(5)),
+    )
+    for index, previous_target_id in enumerate(previous_target_ids, start=1):
+        state.record_stratagem_use(
+            _seeded_counteroffensive_use(
+                record=counteroffensive,
+                target_unit_id=previous_target_id,
+                use_index=index,
+            )
+        )
+    _prepare_counteroffensive_fight_state(state, eligible_unit_ids=targets)
+    _grant_cp(state, player_id="player-b", amount=2)
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="counteroffensive",
+        player_id="player-b",
+        target_unit_id=target_unit_id,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT,
+        result_id=result_id,
+        trigger_payload={
+            "fought_unit_instance_id": "army-alpha:intercessor-unit-1",
+            "eligible_unit_instance_ids": list(targets),
+        },
+        catalog_record=counteroffensive,
+    )
+    return lifecycle, status
+
+
+def _seeded_counteroffensive_use(
+    *,
+    record: StratagemCatalogRecord,
+    target_unit_id: str,
+    use_index: int,
+) -> StratagemUseRecord:
+    binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-b",
+        target_unit_instance_id=target_unit_id,
+    )
+    return StratagemUseRecord(
+        use_id=f"stratagem-use:player-b:seeded:{use_index:03d}",
+        player_id="player-b",
+        stratagem_id=record.definition.stratagem_id,
+        source_id=record.definition.source_id,
+        battle_round=1,
+        phase=BattlePhase.FIGHT,
+        active_player_id="player-a",
+        timing_window_id=None,
+        request_id=f"seeded-counteroffensive-request-{use_index:03d}",
+        result_id=f"seeded-counteroffensive-result-{use_index:03d}",
+        selected_option_id="submit-parameterized-payload",
+        target_binding=binding,
+        targeted_unit_instance_ids=(target_unit_id,),
+        affected_unit_instance_ids=(target_unit_id,),
+        command_point_cost=0,
+        command_point_transaction_id=None,
+        handler_id="core:counteroffensive",
+    )
+
+
+def _stratagem_use_by_result_id(
+    state: GameState,
+    result_id: str,
+) -> StratagemUseRecord:
+    for record in state.stratagem_use_records:
+        if record.result_id == result_id:
+            return record
+    raise AssertionError(f"Missing Stratagem use for result {result_id}.")
+
+
+def _prepare_counteroffensive_fight_state(
+    state: GameState,
+    *,
+    eligible_unit_ids: tuple[str, ...],
+) -> None:
+    policy = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
+        descriptor_version="july-destroyer-of-futures-counteroffensive-test"
+    ).fight_policy
+    state.fight_phase_state = FightPhaseState.start(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(
+            "army-alpha:intercessor-unit-1",
+            *eligible_unit_ids,
+        ),
+        fights_first_registry=FightsFirstRegistry(),
+    ).with_next_band()
+
+
 def _battle_state(config: GameConfig | None = None) -> GameState:
     resolved_config = _config() if config is None else config
     armies = _mustered_armies(resolved_config)
@@ -4888,6 +5164,7 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
 def _config(
     *,
     beta_unit_selection_ids: tuple[str, ...] = ("enemy-unit",),
+    beta_datasheet_ids: tuple[str, ...] | None = None,
     catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
@@ -4910,6 +5187,7 @@ def _config(
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=beta_unit_selection_ids,
+                datasheet_ids=beta_datasheet_ids,
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -4960,6 +5238,7 @@ def _army_muster_request(
     army_id: str,
     unit_selection_id: str | None = None,
     unit_selection_ids: tuple[str, ...] | None = None,
+    datasheet_ids: tuple[str, ...] | None = None,
 ) -> ArmyMusterRequest:
     if unit_selection_id is not None and unit_selection_ids is not None:
         raise AssertionError("Use unit_selection_id or unit_selection_ids, not both.")
@@ -4970,6 +5249,13 @@ def _army_muster_request(
         resolved_unit_selection_ids = (unit_selection_id,)
     else:
         resolved_unit_selection_ids = unit_selection_ids
+    resolved_datasheet_ids = (
+        tuple("core-intercessor-like-infantry" for _ in resolved_unit_selection_ids)
+        if datasheet_ids is None
+        else datasheet_ids
+    )
+    if len(resolved_datasheet_ids) != len(resolved_unit_selection_ids):
+        raise AssertionError("Datasheet IDs must align with unit selection IDs.")
     return ArmyMusterRequest(
         army_id=army_id,
         player_id=player_id,
@@ -4985,7 +5271,7 @@ def _army_muster_request(
             *(
                 UnitMusterSelection(
                     unit_selection_id=resolved_unit_selection_id,
-                    datasheet_id="core-intercessor-like-infantry",
+                    datasheet_id=datasheet_id,
                     model_profile_selections=(
                         ModelProfileSelection(
                             model_profile_id="core-intercessor-like",
@@ -4993,7 +5279,11 @@ def _army_muster_request(
                         ),
                     ),
                 )
-                for resolved_unit_selection_id in resolved_unit_selection_ids
+                for resolved_unit_selection_id, datasheet_id in zip(
+                    resolved_unit_selection_ids,
+                    resolved_datasheet_ids,
+                    strict=True,
+                )
             ),
         ),
     )

@@ -8,6 +8,10 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
@@ -21,10 +25,14 @@ from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
+    SourceOverlayPack,
     apply_source_release_overlays,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_defiler_datasheet_overlay_2026_06 as defiler_overlay,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    thousand_sons_defiler_datasheet_overlay_2026_07 as july_defiler_overlay,
 )
 from warhammer40k_core.rules.wahapedia_bridge import (
     build_wahapedia_canonical_bridge_artifacts,
@@ -122,6 +130,78 @@ def test_chaos_defiler_overlay_supersedes_blank_keyword_rows() -> None:
 
     for source_row_id, expected_operation_id in _EXPECTED_BLANK_KEYWORD_SUPERSEDES.items():
         assert _fields(keywords, source_row_id)["core_v2_superseded_by"] == (expected_operation_id)
+
+
+def test_july_thousand_sons_defiler_overlay_removes_stale_abilities_and_rule_ir() -> None:
+    june_datasheet = _defiler_catalog_package().army_catalog.datasheet_by_id(
+        defiler_overlay.THOUSAND_SONS_DEFILER_DATASHEET_ID
+    )
+    july_datasheet = _july_defiler_catalog_package().army_catalog.datasheet_by_id(
+        july_defiler_overlay.THOUSAND_SONS_DEFILER_DATASHEET_ID
+    )
+    june_by_name = {ability.name: ability for ability in june_datasheet.abilities}
+    july_by_name = {ability.name: ability for ability in july_datasheet.abilities}
+
+    assert "Feel No Pain" in june_by_name
+    assert "Feel No Pain" not in july_by_name
+    assert june_by_name["Destroyer of Futures"].support is CatalogAbilitySupport.GENERIC_RULE_IR
+    assert june_by_name["Destroyer of Futures"].rule_ir_payload is not None
+    destroyer = july_by_name["Destroyer of Futures"]
+    assert destroyer.ability_id == "000001030:destroyer-of-futures"
+    assert destroyer.support is CatalogAbilitySupport.UNSUPPORTED
+    assert destroyer.rule_ir_payload is None
+    assert destroyer.effect_description == (
+        "Once per phase, per unit: You can target this unit with the Counteroffensive "
+        "stratagem, regardless of any other uses of that stratagem this phase. If you do: "
+        "That use is -1 CP. That use does not prevent any uses of that stratagem on other "
+        "units this phase."
+    )
+
+    abilities = _artifact_by_table(_july_overlay_artifacts(), "Datasheets_abilities")
+    assert _fields(abilities, "000001030:2")["core_v2_superseded_by"] == (
+        "july-thousand-sons-defiler-remove-feel-no-pain"
+    )
+
+
+def test_july_thousand_sons_defiler_overlay_is_source_id_scoped() -> None:
+    june_catalog = _defiler_catalog_package().army_catalog
+    july_catalog = _july_defiler_catalog_package().army_catalog
+
+    for datasheet_id in (
+        defiler_overlay.DEATH_GUARD_DEFILER_DATASHEET_ID,
+        defiler_overlay.WORLD_EATERS_DEFILER_DATASHEET_ID,
+        defiler_overlay.EMPERORS_CHILDREN_DEFILER_DATASHEET_ID,
+    ):
+        june = june_catalog.datasheet_by_id(datasheet_id)
+        july = july_catalog.datasheet_by_id(datasheet_id)
+        assert tuple(_ability_semantics(ability) for ability in july.abilities) == tuple(
+            _ability_semantics(ability) for ability in june.abilities
+        )
+
+    june_abilities = _artifact_by_table(_overlay_artifacts(), "Datasheets_abilities")
+    july_abilities = _artifact_by_table(_july_overlay_artifacts(), "Datasheets_abilities")
+    chaos_space_marines_rows = tuple(
+        row
+        for row in june_abilities.rows
+        if row.runtime_fields_payload().get("datasheet_id")
+        == july_defiler_overlay.CHAOS_SPACE_MARINES_DEFILER_DATASHEET_ID
+    )
+    assert chaos_space_marines_rows
+    for row in chaos_space_marines_rows:
+        assert _fields(july_abilities, row.source_row_id) == row.runtime_fields_payload()
+
+    pack = july_defiler_overlay.overlay_pack()
+    restored = SourceOverlayPack.from_payload(pack.to_payload())
+    assert restored == pack
+    assert pack.package_hash() == "9156857ed8457374a8da524a138222fea2e3e451b79fcc5394fc0ed142bd8d97"
+    assert july_defiler_overlay.source_package_identity_payload() == {
+        "source_package_id": (
+            "data-package:gw:thousand-sons-defiler-datasheet-overlay:11th-2026-07-22"
+        ),
+        "source_payload_checksum_sha256": pack.package_hash(),
+        "source_date": "2026-07-22",
+        "source_edition": "warhammer-40000-11th",
+    }
 
 
 def test_chaos_defiler_overlay_builds_catalog_and_runtime_units() -> None:
@@ -241,6 +321,29 @@ def _defiler_catalog_package() -> CanonicalCatalogPackage:
     )
 
 
+@lru_cache(maxsize=1)
+def _july_defiler_catalog_package() -> CanonicalCatalogPackage:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_july_overlay_artifacts(),
+        bridge_package_id=DataPackageId(
+            namespace="core-v2",
+            package_name="july-thousand-sons-defiler-11e-bridge-test",
+            version="2026-07-22",
+        ),
+        datasheet_ids=july_defiler_overlay.ALIGNED_DEFILER_DATASHEET_IDS,
+        height_overrides=CHAOS_DEFILER_HEIGHT_OVERRIDES,
+    )
+    return build_canonical_catalog_package(
+        package_id=DataPackageId(
+            namespace="core-v2",
+            package_name="july-thousand-sons-defiler-11e-catalog-test",
+            version="2026-07-22",
+        ),
+        catalog_version=july_defiler_overlay.CATALOG_VERSION,
+        source_artifacts=bridge_artifacts,
+    )
+
+
 def _instantiate_defiler(
     *,
     package: CanonicalCatalogPackage,
@@ -274,6 +377,15 @@ def _overlay_artifacts() -> tuple[OverlaySourceArtifact, ...]:
         source_artifacts=_wahapedia_source_artifacts(),
         release_manifest=defiler_overlay.source_release_manifest(),
         overlay_packs=(defiler_overlay.overlay_pack(),),
+    )
+
+
+@lru_cache(maxsize=1)
+def _july_overlay_artifacts() -> tuple[OverlaySourceArtifact, ...]:
+    return apply_source_release_overlays(
+        source_artifacts=_wahapedia_source_artifacts(),
+        release_manifest=july_defiler_overlay.source_release_manifest(),
+        overlay_packs=(july_defiler_overlay.overlay_pack(),),
     )
 
 
@@ -315,3 +427,8 @@ def _row_by_id(
         if row.source_row_id == row_id:
             return row
     raise AssertionError(f"Missing source row: {row_id}.")
+
+
+def _ability_semantics(ability: DatasheetAbilityDescriptor) -> tuple[object, ...]:
+    payload = ability.to_payload()
+    return tuple((key, value) for key, value in payload.items() if key not in {"source_id"})

@@ -46,6 +46,11 @@
       "artifact_sha256": "0bbcb34d5a7915b8cf3be97256d93e3361e585ebc666d75c396327f9fe41fd8d"
     },
     {
+      "artifact_id": "gw-11e-july-thousand-sons-defiler-2026-07",
+      "artifact_path": "artifacts/thousand-sons-defiler.json",
+      "artifact_sha256": "fc320dc67a180a867e30a55d6467a14eeebfde36f132a0dc57bde0aa0845bdc4"
+    },
+    {
       "artifact_id": "gw-11e-july-faction-pack-datasheets-2026-07",
       "artifact_path": "artifacts/datasheets.json",
       "artifact_sha256": "e92f766366d41c999a0656b2a1648b387bac362b3a05ef5f5cda491b373ba4b2"
