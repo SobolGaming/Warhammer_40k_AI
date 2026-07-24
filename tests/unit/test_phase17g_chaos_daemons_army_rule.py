@@ -31,6 +31,7 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine import stratagems_generic_metadata, stratagems_selection
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
@@ -47,9 +48,11 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
+    BattlefieldRuntimeState,
     ModelPlacement,
     UnitPlacement,
 )
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -64,6 +67,12 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
     army_rule,
     datasheets,
     july_2026_candidate,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    july_2026_updates as chaos_daemons_july_updates,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
+    rule as daemonic_incursion_rule,
 )
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -85,11 +94,19 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
+    SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogIndex,
+    StratagemEligibilityContext,
+    StratagemTargetBinding,
+    StratagemTargetKind,
+    create_stratagem_use_decision_request,
     stratagem_decline_payload,
 )
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 from warhammer40k_core.engine.wargear_selections import (
@@ -101,6 +118,9 @@ from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_daemonic_incursion_ir_support_2026_27 as daemonic_incursion_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
@@ -347,69 +367,19 @@ def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> 
 
 
 def test_staged_july_daemonic_manifestation_revival_uses_adapter_decisions() -> None:
-    config = replace(
-        _chaos_daemons_lifecycle_config(battleline=True),
-        game_id="phase17g-config-seed-3",
-    )
-    session = LocalGameSession()
-    session.start(config)
-    state = _record_lifecycle_battle_state(lifecycle=session.lifecycle, config=config)
-    unit_id = "army-alpha:manifestation-daemon"
-    assert state.battlefield_state is not None
-    starting_placements = {
-        placement.model_instance_id: placement
-        for placement in state.battlefield_state.unit_placement_by_id(unit_id).model_placements
-    }
-    destroyed_model_ids = tuple(starting_placements)[:3]
-    survivor_anchor = starting_placements[tuple(starting_placements)[3]]
-    anchor_position = survivor_anchor.pose.position
-    return_placements = {
-        destroyed_model_ids[2]: starting_placements[destroyed_model_ids[2]],
-        destroyed_model_ids[1]: starting_placements[destroyed_model_ids[1]].with_pose(
-            Pose.at(
-                x=anchor_position.x,
-                y=anchor_position.y + 2.0,
-                z=anchor_position.z,
-            )
-        ),
-        destroyed_model_ids[0]: starting_placements[destroyed_model_ids[0]].with_pose(
-            Pose.at(
-                x=anchor_position.x,
-                y=anchor_position.y - 2.0,
-                z=anchor_position.z,
-            )
-        ),
-    }
-    remove_first_models(state, unit_instance_id=unit_id, count=3)
-    for model_instance_id in destroyed_model_ids:
-        _replace_model_wounds(
-            state,
-            model_instance_id=model_instance_id,
-            wounds_remaining=0,
-        )
-    _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
-    candidate = july_2026_candidate.runtime_contribution()
+    (
+        session,
+        state,
+        destroyed_model_ids,
+        return_placements,
+        selection_request,
+    ) = _july_manifestation_revival_session()
     default = army_rule.runtime_contribution()
-    handler = CommandPhaseHandler(
-        stratagem_index=StratagemCatalogIndex.from_records(()),
-        battle_shock_hooks=BattleShockHookRegistry.from_bindings(
-            candidate.battle_shock_hook_bindings
-        ),
-    )
-
-    completed = handler.begin_phase(
-        state=state,
-        decisions=session.lifecycle.decision_controller,
-    )
-
-    assert completed.status_kind is LifecycleStatusKind.ADVANCED
     assert default.battle_shock_hook_bindings[0].source_id == army_rule.SOURCE_RULE_ID
-    assert candidate.battle_shock_hook_bindings[0].source_id == army_rule.JULY_SOURCE_RULE_ID
-    initial_status = session.advance_until_decision_or_terminal()
-    selection_request = _required_decision_request(initial_status)
     assert selection_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
     assert selection_request.actor_id == "player-a"
     assert _healing_option_model_ids(selection_request) == tuple(sorted(destroyed_model_ids))
+    assert _healing_finish_option_id(selection_request).endswith(":finish")
 
     owner_view = session.view(viewer_player_id="player-a")
     opponent_view = session.view(viewer_player_id="player-b")
@@ -474,6 +444,7 @@ def test_staged_july_daemonic_manifestation_revival_uses_adapter_decisions() -> 
     ):
         request = next_status.decision_request
         if request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
+            assert _healing_finish_option_id(request).endswith(":finish")
             selected_model_id = _healing_option_model_ids(request)[-1]
             next_status = session.submit_option(
                 request_id=request.request_id,
@@ -532,6 +503,229 @@ def test_staged_july_daemonic_manifestation_revival_uses_adapter_decisions() -> 
     replay_payload = session.lifecycle.decision_controller.to_payload()
     assert DecisionController.from_payload(replay_payload).to_payload() == replay_payload
     assert "<" not in json.dumps(replay_payload, sort_keys=True)
+
+
+def test_staged_july_daemonic_manifestation_can_finish_before_first_revival() -> None:
+    session, state, destroyed_model_ids, _return_placements, request = (
+        _july_manifestation_revival_session()
+    )
+    finish_option_id = _healing_finish_option_id(request)
+    valid_result = DecisionResult.for_request(
+        result_id="phase17g-july-manifestation-finish-zero",
+        request=request,
+        selected_option_id=finish_option_id,
+    )
+    valid_payload = cast(dict[str, JsonValue], valid_result.payload)
+    malformed_result = replace(
+        valid_result,
+        result_id="phase17g-july-manifestation-malformed-finish",
+        payload={**valid_payload, "legal_model_ids": []},
+    )
+    before_records = session.lifecycle.decision_controller.records
+
+    malformed_status = session.lifecycle.submit_decision(malformed_result)
+    stale_status = session.lifecycle.submit_decision(
+        replace(
+            valid_result,
+            result_id="phase17g-july-manifestation-stale-finish",
+            request_id="phase17g-july-manifestation-stale-request",
+        )
+    )
+
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    assert malformed_status.payload == {
+        "invalid_reason": "invalid_healing_model_selection_result",
+        "field": "payload",
+    }
+    assert stale_status.status_kind is LifecycleStatusKind.INVALID
+    assert stale_status.payload == {
+        "invalid_reason": "invalid_healing_model_selection_result",
+        "field": "request_id",
+    }
+    assert session.lifecycle.decision_controller.queue.peek_next() == request
+    assert session.lifecycle.decision_controller.records == before_records
+
+    completed = session.submit_option(
+        request_id=request.request_id,
+        option_id=finish_option_id,
+        result_id=valid_result.result_id,
+    )
+
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    assert all(
+        _model_by_id(state, model_id).wounds_remaining == 0 for model_id in destroyed_model_ids
+    )
+    finish_event = _event_payloads(
+        session.lifecycle.decision_controller,
+        "healing_step_resolved",
+    )[-1]
+    finish_step = cast(dict[str, JsonValue], finish_event["step"])
+    assert finish_step["step_kind"] == "finish"
+    assert finish_step["model_instance_id"] is None
+    assert finish_step["request_id"] == request.request_id
+    assert finish_step["result_id"] == valid_result.result_id
+    replay_payload = session.lifecycle.decision_controller.to_payload()
+    assert DecisionController.from_payload(replay_payload).to_payload() == replay_payload
+
+
+def test_staged_july_daemonic_manifestation_can_finish_after_partial_revival() -> None:
+    session, state, destroyed_model_ids, return_placements, request = (
+        _july_manifestation_revival_session()
+    )
+    selected_model_id = _healing_option_model_ids(request)[-1]
+    placement_status = session.submit_option(
+        request_id=request.request_id,
+        option_id=_healing_option_id_for_model(request, selected_model_id),
+        result_id="phase17g-july-manifestation-partial-select",
+    )
+    placement_request = _required_decision_request(placement_status)
+    next_status = session.submit_parameterized_payload(
+        request_id=placement_request.request_id,
+        payload=_healing_revival_payload(
+            request=placement_request,
+            placement=return_placements[selected_model_id],
+        ),
+        result_id="phase17g-july-manifestation-partial-place",
+    )
+    finish_request = _required_decision_request(next_status)
+
+    assert finish_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
+    assert len(_healing_option_model_ids(finish_request)) == 2
+    completed = session.submit_option(
+        request_id=finish_request.request_id,
+        option_id=_healing_finish_option_id(finish_request),
+        result_id="phase17g-july-manifestation-partial-finish",
+    )
+
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    assert (
+        _model_by_id(state, selected_model_id).wounds_remaining
+        == _model_by_id(
+            state,
+            selected_model_id,
+        ).starting_wounds
+    )
+    assert all(
+        _model_by_id(state, model_id).wounds_remaining == 0
+        for model_id in destroyed_model_ids
+        if model_id != selected_model_id
+    )
+    step_kinds = tuple(
+        cast(dict[str, JsonValue], event["step"])["step_kind"]
+        for event in _event_payloads(
+            session.lifecycle.decision_controller,
+            "healing_step_resolved",
+        )
+    )
+    assert step_kinds == ("revive_model", "finish")
+
+
+def test_kairos_lifecycle_checks_primary_and_companion_range_targets() -> None:
+    cases = (
+        (False, True, True),
+        (True, False, True),
+        (False, False, False),
+    )
+    for primary_inside, companion_inside, expects_choice in cases:
+        lifecycle, primary_id, companion_id = _kairos_realm_lifecycle(
+            primary_inside=primary_inside,
+            companion_inside=companion_inside,
+        )
+
+        status = _submit_realm_of_chaos_pair(
+            lifecycle=lifecycle,
+            primary_unit_id=primary_id,
+            companion_unit_id=companion_id,
+            result_id=(f"phase17g-kairos-realm:{primary_inside}:{companion_inside}:source-result"),
+        )
+
+        if not expects_choice:
+            assert status.decision_request is None or (
+                status.decision_request.decision_type
+                != SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE
+            )
+            assert not any(
+                event.event_type == "catalog_ir_stratagem_cost_choice_resolved"
+                for event in lifecycle.decision_controller.event_log.records
+            )
+            continue
+        request = _required_decision_request(status)
+        assert request.decision_type == SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE
+        request_payload = cast(dict[str, JsonValue], request.payload)
+        assert request_payload["target_unit_instance_ids"] == sorted((primary_id, companion_id))
+        assert all(
+            cast(dict[str, JsonValue], option.payload)["target_unit_instance_ids"]
+            == sorted((primary_id, companion_id))
+            for option in request.options
+        )
+
+
+def test_kairos_lifecycle_canonicalizes_attached_target_and_restores_choice() -> None:
+    lifecycle, primary_id, companion_id = _kairos_realm_lifecycle(
+        primary_inside=True,
+        companion_inside=False,
+        attached_primary=True,
+    )
+    source_status = _submit_realm_of_chaos_pair(
+        lifecycle=lifecycle,
+        primary_unit_id=primary_id,
+        companion_unit_id=companion_id,
+        result_id="phase17g-kairos-attached-source-result",
+    )
+    request = _required_decision_request(source_status)
+    bundle = _runtime_content_bundle(lifecycle)
+    restored = GameLifecycle.from_payload(
+        lifecycle.to_payload(),
+        runtime_content_bundle=bundle,
+    )
+    restored_request = restored.decision_controller.queue.peek_next()
+
+    assert restored_request == request
+    request_payload = cast(dict[str, JsonValue], restored_request.payload)
+    assert request_payload["target_unit_instance_ids"] == sorted((primary_id, companion_id))
+    decline_option = next(
+        option
+        for option in restored_request.options
+        if cast(dict[str, JsonValue], option.payload)["use_ability"] is False
+    )
+    valid_result = DecisionResult.for_request(
+        result_id="phase17g-kairos-attached-decline",
+        request=restored_request,
+        selected_option_id=decline_option.option_id,
+    )
+    valid_payload = cast(dict[str, JsonValue], valid_result.payload)
+    before_cp = restored.state.command_point_total("player-b") if restored.state else -1
+    before_records = restored.decision_controller.records
+    malformed_status = restored.submit_decision(
+        replace(
+            valid_result,
+            result_id="phase17g-kairos-attached-malformed",
+            payload={
+                **valid_payload,
+                "target_unit_instance_ids": [companion_id],
+            },
+        )
+    )
+
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    assert malformed_status.payload == {
+        "invalid_reason": "invalid_stratagem_cost_modifier_option_result",
+        "field": "payload",
+    }
+    assert restored.decision_controller.queue.peek_next() == restored_request
+    assert restored.decision_controller.records == before_records
+    assert restored.state is not None
+    assert restored.state.command_point_total("player-b") == before_cp
+
+    completed = restored.submit_decision(valid_result)
+
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    choice_event = _event_payload(
+        restored.decision_controller,
+        "catalog_ir_stratagem_cost_choice_resolved",
+    )
+    assert choice_event["target_unit_instance_ids"] == sorted((primary_id, companion_id))
+    assert choice_event["use_ability"] is False
 
 
 def test_staged_july_daemonic_manifestation_has_no_effect_without_eligible_models() -> None:
@@ -1392,9 +1586,19 @@ def _required_decision_request(status: LifecycleStatus) -> DecisionRequest:
 def _healing_option_model_ids(request: DecisionRequest) -> tuple[str, ...]:
     return tuple(
         sorted(
-            cast(str, cast(dict[str, JsonValue], option.payload)["model_instance_id"])
+            model_id
             for option in request.options
+            for model_id in (cast(dict[str, JsonValue], option.payload)["model_instance_id"],)
+            if isinstance(model_id, str)
         )
+    )
+
+
+def _healing_finish_option_id(request: DecisionRequest) -> str:
+    return next(
+        option.option_id
+        for option in request.options
+        if cast(dict[str, JsonValue], option.payload)["selection_kind"] == "finish"
     )
 
 
@@ -1430,4 +1634,522 @@ def _healing_revival_payload(
                 model_placements=(placement,),
             ).to_payload(),
         }
+    )
+
+
+def _july_manifestation_revival_session() -> tuple[
+    LocalGameSession,
+    GameState,
+    tuple[str, ...],
+    dict[str, ModelPlacement],
+    DecisionRequest,
+]:
+    config = replace(
+        _chaos_daemons_lifecycle_config(battleline=True),
+        game_id="phase17g-config-seed-3",
+    )
+    session = LocalGameSession()
+    session.start(config)
+    state = _record_lifecycle_battle_state(lifecycle=session.lifecycle, config=config)
+    unit_id = "army-alpha:manifestation-daemon"
+    if state.battlefield_state is None:
+        raise AssertionError("Manifestation test requires battlefield state.")
+    starting_placements = {
+        placement.model_instance_id: placement
+        for placement in state.battlefield_state.unit_placement_by_id(unit_id).model_placements
+    }
+    destroyed_model_ids = tuple(starting_placements)[:3]
+    survivor_anchor = starting_placements[tuple(starting_placements)[3]]
+    anchor_position = survivor_anchor.pose.position
+    return_placements = {
+        destroyed_model_ids[2]: starting_placements[destroyed_model_ids[2]],
+        destroyed_model_ids[1]: starting_placements[destroyed_model_ids[1]].with_pose(
+            Pose.at(
+                x=anchor_position.x,
+                y=anchor_position.y + 2.0,
+                z=anchor_position.z,
+            )
+        ),
+        destroyed_model_ids[0]: starting_placements[destroyed_model_ids[0]].with_pose(
+            Pose.at(
+                x=anchor_position.x,
+                y=anchor_position.y - 2.0,
+                z=anchor_position.z,
+            )
+        ),
+    }
+    remove_first_models(state, unit_instance_id=unit_id, count=3)
+    for model_instance_id in destroyed_model_ids:
+        _replace_model_wounds(
+            state,
+            model_instance_id=model_instance_id,
+            wounds_remaining=0,
+        )
+    _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
+    candidate = july_2026_candidate.runtime_contribution()
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=BattleShockHookRegistry.from_bindings(
+            candidate.battle_shock_hook_bindings
+        ),
+    )
+    completed = handler.begin_phase(
+        state=state,
+        decisions=session.lifecycle.decision_controller,
+    )
+    if completed.status_kind is not LifecycleStatusKind.ADVANCED:
+        raise AssertionError("Manifestation test command phase did not advance.")
+    if candidate.battle_shock_hook_bindings[0].source_id != army_rule.JULY_SOURCE_RULE_ID:
+        raise AssertionError("Manifestation test did not load the July source.")
+    selection_request = _required_decision_request(session.advance_until_decision_or_terminal())
+    return (
+        session,
+        state,
+        destroyed_model_ids,
+        return_placements,
+        selection_request,
+    )
+
+
+def _kairos_realm_lifecycle(
+    *,
+    primary_inside: bool,
+    companion_inside: bool,
+    attached_primary: bool = False,
+) -> tuple[GameLifecycle, str, str]:
+    config = _kairos_lifecycle_config(attached_primary=attached_primary)
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _record_lifecycle_battle_state(lifecycle=lifecycle, config=config)
+    state.active_player_id = "player-a"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.gain_command_points(
+        player_id="player-b",
+        amount=3,
+        source_id="phase17g-kairos-test-command-points",
+        source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
+        cap_exempt=True,
+    )
+    target_army = state.army_definition_for_player("player-b")
+    if target_army is None:
+        raise AssertionError("Kairos test requires the target army.")
+    companion_id = "army-beta:target-companion"
+    if attached_primary:
+        formation = target_army.attached_units[0]
+        primary_id = formation.attached_unit_instance_id
+        primary_component_id = formation.bodyguard_unit_instance_id
+    else:
+        primary_id = "army-beta:target-primary"
+        primary_component_id = primary_id
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Kairos test requires battlefield state.")
+    primary_position = (
+        battlefield.unit_placement_by_id(primary_component_id).model_placements[0].pose.position
+    )
+    companion_y = (
+        primary_position.y + 20.0
+        if primary_position.y <= battlefield.battlefield_depth_inches / 2.0
+        else primary_position.y - 20.0
+    )
+    _relocate_unit(
+        state=state,
+        unit_instance_id=companion_id,
+        x=primary_position.x,
+        y=companion_y,
+    )
+    updated_battlefield = state.battlefield_state
+    if updated_battlefield is None:
+        raise AssertionError("Kairos test lost battlefield state.")
+    companion_position = (
+        updated_battlefield.unit_placement_by_id(companion_id).model_placements[0].pose.position
+    )
+    kairos_id = "army-alpha:kairos"
+    if primary_inside:
+        source_x, source_y = _nearby_battlefield_point(
+            battlefield=updated_battlefield,
+            x=primary_position.x,
+            y=primary_position.y,
+        )
+    elif companion_inside:
+        source_x, source_y = _nearby_battlefield_point(
+            battlefield=updated_battlefield,
+            x=companion_position.x,
+            y=companion_position.y,
+        )
+    else:
+        source_x, source_y = _farthest_battlefield_point(
+            battlefield=updated_battlefield,
+            points=(
+                (primary_position.x, primary_position.y),
+                (companion_position.x, companion_position.y),
+            ),
+        )
+    _relocate_unit(
+        state=state,
+        unit_instance_id=kairos_id,
+        x=source_x,
+        y=source_y,
+    )
+    _runtime_content_bundle(lifecycle)
+    return lifecycle, primary_id, companion_id
+
+
+def _submit_realm_of_chaos_pair(
+    *,
+    lifecycle: GameLifecycle,
+    primary_unit_id: str,
+    companion_unit_id: str,
+    result_id: str,
+) -> LifecycleStatus:
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("Kairos test lifecycle requires state.")
+    bundle = _runtime_content_bundle(lifecycle)
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-b",
+        trigger_kind=TimingTriggerKind.END_TURN,
+    )
+    realm_pair_record = next(
+        record
+        for record in bundle.stratagem_indexes_by_player_id["player-b"].all_records()
+        if record.definition.stratagem_id == daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID
+        and isinstance(record.definition.effect_payload, dict)
+        and record.definition.effect_payload.get("effect_selection_kind")
+        == stratagems_generic_metadata.SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND
+    )
+    binding_unit_id = primary_unit_id
+    if primary_unit_id.startswith("attached-unit:"):
+        target_army = state.army_definition_for_player("player-b")
+        if target_army is None:
+            raise AssertionError("Kairos attached test requires target army.")
+        formation = next(
+            formation
+            for formation in target_army.attached_units
+            if formation.attached_unit_instance_id == primary_unit_id
+        )
+        binding_unit_id = formation.bodyguard_unit_instance_id
+    target_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-b",
+        target_unit_instance_id=binding_unit_id,
+    )
+    companion_selection = stratagems_generic_metadata.companion_unit_effect_selection(
+        companion_unit_id
+    )
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(
+            stratagems_selection._stratagem_decision_option(
+                record=realm_pair_record,
+                context=context,
+                target_binding=target_binding,
+                effect_selection=companion_selection,
+            ),
+        ),
+    )
+    lifecycle.decision_controller.request_decision(request)
+    selected_option = next(
+        option
+        for option in request.options
+        if _stratagem_option_matches_realm_pair(
+            option_payload=option.payload,
+            primary_unit_id=binding_unit_id,
+            companion_selection=companion_selection,
+        )
+    )
+    return lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id=result_id,
+            request=request,
+            selected_option_id=selected_option.option_id,
+        )
+    )
+
+
+def _stratagem_option_matches_realm_pair(
+    *,
+    option_payload: JsonValue,
+    primary_unit_id: str,
+    companion_selection: JsonValue,
+) -> bool:
+    if not isinstance(option_payload, dict):
+        return False
+    record_payload = option_payload.get("catalog_record")
+    binding_payload = option_payload.get("target_binding")
+    if not isinstance(record_payload, dict) or not isinstance(binding_payload, dict):
+        return False
+    definition_payload = record_payload.get("definition")
+    if not isinstance(definition_payload, dict):
+        return False
+    return (
+        definition_payload.get("stratagem_id")
+        == daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID
+        and binding_payload.get("target_unit_instance_id") == primary_unit_id
+        and option_payload.get("effect_selection") == companion_selection
+    )
+
+
+def _kairos_lifecycle_config(*, attached_primary: bool) -> GameConfig:
+    catalog = _kairos_lifecycle_catalog()
+    target_selections = (
+        (
+            UnitMusterSelection(
+                unit_selection_id="target-bodyguard",
+                datasheet_id="core-intercessor-like-infantry",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="target-leader",
+                datasheet_id="core-character-leader",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="target-companion",
+                datasheet_id="phase17g-kairos-target-daemon",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+            ),
+        )
+        if attached_primary
+        else (
+            UnitMusterSelection(
+                unit_selection_id="target-primary",
+                datasheet_id="phase17g-kairos-target-daemon",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="target-companion",
+                datasheet_id="phase17g-kairos-target-daemon",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+            ),
+        )
+    )
+    detachment_id = daemonic_incursion_rule.DAEMONIC_INCURSION_DETACHMENT_ID
+    return GameConfig(
+        game_id=(
+            "phase17g-kairos-attached-lifecycle"
+            if attached_primary
+            else "phase17g-kairos-pair-lifecycle"
+        ),
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
+            descriptor_version="core-v2-phase17g-kairos-review",
+        ),
+        army_catalog=catalog,
+        army_muster_requests=(
+            ArmyMusterRequest(
+                army_id="army-alpha",
+                player_id="player-a",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id=army_rule.CHAOS_DAEMONS_FACTION_ID,
+                    detachment_ids=(detachment_id,),
+                ),
+                force_disposition_id="phase17g-force",
+                unit_selections=(
+                    UnitMusterSelection(
+                        unit_selection_id="kairos",
+                        datasheet_id=chaos_daemons_july_updates.KAIROS_DATASHEET_ID,
+                        model_profile_selections=(
+                            ModelProfileSelection(
+                                model_profile_id="core-intercessor-like",
+                                model_count=1,
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            ArmyMusterRequest(
+                army_id="army-beta",
+                player_id="player-b",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id=army_rule.CHAOS_DAEMONS_FACTION_ID,
+                    detachment_ids=(detachment_id,),
+                ),
+                force_disposition_id="phase17g-force",
+                unit_selections=target_selections,
+                attachment_declarations=(
+                    (
+                        AttachmentDeclaration(
+                            source_unit_selection_id="target-leader",
+                            bodyguard_unit_selection_id="target-bodyguard",
+                        ),
+                    )
+                    if attached_primary
+                    else ()
+                ),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down"),
+        mission_setup=MissionSetup.from_mission_pack(
+            mission_pack=chapter_approved_2026_27_mission_pack(),
+            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+            attacker_player_id="player-a",
+            defender_player_id="player-b",
+        ),
+    )
+
+
+def _kairos_lifecycle_catalog() -> ArmyCatalog:
+    base = ArmyCatalog.phase9a_canonical_content_pack()
+    base_infantry = base.datasheet_by_id("core-intercessor-like-infantry")
+    kairos = replace(
+        base_infantry,
+        datasheet_id=chaos_daemons_july_updates.KAIROS_DATASHEET_ID,
+        name="Kairos Fateweaver",
+        keywords=DatasheetKeywordSet(
+            keywords=("Character", "Monster", "Psyker", "Fly"),
+            faction_keywords=("Legiones Daemonica",),
+        ),
+        composition=tuple(
+            replace(composition, min_models=1, max_models=1)
+            for composition in base_infantry.composition
+        ),
+        max_unit_models=1,
+        attachment_eligibilities=(),
+        source_ids=("phase17g:test:kairos-fateweaver",),
+    )
+    target_daemon = replace(
+        base_infantry,
+        datasheet_id="phase17g-kairos-target-daemon",
+        name="Kairos Range Target",
+        keywords=DatasheetKeywordSet(
+            keywords=("Infantry",),
+            faction_keywords=("Legiones Daemonica",),
+        ),
+        attachment_eligibilities=(),
+        source_ids=("phase17g:test:kairos-range-target",),
+    )
+    catalog_datasheets = tuple(
+        (
+            replace(
+                datasheet,
+                keywords=replace(
+                    datasheet.keywords,
+                    faction_keywords=("LEGIONES DAEMONICA",),
+                ),
+            )
+            if datasheet.datasheet_id in {"core-character-leader", "core-intercessor-like-infantry"}
+            else datasheet
+        )
+        for datasheet in base.datasheets
+    )
+    detachment_id = daemonic_incursion_rule.DAEMONIC_INCURSION_DETACHMENT_ID
+    return replace(
+        base,
+        datasheets=(*catalog_datasheets, kairos, target_daemon),
+        factions=(
+            *base.factions,
+            FactionDefinition(
+                faction_id=army_rule.CHAOS_DAEMONS_FACTION_ID,
+                name="Chaos Daemons",
+                faction_keywords=("Legiones Daemonica",),
+                source_ids=("phase17g:test:chaos-daemons",),
+            ),
+        ),
+        detachments=(
+            *base.detachments,
+            DetachmentDefinition(
+                detachment_id=detachment_id,
+                name="Daemonic Incursion",
+                faction_id=army_rule.CHAOS_DAEMONS_FACTION_ID,
+                detachment_point_cost=1,
+                unit_datasheet_ids=(
+                    chaos_daemons_july_updates.KAIROS_DATASHEET_ID,
+                    "phase17g-kairos-target-daemon",
+                    "core-character-leader",
+                    "core-intercessor-like-infantry",
+                ),
+                force_disposition_ids=("phase17g-force",),
+                source_ids=("phase17g:test:daemonic-incursion",),
+            ),
+        ),
+    )
+
+
+def _relocate_unit(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    x: float,
+    y: float,
+) -> None:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Unit relocation requires battlefield state.")
+    unit_placement = battlefield.unit_placement_by_id(unit_instance_id)
+    anchor = unit_placement.model_placements[0].pose.position
+    placements = tuple(
+        placement.with_pose(
+            Pose.at(
+                x=x + placement.pose.position.x - anchor.x,
+                y=y + placement.pose.position.y - anchor.y,
+                z=placement.pose.position.z,
+            )
+        )
+        for placement in unit_placement.model_placements
+    )
+    state.battlefield_state = battlefield.with_unit_placement(
+        replace(unit_placement, model_placements=placements)
+    )
+
+
+def _nearby_battlefield_point(
+    *,
+    battlefield: BattlefieldRuntimeState,
+    x: float,
+    y: float,
+) -> tuple[float, float]:
+    depth = battlefield.battlefield_depth_inches
+    return (x, y + 6.0) if y + 7.0 < depth else (x, y - 6.0)
+
+
+def _farthest_battlefield_point(
+    *,
+    battlefield: BattlefieldRuntimeState,
+    points: tuple[tuple[float, float], ...],
+) -> tuple[float, float]:
+    width = battlefield.battlefield_width_inches
+    depth = battlefield.battlefield_depth_inches
+    candidates = ((2.0, 2.0), (2.0, depth - 2.0), (width - 2.0, 2.0), (width - 2.0, depth - 2.0))
+    return max(
+        candidates,
+        key=lambda candidate: min(
+            (candidate[0] - point[0]) ** 2 + (candidate[1] - point[1]) ** 2 for point in points
+        ),
     )

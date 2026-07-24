@@ -35,6 +35,7 @@ class HealingStepKind(StrEnum):
     REVIVE_MODEL = "revive_model"
     REVIVE_MODEL_EMBARKED = "revive_model_embarked"
     REVIVE_MODEL_DESTROYED_NO_CAPACITY = "revive_model_destroyed_no_capacity"
+    FINISH = "finish"
     NO_EFFECT = "no_effect"
 
 
@@ -68,7 +69,7 @@ class HealingSelectionPayload(TypedDict):
     effect_id: str
     target_unit_instance_id: str
     step_index: int
-    model_instance_id: str
+    model_instance_id: str | None
     legal_model_ids: list[str]
     source_rule_id: str
     source_context: JsonValue
@@ -132,16 +133,22 @@ class HealingStep:
             raise GameLifecycleError(
                 "HealingStep transition_batch must be a BattlefieldTransitionBatch."
             )
-        if self.step_kind is HealingStepKind.NO_EFFECT:
+        if self.step_kind in {HealingStepKind.FINISH, HealingStepKind.NO_EFFECT}:
             if self.model_instance_id is not None:
-                raise GameLifecycleError("No-effect HealingStep must not select a model.")
+                raise GameLifecycleError("Finish/no-effect HealingStep must not select a model.")
             if (
                 self.starting_wounds_remaining is not None
                 or self.final_wounds_remaining is not None
             ):
-                raise GameLifecycleError("No-effect HealingStep must not include wounds.")
+                raise GameLifecycleError("Finish/no-effect HealingStep must not include wounds.")
             if self.transition_batch is not None:
-                raise GameLifecycleError("No-effect HealingStep must not include placement.")
+                raise GameLifecycleError("Finish/no-effect HealingStep must not include placement.")
+            if self.step_kind is HealingStepKind.FINISH and (
+                self.request_id is None or self.result_id is None
+            ):
+                raise GameLifecycleError(
+                    "Finish HealingStep requires request and result identities."
+                )
             return
         if self.model_instance_id is None:
             raise GameLifecycleError("HealingStep must select a model.")
@@ -270,10 +277,26 @@ class HealingEffect:
             raise GameLifecycleError("HealingEffect resolved_steps must be sequential.")
         if len(steps) > self.amount:
             raise GameLifecycleError("HealingEffect resolved_steps exceed amount.")
+        finish_steps = tuple(step for step in steps if step.step_kind is HealingStepKind.FINISH)
+        if finish_steps:
+            if not hctx.healing_source_context_bool(
+                self.source_context,
+                "allow_revival_finish",
+            ):
+                raise GameLifecycleError(
+                    "HealingEffect finish step requires source-backed permission."
+                )
+            if len(finish_steps) != 1 or finish_steps[0] is not steps[-1]:
+                raise GameLifecycleError(
+                    "HealingEffect finish step must be the final resolved step."
+                )
         object.__setattr__(self, "resolved_steps", steps)
 
     def is_complete(self) -> bool:
-        return len(self.resolved_steps) == self.amount
+        return len(self.resolved_steps) == self.amount or (
+            bool(self.resolved_steps)
+            and self.resolved_steps[-1].step_kind is HealingStepKind.FINISH
+        )
 
     def next_step_index(self) -> int:
         if self.is_complete():
@@ -343,7 +366,7 @@ class HealingModelSelection:
     effect_id: str
     target_unit_instance_id: str
     step_index: int
-    selected_model_id: str
+    selected_model_id: str | None
     legal_model_ids: tuple[str, ...]
     source_rule_id: str
     source_context: JsonValue
@@ -392,7 +415,7 @@ class HealingModelSelection:
         object.__setattr__(
             self,
             "selected_model_id",
-            _validate_identifier(
+            _validate_optional_identifier(
                 "HealingModelSelection selected_model_id",
                 self.selected_model_id,
             ),
@@ -406,7 +429,10 @@ class HealingModelSelection:
                 min_length=1,
             ),
         )
-        if self.selected_model_id not in self.legal_model_ids:
+        if self.selection_kind is HealingStepKind.FINISH:
+            if self.selected_model_id is not None:
+                raise GameLifecycleError("HealingModelSelection finish must not select a model.")
+        elif self.selected_model_id not in self.legal_model_ids:
             raise GameLifecycleError("HealingModelSelection selected model is not legal.")
         object.__setattr__(
             self,
@@ -420,7 +446,7 @@ class HealingModelSelection:
         if request.decision_type != SELECT_HEALING_MODEL_DECISION_TYPE:
             raise GameLifecycleError("Healing model selection requires a healing request.")
         result.validate_for_request(request)
-        payload = _healing_selection_payload(result.payload)
+        payload = _healing_selection_payload_from_json(result.payload)
         return cls(
             request_id=result.request_id,
             result_id=result.result_id,
@@ -473,6 +499,16 @@ def resolve_healing_until_blocked(
     current = effect
     while not current.is_complete():
         candidates = _healing_candidates_for_next_step(state=state, effect=current)
+        if (
+            candidates.step_kind is HealingStepKind.REVIVE_MODEL
+            and _healing_effect_allows_revival_finish(current)
+        ):
+            return current, _build_healing_model_request(
+                state=state,
+                decisions=decisions,
+                effect=current,
+                candidates=candidates,
+            )
         if candidates.step_kind is HealingStepKind.REVIVE_MODEL and len(candidates.model_ids) == 1:
             embarked_step = _apply_embarked_revival_step_if_applicable(
                 state=state,
@@ -587,7 +623,27 @@ def apply_recorded_healing_model_decision(
         result=result,
         effect=active_effect,
     )
+    if selection.selection_kind is HealingStepKind.FINISH:
+        step = HealingStep(
+            step_index=active_effect.next_step_index(),
+            step_kind=HealingStepKind.FINISH,
+            model_instance_id=None,
+            starting_wounds_remaining=None,
+            final_wounds_remaining=None,
+            request_id=request.request_id,
+            result_id=result.result_id,
+        )
+        updated = active_effect.with_step(step)
+        _emit_healing_step(decisions=decisions, effect=updated, step=step)
+        return resolve_healing_until_blocked(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            effect=updated,
+        )
     if selection.selection_kind is HealingStepKind.REVIVE_MODEL:
+        if selection.selected_model_id is None:
+            raise GameLifecycleError("Healing revival selection requires a model.")
         embarked_step = _apply_embarked_revival_step_if_applicable(
             state=state,
             effect=active_effect,
@@ -780,7 +836,7 @@ def _build_healing_model_request(
     if candidates.step_kind is HealingStepKind.NO_EFFECT:
         raise GameLifecycleError("No-effect healing must not request a model selection.")
     step_index = effect.next_step_index()
-    options = tuple(
+    options = [
         DecisionOption(
             option_id=_healing_option_id(
                 effect_id=effect.effect_id,
@@ -793,9 +849,9 @@ def _build_healing_model_request(
                 model_instance_id=model_id,
             ),
             payload=validate_json_value(
-                _healing_selection_payload_for_model(
+                _healing_selection_payload(
                     effect=effect,
-                    step_kind=candidates.step_kind,
+                    selection_kind=candidates.step_kind,
                     step_index=step_index,
                     model_id=model_id,
                     legal_model_ids=candidates.model_ids,
@@ -803,7 +859,29 @@ def _build_healing_model_request(
             ),
         )
         for model_id in candidates.model_ids
-    )
+    ]
+    if (
+        candidates.step_kind is HealingStepKind.REVIVE_MODEL
+        and _healing_effect_allows_revival_finish(effect)
+    ):
+        options.append(
+            DecisionOption(
+                option_id=_healing_finish_option_id(
+                    effect_id=effect.effect_id,
+                    step_index=step_index,
+                ),
+                label="Finish returning models",
+                payload=validate_json_value(
+                    _healing_selection_payload(
+                        effect=effect,
+                        selection_kind=HealingStepKind.FINISH,
+                        step_index=step_index,
+                        model_id=None,
+                        legal_model_ids=candidates.model_ids,
+                    )
+                ),
+            )
+        )
     request = DecisionRequest(
         request_id=f"{effect.effect_id}:healing-step-{step_index:03d}",
         decision_type=SELECT_HEALING_MODEL_DECISION_TYPE,
@@ -816,7 +894,7 @@ def _build_healing_model_request(
                 "legal_model_ids": list(candidates.model_ids),
             }
         ),
-        options=options,
+        options=tuple(options),
     )
     return decisions.request_decision(request)
 
@@ -859,6 +937,8 @@ def _apply_selected_healing_step(
     candidates: _HealingStepCandidates,
     selection: HealingModelSelection,
 ) -> HealingStep:
+    if selection.selected_model_id is None:
+        raise GameLifecycleError("Healing selected step requires a model.")
     if selection.selected_model_id not in candidates.model_ids:
         raise GameLifecycleError("Healing selected model is not legal.")
     if selection.selection_kind is HealingStepKind.REVIVE_MODEL:
@@ -1034,11 +1114,20 @@ def _validated_healing_selection(
     selection = HealingModelSelection.from_result(request=request, result=result)
     _validate_selection_matches_effect(selection=selection, effect=effect)
     candidates = _healing_candidates_for_next_step(state=state, effect=effect)
-    if selection.selection_kind is not candidates.step_kind:
+    if selection.selection_kind is HealingStepKind.FINISH:
+        if (
+            candidates.step_kind is not HealingStepKind.REVIVE_MODEL
+            or not _healing_effect_allows_revival_finish(effect)
+        ):
+            raise GameLifecycleError("Healing finish selection is stale.")
+    elif selection.selection_kind is not candidates.step_kind:
         raise GameLifecycleError("Healing model selection kind is stale.")
     if selection.legal_model_ids != candidates.model_ids:
         raise GameLifecycleError("Healing model legal candidates are stale.")
-    if selection.selected_model_id not in candidates.model_ids:
+    if (
+        selection.selection_kind is not HealingStepKind.FINISH
+        and selection.selected_model_id not in candidates.model_ids
+    ):
         raise GameLifecycleError("Healing model selection is no longer legal.")
     return selection, candidates
 
@@ -1060,11 +1149,20 @@ def _healing_selection_stale_field(
     if selection.source_context != effect.source_context:
         return "source_context"
     candidates = _healing_candidates_for_next_step(state=state, effect=effect)
-    if selection.selection_kind is not candidates.step_kind:
+    if selection.selection_kind is HealingStepKind.FINISH:
+        if (
+            candidates.step_kind is not HealingStepKind.REVIVE_MODEL
+            or not _healing_effect_allows_revival_finish(effect)
+        ):
+            return "selection_kind"
+    elif selection.selection_kind is not candidates.step_kind:
         return "selection_kind"
     if selection.legal_model_ids != candidates.model_ids:
         return "legal_model_ids"
-    if selection.selected_model_id not in candidates.model_ids:
+    if (
+        selection.selection_kind is not HealingStepKind.FINISH
+        and selection.selected_model_id not in candidates.model_ids
+    ):
         return "model_instance_id"
     return None
 
@@ -1114,17 +1212,17 @@ def _invalid_finite_healing_decision_status(
     return None
 
 
-def _healing_selection_payload_for_model(
+def _healing_selection_payload(
     *,
     effect: HealingEffect,
-    step_kind: HealingStepKind,
+    selection_kind: HealingStepKind,
     step_index: int,
-    model_id: str,
+    model_id: str | None,
     legal_model_ids: tuple[str, ...],
 ) -> HealingSelectionPayload:
     return {
         "submission_kind": SELECT_HEALING_MODEL_DECISION_TYPE,
-        "selection_kind": step_kind.value,
+        "selection_kind": selection_kind.value,
         "effect_id": effect.effect_id,
         "target_unit_instance_id": effect.target_unit_instance_id,
         "step_index": step_index,
@@ -1135,7 +1233,7 @@ def _healing_selection_payload_for_model(
     }
 
 
-def _healing_selection_payload(payload: JsonValue) -> HealingSelectionPayload:
+def _healing_selection_payload_from_json(payload: JsonValue) -> HealingSelectionPayload:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Healing selection payload must be an object.")
     raw = payload
@@ -1150,7 +1248,10 @@ def _healing_selection_payload(payload: JsonValue) -> HealingSelectionPayload:
         effect_id=_payload_string(raw, key="effect_id"),
         target_unit_instance_id=_payload_string(raw, key="target_unit_instance_id"),
         step_index=_payload_int(raw, key="step_index"),
-        model_instance_id=_payload_string(raw, key="model_instance_id"),
+        model_instance_id=_payload_optional_identifier(
+            raw,
+            key="model_instance_id",
+        ),
         legal_model_ids=[
             _validate_identifier("legal_model_id", value) for value in legal_model_ids
         ],
@@ -1166,6 +1267,14 @@ def _healing_option_id(
     model_instance_id: str,
 ) -> str:
     return f"{effect_id}:healing-step-{step_index:03d}:model:{model_instance_id}"
+
+
+def _healing_finish_option_id(*, effect_id: str, step_index: int) -> str:
+    return f"{effect_id}:healing-step-{step_index:03d}:finish"
+
+
+def _healing_effect_allows_revival_finish(effect: HealingEffect) -> bool:
+    return hctx.healing_source_context_bool(effect.source_context, "allow_revival_finish")
 
 
 def _healing_option_label(
@@ -1296,6 +1405,16 @@ def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
     if type(value) is not int:
         raise GameLifecycleError(f"Healing payload key must be an integer: {key}.")
     return value
+
+
+def _payload_optional_identifier(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> str | None:
+    if key not in payload:
+        raise GameLifecycleError(f"Healing payload missing required key: {key}.")
+    return _validate_optional_identifier(key, payload[key])
 
 
 def _canonical_keyword(keyword: str) -> str:

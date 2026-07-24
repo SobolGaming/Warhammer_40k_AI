@@ -421,6 +421,7 @@ def _resolve_july_battleline_daemonic_manifestation(
                 "eligible_revival_model_ids": list(destroyed_model_ids),
                 "revive_destroyed_models_only": True,
                 "revive_model_full_health": True,
+                "allow_revival_finish": True,
                 "d3_result": d3_result.to_payload(),
             }
         ),
