@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from functools import cache
 from pathlib import Path
 from typing import cast
@@ -181,6 +182,79 @@ def test_cross_source_semantic_audit_covers_every_supported_content_surface() ->
     stale_payload["members"][0]["rule_name"] = "Drifted rule name"
     with pytest.raises(SemanticEquivalenceError, match="payload is stale"):
         CrossSourceSemanticAudit.from_payload(stale_payload)
+
+
+def test_cross_source_semantic_audit_does_not_transfer_mismatched_consumer_evidence() -> None:
+    source_audit = _semantic_audit()
+    source_member = source_audit.member(
+        content_kind=SemanticContentKind.DATASHEET_ABILITY,
+        owner_id="000001648",
+        rule_name="No Prey Can Evade",
+    )
+    audit = CrossSourceSemanticAudit(
+        generated_by="consumer-evidence-regression",
+        upstream_execution_checksum_sha256=source_audit.upstream_execution_checksum_sha256,
+        source_artifact_hashes=source_audit.source_artifact_hashes,
+        members=(
+            replace(
+                source_member,
+                member_id="consumer-evidence:left",
+                runtime_consumer_ids=("catalog-ir:consumer-a",),
+            ),
+            replace(
+                source_member,
+                member_id="consumer-evidence:right",
+                runtime_consumer_ids=("catalog-ir:consumer-b",),
+            ),
+        ),
+    )
+
+    group = CrossSourceSemanticAudit.from_payload(audit.to_payload()).equivalence_groups()[0]
+
+    assert all(
+        member.execution_status is SemanticExecutionStatus.ENGINE_CONSUMED
+        and member.support_transfer is SemanticSupportTransfer.CONTENT_NEUTRAL_GENERIC_IR
+        for member in audit.members
+    )
+    assert len({member.semantic_hash for member in audit.members}) == 1
+    assert len({member.equivalence_hash for member in audit.members}) == 1
+    assert group.support_transfer is SemanticSupportTransfer.NONE
+    assert group.runtime_consumer_ids == ()
+
+
+def test_cross_source_semantic_audit_transfers_identical_consumer_evidence() -> None:
+    source_audit = _semantic_audit()
+    source_member = source_audit.member(
+        content_kind=SemanticContentKind.DATASHEET_ABILITY,
+        owner_id="000001648",
+        rule_name="No Prey Can Evade",
+    )
+    common_consumer_ids = (
+        "catalog-ir:consumer-a",
+        "catalog-ir:consumer-b",
+    )
+    audit = CrossSourceSemanticAudit(
+        generated_by="consumer-evidence-regression",
+        upstream_execution_checksum_sha256=source_audit.upstream_execution_checksum_sha256,
+        source_artifact_hashes=source_audit.source_artifact_hashes,
+        members=(
+            replace(
+                source_member,
+                member_id="consumer-evidence:left",
+                runtime_consumer_ids=common_consumer_ids,
+            ),
+            replace(
+                source_member,
+                member_id="consumer-evidence:right",
+                runtime_consumer_ids=common_consumer_ids,
+            ),
+        ),
+    )
+
+    group = CrossSourceSemanticAudit.from_payload(audit.to_payload()).equivalence_groups()[0]
+
+    assert group.support_transfer is SemanticSupportTransfer.CONTENT_NEUTRAL_GENERIC_IR
+    assert group.runtime_consumer_ids == common_consumer_ids
 
 
 def test_cross_source_semantic_audit_reports_both_shalaxi_sources_as_engine_consumed() -> None:

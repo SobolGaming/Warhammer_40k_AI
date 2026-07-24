@@ -724,9 +724,13 @@ def _equivalence_group(
     ):
         raise SemanticEquivalenceError("Equivalence group contains mismatched semantic surfaces.")
     transfers = {member.support_transfer for member in members}
+    consumer_evidence = {member.runtime_consumer_ids for member in members}
+    has_common_consumer_evidence = len(consumer_evidence) == 1
+    common_consumer_ids = first.runtime_consumer_ids if has_common_consumer_evidence else ()
     transfer = (
         SemanticSupportTransfer.CONTENT_NEUTRAL_GENERIC_IR
         if transfers == {SemanticSupportTransfer.CONTENT_NEUTRAL_GENERIC_IR}
+        and has_common_consumer_evidence
         else SemanticSupportTransfer.NONE
     )
     return SemanticEquivalenceGroup(
@@ -740,11 +744,7 @@ def _equivalence_group(
         execution_statuses=tuple(
             sorted({member.execution_status for member in members}, key=lambda value: value.value)
         ),
-        runtime_consumer_ids=tuple(
-            sorted(
-                {consumer_id for member in members for consumer_id in member.runtime_consumer_ids}
-            )
-        ),
+        runtime_consumer_ids=common_consumer_ids,
         support_transfer=transfer,
     )
 
