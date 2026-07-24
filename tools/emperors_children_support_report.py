@@ -67,12 +67,13 @@ _DATASHEET_REVIEW_ROWS = (
         datasheet_id="000004078",
         ir_coverage="Bridge/catalog blocked",
         supported_semantics=(
-            "Leader and the Thrill Seekers army-rule handler are implemented paths."
+            "Leader, the Perfectionists led-unit Lethal Hits grant, and the Thrill Seekers "
+            "army-rule handler are implemented paths. Perfectionists is engine-consumed through "
+            "the same content-neutral RuleIR used by equivalent leader abilities."
         ),
         semantics_needed=(
-            "Perfectionists led-unit Lethal Hits grant; once-per-battle Euphoric Strikes Attacks "
-            "and Armour Penetration modifiers; conditional Lord of the Host Infiltrators and "
-            "Scouts 6-inch grants."
+            "Once-per-battle Euphoric Strikes Attacks and Armour Penetration modifiers; "
+            "conditional Lord of the Host Infiltrators and Scouts 6-inch grants."
         ),
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
@@ -142,11 +143,11 @@ _DATASHEET_REVIEW_ROWS = (
         datasheet_id="000004084",
         ir_coverage="Bridge/catalog blocked",
         supported_semantics=(
-            "Leader and the Thrill Seekers army-rule handler are implemented paths."
+            "Leader, the Obsessive Annunciation ranged Sustained Hits 1 grant, and the Thrill "
+            "Seekers army-rule handler are implemented paths."
         ),
         semantics_needed=(
-            "Obsessive Annunciation ranged Sustained Hits 1 grant and Doom Siren post-shoot "
-            "mortal wounds followed by a conditional Battle-shock test."
+            "Doom Siren post-shoot mortal wounds followed by a conditional Battle-shock test."
         ),
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
@@ -301,13 +302,10 @@ _DATASHEET_REVIEW_ROWS = (
         datasheet_id="000004087",
         ir_coverage="Bridge/catalog blocked",
         supported_semantics=(
-            "Deadly Demise D3, Deep Strike, and the Thrill Seekers army-rule handler are "
-            "implemented paths."
+            "Deadly Demise D3, Deep Strike, Stimulated by Pain incoming Damage reduction, and "
+            "the Thrill Seekers army-rule handler are implemented paths."
         ),
-        semantics_needed=(
-            "Daemonic Destruction charge-end mortal wounds capped at six and Stimulated by Pain "
-            "incoming Damage reduction."
-        ),
+        semantics_needed=("Daemonic Destruction charge-end mortal wounds capped at six."),
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -329,12 +327,13 @@ _DATASHEET_REVIEW_ROWS = (
         group=_SLAANESH_DAEMONS_GROUP,
         datasheet="Fiends",
         datasheet_id="000004096",
-        ir_coverage="Bridge/catalog blocked",
-        supported_semantics="Deep Strike and Pact of Excess mustering restrictions are paths.",
-        semantics_needed=(
-            "Soporific Musk Fall Back Desperate Escape tests, Monster/Vehicle exclusions, and "
-            "the Battle-shocked test modifier."
+        ir_coverage="All known ability semantics consumed; catalog blocked",
+        supported_semantics=(
+            "Deep Strike, Soporific Musk Fall Back Desperate Escape tests and modifiers, and "
+            "Pact of Excess mustering restrictions are implemented paths. Soporific Musk is "
+            "engine-consumed through source-equivalent content-neutral RuleIR."
         ),
+        semantics_needed="None in the exact source ability rows.",
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -356,27 +355,29 @@ _DATASHEET_REVIEW_ROWS = (
         group=_SLAANESH_DAEMONS_GROUP,
         datasheet="Seekers",
         datasheet_id="000004098",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All known ability semantics consumed; catalog blocked",
         supported_semantics=(
             "Deep Strike, Scouts 9 inches, Daemonic Icon Leadership, Instrument of Chaos Charge "
-            "modifier, and Pact of Excess mustering restrictions are implemented paths."
+            "modifier, Unholy Speed Advance- and Charge-roll re-rolls, and Pact of Excess "
+            "mustering restrictions are implemented paths. Unholy Speed is engine-consumed "
+            "through source-equivalent content-neutral RuleIR."
         ),
-        semantics_needed="Unholy Speed Advance- and Charge-roll re-roll permissions.",
+        semantics_needed="None in the exact source ability rows.",
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_SLAANESH_DAEMONS_GROUP,
         datasheet="Shalaxi Helbane",
         datasheet_id="000004094",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All known ability semantics consumed; catalog blocked",
         supported_semantics=(
-            "Deadly Demise D6, Deep Strike, and Pact of Excess mustering restrictions are "
-            "implemented paths."
+            "Deadly Demise D6, Deep Strike, No Prey Can Evade Advance- and Charge-roll re-rolls, "
+            "Monarch of the Hunt deterministic quarry selection, Hit and Wound re-rolls, "
+            "destruction tracking and reselection, and Pact of Excess mustering restrictions "
+            "are implemented paths. Both datasheet abilities are engine-consumed through the "
+            "same source-equivalent content-neutral RuleIR as Chaos Daemons Shalaxi."
         ),
-        semantics_needed=(
-            "No Prey Can Evade Advance and Charge re-rolls and Monarch of the Hunt deterministic "
-            "quarry selection, re-rolls, destruction tracking, and reselection."
-        ),
+        semantics_needed="None in the exact source ability rows.",
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
 )

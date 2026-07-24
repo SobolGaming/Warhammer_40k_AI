@@ -17,6 +17,14 @@ if TYPE_CHECKING or __package__:
         aeldari_detachment_semantics_needed,
         aeldari_semantic_snapshot_markdown,
     )
+    from tools.cross_source_semantic_equivalence import (
+        DEFAULT_DOCS_PATH as DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH,
+    )
+    from tools.cross_source_semantic_equivalence import (
+        cross_source_semantic_audit,
+        faction_semantic_equivalence_markdown,
+        semantic_equivalence_markdown,
+    )
     from tools.emperors_children_support_report import (
         EMPERORS_CHILDREN_FACTION_ID,
         emperors_children_datasheet_support_markdown,
@@ -36,6 +44,14 @@ else:
         aeldari_datasheet_support_markdown,
         aeldari_detachment_semantics_needed,
         aeldari_semantic_snapshot_markdown,
+    )
+    from cross_source_semantic_equivalence import (
+        DEFAULT_DOCS_PATH as DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH,
+    )
+    from cross_source_semantic_equivalence import (
+        cross_source_semantic_audit,
+        faction_semantic_equivalence_markdown,
+        semantic_equivalence_markdown,
     )
     from emperors_children_support_report import (
         EMPERORS_CHILDREN_FACTION_ID,
@@ -154,6 +170,7 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.tyranids impo
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
 )
+from warhammer40k_core.engine.semantic_equivalence import CrossSourceSemanticAudit
 from warhammer40k_core.engine.stratagem_catalog import (
     eleventh_edition_core_stratagem_catalog_records,
 )
@@ -1147,6 +1164,7 @@ def main() -> None:
     datasheet_payloads = datasheet_support_rows_payload(datasheet_rows)
     mustering_payloads = mustering_support_rows_payload(mustering_rows)
     runtime_semantic_payload = runtime_content_semantic_coverage_payload()
+    semantic_audit = cross_source_semantic_audit(source_json_dir=source_json_dir)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(output_dir / "ability_coverage_rows.json", row_payloads)
@@ -1154,12 +1172,20 @@ def main() -> None:
     _write_json(output_dir / "datasheet_support_rows.json", datasheet_payloads)
     _write_json(output_dir / "mustering_support_rows.json", mustering_payloads)
     _write_json(output_dir / "runtime_content_semantic_coverage.json", runtime_semantic_payload)
+    _write_json(
+        output_dir / "cross_source_semantic_equivalence.json",
+        semantic_audit.to_payload(),
+    )
     docs_path.write_text(
         support_matrix_markdown(
             category_payloads,
             ability_rows=row_payloads,
             runtime_semantic_coverage=runtime_semantic_payload,
         ),
+        encoding="utf-8",
+    )
+    _resolve_repo_path(DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH).write_text(
+        semantic_equivalence_markdown(semantic_audit),
         encoding="utf-8",
     )
     faction_docs_dir.mkdir(parents=True, exist_ok=True)
@@ -1171,6 +1197,7 @@ def main() -> None:
                 source_json_dir=source_json_dir,
             )
         ),
+        semantic_audit=semantic_audit,
     ).items():
         (faction_docs_dir / filename).write_text(markdown, encoding="utf-8")
 
@@ -2890,6 +2917,7 @@ def faction_support_markdown_files(
     datasheet_support_rows: tuple[DatasheetSupportRow, ...] | None = None,
     ability_rows: tuple[AbilityCoverageRow, ...] | None = None,
     leader_attachment_evidence_datasheet_ids: frozenset[str] | None = None,
+    semantic_audit: CrossSourceSemanticAudit | None = None,
 ) -> dict[str, str]:
     if datasheet_support_rows is None or ability_rows is None:
         package = _ability_support_catalog_package()
@@ -2904,6 +2932,8 @@ def faction_support_markdown_files(
         leader_attachment_evidence_datasheet_ids = (
             leader_attachment_consumer_evidence_datasheet_ids()
         )
+    if semantic_audit is None:
+        semantic_audit = cross_source_semantic_audit()
     ability_rows_by_id = {row.coverage_row_id: row for row in ability_rows}
     return {
         f"{faction_row.faction_id}.md": _faction_support_markdown(
@@ -2913,6 +2943,7 @@ def faction_support_markdown_files(
             ),
             ability_rows_by_id=ability_rows_by_id,
             leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
+            semantic_audit=semantic_audit,
         )
         for faction_row in faction_detachments_2026_27.faction_rows()
     }
@@ -2924,6 +2955,7 @@ def _faction_support_markdown(
     datasheet_support_rows: tuple[DatasheetSupportRow, ...],
     ability_rows_by_id: Mapping[str, AbilityCoverageRow],
     leader_attachment_evidence_datasheet_ids: frozenset[str],
+    semantic_audit: CrossSourceSemanticAudit,
 ) -> str:
     pdf_record = _faction_pdf_record(faction_row.faction_id)
     coverage_rows = tuple(
@@ -3073,6 +3105,12 @@ def _faction_support_markdown(
             rows=datasheet_support_rows,
             ability_rows_by_id=ability_rows_by_id,
             leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
+        )
+    )
+    lines.extend(
+        faction_semantic_equivalence_markdown(
+            semantic_audit,
+            faction_id=faction_row.faction_id,
         )
     )
     if faction_row.faction_id in (

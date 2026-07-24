@@ -96,6 +96,33 @@ jobs:
       - name: Code-quality tests
         run: uv run --no-sync pytest tests/code_quality -q -n0 --no-cov
 
+  semantic-audit-macos:
+    name: semantic-audit-macos
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Sync test dependencies
+        run: uv sync --locked --no-default-groups --group test
+
+      - name: Verify cross-source semantic audit
+        run: >-
+          uv run --no-sync pytest
+          tests/code_quality/test_generated_ability_support_artifacts.py
+          -q -n0 --no-cov
+
   mypy:
     name: mypy
     runs-on: ubuntu-latest

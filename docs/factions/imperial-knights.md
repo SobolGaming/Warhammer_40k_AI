@@ -86,6 +86,21 @@ This table reports datasheet-level playability evidence generated from the exact
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | No generated catalog datasheets for Imperial Knights | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
 
+## Cross-source Semantic Equivalence
+
+This section is generated from the repository-wide semantic audit. It is separate from catalog load/playability: it reports exact per-rule IR execution evidence and safe equivalence across source owners.
+
+| Source members | Structured RuleIR | Equivalent groups |
+| ---: | ---: | ---: |
+| 91 | 8 | 4 |
+
+| Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
+| --- | --- | --- | --- | --- |
+| `0978af47b4f9` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Orks — Morkanaut — Big an' Shooty (`generic_ir_executable`)<br>Orks — Gorkanaut — Big an' Stompy (`generic_ir_executable`)<br>Space Marines — Stormhawk Interceptor — Interceptor (`generic_ir_executable`)<br>T'au Empire — Hammerhead Gunship — Armour Hunter (`generic_ir_executable`)<br>Tyranids — Hive Crone — Airborne Predator (`generic_ir_executable`)<br>Imperial Knights — Knight Errant — Aggressive Assault (`generic_ir_executable`)<br>Chaos Space Marines — Heldrake — Airborne Predator (`generic_ir_executable`)<br>Space Marines — Stormtalon Gunship — Strafing Run (`generic_ir_executable`)<br>Grey Knights — Stormhawk Interceptor — Interceptor (`generic_ir_executable`)<br>Grey Knights — Stormtalon Gunship — Strafing Run (`generic_ir_executable`)<br>World Eaters — Heldrake — Airborne Predator (`generic_ir_executable`)<br>Space Marines — Repulsor Executioner — Executioner (`generic_ir_executable`)<br>Astra Militarum — Leman Russ Executioner — Gung-ho Executioners (`generic_ir_executable`)<br>Astra Militarum — Leman Russ Executioner — Gung-ho Executioners (`generic_ir_executable`) | Equivalent structured IR; each source retains its local execution evidence. |
+| `301d20b3583b` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Imperial Knights — Knight Castellan — Ion Aegis (Aura) (`blocked_structured_semantics`)<br>Imperial Knights — Knight Valiant — Ion Aegis (Aura) (`blocked_structured_semantics`) | Exact normalized text only; gameplay support is not transferred. |
+| `43a416d159b5` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Grey Knights — Brother-captain — Eye of Judgement (Psychic) (`engine_consumed`)<br>Imperial Knights — Knight Preceptor — Mentor (Bondsman) (`engine_consumed`) | Engine-consumed through content-neutral generic RuleIR: `catalog-ir:wound-roll-reroll`. |
+| `a24eb2f3bf6c` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Imperial Knights — Knight Castellan — Titan Hunter (`engine_consumed`)<br>Chaos Space Marines — Chaos Predator Annihilator — Annihilator (`engine_consumed`)<br>Space Marines — Predator Annihilator — Annihilator (`engine_consumed`) | Engine-consumed through content-neutral generic RuleIR: `catalog-ir:damage-roll-reroll`. |
+
 ## Detachment Rule Coverage Rows
 
 These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.

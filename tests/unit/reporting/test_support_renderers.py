@@ -71,6 +71,7 @@ def test_faction_support_renderer_preserves_section_order() -> None:
         < emperors_children.index("## Detachment Rule Support")
         < emperors_children.index("## Datasheet Source Review")
         < emperors_children.index("## Datasheet / Unit Support")
+        < emperors_children.index("## Cross-source Semantic Equivalence")
     )
     assert "Court of the Phoenician | `Full`" in emperors_children
     assert "### Unit Datasheet Source Treatments" not in emperors_children
@@ -89,6 +90,13 @@ def test_faction_support_renderer_preserves_section_order() -> None:
     for row in review.rows:
         assert row.datasheet_id is not None
         assert support_markdown.count(f"| {row.datasheet_name} (`{row.datasheet_id}`) |") == 1
+    assert (
+        "No Prey Can Evade Advance and Charge re-rolls and Monarch of the Hunt deterministic"
+        not in emperors_children
+    )
+    assert "Both datasheet abilities are engine-consumed" in emperors_children
+    assert "Chaos Daemons — Shalaxi Helbane — Monarch of the Hunt" in emperors_children
+    assert "Emperor's Children — Shalaxi Helbane — Monarch of the Hunt" in emperors_children
     assert "## Detachment Rule Coverage Rows" not in emperors_children
 
 

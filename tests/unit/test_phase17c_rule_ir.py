@@ -1446,6 +1446,11 @@ def test_phase17c_quarry_selection_supports_this_model_hit_and_wound_rerolls() -
     selection_clause = rule_ir.clauses[0]
     attack_clause = rule_ir.clauses[1]
     reselection_clause = rule_ir.clauses[2]
+    clause_rows = ability_clause_coverage_rows_for_rule_ir(
+        source_ability_id="source:quarry",
+        ability_name="Quarry",
+        rule_ir=rule_ir,
+    )
 
     assert rule_ir.is_supported
     assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
@@ -1501,6 +1506,19 @@ def test_phase17c_quarry_selection_supports_this_model_hit_and_wound_rerolls() -
         CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
         CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
         CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
+    )
+    assert clause_rows[1].effect_runtime_consumer_ids == (
+        (CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,),
+        (CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,),
+    )
+    assert clause_rows[1].support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    assert (
+        ability_support_rollup_for_rule_ir(
+            source_ability_id="source:quarry",
+            ability_name="Quarry",
+            rule_ir=rule_ir,
+        ).overall_ability_support
+        is AbilityOverallSupport.FULL
     )
 
 
@@ -2648,6 +2666,40 @@ def test_phase17c_equivalent_roll_modifier_forms_compile_to_same_semantics() -> 
     )
 
     assert parameter_payload(add_effect.parameters) == parameter_payload(signed_effect.parameters)
+    assert add_text.ir_hash() != signed_text.ir_hash()
+    assert add_text.semantic_hash() == signed_text.semantic_hash()
+
+
+def test_phase17c_semantic_hash_excludes_source_provenance_but_preserves_rule_parameters() -> None:
+    raw_text = "You can re-roll Advance and Charge rolls made for this model."
+    first = compile_rule_source_text(
+        RuleSourceText.from_raw(source_id="phase17c:test:semantic-source-a", raw_text=raw_text)
+    ).rule_ir
+    second = compile_rule_source_text(
+        RuleSourceText.from_raw(source_id="phase17c:test:semantic-source-b", raw_text=raw_text)
+    ).rule_ir
+    different = _compiled("You can re-roll Charge rolls made for this model.").rule_ir
+
+    assert first.ir_hash() != second.ir_hash()
+    assert first.semantic_payload() == second.semantic_payload()
+    assert first.semantic_hash() == second.semantic_hash()
+    assert first.semantic_hash() != different.semantic_hash()
+    encoded = json.dumps(first.semantic_payload(), sort_keys=True)
+    assert "semantic-source-a" not in encoded
+    assert raw_text not in encoded
+    assert "source_span" not in encoded
+    assert "template_id" not in encoded
+
+
+def test_phase17c_unsupported_ir_cannot_claim_structured_semantic_equivalence() -> None:
+    unsupported = _compiled("Resolve this mysterious bespoke rule.").rule_ir
+
+    assert not unsupported.is_supported
+    with pytest.raises(
+        RuleIRError,
+        match="Unsupported RuleIR cannot produce a semantic payload",
+    ):
+        unsupported.semantic_hash()
 
 
 def test_phase17c_optional_wargear_ability_text_compiles_to_bearer_unit_ir() -> None:

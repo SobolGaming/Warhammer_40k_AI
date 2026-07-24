@@ -82,6 +82,22 @@ This table reports datasheet-level playability evidence generated from the exact
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | No generated catalog datasheets for Chaos Knights | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
 
+## Cross-source Semantic Equivalence
+
+This section is generated from the repository-wide semantic audit. It is separate from catalog load/playability: it reports exact per-rule IR execution evidence and safe equivalence across source owners.
+
+| Source members | Structured RuleIR | Equivalent groups |
+| ---: | ---: | ---: |
+| 88 | 4 | 5 |
+
+| Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
+| --- | --- | --- | --- | --- |
+| `3a4dcd29d298` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Chaos Knights — War Dog Huntsman — Huntsman (`engine_consumed`)<br>Astra Militarum — Leman Russ Vanquisher — Tank-killer (`engine_consumed`)<br>Astra Militarum — Leman Russ Vanquisher — Tank-killer (`engine_consumed`) | Engine-consumed through content-neutral generic RuleIR: `catalog-ir:wound-roll-reroll`. |
+| `3a898087ac50` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Space Wolves — Murderfang — Bestial Fury (`engine_consumed`)<br>Chaos Daemons — Shalaxi Helbane — No Prey Can Evade (`engine_consumed`)<br>Chaos Knights — War Dog Karnivore — Karnivore (`engine_consumed`)<br>Emperor's Children — Shalaxi Helbane — No Prey Can Evade (`engine_consumed`) | Engine-consumed through content-neutral generic RuleIR: `catalog-ir:advance-roll-reroll`, `catalog-ir:charge-roll-reroll`. |
+| `6f1ded2dcefd` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Chaos Knights — Knight Rampager — Bloodlust (`blocked_structured_semantics`)<br>World Eaters — Daemon Prince of Khorne — Devastating Assault (`blocked_structured_semantics`) | Exact normalized text only; gameplay support is not transferred. |
+| `ca49dae2b75a` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Genestealer Cults — Clamavus — Scrambler Array (`blocked_structured_semantics`)<br>Chaos Knights — Knight Tyrant — Bastion of Corruption (`blocked_structured_semantics`)<br>Death Guard — Miasmic Malignifier — Putrescent Fog (Aura) (`blocked_structured_semantics`)<br>Imperial Agents — Navigator — Gaze into the Empyrean (Psychic) (`blocked_structured_semantics`) | Exact normalized text only; gameplay support is not transferred. |
+| `cbdc30f7cf78` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Chaos Knights — Knight Desecrator — Taskmaster (Aura) (`generic_ir_executable`)<br>Chaos Knights — Knight Rampager — Frenzied Rampage (Aura) (`generic_ir_executable`) | Equivalent structured IR; each source retains its local execution evidence. |
+
 ## Detachment Rule Coverage Rows
 
 These rows expose the underlying Phase17E source coverage and handler IDs. `generic_supported` is emitted only when the generator can build supported RuleIR from the exact rule text without unsupported diagnostics. Parsing and runtime execution remain separate: a row is fully complete only when its execution status is executable and it records runtime consumers. Use the support table above for the gameplay-support summary.

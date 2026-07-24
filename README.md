@@ -245,6 +245,13 @@ Current status:
 - Core rules infrastructure through movement, shooting, charge, fight, setup,
   reserves, transports, missions, replay, source ingestion, catalog generation,
   rule IR, generic rule execution, and adapter decision submission is in place.
+- `uv run python tools/generate_ability_support_matrix.py` also regenerates the
+  typed cross-source semantic-equivalence artifact and report at
+  `data/generated/ability_coverage/cross_source_semantic_equivalence.json` and
+  `docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md`. Fully structured RuleIR uses a
+  provenance-free semantic hash; incomplete IR is grouped by exact normalized
+  text only and cannot transfer gameplay support. Every generated faction
+  support document consumes the same audit.
 - Faction semantic execution is active incremental work. Current runtime
   support includes selected Phase 17G faction slices across Chaos Daemons,
   Chaos Space Marines, Aeldari, Death Guard, World Eaters, Orks,
