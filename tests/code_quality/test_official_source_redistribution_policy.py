@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import shutil
 import subprocess
 from pathlib import Path, PurePosixPath
@@ -16,6 +17,7 @@ _FORBIDDEN_TRACKED_SOURCE_PATTERNS = (
 )
 _TRACKED_FACTION_PACK_PDF_PATTERN = "data/raw/faction_packs/*.pdf"
 _ROOT = Path(__file__).resolve().parents[2]
+_ARCHIVED_JULY_UPDATE_PLAN_PATH = _ROOT / "docs" / "Archive" / "July_22_2026_Update.md"
 _FACTION_PACK_MANIFEST_PATHS = (
     _ROOT / "data" / "source_manifests" / "gw_11e_faction_packs.yaml",
     _ROOT / "data" / "source_manifests" / "gw_11e_faction_pack_predecessors_2026_06.yaml",
@@ -79,6 +81,26 @@ def test_official_gw_predecessor_faction_pack_manifest_retains_historical_eviden
         for entry in entries
     )
     assert all("retained as versioned predecessor" in entry.license_note for entry in entries)
+
+
+def test_archived_july_update_plan_faction_pack_links_resolve() -> None:
+    plan_text = _ARCHIVED_JULY_UPDATE_PLAN_PATH.read_text(encoding="utf-8")
+    link_targets = tuple(
+        re.findall(r"\]\((\.\./\.\./data/raw/faction_packs/[^)]+\.pdf)\)", plan_text)
+    )
+
+    assert "](data/raw/faction_packs/" not in plan_text
+    assert len(link_targets) == 27
+    assert len(set(link_targets)) == len(link_targets)
+    missing_targets = tuple(
+        target
+        for target in link_targets
+        if not (_ARCHIVED_JULY_UPDATE_PLAN_PATH.parent / target).is_file()
+    )
+    assert not missing_targets, (
+        "Archived July update plan contains unresolved faction-pack links:\n"
+        + "\n".join(missing_targets)
+    )
 
 
 def _assert_tracked_faction_pack_pdfs_match_manifest(tracked_files: tuple[str, ...]) -> None:
