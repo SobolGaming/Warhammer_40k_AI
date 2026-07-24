@@ -13,6 +13,7 @@ from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.deployment_zones import (
@@ -65,6 +66,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_decisions import (
+    DECLINE_MISSION_ACTION_START_OPTION_ID,
     START_MISSION_ACTION_DECISION_TYPE,
     TACTICAL_SECONDARY_DISCARD_DECISION_TYPE,
     TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
@@ -107,7 +109,10 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementPhaseActionKind,
 )
-from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
+from warhammer40k_core.engine.phases.shooting import (
+    SELECT_SHOOTING_UNIT_DECISION_TYPE,
+    ShootingPhaseState,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
@@ -142,6 +147,10 @@ from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
+)
+from warhammer40k_core.engine.transports import (
+    TransportCapacityProfile,
+    TransportCargoState,
 )
 from warhammer40k_core.engine.turn_cleanup import (
     CoherencyCleanupRemoval,
@@ -2682,8 +2691,303 @@ def test_tactical_secondary_discard_in_opponents_turn_has_no_source_backed_cp_re
     assert discard_payload["command_point_gain"] is None
 
 
+def test_local_session_exposes_held_mission_action_and_decline_continues_shooting() -> None:
+    lifecycle = _battle_lifecycle(
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="center",
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+
+    waiting = session.advance_until_decision_or_terminal()
+
+    request = waiting.decision_request
+    assert request is not None
+    assert request.decision_type == START_MISSION_ACTION_DECISION_TYPE
+    assert request.payload == {
+        "game_id": state.game_id,
+        "player_id": "player-a",
+        "battle_round": 1,
+        "phase": BattlePhase.SHOOTING.value,
+        "mission_action_opportunity": True,
+        "legal_mission_action_ids": ["cleanse-objective"],
+        "legal_action_option_ids": [
+            (
+                "start:cleanse-objective:army-alpha:intercessor-unit-1:"
+                "take-and-hold-vs-purge-the-foe-layout-3-center-central"
+            )
+        ],
+        "legal_option_ids": [
+            DECLINE_MISSION_ACTION_START_OPTION_ID,
+            (
+                "start:cleanse-objective:army-alpha:intercessor-unit-1:"
+                "take-and-hold-vs-purge-the-foe-layout-3-center-central"
+            ),
+        ],
+    }
+    assert DECLINE_MISSION_ACTION_START_OPTION_ID in {
+        option.option_id for option in request.options
+    }
+    actor_view = session.view(viewer_player_id="player-a")
+    pending_view = cast(dict[str, JsonValue], actor_view["pending_decision"])
+    assert pending_view["decision_type"] == START_MISSION_ACTION_DECISION_TYPE
+    assert [
+        cast(dict[str, JsonValue], option)["option_id"]
+        for option in cast(list[JsonValue], pending_view["options"])
+    ] == [option.option_id for option in request.options]
+
+    action_session = session.fork()
+    action_option = next(
+        option
+        for option in request.options
+        if option.option_id != DECLINE_MISSION_ACTION_START_OPTION_ID
+    )
+    action_session.submit_option(
+        request_id=request.request_id,
+        option_id=action_option.option_id,
+        result_id="phase11e-local-session-start-cleanse",
+    )
+    action_state = action_session.lifecycle.state
+    assert action_state is not None
+    started = action_state.mission_action_state_by_id(
+        "mission-action:phase11e-local-session-start-cleanse"
+    )
+    assert started.unit_instance_id == "army-alpha:intercessor-unit-1"
+    assert not any(
+        event.event_type == "shooting_unit_selected"
+        and cast(dict[str, JsonValue], event.payload).get("unit_instance_id")
+        == started.unit_instance_id
+        for event in action_session.lifecycle.decision_controller.event_log.records
+    )
+
+    shooting_status = session.submit_option(
+        request_id=request.request_id,
+        option_id=DECLINE_MISSION_ACTION_START_OPTION_ID,
+        result_id="phase11e-decline-mission-action",
+    )
+
+    shooting_request = shooting_status.decision_request
+    assert shooting_request is not None
+    assert shooting_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
+    assert state.shooting_phase_state is not None
+    assert state.shooting_phase_state.mission_action_opportunity_declined is True
+    round_tripped = GameLifecycle.from_payload(session.lifecycle.to_payload())
+    assert round_tripped.state is not None
+    assert round_tripped.state.shooting_phase_state is not None
+    assert round_tripped.state.shooting_phase_state.mission_action_opportunity_declined is True
+
+
+def test_started_action_repeats_opportunity_and_excludes_that_unit_from_shooting() -> None:
+    config = replace(
+        _config_with_player_a_vehicle(),
+        mission_setup=_mission_setup_for_primary("terraform"),
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    infantry_id = "army-alpha:intercessor-unit-1"
+    vehicle_id = "army-alpha:vehicle-unit-2"
+    for unit_id in (infantry_id, vehicle_id):
+        _place_unit_near_objective(
+            state,
+            unit_instance_id=unit_id,
+            target_suffix="center",
+        )
+    session = LocalGameSession(lifecycle=lifecycle)
+    initial_status = session.advance_until_decision_or_terminal()
+    initial_request = initial_status.decision_request
+    assert initial_request is not None
+    cleanse_option = next(
+        option
+        for option in initial_request.options
+        if option.option_id.startswith(f"start:cleanse-objective:{infantry_id}:")
+    )
+
+    repeated_status = session.submit_option(
+        request_id=initial_request.request_id,
+        option_id=cleanse_option.option_id,
+        result_id="phase11e-start-cleanse-before-repeat",
+    )
+
+    repeated_request = repeated_status.decision_request
+    assert repeated_request is not None
+    assert repeated_request.decision_type == START_MISSION_ACTION_DECISION_TYPE
+    repeated_action_payloads = [
+        cast(dict[str, JsonValue], option.payload)
+        for option in repeated_request.options
+        if option.option_id != DECLINE_MISSION_ACTION_START_OPTION_ID
+    ]
+    assert repeated_action_payloads
+    assert {cast(str, payload["unit_instance_id"]) for payload in repeated_action_payloads} == {
+        vehicle_id
+    }
+    shooting_status = session.submit_option(
+        request_id=repeated_request.request_id,
+        option_id=DECLINE_MISSION_ACTION_START_OPTION_ID,
+        result_id="phase11e-decline-repeated-action-opportunity",
+    )
+    shooting_request = shooting_status.decision_request
+    assert shooting_request is not None
+    assert shooting_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
+    assert infantry_id not in {option.option_id for option in shooting_request.options}
+    assert vehicle_id in {option.option_id for option in shooting_request.options}
+
+
+def test_shooting_lifecycle_offers_action_even_without_a_legal_shooting_attack() -> None:
+    lifecycle = _battle_lifecycle(
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        "army-beta:intercessor-unit-3"
+    )
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="center",
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+
+    waiting = session.advance_until_decision_or_terminal()
+
+    request = waiting.decision_request
+    assert request is not None
+    assert request.decision_type == START_MISSION_ACTION_DECISION_TYPE
+    assert any(
+        option.option_id.startswith("start:cleanse-objective:") for option in request.options
+    )
+
+
+def test_shooting_lifecycle_filters_mission_actions_by_primary_and_secondary_ownership() -> None:
+    unheld_lifecycle = _battle_lifecycle()
+    unheld_state = unheld_lifecycle.state
+    assert unheld_state is not None
+    unheld_state.battle_phase_index = unheld_state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    _place_unit_near_objective(
+        unheld_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="center",
+    )
+
+    unheld_status = LocalGameSession(
+        lifecycle=unheld_lifecycle
+    ).advance_until_decision_or_terminal()
+    direct_unheld_status = request_mission_action_start(
+        state=unheld_state,
+        decisions=GameLifecycle().decision_controller,
+        player_id="player-a",
+        mission_action_id="cleanse-objective",
+    )
+
+    assert unheld_status.decision_request is not None
+    assert unheld_status.decision_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
+    assert direct_unheld_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+
+    terraform_lifecycle = _battle_lifecycle(
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        mission_setup=_mission_setup_for_primary("terraform"),
+    )
+    terraform_state = terraform_lifecycle.state
+    assert terraform_state is not None
+    terraform_state.battle_phase_index = terraform_state.battle_phase_sequence.index(
+        BattlePhase.SHOOTING
+    )
+    _place_unit_near_objective(
+        terraform_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="center",
+    )
+
+    terraform_status = LocalGameSession(
+        lifecycle=terraform_lifecycle
+    ).advance_until_decision_or_terminal()
+
+    terraform_request = terraform_status.decision_request
+    assert terraform_request is not None
+    assert terraform_request.decision_type == START_MISSION_ACTION_DECISION_TYPE
+    assert cast(dict[str, JsonValue], terraform_request.payload)["legal_mission_action_ids"] == [
+        "cleanse-objective",
+        "terraform-objective",
+    ]
+
+    death_trap_lifecycle = _battle_lifecycle_for_primary(
+        "primary-death-trap",
+        objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
+    )
+    death_trap_state = death_trap_lifecycle.state
+    assert death_trap_state is not None
+    death_trap_state.battle_phase_index = death_trap_state.battle_phase_sequence.index(
+        BattlePhase.SHOOTING
+    )
+    _place_unit_near_objective(
+        death_trap_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="center",
+    )
+
+    death_trap_status = LocalGameSession(
+        lifecycle=death_trap_lifecycle
+    ).advance_until_decision_or_terminal()
+
+    death_trap_request = death_trap_status.decision_request
+    assert death_trap_request is not None
+    assert death_trap_request.decision_type == START_MISSION_ACTION_DECISION_TYPE
+    assert cast(dict[str, JsonValue], death_trap_request.payload)["legal_mission_action_ids"] == [
+        "booby-trap-terrain"
+    ]
+
+
+def test_shooting_lifecycle_exposes_held_tactical_plunder() -> None:
+    lifecycle = _battle_lifecycle(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        mission_setup=_event_companion_mission_setup_with_scoring_terrain_feature(),
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.mission_setup is not None
+    _record_active_tactical_secondary(state, secondary_mission_id="plunder")
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    terrain_feature = _first_non_player_deployment_terrain_feature(
+        state,
+        player_id="player-a",
+    )
+    min_x, min_y, max_x, max_y = terrain_feature.bounds()
+    _place_unit_near_point(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        x_inches=(min_x + max_x) / 2.0,
+        y_inches=(min_y + max_y) / 2.0,
+    )
+
+    waiting = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
+
+    request = waiting.decision_request
+    assert request is not None
+    assert request.decision_type == START_MISSION_ACTION_DECISION_TYPE
+    assert cast(dict[str, JsonValue], request.payload)["legal_mission_action_ids"] == [
+        "plunder-terrain"
+    ]
+
+
 def test_mission_action_can_complete_interrupt_and_score() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
     state = lifecycle.state
     assert state is not None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
@@ -2755,6 +3059,7 @@ def test_plunder_mission_action_completes_immediately_and_records_secondary_evid
     state = lifecycle.state
     assert state is not None
     assert state.mission_setup is not None
+    _record_active_tactical_secondary(state, secondary_mission_id="plunder")
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     terrain_feature = _first_non_player_deployment_terrain_feature(state, player_id="player-a")
     min_x, min_y, max_x, max_y = terrain_feature.bounds()
@@ -2841,6 +3146,7 @@ def test_plunder_excludes_terrain_area_in_player_territory_outside_deployment_zo
     )
     state = lifecycle.state
     assert state is not None
+    _record_active_tactical_secondary(state, secondary_mission_id="plunder")
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     _place_unit_near_point(
         state,
@@ -3190,7 +3496,9 @@ def test_mission_action_interruption_helpers_reject_malformed_state() -> None:
 
 
 def test_mission_action_start_rejects_drifted_lifecycle_option() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
     state = lifecycle.state
     assert state is not None
     assert state.battlefield_state is not None
@@ -3200,15 +3508,15 @@ def test_mission_action_start_rejects_drifted_lifecycle_option() -> None:
         unit_instance_id="army-alpha:intercessor-unit-1",
         target_suffix="center",
     )
-    waiting = request_mission_action_start(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        player_id="player-a",
-        mission_action_id="cleanse-objective",
-    )
+    waiting = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
     request = waiting.decision_request
     assert request is not None
-    option = request.options[0]
+    assert request.decision_type == START_MISSION_ACTION_DECISION_TYPE
+    option = next(
+        candidate
+        for candidate in request.options
+        if candidate.option_id != DECLINE_MISSION_ACTION_START_OPTION_ID
+    )
     result = FiniteOptionSubmission(
         request_id=request.request_id,
         selected_option_id=option.option_id,
@@ -3241,16 +3549,16 @@ def test_cleanse_mission_action_filters_ineligible_vehicle_units() -> None:
         target_suffix="center",
     )
 
-    waiting = request_mission_action_start(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        player_id="player-a",
-        mission_action_id="cleanse-objective",
-    )
+    waiting = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
     request = waiting.decision_request
     assert request is not None
+    assert request.decision_type == START_MISSION_ACTION_DECISION_TYPE
 
-    option_payloads = [cast(dict[str, JsonValue], option.payload) for option in request.options]
+    option_payloads = [
+        cast(dict[str, JsonValue], option.payload)
+        for option in request.options
+        if option.option_id != DECLINE_MISSION_ACTION_START_OPTION_ID
+    ]
     assert option_payloads
     assert {
         cast(str, option_payload["unit_instance_id"]) for option_payload in option_payloads
@@ -3263,7 +3571,9 @@ def test_cleanse_mission_action_filters_ineligible_vehicle_units() -> None:
 
 
 def test_mission_action_start_excludes_units_that_shot_this_shooting_phase() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
     state = lifecycle.state
     assert state is not None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
@@ -3291,6 +3601,109 @@ def test_mission_action_start_excludes_units_that_shot_this_shooting_phase() -> 
     assert waiting.decision_request is None
     waiting_payload = cast(dict[str, JsonValue], waiting.payload)
     assert waiting_payload["mission_action_id"] == "cleanse-objective"
+
+
+@pytest.mark.parametrize(
+    "ineligible_state",
+    [
+        pytest.param("battle_shocked"),
+        pytest.param("already_shot"),
+        pytest.param("destroyed"),
+        pytest.param("reserve"),
+    ],
+)
+def test_automatic_mission_action_opportunity_excludes_unavailable_units(
+    ineligible_state: str,
+) -> None:
+    lifecycle = _battle_lifecycle(
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    unit_id = "army-alpha:intercessor-unit-1"
+    _place_unit_near_objective(
+        state,
+        unit_instance_id=unit_id,
+        target_suffix="center",
+    )
+    unit_placement = state.battlefield_state.unit_placement_by_id(unit_id)
+    if ineligible_state == "battle_shocked":
+        state.battle_shocked_unit_ids = [unit_id]
+    elif ineligible_state == "already_shot":
+        state.shooting_phase_state = ShootingPhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            selected_unit_ids=(unit_id,),
+            shot_unit_ids=(unit_id,),
+        )
+    elif ineligible_state == "destroyed":
+        state.battlefield_state = state.battlefield_state.with_removed_models(
+            tuple(
+                model_placement.model_instance_id
+                for model_placement in unit_placement.model_placements
+            )
+        )
+    elif ineligible_state == "reserve":
+        state.battlefield_state = state.battlefield_state.without_unit_placement(unit_id)
+        state.record_reserve_state(
+            ReserveState.declared_before_battle(
+                player_id="player-a",
+                unit_instance_id=unit_id,
+                reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+                destruction_deadline_policy=reserve_destruction_policy_from_scoring_policy(
+                    mission_scoring_policy_from_setup(_mission_setup())
+                ),
+            )
+        )
+    else:
+        raise AssertionError("unsupported ineligible-state fixture")
+
+    status = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
+
+    request = status.decision_request
+    assert request is None or request.decision_type != START_MISSION_ACTION_DECISION_TYPE
+
+
+def test_automatic_mission_action_opportunity_excludes_embarked_units() -> None:
+    config = _config_with_player_a_transport()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    passenger_id = "army-alpha:intercessor-unit-1"
+    transport_id = "army-alpha:transport-unit-2"
+    _place_unit_near_objective(
+        state,
+        unit_instance_id=passenger_id,
+        target_suffix="center",
+    )
+    transport = state.army_definitions[0].unit_by_id(transport_id)
+    state.battlefield_state = state.battlefield_state.without_unit_placement(passenger_id)
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-a",
+            transport_unit_instance_id=transport_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=(passenger_id,),
+        )
+    )
+
+    status = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
+
+    request = status.decision_request
+    assert request is None or request.decision_type != START_MISSION_ACTION_DECISION_TYPE
 
 
 def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() -> None:
@@ -4461,6 +4874,7 @@ def _battle_lifecycle(
     *,
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+    player_a_fixed_mission_ids: tuple[str, str] = ("assassination", "bring-it-down"),
     mission_setup: MissionSetup | None = None,
 ) -> GameLifecycle:
     config = _config(mission_setup=mission_setup)
@@ -4469,6 +4883,7 @@ def _battle_lifecycle(
     lifecycle.state = _battle_state(
         player_a_secondary=player_a_secondary,
         player_b_secondary=player_b_secondary,
+        player_a_fixed_mission_ids=player_a_fixed_mission_ids,
         mission_setup=mission_setup,
     )
     return lifecycle
@@ -4542,6 +4957,21 @@ def _active_tactical_card(state: GameState) -> SecondaryMissionCardState:
     )
 
 
+def _record_active_tactical_secondary(
+    state: GameState,
+    *,
+    secondary_mission_id: str,
+) -> None:
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id=secondary_mission_id,
+            battle_round=state.battle_round,
+            source_result_id=f"phase11e-hold-{secondary_mission_id}",
+        )
+    )
+
+
 def _record_tactical_secondary_achievement_context(
     *,
     state: GameState,
@@ -4604,7 +5034,10 @@ def _battle_lifecycle_with_player_a_vehicle() -> GameLifecycle:
     config = _config_with_player_a_vehicle()
     lifecycle = GameLifecycle()
     lifecycle.start(config)
-    lifecycle.state = _battle_state_from_config(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+    )
     return lifecycle
 
 
@@ -4612,6 +5045,7 @@ def _battle_state(
     *,
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+    player_a_fixed_mission_ids: tuple[str, str] = ("assassination", "bring-it-down"),
     mission_setup: MissionSetup | None = None,
 ) -> GameState:
     config = _config(mission_setup=mission_setup)
@@ -4619,6 +5053,7 @@ def _battle_state(
         config,
         player_a_secondary=player_a_secondary,
         player_b_secondary=player_b_secondary,
+        player_a_fixed_mission_ids=player_a_fixed_mission_ids,
     )
 
 
@@ -4631,6 +5066,7 @@ def _battle_state_from_config(
     *,
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+    player_a_fixed_mission_ids: tuple[str, str] = ("assassination", "bring-it-down"),
 ) -> GameState:
     state = GameState.from_config(config)
     for army in _mustered_armies(config):
@@ -4641,7 +5077,11 @@ def _battle_state_from_config(
     )
     state.record_battlefield_state(scenario.battlefield_state)
     state.record_secondary_mission_choice(
-        _secondary_choice(player_id="player-a", mode=player_a_secondary)
+        _secondary_choice(
+            player_id="player-a",
+            mode=player_a_secondary,
+            fixed_mission_ids=player_a_fixed_mission_ids,
+        )
     )
     state.record_secondary_mission_choice(
         _secondary_choice(player_id="player-b", mode=player_b_secondary)
@@ -4652,13 +5092,18 @@ def _battle_state_from_config(
     return state
 
 
-def _secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> SecondaryMissionChoice:
+def _secondary_choice(
+    *,
+    player_id: str,
+    mode: SecondaryMissionMode,
+    fixed_mission_ids: tuple[str, str] = ("assassination", "bring-it-down"),
+) -> SecondaryMissionChoice:
     if mode is SecondaryMissionMode.TACTICAL:
         return SecondaryMissionChoice(player_id=player_id, mode=mode)
     return SecondaryMissionChoice(
         player_id=player_id,
         mode=mode,
-        fixed_mission_ids=("assassination", "bring-it-down"),
+        fixed_mission_ids=fixed_mission_ids,
     )
 
 
@@ -4734,6 +5179,54 @@ def _config_with_player_a_vehicle() -> GameConfig:
                         unit_selection_id="vehicle-unit-2",
                         datasheet_id="core-vehicle-monster",
                         model_profile_id="core-vehicle-monster",
+                        model_count=1,
+                    ),
+                ),
+            ),
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_ids=("intercessor-unit-3",),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
+        mission_setup=_mission_setup(),
+    )
+
+
+def _config_with_player_a_transport() -> GameConfig:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return GameConfig(
+        game_id="phase11e-game",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            ArmyMusterRequest(
+                army_id="army-alpha",
+                player_id="player-a",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="core-marine-force",
+                    detachment_ids=("core-combined-arms",),
+                ),
+                force_disposition_id="purge-the-foe",
+                unit_selections=(
+                    _unit_muster_selection(
+                        unit_selection_id="intercessor-unit-1",
+                        datasheet_id="core-intercessor-like-infantry",
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                    _unit_muster_selection(
+                        unit_selection_id="transport-unit-2",
+                        datasheet_id="core-transport",
+                        model_profile_id="core-transport",
                         model_count=1,
                     ),
                 ),

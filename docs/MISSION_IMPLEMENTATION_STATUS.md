@@ -70,6 +70,10 @@ Secondary status:
   `commit-sabotage`, `secure-asset`, `vanguard-operation`, and
   `maintain-control` are tracked as source descriptors only and are not
   exposed as runtime mission actions.
+- Runtime Mission Actions: Death Trap's `booby-trap-terrain`, Terraform's
+  `terraform-objective`, Cleanse's `cleanse-objective`, and Plunder's
+  `plunder-terrain` are automatically exposed before Shooting-unit selection
+  only when the active player owns the applicable Primary or Secondary.
 - Secondary missions: 18 `source_tracked` and `policy_loaded`.
 - Secondary scoring rows: 4 fixed policy rows, 20 tactical policy rows, and 28
   source-only branch/procedure rows.

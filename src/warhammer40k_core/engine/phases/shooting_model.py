@@ -84,6 +84,7 @@ class ShootingPhaseStatePayload(TypedDict):
     battle_round: int
     active_player_id: str
     phase_complete: bool
+    mission_action_opportunity_declined: bool
     selected_unit_ids: list[str]
     shot_unit_ids: list[str]
     skipped_unit_ids: list[str]
@@ -305,6 +306,7 @@ class ShootingPhaseState:
     battle_round: int
     active_player_id: str
     phase_complete: bool = False
+    mission_action_opportunity_declined: bool = False
     selected_unit_ids: tuple[str, ...] = ()
     shot_unit_ids: tuple[str, ...] = ()
     skipped_unit_ids: tuple[str, ...] = ()
@@ -328,6 +330,10 @@ class ShootingPhaseState:
         )
         if type(self.phase_complete) is not bool:
             raise GameLifecycleError("ShootingPhaseState phase_complete must be a bool.")
+        if type(self.mission_action_opportunity_declined) is not bool:
+            raise GameLifecycleError(
+                "ShootingPhaseState mission_action_opportunity_declined must be a bool."
+            )
         object.__setattr__(
             self,
             "selected_unit_ids",
@@ -450,6 +456,7 @@ class ShootingPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=False,
+            mission_action_opportunity_declined=self.mission_action_opportunity_declined,
             selected_unit_ids=(*self.selected_unit_ids, selection.unit_instance_id),
             shot_unit_ids=self.shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
@@ -480,6 +487,7 @@ class ShootingPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=False,
+            mission_action_opportunity_declined=self.mission_action_opportunity_declined,
             selected_unit_ids=self.selected_unit_ids,
             shot_unit_ids=self.shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
@@ -526,6 +534,7 @@ class ShootingPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=False,
+            mission_action_opportunity_declined=self.mission_action_opportunity_declined,
             selected_unit_ids=self.selected_unit_ids,
             shot_unit_ids=shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
@@ -547,6 +556,7 @@ class ShootingPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=self.phase_complete,
+            mission_action_opportunity_declined=self.mission_action_opportunity_declined,
             selected_unit_ids=self.selected_unit_ids,
             shot_unit_ids=self.shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
@@ -570,6 +580,7 @@ class ShootingPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=self.phase_complete,
+            mission_action_opportunity_declined=self.mission_action_opportunity_declined,
             selected_unit_ids=self.selected_unit_ids,
             shot_unit_ids=self.shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
@@ -578,6 +589,35 @@ class ShootingPhaseState:
             pending_completed_attack_sequence=attack_sequence,
             attack_pools=self.attack_pools,
             attack_sequence=self.attack_sequence,
+            allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
+        )
+
+    def with_mission_action_opportunity_declined(self) -> Self:
+        if self.phase_complete:
+            raise GameLifecycleError(
+                "Cannot decline the Mission Action opportunity after phase completion."
+            )
+        if self.active_selection is not None:
+            raise GameLifecycleError(
+                "Mission Action opportunity decline requires no active shooting selection."
+            )
+        if self.attack_sequence is not None or self.pending_completed_attack_sequence is not None:
+            raise GameLifecycleError(
+                "Mission Action opportunity decline requires no attack sequence."
+            )
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            phase_complete=False,
+            mission_action_opportunity_declined=True,
+            selected_unit_ids=self.selected_unit_ids,
+            shot_unit_ids=self.shot_unit_ids,
+            skipped_unit_ids=self.skipped_unit_ids,
+            active_selection=None,
+            selected_shooting_type=None,
+            pending_completed_attack_sequence=None,
+            attack_pools=self.attack_pools,
+            attack_sequence=None,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
         )
 
@@ -597,6 +637,7 @@ class ShootingPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=True,
+            mission_action_opportunity_declined=self.mission_action_opportunity_declined,
             selected_unit_ids=self.selected_unit_ids,
             shot_unit_ids=self.shot_unit_ids,
             skipped_unit_ids=tuple(sorted({*self.skipped_unit_ids, *skipped_ids})),
@@ -613,6 +654,7 @@ class ShootingPhaseState:
             "battle_round": self.battle_round,
             "active_player_id": self.active_player_id,
             "phase_complete": self.phase_complete,
+            "mission_action_opportunity_declined": self.mission_action_opportunity_declined,
             "selected_unit_ids": list(self.selected_unit_ids),
             "shot_unit_ids": list(self.shot_unit_ids),
             "skipped_unit_ids": list(self.skipped_unit_ids),
@@ -645,6 +687,7 @@ class ShootingPhaseState:
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
             phase_complete=payload["phase_complete"],
+            mission_action_opportunity_declined=payload["mission_action_opportunity_declined"],
             selected_unit_ids=tuple(payload["selected_unit_ids"]),
             shot_unit_ids=tuple(payload["shot_unit_ids"]),
             skipped_unit_ids=tuple(payload["skipped_unit_ids"]),

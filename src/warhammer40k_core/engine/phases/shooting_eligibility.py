@@ -76,12 +76,17 @@ def _legal_shooting_unit_ids(
     scenario = _battlefield_scenario(state)
     active_player_id = _active_player_id(state)
     placed_unit_ids = _active_player_placed_unit_ids(state=state, player_id=active_player_id)
+    mission_action_unit_ids = _mission_action_rules_unit_ids_for_current_shooting_phase(
+        state=state,
+        player_id=active_player_id,
+    )
     legal: list[str] = []
     for unit_id in placed_unit_ids:
         if (
             unit_id in shooting_state.selected_unit_ids
             or unit_id in shooting_state.shot_unit_ids
             or unit_id in shooting_state.skipped_unit_ids
+            or unit_id in mission_action_unit_ids
         ):
             continue
         rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
@@ -101,6 +106,24 @@ def _legal_shooting_unit_ids(
         ):
             legal.append(rules_unit.unit_instance_id)
     return tuple(sorted(legal))
+
+
+def _mission_action_rules_unit_ids_for_current_shooting_phase(
+    *,
+    state: GameState,
+    player_id: str,
+) -> frozenset[str]:
+    armies = tuple(state.army_definitions)
+    return frozenset(
+        rules_unit_id_for_unit_id(
+            armies=armies,
+            unit_instance_id=action_state.unit_instance_id,
+        )
+        for action_state in state.mission_action_states
+        if action_state.player_id == player_id
+        and action_state.battle_round_started == state.battle_round
+        and action_state.phase_started == BattlePhase.SHOOTING.value
+    )
 
 
 def _rules_unit_has_legal_shooting_declaration(

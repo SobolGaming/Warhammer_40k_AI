@@ -266,6 +266,18 @@ class ShootingPhaseHandler:
         if active_stratagem_status is not None:
             return active_stratagem_status
 
+        from warhammer40k_core.engine.mission_decisions import (
+            request_mission_action_opportunity,
+        )
+
+        mission_action_status = request_mission_action_opportunity(
+            state=state,
+            decisions=decisions,
+            player_id=_active_player_id(state),
+        )
+        if mission_action_status is not None:
+            return mission_action_status
+
         legal_unit_ids = _legal_shooting_unit_ids(
             state=state,
             shooting_state=shooting_state,

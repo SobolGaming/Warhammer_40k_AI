@@ -1625,6 +1625,10 @@ Invariants:
   using default scoring amounts;
 - player-facing Tactical discard and supported mission Action start selections use
   finite `DecisionRequest` options through `GameLifecycle.submit_decision(...)`;
+- the Shooting lifecycle automatically emits one ownership-filtered Mission
+  Action opportunity before ordinary unit selection, aggregating the active
+  Primary, selected Fixed Secondaries, and active Tactical cards with an
+  explicit continue-to-shooting option;
 - mission Actions have source-backed start timing, eligible units, target IDs,
   interruption conditions, completion timing, and scoring effects;
 - the mission deck grants two Secondary Missions per player turn;
@@ -1655,8 +1659,13 @@ Required tests:
 - New Orders emits deterministic Stratagem, CP, discard, and replacement-draw
   records, rejects second use in the same game, and cannot be confused with
   ordinary Tactical discard;
-- mission Action can start through the lifecycle decision path, persist its target,
-  filter ineligible units, complete, be interrupted, and score;
+- mission Action opportunity is generated through `LocalGameSession` phase
+  advancement, is visible through viewer-scoped projection, can be declined
+  into ordinary shooting, and remains available when no unit has a legal
+  shooting attack;
+- mission Action can start through the lifecycle decision path, persist its
+  target, enforce Primary/Secondary ownership, filter ineligible units,
+  complete, be interrupted, and score;
 - source package payloads round-trip and preserve 11th Edition mission/scoring/action snapshots;
 - end-of-turn coherency cleanup removes models without destroyed triggers;
 - unarrived Reserves are destroyed at the configured deadline through the lifecycle hook;
