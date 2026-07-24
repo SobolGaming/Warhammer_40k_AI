@@ -155,6 +155,12 @@ class RulesUnitView:
         )
 
 
+def rules_unit_display_name(rules_unit: RulesUnitView) -> str:
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Rules-unit display name requires RulesUnitView.")
+    return " + ".join(component.unit.name for component in rules_unit.components)
+
+
 def rules_unit_view_by_id(*, state: GameState, unit_instance_id: str) -> RulesUnitView:
     return rules_unit_view_from_armies(
         armies=tuple(state.army_definitions),

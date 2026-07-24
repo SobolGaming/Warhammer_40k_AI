@@ -12,6 +12,9 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mission_action_eligibility import (
+    mission_action_unit_ineligibility_reason,
+)
 from warhammer40k_core.engine.mission_terrain import (
     terrain_feature_within_player_deployment_zone,
     terrain_feature_within_player_territory,
@@ -23,6 +26,12 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_display_name,
+    rules_unit_id_for_unit_id,
+    rules_unit_view_by_id,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.scoring import SecondaryMissionCardStatus
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -41,6 +50,17 @@ class MissionActionStartOption:
 
     def option_id(self) -> str:
         return f"start:{self.action.mission_action_id}:{self.unit_instance_id}:{self.target_id}"
+
+    def label(self, *, state: GameState) -> str:
+        rules_unit = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=self.unit_instance_id,
+        )
+        return (
+            f"{self.action.name} — "
+            f"{rules_unit_display_name(rules_unit)} ({self.unit_instance_id}) — "
+            f"{_target_display_name(state=state, target_id=self.target_id)} ({self.target_id})"
+        )
 
     def payload(
         self,
@@ -116,24 +136,10 @@ def mission_action_start_options(
         armies=tuple(state.army_definitions),
         battlefield_state=battlefield_state,
     )
-    eligible_unit_ids = _eligible_unit_instance_ids_for_action(
-        scenario=scenario,
-        unit_placements=placed_army.unit_placements,
-        action=action,
-    )
-    ineligible_action_unit_ids = _mission_action_unit_ids_started_this_shooting_phase(
+    eligible_unit_ids = _eligible_rules_unit_instance_ids_for_action(
         state=state,
         player_id=player_id,
-    )
-    eligible_unit_ids = tuple(
-        unit_id
-        for unit_id in eligible_unit_ids
-        if unit_id not in state.battle_shocked_unit_ids
-        and not _unit_has_shot_this_shooting_phase(
-            state=state,
-            unit_instance_id=unit_id,
-        )
-        and unit_id not in ineligible_action_unit_ids
+        action=action,
     )
     target_ids_by_unit = _target_ids_by_unit_for_action(
         state=state,
@@ -226,21 +232,28 @@ def mission_action_opportunity_drift_reason(
     return None
 
 
-def _eligible_unit_instance_ids_for_action(
+def _eligible_rules_unit_instance_ids_for_action(
     *,
-    scenario: BattlefieldScenario,
-    unit_placements: tuple[object, ...],
+    state: GameState,
+    player_id: str,
     action: MissionActionDefinition,
 ) -> tuple[str, ...]:
-    from warhammer40k_core.engine.battlefield_state import UnitPlacement
-
     eligible_ids: list[str] = []
-    for placement in unit_placements:
-        if type(placement) is not UnitPlacement:
-            raise GameLifecycleError("Mission Action options require UnitPlacement values.")
-        unit = scenario.unit_instance_for_placement(placement)
-        if _unit_matches_eligible_policy(unit.keywords, action.eligible_unit_policy):
-            eligible_ids.append(placement.unit_instance_id)
+    for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        if rules_unit.owner_player_id != player_id:
+            continue
+        if (
+            mission_action_unit_ineligibility_reason(
+                state=state,
+                player_id=player_id,
+                unit_instance_id=rules_unit.unit_instance_id,
+            )
+            is not None
+        ):
+            continue
+        if not _unit_matches_eligible_policy(rules_unit.keywords, action.eligible_unit_policy):
+            continue
+        eligible_ids.append(rules_unit.unit_instance_id)
     return tuple(sorted(eligible_ids))
 
 
@@ -328,9 +341,11 @@ def _objective_marker_target_ids_by_unit(
         for contribution in result.contributors:
             if contribution.player_id != player_id:
                 continue
-            targets_by_unit.setdefault(contribution.unit_instance_id, set()).add(
-                result.objective_id
+            rules_unit_id = rules_unit_id_for_unit_id(
+                armies=tuple(state.army_definitions),
+                unit_instance_id=contribution.unit_instance_id,
             )
+            targets_by_unit.setdefault(rules_unit_id, set()).add(result.objective_id)
     return {
         unit_id: tuple(sorted(target_ids))
         for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
@@ -380,7 +395,11 @@ def _trappable_terrain_target_ids_by_unit(
         return {}
     targets_by_unit: dict[str, set[str]] = {}
     for unit_placement in placed_army.unit_placements:
-        if unit_placement.unit_instance_id not in eligible_unit_ids:
+        rules_unit_id = rules_unit_id_for_unit_id(
+            armies=tuple(state.army_definitions),
+            unit_instance_id=unit_placement.unit_instance_id,
+        )
+        if rules_unit_id not in eligible_unit_ids:
             continue
         for model_placement in unit_placement.model_placements:
             model = geometry_model_for_placement(
@@ -389,9 +408,7 @@ def _trappable_terrain_target_ids_by_unit(
             )
             for feature in candidate_features:
                 if _model_is_within_terrain_area(model=model, feature=feature):
-                    targets_by_unit.setdefault(unit_placement.unit_instance_id, set()).add(
-                        feature.feature_id
-                    )
+                    targets_by_unit.setdefault(rules_unit_id, set()).add(feature.feature_id)
     return {
         unit_id: tuple(sorted(target_ids))
         for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
@@ -468,7 +485,11 @@ def _terrain_area_target_ids_by_unit(
         return {}
     targets_by_unit: dict[str, set[str]] = {}
     for unit_placement in placed_army.unit_placements:
-        if unit_placement.unit_instance_id not in eligible_unit_ids:
+        rules_unit_id = rules_unit_id_for_unit_id(
+            armies=tuple(state.army_definitions),
+            unit_instance_id=unit_placement.unit_instance_id,
+        )
+        if rules_unit_id not in eligible_unit_ids:
             continue
         for model_placement in unit_placement.model_placements:
             model = geometry_model_for_placement(
@@ -477,9 +498,7 @@ def _terrain_area_target_ids_by_unit(
             )
             for feature in candidate_features:
                 if _model_is_within_terrain_area(model=model, feature=feature):
-                    targets_by_unit.setdefault(unit_placement.unit_instance_id, set()).add(
-                        feature.feature_id
-                    )
+                    targets_by_unit.setdefault(rules_unit_id, set()).add(feature.feature_id)
     return {
         unit_id: tuple(sorted(target_ids))
         for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
@@ -534,33 +553,16 @@ def _target_kind_for_policy(target_policy: str) -> str:
     raise GameLifecycleError("Unsupported Mission Action target policy.")
 
 
-def _unit_has_shot_this_shooting_phase(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-) -> bool:
-    if _current_phase(state) is not BattlePhase.SHOOTING:
-        return False
-    shooting_state = state.shooting_phase_state
-    if shooting_state is None:
-        return False
-    return unit_instance_id in shooting_state.shot_unit_ids
-
-
-def _mission_action_unit_ids_started_this_shooting_phase(
-    *,
-    state: GameState,
-    player_id: str,
-) -> frozenset[str]:
-    if _current_phase(state) is not BattlePhase.SHOOTING:
-        return frozenset()
-    return frozenset(
-        action_state.unit_instance_id
-        for action_state in state.mission_action_states
-        if action_state.player_id == player_id
-        and action_state.battle_round_started == state.battle_round
-        and action_state.phase_started == BattlePhase.SHOOTING.value
-    )
+def _target_display_name(*, state: GameState, target_id: str) -> str:
+    if state.mission_setup is None:
+        raise GameLifecycleError("Mission Action target display requires MissionSetup.")
+    for marker in state.mission_setup.objective_markers:
+        if marker.objective_marker_id == target_id:
+            return marker.name
+    for feature in state.mission_setup.terrain_features:
+        if feature.feature_id == target_id:
+            return f"{feature.feature_kind.value.replace('_', ' ').title()} terrain"
+    raise GameLifecycleError("Mission Action target display identity is unknown.")
 
 
 def _canonical_keyword(keyword: str) -> str:

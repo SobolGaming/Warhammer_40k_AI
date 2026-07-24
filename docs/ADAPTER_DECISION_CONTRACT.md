@@ -698,7 +698,10 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   active player's selected Fixed Secondary Actions, and the player's currently
   active Tactical Secondary Actions. A single request contains every legal
   `start:<mission_action_id>:<unit_instance_id>:<target_id>` option plus
-  `continue_to_shooting`. The request carries `mission_action_opportunity: true`,
+  `continue_to_shooting`. Each Action option has a unique human-readable label
+  containing its Action, canonical rules unit, and target names and IDs, so
+  generic CLI and projection clients do not need to decode the option ID or
+  payload to distinguish choices. The request carries `mission_action_opportunity: true`,
   `legal_mission_action_ids`, `legal_action_option_ids`, and `legal_option_ids`;
   selecting `continue_to_shooting` closes the persisted Shooting-phase
   opportunity without mutating an Action. Starting one Action returns to the
@@ -718,11 +721,17 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   deployment zone and are limited to one plundered terrain area per player
   turn. Cleanse objective targets exclude the player's home objective and
   objectives already selected for that player's Cleanse actions this turn. The
-  engine filters units through the source `eligible_unit_policy`; excludes
-  battle-shocked, destroyed, embarked, reserve, already-Actioned, and
-  already-shot units; persists the selected `target_id` in
-  `MissionActionState`; and excludes a unit that started an Action from ordinary
-  shooting in that phase. Immediate zero-VP actions complete in the same
+  engine first applies the canonical general Action eligibility query, excluding
+  destroyed, embarked, reserve, `AIRCRAFT`, `FORTIFICATION`, Battle-shocked,
+  Objective Control 0 or `-`, non-`TITANIC` engaged, Advanced, Fallen Back,
+  already-shot, and already-Actioned rules units, and then applies the source
+  `eligible_unit_policy`. Attached units are enumerated once by canonical rules-unit
+  ID, combine component keywords and alive models, and use all component
+  placements for target geometry and objective control. `MissionActionState`
+  persists that canonical rules-unit ID and the selected `target_id`. A unit that
+  started an Action cannot declare a Charge for the rest of that turn even if the
+  Action completes immediately or is interrupted, and cannot shoot in that
+  Shooting phase unless its rules unit is `TITANIC`. Immediate zero-VP actions complete in the same
   decision handler without creating a VP transaction; Booby Trap records an
   engine-owned terrain trap state for later primary scoring and Plunder records
   an engine-owned terrain plunder state for later secondary scoring. Turn-end

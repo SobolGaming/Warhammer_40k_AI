@@ -110,6 +110,9 @@ from warhammer40k_core.engine.faction_resources import (
     apply_faction_resource_spend_effect,
     faction_resource_result_enriched_payload,
 )
+from warhammer40k_core.engine.mission_action_eligibility import (
+    mission_action_prevents_rules_unit_from_shooting_this_phase,
+)
 from warhammer40k_core.engine.movement_proposals import PLACEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -392,6 +395,7 @@ __all__ = (
     "is_destroyed_transport_disembark_proposal_request",
     "melta_damage_bonus",
     "melta_rule_id",
+    "mission_action_prevents_rules_unit_from_shooting_this_phase",
     "parameterized_decision_option",
     "ranged_attacks_keep_hidden_by_effects",
     "rapid_fire_attack_bonus",

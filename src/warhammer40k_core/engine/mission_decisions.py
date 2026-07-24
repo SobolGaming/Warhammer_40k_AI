@@ -143,7 +143,7 @@ def request_mission_action_opportunity(
             *(
                 DecisionOption(
                     option_id=option.option_id(),
-                    label=f"Start {option.action.name}",
+                    label=option.label(state=state),
                     payload={
                         **option.payload(
                             state=state,
@@ -438,7 +438,7 @@ def request_mission_action_start(
         options=tuple(
             DecisionOption(
                 option_id=option.option_id(),
-                label=f"Start {option.action.name}",
+                label=option.label(state=state),
                 payload=option.payload(
                     state=state,
                     player_id=requested_player,
