@@ -27,7 +27,14 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     manifest as chaos_daemons_june_manifest,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
+    july_2026_candidate as emperors_children_july_candidate,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
+    manifest as emperors_children_june_manifest,
+)
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, parameter_payload
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
     OverlaySourceArtifactPayload,
@@ -652,6 +659,50 @@ def test_july_chaos_daemons_runtime_artifact_is_candidate_only_and_contract_stab
         record.definition.source_id == artifact.rows[0].source_row_id
         for record in candidate_contribution.stratagem_records
     )
+
+
+def test_july_exalted_patron_artifact_is_candidate_only_generic_rule_ir() -> None:
+    artifact = july_faction_packs_2026_07.exalted_patron()
+    rule_ir = artifact.rule_ir()
+    execution_record = artifact.execution_record()
+
+    assert artifact.provider_activation_status == "candidate_only"
+    assert artifact.target_required_keywords == ["LORD EXULTANT"]
+    assert artifact.removed_ability_ids == ["may_attach_to_flawless_blades"]
+    assert tuple(effect.kind for clause in rule_ir.clauses for effect in clause.effects) == (
+        RuleEffectKind.MODIFY_MOVE_DISTANCE,
+    )
+    assert parameter_payload(rule_ir.clauses[1].effects[0].parameters) == {"delta": 1}
+    assert execution_record.rule_ir_hash == rule_ir.ir_hash()
+    assert (
+        emperors_children_july_candidate.runtime_contribution().contribution_id
+        == artifact.runtime_provider_id
+    )
+    assert (
+        emperors_children_june_manifest.runtime_contribution().contribution_id
+        != artifact.runtime_provider_id
+    )
+
+    june_record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.execution_id == artifact.phase17f_execution_id
+    )
+    staged_record = next(
+        record
+        for record in emperors_children_july_candidate.faction_execution_records()
+        if record.execution_id == artifact.phase17f_execution_id
+    )
+    assert june_record.rule_ir_hash != staged_record.rule_ir_hash
+    assert staged_record == execution_record
+
+    frenzied_host = next(
+        row
+        for row in july_faction_packs_2026_07.phase17f_execution().rows
+        if row.source_row_id.endswith(":subrule:emperors-children:frenzied-host:frantic-focus")
+    )
+    assert frenzied_host.execution_status == "blocked_structured_semantics_required"
+    assert frenzied_host.runtime_consumer_ids == []
 
 
 def test_july_kairos_uses_existing_generic_stratagem_cost_semantics() -> None:

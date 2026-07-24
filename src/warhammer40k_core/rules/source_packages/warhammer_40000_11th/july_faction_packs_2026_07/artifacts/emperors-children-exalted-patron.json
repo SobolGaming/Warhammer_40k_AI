@@ -1,0 +1,140 @@
+{
+  "artifact_schema": "core-v2-july-emperors-children-exalted-patron-v1",
+  "artifact_id": "gw-11e-july-emperors-children-exalted-patron-2026-07",
+  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
+  "source_date": "2026-07-22",
+  "source_pdf_package_id": "gw-11e-emperors-children-faction-pack-2026-07",
+  "source_pdf_page": 1,
+  "source_row_id": "gw-11e-staged-faction-packs-2026-07:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+  "predecessor_source_row_id": "enhancement:emperors-children:court-of-the-phoenician:000010654003",
+  "rule_name": "Exalted Patron",
+  "raw_rule_text": "LORD EXULTANT model only. Add 1\" to the Move characteristic of the bearer.",
+  "normalized_rule_text": "LORD EXULTANT model only. Add 1\" to the Move characteristic of the bearer.",
+  "phase17e_descriptor_id": "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+  "phase17f_execution_id": "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+  "load_support_status": "loaded",
+  "semantic_execution_status": "executable_generic_ir",
+  "runtime_consumer_ids": [
+    "warhammer_40000_11th:generic-enhancement-effects",
+    "warhammer_40000_11th:generic-rule-movement-modifier"
+  ],
+  "runtime_provider_id": "warhammer_40000_11th:emperors_children:faction_manifest:july_2026_candidate",
+  "provider_activation_status": "candidate_only",
+  "target_required_keywords": [
+    "LORD EXULTANT"
+  ],
+  "removed_ability_ids": [
+    "may_attach_to_flawless_blades"
+  ],
+  "rule_ir_payload": {
+    "clauses": [
+      {
+        "clause_id": "gw-11e-staged-faction-packs-2026-07:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003:source-text:gate:001",
+        "conditions": [
+          {
+            "kind": "keyword_gate",
+            "parameters": [
+              {
+                "key": "required_keyword",
+                "value": "LORD EXULTANT"
+              }
+            ],
+            "source_span": {
+              "end": 13,
+              "start": 0,
+              "text": "LORD EXULTANT"
+            }
+          }
+        ],
+        "diagnostics": [],
+        "duration": null,
+        "effects": [],
+        "source_span": {
+          "end": 24,
+          "start": 0,
+          "text": "LORD EXULTANT model only"
+        },
+        "target": null,
+        "template_id": "phase17c:keyword-gate",
+        "trigger": null,
+        "unsupported_reason": null
+      },
+      {
+        "clause_id": "gw-11e-staged-faction-packs-2026-07:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003:source-text:effect:001",
+        "conditions": [],
+        "diagnostics": [],
+        "duration": null,
+        "effects": [
+          {
+            "kind": "modify_move_distance",
+            "parameters": [
+              {
+                "key": "delta",
+                "value": 1
+              }
+            ],
+            "source_span": {
+              "end": 59,
+              "start": 26,
+              "text": "Add 1\" to the Move characteristic"
+            }
+          }
+        ],
+        "source_span": {
+          "end": 74,
+          "start": 26,
+          "text": "Add 1\" to the Move characteristic of the bearer."
+        },
+        "target": {
+          "kind": "this_model",
+          "parameters": [],
+          "source_span": {
+            "end": 73,
+            "start": 67,
+            "text": "bearer"
+          }
+        },
+        "template_id": "phase17c:movement-distance-modifier",
+        "trigger": null,
+        "unsupported_reason": null
+      }
+    ],
+    "diagnostics": [],
+    "ir_hash": "5568f48e4db95f86aca0329c7f1d098e1e1fe78382487e9e899638e16df3835d",
+    "normalized_text": "LORD EXULTANT model only. Add 1\" to the Move characteristic of the bearer.",
+    "parser_version": "phase17c-rule-parser-v1",
+    "rule_id": "gw-11e-staged-faction-packs-2026-07:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003:source-text",
+    "schema_version": "phase17c-rule-ir-v1",
+    "source_id": "gw-11e-staged-faction-packs-2026-07:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003:source-text"
+  },
+  "execution_record_payload": {
+    "block_reason": null,
+    "coverage_descriptor_id": "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+    "coverage_kind": "detachment_enhancement",
+    "coverage_status": "generic_supported",
+    "detachment_id": "court-of-the-phoenician",
+    "detachment_name": "Court of the Phoenician",
+    "execution_id": "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+    "execution_status": "executable_generic_ir",
+    "faction_id": "emperors-children",
+    "faction_name": "Emperor's Children",
+    "handler_id": null,
+    "phase17e_unsupported_reason": null,
+    "rule_category": "enhancement",
+    "rule_id": "000010654003",
+    "rule_ir_hash": "5568f48e4db95f86aca0329c7f1d098e1e1fe78382487e9e899638e16df3835d",
+    "rule_name": "Exalted Patron",
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:generic-enhancement-effects",
+      "warhammer_40000_11th:generic-rule-movement-modifier"
+    ],
+    "runtime_support_status": "implemented",
+    "source_ids": [
+      "gw-11e-staged-faction-packs-2026-07:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+      "gw-11e-staged-faction-packs-2026-07:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003:source-text",
+      "gw-11e-staged-faction-packs-2026-07:source-pdf:emperors-children"
+    ],
+    "source_pdf_package_id": "gw-11e-emperors-children-faction-pack-2026-07",
+    "timing_descriptor": "army_construction"
+  }
+}

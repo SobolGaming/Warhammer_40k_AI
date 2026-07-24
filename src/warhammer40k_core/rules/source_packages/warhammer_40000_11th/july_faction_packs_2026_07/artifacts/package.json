@@ -41,6 +41,11 @@
       "artifact_sha256": "cbb570623bd6dc9f5731e23d91b94a65f40a4e12a762597c093988676678d40f"
     },
     {
+      "artifact_id": "gw-11e-july-emperors-children-exalted-patron-2026-07",
+      "artifact_path": "artifacts/emperors-children-exalted-patron.json",
+      "artifact_sha256": "0bbcb34d5a7915b8cf3be97256d93e3361e585ebc666d75c396327f9fe41fd8d"
+    },
+    {
       "artifact_id": "gw-11e-july-faction-pack-datasheets-2026-07",
       "artifact_path": "artifacts/datasheets.json",
       "artifact_sha256": "e92f766366d41c999a0656b2a1648b387bac362b3a05ef5f5cda491b373ba4b2"

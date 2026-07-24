@@ -1,8 +1,22 @@
 from __future__ import annotations
 
+from typing import cast
+
 import msgspec
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.rules.rule_ir import (
+    RuleEffectKind,
+    RuleIR,
+    RuleIRError,
+    RuleIRPayload,
+    parameter_payload,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
+    Phase17FExecutionRecord,
+    Phase17FExecutionRecordPayload,
+    Phase17FExecutionStatus,
+)
 from warhammer40k_core.rules.text_normalization import (
     TextNormalizationError,
     normalize_rule_text,
@@ -16,6 +30,7 @@ from ._artifacts import (
 
 JULY_DAEMONIC_MANIFESTATION_SCHEMA = "core-v2-july-chaos-daemons-daemonic-manifestation-v1"
 JULY_CHAOS_DAEMONS_RUNTIME_SCHEMA = "core-v2-july-chaos-daemons-runtime-updates-v1"
+JULY_EXALTED_PATRON_SCHEMA = "core-v2-july-emperors-children-exalted-patron-v1"
 
 
 class JulyDaemonicManifestationArtifact(msgspec.Struct, frozen=True):
@@ -309,6 +324,153 @@ def july_chaos_daemons_runtime_from_json_bytes(
         raise JulyFactionPackStagingError(
             "July Chaos Daemons runtime artifact is invalid."
         ) from exc
+    artifact.validate()
+    return artifact
+
+
+class JulyExaltedPatronArtifact(msgspec.Struct, frozen=True):
+    artifact_schema: str
+    artifact_id: str
+    source_package_id: str
+    source_date: str
+    source_pdf_package_id: str
+    source_pdf_page: int
+    source_row_id: str
+    predecessor_source_row_id: str
+    rule_name: str
+    raw_rule_text: str
+    normalized_rule_text: str
+    phase17e_descriptor_id: str
+    phase17f_execution_id: str
+    load_support_status: str
+    semantic_execution_status: str
+    runtime_consumer_ids: list[str]
+    runtime_provider_id: str
+    provider_activation_status: str
+    target_required_keywords: list[str]
+    removed_ability_ids: list[str]
+    rule_ir_payload: dict[str, object]
+    execution_record_payload: dict[str, object]
+
+    def validate(self) -> None:
+        if self.artifact_schema != JULY_EXALTED_PATRON_SCHEMA:
+            raise JulyFactionPackStagingError("July Exalted Patron artifact schema is unsupported.")
+        if self.artifact_id != "gw-11e-july-emperors-children-exalted-patron-2026-07":
+            raise JulyFactionPackStagingError("July Exalted Patron artifact identity drifted.")
+        if (
+            self.source_package_id != JULY_FACTION_PACK_SOURCE_PACKAGE_ID
+            or self.source_date != JULY_FACTION_PACK_SOURCE_DATE
+            or self.source_pdf_package_id != "gw-11e-emperors-children-faction-pack-2026-07"
+            or self.source_pdf_page != 1
+        ):
+            raise JulyFactionPackStagingError("July Exalted Patron source identity is invalid.")
+        if self.source_row_id != (
+            f"{JULY_FACTION_PACK_SOURCE_PACKAGE_ID}:enhancement:"
+            "emperors-children:court-of-the-phoenician:000010654003"
+        ):
+            raise JulyFactionPackStagingError("July Exalted Patron source row identity drifted.")
+        if self.predecessor_source_row_id != (
+            "enhancement:emperors-children:court-of-the-phoenician:000010654003"
+        ):
+            raise JulyFactionPackStagingError("July Exalted Patron predecessor source row drifted.")
+        if self.rule_name != "Exalted Patron":
+            raise JulyFactionPackStagingError("July Exalted Patron rule name drifted.")
+        try:
+            normalized_text = normalize_rule_text(self.raw_rule_text)
+        except TextNormalizationError as exc:
+            raise JulyFactionPackStagingError(
+                "July Exalted Patron source text is invalid."
+            ) from exc
+        if self.normalized_rule_text != normalized_text:
+            raise JulyFactionPackStagingError("July Exalted Patron normalized text is stale.")
+        expected_descriptor_id = (
+            "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003"
+        )
+        if self.phase17e_descriptor_id != expected_descriptor_id:
+            raise JulyFactionPackStagingError("July Exalted Patron descriptor identity drifted.")
+        if self.phase17f_execution_id != f"phase17f:{expected_descriptor_id}":
+            raise JulyFactionPackStagingError("July Exalted Patron execution identity drifted.")
+        if (
+            self.load_support_status != "loaded"
+            or self.semantic_execution_status != "executable_generic_ir"
+        ):
+            raise JulyFactionPackStagingError("July Exalted Patron support status is invalid.")
+        _validate_exact_identifier_list(
+            "Exalted Patron runtime_consumer_ids",
+            self.runtime_consumer_ids,
+            expected=(
+                "warhammer_40000_11th:generic-enhancement-effects",
+                "warhammer_40000_11th:generic-rule-movement-modifier",
+            ),
+        )
+        if (
+            self.runtime_provider_id
+            != "warhammer_40000_11th:emperors_children:faction_manifest:july_2026_candidate"
+            or self.provider_activation_status != "candidate_only"
+        ):
+            raise JulyFactionPackStagingError(
+                "July Exalted Patron provider must remain candidate-only."
+            )
+        _validate_exact_identifier_list(
+            "Exalted Patron target_required_keywords",
+            self.target_required_keywords,
+            expected=("LORD EXULTANT",),
+        )
+        _validate_exact_identifier_list(
+            "Exalted Patron removed_ability_ids",
+            self.removed_ability_ids,
+            expected=("may_attach_to_flawless_blades",),
+        )
+        rule_ir = self.rule_ir()
+        if (
+            rule_ir.source_id
+            != f"{JULY_FACTION_PACK_SOURCE_PACKAGE_ID}:{expected_descriptor_id}:source-text"
+            or rule_ir.normalized_text != self.normalized_rule_text
+            or len(rule_ir.clauses) != 2
+        ):
+            raise JulyFactionPackStagingError("July Exalted Patron RuleIR identity drifted.")
+        effect_kinds = tuple(effect.kind for clause in rule_ir.clauses for effect in clause.effects)
+        if effect_kinds != (RuleEffectKind.MODIFY_MOVE_DISTANCE,):
+            raise JulyFactionPackStagingError("July Exalted Patron RuleIR effects drifted.")
+        move_parameters = parameter_payload(rule_ir.clauses[1].effects[0].parameters)
+        if move_parameters != {"delta": 1}:
+            raise JulyFactionPackStagingError("July Exalted Patron Move modifier drifted.")
+        record = self.execution_record()
+        if (
+            record.execution_id != self.phase17f_execution_id
+            or record.coverage_descriptor_id != self.phase17e_descriptor_id
+            or record.execution_status is not Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+            or record.rule_ir_hash != rule_ir.ir_hash()
+            or record.source_pdf_package_id != self.source_pdf_package_id
+            or self.source_row_id not in record.source_ids
+            or record.runtime_consumer_ids != tuple(self.runtime_consumer_ids)
+        ):
+            raise JulyFactionPackStagingError(
+                "July Exalted Patron execution record is inconsistent."
+            )
+
+    def rule_ir(self) -> RuleIR:
+        try:
+            return RuleIR.from_payload(cast(RuleIRPayload, self.rule_ir_payload))
+        except (KeyError, RuleIRError, TypeError) as exc:
+            raise JulyFactionPackStagingError("July Exalted Patron RuleIR is invalid.") from exc
+
+    def execution_record(self) -> Phase17FExecutionRecord:
+        try:
+            return Phase17FExecutionRecord.from_payload(
+                cast(Phase17FExecutionRecordPayload, self.execution_record_payload)
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise JulyFactionPackStagingError(
+                "July Exalted Patron execution record is invalid."
+            ) from exc
+
+
+def july_exalted_patron_from_json_bytes(raw: bytes) -> JulyExaltedPatronArtifact:
+    try:
+        artifact = msgspec.json.decode(raw, type=JulyExaltedPatronArtifact)
+    except msgspec.DecodeError as exc:
+        raise JulyFactionPackStagingError("July Exalted Patron artifact is invalid.") from exc
     artifact.validate()
     return artifact
 

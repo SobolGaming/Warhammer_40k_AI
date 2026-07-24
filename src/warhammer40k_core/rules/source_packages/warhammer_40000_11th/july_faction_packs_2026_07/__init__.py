@@ -39,8 +39,10 @@ from ._runtime_artifacts import (
     JulyChaosDaemonsRuntimeArtifact,
     JulyChaosDaemonsRuntimeRow,
     JulyDaemonicManifestationArtifact,
+    JulyExaltedPatronArtifact,
     july_chaos_daemons_runtime_from_json_bytes,
     july_daemonic_manifestation_from_json_bytes,
+    july_exalted_patron_from_json_bytes,
 )
 
 _PACKAGE_ARTIFACT_PATH: Final = "artifacts/package.json"
@@ -126,6 +128,12 @@ def daemonic_manifestation() -> JulyDaemonicManifestationArtifact:
 def chaos_daemons_runtime_updates() -> JulyChaosDaemonsRuntimeArtifact:
     return july_chaos_daemons_runtime_from_json_bytes(
         _staged_artifact_bytes("gw-11e-july-chaos-daemons-runtime-updates-2026-07")
+    )
+
+
+def exalted_patron() -> JulyExaltedPatronArtifact:
+    return july_exalted_patron_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-emperors-children-exalted-patron-2026-07")
     )
 
 
@@ -227,6 +235,7 @@ __all__ = (
     "JulyDatasheetPreviewArtifact",
     "JulyDeltaLedgerArtifact",
     "JulyDetachmentArtifact",
+    "JulyExaltedPatronArtifact",
     "JulyFactionPackStagingError",
     "JulyPhase17ECoverageArtifact",
     "JulyPhase17FExecutionArtifact",
@@ -244,6 +253,7 @@ __all__ = (
     "datasheets",
     "delta_ledger",
     "detachments",
+    "exalted_patron",
     "phase17e_coverage",
     "phase17f_execution",
     "runtime_scaffolds",

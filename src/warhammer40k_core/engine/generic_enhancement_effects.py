@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import cast
@@ -62,11 +62,16 @@ def generic_enhancement_effect_bindings(
     *,
     activation: RuntimeContentActivation,
     execution_records: tuple[_Phase17FExecutionRecord, ...],
+    rule_ir_resolver: Callable[[str], RuleIR] = (
+        faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id
+    ),
 ) -> tuple[EnhancementEffectBinding, ...]:
     if type(activation) is not RuntimeContentActivation:
         raise GameLifecycleError("Generic enhancement bindings require activation.")
     if type(execution_records) is not tuple:
         raise GameLifecycleError("Generic enhancement bindings require execution records.")
+    if not callable(rule_ir_resolver):
+        raise GameLifecycleError("Generic enhancement RuleIR resolver must be callable.")
     assignments_by_enhancement_id = _assignments_by_enhancement_id(activation)
     if not assignments_by_enhancement_id:
         return ()
@@ -80,9 +85,9 @@ def generic_enhancement_effect_bindings(
         assignments = assignments_by_enhancement_id.get(enhancement_id)
         if assignments is None:
             continue
-        rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
-            record.coverage_descriptor_id
-        )
+        rule_ir = rule_ir_resolver(record.coverage_descriptor_id)
+        if type(rule_ir) is not RuleIR:
+            raise GameLifecycleError("Generic enhancement RuleIR resolver returned invalid value.")
         if rule_ir.ir_hash() != record.rule_ir_hash:
             raise GameLifecycleError("Generic enhancement execution record has stale rule_ir_hash.")
         if _rule_ir_has_specialized_runtime_hook_family(rule_ir):

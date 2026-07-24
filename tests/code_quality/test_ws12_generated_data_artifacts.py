@@ -56,6 +56,7 @@ def test_july_faction_pack_staging_uses_typed_json_artifacts() -> None:
         "datasheets.json",
         "delta-ledger.json",
         "detachments.json",
+        "emperors-children-exalted-patron.json",
         "package.json",
         "phase17e-coverage.json",
         "phase17f-execution.json",
