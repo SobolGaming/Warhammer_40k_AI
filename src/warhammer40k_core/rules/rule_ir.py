@@ -85,6 +85,24 @@ class RuleIRPayload(TypedDict):
     ir_hash: str
 
 
+class RuleSemanticComponentPayload(TypedDict):
+    kind: str
+    parameters: list[RuleParameterPayload]
+
+
+class RuleSemanticClausePayload(TypedDict):
+    trigger: RuleSemanticComponentPayload | None
+    conditions: list[RuleSemanticComponentPayload]
+    target: RuleSemanticComponentPayload | None
+    effects: list[RuleSemanticComponentPayload]
+    duration: RuleSemanticComponentPayload | None
+
+
+class RuleSemanticPayload(TypedDict):
+    schema_version: str
+    clauses: list[RuleSemanticClausePayload]
+
+
 class RuleTriggerKind(StrEnum):
     TIMING_WINDOW = "timing_window"
     DICE_ROLL = "dice_roll"
@@ -562,6 +580,19 @@ class RuleIR:
     def ir_hash(self) -> str:
         return _sha256_payload(self._payload_without_hash())
 
+    def semantic_hash(self) -> str:
+        """Return a provenance-free hash for fully structured rule semantics."""
+        return _sha256_payload(self.semantic_payload())
+
+    def semantic_payload(self) -> RuleSemanticPayload:
+        """Return structured semantics without source identity, text, spans, or parser metadata."""
+        if not self.is_supported:
+            raise RuleIRError("Unsupported RuleIR cannot produce a semantic payload.")
+        return {
+            "schema_version": self.schema_version,
+            "clauses": [_semantic_clause_payload(clause) for clause in self.clauses],
+        }
+
     def to_json_bytes(self) -> bytes:
         return json.dumps(self.to_payload(), sort_keys=True, separators=(",", ":")).encode()
 
@@ -675,6 +706,60 @@ def parameters_from_pairs(
 
 def parameter_payload(parameters: tuple[RuleParameter, ...]) -> dict[str, RuleParameterValue]:
     return {parameter.key: parameter.value for parameter in parameters}
+
+
+def _semantic_clause_payload(clause: RuleClause) -> RuleSemanticClausePayload:
+    return {
+        "trigger": (
+            None
+            if clause.trigger is None
+            else _semantic_component_payload(
+                kind=clause.trigger.kind.value,
+                parameters=clause.trigger.parameters,
+            )
+        ),
+        "conditions": [
+            _semantic_component_payload(
+                kind=condition.kind.value,
+                parameters=condition.parameters,
+            )
+            for condition in clause.conditions
+        ],
+        "target": (
+            None
+            if clause.target is None
+            else _semantic_component_payload(
+                kind=clause.target.kind.value,
+                parameters=clause.target.parameters,
+            )
+        ),
+        "effects": [
+            _semantic_component_payload(
+                kind=effect.kind.value,
+                parameters=effect.parameters,
+            )
+            for effect in clause.effects
+        ],
+        "duration": (
+            None
+            if clause.duration is None
+            else _semantic_component_payload(
+                kind=clause.duration.kind.value,
+                parameters=clause.duration.parameters,
+            )
+        ),
+    }
+
+
+def _semantic_component_payload(
+    *,
+    kind: str,
+    parameters: tuple[RuleParameter, ...],
+) -> RuleSemanticComponentPayload:
+    return {
+        "kind": kind,
+        "parameters": [parameter.to_payload() for parameter in parameters],
+    }
 
 
 def _span_from_payload(payload: TextSpanPayload) -> TextSpan:
