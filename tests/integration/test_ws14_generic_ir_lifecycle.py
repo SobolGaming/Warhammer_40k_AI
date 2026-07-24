@@ -21,7 +21,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
-from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
 from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     EnhancementAssignment,
@@ -32,17 +31,10 @@ from warhammer40k_core.engine.command_points import CommandPointGainStatus, Comm
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
-from warhammer40k_core.engine.faction_content.runtime import (
-    runtime_content_activation_for_armies,
-)
-from warhammer40k_core.engine.faction_content.stratagem_activation import (
-    source_backed_detachment_stratagem_activation_records,
-)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
-    july_2026_candidate as emperors_children_july_candidate,
+    july_2026 as emperors_children_july,
 )
 from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionContext,
@@ -930,10 +922,10 @@ def test_ws14_court_of_the_phoenician_rule_and_enhancements_bind_to_runtime_hook
 
 @pytest.mark.integration
 def test_ws14_july_exalted_patron_mustering_and_lifecycle_remove_attachment_grant() -> None:
-    staged_catalog = emperors_children_july_candidate.staged_army_catalog(_court_catalog())
+    current_catalog = emperors_children_july.current_army_catalog(_court_catalog())
     valid_request = replace(
         _court_muster_request(
-            catalog=staged_catalog,
+            catalog=current_catalog,
             army_id="army-alpha",
             player_id="player-a",
             unit_selection_ids=("lord-exultant-1",),
@@ -941,7 +933,7 @@ def test_ws14_july_exalted_patron_mustering_and_lifecycle_remove_attachment_gran
         ),
         roster_legality_required=False,
     )
-    mustered = muster_army(catalog=staged_catalog, request=valid_request)
+    mustered = muster_army(catalog=current_catalog, request=valid_request)
     assert not any(
         violation.violation_code == "enhancement_target_keyword_required"
         for violation in mustered.roster_legality_report.violations
@@ -949,7 +941,7 @@ def test_ws14_july_exalted_patron_mustering_and_lifecycle_remove_attachment_gran
 
     invalid_request = replace(
         _court_muster_request(
-            catalog=staged_catalog,
+            catalog=current_catalog,
             army_id="army-alpha",
             player_id="player-a",
             unit_selection_ids=("tears-1",),
@@ -957,13 +949,13 @@ def test_ws14_july_exalted_patron_mustering_and_lifecycle_remove_attachment_gran
         ),
         roster_legality_required=False,
     )
-    invalid_mustered = muster_army(catalog=staged_catalog, request=invalid_request)
+    invalid_mustered = muster_army(catalog=current_catalog, request=invalid_request)
     assert any(
         violation.violation_code == "enhancement_target_keyword_required"
         for violation in invalid_mustered.roster_legality_report.violations
     )
 
-    lifecycle = _court_battle_lifecycle(staged_july=True)
+    lifecycle = _court_battle_lifecycle()
     state = _state(lifecycle)
     bundle = _runtime_content_bundle(lifecycle)
     artifact = july_faction_packs_2026_07.exalted_patron()
@@ -984,31 +976,15 @@ def test_ws14_july_exalted_patron_mustering_and_lifecycle_remove_attachment_gran
         )
         == 7.0
     )
-    staged_effect_payload = json.dumps(
+    current_effect_payload = json.dumps(
         [
             effect.to_payload()
             for effect in state.persisting_effects_for_unit("army-alpha:lord-exultant-1")
         ],
         sort_keys=True,
     )
-    assert "may_attach_to_flawless_blades" not in staged_effect_payload
-    assert "FLAWLESS BLADES" not in staged_effect_payload
-
-    june_lifecycle = _court_battle_lifecycle()
-    june_record = _runtime_content_bundle(
-        june_lifecycle
-    ).faction_rule_execution_registry.record_by_execution_id(artifact.phase17f_execution_id)
-    assert june_record.rule_ir_hash != record.rule_ir_hash
-    june_effect_payload = json.dumps(
-        [
-            effect.to_payload()
-            for effect in _state(june_lifecycle).persisting_effects_for_unit(
-                "army-alpha:lord-exultant-1"
-            )
-        ],
-        sort_keys=True,
-    )
-    assert "may_attach_to_flawless_blades" in june_effect_payload
+    assert "may_attach_to_flawless_blades" not in current_effect_payload
+    assert "FLAWLESS BLADES" not in current_effect_payload
 
 
 @pytest.mark.integration
@@ -1566,10 +1542,8 @@ def _spectacle_muster_request(
     )
 
 
-def _court_lifecycle_config(*, staged_july: bool = False) -> GameConfig:
-    catalog = _court_catalog()
-    if staged_july:
-        catalog = emperors_children_july_candidate.staged_army_catalog(catalog)
+def _court_lifecycle_config() -> GameConfig:
+    catalog = emperors_children_july.current_army_catalog(_court_catalog())
     return GameConfig(
         game_id="ws14-court-of-the-phoenician-generic-ir-game",
         allow_legacy_non_strict_rosters=True,
@@ -1609,8 +1583,8 @@ def _court_lifecycle_config(*, staged_july: bool = False) -> GameConfig:
     )
 
 
-def _court_battle_lifecycle(*, staged_july: bool = False) -> GameLifecycle:
-    config = _court_lifecycle_config(staged_july=staged_july)
+def _court_battle_lifecycle() -> GameLifecycle:
+    config = _court_lifecycle_config()
     armies = tuple(
         muster_army(catalog=config.army_catalog, request=request)
         for request in config.army_muster_requests
@@ -1625,44 +1599,15 @@ def _court_battle_lifecycle(*, staged_july: bool = False) -> GameLifecycle:
     state.record_battlefield_state(scenario.battlefield_state)
     _record_fixed_secondary_choices_for_fixture(state, config=config)
     enter_battle_for_fixture(state)
-    if staged_july:
-        staged_bundle = RuntimeContentBundle.from_contributions(
-            activation=runtime_content_activation_for_armies(
-                config=config,
-                armies=tuple(state.army_definitions),
-            ),
-            armies=tuple(state.army_definitions),
-            catalog=config.army_catalog,
-            contributions=(emperors_children_july_candidate.runtime_contribution(),),
-            base_ability_records=catalog_ability_records_from_catalog(config.army_catalog),
-            base_stratagem_records=source_backed_detachment_stratagem_activation_records(),
-            faction_execution_records=(
-                emperors_children_july_candidate.faction_execution_records()
-            ),
-            faction_rule_ir_resolver=(
-                emperors_children_july_candidate.rule_ir_by_coverage_descriptor_id
-            ),
-        )
-        lifecycle = GameLifecycle(
-            state=state,
-            _config=config,
-            _runtime_content_bundle=staged_bundle,
-        )
-        apply_enhancement_effects(
-            state=state,
-            registry=staged_bundle.enhancement_effect_registry,
-            decisions=lifecycle.decision_controller,
-        )
-    else:
-        lifecycle = GameLifecycle.from_payload(
-            {
-                "config": config.to_payload(),
-                "parameterized_movement_proposals": True,
-                "state": state.to_payload(),
-                "decisions": DecisionController().to_payload(),
-                "reaction_queue": ReactionQueue().to_payload(),
-            }
-        )
+    lifecycle = GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": DecisionController().to_payload(),
+            "reaction_queue": ReactionQueue().to_payload(),
+        }
+    )
     _apply_battle_formation_hooks_from_bundle(lifecycle)
     return lifecycle
 

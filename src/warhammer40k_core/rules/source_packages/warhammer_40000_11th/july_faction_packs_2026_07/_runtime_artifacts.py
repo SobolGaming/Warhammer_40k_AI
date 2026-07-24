@@ -123,9 +123,9 @@ class JulyDaemonicManifestationArtifact(msgspec.Struct, frozen=True):
             "Daemonic Manifestation runtime_provider_id",
             self.runtime_provider_id,
         )
-        if self.provider_activation_status != "candidate_only":
+        if self.provider_activation_status != "current_default":
             raise JulyFactionPackStagingError(
-                "July Daemonic Manifestation provider must remain candidate-only."
+                "July Daemonic Manifestation provider must be current."
             )
         if (
             self.named_handler_classification
@@ -286,11 +286,11 @@ class JulyChaosDaemonsRuntimeArtifact(msgspec.Struct, frozen=True):
             )
         if (
             self.runtime_provider_id
-            != "warhammer_40000_11th:chaos_daemons:faction_manifest:july_2026_candidate"
-            or self.provider_activation_status != "candidate_only"
+            != "warhammer_40000_11th:chaos_daemons:faction_manifest:july_2026"
+            or self.provider_activation_status != "current_default"
         ):
             raise JulyFactionPackStagingError(
-                "July Chaos Daemons runtime provider must remain candidate-only."
+                "July Chaos Daemons runtime provider must be current."
             )
         if (
             self.ingress_decision_type != "submit_placement_proposal"
@@ -422,11 +422,11 @@ class JulyThousandSonsDefilerArtifact(msgspec.Struct, frozen=True):
         )
         if (
             self.runtime_provider_id
-            != "warhammer_40000_11th:thousand_sons:faction_manifest:july_2026_candidate"
-            or self.provider_activation_status != "candidate_only"
+            != "warhammer_40000_11th:thousand_sons:faction_manifest:july_2026"
+            or self.provider_activation_status != "current_default"
         ):
             raise JulyFactionPackStagingError(
-                "July Thousand Sons Defiler provider must remain candidate-only."
+                "July Thousand Sons Defiler provider must be current."
             )
         self._validate_operations()
 
@@ -609,12 +609,10 @@ class JulyExaltedPatronArtifact(msgspec.Struct, frozen=True):
         )
         if (
             self.runtime_provider_id
-            != "warhammer_40000_11th:emperors_children:faction_manifest:july_2026_candidate"
-            or self.provider_activation_status != "candidate_only"
+            != "warhammer_40000_11th:emperors_children:faction_manifest:july_2026"
+            or self.provider_activation_status != "current_default"
         ):
-            raise JulyFactionPackStagingError(
-                "July Exalted Patron provider must remain candidate-only."
-            )
+            raise JulyFactionPackStagingError("July Exalted Patron provider must be current.")
         _validate_exact_identifier_list(
             "Exalted Patron target_required_keywords",
             self.target_required_keywords,

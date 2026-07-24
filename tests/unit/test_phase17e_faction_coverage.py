@@ -41,6 +41,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_warptide_ir_support_2026_27 as warptide_ir,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    july_faction_packs_2026_07,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
     Phase17ECoverageRow,
@@ -51,8 +54,8 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_covera
 
 ROOT = Path(__file__).resolve().parents[2]
 FACTION_PACK_MANIFEST = ROOT / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
-PENDING_FACTION_PACK_MANIFEST = (
-    ROOT / "data" / "source_manifests" / "gw_11e_pending_faction_packs_2026_07.yaml"
+PREDECESSOR_FACTION_PACK_MANIFEST = (
+    ROOT / "data" / "source_manifests" / "gw_11e_faction_pack_predecessors_2026_06.yaml"
 )
 RAW_FACTION_PDF_DIR = ROOT / "data" / "raw" / "faction_packs"
 BRIDGE_JSON_DIR = (
@@ -861,6 +864,15 @@ def test_phase17e_exact_enhancement_and_stratagem_rows_cover_source_catalog() ->
         detachment_row = detachment_rows_by_owner_id[
             (enhancement_source_row.faction_id, enhancement_source_row.detachment_id)
         ]
+        runtime_support_status = enhancement_source_row.runtime_support_status.value
+        runtime_consumer_ids = enhancement_source_row.runtime_consumer_ids
+        if (
+            enhancement_source_row.source_row_id
+            in GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS
+        ):
+            exalted_patron = july_faction_packs_2026_07.exalted_patron()
+            runtime_support_status = "engine_consumed"
+            runtime_consumer_ids = tuple(exalted_patron.runtime_consumer_ids)
         _assert_exact_subrule_coverage_matches_source(
             coverage_row=coverage_row,
             source_ids=enhancement_source_row.all_source_ids,
@@ -868,8 +880,8 @@ def test_phase17e_exact_enhancement_and_stratagem_rows_cover_source_catalog() ->
             rule_name=enhancement_source_row.name,
             timing_descriptor=enhancement_source_row.timing_descriptor,
             rule_category=enhancement_source_row.category,
-            runtime_support_status=enhancement_source_row.runtime_support_status.value,
-            runtime_consumer_ids=enhancement_source_row.runtime_consumer_ids,
+            runtime_support_status=runtime_support_status,
+            runtime_consumer_ids=runtime_consumer_ids,
             detachment_source_id=detachment_row.source_id,
             pdf_source_id=pdf_by_faction_id[enhancement_source_row.faction_id].source_id,
         )
@@ -1463,14 +1475,23 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
                     ]
                 )
             )
+        elif source_row_id in GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS:
+            assert row.runtime_support_status.value == "engine_consumed"
+            assert row.runtime_consumer_ids == tuple(
+                july_faction_packs_2026_07.exalted_patron().runtime_consumer_ids
+            )
         else:
             assert row.runtime_support_status.value == "source_only"
             assert row.runtime_consumer_ids == ()
-        assert row.rule_ir_hash == (
-            generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
-                f"phase17e:{source_row_id}"
+        descriptor_id = f"phase17e:{source_row_id}"
+        expected_rule_ir_hash = (
+            july_faction_packs_2026_07.exalted_patron().rule_ir().ir_hash()
+            if source_row_id in GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS
+            else generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+                descriptor_id
             )
         )
+        assert row.rule_ir_hash == expected_rule_ir_hash
 
 
 def test_phase17e_court_of_the_phoenician_rows_are_generic_rule_ir_supported() -> None:
@@ -1491,9 +1512,15 @@ def test_phase17e_court_of_the_phoenician_rows_are_generic_rule_ir_supported() -
         assert row.faction_id == "emperors-children"
         assert row.detachment_id == "court-of-the-phoenician"
         assert row.handler_id is None
-        assert row.rule_ir_hash == (
-            generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
+        expected_rule_ir_hash = (
+            july_faction_packs_2026_07.exalted_patron().rule_ir().ir_hash()
+            if descriptor_id == "phase17e:enhancement:emperors-children:"
+            "court-of-the-phoenician:000010654003"
+            else generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+                descriptor_id
+            )
         )
+        assert row.rule_ir_hash == expected_rule_ir_hash
 
 
 def test_phase17e_coverage_rows_reject_unapproved_or_incomplete_status_shapes() -> None:
@@ -1636,12 +1663,12 @@ def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:
     records_by_filename = {
         record.pdf_filename: record for record in faction_coverage_source.faction_pdf_records()
     }
-    pending_entries_by_filename = {
+    predecessor_entries_by_filename = {
         PurePosixPath(entry.local_cache_path).name: entry
-        for entry in load_official_source_manifest(PENDING_FACTION_PACK_MANIFEST)
+        for entry in load_official_source_manifest(PREDECESSOR_FACTION_PACK_MANIFEST)
         if entry.local_cache_path is not None
     }
-    declared_pdf_filenames = records_by_filename.keys() | pending_entries_by_filename.keys()
+    declared_pdf_filenames = records_by_filename.keys() | predecessor_entries_by_filename.keys()
     unknown_pdf_filenames = present_pdf_filenames.difference(declared_pdf_filenames)
     assert not unknown_pdf_filenames
 
@@ -1651,11 +1678,11 @@ def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:
             expected_bytes = record.bytes
             expected_sha256 = record.sha256
         else:
-            pending_entry = pending_entries_by_filename[pdf_filename]
-            if pending_entry.expected_bytes is None:
-                raise AssertionError("Pending faction-pack source must declare bytes.")
-            expected_bytes = pending_entry.expected_bytes
-            expected_sha256 = pending_entry.sha256
+            predecessor_entry = predecessor_entries_by_filename[pdf_filename]
+            if predecessor_entry.expected_bytes is None:
+                raise AssertionError("Predecessor faction-pack source must declare bytes.")
+            expected_bytes = predecessor_entry.expected_bytes
+            expected_sha256 = predecessor_entry.sha256
         pdf_path = RAW_FACTION_PDF_DIR / pdf_filename
         assert pdf_path.is_file()
         pdf_data = pdf_path.read_bytes()

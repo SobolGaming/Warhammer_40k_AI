@@ -77,17 +77,17 @@
       "source_table": "Datasheets_abilities"
     }
   ],
-  "provider_activation_status": "candidate_only",
+  "provider_activation_status": "current_default",
   "removed_ability_id": "000008338",
   "runtime_consumer_ids": [
     "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception",
     "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount"
   ],
-  "runtime_provider_id": "warhammer_40000_11th:thousand_sons:faction_manifest:july_2026_candidate",
+  "runtime_provider_id": "warhammer_40000_11th:thousand_sons:faction_manifest:july_2026",
   "semantic_execution_status": "executable_generic_runtime",
   "source_ability_id": "000001030:destroyer-of-futures",
   "source_date": "2026-07-22",
-  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
+  "source_package_id": "gw-11e-faction-packs-2026-07",
   "source_pdf_package_id": "gw-11e-thousand-sons-faction-pack-2026-07",
   "source_pdf_page": 7,
   "source_rule_name": "Destroyer of Futures",

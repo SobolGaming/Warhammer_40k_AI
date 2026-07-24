@@ -42,7 +42,7 @@ def test_ws12_event_companion_base_sizes_are_json_artifact_backed() -> None:
     assert _line_count(loader) < 1500
 
 
-def test_july_faction_pack_staging_uses_typed_json_artifacts() -> None:
+def test_july_faction_pack_current_source_uses_typed_json_artifacts() -> None:
     python_modules = tuple(sorted(path.name for path in JULY_FACTION_PACK_PACKAGE.glob("*.py")))
     json_artifacts = tuple(
         sorted(path.name for path in (JULY_FACTION_PACK_PACKAGE / "artifacts").glob("*.json"))
@@ -52,6 +52,7 @@ def test_july_faction_pack_staging_uses_typed_json_artifacts() -> None:
     assert json_artifacts == (
         "chaos-daemons-daemonic-manifestation.json",
         "chaos-daemons-runtime-updates.json",
+        "current-sources.json",
         "datasheet-support-preview.json",
         "datasheets.json",
         "delta-ledger.json",

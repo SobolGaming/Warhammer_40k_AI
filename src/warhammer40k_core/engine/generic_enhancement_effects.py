@@ -32,7 +32,7 @@ from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, parameter_pa
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_execution_2026_27,
-    faction_generic_ir_support_2026_27,
+    faction_rule_ir_promotion_2026_07,
 )
 
 _Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
@@ -63,7 +63,7 @@ def generic_enhancement_effect_bindings(
     activation: RuntimeContentActivation,
     execution_records: tuple[_Phase17FExecutionRecord, ...],
     rule_ir_resolver: Callable[[str], RuleIR] = (
-        faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id
+        faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id
     ),
 ) -> tuple[EnhancementEffectBinding, ...]:
     if type(activation) is not RuntimeContentActivation:

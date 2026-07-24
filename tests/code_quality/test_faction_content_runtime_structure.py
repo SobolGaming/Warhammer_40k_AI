@@ -332,12 +332,8 @@ def test_generated_manifest_module_paths_match_scaffold_files() -> None:
     }
 
     for faction_row in faction_detachments_2026_27.faction_rows():
-        faction_module = generate_faction_content_scaffold.module_name_for_id(
+        expected_module_path = generate_faction_content_scaffold.current_faction_module_path_for_id(
             faction_row.faction_id
-        )
-        expected_module_path = (
-            "warhammer40k_core.engine.faction_content.warhammer_40000_11th"
-            f".{faction_module}.manifest"
         )
         row = rows_by_content_id[faction_row.faction_id]
         assert row.family is RuntimeContentModuleFamily.FACTION

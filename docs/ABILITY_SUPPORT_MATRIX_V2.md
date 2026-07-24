@@ -295,7 +295,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon<br>Psychic Guidance |
-| `catalog-ir:minimum-unmodified-hit-success` | Destroyer of Futures<br>Mandiblasters<br>Whispering Web |
+| `catalog-ir:minimum-unmodified-hit-success` | Mandiblasters<br>Whispering Web |
 | `catalog-ir:movement-action-grant` | Flickerjump |
 | `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
@@ -380,13 +380,11 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:destruction-reaction:deadly-demise-resolution` | Deadly Demise |
 | `descriptor:destruction-reaction:deadly-demise-source` | Deadly Demise |
 | `descriptor:fight-order:fights-first` | Fights First |
-| `descriptor:lost-wound:feel-no-pain-resolution` | Feel No Pain |
-| `descriptor:lost-wound:feel-no-pain-source` | Feel No Pain |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
 | `descriptor:prebattle:infiltrators` | Infiltrators |
 | `descriptor:prebattle:scouts` | Scouts |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
-| `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>Corrupt Realspace<br>DEATH DENIED<br>Daemonic Infestation<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Soulseeing<br>The Realm of Chaos<br>Vengeful Sorrow<br>Warp Surge<br>Warp-Riders |
+| `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>Corrupt Realspace<br>DEATH DENIED<br>Daemonic Infestation<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>Fluxmaster<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>One Head Looks Back<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Soulseeing<br>The Realm of Chaos<br>Vengeful Sorrow<br>Warp Surge<br>Warp-Riders |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |
@@ -424,6 +422,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:uphold_the_honour:objective-control` | Templar Vows |
 | `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos` | The Shadow of Chaos |
+| `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026` | July 2026 |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne` | Daemon Lord of Khorne |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage` | Relentless Carnage |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage:mortal-wound-fnp` | Relentless Carnage - Mortal Wound Feel No Pain |
@@ -502,6 +501,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers` | Cabal of Sorcerers |
 | `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:mortal-wound-feel-no-pain` | Cabal of Sorcerers - Mortal Wound Feel No Pain |
 | `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:weapon-profile` | Cabal of Sorcerers - Weapon Profile |
+| `warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount` | Counteroffensive Discount<br>Destroyer of Futures |
+| `warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception` | Destroyer of Futures |
 | `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp` | Shadow in the Warp / Synapse |
 | `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:battle-shock` | Shadow in the Warp / Synapse - Battle-shock |
 | `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:synapse:weapon-profile` | Shadow in the Warp / Synapse - Weapon Profile |

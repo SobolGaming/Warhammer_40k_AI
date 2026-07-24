@@ -1,18 +1,74 @@
 {
-  "artifact_schema": "core-v2-july-faction-pack-datasheet-preview-v1",
   "artifact_id": "gw-11e-july-faction-pack-datasheet-preview-2026-07",
-  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
-  "source_date": "2026-07-22",
-  "preview_marker": "staged_preview_not_current",
+  "artifact_schema": "core-v2-july-faction-pack-datasheet-preview-v1",
   "datasheet_artifact_id": "gw-11e-july-faction-pack-datasheets-2026-07",
-  "datasheet_artifact_sha256": "e92f766366d41c999a0656b2a1648b387bac362b3a05ef5f5cda491b373ba4b2",
+  "datasheet_artifact_sha256": "6599a5f5b6379dae468e98b9e217f1af0366885b0b57dfe6e748f2da67436f1b",
+  "preview_marker": "current_source",
   "rows": [
-    ["000004210", "Thulia Ghuld", "adeptus-mechanicus", "current_matched_play", "loaded", "blocked", "unknown"],
-    ["000000969", "Defiler", "chaos-space-marines", "current_matched_play", "loaded", "blocked", "unknown"],
-    ["000004221", "Wazdakka Gutsmek", "orks", "current_matched_play", "loaded", "blocked", "unknown"],
-    ["000004216", "Commissar Yarrick", "astra-militarum", "current_matched_play", "loaded", "blocked", "unknown"],
-    ["000003834", "Tempestus Aquilons", "astra-militarum", "historical_predecessor_only", "loaded", "blocked", "unknown"],
-    ["000000724", "Ratlings", "astra-militarum", "historical_predecessor_only", "loaded", "blocked", "unknown"],
-    ["000004225", "The Red Terror", "tyranids", "current_matched_play", "loaded", "blocked", "unknown"]
-  ]
+    [
+      "000004210",
+      "Thulia Ghuld",
+      "adeptus-mechanicus",
+      "current_matched_play",
+      "loaded",
+      "blocked",
+      "unknown"
+    ],
+    [
+      "000000969",
+      "Defiler",
+      "chaos-space-marines",
+      "current_matched_play",
+      "loaded",
+      "blocked",
+      "unknown"
+    ],
+    [
+      "000004221",
+      "Wazdakka Gutsmek",
+      "orks",
+      "current_matched_play",
+      "loaded",
+      "blocked",
+      "unknown"
+    ],
+    [
+      "000004216",
+      "Commissar Yarrick",
+      "astra-militarum",
+      "current_matched_play",
+      "loaded",
+      "blocked",
+      "unknown"
+    ],
+    [
+      "000003834",
+      "Tempestus Aquilons",
+      "astra-militarum",
+      "historical_predecessor_only",
+      "loaded",
+      "blocked",
+      "unknown"
+    ],
+    [
+      "000000724",
+      "Ratlings",
+      "astra-militarum",
+      "historical_predecessor_only",
+      "loaded",
+      "blocked",
+      "unknown"
+    ],
+    [
+      "000004225",
+      "The Red Terror",
+      "tyranids",
+      "current_matched_play",
+      "loaded",
+      "blocked",
+      "unknown"
+    ]
+  ],
+  "source_date": "2026-07-22",
+  "source_package_id": "gw-11e-faction-packs-2026-07"
 }

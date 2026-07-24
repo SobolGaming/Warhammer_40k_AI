@@ -1518,7 +1518,6 @@
   {
     "ability_coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001030/core/000008339/none",
-      "chaos-daemons-bridge-catalog/000001030/core/000008338/none",
       "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none",
       "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:scuttling-walker/none"
     ],
@@ -1543,7 +1542,7 @@
     "notes": "No source-backed faction ability row; detachment support 0/9.",
     "overall": "Playable",
     "supported_detachment_ids": [],
-    "tests_evidence": "Runtime consumers: `catalog-ir:minimum-unmodified-hit-success`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:lost-wound:feel-no-pain-resolution`, `descriptor:lost-wound:feel-no-pain-source`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount`, `warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

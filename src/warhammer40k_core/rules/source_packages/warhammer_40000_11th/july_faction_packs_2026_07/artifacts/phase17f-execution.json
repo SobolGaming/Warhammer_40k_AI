@@ -1,43 +1,307 @@
 {
-  "artifact_schema": "core-v2-july-faction-pack-phase17f-execution-v1",
   "artifact_id": "gw-11e-july-faction-pack-phase17f-execution-2026-07",
-  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
-  "source_date": "2026-07-22",
+  "artifact_schema": "core-v2-july-faction-pack-phase17f-execution-v1",
   "predecessor_package_id": "gw-11e-phase17f-faction-execution-2026-27",
   "predecessor_package_sha256": "10459e9f1f0f7bf7247786c02784ed15198a650f3917ef81bcf6a16fd25b1c55",
   "rows": [
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:detachment:emperors-children:frenzied-host", "gw-11e-staged-faction-packs-2026-07:phase17e:detachment:emperors-children:frenzied-host", "gw-11e-staged-faction-packs-2026-07:detachment:emperors-children:frenzied-host", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:detachment:orks:equatorial-hordes", "gw-11e-staged-faction-packs-2026-07:phase17e:detachment:orks:equatorial-hordes", "gw-11e-staged-faction-packs-2026-07:detachment:orks:equatorial-hordes", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:detachment:space-marines:vengeful-hosts", "gw-11e-staged-faction-packs-2026-07:phase17e:detachment:space-marines:vengeful-hosts", "gw-11e-staged-faction-packs-2026-07:detachment:space-marines:vengeful-hosts", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:adepta-sororitas:sanctified-orators:hagiomnifex", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:adepta-sororitas:sanctified-orators:hagiomnifex", "gw-11e-staged-faction-packs-2026-07:subrule:adepta-sororitas:sanctified-orators:hagiomnifex", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:blood-angels:angelic-inheritors:ordained-sacrifice", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:blood-angels:angelic-inheritors:ordained-sacrifice", "gw-11e-staged-faction-packs-2026-07:subrule:blood-angels:angelic-inheritors:ordained-sacrifice", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:chaos-daemons:plague-legion:foetid-resurgence", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:chaos-daemons:plague-legion:foetid-resurgence", "gw-11e-staged-faction-packs-2026-07:subrule:chaos-daemons:plague-legion:foetid-resurgence", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:chaos-daemons:legion-of-excess:thieves-of-pain", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:chaos-daemons:legion-of-excess:thieves-of-pain", "gw-11e-staged-faction-packs-2026-07:subrule:chaos-daemons:legion-of-excess:thieves-of-pain", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:chaos-daemons:scintillating-legion:infernal-puppeteer", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:chaos-daemons:scintillating-legion:infernal-puppeteer", "gw-11e-staged-faction-packs-2026-07:subrule:chaos-daemons:scintillating-legion:infernal-puppeteer", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:chaos-space-marines:cabal-of-chaos:empyric-wellspring", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:chaos-space-marines:cabal-of-chaos:empyric-wellspring", "gw-11e-staged-faction-packs-2026-07:subrule:chaos-space-marines:cabal-of-chaos:empyric-wellspring", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:chaos-space-marines:nightmare-hunt:sorrowscent-vulture", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:chaos-space-marines:nightmare-hunt:sorrowscent-vulture", "gw-11e-staged-faction-packs-2026-07:subrule:chaos-space-marines:nightmare-hunt:sorrowscent-vulture", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:emperors-children:frenzied-host:frantic-focus", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:emperors-children:frenzied-host:frantic-focus", "gw-11e-staged-faction-packs-2026-07:subrule:emperors-children:frenzied-host:frantic-focus", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:grey-knights:immaterial-interdiction:echojump", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:grey-knights:immaterial-interdiction:echojump", "gw-11e-staged-faction-packs-2026-07:subrule:grey-knights:immaterial-interdiction:echojump", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:imperial-knights:freeblade-company:mysterious-guardian", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:imperial-knights:freeblade-company:mysterious-guardian", "gw-11e-staged-faction-packs-2026-07:subrule:imperial-knights:freeblade-company:mysterious-guardian", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:necrons:cursed-legion:murdermind", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:necrons:cursed-legion:murdermind", "gw-11e-staged-faction-packs-2026-07:subrule:necrons:cursed-legion:murdermind", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:necrons:pantheon-of-woe:reletavistic-tether", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:necrons:pantheon-of-woe:reletavistic-tether", "gw-11e-staged-faction-packs-2026-07:subrule:necrons:pantheon-of-woe:reletavistic-tether", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:jungle-know-wotz", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:jungle-know-wotz", "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:jungle-know-wotz", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:kunnin-hunta", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:kunnin-hunta", "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:kunnin-hunta", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:unkillable-scourge", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:unkillable-scourge", "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:unkillable-scourge", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:concealed-krumpin", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:concealed-krumpin", "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:concealed-krumpin", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:stragglerz", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:stragglerz", "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:stragglerz", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:deyre-over-ere", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:deyre-over-ere", "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:deyre-over-ere", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:imperator-unleashed", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:imperator-unleashed", "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:imperator-unleashed", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:avenging-angel", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:avenging-angel", "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:avenging-angel", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:orksbane", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:orksbane", "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:orksbane", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:meteoric-onslaught", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:meteoric-onslaught", "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:meteoric-onslaught", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:purge-by-sectors", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:purge-by-sectors", "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:purge-by-sectors", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:know-no-fear", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:know-no-fear", "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:know-no-fear", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:space-marines:spearpoint-task-force:evasive-manoeuvres", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:space-marines:spearpoint-task-force:evasive-manoeuvres", "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:spearpoint-task-force:evasive-manoeuvres", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:space-marines:librarius-conclave:fusillade", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:space-marines:librarius-conclave:fusillade", "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:librarius-conclave:fusillade", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:space-marines:librarius-conclave:temporal-corridor", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:space-marines:librarius-conclave:temporal-corridor", "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:librarius-conclave:temporal-corridor", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:thousand-sons:ritual-of-regeneration:eruption-of-vitality", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:thousand-sons:ritual-of-regeneration:eruption-of-vitality", "gw-11e-staged-faction-packs-2026-07:subrule:thousand-sons:ritual-of-regeneration:eruption-of-vitality", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:thousand-sons:hexwarp-thrallband:kaleidoscopic-tempest", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:thousand-sons:hexwarp-thrallband:kaleidoscopic-tempest", "gw-11e-staged-faction-packs-2026-07:subrule:thousand-sons:hexwarp-thrallband:kaleidoscopic-tempest", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null],
-    ["gw-11e-staged-faction-packs-2026-07:phase17f:subrule:astra-militarum:armoured-infantry:on-my-signal", "gw-11e-staged-faction-packs-2026-07:phase17e:subrule:astra-militarum:armoured-infantry:on-my-signal", "gw-11e-staged-faction-packs-2026-07:subrule:astra-militarum:armoured-infantry:on-my-signal", "blocked_structured_semantics_required", "structured_rule_semantics_required", [], null]
-  ]
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:detachment:emperors-children:frenzied-host",
+      "gw-11e-faction-packs-2026-07:phase17e:detachment:emperors-children:frenzied-host",
+      "gw-11e-faction-packs-2026-07:detachment:emperors-children:frenzied-host",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:detachment:orks:equatorial-hordes",
+      "gw-11e-faction-packs-2026-07:phase17e:detachment:orks:equatorial-hordes",
+      "gw-11e-faction-packs-2026-07:detachment:orks:equatorial-hordes",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:detachment:space-marines:vengeful-hosts",
+      "gw-11e-faction-packs-2026-07:phase17e:detachment:space-marines:vengeful-hosts",
+      "gw-11e-faction-packs-2026-07:detachment:space-marines:vengeful-hosts",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:adepta-sororitas:sanctified-orators:hagiomnifex",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:adepta-sororitas:sanctified-orators:hagiomnifex",
+      "gw-11e-faction-packs-2026-07:subrule:adepta-sororitas:sanctified-orators:hagiomnifex",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:blood-angels:angelic-inheritors:ordained-sacrifice",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:blood-angels:angelic-inheritors:ordained-sacrifice",
+      "gw-11e-faction-packs-2026-07:subrule:blood-angels:angelic-inheritors:ordained-sacrifice",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:chaos-daemons:plague-legion:foetid-resurgence",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:chaos-daemons:plague-legion:foetid-resurgence",
+      "gw-11e-faction-packs-2026-07:subrule:chaos-daemons:plague-legion:foetid-resurgence",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:chaos-daemons:legion-of-excess:thieves-of-pain",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:chaos-daemons:legion-of-excess:thieves-of-pain",
+      "gw-11e-faction-packs-2026-07:subrule:chaos-daemons:legion-of-excess:thieves-of-pain",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:chaos-daemons:scintillating-legion:infernal-puppeteer",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:chaos-daemons:scintillating-legion:infernal-puppeteer",
+      "gw-11e-faction-packs-2026-07:subrule:chaos-daemons:scintillating-legion:infernal-puppeteer",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:chaos-space-marines:cabal-of-chaos:empyric-wellspring",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:chaos-space-marines:cabal-of-chaos:empyric-wellspring",
+      "gw-11e-faction-packs-2026-07:subrule:chaos-space-marines:cabal-of-chaos:empyric-wellspring",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:chaos-space-marines:nightmare-hunt:sorrowscent-vulture",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:chaos-space-marines:nightmare-hunt:sorrowscent-vulture",
+      "gw-11e-faction-packs-2026-07:subrule:chaos-space-marines:nightmare-hunt:sorrowscent-vulture",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:emperors-children:frenzied-host:frantic-focus",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:emperors-children:frenzied-host:frantic-focus",
+      "gw-11e-faction-packs-2026-07:subrule:emperors-children:frenzied-host:frantic-focus",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:grey-knights:immaterial-interdiction:echojump",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:grey-knights:immaterial-interdiction:echojump",
+      "gw-11e-faction-packs-2026-07:subrule:grey-knights:immaterial-interdiction:echojump",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:imperial-knights:freeblade-company:mysterious-guardian",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:imperial-knights:freeblade-company:mysterious-guardian",
+      "gw-11e-faction-packs-2026-07:subrule:imperial-knights:freeblade-company:mysterious-guardian",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:necrons:cursed-legion:murdermind",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:necrons:cursed-legion:murdermind",
+      "gw-11e-faction-packs-2026-07:subrule:necrons:cursed-legion:murdermind",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:necrons:pantheon-of-woe:reletavistic-tether",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:necrons:pantheon-of-woe:reletavistic-tether",
+      "gw-11e-faction-packs-2026-07:subrule:necrons:pantheon-of-woe:reletavistic-tether",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:jungle-know-wotz",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:jungle-know-wotz",
+      "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:jungle-know-wotz",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:kunnin-hunta",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:kunnin-hunta",
+      "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:kunnin-hunta",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:unkillable-scourge",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:unkillable-scourge",
+      "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:unkillable-scourge",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:concealed-krumpin",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:concealed-krumpin",
+      "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:concealed-krumpin",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:stragglerz",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:stragglerz",
+      "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:stragglerz",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:orks:equatorial-hordes:deyre-over-ere",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:orks:equatorial-hordes:deyre-over-ere",
+      "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:deyre-over-ere",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:imperator-unleashed",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:imperator-unleashed",
+      "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:imperator-unleashed",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:avenging-angel",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:avenging-angel",
+      "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:avenging-angel",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:orksbane",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:orksbane",
+      "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:orksbane",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:meteoric-onslaught",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:meteoric-onslaught",
+      "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:meteoric-onslaught",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:purge-by-sectors",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:purge-by-sectors",
+      "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:purge-by-sectors",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:space-marines:vengeful-hosts:know-no-fear",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:space-marines:vengeful-hosts:know-no-fear",
+      "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:know-no-fear",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:space-marines:spearpoint-task-force:evasive-manoeuvres",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:space-marines:spearpoint-task-force:evasive-manoeuvres",
+      "gw-11e-faction-packs-2026-07:subrule:space-marines:spearpoint-task-force:evasive-manoeuvres",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:space-marines:librarius-conclave:fusillade",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:space-marines:librarius-conclave:fusillade",
+      "gw-11e-faction-packs-2026-07:subrule:space-marines:librarius-conclave:fusillade",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:space-marines:librarius-conclave:temporal-corridor",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:space-marines:librarius-conclave:temporal-corridor",
+      "gw-11e-faction-packs-2026-07:subrule:space-marines:librarius-conclave:temporal-corridor",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:thousand-sons:ritual-of-regeneration:eruption-of-vitality",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:thousand-sons:ritual-of-regeneration:eruption-of-vitality",
+      "gw-11e-faction-packs-2026-07:subrule:thousand-sons:ritual-of-regeneration:eruption-of-vitality",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:thousand-sons:hexwarp-thrallband:kaleidoscopic-tempest",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:thousand-sons:hexwarp-thrallband:kaleidoscopic-tempest",
+      "gw-11e-faction-packs-2026-07:subrule:thousand-sons:hexwarp-thrallband:kaleidoscopic-tempest",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ],
+    [
+      "gw-11e-faction-packs-2026-07:phase17f:subrule:astra-militarum:armoured-infantry:on-my-signal",
+      "gw-11e-faction-packs-2026-07:phase17e:subrule:astra-militarum:armoured-infantry:on-my-signal",
+      "gw-11e-faction-packs-2026-07:subrule:astra-militarum:armoured-infantry:on-my-signal",
+      "blocked_structured_semantics_required",
+      "structured_rule_semantics_required",
+      [],
+      null
+    ]
+  ],
+  "source_date": "2026-07-22",
+  "source_package_id": "gw-11e-faction-packs-2026-07"
 }

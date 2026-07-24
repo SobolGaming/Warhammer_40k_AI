@@ -218,7 +218,7 @@ def test_aeldari_markdown_preserves_groups_provenance_and_exclusions() -> None:
     assert "Prince Yriel (`000004193`) | `complete_pdf`" in markdown
     assert "Asurmen (`000000571`) | `rules_update`" in markdown
     assert "Eldrad Ulthran (`000000568`) | `unchanged_predecessor`" in markdown
-    assert "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9" in markdown
+    assert "2a1954801042948256c002095937be88c9d334994f0b01d7a63510c94d39fe1d" in markdown
     assert (
         "Warhammer Legends, Legends, Forge World, and Imperial Armour rows are excluded" in markdown
     )
@@ -297,6 +297,16 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("thousand-sons", "000001030", "Playable"),
         ("world-eaters", "000004207", "Partial"),
     }
+    thousand_sons_defiler = next(
+        row
+        for row in ability_rows
+        if row.datasheet_id == "000001030" and row.ability_id == "000001030:destroyer-of-futures"
+    )
+    assert thousand_sons_defiler.support_stage.value == "engine_consumed"
+    assert thousand_sons_defiler.runtime_consumer_ids == (
+        "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception",
+        "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount",
+    )
     rangers_infiltrators = next(
         row
         for row in ability_rows

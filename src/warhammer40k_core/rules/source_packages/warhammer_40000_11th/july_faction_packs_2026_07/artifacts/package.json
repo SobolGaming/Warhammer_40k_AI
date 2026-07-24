@@ -1,8 +1,8 @@
 {
-  "activation_status": "staged",
+  "activation_status": "current",
   "artifact_schema": "core-v2-july-faction-pack-staging-package-v1",
   "delta_ledger_artifact": "artifacts/delta-ledger.json",
-  "delta_ledger_sha256": "5672533339c900a9bb63a73d2d2ac30fd9531d48e27ccf3b547bbb113e61f96b",
+  "delta_ledger_sha256": "450f30103ecf65828b9543d8cc8f918852ba0fb3d65c181f2d7b1e6eb17eb836",
   "predecessor_artifacts": [
     {
       "source_date": "2026-06-11",
@@ -26,64 +26,69 @@
     }
   ],
   "source_date": "2026-07-22",
-  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
-  "source_title": "Warhammer 40,000 11th Edition July 22 Faction Pack Staging",
-  "source_version": "2026-07-22-staged",
+  "source_package_id": "gw-11e-faction-packs-2026-07",
+  "source_title": "Warhammer 40,000 11th Edition July 22 Faction Packs",
+  "source_version": "2026-07-22",
   "staged_data_artifacts": [
+    {
+      "artifact_id": "gw-11e-faction-packs-2026-07",
+      "artifact_path": "artifacts/current-sources.json",
+      "artifact_sha256": "0cbfc2b08bc86be654b8237fc1d6c10483d4d0841cbeaba6d48a2bf4bb56ffad"
+    },
     {
       "artifact_id": "gw-11e-july-chaos-daemons-daemonic-manifestation-2026-07",
       "artifact_path": "artifacts/chaos-daemons-daemonic-manifestation.json",
-      "artifact_sha256": "4fcbc6bf1bf135da06d82c8c4458fd49140bdd3a2ffd992f7d7c6c1b8e0fbcb0"
+      "artifact_sha256": "4dee7eb59d8bf6c2e66e43b6ed025b467388114e321e49934a8898926e68df97"
     },
     {
       "artifact_id": "gw-11e-july-chaos-daemons-runtime-updates-2026-07",
       "artifact_path": "artifacts/chaos-daemons-runtime-updates.json",
-      "artifact_sha256": "cbb570623bd6dc9f5731e23d91b94a65f40a4e12a762597c093988676678d40f"
+      "artifact_sha256": "b2c3e45752b5b82224600823d9c52bf6931c44d5106feee761dda2978a0c9492"
     },
     {
       "artifact_id": "gw-11e-july-emperors-children-exalted-patron-2026-07",
       "artifact_path": "artifacts/emperors-children-exalted-patron.json",
-      "artifact_sha256": "0bbcb34d5a7915b8cf3be97256d93e3361e585ebc666d75c396327f9fe41fd8d"
-    },
-    {
-      "artifact_id": "gw-11e-july-thousand-sons-defiler-2026-07",
-      "artifact_path": "artifacts/thousand-sons-defiler.json",
-      "artifact_sha256": "fc320dc67a180a867e30a55d6467a14eeebfde36f132a0dc57bde0aa0845bdc4"
-    },
-    {
-      "artifact_id": "gw-11e-july-faction-pack-datasheets-2026-07",
-      "artifact_path": "artifacts/datasheets.json",
-      "artifact_sha256": "e92f766366d41c999a0656b2a1648b387bac362b3a05ef5f5cda491b373ba4b2"
+      "artifact_sha256": "5eb687b60880e4fa7bfca725f99fce858f0be88198063688b8a609dad056a0aa"
     },
     {
       "artifact_id": "gw-11e-july-faction-pack-datasheet-preview-2026-07",
       "artifact_path": "artifacts/datasheet-support-preview.json",
-      "artifact_sha256": "c0a2d2ac4552abf6fc1817326ac8e939860532c3d1ad9ed75af5bfc71d6657e9"
+      "artifact_sha256": "4eab3f07ffbdab40f091921e2420447fc8392d65b22ac975a0be183519aa2709"
+    },
+    {
+      "artifact_id": "gw-11e-july-faction-pack-datasheets-2026-07",
+      "artifact_path": "artifacts/datasheets.json",
+      "artifact_sha256": "6599a5f5b6379dae468e98b9e217f1af0366885b0b57dfe6e748f2da67436f1b"
     },
     {
       "artifact_id": "gw-11e-july-faction-pack-detachments-2026-07",
       "artifact_path": "artifacts/detachments.json",
-      "artifact_sha256": "831afe7cbe8b3f54339826bdad26e4f8ccc59ba70dd6a7ce3ca260d6b3cb5c49"
-    },
-    {
-      "artifact_id": "gw-11e-july-faction-pack-subrules-2026-07",
-      "artifact_path": "artifacts/subrules.json",
-      "artifact_sha256": "83f00732d6d02484db9bd484399ce975330caaf325b8d83e1f27e2fd370076de"
+      "artifact_sha256": "664fae1565a6e6b69b935cde8a329232295fc8e3e013b0b5488e0e900e10c2d9"
     },
     {
       "artifact_id": "gw-11e-july-faction-pack-phase17e-coverage-2026-07",
       "artifact_path": "artifacts/phase17e-coverage.json",
-      "artifact_sha256": "a03688e6c04e7738537817fb87a06f6faeb2800f912218fc60fd71aa2c4539c0"
+      "artifact_sha256": "bc01d36a6a898bd01df70d7b933b793a8778a95a9376f9c86d1233e244e760b6"
     },
     {
       "artifact_id": "gw-11e-july-faction-pack-phase17f-execution-2026-07",
       "artifact_path": "artifacts/phase17f-execution.json",
-      "artifact_sha256": "08d6c7f80a52303a1b015cb959ffde2def7c66635e4edc32cd39c22d2a6284fa"
+      "artifact_sha256": "7572048389f97f75b2d9d7797fc57c0c9f3cc8e660eef0b34a5d1a46f5a4b4b5"
     },
     {
       "artifact_id": "gw-11e-july-faction-pack-runtime-scaffolds-2026-07",
       "artifact_path": "artifacts/runtime-scaffolds.json",
-      "artifact_sha256": "0d57534e4fb5c1616a0c7f7cb03871e596afaa5b58e249e332196b2a760707c0"
+      "artifact_sha256": "1b7fd9287f2c0251703d9d3200bb3a0d82fca6f3d6811b39d2fb5fb345aaf524"
+    },
+    {
+      "artifact_id": "gw-11e-july-faction-pack-subrules-2026-07",
+      "artifact_path": "artifacts/subrules.json",
+      "artifact_sha256": "4bd93268ec09a6c39b258210bfbfd79c25000cf4220cfc18317d27170cec5f74"
+    },
+    {
+      "artifact_id": "gw-11e-july-thousand-sons-defiler-2026-07",
+      "artifact_path": "artifacts/thousand-sons-defiler.json",
+      "artifact_sha256": "0892be8fe6810df40ce8791f5c9a2b6007a6351dc37c0f9fd495aaf9744faa62"
     }
   ]
 }

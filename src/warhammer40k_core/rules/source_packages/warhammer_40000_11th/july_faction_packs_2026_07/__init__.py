@@ -7,9 +7,11 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
     SourcePackageArtifactError,
     package_artifact_bytes,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_source_promotion_2026_07,
+)
 
 from ._artifacts import (
-    JULY_FACTION_PACK_SOURCE_PACKAGE_ID,
     JulyDatasheetArtifact,
     JulyDatasheetPreviewArtifact,
     JulyDeltaLedgerArtifact,
@@ -73,7 +75,7 @@ ACTIVATION_STATUS: Final = _PACKAGE.activation_status
 SOURCE_PAYLOAD_CHECKSUM_SHA256: Final = _PACKAGE.source_payload_checksum_sha256()
 
 
-def staging_package() -> JulyStagingPackageArtifact:
+def source_package() -> JulyStagingPackageArtifact:
     return _PACKAGE
 
 
@@ -180,53 +182,21 @@ def source_package_identity_payload() -> dict[str, str]:
     }
 
 
-def staged_identity_tokens() -> frozenset[str]:
-    ledger = delta_ledger()
-    staged_source_row_ids = {
-        *(row.source_row_id for row in datasheets().rows),
-        *(row.source_row_id for row in detachments().rows),
-        *(row.source_row_id for row in subrules().rows),
-    }
-    return frozenset(
-        {
-            JULY_FACTION_PACK_SOURCE_PACKAGE_ID,
-            *(review.successor_package_id for review in ledger.pack_reviews),
-            *(artifact.artifact_id for artifact in _PACKAGE.staged_data_artifacts),
-            *staged_source_row_ids,
-        }
-    )
-
-
-def audit_staged_package_is_not_active(
+def audit_current_package_is_atomically_active(
     *,
     current_source_package_ids: tuple[str, ...],
     phase17_source_package_ids: tuple[str, ...],
     runtime_source_package_ids: tuple[str, ...],
+    runtime_module_paths_by_faction: Mapping[str, str],
     generated_current_documents: Mapping[str, str],
 ) -> None:
-    groups = (
-        current_source_package_ids,
-        phase17_source_package_ids,
-        runtime_source_package_ids,
+    faction_source_promotion_2026_07.audit_atomic_current_activation(
+        current_source_package_ids=current_source_package_ids,
+        phase17_source_package_ids=phase17_source_package_ids,
+        runtime_source_package_ids=runtime_source_package_ids,
+        runtime_module_paths_by_faction=runtime_module_paths_by_faction,
+        generated_current_documents=generated_current_documents,
     )
-    if any(type(group) is not tuple for group in groups):
-        raise JulyFactionPackStagingError("July cutover guard package-ID groups must be tuples.")
-    forbidden = staged_identity_tokens()
-    active_tokens = {value for group in groups for value in group}
-    leaked_package_ids = forbidden.intersection(active_tokens)
-    if leaked_package_ids:
-        raise JulyFactionPackStagingError(
-            "Staged July package identity leaked into an active source or runtime mapping."
-        )
-    for filename, document in generated_current_documents.items():
-        if type(filename) is not str or type(document) is not str:
-            raise JulyFactionPackStagingError(
-                "July cutover guard documents must map filenames to text."
-            )
-        if any(token in document for token in forbidden):
-            raise JulyFactionPackStagingError(
-                "Staged July package identity leaked into generated current documentation."
-            )
 
 
 __all__ = (
@@ -251,11 +221,11 @@ __all__ = (
     "JulyStagingPackageArtifact",
     "JulySubruleArtifact",
     "JulyThousandSonsDefilerArtifact",
+    "audit_current_package_is_atomically_active",
     "audit_datasheet_preview_links",
     "audit_load_only_artifact_links",
     "audit_manifest_links",
     "audit_runtime_predecessor_references",
-    "audit_staged_package_is_not_active",
     "chaos_daemons_runtime_updates",
     "daemonic_manifestation",
     "datasheet_support_preview",
@@ -266,9 +236,8 @@ __all__ = (
     "phase17e_coverage",
     "phase17f_execution",
     "runtime_scaffolds",
+    "source_package",
     "source_package_identity_payload",
-    "staged_identity_tokens",
-    "staging_package",
     "subrules",
     "thousand_sons_defiler",
 )

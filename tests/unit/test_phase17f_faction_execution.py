@@ -36,6 +36,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_generic_ir_support_2026_27 as generic_ir_support_source,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    july_faction_packs_2026_07,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
     Phase17ECoverageStatus,
@@ -776,9 +779,15 @@ def test_phase17f_court_of_the_phoenician_rows_are_executable_generic_ir() -> No
         assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
         assert record.block_reason is None
         assert record.handler_id is None
-        assert record.rule_ir_hash == (
-            generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
+        expected_rule_ir_hash = (
+            july_faction_packs_2026_07.exalted_patron().rule_ir().ir_hash()
+            if descriptor_id == "phase17e:enhancement:emperors-children:"
+            "court-of-the-phoenician:000010654003"
+            else generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+                descriptor_id
+            )
         )
+        assert record.rule_ir_hash == expected_rule_ir_hash
 
 
 def test_phase17f_cavalcade_of_chaos_rows_are_executable_generic_ir() -> None:

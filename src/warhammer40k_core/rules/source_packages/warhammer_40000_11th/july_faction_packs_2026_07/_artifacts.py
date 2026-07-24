@@ -23,9 +23,9 @@ JULY_PHASE17F_SCHEMA: Final = "core-v2-july-faction-pack-phase17f-execution-v1"
 JULY_RUNTIME_SCAFFOLD_SCHEMA: Final = "core-v2-july-faction-pack-runtime-scaffolds-v1"
 JULY_DATASHEET_SCHEMA: Final = "core-v2-july-faction-pack-datasheets-v1"
 JULY_DATASHEET_PREVIEW_SCHEMA: Final = "core-v2-july-faction-pack-datasheet-preview-v1"
-JULY_FACTION_PACK_SOURCE_PACKAGE_ID: Final = "gw-11e-staged-faction-packs-2026-07"
+JULY_FACTION_PACK_SOURCE_PACKAGE_ID: Final = "gw-11e-faction-packs-2026-07"
 JULY_FACTION_PACK_SOURCE_DATE: Final = "2026-07-22"
-JULY_FACTION_PACK_ACTIVATION_STATUS: Final = "staged"
+JULY_FACTION_PACK_ACTIVATION_STATUS: Final = "current"
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _IDENTIFIER_RE = re.compile(r"^[a-z0-9]+(?:[-:._][a-z0-9]+)*$")
@@ -214,7 +214,7 @@ class JulyPackReviewArtifact(msgspec.Struct, frozen=True):
             )
         if not self.review_items:
             raise JulyFactionPackStagingError(
-                "Every pending July faction pack requires one or more review items."
+                "Every July faction pack requires one or more review items."
             )
         seen_item_ids: set[str] = set()
         for item in self.review_items:
@@ -254,7 +254,7 @@ class JulyDeltaLedgerArtifact(msgspec.Struct, frozen=True):
             review.validate()
             if review.faction_id in faction_ids:
                 raise JulyFactionPackStagingError(
-                    "Every pending July faction pack must have exactly one review row."
+                    "Every July faction pack must have exactly one review row."
                 )
             if review.successor_package_id in successor_package_ids:
                 raise JulyFactionPackStagingError("July successor package IDs must be unique.")
@@ -789,9 +789,9 @@ class JulyDatasheetPreviewArtifact(msgspec.Struct, frozen=True):
             )
         if self.source_date != JULY_FACTION_PACK_SOURCE_DATE:
             raise JulyFactionPackStagingError("July datasheet preview source date is stale.")
-        if self.preview_marker != "staged_preview_not_current":
+        if self.preview_marker != "current_source":
             raise JulyFactionPackStagingError(
-                "July datasheet support output must be marked as a staged preview."
+                "July datasheet support output must be marked as current."
             )
         if self.datasheet_artifact_id != "gw-11e-july-faction-pack-datasheets-2026-07":
             raise JulyFactionPackStagingError(
@@ -833,7 +833,7 @@ class JulyStagingPackageArtifact(msgspec.Struct, frozen=True):
             raise JulyFactionPackStagingError("July faction-pack staging source date is stale.")
         if self.activation_status != JULY_FACTION_PACK_ACTIVATION_STATUS:
             raise JulyFactionPackStagingError(
-                "July faction-pack successor must remain staged before promotion."
+                "July faction-pack successor must be the current promoted source."
             )
         if self.delta_ledger_artifact != "artifacts/delta-ledger.json":
             raise JulyFactionPackStagingError(
@@ -881,6 +881,7 @@ class JulyStagingPackageArtifact(msgspec.Struct, frozen=True):
             "gw-11e-july-faction-pack-phase17e-coverage-2026-07",
             "gw-11e-july-faction-pack-phase17f-execution-2026-07",
             "gw-11e-july-faction-pack-runtime-scaffolds-2026-07",
+            JULY_FACTION_PACK_SOURCE_PACKAGE_ID,
         }
         if seen_artifact_ids != expected_staged_artifact_ids:
             raise JulyFactionPackStagingError(
@@ -990,39 +991,39 @@ def canonical_json_sha256_from_bytes(raw: bytes) -> str:
 def audit_manifest_links(
     *,
     ledger: JulyDeltaLedgerArtifact,
-    pending_packages: Mapping[str, tuple[str, str]],
-    current_packages: Mapping[str, tuple[str, str]],
+    successor_packages: Mapping[str, tuple[str, str]],
+    predecessor_packages: Mapping[str, tuple[str, str]],
 ) -> None:
     if type(ledger) is not JulyDeltaLedgerArtifact:
         raise JulyFactionPackStagingError(
             "July manifest-link audit requires a delta ledger artifact."
         )
-    pending = _validate_manifest_mapping("pending_packages", pending_packages)
-    current = _validate_manifest_mapping("current_packages", current_packages)
+    successors = _validate_manifest_mapping("successor_packages", successor_packages)
+    predecessors = _validate_manifest_mapping("predecessor_packages", predecessor_packages)
     ledger_successors = {review.successor_package_id for review in ledger.pack_reviews}
-    if set(pending) != ledger_successors:
+    if set(successors) != ledger_successors:
         raise JulyFactionPackStagingError(
-            "Every pending July faction pack must have exactly one ledger review row."
+            "Every current July faction pack must have exactly one ledger review row."
         )
-    expected_current_ids = {review.predecessor_package_id for review in ledger.pack_reviews}
+    expected_predecessor_ids = {review.predecessor_package_id for review in ledger.pack_reviews}
     deathwatch_package_id = "gw-11e-deathwatch-faction-pack-2026-06"
-    if set(current) != expected_current_ids | {deathwatch_package_id}:
+    if set(predecessors) != expected_predecessor_ids | {deathwatch_package_id}:
         raise JulyFactionPackStagingError(
-            "July predecessor audit requires the exact active June package set."
+            "July predecessor audit requires the exact retained June package set."
         )
     for review in ledger.pack_reviews:
-        successor_sha256, successor_path = pending[review.successor_package_id]
-        predecessor_sha256, _predecessor_path = current[review.predecessor_package_id]
+        successor_sha256, successor_path = successors[review.successor_package_id]
+        predecessor_sha256, _predecessor_path = predecessors[review.predecessor_package_id]
         if (successor_sha256, successor_path) != (
             review.successor_pdf_sha256,
             review.successor_pdf_path,
         ):
             raise JulyFactionPackStagingError(
-                "July successor package hash or path drifted from the pending manifest."
+                "July successor package hash or path drifted from the current manifest."
             )
         if predecessor_sha256 != review.predecessor_pdf_sha256:
             raise JulyFactionPackStagingError(
-                "June predecessor package hash drifted from the current manifest."
+                "June predecessor package hash drifted from the retained manifest."
             )
 
 

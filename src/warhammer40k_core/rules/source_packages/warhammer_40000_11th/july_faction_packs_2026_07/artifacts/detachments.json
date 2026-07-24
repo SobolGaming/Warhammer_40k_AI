@@ -1,74 +1,76 @@
 {
-  "artifact_schema": "core-v2-july-faction-pack-detachments-v1",
   "artifact_id": "gw-11e-july-faction-pack-detachments-2026-07",
-  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
-  "source_date": "2026-07-22",
+  "artifact_schema": "core-v2-july-faction-pack-detachments-v1",
   "predecessor_package_id": "gw-11e-faction-detachments-2026-27",
   "predecessor_package_sha256": "5e48d00f5d670b60a9ef78902772e6cd6fed95f5f6ab8ad3e27bea4e5bd5ff89",
   "rows": [
     {
-      "source_row_id": "gw-11e-staged-faction-packs-2026-07:detachment:emperors-children:frenzied-host",
-      "predecessor_source_row_id": "gw-11e-faction-detachments-2026-27:detachment:emperors-children:frenzied-host",
-      "faction_id": "emperors-children",
-      "faction_name": "Emperor's Children",
+      "block_reason": "structured_rule_semantics_required",
+      "component_source_row_ids": [
+        "gw-11e-faction-packs-2026-07:subrule:emperors-children:frenzied-host:frantic-focus"
+      ],
       "detachment_id": "frenzied-host",
       "detachment_name": "Frenzied Host",
+      "faction_id": "emperors-children",
+      "faction_name": "Emperor's Children",
+      "load_support_status": "loaded",
+      "predecessor_source_row_id": "gw-11e-faction-detachments-2026-27:detachment:emperors-children:frenzied-host",
+      "removed_tags": [
+        "host"
+      ],
+      "semantic_execution_status": "blocked",
       "source_pdf_package_id": "gw-11e-emperors-children-faction-pack-2026-07",
       "source_pdf_page": 2,
-      "tags": [],
-      "removed_tags": ["host"],
-      "component_source_row_ids": [
-        "gw-11e-staged-faction-packs-2026-07:subrule:emperors-children:frenzied-host:frantic-focus"
-      ],
-      "load_support_status": "loaded",
-      "semantic_execution_status": "blocked",
-      "block_reason": "structured_rule_semantics_required"
+      "source_row_id": "gw-11e-faction-packs-2026-07:detachment:emperors-children:frenzied-host",
+      "tags": []
     },
     {
-      "source_row_id": "gw-11e-staged-faction-packs-2026-07:detachment:orks:equatorial-hordes",
-      "predecessor_source_row_id": null,
-      "faction_id": "orks",
-      "faction_name": "Orks",
+      "block_reason": "structured_rule_semantics_required",
+      "component_source_row_ids": [
+        "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:jungle-know-wotz",
+        "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:kunnin-hunta",
+        "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:unkillable-scourge",
+        "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:concealed-krumpin",
+        "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:stragglerz",
+        "gw-11e-faction-packs-2026-07:subrule:orks:equatorial-hordes:deyre-over-ere"
+      ],
       "detachment_id": "equatorial-hordes",
       "detachment_name": "Equatorial Hordes",
+      "faction_id": "orks",
+      "faction_name": "Orks",
+      "load_support_status": "loaded",
+      "predecessor_source_row_id": null,
+      "removed_tags": [],
+      "semantic_execution_status": "blocked",
       "source_pdf_package_id": "gw-11e-orks-faction-pack-2026-07",
       "source_pdf_page": 2,
-      "tags": [],
-      "removed_tags": [],
-      "component_source_row_ids": [
-        "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:jungle-know-wotz",
-        "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:kunnin-hunta",
-        "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:unkillable-scourge",
-        "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:concealed-krumpin",
-        "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:stragglerz",
-        "gw-11e-staged-faction-packs-2026-07:subrule:orks:equatorial-hordes:deyre-over-ere"
-      ],
-      "load_support_status": "loaded",
-      "semantic_execution_status": "blocked",
-      "block_reason": "structured_rule_semantics_required"
+      "source_row_id": "gw-11e-faction-packs-2026-07:detachment:orks:equatorial-hordes",
+      "tags": []
     },
     {
-      "source_row_id": "gw-11e-staged-faction-packs-2026-07:detachment:space-marines:vengeful-hosts",
-      "predecessor_source_row_id": null,
-      "faction_id": "space-marines",
-      "faction_name": "Space Marines",
+      "block_reason": "structured_rule_semantics_required",
+      "component_source_row_ids": [
+        "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:imperator-unleashed",
+        "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:avenging-angel",
+        "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:orksbane",
+        "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:meteoric-onslaught",
+        "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:purge-by-sectors",
+        "gw-11e-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:know-no-fear"
+      ],
       "detachment_id": "vengeful-hosts",
       "detachment_name": "Vengeful Hosts",
+      "faction_id": "space-marines",
+      "faction_name": "Space Marines",
+      "load_support_status": "loaded",
+      "predecessor_source_row_id": null,
+      "removed_tags": [],
+      "semantic_execution_status": "blocked",
       "source_pdf_package_id": "gw-11e-space-marines-faction-pack-2026-07",
       "source_pdf_page": 2,
-      "tags": [],
-      "removed_tags": [],
-      "component_source_row_ids": [
-        "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:imperator-unleashed",
-        "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:avenging-angel",
-        "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:orksbane",
-        "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:meteoric-onslaught",
-        "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:purge-by-sectors",
-        "gw-11e-staged-faction-packs-2026-07:subrule:space-marines:vengeful-hosts:know-no-fear"
-      ],
-      "load_support_status": "loaded",
-      "semantic_execution_status": "blocked",
-      "block_reason": "structured_rule_semantics_required"
+      "source_row_id": "gw-11e-faction-packs-2026-07:detachment:space-marines:vengeful-hosts",
+      "tags": []
     }
-  ]
+  ],
+  "source_date": "2026-07-22",
+  "source_package_id": "gw-11e-faction-packs-2026-07"
 }

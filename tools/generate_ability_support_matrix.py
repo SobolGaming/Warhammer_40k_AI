@@ -4,7 +4,7 @@ import argparse
 import importlib
 import json
 from collections.abc import Callable, Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from functools import cache
 from pathlib import Path
@@ -168,12 +168,14 @@ from warhammer40k_core.rules.source_overlay import (
     apply_source_release_overlays,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    chaos_defiler_datasheet_overlay_2026_06 as chaos_defiler_overlay,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_detachments_2026_27,
     faction_execution_2026_27,
+    faction_source_promotion_2026_07,
+    july_faction_packs_2026_07,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    thousand_sons_defiler_datasheet_overlay_2026_07 as chaos_defiler_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
@@ -254,7 +256,7 @@ CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 UNDIVIDED_DAEMON_DATASHEET_IDS = ("000001149", "000002758", "000001151")
-CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.DEFILER_DATASHEET_IDS
+CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.ALIGNED_DEFILER_DATASHEET_IDS
 ABILITY_SUPPORT_DATASHEET_IDS = (
     *AELDARI_ASPECT_WARRIORS_DATASHEET_IDS,
     *AELDARI_AUTARCHS_DATASHEET_IDS,
@@ -1570,7 +1572,42 @@ def _ability_support_matrix_rows_from_package(
         package.army_catalog,
         datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
     )
+    rows = _promote_july_runtime_backed_datasheet_abilities(rows)
     return (*rows, *_runtime_faction_army_rule_rows())
+
+
+def _promote_july_runtime_backed_datasheet_abilities(
+    rows: tuple[AbilityCoverageRow, ...],
+) -> tuple[AbilityCoverageRow, ...]:
+    artifact = july_faction_packs_2026_07.thousand_sons_defiler()
+    promoted: list[AbilityCoverageRow] = []
+    replacements = 0
+    for row in rows:
+        if (
+            row.datasheet_id != artifact.datasheet_id
+            or row.ability_id != artifact.source_ability_id
+        ):
+            promoted.append(row)
+            continue
+        promoted.append(
+            replace(
+                row,
+                catalog_support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                semantic_categories=(
+                    "datasheet.counteroffensive.phase_use_exception",
+                    "datasheet.counteroffensive.cost_modifier",
+                ),
+                runtime_consumer_ids=tuple(artifact.runtime_consumer_ids),
+                diagnostic_reasons=(),
+            )
+        )
+        replacements += 1
+    if replacements != 1:
+        raise ValueError(
+            "July Thousand Sons Defiler ability coverage must replace exactly one source row."
+        )
+    return tuple(promoted)
 
 
 def _datasheet_support_rows_from_package(
@@ -2934,6 +2971,8 @@ def _faction_support_markdown(
             f"(<../../data/raw/faction_packs/{pdf_record.pdf_filename}>)"
         ),
         "",
+        f"Current source package: `{pdf_record.package_id}`",
+        "",
         "## Summary",
         "",
         (
@@ -2946,6 +2985,7 @@ def _faction_support_markdown(
             f"{len(enhancement_rows)} | {len(stratagem_rows)} | {engine_consumed_row_count} |"
         ),
     ]
+    lines.extend(_july_source_update_markdown(faction_row.faction_id))
     if faction_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
         source_detachment_rows = {
             row.detachment_id: row
@@ -3047,6 +3087,56 @@ def _faction_support_markdown(
     lines.extend(_faction_exact_rule_rows_markdown("Stratagems", stratagem_rows))
     lines.append("")
     return "\n".join(lines)
+
+
+def _july_source_update_markdown(faction_id: str) -> list[str]:
+    records = tuple(
+        record
+        for record in faction_source_promotion_2026_07.current_source_records()
+        if record.faction_id == faction_id
+    )
+    if len(records) != 1:
+        raise ValueError("Faction support document requires one current source record.")
+    record = records[0]
+    lines = [
+        "",
+        "## July 22, 2026 Source Status",
+        "",
+        f"Current source package: `{record.package_id}`.",
+    ]
+    if faction_id == faction_source_promotion_2026_07.DEATHWATCH_FACTION_ID:
+        lines.extend(
+            (
+                "",
+                (
+                    "Games Workshop published no July successor for Deathwatch. "
+                    "Its June package remains current source evidence."
+                ),
+            )
+        )
+        return lines
+    reviews = tuple(
+        review
+        for review in july_faction_packs_2026_07.delta_ledger().pack_reviews
+        if review.faction_id == faction_id
+    )
+    if len(reviews) != 1:
+        raise ValueError("Faction support document requires one July review row.")
+    lines.extend(
+        (
+            "",
+            (
+                "The structured July delta ledger records the following first-page "
+                "review items. Load support and semantic execution remain separate claims."
+            ),
+            "",
+            "| Review item | Disposition |",
+            "| --- | --- |",
+        )
+    )
+    for item in reviews[0].review_items:
+        lines.append(f"| {_markdown_text(item.name)} | `{_markdown_text(item.disposition)}` |")
+    return lines
 
 
 def _engine_consumed_coverage_row_count(rows: Iterable[Phase17ECoverageRow]) -> int:

@@ -18,12 +18,12 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_covera
 
 EDITION_ID = "warhammer_40000_11th"
 SOURCE_EDITION = "11th"
-SOURCE_PACKAGE_ID = "gw-11e-phase17f-faction-execution-2026-27"
-SOURCE_TITLE = "Warhammer 40,000 11th Edition Phase 17F Faction Execution"
-SOURCE_VERSION = "2026-27"
-SOURCE_DATE = "2026-06-11"
+SOURCE_PACKAGE_ID = "gw-11e-phase17f-faction-execution-2026-07"
+SOURCE_TITLE = "Warhammer 40,000 11th Edition Phase 17F July Faction Execution"
+SOURCE_VERSION = "2026-07-22"
+SOURCE_DATE = "2026-07-22"
 UPSTREAM_IDENTITY = faction_coverage_2026_27.SOURCE_PACKAGE_ID
-IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17f-faction-execution-v2"
+IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17f-faction-execution-v3"
 
 
 class Phase17FFactionExecutionError(ValueError):
@@ -388,9 +388,25 @@ class Phase17FExecutionPackage:
 
 
 def phase17f_execution_package() -> Phase17FExecutionPackage:
-    return Phase17FExecutionPackage(
-        execution_records=tuple(_execution_record(row) for row in _coverage_rows())
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        july_faction_packs_2026_07,
     )
+
+    successor = july_faction_packs_2026_07.exalted_patron().execution_record()
+    records: list[Phase17FExecutionRecord] = []
+    replacements = 0
+    for row in _coverage_rows():
+        record = _execution_record(row)
+        if record.execution_id == successor.execution_id:
+            records.append(successor)
+            replacements += 1
+        else:
+            records.append(record)
+    if replacements != 1:
+        raise Phase17FFactionExecutionError(
+            "July execution package requires exactly one Exalted Patron predecessor."
+        )
+    return Phase17FExecutionPackage(execution_records=tuple(records))
 
 
 def execution_records() -> tuple[Phase17FExecutionRecord, ...]:

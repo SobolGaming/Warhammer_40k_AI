@@ -3,7 +3,7 @@
   "artifact_id": "gw-11e-july-chaos-daemons-runtime-updates-2026-07",
   "artifact_schema": "core-v2-july-chaos-daemons-runtime-updates-v1",
   "ingress_decision_type": "submit_placement_proposal",
-  "provider_activation_status": "candidate_only",
+  "provider_activation_status": "current_default",
   "rows": [
     {
       "datasheet_id": null,
@@ -20,7 +20,7 @@
       ],
       "semantic_execution_status": "executable_generic_rule_ir",
       "source_pdf_page": 6,
-      "source_row_id": "gw-11e-staged-faction-packs-2026-07:stratagem:chaos-daemons:daemonic-incursion:000008437006"
+      "source_row_id": "gw-11e-faction-packs-2026-07:stratagem:chaos-daemons:daemonic-incursion:000008437006"
     },
     {
       "datasheet_id": "000001117",
@@ -37,7 +37,7 @@
       ],
       "semantic_execution_status": "executable_generic_rule_ir",
       "source_pdf_page": 38,
-      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-ability:chaos-daemons:000001117:6"
+      "source_row_id": "gw-11e-faction-packs-2026-07:datasheet-ability:chaos-daemons:000001117:6"
     },
     {
       "datasheet_id": "000001464",
@@ -55,7 +55,7 @@
       ],
       "semantic_execution_status": "executable_generic_rule_ir",
       "source_pdf_page": 46,
-      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-ability:chaos-daemons:000001464:4"
+      "source_row_id": "gw-11e-faction-packs-2026-07:datasheet-ability:chaos-daemons:000001464:4"
     },
     {
       "datasheet_id": "000001464",
@@ -70,7 +70,7 @@
       "runtime_consumer_ids": [],
       "semantic_execution_status": "unsupported",
       "source_pdf_page": 46,
-      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-ability:chaos-daemons:000001464:5"
+      "source_row_id": "gw-11e-faction-packs-2026-07:datasheet-ability:chaos-daemons:000001464:5"
     },
     {
       "datasheet_id": "000001127",
@@ -94,12 +94,12 @@
       ],
       "semantic_execution_status": "executable_keyword_overlay",
       "source_pdf_page": 60,
-      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-keywords:chaos-daemons:000001127"
+      "source_row_id": "gw-11e-faction-packs-2026-07:datasheet-keywords:chaos-daemons:000001127"
     }
   ],
-  "runtime_provider_id": "warhammer_40000_11th:chaos_daemons:faction_manifest:july_2026_candidate",
+  "runtime_provider_id": "warhammer_40000_11th:chaos_daemons:faction_manifest:july_2026",
   "source_date": "2026-07-22",
-  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
+  "source_package_id": "gw-11e-faction-packs-2026-07",
   "source_pdf_package_id": "gw-11e-chaos-daemons-faction-pack-2026-07",
   "stratagem_cost_decision_type": "select_stratagem_cost_modifier_option"
 }

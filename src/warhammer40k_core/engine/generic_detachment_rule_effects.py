@@ -47,7 +47,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_execution_2026_27,
-    faction_generic_ir_support_2026_27,
+    faction_rule_ir_promotion_2026_07,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_more_dakka_ir_support_2026_27 as more_dakka_ir,
@@ -150,7 +150,7 @@ def generic_detachment_rule_battle_formation_hook_bindings(
             continue
         if record.detachment_id not in selected_detachment_ids:
             continue
-        rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
             record.coverage_descriptor_id
         )
         source = _GenericDetachmentRuleBindingSource(record=record, rule_ir=rule_ir)

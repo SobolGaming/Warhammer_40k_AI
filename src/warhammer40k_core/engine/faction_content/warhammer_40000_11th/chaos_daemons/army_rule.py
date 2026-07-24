@@ -71,7 +71,7 @@ HOOK_ID = "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:army-rule"
 JULY_HOOK_ID = "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
 JULY_SOURCE_RULE_ID = (
-    "gw-11e-staged-faction-packs-2026-07:phase17f:army-rule:chaos-daemons:daemonic-manifestation"
+    "gw-11e-faction-packs-2026-07:phase17f:army-rule:chaos-daemons:daemonic-manifestation"
 )
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 LEGIONES_DAEMONICA = "LEGIONES DAEMONICA"

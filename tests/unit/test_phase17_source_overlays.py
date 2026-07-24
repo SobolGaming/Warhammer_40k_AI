@@ -17,9 +17,12 @@ from warhammer40k_core.engine.catalog_command_point_support import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
 )
+from warhammer40k_core.engine.faction_content.manifest import (
+    RuntimeContentModuleFamily,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th import generated_manifest
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
-    july_2026_candidate as chaos_daemons_july_candidate,
+    july_2026 as chaos_daemons_july,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     july_2026_updates as chaos_daemons_july_updates,
@@ -28,13 +31,13 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
     manifest as chaos_daemons_june_manifest,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
-    july_2026_candidate as emperors_children_july_candidate,
+    july_2026 as emperors_children_july,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
     manifest as emperors_children_june_manifest,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
-    july_2026_candidate as thousand_sons_july_candidate,
+    july_2026 as thousand_sons_july,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
     manifest as thousand_sons_june_manifest,
@@ -59,8 +62,8 @@ from warhammer40k_core.rules.source_overlay import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
-    faction_detachments_2026_27,
     faction_execution_2026_27,
+    faction_source_promotion_2026_07,
     faction_subrules_2026_27,
     july_faction_packs_2026_07,
 )
@@ -447,20 +450,27 @@ def test_phase17_source_overlay_and_reference_payloads_reject_hash_drift() -> No
         SourceReferenceCatalog.from_payload(reference_payload)
 
 
-def test_july_faction_pack_staging_ledger_matches_pending_and_predecessor_manifests() -> None:
+def test_july_faction_pack_ledger_matches_current_and_predecessor_manifests() -> None:
     root = Path(__file__).resolve().parents[2]
-    pending = _official_source_identities(
-        root / "data" / "source_manifests" / "gw_11e_pending_faction_packs_2026_07.yaml"
-    )
     current = _official_source_identities(
         root / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
     )
+    predecessors = _official_source_identities(
+        root / "data" / "source_manifests" / "gw_11e_faction_pack_predecessors_2026_06.yaml"
+    )
+    deathwatch_id = faction_source_promotion_2026_07.DEATHWATCH_PACKAGE_ID
+    successors = {
+        package_id: identity
+        for package_id, identity in current.items()
+        if package_id != deathwatch_id
+    }
+    retained_predecessors = {**predecessors, deathwatch_id: current[deathwatch_id]}
     ledger = july_faction_packs_2026_07.delta_ledger()
 
     july_faction_packs_2026_07.audit_manifest_links(
         ledger=ledger,
-        pending_packages=pending,
-        current_packages=current,
+        successor_packages=successors,
+        predecessor_packages=retained_predecessors,
     )
 
     assert len(ledger.pack_reviews) == 27
@@ -609,7 +619,7 @@ def test_july_datasheet_preview_preserves_inventory_and_support_boundaries() -> 
     } == {"000004225:5"}
     datasheet_reference = next(
         artifact
-        for artifact in july_faction_packs_2026_07.staging_package().staged_data_artifacts
+        for artifact in july_faction_packs_2026_07.source_package().staged_data_artifacts
         if artifact.artifact_id == datasheets.artifact_id
     )
     july_faction_packs_2026_07.audit_datasheet_preview_links(
@@ -619,13 +629,13 @@ def test_july_datasheet_preview_preserves_inventory_and_support_boundaries() -> 
     )
 
 
-def test_july_daemonic_manifestation_artifact_is_candidate_only_and_executable() -> None:
+def test_july_daemonic_manifestation_artifact_is_current_and_executable() -> None:
     artifact = july_faction_packs_2026_07.daemonic_manifestation()
 
     assert artifact.rule_name == "Daemonic Manifestation"
     assert artifact.predecessor_source_rule_id == "phase17f:phase17e:chaos-daemons:army-rule"
     assert artifact.semantic_execution_status == "executable_named_handler"
-    assert artifact.provider_activation_status == "candidate_only"
+    assert artifact.provider_activation_status == "current_default"
     assert (
         artifact.named_handler_classification
         == "approved_successor_of_existing_army_rule_orchestrator"
@@ -637,10 +647,10 @@ def test_july_daemonic_manifestation_artifact_is_candidate_only_and_executable()
     ]
 
 
-def test_july_chaos_daemons_runtime_artifact_is_candidate_only_and_contract_stable() -> None:
+def test_july_chaos_daemons_runtime_artifact_is_current_and_contract_stable() -> None:
     artifact = july_faction_packs_2026_07.chaos_daemons_runtime_updates()
 
-    assert artifact.provider_activation_status == "candidate_only"
+    assert artifact.provider_activation_status == "current_default"
     assert artifact.ingress_decision_type == "submit_placement_proposal"
     assert artifact.stratagem_cost_decision_type == "select_stratagem_cost_modifier_option"
     assert artifact.adapter_contract_status == "existing_contract_unchanged"
@@ -659,23 +669,23 @@ def test_july_chaos_daemons_runtime_artifact_is_candidate_only_and_contract_stab
         ("Altered Reality", "unsupported")
     ]
     june_contribution = chaos_daemons_june_manifest.runtime_contribution()
-    candidate_contribution = chaos_daemons_july_candidate.runtime_contribution()
+    current_contribution = chaos_daemons_july.runtime_contribution()
     assert all(
         record.definition.source_id != artifact.rows[0].source_row_id
         for record in june_contribution.stratagem_records
     )
     assert any(
         record.definition.source_id == artifact.rows[0].source_row_id
-        for record in candidate_contribution.stratagem_records
+        for record in current_contribution.stratagem_records
     )
 
 
-def test_july_exalted_patron_artifact_is_candidate_only_generic_rule_ir() -> None:
+def test_july_exalted_patron_artifact_is_current_generic_rule_ir() -> None:
     artifact = july_faction_packs_2026_07.exalted_patron()
     rule_ir = artifact.rule_ir()
     execution_record = artifact.execution_record()
 
-    assert artifact.provider_activation_status == "candidate_only"
+    assert artifact.provider_activation_status == "current_default"
     assert artifact.target_required_keywords == ["LORD EXULTANT"]
     assert artifact.removed_ability_ids == ["may_attach_to_flawless_blades"]
     assert tuple(effect.kind for clause in rule_ir.clauses for effect in clause.effects) == (
@@ -684,7 +694,7 @@ def test_july_exalted_patron_artifact_is_candidate_only_generic_rule_ir() -> Non
     assert parameter_payload(rule_ir.clauses[1].effects[0].parameters) == {"delta": 1}
     assert execution_record.rule_ir_hash == rule_ir.ir_hash()
     assert (
-        emperors_children_july_candidate.runtime_contribution().contribution_id
+        emperors_children_july.runtime_contribution().contribution_id
         == artifact.runtime_provider_id
     )
     assert (
@@ -692,18 +702,12 @@ def test_july_exalted_patron_artifact_is_candidate_only_generic_rule_ir() -> Non
         != artifact.runtime_provider_id
     )
 
-    june_record = next(
+    current_record = next(
         record
         for record in faction_execution_2026_27.execution_records()
         if record.execution_id == artifact.phase17f_execution_id
     )
-    staged_record = next(
-        record
-        for record in emperors_children_july_candidate.faction_execution_records()
-        if record.execution_id == artifact.phase17f_execution_id
-    )
-    assert june_record.rule_ir_hash != staged_record.rule_ir_hash
-    assert staged_record == execution_record
+    assert current_record == execution_record
 
     frenzied_host = next(
         row
@@ -714,11 +718,11 @@ def test_july_exalted_patron_artifact_is_candidate_only_generic_rule_ir() -> Non
     assert frenzied_host.runtime_consumer_ids == []
 
 
-def test_july_thousand_sons_defiler_artifact_and_provider_remain_candidate_only() -> None:
+def test_july_thousand_sons_defiler_artifact_and_provider_are_current() -> None:
     artifact = july_faction_packs_2026_07.thousand_sons_defiler()
     june = thousand_sons_june_manifest.runtime_contribution()
-    candidate = thousand_sons_july_candidate.runtime_contribution()
-    record = candidate.stratagem_records[0]
+    current = thousand_sons_july.runtime_contribution()
+    record = current.stratagem_records[0]
     exception = stratagem_phase_use_exception(record.definition)
 
     assert artifact.aligned_defiler_datasheet_ids == [
@@ -730,16 +734,16 @@ def test_july_thousand_sons_defiler_artifact_and_provider_remain_candidate_only(
     assert artifact.audited_chaos_space_marines_datasheet_id == "000000969"
     assert artifact.old_rule_ir_semantics == "removed_minimum_hit_threshold"
     assert artifact.semantic_execution_status == "executable_generic_runtime"
-    assert artifact.provider_activation_status == "candidate_only"
+    assert artifact.provider_activation_status == "current_default"
     assert june.contribution_id != artifact.runtime_provider_id
     assert june.stratagem_records == ()
     assert june.stratagem_cost_modifier_bindings == ()
-    assert candidate.contribution_id == artifact.runtime_provider_id
+    assert current.contribution_id == artifact.runtime_provider_id
     assert record.definition.handler_id == artifact.counteroffensive_handler_id
     assert exception is not None
     assert exception.source_ability_id == artifact.source_ability_id
     assert exception.eligible_datasheet_ids == (artifact.datasheet_id,)
-    assert tuple(binding.modifier_id for binding in candidate.stratagem_cost_modifier_bindings) == (
+    assert tuple(binding.modifier_id for binding in current.stratagem_cost_modifier_bindings) == (
         artifact.runtime_consumer_ids[1],
     )
 
@@ -749,7 +753,7 @@ def test_july_thousand_sons_defiler_artifact_and_provider_remain_candidate_only(
         if row.owner_faction_id == "thousand-sons" and row.owner_detachment_id is None
     )
     assert active_thousand_sons_row.module_path is not None
-    assert active_thousand_sons_row.module_path.endswith(".thousand_sons.manifest")
+    assert active_thousand_sons_row.module_path.endswith(".thousand_sons.july_2026")
     assert "july_2026_candidate" not in active_thousand_sons_row.module_path
 
 
@@ -768,7 +772,7 @@ def test_july_kairos_uses_existing_generic_stratagem_cost_semantics() -> None:
     assert record.definition.source_id.startswith(july_faction_packs_2026_07.SOURCE_PACKAGE_ID)
 
 
-def test_july_cutover_guard_keeps_staged_ids_out_of_june_defaults() -> None:
+def test_july_source_runtime_and_document_promotion_is_atomic() -> None:
     root = Path(__file__).resolve().parents[2]
     current = _official_source_identities(
         root / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
@@ -777,36 +781,78 @@ def test_july_cutover_guard_keeps_staged_ids_out_of_june_defaults() -> None:
         path.name: path.read_text(encoding="utf-8")
         for path in sorted((root / "docs" / "factions").glob("*.md"))
     }
-    active_phase17_package_ids = (
-        faction_detachments_2026_27.SOURCE_PACKAGE_ID,
-        faction_subrules_2026_27.SOURCE_PACKAGE_ID,
+    phase17_package_ids = (
         faction_coverage_2026_27.SOURCE_PACKAGE_ID,
         faction_execution_2026_27.SOURCE_PACKAGE_ID,
     )
-    active_runtime_package_ids = tuple(
-        sorted(
-            {row.source_package_id for row in generated_manifest.generated_runtime_content_rows()}
-        )
-    )
+    runtime_rows = generated_manifest.generated_runtime_content_rows()
+    runtime_package_ids = tuple(sorted({row.source_package_id for row in runtime_rows}))
+    runtime_module_paths: dict[str, str] = {}
+    for row in runtime_rows:
+        if row.family is not RuntimeContentModuleFamily.FACTION:
+            continue
+        if row.owner_faction_id is None or row.module_path is None:
+            raise AssertionError("Current faction runtime row is incomplete.")
+        runtime_module_paths[row.owner_faction_id] = row.module_path
+    source_records = faction_source_promotion_2026_07.current_source_records()
+    current_package_ids = tuple(record.package_id for record in source_records)
+    assert set(current) == set(current_package_ids)
 
-    july_faction_packs_2026_07.audit_staged_package_is_not_active(
-        current_source_package_ids=tuple(sorted(current)),
-        phase17_source_package_ids=active_phase17_package_ids,
-        runtime_source_package_ids=active_runtime_package_ids,
+    july_faction_packs_2026_07.audit_current_package_is_atomically_active(
+        current_source_package_ids=current_package_ids,
+        phase17_source_package_ids=phase17_package_ids,
+        runtime_source_package_ids=runtime_package_ids,
+        runtime_module_paths_by_faction=runtime_module_paths,
         generated_current_documents=current_docs,
     )
 
+    current_source_by_faction = {record.faction_id: record.package_id for record in source_records}
+    executable_statuses = {
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+    }
+    assert all(
+        record.source_pdf_package_id == current_source_by_faction[record.faction_id]
+        for record in faction_execution_2026_27.execution_records()
+        if record.execution_status in executable_statuses
+    )
+    source_set = faction_source_promotion_2026_07.current_source_set()
+    deathwatch = next(
+        record
+        for record in source_set.records
+        if record.faction_id == faction_source_promotion_2026_07.DEATHWATCH_FACTION_ID
+    )
+    assert (
+        deathwatch.package_id,
+        deathwatch.sha256,
+        deathwatch.pdf_path,
+    ) == (
+        faction_source_promotion_2026_07.DEATHWATCH_PACKAGE_ID,
+        faction_source_promotion_2026_07.DEATHWATCH_SHA256,
+        faction_source_promotion_2026_07.DEATHWATCH_PDF_PATH,
+    )
+    assert deathwatch.predecessor_package_id is None
+    provenance_only_ids = {
+        record.faction_id
+        for record in source_set.records
+        if record.semantic_change_status == "provenance_only"
+    }
+    assert provenance_only_ids == faction_source_promotion_2026_07.NO_ACTION_FACTION_IDS
+    assert source_set.excluded_content_categories == ["imperial-armour", "legends"]
+    assert not (
+        {"imperial-armour", "legends"}
+        & {row.inventory_status for row in july_faction_packs_2026_07.datasheets().rows}
+    )
+
     with pytest.raises(
-        july_faction_packs_2026_07.JulyFactionPackStagingError,
-        match="leaked into an active",
+        faction_source_promotion_2026_07.FactionSourcePromotionError,
+        match="exact promoted set",
     ):
-        july_faction_packs_2026_07.audit_staged_package_is_not_active(
-            current_source_package_ids=(
-                *tuple(sorted(current)),
-                july_faction_packs_2026_07.SOURCE_PACKAGE_ID,
-            ),
-            phase17_source_package_ids=active_phase17_package_ids,
-            runtime_source_package_ids=active_runtime_package_ids,
+        july_faction_packs_2026_07.audit_current_package_is_atomically_active(
+            current_source_package_ids=current_package_ids[:-1],
+            phase17_source_package_ids=phase17_package_ids,
+            runtime_source_package_ids=runtime_package_ids,
+            runtime_module_paths_by_faction=runtime_module_paths,
             generated_current_documents=current_docs,
         )
 

@@ -22,7 +22,7 @@ from warhammer40k_core.engine.rule_execution import (
 from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
-    faction_generic_ir_support_2026_27,
+    faction_rule_ir_promotion_2026_07,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionRecord,
@@ -443,7 +443,7 @@ def default_faction_rule_generic_ir_executor(
 
 
 def default_faction_rule_ir_resolver(coverage_descriptor_id: str) -> RuleIR:
-    return faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+    return faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
         coverage_descriptor_id
     )
 

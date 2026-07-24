@@ -707,10 +707,10 @@ def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest()
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
 
-    assert army_rule.HOOK_ID in summary["battle_shock_hook_ids"]
+    assert army_rule.JULY_HOOK_ID in summary["battle_shock_hook_ids"]
     assert army_rule.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
     assert any(
-        path.endswith(".chaos_daemons.manifest") for path in summary["selected_module_paths"]
+        path.endswith(".chaos_daemons.july_2026") for path in summary["selected_module_paths"]
     )
 
     status = lifecycle.advance_until_decision_or_terminal()
@@ -725,7 +725,7 @@ def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest()
         lifecycle.decision_controller,
         "chaos_daemons_daemonic_manifestation_healing_resolved",
     )
-    assert manifestation_payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
+    assert manifestation_payload["source_rule_id"] == army_rule.JULY_SOURCE_RULE_ID
     assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
 
 
