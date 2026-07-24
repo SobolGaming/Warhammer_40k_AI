@@ -51,6 +51,7 @@ def test_july_faction_pack_staging_uses_typed_json_artifacts() -> None:
     assert python_modules == ("__init__.py", "_artifacts.py", "_runtime_artifacts.py")
     assert json_artifacts == (
         "chaos-daemons-daemonic-manifestation.json",
+        "chaos-daemons-runtime-updates.json",
         "datasheet-support-preview.json",
         "datasheets.json",
         "delta-ledger.json",

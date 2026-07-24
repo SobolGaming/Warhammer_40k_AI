@@ -70,6 +70,9 @@ from warhammer40k_core.engine.faction_content import bundle_payloads as _bundle_
 from warhammer40k_core.engine.faction_content import bundle_validation as _bundle_validation
 from warhammer40k_core.engine.faction_content import catalog_generic_hooks, catalog_runtime_hooks
 from warhammer40k_core.engine.faction_content import unit_move_completed as _unit_move_completed
+from warhammer40k_core.engine.faction_content.ability_record_merge import (
+    merge_ability_records_with_contribution_overrides,
+)
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
@@ -1293,14 +1296,13 @@ class RuntimeContentBundle:
             raise GameLifecycleError("Runtime content bundle requires ArmyCatalog.")
         validated_contributions = _validate_contributions(contributions)
         vc = validated_contributions
-        ability_records = _merge_records(
-            "ability_records",
+        contribution_ability_records = _contribution_values(
+            validated_contributions,
+            lambda contribution: contribution.ability_records,
+        )
+        ability_records = merge_ability_records_with_contribution_overrides(
             base_ability_records,
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.ability_records,
-            ),
-            AbilityCatalogRecord,
+            contribution_ability_records,
         )
         contribution_stratagem_records = _contribution_values(
             validated_contributions,

@@ -10,7 +10,23 @@ import pytest
 from tools.apply_source_overlays import apply_source_overlays
 from tools.fetch_official_sources import load_official_source_manifest
 
+from warhammer40k_core.engine.catalog_command_point_support import (
+    CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    command_point_consumer_ids_for_clause,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_rule_clauses_from_record,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th import generated_manifest
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    july_2026_candidate as chaos_daemons_july_candidate,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    july_2026_updates as chaos_daemons_july_updates,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    manifest as chaos_daemons_june_manifest,
+)
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
@@ -603,6 +619,54 @@ def test_july_daemonic_manifestation_artifact_is_candidate_only_and_executable()
         "select_healing_model",
         "submit_healing_revival_placement",
     ]
+
+
+def test_july_chaos_daemons_runtime_artifact_is_candidate_only_and_contract_stable() -> None:
+    artifact = july_faction_packs_2026_07.chaos_daemons_runtime_updates()
+
+    assert artifact.provider_activation_status == "candidate_only"
+    assert artifact.ingress_decision_type == "submit_placement_proposal"
+    assert artifact.stratagem_cost_decision_type == "select_stratagem_cost_modifier_option"
+    assert artifact.adapter_contract_status == "existing_contract_unchanged"
+    assert chaos_daemons_july_updates.replacement_keywords_for_datasheet(
+        chaos_daemons_july_updates.SCREAMERS_DATASHEET_ID
+    ) == (
+        "BEAST",
+        "FLY",
+        "CHAOS",
+        "DAEMON",
+        "TZEENTCH",
+        "SCREAMERS",
+    )
+    unsupported = chaos_daemons_july_updates.unsupported_ability_rows()
+    assert [(row.rule_name, row.semantic_execution_status) for row in unsupported] == [
+        ("Altered Reality", "unsupported")
+    ]
+    june_contribution = chaos_daemons_june_manifest.runtime_contribution()
+    candidate_contribution = chaos_daemons_july_candidate.runtime_contribution()
+    assert all(
+        record.definition.source_id != artifact.rows[0].source_row_id
+        for record in june_contribution.stratagem_records
+    )
+    assert any(
+        record.definition.source_id == artifact.rows[0].source_row_id
+        for record in candidate_contribution.stratagem_records
+    )
+
+
+def test_july_kairos_uses_existing_generic_stratagem_cost_semantics() -> None:
+    record = next(
+        record
+        for record in chaos_daemons_july_updates.runtime_contribution().ability_records
+        if record.datasheet_id == chaos_daemons_july_updates.KAIROS_DATASHEET_ID
+    )
+    clauses = catalog_rule_clauses_from_record(record)
+
+    assert len(clauses) == 1
+    assert command_point_consumer_ids_for_clause(clauses[0]) == (
+        CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    )
+    assert record.definition.source_id.startswith(july_faction_packs_2026_07.SOURCE_PACKAGE_ID)
 
 
 def test_july_cutover_guard_keeps_staged_ids_out_of_june_defaults() -> None:

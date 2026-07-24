@@ -871,6 +871,7 @@ class JulyStagingPackageArtifact(msgspec.Struct, frozen=True):
             seen_artifact_paths.add(artifact.artifact_path)
         expected_staged_artifact_ids = {
             "gw-11e-july-chaos-daemons-daemonic-manifestation-2026-07",
+            "gw-11e-july-chaos-daemons-runtime-updates-2026-07",
             "gw-11e-july-faction-pack-datasheet-preview-2026-07",
             "gw-11e-july-faction-pack-datasheets-2026-07",
             "gw-11e-july-faction-pack-detachments-2026-07",
@@ -881,7 +882,7 @@ class JulyStagingPackageArtifact(msgspec.Struct, frozen=True):
         }
         if seen_artifact_ids != expected_staged_artifact_ids:
             raise JulyFactionPackStagingError(
-                "July staging package must declare the exact staged PR 2 artifacts."
+                "July staging package must declare the exact staged artifacts."
             )
 
     def source_payload_checksum_sha256(self) -> str:

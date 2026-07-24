@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.reserves import StrategicReserveRule
+
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
@@ -432,6 +434,7 @@ def _resolve_reinforcement_placement_submission(
         objective_markers=_objective_markers_for_state(state),
         enemy_deployment_zones=enemy_deployment_zones,
         large_model_exceptions=large_model_exceptions,
+        strategic_reserve_rule=_required_ingress_strategic_reserve_rule(reserve_state),
         deep_strike_enemy_horizontal_distance_inches=deep_strike_enemy_distance,
         additional_violations=restriction_violations,
     )
@@ -465,6 +468,21 @@ def _resolve_reinforcement_placement_submission(
         placement=placement,
         result=result,
     )
+    return None
+
+
+def _required_ingress_strategic_reserve_rule(
+    reserve_state: ReserveState,
+) -> StrategicReserveRule | None:
+    if (
+        reserve_state.required_arrival_battle_round == 1
+        and reserve_state.required_arrival_placement_kind
+        == BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+    ):
+        return StrategicReserveRule(
+            earliest_arrival_battle_round=1,
+            ignores_mission_arrival_round_blocks=True,
+        )
     return None
 
 

@@ -1,0 +1,105 @@
+{
+  "adapter_contract_status": "existing_contract_unchanged",
+  "artifact_id": "gw-11e-july-chaos-daemons-runtime-updates-2026-07",
+  "artifact_schema": "core-v2-july-chaos-daemons-runtime-updates-v1",
+  "ingress_decision_type": "submit_placement_proposal",
+  "provider_activation_status": "candidate_only",
+  "rows": [
+    {
+      "datasheet_id": null,
+      "load_support_status": "loaded",
+      "normalized_rule_text": "Place your unit in Strategic Reserves. Your unit must make an Ingress move in your next Movement phase (including in your first turn).",
+      "predecessor_source_row_id": "stratagem:chaos-daemons:daemonic-incursion:000008437006",
+      "raw_rule_text": "Place your unit in Strategic Reserves. Your unit must make an Ingress move in your next Movement phase (including in your first turn).",
+      "replacement_keywords": [],
+      "row_id": "chaos-daemons:the-realm-of-chaos",
+      "row_kind": "stratagem",
+      "rule_name": "The Realm of Chaos",
+      "runtime_consumer_ids": [
+        "generic-rule-ir:reserve-removal"
+      ],
+      "semantic_execution_status": "executable_generic_rule_ir",
+      "source_pdf_page": 6,
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:stratagem:chaos-daemons:daemonic-incursion:000008437006"
+    },
+    {
+      "datasheet_id": "000001117",
+      "load_support_status": "loaded",
+      "normalized_rule_text": "Once per turn, when your opponent targets a unit from their army within 12\" of this model with a Stratagem, you can use this ability. If you do, increase the CP cost of that use of that Stratagem by 1CP.",
+      "predecessor_source_row_id": "gw-11e-wahapedia-2026-27:Datasheets_abilities:000001117:6:description",
+      "raw_rule_text": "Once per turn, when your opponent targets a unit from their army within 12\" of this model with a Stratagem, you can use this ability. If you do, increase the CP cost of that use of that Stratagem by 1CP.",
+      "replacement_keywords": [],
+      "row_id": "chaos-daemons:kairos-fateweaver:one-head-looks-back",
+      "row_kind": "datasheet_ability",
+      "rule_name": "One Head Looks Back",
+      "runtime_consumer_ids": [
+        "catalog-ir:stratagem-cost-modifier"
+      ],
+      "semantic_execution_status": "executable_generic_rule_ir",
+      "source_pdf_page": 38,
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-ability:chaos-daemons:000001117:6"
+    },
+    {
+      "datasheet_id": "000001464",
+      "load_support_status": "loaded",
+      "normalized_rule_text": "This unit has Stealth. Melee attacks that target this unit have -1 to Hit rolls.",
+      "predecessor_source_row_id": "gw-11e-wahapedia-2026-27:Datasheets_abilities:000001464:4:description",
+      "raw_rule_text": "This unit has Stealth. Melee attacks that target this unit have -1 to Hit rolls.",
+      "replacement_keywords": [],
+      "row_id": "chaos-daemons:fluxmaster:fluxmaster",
+      "row_kind": "datasheet_ability",
+      "rule_name": "Fluxmaster",
+      "runtime_consumer_ids": [
+        "catalog-ir:passive-self-ability:stealth",
+        "catalog-ir:passive-self-defensive-hit-roll-modifier"
+      ],
+      "semantic_execution_status": "executable_generic_rule_ir",
+      "source_pdf_page": 46,
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-ability:chaos-daemons:000001464:4"
+    },
+    {
+      "datasheet_id": "000001464",
+      "load_support_status": "loaded",
+      "normalized_rule_text": "Once per battle round, after a Hit roll, a Wound roll or a saving throw is made for this model, you can change the result of that roll to an unmodified 6.",
+      "predecessor_source_row_id": "gw-11e-wahapedia-2026-27:Datasheets_abilities:000001464:5:description",
+      "raw_rule_text": "Once per battle round, after a Hit roll, a Wound roll or a saving throw is made for this model, you can change the result of that roll to an unmodified 6.",
+      "replacement_keywords": [],
+      "row_id": "chaos-daemons:fluxmaster:altered-reality",
+      "row_kind": "unsupported_datasheet_ability",
+      "rule_name": "Altered Reality",
+      "runtime_consumer_ids": [],
+      "semantic_execution_status": "unsupported",
+      "source_pdf_page": 46,
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-ability:chaos-daemons:000001464:5"
+    },
+    {
+      "datasheet_id": "000001127",
+      "load_support_status": "loaded",
+      "normalized_rule_text": "BEAST, FLY, CHAOS, DAEMON, TZEENTCH, SCREAMERS",
+      "predecessor_source_row_id": "gw-11e-wahapedia-2026-27:Datasheets_keywords:000001127",
+      "raw_rule_text": "BEAST, FLY, CHAOS, DAEMON, TZEENTCH, SCREAMERS",
+      "replacement_keywords": [
+        "BEAST",
+        "FLY",
+        "CHAOS",
+        "DAEMON",
+        "TZEENTCH",
+        "SCREAMERS"
+      ],
+      "row_id": "chaos-daemons:screamers:keywords",
+      "row_kind": "keyword_overlay",
+      "rule_name": "Screamers keywords",
+      "runtime_consumer_ids": [
+        "catalog:datasheet-keyword-query"
+      ],
+      "semantic_execution_status": "executable_keyword_overlay",
+      "source_pdf_page": 60,
+      "source_row_id": "gw-11e-staged-faction-packs-2026-07:datasheet-keywords:chaos-daemons:000001127"
+    }
+  ],
+  "runtime_provider_id": "warhammer_40000_11th:chaos_daemons:faction_manifest:july_2026_candidate",
+  "source_date": "2026-07-22",
+  "source_package_id": "gw-11e-staged-faction-packs-2026-07",
+  "source_pdf_package_id": "gw-11e-chaos-daemons-faction-pack-2026-07",
+  "stratagem_cost_decision_type": "select_stratagem_cost_modifier_option"
+}

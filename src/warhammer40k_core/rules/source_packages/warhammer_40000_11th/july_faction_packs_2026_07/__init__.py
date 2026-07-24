@@ -36,7 +36,10 @@ from ._artifacts import (
     july_subrules_from_json_bytes,
 )
 from ._runtime_artifacts import (
+    JulyChaosDaemonsRuntimeArtifact,
+    JulyChaosDaemonsRuntimeRow,
     JulyDaemonicManifestationArtifact,
+    july_chaos_daemons_runtime_from_json_bytes,
     july_daemonic_manifestation_from_json_bytes,
 )
 
@@ -117,6 +120,12 @@ def datasheet_support_preview() -> JulyDatasheetPreviewArtifact:
 def daemonic_manifestation() -> JulyDaemonicManifestationArtifact:
     return july_daemonic_manifestation_from_json_bytes(
         _staged_artifact_bytes("gw-11e-july-chaos-daemons-daemonic-manifestation-2026-07")
+    )
+
+
+def chaos_daemons_runtime_updates() -> JulyChaosDaemonsRuntimeArtifact:
+    return july_chaos_daemons_runtime_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-chaos-daemons-runtime-updates-2026-07")
     )
 
 
@@ -211,6 +220,8 @@ __all__ = (
     "SOURCE_PAYLOAD_CHECKSUM_SHA256",
     "SOURCE_TITLE",
     "SOURCE_VERSION",
+    "JulyChaosDaemonsRuntimeArtifact",
+    "JulyChaosDaemonsRuntimeRow",
     "JulyDaemonicManifestationArtifact",
     "JulyDatasheetArtifact",
     "JulyDatasheetPreviewArtifact",
@@ -227,6 +238,7 @@ __all__ = (
     "audit_manifest_links",
     "audit_runtime_predecessor_references",
     "audit_staged_package_is_not_active",
+    "chaos_daemons_runtime_updates",
     "daemonic_manifestation",
     "datasheet_support_preview",
     "datasheets",

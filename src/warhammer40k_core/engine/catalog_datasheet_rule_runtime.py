@@ -46,6 +46,8 @@ from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     defensive_strength_toughness_wound_handler,
     half_range_weapon_ability_handler,
+    passive_self_defensive_hit_handler,
+    passive_self_stealth_hit_handler,
 )
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     rules_units_within as _rules_units_within,
@@ -82,6 +84,8 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_FIGHT_ON_DEATH_SOURCE_CONSUMER_ID,
     CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
+    CATALOG_IR_PASSIVE_SELF_DEFENSIVE_HIT_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_PASSIVE_SELF_STEALTH_CONSUMER_ID,
     CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
     clause_is_charge_end_leading_unit_weapon_ability_grant,
     clause_is_conditional_lone_operative,
@@ -93,6 +97,8 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     clause_is_leading_unit_hit_roll_modifier,
     clause_is_leading_unit_wound_roll_modifier,
     clause_is_passive_characteristic_modifier,
+    clause_is_passive_self_defensive_hit_roll_modifier,
+    clause_is_passive_self_stealth,
     clause_is_stealth_aura,
 )
 from warhammer40k_core.engine.catalog_defensive_rule_runtime import (
@@ -437,6 +443,25 @@ class CatalogDatasheetRuleRuntime:
                 handler=self._leading_unit_hit_roll_handler(source),
             )
             for source in self._sources(clause_is_leading_unit_hit_roll_modifier)
+        )
+        bindings.extend(
+            HitRollModifierBinding(
+                modifier_id=f"{CATALOG_IR_PASSIVE_SELF_STEALTH_CONSUMER_ID}:{source.binding_id}",
+                source_id=source.rule_ir.source_id,
+                handler=passive_self_stealth_hit_handler(source),
+            )
+            for source in self._sources(clause_is_passive_self_stealth)
+        )
+        bindings.extend(
+            HitRollModifierBinding(
+                modifier_id=(
+                    f"{CATALOG_IR_PASSIVE_SELF_DEFENSIVE_HIT_MODIFIER_CONSUMER_ID}:"
+                    f"{source.binding_id}"
+                ),
+                source_id=source.rule_ir.source_id,
+                handler=passive_self_defensive_hit_handler(source),
+            )
+            for source in self._sources(clause_is_passive_self_defensive_hit_roll_modifier)
         )
         bindings.extend(
             HitRollModifierBinding(
