@@ -56,6 +56,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -1294,6 +1295,7 @@ def test_attached_unit_split_recovers_original_starting_strength_records() -> No
         player_id="player-a",
         attached_unit_instance_id=attached_id,
         surviving_unit_instance_ids=(leader_id, bodyguard_id),
+        event_log=EventLog(),
     )
 
     assert tuple(record.unit_instance_id for record in recovered) == (leader_id, bodyguard_id)
@@ -1369,6 +1371,7 @@ def test_mustered_attached_unit_uses_attached_starting_strength_until_split() ->
         player_id="player-a",
         attached_unit_instance_id=attached_id,
         surviving_unit_instance_ids=(leader_id, support_id, bodyguard_id),
+        event_log=EventLog(),
     )
 
     assert tuple(record.unit_instance_id for record in recovered) == (
@@ -1396,6 +1399,7 @@ def test_attached_unit_split_recovery_rejects_invalid_survivors() -> None:
             player_id="player-a",
             attached_unit_instance_id="army-alpha:intercessor-unit-1",
             surviving_unit_instance_ids=("army-alpha:intercessor-unit-1",),
+            event_log=EventLog(),
         )
     payload_before_missing_attached = state.to_payload()
     with pytest.raises(GameLifecycleError, match="existing StartingStrengthRecord"):
@@ -1403,6 +1407,7 @@ def test_attached_unit_split_recovery_rejects_invalid_survivors() -> None:
             player_id="player-a",
             attached_unit_instance_id="attached-unit:typo",
             surviving_unit_instance_ids=("army-alpha:intercessor-unit-1",),
+            event_log=EventLog(),
         )
     assert state.to_payload() == payload_before_missing_attached
     with pytest.raises(GameLifecycleError, match="survivor unit is unknown"):
@@ -1410,12 +1415,14 @@ def test_attached_unit_split_recovery_rejects_invalid_survivors() -> None:
             player_id="player-a",
             attached_unit_instance_id="army-alpha:intercessor-unit-1",
             surviving_unit_instance_ids=("missing-unit",),
+            event_log=EventLog(),
         )
     with pytest.raises(GameLifecycleError, match="survivor player_id drift"):
         state.recover_starting_strength_after_attached_unit_split(
             player_id="player-a",
             attached_unit_instance_id="army-alpha:intercessor-unit-1",
             surviving_unit_instance_ids=("army-beta:intercessor-unit-3",),
+            event_log=EventLog(),
         )
 
 

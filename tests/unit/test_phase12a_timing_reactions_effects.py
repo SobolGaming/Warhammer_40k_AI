@@ -23,7 +23,7 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
     effect_expiration_kind_from_token,
 )
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -596,6 +596,7 @@ def test_persisting_effect_survives_attached_unit_split() -> None:
             "army-alpha:intercessor-unit-1",
             "army-alpha:intercessor-unit-2",
         ),
+        event_log=EventLog(),
     )
 
     assert tuple(record.unit_instance_id for record in recovered) == (

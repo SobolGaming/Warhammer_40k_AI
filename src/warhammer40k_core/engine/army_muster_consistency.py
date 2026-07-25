@@ -59,7 +59,10 @@ def _armies_match_muster_with_runtime_attached_unit_splits(
     if len(state_armies) != len(expected_armies):
         return False
     for state_army, expected_army in zip(state_armies, expected_armies, strict=True):
-        if state.stage is not GameLifecycleStage.BATTLE:
+        if state.stage not in {
+            GameLifecycleStage.BATTLE,
+            GameLifecycleStage.COMPLETE,
+        }:
             if state_army != expected_army:
                 return False
             continue

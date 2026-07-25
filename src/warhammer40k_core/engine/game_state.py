@@ -65,7 +65,7 @@ from warhammer40k_core.engine.effects import (
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_resources import (
     FactionResourceLedger,
     FactionResourceResult,
@@ -3343,6 +3343,7 @@ class GameState:
         player_id: str,
         attached_unit_instance_id: str,
         surviving_unit_instance_ids: tuple[str, ...],
+        event_log: EventLog,
     ) -> tuple[StartingStrengthRecord, ...]:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         requested_attached_unit_id = _validate_identifier(
@@ -3406,7 +3407,9 @@ class GameState:
             attached_unit_instance_id=requested_attached_unit_id,
             surviving_unit_instance_ids=surviving_ids,
         )
-        _action_history.interrupt_for_attached_unit_split(self, requested_attached_unit_id)
+        _action_history.interrupt_and_emit_attached_unit_split(
+            self, event_log, requested_attached_unit_id, surviving_ids
+        )
         self._remove_attached_unit_formation(attached_unit_instance_id=requested_attached_unit_id)
         replaced_ids = {*recovery_unit_ids, requested_attached_unit_id}
         self.starting_strength_records = [

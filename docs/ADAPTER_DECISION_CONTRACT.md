@@ -741,6 +741,17 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   that are not yet represented as finite options return a typed `unsupported`
   status instead of exposing an adapter mutation path.
 
+If destruction splits an Attached Unit, the engine interrupts each qualifying
+started Action before removing the canonical formation identity and emits one
+public `mission_action_interrupted` event per interrupted Action. The payload
+includes `action_id`, the canonical pre-split `unit_instance_id`,
+`surviving_unit_instance_ids`, `interrupted_reason: "unit_destroyed"`,
+`battle_round`, `phase`, and the serialized interrupted
+`mission_action_state`. Both players consume this through the ordinary
+viewer-scoped event stream, and replay preserves the same event payload. This
+uses the existing generic `EventRecord` payload contract and does not introduce
+a new decision, submission, or event-delta schema.
+
 These mission-scoring decision types must be submitted through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. Tests, replay, UI, CLI, network, and headless adapters must not call `GameState.discard_tactical_secondary(...)`, `GameState.score_secondary_mission(...)`, `GameState.record_tactical_secondary_replacement_use(...)`, or `GameState.record_mission_action_state(...)` directly for player choices; those methods are engine-owned primitives used by validated decision handlers and automatic rule hooks.
 
 ## Phase 12A Reaction And Sequencing Decisions
