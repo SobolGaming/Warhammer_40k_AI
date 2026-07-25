@@ -8219,6 +8219,7 @@
         "terrain_layout_id": "take-and-hold-vs-take-and-hold-layout-3"
       },
       "movement_phase_state": null,
+      "normal_move_states": [],
       "objective_control_records": [],
       "one_shot_weapon_use_records": [],
       "out_of_phase_shooting_state": null,
@@ -8291,7 +8292,6 @@
       ],
       "sticky_objective_control_states": [],
       "stratagem_use_records": [],
-      "surge_move_states": [],
       "tactical_secondary_achievement_contexts": [],
       "tactical_secondary_discard_cp_reward_window_ids": [],
       "tactical_secondary_draw_count": 2,

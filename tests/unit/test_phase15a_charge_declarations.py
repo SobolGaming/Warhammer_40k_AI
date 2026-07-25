@@ -10,6 +10,7 @@ from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, Paramet
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -1170,6 +1171,56 @@ def test_charge_phase_filters_ineligible_units() -> None:
     assert request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE
     assert {option.option_id for option in request.options} == {
         units["intercessor-5"].unit_instance_id,
+        COMPLETE_CHARGE_PHASE_OPTION_ID,
+    }
+
+
+@pytest.mark.parametrize("action_status", ["started", "completed", "interrupted"])
+def test_unit_that_started_action_this_turn_cannot_declare_charge(action_status: str) -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1", "intercessor-2"),
+        alpha_origins={
+            "intercessor-1": Pose.at(10.0, 20.0),
+            "intercessor-2": Pose.at(10.0, 25.0),
+        },
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 22.5),
+            model_count=5,
+        ),
+        game_id=f"phase15a-action-{action_status}",
+    )
+    state = _state(lifecycle)
+    unit_id = units["intercessor-1"].unit_instance_id
+    action_state = MissionActionState.start(
+        action_id=f"phase15a-action-{action_status}",
+        player_id="player-a",
+        unit_instance_id=unit_id,
+        target_id="phase15a-action-target",
+        mission_id="phase15a-action-mission",
+        battle_round=state.battle_round,
+        phase=BattlePhase.SHOOTING.value,
+        start_timing="shooting_phase",
+        completion_timing="immediate",
+        eligible_unit_instance_ids=(unit_id,),
+        interruption_conditions=("unit_moved",),
+        scoring_source_id="phase15a-action-source",
+        victory_points=0,
+    )
+    if action_status == "completed":
+        action_state = action_state.complete_without_award(
+            battle_round=state.battle_round,
+            phase=BattlePhase.SHOOTING.value,
+            completion_timing="immediate",
+        )
+    elif action_status == "interrupted":
+        action_state = action_state.interrupt(reason="unit_moved")
+    state.record_mission_action_state(action_state)
+
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+
+    assert request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE
+    assert {option.option_id for option in request.options} == {
+        units["intercessor-2"].unit_instance_id,
         COMPLETE_CHARGE_PHASE_OPTION_ID,
     }
 

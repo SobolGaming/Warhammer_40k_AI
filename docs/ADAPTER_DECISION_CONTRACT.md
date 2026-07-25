@@ -693,7 +693,64 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   only resolves the current Command-phase replacement window.
 - `discard_tactical_secondary_mission`: the engine emits one option for each non-empty set of active Tactical secondary cards the player can discard. Single-card options retain the `discard:<secondary_mission_id>` option shape, while multi-card options use `discard:<secondary_mission_id>+<secondary_mission_id>`. The request payload includes `legal_secondary_mission_ids`, `legal_secondary_mission_id_sets`, `discard_cp_reward_window_id`, and `discard_cp_reward_window_used`. The selected option payload includes the game, player, active player, battle round, phase, `secondary_mission_ids`, and `discard_cp_reward_window_id`. The lifecycle applies all selected discards and emits `tactical_secondary_missions_discarded`. Under Chapter Approved 2026-27, ordinary Tactical discard awards exactly 1 CP once for the active player's own-turn discard window, even when multiple active Tactical secondaries are discarded together. After that window is consumed, additional own-turn discard requests are unsupported until the lifecycle reaches a new source-backed discard window. Opponent-turn discards are legal but emit `command_point_reward_eligible: false` and no `command_point_gain`.
 - `score_tactical_secondary_mission`: when the engine records a source-backed `TacticalSecondaryAchievementContext` proving that a Tactical Secondary Mission Card's requirements have been achieved, it emits a finite choice for that context. Merely having an active Tactical card is not sufficient to emit this decision. The selected option payload includes the `achievement_id`, card identity, scoring rule ID, scoring rule condition, scoring rule source ID, scoring timing, phase/round/actor context, and JSON-safe achievement evidence. The `score:<secondary_mission_id>` option awards the source-backed VP, marks the card scored/non-active, consumes the achievement context, and emits `tactical_secondary_mission_scored` with `discarded_after_score: true`. The `retain:<secondary_mission_id>` option awards no VP, leaves the card active, consumes the finite achievement context, and emits `tactical_secondary_mission_score_declined`. Stale score/retain submissions are rejected before queue pop if the achievement context is missing, mismatched, stale, no longer source-valid, no longer matches the active card, the phase/round/actor drifted, or the source-backed scoring metadata changed.
-- `start_mission_action`: the engine emits legal source-backed Mission Action start options. Current support enumerates action/unit/target options for source-backed `objective_marker` actions such as Cleanse, `trappable_terrain_area` actions such as Death Trap's Booby Trap, and `plunderable_terrain_area` actions such as Plunder. Option payloads include `target_policy` and `target_kind`; `objective_marker` targets use objective marker IDs, while terrain-area targets use terrain feature IDs. `trappable_terrain_area` targets exclude terrain already trapped by that player and terrain fully within that player's deployment zone. `plunderable_terrain_area` targets exclude terrain fully within that player's deployment zone and are limited to one plundered terrain area per player turn. Cleanse objective targets exclude the player's home objective and objectives already selected for that player's Cleanse actions this turn. The engine filters units through the source `eligible_unit_policy`, excludes battle-shocked units and units that already shot when the action starts in the Shooting phase, and persists the selected `target_id` in `MissionActionState`. Immediate zero-VP actions complete in the same decision handler without creating a VP transaction; Booby Trap records an engine-owned terrain trap state for later primary scoring and Plunder records an engine-owned terrain plunder state for later secondary scoring. Turn-end zero-VP Cleanse completion validates objective control through the engine objective-control resolver and records an engine-owned objective cleanse state instead of creating a VP transaction. Mission Action target policies that are not yet represented as finite options must return a typed `unsupported` status instead of exposing an adapter mutation path.
+- `start_mission_action`: before ordinary Shooting-unit selection, the engine
+  automatically enumerates the active Primary Mission's supported Actions, the
+  active player's selected Fixed Secondary Actions, and the player's currently
+  active Tactical Secondary Actions. A single request contains every legal
+  `start:<mission_action_id>:<unit_instance_id>:<target_id>` option plus
+  `continue_to_shooting`. Each Action option has a unique human-readable label
+  containing its Action, canonical rules unit, and target names and IDs, so
+  generic CLI and projection clients do not need to decode the option ID or
+  payload to distinguish choices. The request carries `mission_action_opportunity: true`,
+  `legal_mission_action_ids`, `legal_action_option_ids`, and `legal_option_ids`;
+  selecting `continue_to_shooting` closes the persisted Shooting-phase
+  opportunity without mutating an Action. Starting one Action returns to the
+  same opportunity step so any remaining legal unit/target Actions can be
+  selected before the player continues to shooting. Direct requests for an
+  unselected Secondary Action are unsupported, and submissions drift invalid if
+  the held card set, active Primary, unit eligibility, geometry, target set,
+  round, phase, or actor changes before queue pop. Current support enumerates
+  source-backed `objective_marker` actions such as Cleanse and Terraform,
+  `trappable_terrain_area` actions such as Death Trap's Booby Trap, and
+  `plunderable_terrain_area` actions such as Plunder. Option payloads include
+  `target_policy` and `target_kind`; `objective_marker` targets use objective
+  marker IDs, while terrain-area targets use terrain feature IDs.
+  `trappable_terrain_area` targets exclude terrain already trapped by that
+  player and terrain fully within that player's deployment zone.
+  `plunderable_terrain_area` targets exclude terrain fully within that player's
+  deployment zone and are limited to one plundered terrain area per player
+  turn. Cleanse objective targets exclude the player's home objective and
+  objectives already selected for that player's Cleanse actions this turn. The
+  engine first applies the canonical general Action eligibility query, excluding
+  destroyed, embarked, reserve, `AIRCRAFT`, `FORTIFICATION`, Battle-shocked,
+  Objective Control 0 or `-`, non-`TITANIC` engaged, Advanced, Fallen Back,
+  already-shot, and already-Actioned rules units, and then applies the source
+  `eligible_unit_policy`. Attached units are enumerated once by canonical rules-unit
+  ID, combine component keywords and alive models, and use all component
+  placements for target geometry and objective control. `MissionActionState`
+  persists that canonical rules-unit ID and the selected `target_id`. A unit that
+  started an Action cannot declare a Charge for the rest of that turn even if the
+  Action completes immediately or is interrupted, and cannot shoot in that
+  Shooting phase unless its rules unit is `TITANIC`. Immediate zero-VP actions complete in the same
+  decision handler without creating a VP transaction; Booby Trap records an
+  engine-owned terrain trap state for later primary scoring and Plunder records
+  an engine-owned terrain plunder state for later secondary scoring. Turn-end
+  zero-VP Cleanse completion validates objective control through the engine
+  objective-control resolver and records an engine-owned objective cleanse
+  state instead of creating a VP transaction. Mission Action target policies
+  that are not yet represented as finite options return a typed `unsupported`
+  status instead of exposing an adapter mutation path.
+
+If destruction splits an Attached Unit, the engine interrupts each qualifying
+started Action before removing the canonical formation identity and emits one
+public `mission_action_interrupted` event per interrupted Action. The payload
+includes `action_id`, the canonical pre-split `unit_instance_id`,
+`surviving_unit_instance_ids`, `interrupted_reason: "unit_destroyed"`,
+`battle_round`, `phase`, and the serialized interrupted
+`mission_action_state`. Both players consume this through the ordinary
+viewer-scoped event stream, and replay preserves the same event payload. This
+uses the existing generic `EventRecord` payload contract and does not introduce
+a new decision, submission, or event-delta schema.
 
 These mission-scoring decision types must be submitted through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. Tests, replay, UI, CLI, network, and headless adapters must not call `GameState.discard_tactical_secondary(...)`, `GameState.score_secondary_mission(...)`, `GameState.record_tactical_secondary_replacement_use(...)`, or `GameState.record_mission_action_state(...)` directly for player choices; those methods are engine-owned primitives used by validated decision handlers and automatic rule hooks.
 

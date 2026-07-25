@@ -4015,6 +4015,7 @@ def _bodyguard_destroyed_split_state() -> GameState:
             "army-alpha:leader-unit",
             "army-alpha:support-unit",
         ),
+        event_log=EventLog(),
     )
     return state
 

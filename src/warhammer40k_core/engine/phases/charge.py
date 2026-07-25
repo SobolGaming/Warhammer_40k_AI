@@ -84,6 +84,9 @@ from warhammer40k_core.engine.faction_resources import (
     faction_resource_result_enriched_payload,
     resolve_faction_resource_refund_roll,
 )
+from warhammer40k_core.engine.mission_action_eligibility import (
+    rules_unit_started_mission_action_this_turn,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -2449,6 +2452,12 @@ def _charge_unit_ineligibility_reason(
         player_id=charge_state.active_player_id,
     ):
         return "charge_unit_off_battlefield"
+    if rules_unit_started_mission_action_this_turn(
+        state=state,
+        player_id=charge_state.active_player_id,
+        unit_instance_id=requested_unit_id,
+    ):
+        return "charge_unit_started_action"
     advanced_state = state.advanced_unit_state_for_unit(
         player_id=charge_state.active_player_id,
         battle_round=state.battle_round,

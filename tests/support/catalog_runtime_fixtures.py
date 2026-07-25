@@ -32,6 +32,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleStage,
@@ -49,6 +50,9 @@ from warhammer40k_core.engine.unit_factory import (
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
@@ -102,6 +106,8 @@ def battle_state_with_armies(
     active_player_id: str,
     phase: BattlePhase,
 ) -> GameState:
+    if len(armies) != 2:
+        raise AssertionError("Catalog runtime battle fixture requires exactly two armies.")
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     battle_phase_sequence = tuple(descriptor.battle_phase_sequence.phases)
     state = GameState(
@@ -117,6 +123,13 @@ def battle_state_with_armies(
         player_ids=tuple(army.player_id for army in armies),
         turn_order=tuple(army.player_id for army in armies),
         tactical_secondary_draw_count=2,
+        mission_setup=MissionSetup.from_mission_pack(
+            mission_pack=chapter_approved_2026_27_mission_pack(),
+            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+            attacker_player_id=armies[0].player_id,
+            defender_player_id=armies[1].player_id,
+        ),
     )
     for army in armies:
         state.record_army_definition(army)

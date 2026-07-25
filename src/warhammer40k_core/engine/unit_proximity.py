@@ -1,13 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
     geometry_model_for_placement,
 )
-from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
-from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
@@ -16,32 +14,36 @@ from warhammer40k_core.engine.rules_units import (
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
+
 
 def unit_within_enemy_engagement_range(
     *,
     state: GameState,
     unit_instance_id: str,
 ) -> bool:
-    if type(state) is not GameState:
-        raise GameLifecycleError("Engagement range check requires GameState.")
-    owner = _owner_for_unit(tuple(state.army_definitions), unit_instance_id=unit_instance_id)
+    _require_game_state(state, operation="Engagement range check")
+    source_view = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
     engagement_policy = state.runtime_ruleset_descriptor().engagement_policy
-    unit_models = _unit_geometry_models(state=state, unit_instance_id=unit_instance_id)
-    for army in state.army_definitions:
-        if army.player_id == owner:
+    unit_models = _geometry_models_for_alive_models(
+        state=state,
+        models=source_view.alive_models(),
+    )
+    for enemy_view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        if enemy_view.owner_player_id == source_view.owner_player_id:
             continue
-        for enemy_unit in army.units:
-            enemy_models = _unit_geometry_models(
-                state=state,
-                unit_instance_id=enemy_unit.unit_instance_id,
-            )
-            if _any_models_within_engagement_range(
-                unit_models,
-                enemy_models,
-                horizontal_inches=engagement_policy.horizontal_inches,
-                vertical_inches=engagement_policy.vertical_inches,
-            ):
-                return True
+        enemy_models = _geometry_models_for_alive_models(
+            state=state,
+            models=enemy_view.alive_models(),
+        )
+        if _any_models_within_engagement_range(
+            unit_models,
+            enemy_models,
+            horizontal_inches=engagement_policy.horizontal_inches,
+            vertical_inches=engagement_policy.vertical_inches,
+        ):
+            return True
     return False
 
 
@@ -52,8 +54,7 @@ def rules_unit_within_friendly_keyworded_models(
     required_keyword_sequence: tuple[str, ...],
     max_range_inches: float,
 ) -> bool:
-    if type(state) is not GameState:
-        raise GameLifecycleError("Keyworded-model proximity requires GameState.")
+    _require_game_state(state, operation="Keyworded-model proximity")
     if state.battlefield_state is None:
         raise GameLifecycleError("Keyworded-model proximity requires battlefield_state.")
     source_unit_id = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
@@ -96,8 +97,7 @@ def rules_unit_within_friendly_keyworded_units(
     required_keyword_sequence: tuple[str, ...],
     max_range_inches: float,
 ) -> bool:
-    if type(state) is not GameState:
-        raise GameLifecycleError("Keyworded-unit proximity requires GameState.")
+    _require_game_state(state, operation="Keyworded-unit proximity")
     if state.battlefield_state is None:
         raise GameLifecycleError("Keyworded-unit proximity requires battlefield_state.")
     source_unit_id = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
@@ -130,33 +130,6 @@ def rules_unit_within_friendly_keyworded_units(
         ):
             return True
     return False
-
-
-def _unit_geometry_models(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-) -> tuple[GeometryModel, ...]:
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Unit geometry lookup requires battlefield_state.")
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    unit_placement = state.battlefield_state.unit_placement_or_none(unit_instance_id)
-    if unit_placement is None:
-        return ()
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(model_placement),
-            placement=model_placement,
-        )
-        for model_placement in unit_placement.model_placements
-        if model_is_present_on_battlefield(
-            state=state,
-            model_instance_id=model_placement.model_instance_id,
-        )
-    )
 
 
 def _geometry_models_for_alive_models(
@@ -197,20 +170,19 @@ def _any_models_within_engagement_range(
     return False
 
 
-def _owner_for_unit(armies: tuple[ArmyDefinition, ...], *, unit_instance_id: str) -> str:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in armies:
-        if any(unit.unit_instance_id == requested_unit_id for unit in army.units):
-            return army.player_id
-    raise GameLifecycleError("Unit owner is unknown.")
-
-
 def _required_keyword_sequence(values: tuple[str, ...]) -> frozenset[str]:
     if type(values) is not tuple or not values:
         raise GameLifecycleError("required_keyword_sequence must be a non-empty tuple.")
     return frozenset(
         _validate_identifier("required_keyword_sequence value", value) for value in values
     )
+
+
+def _require_game_state(state: object, *, operation: str) -> None:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError(f"{operation} requires GameState.")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

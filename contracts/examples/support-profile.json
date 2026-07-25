@@ -442,7 +442,7 @@
     {
       "decision_type": "start_mission_action",
       "interaction_kinds": [
-        "confirmation"
+        "opportunity_window"
       ],
       "submission_kind": "finite"
     },

@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from itertools import combinations
 from typing import cast
 
-from warhammer40k_core.core.missions import MissionActionDefinition
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.actions import MissionActionState
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
-    PlacementError,
-    geometry_model_for_placement,
-)
+from warhammer40k_core.engine.battlefield_state import PlacementError
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
@@ -21,22 +15,33 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.mission_terrain import (
-    terrain_feature_within_player_deployment_zone,
-    terrain_feature_within_player_territory,
+from warhammer40k_core.engine.mission_action_options import (
+    SUPPORTED_MISSION_ACTION_TARGET_POLICIES as _SUPPORTED_MISSION_ACTION_TARGET_POLICIES,
 )
-from warhammer40k_core.engine.missions import mission_pack_for_id, mission_scoring_policy_from_setup
-from warhammer40k_core.engine.objective_control import (
-    ObjectiveControlContext,
-    ObjectiveControlTiming,
-    resolve_objective_control,
+from warhammer40k_core.engine.mission_action_options import (
+    available_mission_actions_for_state as _available_mission_actions_for_state,
 )
+from warhammer40k_core.engine.mission_action_options import (
+    mission_action_for_state as _mission_action_for_state,
+)
+from warhammer40k_core.engine.mission_action_options import (
+    mission_action_opportunity_drift_reason as _mission_action_opportunity_drift_reason,
+)
+from warhammer40k_core.engine.mission_action_options import (
+    mission_action_opportunity_options as _mission_action_opportunity_options,
+)
+from warhammer40k_core.engine.mission_action_options import (
+    mission_action_start_options as _mission_action_start_options,
+)
+from warhammer40k_core.engine.missions import mission_scoring_policy_from_setup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
@@ -45,15 +50,11 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     VictoryPointTransaction,
 )
-from warhammer40k_core.geometry import shapely_backend
-from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 TACTICAL_SECONDARY_SCORE_DECISION_TYPE = "score_tactical_secondary_mission"
 TACTICAL_SECONDARY_DISCARD_DECISION_TYPE = "discard_tactical_secondary_mission"
 START_MISSION_ACTION_DECISION_TYPE = "start_mission_action"
-_SUPPORTED_MISSION_ACTION_TARGET_POLICIES = frozenset(
-    ("objective_marker", "trappable_terrain_area", "plunderable_terrain_area")
-)
+DECLINE_MISSION_ACTION_START_OPTION_ID = "continue_to_shooting"
 MISSION_DECISION_TYPES = frozenset(
     (
         TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
@@ -63,42 +64,129 @@ MISSION_DECISION_TYPES = frozenset(
 )
 
 
-@dataclass(frozen=True, slots=True)
-class MissionActionStartOption:
-    action: MissionActionDefinition
-    unit_instance_id: str
-    target_id: str
-    eligible_unit_instance_ids: tuple[str, ...]
+def mission_decision_pauses_after_apply(request: DecisionRequest) -> bool:
+    if request.decision_type != START_MISSION_ACTION_DECISION_TYPE:
+        return False
+    payload = _payload_object(request.payload)
+    opportunity = payload.get("mission_action_opportunity")
+    if opportunity is not None and type(opportunity) is not bool:
+        raise GameLifecycleError("mission_action_opportunity must be a bool.")
+    return opportunity is not True
 
-    def option_id(self) -> str:
-        return f"start:{self.action.mission_action_id}:{self.unit_instance_id}:{self.target_id}"
 
-    def payload(
-        self,
-        *,
-        state: GameState,
-        player_id: str,
-        phase: BattlePhase,
-    ) -> JsonValue:
-        return {
+def request_mission_action_opportunity(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    player_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> LifecycleStatus | None:
+    _assert_battle_state(state)
+    _require_runtime_modifier_registry(runtime_modifier_registry)
+    requested_player = _validate_active_player_id(state=state, player_id=player_id)
+    phase = _current_phase(state)
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None:
+        raise GameLifecycleError("Mission Action opportunity requires ShootingPhaseState.")
+    if shooting_state.mission_action_opportunity_declined:
+        return None
+    relevant_actions = _available_mission_actions_for_state(
+        state=state,
+        player_id=requested_player,
+    )
+    unsupported_actions = tuple(
+        action
+        for action in relevant_actions
+        if action.start_phase == phase.value
+        and action.target_policy not in _SUPPORTED_MISSION_ACTION_TARGET_POLICIES
+    )
+    if unsupported_actions:
+        return LifecycleStatus.unsupported(
+            stage=state.stage,
+            message="A held Mission Action uses an unsupported target policy.",
+            payload={
+                "game_id": state.game_id,
+                "player_id": requested_player,
+                "mission_action_ids": [action.mission_action_id for action in unsupported_actions],
+                "target_policies": [action.target_policy for action in unsupported_actions],
+            },
+        )
+    options = _mission_action_opportunity_options(
+        state=state,
+        player_id=requested_player,
+        runtime_modifier_registry=runtime_modifier_registry,
+        relevant_actions=relevant_actions,
+    )
+    if not options:
+        return None
+    legal_action_option_id_values = [option.option_id() for option in options]
+    legal_action_option_ids = cast(list[JsonValue], legal_action_option_id_values)
+    legal_mission_action_ids = cast(
+        list[JsonValue],
+        sorted({option.action.mission_action_id for option in options}),
+    )
+    legal_option_ids = cast(
+        list[JsonValue],
+        sorted((*legal_action_option_id_values, DECLINE_MISSION_ACTION_START_OPTION_ID)),
+    )
+    opportunity_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "player_id": requested_player,
+        "battle_round": state.battle_round,
+        "phase": phase.value,
+        "mission_action_opportunity": True,
+        "legal_mission_action_ids": legal_mission_action_ids,
+        "legal_action_option_ids": legal_action_option_ids,
+        "legal_option_ids": legal_option_ids,
+    }
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=START_MISSION_ACTION_DECISION_TYPE,
+        actor_id=requested_player,
+        payload=opportunity_payload,
+        options=(
+            *(
+                DecisionOption(
+                    option_id=option.option_id(),
+                    label=option.label(state=state),
+                    payload={
+                        **option.payload(
+                            state=state,
+                            player_id=requested_player,
+                            phase=phase,
+                        ),
+                        "mission_action_opportunity": True,
+                        "legal_action_option_ids": legal_action_option_ids,
+                    },
+                )
+                for option in options
+            ),
+            DecisionOption(
+                option_id=DECLINE_MISSION_ACTION_START_OPTION_ID,
+                label="Continue to shooting",
+                payload={
+                    "game_id": state.game_id,
+                    "player_id": requested_player,
+                    "battle_round": state.battle_round,
+                    "phase": phase.value,
+                    "mission_action_opportunity": True,
+                    "legal_action_option_ids": legal_action_option_ids,
+                },
+            ),
+        ),
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
             "game_id": state.game_id,
-            "player_id": player_id,
-            "battle_round": state.battle_round,
-            "phase": phase.value,
-            "mission_action_id": self.action.mission_action_id,
-            "mission_id": self.action.mission_id,
-            "mission_kind": self.action.mission_kind,
-            "unit_instance_id": self.unit_instance_id,
-            "target_id": self.target_id,
-            "target_kind": _target_kind_for_policy(self.action.target_policy),
-            "target_policy": self.action.target_policy,
-            "start_timing": self.action.start_timing,
-            "completion_timing": self.action.completion_timing,
-            "eligible_unit_instance_ids": list(self.eligible_unit_instance_ids),
-            "interruption_conditions": list(self.action.interruption_conditions),
-            "scoring_source_id": self.action.scoring_source_id,
-            "victory_points": self.action.victory_points,
-        }
+            "player_id": requested_player,
+            "decision_type": START_MISSION_ACTION_DECISION_TYPE,
+            "mission_action_opportunity": True,
+            "legal_action_option_count": len(legal_action_option_ids),
+        },
+    )
 
 
 def request_tactical_secondary_discard(
@@ -275,21 +363,27 @@ def request_mission_action_start(
     decisions: DecisionController,
     player_id: str,
     mission_action_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus:
     _assert_battle_state(state)
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     requested_player = _validate_active_player_id(state=state, player_id=player_id)
     phase = _current_phase(state)
     mission_action = _mission_action_for_state(state=state, mission_action_id=mission_action_id)
     mission_setup = state.mission_setup
     if mission_setup is None:
         raise GameLifecycleError("Mission Action start requires MissionSetup.")
-    if (
-        mission_action.mission_kind == "primary"
-        and mission_action.mission_id != mission_setup.primary_mission_id
-    ):
+    available_action_ids = {
+        action.mission_action_id
+        for action in _available_mission_actions_for_state(
+            state=state,
+            player_id=requested_player,
+        )
+    }
+    if mission_action.mission_action_id not in available_action_ids:
         return LifecycleStatus.unsupported(
             stage=state.stage,
-            message="Primary Mission Action does not belong to the active primary mission.",
+            message="Mission Action does not belong to the active Primary or a held Secondary.",
             payload={
                 "game_id": state.game_id,
                 "player_id": requested_player,
@@ -325,6 +419,7 @@ def request_mission_action_start(
         state=state,
         player_id=requested_player,
         action=mission_action,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if not options:
         return LifecycleStatus.unsupported(
@@ -351,7 +446,7 @@ def request_mission_action_start(
         options=tuple(
             DecisionOption(
                 option_id=option.option_id(),
-                label=f"Start {option.action.mission_action_id}",
+                label=option.label(state=state),
                 payload=option.payload(
                     state=state,
                     player_id=requested_player,
@@ -378,7 +473,9 @@ def invalid_mission_decision_status(
     state: GameState,
     request: DecisionRequest,
     result: DecisionResult,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     if request.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
         payload = _payload_object(result.payload)
         player_id = _payload_string(payload, key="player_id")
@@ -476,9 +573,6 @@ def invalid_mission_decision_status(
     if request.decision_type == START_MISSION_ACTION_DECISION_TYPE:
         payload = _payload_object(result.payload)
         player_id = _payload_string(payload, key="player_id")
-        mission_action_id = _payload_string(payload, key="mission_action_id")
-        unit_instance_id = _payload_string(payload, key="unit_instance_id")
-        target_id = _payload_string(payload, key="target_id")
         drift_reason = _decision_context_drift_reason(
             state=state,
             payload=payload,
@@ -492,27 +586,80 @@ def invalid_mission_decision_status(
                 payload={
                     "game_id": state.game_id,
                     "player_id": player_id,
-                    "mission_action_id": mission_action_id,
-                    "unit_instance_id": unit_instance_id,
-                    "target_id": target_id,
                     "invalid_reason": drift_reason,
                 },
             )
+        opportunity = payload.get("mission_action_opportunity")
+        if opportunity is not None and type(opportunity) is not bool:
+            raise GameLifecycleError("mission_action_opportunity must be a bool.")
+        if opportunity is True:
+            opportunity_drift_reason = _mission_action_opportunity_drift_reason(
+                state=state,
+                payload=payload,
+                player_id=player_id,
+                runtime_modifier_registry=runtime_modifier_registry,
+            )
+            if opportunity_drift_reason is not None:
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Mission Action opportunity option drifted.",
+                    payload={
+                        "game_id": state.game_id,
+                        "player_id": player_id,
+                        "invalid_reason": opportunity_drift_reason,
+                    },
+                )
+        if result.selected_option_id == DECLINE_MISSION_ACTION_START_OPTION_ID:
+            if opportunity is not True:
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Mission Action decline requires an engine-owned opportunity.",
+                    payload={
+                        "game_id": state.game_id,
+                        "player_id": player_id,
+                        "invalid_reason": "missing_mission_action_opportunity",
+                    },
+                )
+            return None
+        mission_action_id = _payload_string(payload, key="mission_action_id")
+        unit_instance_id = _payload_string(payload, key="unit_instance_id")
+        target_id = _payload_string(payload, key="target_id")
         try:
             action = _mission_action_for_state(
                 state=state,
                 mission_action_id=mission_action_id,
             )
+            available_action_ids = {
+                available_action.mission_action_id
+                for available_action in _available_mission_actions_for_state(
+                    state=state,
+                    player_id=player_id,
+                )
+            }
             option_ids = {
                 option.option_id()
                 for option in _mission_action_start_options(
                     state=state,
                     player_id=player_id,
                     action=action,
+                    runtime_modifier_registry=runtime_modifier_registry,
                 )
             }
         except PlacementError as exc:
             raise GameLifecycleError("Mission Action drift validation failed.") from exc
+        if action.mission_action_id not in available_action_ids:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Mission Action start option drifted.",
+                payload={
+                    "game_id": state.game_id,
+                    "player_id": player_id,
+                    "mission_action_id": mission_action_id,
+                    "unit_instance_id": unit_instance_id,
+                    "target_id": target_id,
+                    "invalid_reason": "mission_action_not_held",
+                },
+            )
         if f"start:{mission_action_id}:{unit_instance_id}:{target_id}" not in option_ids:
             return LifecycleStatus.invalid(
                 stage=state.stage,
@@ -534,7 +681,9 @@ def apply_mission_decision(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     if result.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
         _apply_tactical_secondary_score(state=state, result=result, decisions=decisions)
         return
@@ -542,7 +691,20 @@ def apply_mission_decision(
         _apply_tactical_secondary_discard(state=state, result=result, decisions=decisions)
         return
     if result.decision_type == START_MISSION_ACTION_DECISION_TYPE:
-        _apply_start_mission_action(state=state, result=result, decisions=decisions)
+        if result.selected_option_id == DECLINE_MISSION_ACTION_START_OPTION_ID:
+            _apply_mission_action_opportunity_decline(
+                state=state,
+                result=result,
+                decisions=decisions,
+                runtime_modifier_registry=runtime_modifier_registry,
+            )
+            return
+        _apply_start_mission_action(
+            state=state,
+            result=result,
+            decisions=decisions,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
         return
     raise GameLifecycleError("Mission decision handler received unsupported decision_type.")
 
@@ -680,8 +842,10 @@ def _apply_start_mission_action(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
     _assert_battle_state(state)
+    _require_runtime_modifier_registry(runtime_modifier_registry)
     payload = _payload_object(result.payload)
     player_id = _payload_string(payload, key="player_id")
     _validate_decision_context(state=state, payload=payload, player_id=player_id, result=result)
@@ -689,10 +853,16 @@ def _apply_start_mission_action(
         state=state,
         mission_action_id=_payload_string(payload, key="mission_action_id"),
     )
+    unit_instance_id = _payload_string(payload, key="unit_instance_id")
+    if rules_unit_is_battle_shocked(
+        state=state,
+        unit_instance_id=unit_instance_id,
+    ):
+        raise GameLifecycleError("Battle-shocked units cannot start actions.")
     action_state = MissionActionState.start(
         action_id=f"mission-action:{result.result_id}",
         player_id=player_id,
-        unit_instance_id=_payload_string(payload, key="unit_instance_id"),
+        unit_instance_id=unit_instance_id,
         target_id=_payload_string(payload, key="target_id"),
         mission_id=mission_action.mission_id,
         battle_round=state.battle_round,
@@ -794,374 +964,42 @@ def _apply_start_mission_action(
     )
 
 
-def _mission_action_start_options(
+def _apply_mission_action_opportunity_decline(
     *,
     state: GameState,
-    player_id: str,
-    action: MissionActionDefinition,
-) -> tuple[MissionActionStartOption, ...]:
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Mission Action start requires battlefield_state.")
-    if state.mission_setup is None:
-        raise GameLifecycleError("Mission Action start requires MissionSetup.")
-    if action.target_policy not in _SUPPORTED_MISSION_ACTION_TARGET_POLICIES:
-        raise GameLifecycleError("Unsupported Mission Action target policy.")
-    placed_army = battlefield_state.placed_army_for_player_or_none(player_id)
-    if placed_army is None:
-        return ()
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=battlefield_state,
-    )
-    eligible_unit_ids = _eligible_unit_instance_ids_for_action(
-        scenario=scenario,
-        unit_placements=placed_army.unit_placements,
-        action=action,
-    )
-    target_ids_by_unit = _target_ids_by_unit_for_action(
+    result: DecisionResult,
+    decisions: DecisionController,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> None:
+    _assert_battle_state(state)
+    payload = _payload_object(result.payload)
+    player_id = _payload_string(payload, key="player_id")
+    _validate_decision_context(state=state, payload=payload, player_id=player_id, result=result)
+    if not _payload_bool(payload, key="mission_action_opportunity"):
+        raise GameLifecycleError("Mission Action decline requires an opportunity payload.")
+    drift_reason = _mission_action_opportunity_drift_reason(
         state=state,
+        payload=payload,
         player_id=player_id,
-        action=action,
-        scenario=scenario,
-        placed_unit_ids=eligible_unit_ids,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
-    eligible_target_pairs = tuple(
-        (unit_id, target_id)
-        for unit_id in eligible_unit_ids
-        for target_id in target_ids_by_unit.get(unit_id, ())
-        if unit_id not in state.battle_shocked_unit_ids
-        and not _unit_has_shot_this_shooting_phase(state=state, unit_instance_id=unit_id)
-    )
-    if not eligible_target_pairs:
-        return ()
-    return tuple(
-        MissionActionStartOption(
-            action=action,
-            unit_instance_id=unit_id,
-            target_id=target_id,
-            eligible_unit_instance_ids=eligible_unit_ids,
-        )
-        for unit_id, target_id in eligible_target_pairs
-    )
-
-
-def _eligible_unit_instance_ids_for_action(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placements: tuple[object, ...],
-    action: MissionActionDefinition,
-) -> tuple[str, ...]:
-    from warhammer40k_core.engine.battlefield_state import UnitPlacement
-
-    eligible_ids: list[str] = []
-    for placement in unit_placements:
-        if type(placement) is not UnitPlacement:
-            raise GameLifecycleError("Mission Action options require UnitPlacement values.")
-        unit = scenario.unit_instance_for_placement(placement)
-        if _unit_matches_eligible_policy(unit.keywords, action.eligible_unit_policy):
-            eligible_ids.append(placement.unit_instance_id)
-    return tuple(sorted(eligible_ids))
-
-
-def _target_ids_by_unit_for_action(
-    *,
-    state: GameState,
-    player_id: str,
-    action: MissionActionDefinition,
-    scenario: BattlefieldScenario,
-    placed_unit_ids: tuple[str, ...],
-) -> dict[str, tuple[str, ...]]:
-    if action.target_policy == "objective_marker":
-        return _objective_marker_target_ids_by_unit(
-            state=state,
-            player_id=player_id,
-            action=action,
-        )
-    if action.target_policy == "trappable_terrain_area":
-        return _trappable_terrain_target_ids_by_unit(
-            state=state,
-            player_id=player_id,
-            scenario=scenario,
-            placed_unit_ids=placed_unit_ids,
-        )
-    if action.target_policy == "plunderable_terrain_area":
-        return _plunderable_terrain_target_ids_by_unit(
-            state=state,
-            player_id=player_id,
-            scenario=scenario,
-            placed_unit_ids=placed_unit_ids,
-        )
-    raise GameLifecycleError("Unsupported Mission Action target policy.")
-
-
-def _unit_matches_eligible_policy(
-    keywords: tuple[str, ...],
-    eligible_unit_policy: str,
-) -> bool:
-    policy = _validate_identifier("eligible_unit_policy", eligible_unit_policy)
-    keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
-    if policy == "active_player_unit":
-        return True
-    if policy == "active_player_infantry_or_battleline_unit":
-        return bool(keyword_set.intersection({"INFANTRY", "BATTLELINE"}))
-    raise GameLifecycleError("Unsupported Mission Action eligible unit policy.")
-
-
-def _objective_marker_target_ids_by_unit(
-    *,
-    state: GameState,
-    player_id: str,
-    action: MissionActionDefinition,
-) -> dict[str, tuple[str, ...]]:
-    record = resolve_objective_control(
-        ObjectiveControlContext.from_game_state(
-            state,
-            timing=ObjectiveControlTiming.PHASE_END,
-            phase=_current_phase(state),
-            ruleset_descriptor=state.runtime_ruleset_descriptor(),
-        )
-    )
-    home_objective_ids: frozenset[str]
-    already_actioned_objective_ids: set[str]
-    if action.mission_action_id == "cleanse-objective":
-        home_objective_ids = _home_objective_ids_for_player(state=state, player_id=player_id)
-        already_actioned_objective_ids = {
-            action_state.target_id
-            for action_state in state.mission_action_states
-            if action_state.player_id == player_id
-            and action_state.mission_id == action.mission_id
-            and action_state.battle_round_started == state.battle_round
-        }
-    else:
-        home_objective_ids = frozenset()
-        already_actioned_objective_ids = set()
-    targets_by_unit: dict[str, set[str]] = {}
-    for result in record.results:
-        if result.objective_id in home_objective_ids:
-            continue
-        if result.objective_id in already_actioned_objective_ids:
-            continue
-        for contribution in result.contributors:
-            if contribution.player_id != player_id:
-                continue
-            targets_by_unit.setdefault(contribution.unit_instance_id, set()).add(
-                result.objective_id
-            )
-    return {
-        unit_id: tuple(sorted(target_ids))
-        for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
-    }
-
-
-def _trappable_terrain_target_ids_by_unit(
-    *,
-    state: GameState,
-    player_id: str,
-    scenario: BattlefieldScenario,
-    placed_unit_ids: tuple[str, ...],
-) -> dict[str, tuple[str, ...]]:
-    if state.mission_setup is None:
-        raise GameLifecycleError("Trappable terrain Mission Action requires MissionSetup.")
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Trappable terrain Mission Action requires battlefield_state.")
-    requested_player = _validate_player_id(state=state, player_id=player_id)
-    eligible_unit_ids = set(
-        _validate_identifier_tuple(
-            "placed_unit_ids",
-            placed_unit_ids,
-            min_length=0,
-            sort_values=True,
-        )
-    )
-    trapped_feature_ids = {
-        trap.terrain_feature_id
-        for trap in state.primary_terrain_trap_states
-        if trap.player_id == requested_player
-    }
-    candidate_features = tuple(
-        feature
-        for feature in state.mission_setup.terrain_features
-        if feature.feature_id not in trapped_feature_ids
-        and not terrain_feature_within_player_deployment_zone(
-            feature,
-            mission_setup=state.mission_setup,
-            player_id=requested_player,
-        )
-    )
-    if not candidate_features:
-        return {}
-    placed_army = battlefield_state.placed_army_for_player_or_none(requested_player)
-    if placed_army is None:
-        return {}
-    targets_by_unit: dict[str, set[str]] = {}
-    for unit_placement in placed_army.unit_placements:
-        if unit_placement.unit_instance_id not in eligible_unit_ids:
-            continue
-        for model_placement in unit_placement.model_placements:
-            model = geometry_model_for_placement(
-                model=scenario.model_instance_for_placement(model_placement),
-                placement=model_placement,
-            )
-            for feature in candidate_features:
-                if _model_is_within_terrain_area(model=model, feature=feature):
-                    targets_by_unit.setdefault(unit_placement.unit_instance_id, set()).add(
-                        feature.feature_id
-                    )
-    return {
-        unit_id: tuple(sorted(target_ids))
-        for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
-    }
-
-
-def _plunderable_terrain_target_ids_by_unit(
-    *,
-    state: GameState,
-    player_id: str,
-    scenario: BattlefieldScenario,
-    placed_unit_ids: tuple[str, ...],
-) -> dict[str, tuple[str, ...]]:
-    if any(
-        plunder.player_id == player_id
-        and plunder.battle_round == state.battle_round
-        and plunder.active_player_id == _active_player_id(state)
-        for plunder in state.secondary_terrain_plunder_states
-    ):
-        return {}
-    return _terrain_area_target_ids_by_unit(
-        state=state,
-        player_id=player_id,
-        scenario=scenario,
-        placed_unit_ids=placed_unit_ids,
-        excluded_feature_ids=(),
-    )
-
-
-def _terrain_area_target_ids_by_unit(
-    *,
-    state: GameState,
-    player_id: str,
-    scenario: BattlefieldScenario,
-    placed_unit_ids: tuple[str, ...],
-    excluded_feature_ids: tuple[str, ...],
-) -> dict[str, tuple[str, ...]]:
-    if state.mission_setup is None:
-        raise GameLifecycleError("Terrain area Mission Action requires MissionSetup.")
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Terrain area Mission Action requires battlefield_state.")
-    requested_player = _validate_player_id(state=state, player_id=player_id)
-    eligible_unit_ids = set(
-        _validate_identifier_tuple(
-            "placed_unit_ids",
-            placed_unit_ids,
-            min_length=0,
-            sort_values=True,
-        )
-    )
-    excluded_ids = set(
-        _validate_identifier_tuple(
-            "excluded_feature_ids",
-            excluded_feature_ids,
-            min_length=0,
-            sort_values=True,
-        )
-    )
-    candidate_features = tuple(
-        feature
-        for feature in state.mission_setup.terrain_features
-        if feature.feature_id not in excluded_ids
-        and not terrain_feature_within_player_territory(
-            feature,
-            mission_setup=state.mission_setup,
-            player_id=requested_player,
-        )
-    )
-    if not candidate_features:
-        return {}
-    placed_army = battlefield_state.placed_army_for_player_or_none(requested_player)
-    if placed_army is None:
-        return {}
-    targets_by_unit: dict[str, set[str]] = {}
-    for unit_placement in placed_army.unit_placements:
-        if unit_placement.unit_instance_id not in eligible_unit_ids:
-            continue
-        for model_placement in unit_placement.model_placements:
-            model = geometry_model_for_placement(
-                model=scenario.model_instance_for_placement(model_placement),
-                placement=model_placement,
-            )
-            for feature in candidate_features:
-                if _model_is_within_terrain_area(model=model, feature=feature):
-                    targets_by_unit.setdefault(unit_placement.unit_instance_id, set()).add(
-                        feature.feature_id
-                    )
-    return {
-        unit_id: tuple(sorted(target_ids))
-        for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
-    }
-
-
-def _home_objective_ids_for_player(
-    *,
-    state: GameState,
-    player_id: str,
-) -> frozenset[str]:
-    if state.mission_setup is None:
-        raise GameLifecycleError("Home objective lookup requires MissionSetup.")
-    requested_player = _validate_player_id(state=state, player_id=player_id)
-    zones = tuple(
-        zone for zone in state.mission_setup.deployment_zones if zone.player_id == requested_player
-    )
-    return frozenset(
-        marker.objective_marker_id
-        for marker in state.mission_setup.objective_markers
-        if any(zone.contains_point(marker.x_inches, marker.y_inches) for zone in zones)
-    )
-
-
-def _model_is_within_terrain_area(
-    *,
-    model: object,
-    feature: TerrainFeatureDefinition,
-) -> bool:
-    from warhammer40k_core.geometry.volume import Model as GeometryModel
-
-    if type(model) is not GeometryModel:
-        raise GameLifecycleError("terrain target check requires a GeometryModel.")
-    if type(feature) is not TerrainFeatureDefinition:
-        raise GameLifecycleError("terrain target check requires TerrainFeatureDefinition.")
-    return (
-        shapely_backend.base_footprint_distance_to_bounds(
-            model.base,
-            model.pose,
-            feature.bounds(),
-        )
-        == 0.0
-    )
-
-
-def _target_kind_for_policy(target_policy: str) -> str:
-    policy = _validate_identifier("target_policy", target_policy)
-    if policy == "objective_marker":
-        return "objective_marker"
-    if policy in {"trappable_terrain_area", "plunderable_terrain_area"}:
-        return "terrain_feature"
-    raise GameLifecycleError("Unsupported Mission Action target policy.")
-
-
-def _unit_has_shot_this_shooting_phase(*, state: GameState, unit_instance_id: str) -> bool:
-    if _current_phase(state) is not BattlePhase.SHOOTING:
-        return False
+    if drift_reason is not None:
+        raise GameLifecycleError(f"Mission Action opportunity drifted: {drift_reason}.")
     shooting_state = state.shooting_phase_state
     if shooting_state is None:
-        return False
-    return unit_instance_id in shooting_state.shot_unit_ids
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return _validate_identifier("keyword", keyword).replace("-", " ").replace("_", " ").upper()
+        raise GameLifecycleError("Mission Action decline requires ShootingPhaseState.")
+    state.replace_shooting_phase_state(shooting_state.with_mission_action_opportunity_declined())
+    decisions.event_log.append(
+        "mission_action_opportunity_declined",
+        {
+            "game_id": state.game_id,
+            "player_id": player_id,
+            "battle_round": state.battle_round,
+            "phase": _current_phase(state).value,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+        },
+    )
 
 
 def _active_tactical_secondary_cards(
@@ -1202,17 +1040,6 @@ def _tactical_secondary_discard_option_id(card_ids: tuple[str, ...]) -> str:
         sort_values=False,
     )
     return f"discard:{'+'.join(card_ids)}"
-
-
-def _mission_action_for_state(
-    *,
-    state: GameState,
-    mission_action_id: str,
-) -> MissionActionDefinition:
-    if state.mission_setup is None:
-        raise GameLifecycleError("Mission Action start requires MissionSetup.")
-    mission_pack = mission_pack_for_id(state.mission_setup.mission_pack_id)
-    return mission_pack.mission_action(mission_action_id)
 
 
 def _validate_decision_context(
@@ -1509,6 +1336,11 @@ def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"Mission decision payload key must be a bool: {key}.")
     return value
+
+
+def _require_runtime_modifier_registry(registry: object) -> None:
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Mission decisions require a RuntimeModifierRegistry.")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -23,7 +23,6 @@ LEGACY_OVERSIZED_MODULE_LIMITS = {
     "src/warhammer40k_core/engine/fight_resolution.py": 3324,
     "src/warhammer40k_core/engine/game_state.py": 7360,
     "src/warhammer40k_core/engine/lifecycle.py": 3921,
-    "src/warhammer40k_core/engine/mission_decisions.py": 1560,
     "src/warhammer40k_core/engine/phases/charge.py": 3881,
     "src/warhammer40k_core/engine/phases/fight.py": 4065,
     "src/warhammer40k_core/engine/prebattle.py": 3546,

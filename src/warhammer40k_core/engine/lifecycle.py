@@ -172,9 +172,9 @@ from warhammer40k_core.engine.lifecycle_state_queries import (
 )
 from warhammer40k_core.engine.mission_decisions import (
     MISSION_DECISION_TYPES,
-    START_MISSION_ACTION_DECISION_TYPE,
     apply_mission_decision,
     invalid_mission_decision_status,
+    mission_decision_pauses_after_apply,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
@@ -2064,6 +2064,7 @@ class GameLifecycle:
             state=self._require_state(),
             request=request,
             result=result,
+            runtime_modifier_registry=self._shooting_phase_handler.runtime_modifier_registry,
         )
 
     def _apply_mission_decision(
@@ -2076,12 +2077,13 @@ class GameLifecycle:
             state=state,
             result=result,
             decisions=self.decision_controller,
+            runtime_modifier_registry=self._shooting_phase_handler.runtime_modifier_registry,
         )
-        if record.request.decision_type == START_MISSION_ACTION_DECISION_TYPE:
+        if mission_decision_pauses_after_apply(record.request):
             return LifecycleStatus.advanced(
                 stage=state.stage,
                 payload={
-                    "decision_type": START_MISSION_ACTION_DECISION_TYPE,
+                    "decision_type": record.request.decision_type,
                     "result_id": result.result_id,
                 },
             )

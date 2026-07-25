@@ -1625,6 +1625,19 @@ Invariants:
   using default scoring amounts;
 - player-facing Tactical discard and supported mission Action start selections use
   finite `DecisionRequest` options through `GameLifecycle.submit_decision(...)`;
+- the Shooting lifecycle automatically emits one ownership-filtered Mission
+  Action opportunity before ordinary unit selection, aggregating the active
+  Primary, selected Fixed Secondaries, and active Tactical cards with an
+  explicit continue-to-shooting option;
+- Mission Action choices use canonical attached rules-unit identities, combined
+  keywords and alive models, group-aware objective/terrain geometry, and
+  unique Action/unit/target option labels;
+- the shared general Action eligibility query rejects `AIRCRAFT`,
+  `FORTIFICATION`, Battle-shocked, Objective Control 0 or `-`, non-`TITANIC`
+  engaged, Advanced, Fallen Back, already-shot, and already-Actioned rules
+  units before applying source-specific eligibility;
+- starting an Action prevents Charge declarations until turn end and prevents
+  ordinary Shooting-phase selection except for `TITANIC` rules units;
 - mission Actions have source-backed start timing, eligible units, target IDs,
   interruption conditions, completion timing, and scoring effects;
 - the mission deck grants two Secondary Missions per player turn;
@@ -1655,8 +1668,16 @@ Required tests:
 - New Orders emits deterministic Stratagem, CP, discard, and replacement-draw
   records, rejects second use in the same game, and cannot be confused with
   ordinary Tactical discard;
-- mission Action can start through the lifecycle decision path, persist its target,
-  filter ineligible units, complete, be interrupted, and score;
+- mission Action opportunity is generated through `LocalGameSession` phase
+  advancement, is visible through viewer-scoped projection, can be declined
+  into ordinary shooting, and remains available when no unit has a legal
+  shooting attack;
+- mission Action can start through the lifecycle decision path, persist its
+  canonical rules-unit identity and target, enforce Primary/Secondary ownership,
+  filter every general and source-specific ineligibility independently, apply
+  attached-unit group geometry, expose unique projected/CLI labels, complete,
+  be interrupted, prevent Charges, apply the `TITANIC` shooting exception, and
+  score;
 - source package payloads round-trip and preserve 11th Edition mission/scoring/action snapshots;
 - end-of-turn coherency cleanup removes models without destroyed triggers;
 - unarrived Reserves are destroyed at the configured deadline through the lifecycle hook;
@@ -2622,7 +2643,7 @@ Status: Complete.
 
 Phase 14F completes the shooting-type cutover. The active player selects an eligible unit, then answers the finite `select_shooting_type` decision before the engine emits the parameterized shooting declaration request. The selected shooting type is preserved through declarations, attack pools, replay payloads, supported grouped attack resolution, allocation-order decisions, saves, damage, and Fire Overwatch Snap Shooting. Phase 14E supplies the grouped attack/allocation host used by this shooting cutover.
 
-Indirect and Snap Shooting now attach deterministic no-Hit-reroll rule IDs to Hit-roll specs, and the dice/Command Re-roll paths reject reroll windows for those rolls before mutation. Units that shoot in the Shooting phase are excluded from Mission Action start options until the phase ends through the shared action decision path.
+Indirect and Snap Shooting now attach deterministic no-Hit-reroll rule IDs to Hit-roll specs, and the dice/Command Re-roll paths reject reroll windows for those rolls before mutation. Units that shoot in the Shooting phase are excluded from Mission Action start options until the phase ends through the shared action decision path. Units that start a Mission Action are excluded from ordinary Shooting-phase selection unless their canonical rules unit is `TITANIC`.
 
 Invariants:
 
@@ -2635,6 +2656,8 @@ Invariants:
 - Indirect shooting can only declare `[INDIRECT FIRE]` weapon profiles, grants cover, forbids hit rerolls, and has the 1-5/1-3 unmodified fail policy;
 - Snap Shooting targets one visible enemy unit within 24", hits only on unmodified 6, and forbids Hit-roll rerolls;
 - after a unit shoots in the Shooting phase, it cannot start a Mission Action until the phase ends.
+- after a unit starts a Mission Action, it cannot shoot in that Shooting phase
+  unless its canonical rules unit is `TITANIC`.
 
 Required tests:
 

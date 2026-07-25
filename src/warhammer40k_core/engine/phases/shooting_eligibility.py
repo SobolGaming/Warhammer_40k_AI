@@ -82,6 +82,11 @@ def _legal_shooting_unit_ids(
             unit_id in shooting_state.selected_unit_ids
             or unit_id in shooting_state.shot_unit_ids
             or unit_id in shooting_state.skipped_unit_ids
+            or mission_action_prevents_rules_unit_from_shooting_this_phase(
+                state=state,
+                player_id=active_player_id,
+                unit_instance_id=unit_id,
+            )
         ):
             continue
         rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)

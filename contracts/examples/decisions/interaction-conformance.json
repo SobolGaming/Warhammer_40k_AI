@@ -3777,10 +3777,10 @@
             "submission_schema_ref": "finite-submission.schema.json"
           },
           "display_hints": {
-            "confirm_label": "Confirm",
-            "decline_label": null
+            "confirm_label": "Resolve Opportunity",
+            "decline_label": "Decline"
           },
-          "interaction_kind": "confirmation",
+          "interaction_kind": "opportunity_window",
           "proposal_kind": null,
           "required_inputs": [
             "selected_option"
@@ -3790,8 +3790,8 @@
           "submission_kind": "finite",
           "submission_variants": [
             {
-              "display_label": "Confirm",
-              "interaction_kind": "confirmation",
+              "display_label": "Resolve Opportunity",
+              "interaction_kind": "opportunity_window",
               "proposal_schema_ref": null,
               "required_inputs": [
                 "selected_option"

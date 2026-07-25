@@ -593,7 +593,7 @@
       "decision_type": "start_mission_action",
       "example_path": null,
       "interaction_kinds": [
-        "confirmation"
+        "opportunity_window"
       ],
       "registry_scope": "registered",
       "submission_kind": "finite"

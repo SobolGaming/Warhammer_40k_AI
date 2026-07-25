@@ -261,7 +261,7 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
         ),
         "select_triggered_movement": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
         "select_weapon_ability_instance": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
-        "start_mission_action": InteractionSpec(InteractionKind.CONFIRMATION),
+        "start_mission_action": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
         "use_stratagem": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
     }
 )
