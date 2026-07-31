@@ -287,10 +287,12 @@ def test_emperors_children_semantic_rows_name_every_reviewed_ability() -> None:
     }
 
     def normalized_name(value: str) -> str:
-        return value.replace("\u2019", "'").split(" (", 1)[0].casefold()
+        return value.replace("\u2019", "'").casefold()
 
     for assignment in assignments:
         source_name = assignment["name"] or ability_names_by_id[assignment["ability_id"]]
+        if assignment["parameter"]:
+            source_name = f"{source_name} {assignment['parameter']}"
         semantic_columns = " ".join(rendered_rows[assignment["datasheet_id"]].split("|")[4:6])
         assert normalized_name(source_name) in normalized_name(semantic_columns), (
             assignment["datasheet_id"],

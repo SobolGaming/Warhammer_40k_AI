@@ -2,62 +2,20 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from warhammer40k_core.rules.external_reference_lookup import (
-    THIRTY_NINE_K_PRO_TARGET_EDITION,
-    ExternalReferenceKind,
-    verify_thirty_nine_k_pro_reference_url,
-)
+if TYPE_CHECKING or __package__:
+    from tools.emperors_children_39k_pro_audit import (
+        emperors_children_thirty_nine_k_pro_audit,
+    )
+else:
+    from emperors_children_39k_pro_audit import emperors_children_thirty_nine_k_pro_audit
 
 EMPERORS_CHILDREN_FACTION_ID = "emperors-children"
 
 _EMPERORS_CHILDREN_GROUP = "Emperor's Children"
 _VEHICLES_GROUP = "Vehicles and Daemon Engines"
 _SLAANESH_DAEMONS_GROUP = "Slaanesh Daemons"
-
-_THIRTY_NINE_K_PRO_AUDIT_DATE = "31 July 2026"
-_THIRTY_NINE_K_PRO_FACTION_URL = "https://39k.pro/faction/uyQevAixq5I"
-_THIRTY_NINE_K_PRO_DATASHEET_ID_BY_SOURCE_ID = {
-    "000004077": "hUMCUGv2Rtw",
-    "000004078": "LrNhuqtvb0g",
-    "000004079": "6cftUW2989M",
-    "000004080": "9MjNXsR1v9o",
-    "000004081": "WlGvCaQ9g5A",
-    "000004082": "l2bJqjxzCvA",
-    "000004083": "2GjV9sUoNgs",
-    "000004084": "HUhQ9i0F3Z4",
-    "000004085": "uyd14SRZjAM",
-    "000004086": "QSUFaNRG3sk",
-    "000004087": "H5Q_VKONzug",
-    "000004088": "xeuzBHnabBw",
-    "000004089": "ltDU6RTtMKE",
-    "000004090": "C1d0aHQqOGQ",
-    "000004091": "3m7RnkHoK38",
-    "000004092": "bW1Q89iLpFA",
-    "000004093": "mv-ZCUK3B6I",
-    "000004094": "-Pzbr3q9cZs",
-    "000004095": "UodV5D_cG0w",
-    "000004096": "ZBFxIFRmRxY",
-    "000004097": "8clGqdXl2mw",
-    "000004098": "8R4AIU1Mqg8",
-    "000004208": "9dx26PxlCLE",
-}
-
-_ABILITY_CATEGORY_AUDIT_ROWS = (
-    ("Core", 31, "31 assignments matched"),
-    ("Faction", 23, "23 assignments matched"),
-    (
-        "Datasheet",
-        35,
-        (
-            "34 assignments matched; Serpentine exists as an exact provider ability definition "
-            "but is not linked to Fulgrim"
-        ),
-    ),
-    ("Wargear", 7, "7 assignments matched"),
-    ("Daemon Primarch choice", 3, "3 sub-ability assignments matched"),
-    ("Datasheet sidebar rule", 2, "2 assignments matched"),
-)
 
 
 @dataclass(frozen=True, slots=True)
@@ -106,9 +64,9 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed=(
             "Daemonic Poisons persistent target state and Command-phase mortal wounds; Daemon "
             "Primarch of Slaanesh mode selection; Beguiling Form hit modifier; Daemonic Speed "
-            "Fights First; Enthralling Hypnosis Fall Back test and denial; Serpentine 4-inch "
-            "terrain-transit permission. The source overlay carries the authoritative updated "
-            "Serpentine text."
+            "Fights First; Enthralling Hypnosis (Aura) Fall Back test and denial; Serpentine "
+            "4-inch terrain-transit permission. The source overlay carries the authoritative "
+            "updated Serpentine text."
         ),
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
@@ -149,7 +107,7 @@ _DATASHEET_REVIEW_ROWS = (
         datasheet_id="000004080",
         ir_coverage="Bridge/catalog blocked",
         supported_semantics=(
-            "Scouts 6 inches and the Thrill Seekers army-rule handler are implemented paths; "
+            'Scouts 6" and the Thrill Seekers army-rule handler are implemented paths; '
             "the source overlay applies the updated power sword Strength."
         ),
         semantics_needed=(
@@ -211,8 +169,8 @@ _DATASHEET_REVIEW_ROWS = (
             "Leader and the Thrill Seekers army-rule handler are implemented paths."
         ),
         semantics_needed=(
-            "Warped Interference ranged-cover grant and Wracking Agonies persisted Move and "
-            "Charge-roll penalties on a unit hit by Agonising Energies."
+            "Warped Interference (Psychic) ranged-cover grant and Wracking Agonies (Psychic) "
+            "persisted Move and Charge-roll penalties on a unit hit by Agonising Energies."
         ),
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
@@ -342,8 +300,8 @@ _DATASHEET_REVIEW_ROWS = (
             "Deadly Demise D3 and the Thrill Seekers army-rule handler are implemented paths."
         ),
         semantics_needed=(
-            "Lord of Excess conditional Lone Operative, Excessive Vigour charged-unit melee "
-            "Armour Penetration aura, and Ecstatic Death fight-on-death sequencing."
+            "Lord of Excess conditional Lone Operative, Excessive Vigour (Aura) charged-unit "
+            "melee Armour Penetration aura, and Ecstatic Death fight-on-death sequencing."
         ),
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
@@ -397,7 +355,7 @@ _DATASHEET_REVIEW_ROWS = (
             "Pact of Excess mustering restrictions are implemented generic paths."
         ),
         semantics_needed=(
-            "Daemon Lord of Slaanesh melee Armour Penetration aura for Legions of Excess units "
+            "Daemon Lord of Slaanesh (Aura) melee Armour Penetration for Legions of Excess units "
             "and exact Mesmerising Form source binding."
         ),
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
@@ -408,7 +366,7 @@ _DATASHEET_REVIEW_ROWS = (
         datasheet_id="000004098",
         ir_coverage="All known ability semantics consumed; catalog blocked",
         supported_semantics=(
-            "Deep Strike, Scouts 9 inches, Daemonic Icon Leadership, Instrument of Chaos Charge "
+            'Deep Strike, Scouts 9", Daemonic Icon Leadership, Instrument of Chaos Charge '
             "modifier, Unholy Speed Advance- and Charge-roll re-rolls, and Pact of Excess "
             "mustering restrictions are implemented paths. Unholy Speed is engine-consumed "
             "through source-equivalent content-neutral RuleIR."
@@ -438,77 +396,95 @@ def emperors_children_secondary_reference_audit_markdown(
     *,
     review_rows: tuple[tuple[str, str], ...],
 ) -> list[str]:
+    audit = emperors_children_thirty_nine_k_pro_audit()
     review_by_id = dict(review_rows)
-    if review_by_id.keys() != _THIRTY_NINE_K_PRO_DATASHEET_ID_BY_SOURCE_ID.keys():
-        raise ValueError(
-            "Emperor's Children 39k PRO audit must cover every reviewed datasheet exactly."
-        )
-
-    faction_reference = verify_thirty_nine_k_pro_reference_url(
-        target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
-        expected_kind=ExternalReferenceKind.FACTION,
-        reference_url=_THIRTY_NINE_K_PRO_FACTION_URL,
-    )
-    references_by_source_id = {
-        source_id: verify_thirty_nine_k_pro_reference_url(
-            target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
-            expected_kind=ExternalReferenceKind.DATASHEET,
-            reference_url=f"https://39k.pro/datasheet/{provider_id}",
-        )
-        for source_id, provider_id in _THIRTY_NINE_K_PRO_DATASHEET_ID_BY_SOURCE_ID.items()
+    observations_by_id = {row.source_datasheet_id: row for row in audit.datasheets}
+    audited_review_rows = {
+        source_id: row.source_datasheet_name for source_id, row in observations_by_id.items()
     }
+    if review_by_id != audited_review_rows:
+        raise ValueError(
+            "Emperor's Children 39k PRO evidence must cover every reviewed datasheet exactly."
+        )
+    matched_assignments = sum(row.match_status == "matched" for row in audit.assignments)
+    discrepancy_count = len(audit.assignment_discrepancies)
+    audit_date = audit.provider.audit_date
+    rendered_audit_date = f"{audit_date.day} {audit_date:%B %Y}"
 
     lines = [
         "",
         "## 39k PRO Secondary-reference Audit",
         "",
         (
-            f"Observed {_THIRTY_NINE_K_PRO_AUDIT_DATE} from the verified "
-            f"[Emperor's Children faction reference]({faction_reference.reference_url}). The "
+            f"Observed {rendered_audit_date} from the verified "
+            f"[Emperor's Children faction reference]({audit.provider.faction_url}). The "
             "provider is secondary corroboration only: the hashed GW Faction Pack and pinned "
             "predecessor snapshot above remain authoritative, and no provider content is loaded "
             "by the runtime."
         ),
         "",
         (
-            "The provider's current non-Legends inventory matches all 23 reviewed datasheet "
-            "names. The 101 named and shared source ability rows classify as follows."
+            "The checked-in [observation artifact](../../data/source_audits/39k_pro/"
+            "emperors_children_2026_07_31.audit.json) retains the provider asset SHA-256 "
+            f"`{audit.provider.asset_sha256}`, every source/provider datasheet identity, and "
+            "every assignment-level comparison used below."
+        ),
+        "",
+        (
+            f"The retained non-Legends inventory matches all {len(audit.datasheets)} reviewed "
+            f"datasheet names. Of {len(audit.assignments)} exact source assignment identities, "
+            f"{matched_assignments} have observed provider relationships and {discrepancy_count} "
+            "has a fail-closed discrepancy."
         ),
         "",
         "| Ability surface | Authoritative reviewed rows | 39k PRO assignment audit |",
         "| --- | ---: | --- |",
     ]
-    for category, source_count, result in _ABILITY_CATEGORY_AUDIT_ROWS:
+    for category, source_count, result in audit.ability_category_rows():
         lines.append(f"| {_markdown_text(category)} | {source_count} | {_markdown_text(result)} |")
     lines.extend(
         (
             "",
-            (
-                "The July datasheet deltas also agree on the updated Lethal Obsession and "
-                "Scuttling Horrors text, Blissblade Attacks 4, both power swords at Strength 5, "
-                "Heldrake Movement 12 inches / Save 3+ / Objective Control '-' with no Aircraft "
-                "keyword, and the Frame keyword on both transports."
-            ),
+            "The retained July datasheet-delta observations compare as follows.",
             "",
+            "| Source operation | Subject | Field | Provider record | Comparison |",
+            "| --- | --- | --- | --- | --- |",
+        )
+    )
+    for delta in audit.datasheet_deltas:
+        lines.append(
+            f"| `{delta.source_operation_id}` | {_markdown_text(delta.subject)} | "
+            f"`{_markdown_text(delta.field)}` | `{delta.observed_provider_record_id}` | "
+            f"{_markdown_text(delta.comparison_result)} |"
+        )
+    lines.append("")
+    for discrepancy in audit.assignment_discrepancies:
+        lines.extend(
             (
-                "The single relationship discrepancy is fail-closed: 39k PRO contains the exact "
-                "Serpentine definition but its current data does not assign that definition to "
-                "Fulgrim. The official July Rules Update explicitly assigns Serpentine to "
-                "Fulgrim, so this report retains the rule and categorizes its runtime semantics "
-                "as still needed."
-            ),
-            "",
-            "| Datasheet | Source ID | Verified 39k PRO reference |",
-            "| --- | --- | --- |",
+                (
+                    f"**{_markdown_text(discrepancy.source_assignment_name)}:** "
+                    f"{_markdown_text(discrepancy.discrepancy_reason)} The official source "
+                    "assignment remains authoritative, so this report retains the rule and "
+                    "categorizes its runtime semantics as still needed."
+                ),
+                "",
+            )
+        )
+    lines.extend(
+        (
+            "| Source datasheet | Source ID | Observed provider identity | Comparison |",
+            "| --- | --- | --- | --- |",
         )
     )
     for source_id, datasheet_name in sorted(
         review_by_id.items(), key=lambda item: (item[1].lower(), item[0])
     ):
-        reference = references_by_source_id[source_id]
+        observation = observations_by_id[source_id]
         lines.append(
             f"| {_markdown_text(datasheet_name)} | `{source_id}` | "
-            f"[{reference.reference_id}]({reference.reference_url}) |"
+            f"[{_markdown_text(observation.observed_provider_name)}]"
+            f"({observation.observed_provider_url}) | "
+            f"`{observation.comparison_result}` |"
         )
     return lines
 
@@ -844,7 +820,7 @@ def emperors_children_datasheet_support_markdown(
         raise ValueError(
             "Emperor's Children datasheet semantic review must cover every manifest row exactly."
         )
-    if generated_support_datasheet_ids != {"000004208"}:
+    if generated_support_datasheet_ids != frozenset({"000004208"}):
         raise ValueError(
             "Emperor's Children generated support-row inventory changed; review the custom "
             "datasheet evidence before regenerating documentation."

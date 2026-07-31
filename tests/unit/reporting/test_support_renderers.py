@@ -1,6 +1,15 @@
 # pyright: reportPrivateUsage=false
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+import pytest
+from tools.emperors_children_39k_pro_audit import (
+    AUDIT_PATH,
+    emperors_children_thirty_nine_k_pro_audit,
+    load_emperors_children_thirty_nine_k_pro_audit,
+)
 from tools.faction_pack_datasheet_review import faction_pack_datasheet_review
 from tools.generate_ability_support_matrix import (
     _ability_datasheet_pairs_text,
@@ -78,10 +87,18 @@ def test_faction_support_renderer_preserves_section_order() -> None:
     assert "| Core | 31 | 31 assignments matched |" in emperors_children
     assert "| Faction | 23 | 23 assignments matched |" in emperors_children
     assert "| Datasheet | 35 | 34 assignments matched;" in emperors_children
-    assert "Blissblade Attacks 4, both power swords at Strength 5" in emperors_children
-    assert "Heldrake Movement 12 inches / Save 3+ / Objective Control '-'" in emperors_children
+    assert "`ec-flawless-blades-blissblade-attacks`" in emperors_children
+    assert "`ec-tormentors-power-sword-strength`" in emperors_children
+    assert "`ec-infractors-power-sword-strength`" in emperors_children
+    assert emperors_children.count("| `ec-heldrake-profile` | Heldrake |") == 3
+    assert "`ec-heldrake-remove-aircraft`" in emperors_children
+    assert "`ec-chaos-land-raider-frame`" in emperors_children
+    assert "`ec-chaos-rhino-frame`" in emperors_children
     assert "https://39k.pro/faction/uyQevAixq5I" in emperors_children
     assert emperors_children.count("https://39k.pro/datasheet/") == 23
+    assert "emperors_children_2026_07_31.audit.json" in emperors_children
+    assert "e114f25710a8fbc2089ca2bf02fe578cb5d7ed541f1671ee8c1a6405e124ac8a" in (emperors_children)
+    assert "100 have observed provider relationships" in emperors_children
     assert "http://39k.pro" not in emperors_children
     assert "### Unit Datasheet Source Treatments" not in emperors_children
     assert "### Datasheet Ability Details" not in emperors_children
@@ -107,6 +124,62 @@ def test_faction_support_renderer_preserves_section_order() -> None:
     assert "Chaos Daemons — Shalaxi Helbane — Monarch of the Hunt" in emperors_children
     assert "Emperor's Children — Shalaxi Helbane — Monarch of the Hunt" in emperors_children
     assert "## Detachment Rule Coverage Rows" not in emperors_children
+
+
+def test_emperors_children_39k_pro_audit_retains_assignment_level_evidence() -> None:
+    audit = emperors_children_thirty_nine_k_pro_audit()
+
+    assert len(audit.datasheets) == 23
+    assert len(audit.assignments) == 101
+    assert len({row.observed_provider_url for row in audit.datasheets}) == 23
+    assert all(
+        row.source_datasheet_name.replace("\u2019", "'").casefold()
+        == row.observed_provider_name.replace("\u2019", "'").casefold()
+        for row in audit.datasheets
+    )
+    assert audit.ability_category_rows() == (
+        ("Core", 31, "31 assignments matched"),
+        ("Faction", 23, "23 assignments matched"),
+        ("Datasheet", 35, "34 assignments matched; 1 retained provider relationship discrepancy"),
+        ("Wargear", 7, "7 assignments matched"),
+        ("Daemon Primarch choice", 3, "3 assignments matched"),
+        ("Datasheet sidebar rule", 2, "2 assignments matched"),
+    )
+    assert tuple(
+        (row.source_assignment_id, row.source_assignment_name, row.match_status)
+        for row in audit.assignment_discrepancies
+    ) == (("000004077:6", "Serpentine", "provider_definition_unassigned"),)
+    qualified_assignments = {
+        row.source_assignment_id: (
+            row.source_assignment_name,
+            row.source_qualifiers,
+            row.observed_provider_qualifiers,
+        )
+        for row in audit.assignments
+        if row.source_qualifiers
+    }
+    assert qualified_assignments == {
+        "000004077:9": ("Enthralling Hypnosis (Aura)", ("Aura",), ("Aura",)),
+        "000004085:3": ("Warped Interference (Psychic)", ("Psychic",), ("Psychic",)),
+        "000004085:4": ("Wracking Agonies (Psychic)", ("Psychic",), ("Psychic",)),
+        "000004086:4": ("Excessive Vigour (Aura)", ("Aura",), ("Aura",)),
+        "000004097:4": ("Daemon Lord of Slaanesh (Aura)", ("Aura",), ("Aura",)),
+    }
+
+
+def test_emperors_children_39k_pro_audit_rejects_swapped_provider_urls(tmp_path: Path) -> None:
+    payload = json.loads(AUDIT_PATH.read_text(encoding="utf-8"))
+    first = payload["datasheets"][0]
+    second = payload["datasheets"][1]
+    first["observed_provider_url"], second["observed_provider_url"] = (
+        second["observed_provider_url"],
+        first["observed_provider_url"],
+    )
+    tampered_path = tmp_path / "tampered-audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="datasheet evidence hash drifted"):
+        load_emperors_children_thirty_nine_k_pro_audit(tampered_path)
 
 
 def test_support_renderer_escapes_tables_and_renders_empty_cells() -> None:

@@ -170,46 +170,63 @@ This source-review subsection alone makes no catalog-load or semantic-execution 
 
 Observed 31 July 2026 from the verified [Emperor's Children faction reference](https://39k.pro/faction/uyQevAixq5I). The provider is secondary corroboration only: the hashed GW Faction Pack and pinned predecessor snapshot above remain authoritative, and no provider content is loaded by the runtime.
 
-The provider's current non-Legends inventory matches all 23 reviewed datasheet names. The 101 named and shared source ability rows classify as follows.
+The checked-in [observation artifact](../../data/source_audits/39k_pro/emperors_children_2026_07_31.audit.json) retains the provider asset SHA-256 `e114f25710a8fbc2089ca2bf02fe578cb5d7ed541f1671ee8c1a6405e124ac8a`, every source/provider datasheet identity, and every assignment-level comparison used below.
+
+The retained non-Legends inventory matches all 23 reviewed datasheet names. Of 101 exact source assignment identities, 100 have observed provider relationships and 1 has a fail-closed discrepancy.
 
 | Ability surface | Authoritative reviewed rows | 39k PRO assignment audit |
 | --- | ---: | --- |
 | Core | 31 | 31 assignments matched |
 | Faction | 23 | 23 assignments matched |
-| Datasheet | 35 | 34 assignments matched; Serpentine exists as an exact provider ability definition but is not linked to Fulgrim |
+| Datasheet | 35 | 34 assignments matched; 1 retained provider relationship discrepancy |
 | Wargear | 7 | 7 assignments matched |
-| Daemon Primarch choice | 3 | 3 sub-ability assignments matched |
+| Daemon Primarch choice | 3 | 3 assignments matched |
 | Datasheet sidebar rule | 2 | 2 assignments matched |
 
-The July datasheet deltas also agree on the updated Lethal Obsession and Scuttling Horrors text, Blissblade Attacks 4, both power swords at Strength 5, Heldrake Movement 12 inches / Save 3+ / Objective Control '-' with no Aircraft keyword, and the Frame keyword on both transports.
+The retained July datasheet-delta observations compare as follows.
 
-The single relationship discrepancy is fail-closed: 39k PRO contains the exact Serpentine definition but its current data does not assign that definition to Fulgrim. The official July Rules Update explicitly assigns Serpentine to Fulgrim, so this report retains the rule and categorizes its runtime semantics as still needed.
+| Source operation | Subject | Field | Provider record | Comparison |
+| --- | --- | --- | --- | --- |
+| `ec-chaos-terminators-lethal-obsession` | Chaos Terminators - Lethal Obsession | `description` | `WXuX7Fg5d_c` | matched |
+| `ec-chaos-spawn-scuttling-horrors` | Chaos Spawn - Scuttling Horrors | `description` | `3clu0_dcZ3Q` | matched |
+| `ec-fulgrim-serpentine` | Fulgrim - Serpentine definition | `description` | `S3DBCLV4Ou0` | matched |
+| `ec-flawless-blades-blissblade-attacks` | Flawless Blades - Blissblade | `A` | `ltDU6RTtMKE` | matched |
+| `ec-tormentors-power-sword-strength` | Tormentors - power sword | `S` | `6cftUW2989M` | matched |
+| `ec-infractors-power-sword-strength` | Infractors - power sword | `S` | `9MjNXsR1v9o` | matched |
+| `ec-heldrake-profile` | Heldrake | `M` | `bW1Q89iLpFA` | matched |
+| `ec-heldrake-profile` | Heldrake | `Sv` | `bW1Q89iLpFA` | matched |
+| `ec-heldrake-profile` | Heldrake | `OC` | `bW1Q89iLpFA` | matched |
+| `ec-heldrake-remove-aircraft` | Heldrake - Aircraft keyword | `presence` | `bW1Q89iLpFA` | matched |
+| `ec-chaos-land-raider-frame` | Chaos Land Raider - Frame keyword | `presence` | `l2bJqjxzCvA` | matched |
+| `ec-chaos-rhino-frame` | Chaos Rhino - Frame keyword | `presence` | `mv-ZCUK3B6I` | matched |
 
-| Datasheet | Source ID | Verified 39k PRO reference |
-| --- | --- | --- |
-| Chaos Land Raider | `000004082` | [l2bJqjxzCvA](https://39k.pro/datasheet/l2bJqjxzCvA) |
-| Chaos Rhino | `000004093` | [mv-ZCUK3B6I](https://39k.pro/datasheet/mv-ZCUK3B6I) |
-| Chaos Spawn | `000004090` | [C1d0aHQqOGQ](https://39k.pro/datasheet/C1d0aHQqOGQ) |
-| Chaos Terminators | `000004081` | [WlGvCaQ9g5A](https://39k.pro/datasheet/WlGvCaQ9g5A) |
-| Daemon Prince of Slaanesh | `000004086` | [QSUFaNRG3sk](https://39k.pro/datasheet/QSUFaNRG3sk) |
-| Daemon Prince of Slaanesh with Wings | `000004087` | [H5Q_VKONzug](https://39k.pro/datasheet/H5Q_VKONzug) |
-| Daemonettes | `000004095` | [UodV5D_cG0w](https://39k.pro/datasheet/UodV5D_cG0w) |
-| Defiler | `000004208` | [9dx26PxlCLE](https://39k.pro/datasheet/9dx26PxlCLE) |
-| Fiends | `000004096` | [ZBFxIFRmRxY](https://39k.pro/datasheet/ZBFxIFRmRxY) |
-| Flawless Blades | `000004089` | [ltDU6RTtMKE](https://39k.pro/datasheet/ltDU6RTtMKE) |
-| Fulgrim | `000004077` | [hUMCUGv2Rtw](https://39k.pro/datasheet/hUMCUGv2Rtw) |
-| Heldrake | `000004092` | [bW1Q89iLpFA](https://39k.pro/datasheet/bW1Q89iLpFA) |
-| Infractors | `000004080` | [9MjNXsR1v9o](https://39k.pro/datasheet/9MjNXsR1v9o) |
-| Keeper of Secrets | `000004097` | [8clGqdXl2mw](https://39k.pro/datasheet/8clGqdXl2mw) |
-| Lord Exultant | `000004078` | [LrNhuqtvb0g](https://39k.pro/datasheet/LrNhuqtvb0g) |
-| Lord Kakophonist | `000004084` | [HUhQ9i0F3Z4](https://39k.pro/datasheet/HUhQ9i0F3Z4) |
-| Lucius the Eternal | `000004083` | [2GjV9sUoNgs](https://39k.pro/datasheet/2GjV9sUoNgs) |
-| Maulerfiend | `000004091` | [3m7RnkHoK38](https://39k.pro/datasheet/3m7RnkHoK38) |
-| Noise Marines | `000004088` | [xeuzBHnabBw](https://39k.pro/datasheet/xeuzBHnabBw) |
-| Seekers | `000004098` | [8R4AIU1Mqg8](https://39k.pro/datasheet/8R4AIU1Mqg8) |
-| Shalaxi Helbane | `000004094` | [-Pzbr3q9cZs](https://39k.pro/datasheet/-Pzbr3q9cZs) |
-| Sorcerer | `000004085` | [uyd14SRZjAM](https://39k.pro/datasheet/uyd14SRZjAM) |
-| Tormentors | `000004079` | [6cftUW2989M](https://39k.pro/datasheet/6cftUW2989M) |
+**Serpentine:** The exact provider ability definition is present, but no provider relationship assigns it to Fulgrim. The official source assignment remains authoritative, so this report retains the rule and categorizes its runtime semantics as still needed.
+
+| Source datasheet | Source ID | Observed provider identity | Comparison |
+| --- | --- | --- | --- |
+| Chaos Land Raider | `000004082` | [Chaos Land Raider](https://39k.pro/datasheet/l2bJqjxzCvA) | `matched` |
+| Chaos Rhino | `000004093` | [Chaos Rhino](https://39k.pro/datasheet/mv-ZCUK3B6I) | `matched` |
+| Chaos Spawn | `000004090` | [Chaos Spawn](https://39k.pro/datasheet/C1d0aHQqOGQ) | `matched` |
+| Chaos Terminators | `000004081` | [Chaos Terminators](https://39k.pro/datasheet/WlGvCaQ9g5A) | `matched` |
+| Daemon Prince of Slaanesh | `000004086` | [Daemon Prince of Slaanesh](https://39k.pro/datasheet/QSUFaNRG3sk) | `matched` |
+| Daemon Prince of Slaanesh with Wings | `000004087` | [Daemon Prince of Slaanesh with Wings](https://39k.pro/datasheet/H5Q_VKONzug) | `matched` |
+| Daemonettes | `000004095` | [Daemonettes](https://39k.pro/datasheet/UodV5D_cG0w) | `matched` |
+| Defiler | `000004208` | [Defiler](https://39k.pro/datasheet/9dx26PxlCLE) | `matched` |
+| Fiends | `000004096` | [Fiends](https://39k.pro/datasheet/ZBFxIFRmRxY) | `matched` |
+| Flawless Blades | `000004089` | [Flawless Blades](https://39k.pro/datasheet/ltDU6RTtMKE) | `matched` |
+| Fulgrim | `000004077` | [Fulgrim](https://39k.pro/datasheet/hUMCUGv2Rtw) | `matched_with_assignment_discrepancies` |
+| Heldrake | `000004092` | [Heldrake](https://39k.pro/datasheet/bW1Q89iLpFA) | `matched` |
+| Infractors | `000004080` | [Infractors](https://39k.pro/datasheet/9MjNXsR1v9o) | `matched` |
+| Keeper of Secrets | `000004097` | [Keeper of Secrets](https://39k.pro/datasheet/8clGqdXl2mw) | `matched` |
+| Lord Exultant | `000004078` | [Lord Exultant](https://39k.pro/datasheet/LrNhuqtvb0g) | `matched` |
+| Lord Kakophonist | `000004084` | [Lord Kakophonist](https://39k.pro/datasheet/HUhQ9i0F3Z4) | `matched` |
+| Lucius the Eternal | `000004083` | [Lucius the Eternal](https://39k.pro/datasheet/2GjV9sUoNgs) | `matched` |
+| Maulerfiend | `000004091` | [Maulerfiend](https://39k.pro/datasheet/3m7RnkHoK38) | `matched` |
+| Noise Marines | `000004088` | [Noise Marines](https://39k.pro/datasheet/xeuzBHnabBw) | `matched` |
+| Seekers | `000004098` | [Seekers](https://39k.pro/datasheet/8R4AIU1Mqg8) | `matched` |
+| Shalaxi Helbane | `000004094` | [Shalaxi Helbane](https://39k.pro/datasheet/-Pzbr3q9cZs) | `matched` |
+| Sorcerer | `000004085` | [Sorcerer](https://39k.pro/datasheet/uyd14SRZjAM) | `matched` |
+| Tormentors | `000004079` | [Tormentors](https://39k.pro/datasheet/6cftUW2989M) | `matched` |
 
 ## Datasheet / Unit Support
 
@@ -223,13 +240,13 @@ This table covers Emperor's Children characters and infantry from the pinned pre
 | --- | --- | --- | --- | --- | --- |
 | Chaos Terminators (`000004081`) | Pinned predecessor row plus PDF Rules Updates, physical page 9. | Bridge/catalog blocked | Deep Strike and the Thrill Seekers army-rule handler are implemented paths; the source overlay applies the updated Lethal Obsession text. | Lethal Obsession must persist the sole shooting target and condition the later Charge-roll re-roll on declaring against that target. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Flawless Blades (`000004089`) | Pinned predecessor row plus PDF Rules Updates, physical page 9. | Bridge/catalog blocked | The Thrill Seekers army-rule handler is implemented; the source overlay applies the updated Blissblade Attacks characteristic. | Daemonic Patrons Critical Wound threshold, phase-scoped state, destroyed-enemy attribution, and end-of-Fight self-destruction. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
-| Fulgrim (`000004077`) | Pinned predecessor row plus PDF Rules Updates, physical page 9. | Bridge/catalog blocked | Deadly Demise D6, Deep Strike, Supreme Commander mustering, and the Thrill Seekers army-rule handler are implemented generic or faction paths. | Daemonic Poisons persistent target state and Command-phase mortal wounds; Daemon Primarch of Slaanesh mode selection; Beguiling Form hit modifier; Daemonic Speed Fights First; Enthralling Hypnosis Fall Back test and denial; Serpentine 4-inch terrain-transit permission. The source overlay carries the authoritative updated Serpentine text. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
-| Infractors (`000004080`) | Pinned predecessor row plus PDF Rules Updates, physical page 9. | Bridge/catalog blocked | Scouts 6 inches and the Thrill Seekers army-rule handler are implemented paths; the source overlay applies the updated power sword Strength. | Excessive Assault conditional Wound re-rolls and Icon of Excess end-of-phase Leadership test and Command point reward. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
+| Fulgrim (`000004077`) | Pinned predecessor row plus PDF Rules Updates, physical page 9. | Bridge/catalog blocked | Deadly Demise D6, Deep Strike, Supreme Commander mustering, and the Thrill Seekers army-rule handler are implemented generic or faction paths. | Daemonic Poisons persistent target state and Command-phase mortal wounds; Daemon Primarch of Slaanesh mode selection; Beguiling Form hit modifier; Daemonic Speed Fights First; Enthralling Hypnosis (Aura) Fall Back test and denial; Serpentine 4-inch terrain-transit permission. The source overlay carries the authoritative updated Serpentine text. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
+| Infractors (`000004080`) | Pinned predecessor row plus PDF Rules Updates, physical page 9. | Bridge/catalog blocked | Scouts 6" and the Thrill Seekers army-rule handler are implemented paths; the source overlay applies the updated power sword Strength. | Excessive Assault conditional Wound re-rolls and Icon of Excess end-of-phase Leadership test and Command point reward. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Lord Exultant (`000004078`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Leader, the Perfectionists led-unit Lethal Hits grant, and the Thrill Seekers army-rule handler are implemented paths. Perfectionists is engine-consumed through the same content-neutral RuleIR used by equivalent leader abilities. | Once-per-battle Euphoric Strikes Attacks and Armour Penetration modifiers; conditional Lord of the Host Infiltrators and Scouts 6-inch grants. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Lord Kakophonist (`000004084`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Leader, the Obsessive Annunciation ranged Sustained Hits 1 grant, and the Thrill Seekers army-rule handler are implemented paths. | Doom Siren post-shoot mortal wounds followed by a conditional Battle-shock test. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Lucius the Eternal (`000004083`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Feel No Pain 5+, Leader, Lone Operative, and the Thrill Seekers army-rule handler are implemented paths. | A Challenge Worthy of Skill keyword-targeted Hit and Wound re-rolls and Duellist's Hubris conditional Fights First while not leading a unit. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Noise Marines (`000004088`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | The Thrill Seekers army-rule handler is implemented. | Terrifying Crescendo must persist and stack its Battle-shock and Leadership test penalty, including the Faction Pack FAQ clarification. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
-| Sorcerer (`000004085`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Leader and the Thrill Seekers army-rule handler are implemented paths. | Warped Interference ranged-cover grant and Wracking Agonies persisted Move and Charge-roll penalties on a unit hit by Agonising Energies. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
+| Sorcerer (`000004085`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Leader and the Thrill Seekers army-rule handler are implemented paths. | Warped Interference (Psychic) ranged-cover grant and Wracking Agonies (Psychic) persisted Move and Charge-roll penalties on a unit hit by Agonising Energies. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Tormentors (`000004079`) | Pinned predecessor row plus PDF Rules Updates, physical page 9. | Bridge/catalog blocked | Infiltrators and the Thrill Seekers army-rule handler are implemented paths; the source overlay applies the updated power sword Strength. | Objective Defiled sticky-objective control and Icon of Excess end-of-phase Leadership test and Command point reward. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 
 ### Vehicles and Daemon Engines
@@ -251,12 +268,12 @@ This table covers the Slaanesh Daemon datasheets retained by the Emperor's Child
 
 | Datasheet | Source basis | IR coverage | Supported semantics | IR semantics still needed | Bridge / catalog blockers |
 | --- | --- | --- | --- | --- | --- |
-| Daemon Prince of Slaanesh (`000004086`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Deadly Demise D3 and the Thrill Seekers army-rule handler are implemented paths. | Lord of Excess conditional Lone Operative, Excessive Vigour charged-unit melee Armour Penetration aura, and Ecstatic Death fight-on-death sequencing. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
+| Daemon Prince of Slaanesh (`000004086`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Deadly Demise D3 and the Thrill Seekers army-rule handler are implemented paths. | Lord of Excess conditional Lone Operative, Excessive Vigour (Aura) charged-unit melee Armour Penetration aura, and Ecstatic Death fight-on-death sequencing. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Daemon Prince of Slaanesh with Wings (`000004087`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Deadly Demise D3, Deep Strike, Stimulated by Pain incoming Damage reduction, and the Thrill Seekers army-rule handler are implemented paths. | Daemonic Destruction charge-end mortal wounds capped at six. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Daemonettes (`000004095`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Deep Strike, Fights First, Daemonic Icon Leadership, Instrument of Chaos Charge modifier, and Pact of Excess mustering restrictions are implemented paths. | Horrifying Beauty Fight-start Battle-shock tests with the Below Half-strength modifier. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Fiends (`000004096`) | Pinned predecessor row; not reprinted or updated in the PDF. | All known ability semantics consumed; catalog blocked | Deep Strike, Soporific Musk Fall Back Desperate Escape tests and modifiers, and Pact of Excess mustering restrictions are implemented paths. Soporific Musk is engine-consumed through source-equivalent content-neutral RuleIR. | None in the exact source ability rows. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
-| Keeper of Secrets (`000004097`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Deadly Demise D6, Deep Strike, hit-roll modifiers, Shining Aegis Save override, and Pact of Excess mustering restrictions are implemented generic paths. | Daemon Lord of Slaanesh melee Armour Penetration aura for Legions of Excess units and exact Mesmerising Form source binding. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
-| Seekers (`000004098`) | Pinned predecessor row; not reprinted or updated in the PDF. | All known ability semantics consumed; catalog blocked | Deep Strike, Scouts 9 inches, Daemonic Icon Leadership, Instrument of Chaos Charge modifier, Unholy Speed Advance- and Charge-roll re-rolls, and Pact of Excess mustering restrictions are implemented paths. Unholy Speed is engine-consumed through source-equivalent content-neutral RuleIR. | None in the exact source ability rows. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
+| Keeper of Secrets (`000004097`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Deadly Demise D6, Deep Strike, hit-roll modifiers, Shining Aegis Save override, and Pact of Excess mustering restrictions are implemented generic paths. | Daemon Lord of Slaanesh (Aura) melee Armour Penetration for Legions of Excess units and exact Mesmerising Form source binding. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
+| Seekers (`000004098`) | Pinned predecessor row; not reprinted or updated in the PDF. | All known ability semantics consumed; catalog blocked | Deep Strike, Scouts 9", Daemonic Icon Leadership, Instrument of Chaos Charge modifier, Unholy Speed Advance- and Charge-roll re-rolls, and Pact of Excess mustering restrictions are implemented paths. Unholy Speed is engine-consumed through source-equivalent content-neutral RuleIR. | None in the exact source ability rows. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Shalaxi Helbane (`000004094`) | Pinned predecessor row; not reprinted or updated in the PDF. | All known ability semantics consumed; catalog blocked | Deadly Demise D6, Deep Strike, No Prey Can Evade Advance- and Charge-roll re-rolls, Monarch of the Hunt deterministic quarry selection, Hit and Wound re-rolls, destruction tracking and reselection, and Pact of Excess mustering restrictions are implemented paths. Both datasheet abilities are engine-consumed through the same source-equivalent content-neutral RuleIR as Chaos Daemons Shalaxi. | None in the exact source ability rows. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 
 ## Cross-source Semantic Equivalence
