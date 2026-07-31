@@ -46,6 +46,12 @@ from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
     stratagem_phase_use_exception,
 )
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.external_reference_lookup import (
+    THIRTY_NINE_K_PRO_TARGET_EDITION,
+    ExternalReferenceKind,
+    ExternalReferenceLookupError,
+    build_thirty_nine_k_pro_reference_lookup,
+)
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, parameter_payload
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
@@ -78,6 +84,66 @@ from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaCsvTable,
     WahapediaJsonArtifact,
 )
+
+
+@pytest.mark.parametrize(
+    ("reference_kind", "query", "reference_id", "encoded_query"),
+    [
+        (ExternalReferenceKind.FACTION, "Aeldari", "VpM8N0uc-Q0", "Aeldari"),
+        (
+            ExternalReferenceKind.DETACHMENT,
+            "Gladius Task Force",
+            "458MT20ztYU",
+            "Gladius%20Task%20Force",
+        ),
+        (
+            ExternalReferenceKind.DATASHEET,
+            "Intercessor Squad",
+            "Tw1hCD7xdlA",
+            "Intercessor%20Squad",
+        ),
+    ],
+)
+def test_phase17_39k_pro_lookup_builds_typed_11th_edition_reference_routes(
+    reference_kind: ExternalReferenceKind,
+    query: str,
+    reference_id: str,
+    encoded_query: str,
+) -> None:
+    lookup = build_thirty_nine_k_pro_reference_lookup(
+        target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+        reference_kind=reference_kind,
+        query=query,
+    )
+
+    assert lookup.lookup_url == f"http://39k.pro/search?q={encoded_query}"
+    assert lookup.expected_result_url_prefix == f"http://39k.pro/{reference_kind.value}/"
+    assert lookup.reference_url(reference_id) == (
+        f"http://39k.pro/{reference_kind.value}/{reference_id}"
+    )
+    assert json.loads(json.dumps(lookup.to_payload(), sort_keys=True)) == lookup.to_payload()
+
+
+def test_phase17_39k_pro_lookup_rejects_wrong_edition_kind_and_result_id() -> None:
+    with pytest.raises(ExternalReferenceLookupError, match=r"only.*11th Edition"):
+        build_thirty_nine_k_pro_reference_lookup(
+            target_edition="warhammer-40000-12th",
+            reference_kind=ExternalReferenceKind.FACTION,
+            query="Aeldari",
+        )
+    with pytest.raises(ExternalReferenceLookupError, match="ExternalReferenceKind"):
+        build_thirty_nine_k_pro_reference_lookup(
+            target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+            reference_kind=cast(ExternalReferenceKind, "faction"),
+            query="Aeldari",
+        )
+    lookup = build_thirty_nine_k_pro_reference_lookup(
+        target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+        reference_kind=ExternalReferenceKind.FACTION,
+        query="Aeldari",
+    )
+    with pytest.raises(ExternalReferenceLookupError, match="URL-safe"):
+        lookup.reference_url("../detachment/458MT20ztYU")
 
 
 def test_phase17_source_overlay_applies_add_update_and_supersede_operations() -> None:
