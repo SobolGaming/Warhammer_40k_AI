@@ -70,10 +70,19 @@ def test_faction_support_renderer_preserves_section_order() -> None:
         < emperors_children.index("## Semantic Support Snapshot")
         < emperors_children.index("## Detachment Rule Support")
         < emperors_children.index("## Datasheet Source Review")
+        < emperors_children.index("## 39k PRO Secondary-reference Audit")
         < emperors_children.index("## Datasheet / Unit Support")
         < emperors_children.index("## Cross-source Semantic Equivalence")
     )
     assert "Court of the Phoenician | `Full`" in emperors_children
+    assert "| Core | 31 | 31 assignments matched |" in emperors_children
+    assert "| Faction | 23 | 23 assignments matched |" in emperors_children
+    assert "| Datasheet | 35 | 34 assignments matched;" in emperors_children
+    assert "Blissblade Attacks 4, both power swords at Strength 5" in emperors_children
+    assert "Heldrake Movement 12 inches / Save 3+ / Objective Control '-'" in emperors_children
+    assert "https://39k.pro/faction/uyQevAixq5I" in emperors_children
+    assert emperors_children.count("https://39k.pro/datasheet/") == 23
+    assert "http://39k.pro" not in emperors_children
     assert "### Unit Datasheet Source Treatments" not in emperors_children
     assert "### Datasheet Ability Details" not in emperors_children
     support_markdown = emperors_children.split("## Datasheet / Unit Support", 1)[1]

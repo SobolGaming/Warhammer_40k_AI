@@ -3,11 +3,61 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 
+from warhammer40k_core.rules.external_reference_lookup import (
+    THIRTY_NINE_K_PRO_TARGET_EDITION,
+    ExternalReferenceKind,
+    verify_thirty_nine_k_pro_reference_url,
+)
+
 EMPERORS_CHILDREN_FACTION_ID = "emperors-children"
 
 _EMPERORS_CHILDREN_GROUP = "Emperor's Children"
 _VEHICLES_GROUP = "Vehicles and Daemon Engines"
 _SLAANESH_DAEMONS_GROUP = "Slaanesh Daemons"
+
+_THIRTY_NINE_K_PRO_AUDIT_DATE = "31 July 2026"
+_THIRTY_NINE_K_PRO_FACTION_URL = "https://39k.pro/faction/uyQevAixq5I"
+_THIRTY_NINE_K_PRO_DATASHEET_ID_BY_SOURCE_ID = {
+    "000004077": "hUMCUGv2Rtw",
+    "000004078": "LrNhuqtvb0g",
+    "000004079": "6cftUW2989M",
+    "000004080": "9MjNXsR1v9o",
+    "000004081": "WlGvCaQ9g5A",
+    "000004082": "l2bJqjxzCvA",
+    "000004083": "2GjV9sUoNgs",
+    "000004084": "HUhQ9i0F3Z4",
+    "000004085": "uyd14SRZjAM",
+    "000004086": "QSUFaNRG3sk",
+    "000004087": "H5Q_VKONzug",
+    "000004088": "xeuzBHnabBw",
+    "000004089": "ltDU6RTtMKE",
+    "000004090": "C1d0aHQqOGQ",
+    "000004091": "3m7RnkHoK38",
+    "000004092": "bW1Q89iLpFA",
+    "000004093": "mv-ZCUK3B6I",
+    "000004094": "-Pzbr3q9cZs",
+    "000004095": "UodV5D_cG0w",
+    "000004096": "ZBFxIFRmRxY",
+    "000004097": "8clGqdXl2mw",
+    "000004098": "8R4AIU1Mqg8",
+    "000004208": "9dx26PxlCLE",
+}
+
+_ABILITY_CATEGORY_AUDIT_ROWS = (
+    ("Core", 31, "31 assignments matched"),
+    ("Faction", 23, "23 assignments matched"),
+    (
+        "Datasheet",
+        35,
+        (
+            "34 assignments matched; Serpentine exists as an exact provider ability definition "
+            "but is not linked to Fulgrim"
+        ),
+    ),
+    ("Wargear", 7, "7 assignments matched"),
+    ("Daemon Primarch choice", 3, "3 sub-ability assignments matched"),
+    ("Datasheet sidebar rule", 2, "2 assignments matched"),
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,14 +100,15 @@ _DATASHEET_REVIEW_ROWS = (
         datasheet_id="000004077",
         ir_coverage="Bridge/catalog blocked",
         supported_semantics=(
-            "Deadly Demise D6, Deep Strike, and the Thrill Seekers army-rule handler are "
-            "implemented generic or faction paths. The source overlay applies the updated "
-            "Serpentine terrain-transit text."
+            "Deadly Demise D6, Deep Strike, Supreme Commander mustering, and the Thrill Seekers "
+            "army-rule handler are implemented generic or faction paths."
         ),
         semantics_needed=(
             "Daemonic Poisons persistent target state and Command-phase mortal wounds; Daemon "
-            "Primarch mode selection; Beguiling Form hit modifier; Daemonic Speed Fights First; "
-            "Enthralling Hypnosis Fall Back test and denial."
+            "Primarch of Slaanesh mode selection; Beguiling Form hit modifier; Daemonic Speed "
+            "Fights First; Enthralling Hypnosis Fall Back test and denial; Serpentine 4-inch "
+            "terrain-transit permission. The source overlay carries the authoritative updated "
+            "Serpentine text."
         ),
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
@@ -132,7 +183,7 @@ _DATASHEET_REVIEW_ROWS = (
             "are implemented paths."
         ),
         semantics_needed=(
-            "A Challenge Worthy of Skill keyword-targeted Hit and Wound re-rolls and Duelist's "
+            "A Challenge Worthy of Skill keyword-targeted Hit and Wound re-rolls and Duellist's "
             "Hubris conditional Fights First while not leading a unit."
         ),
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
@@ -381,6 +432,86 @@ _DATASHEET_REVIEW_ROWS = (
         catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
 )
+
+
+def emperors_children_secondary_reference_audit_markdown(
+    *,
+    review_rows: tuple[tuple[str, str], ...],
+) -> list[str]:
+    review_by_id = dict(review_rows)
+    if review_by_id.keys() != _THIRTY_NINE_K_PRO_DATASHEET_ID_BY_SOURCE_ID.keys():
+        raise ValueError(
+            "Emperor's Children 39k PRO audit must cover every reviewed datasheet exactly."
+        )
+
+    faction_reference = verify_thirty_nine_k_pro_reference_url(
+        target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+        expected_kind=ExternalReferenceKind.FACTION,
+        reference_url=_THIRTY_NINE_K_PRO_FACTION_URL,
+    )
+    references_by_source_id = {
+        source_id: verify_thirty_nine_k_pro_reference_url(
+            target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+            expected_kind=ExternalReferenceKind.DATASHEET,
+            reference_url=f"https://39k.pro/datasheet/{provider_id}",
+        )
+        for source_id, provider_id in _THIRTY_NINE_K_PRO_DATASHEET_ID_BY_SOURCE_ID.items()
+    }
+
+    lines = [
+        "",
+        "## 39k PRO Secondary-reference Audit",
+        "",
+        (
+            f"Observed {_THIRTY_NINE_K_PRO_AUDIT_DATE} from the verified "
+            f"[Emperor's Children faction reference]({faction_reference.reference_url}). The "
+            "provider is secondary corroboration only: the hashed GW Faction Pack and pinned "
+            "predecessor snapshot above remain authoritative, and no provider content is loaded "
+            "by the runtime."
+        ),
+        "",
+        (
+            "The provider's current non-Legends inventory matches all 23 reviewed datasheet "
+            "names. The 101 named and shared source ability rows classify as follows."
+        ),
+        "",
+        "| Ability surface | Authoritative reviewed rows | 39k PRO assignment audit |",
+        "| --- | ---: | --- |",
+    ]
+    for category, source_count, result in _ABILITY_CATEGORY_AUDIT_ROWS:
+        lines.append(f"| {_markdown_text(category)} | {source_count} | {_markdown_text(result)} |")
+    lines.extend(
+        (
+            "",
+            (
+                "The July datasheet deltas also agree on the updated Lethal Obsession and "
+                "Scuttling Horrors text, Blissblade Attacks 4, both power swords at Strength 5, "
+                "Heldrake Movement 12 inches / Save 3+ / Objective Control '-' with no Aircraft "
+                "keyword, and the Frame keyword on both transports."
+            ),
+            "",
+            (
+                "The single relationship discrepancy is fail-closed: 39k PRO contains the exact "
+                "Serpentine definition but its current data does not assign that definition to "
+                "Fulgrim. The official July Rules Update explicitly assigns Serpentine to "
+                "Fulgrim, so this report retains the rule and categorizes its runtime semantics "
+                "as still needed."
+            ),
+            "",
+            "| Datasheet | Source ID | Verified 39k PRO reference |",
+            "| --- | --- | --- |",
+        )
+    )
+    for source_id, datasheet_name in sorted(
+        review_by_id.items(), key=lambda item: (item[1].lower(), item[0])
+    ):
+        reference = references_by_source_id[source_id]
+        lines.append(
+            f"| {_markdown_text(datasheet_name)} | `{source_id}` | "
+            f"[{reference.reference_id}]({reference.reference_url}) |"
+        )
+    return lines
+
 
 _DETACHMENT_PDF_REFERENCE_BY_ID = {
     "elegant-brutes": "Physical PDF page 2",

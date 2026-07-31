@@ -30,6 +30,7 @@ if TYPE_CHECKING or __package__:
         emperors_children_datasheet_support_markdown,
         emperors_children_detachment_semantics_needed,
         emperors_children_faction_pack_review_markdown,
+        emperors_children_secondary_reference_audit_markdown,
         emperors_children_semantic_snapshot_markdown,
     )
     from tools.faction_pack_datasheet_review import (
@@ -58,6 +59,7 @@ else:
         emperors_children_datasheet_support_markdown,
         emperors_children_detachment_semantics_needed,
         emperors_children_faction_pack_review_markdown,
+        emperors_children_secondary_reference_audit_markdown,
         emperors_children_semantic_snapshot_markdown,
     )
     from faction_pack_datasheet_review import (
@@ -3099,6 +3101,17 @@ def _faction_support_markdown(
     if faction_row.faction_id in reviewed_faction_ids():
         lines.extend(("", "## Datasheet Source Review", ""))
         lines.extend(faction_pack_datasheet_review_markdown(faction_row.faction_id))
+    if faction_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
+        review = faction_pack_datasheet_review(EMPERORS_CHILDREN_FACTION_ID)
+        lines.extend(
+            emperors_children_secondary_reference_audit_markdown(
+                review_rows=tuple(
+                    (row.datasheet_id, row.datasheet_name)
+                    for row in review.rows
+                    if row.datasheet_id is not None
+                )
+            )
+        )
     lines.extend(
         _faction_datasheet_support_markdown(
             faction_row=faction_row,

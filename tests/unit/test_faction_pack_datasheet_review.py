@@ -239,6 +239,69 @@ def test_emperors_children_review_uses_the_faction_pack_page_boundaries() -> Non
     } == {"Defiler"}
 
 
+def test_emperors_children_semantic_rows_name_every_reviewed_ability() -> None:
+    review = faction_pack_datasheet_review("emperors-children")
+    reviewed_names_by_id = {
+        row.datasheet_id: row.datasheet_name for row in review.rows if row.datasheet_id is not None
+    }
+    source_dir = SOURCE_DATASHEETS_PATH.parent
+    abilities_payload = cast(
+        dict[str, Any],
+        json.loads((source_dir / "Abilities.json").read_text(encoding="utf-8")),
+    )
+    ability_names_by_id: dict[str, str] = {}
+    for raw_row in cast(list[dict[str, Any]], abilities_payload["rows"]):
+        fields = cast(dict[str, str], raw_row["fields"])
+        existing_name = ability_names_by_id.setdefault(fields["id"], fields["name"])
+        assert existing_name == fields["name"]
+
+    assignments_payload = cast(
+        dict[str, Any],
+        json.loads((source_dir / "Datasheets_abilities.json").read_text(encoding="utf-8")),
+    )
+    assignments = tuple(
+        cast(dict[str, str], raw_row["fields"])
+        for raw_row in cast(list[dict[str, Any]], assignments_payload["rows"])
+        if cast(dict[str, str], raw_row["fields"])["datasheet_id"] in reviewed_names_by_id
+    )
+    assert len(assignments) == 101
+    assert Counter(row["type"] for row in assignments) == {
+        "Core": 31,
+        "Datasheet": 35,
+        "Faction": 23,
+        "Fortification (левая колонка)": 2,
+        "Primarch": 3,
+        "Wargear": 7,
+    }
+
+    support_markdown = faction_support_markdown_files()["emperors-children.md"].split(
+        "## Datasheet / Unit Support", 1
+    )[1]
+    rendered_rows = {
+        datasheet_id: next(
+            line
+            for line in support_markdown.splitlines()
+            if line.startswith(f"| {datasheet_name} (`{datasheet_id}`) |")
+        )
+        for datasheet_id, datasheet_name in reviewed_names_by_id.items()
+    }
+
+    def normalized_name(value: str) -> str:
+        return value.replace("\u2019", "'").split(" (", 1)[0].casefold()
+
+    for assignment in assignments:
+        source_name = assignment["name"] or ability_names_by_id[assignment["ability_id"]]
+        semantic_columns = " ".join(rendered_rows[assignment["datasheet_id"]].split("|")[4:6])
+        assert normalized_name(source_name) in normalized_name(semantic_columns), (
+            assignment["datasheet_id"],
+            source_name,
+        )
+
+    fulgrim_columns = rendered_rows["000004077"].split("|")
+    assert "Supreme Commander" in fulgrim_columns[4]
+    assert "Serpentine" in fulgrim_columns[5]
+
+
 def test_manifest_is_a_versioned_data_artifact() -> None:
     manifest_path = (
         Path(__file__).resolve().parents[2]
