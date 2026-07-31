@@ -79,6 +79,28 @@ Do not add AI/ranker/training logic before the deterministic rules core, decisio
 - Decision records must not contain Python object reprs or memory addresses.
 - Unsupported rule paths raise explicit domain errors or return typed unsupported/invalid results.
 
+## 11th Edition secondary reference lookup
+
+- Agents may use 39k PRO as a secondary faction, detachment, and datasheet
+  reference for Warhammer 40,000 11th Edition only.
+- Build lookups through
+  `warhammer40k_core.rules.external_reference_lookup.build_thirty_nine_k_pro_reference_lookup`
+  or `uv run python tools/lookup_39k_reference.py <faction|detachment|datasheet> <name>`.
+  Datasheets use `https://39k.pro/search?q=<url-encoded-name>`, factions use the
+  site's faction navigation, and detachments require `--parent-faction-url`
+  before following that faction page's detachment navigation.
+- Verify an observed complete result URL with `--reference-url` before recording
+  it. Verification requires HTTPS, the exact `39k.pro` host, a canonical
+  `/faction/<id>`, `/detachment/<id>`, or `/datasheet/<id>` path, and a path kind
+  matching the requested reference kind.
+- 39k PRO identifiers are provider-local reference IDs. They must not replace
+  stable source rule IDs, descriptor IDs, catalog IDs, package hashes, or
+  official provenance.
+- 39k PRO is not official source evidence and must not be the sole basis for
+  generated catalog data or runtime semantics. Continue to cite and preserve
+  official GW source artifacts, hashes, and provenance. Do not ingest or expose
+  out-of-scope content found through the site.
+
 ## Exception and fallback policy
 
 Forbidden by default:

@@ -46,6 +46,13 @@ from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
     stratagem_phase_use_exception,
 )
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.external_reference_lookup import (
+    THIRTY_NINE_K_PRO_TARGET_EDITION,
+    ExternalReferenceDiscoveryMethod,
+    ExternalReferenceKind,
+    ExternalReferenceLookupError,
+    build_thirty_nine_k_pro_reference_lookup,
+)
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, parameter_payload
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
@@ -78,6 +85,165 @@ from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaCsvTable,
     WahapediaJsonArtifact,
 )
+
+
+@pytest.mark.parametrize(
+    (
+        "reference_kind",
+        "query",
+        "parent_faction_url",
+        "expected_method",
+        "expected_discovery_url",
+    ),
+    [
+        (
+            ExternalReferenceKind.FACTION,
+            "Aeldari",
+            None,
+            ExternalReferenceDiscoveryMethod.FACTION_NAVIGATION,
+            "https://39k.pro/",
+        ),
+        (
+            ExternalReferenceKind.DATASHEET,
+            "Intercessor Squad",
+            None,
+            ExternalReferenceDiscoveryMethod.DATASHEET_SEARCH,
+            "https://39k.pro/search?q=Intercessor%20Squad",
+        ),
+        (
+            ExternalReferenceKind.DETACHMENT,
+            "Gladius Task Force",
+            "https://39k.pro/faction/VpM8N0uc-Q0",
+            ExternalReferenceDiscoveryMethod.FACTION_DETACHMENT_NAVIGATION,
+            "https://39k.pro/faction/VpM8N0uc-Q0",
+        ),
+    ],
+)
+def test_phase17_39k_pro_lookup_builds_kind_specific_discovery_routes(
+    reference_kind: ExternalReferenceKind,
+    query: str,
+    parent_faction_url: str | None,
+    expected_method: ExternalReferenceDiscoveryMethod,
+    expected_discovery_url: str,
+) -> None:
+    lookup = build_thirty_nine_k_pro_reference_lookup(
+        target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+        reference_kind=reference_kind,
+        query=query,
+        parent_faction_url=parent_faction_url,
+    )
+
+    assert lookup.discovery_method is expected_method
+    assert lookup.discovery_url == expected_discovery_url
+    assert lookup.to_payload()["reference_verification_required"] is True
+    assert json.loads(json.dumps(lookup.to_payload(), sort_keys=True)) == lookup.to_payload()
+
+
+@pytest.mark.parametrize(
+    ("reference_kind", "query", "reference_url", "reference_id"),
+    [
+        (
+            ExternalReferenceKind.FACTION,
+            "Aeldari",
+            "https://39k.pro/faction/VpM8N0uc-Q0",
+            "VpM8N0uc-Q0",
+        ),
+        (
+            ExternalReferenceKind.DATASHEET,
+            "Intercessor Squad",
+            "https://39k.pro/datasheet/Tw1hCD7xdlA",
+            "Tw1hCD7xdlA",
+        ),
+        (
+            ExternalReferenceKind.DETACHMENT,
+            "Gladius Task Force",
+            "https://39k.pro/detachment/--1EtXzGAuw",
+            "--1EtXzGAuw",
+        ),
+    ],
+)
+def test_phase17_39k_pro_lookup_verifies_observed_complete_reference_urls(
+    reference_kind: ExternalReferenceKind,
+    query: str,
+    reference_url: str,
+    reference_id: str,
+) -> None:
+    parent_faction_url = (
+        "https://39k.pro/faction/VpM8N0uc-Q0"
+        if reference_kind is ExternalReferenceKind.DETACHMENT
+        else None
+    )
+    lookup = build_thirty_nine_k_pro_reference_lookup(
+        target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+        reference_kind=reference_kind,
+        query=query,
+        parent_faction_url=parent_faction_url,
+    )
+
+    reference = lookup.verify_reference_url(reference_url)
+
+    assert reference.reference_id == reference_id
+    assert reference.reference_url == reference_url
+    assert reference.to_payload()["is_verified"] is True
+
+
+def test_phase17_39k_pro_lookup_rejects_wrong_edition_kind_and_discovery_context() -> None:
+    with pytest.raises(ExternalReferenceLookupError, match=r"only.*11th Edition"):
+        build_thirty_nine_k_pro_reference_lookup(
+            target_edition="warhammer-40000-12th",
+            reference_kind=ExternalReferenceKind.FACTION,
+            query="Aeldari",
+        )
+    with pytest.raises(ExternalReferenceLookupError, match="ExternalReferenceKind"):
+        build_thirty_nine_k_pro_reference_lookup(
+            target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+            reference_kind=cast(ExternalReferenceKind, "faction"),
+            query="Aeldari",
+        )
+    with pytest.raises(ExternalReferenceLookupError, match="parent_faction_url"):
+        build_thirty_nine_k_pro_reference_lookup(
+            target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+            reference_kind=ExternalReferenceKind.DETACHMENT,
+            query="Gladius Task Force",
+        )
+    with pytest.raises(ExternalReferenceLookupError, match="expected_kind"):
+        build_thirty_nine_k_pro_reference_lookup(
+            target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+            reference_kind=ExternalReferenceKind.DETACHMENT,
+            query="Gladius Task Force",
+            parent_faction_url="https://39k.pro/detachment/--1EtXzGAuw",
+        )
+
+
+@pytest.mark.parametrize(
+    "reference_url",
+    [
+        "http://39k.pro/faction/VpM8N0uc-Q0",
+        "https://example.com/faction/VpM8N0uc-Q0",
+        "https://39k.pro/faction/../detachment/--1EtXzGAuw",
+        "https://39k.pro/faction/VpM8N0uc-Q0?query=invalid",
+    ],
+)
+def test_phase17_39k_pro_lookup_rejects_untrusted_reference_urls(reference_url: str) -> None:
+    lookup = build_thirty_nine_k_pro_reference_lookup(
+        target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+        reference_kind=ExternalReferenceKind.FACTION,
+        query="Aeldari",
+    )
+
+    with pytest.raises(ExternalReferenceLookupError):
+        lookup.verify_reference_url(reference_url)
+
+
+def test_phase17_39k_pro_lookup_rejects_reference_kind_mismatch() -> None:
+    lookup = build_thirty_nine_k_pro_reference_lookup(
+        target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
+        reference_kind=ExternalReferenceKind.FACTION,
+        query="Aeldari",
+    )
+
+    with pytest.raises(ExternalReferenceLookupError, match="expected_kind"):
+        lookup.verify_reference_url("https://39k.pro/detachment/--1EtXzGAuw")
 
 
 def test_phase17_source_overlay_applies_add_update_and_supersede_operations() -> None:
